@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quran_app/core/utils/app_strings.dart';
-import 'package:quran_app/features/auth/presentation/screens/splash.dart';
+import 'package:quran_app/features/auth/presentation/screens/onboarding_screen.dart';
 
 class QuranApp extends StatelessWidget {
   const QuranApp({super.key});
@@ -15,7 +15,7 @@ class QuranApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const Splash(),
+      home: const OnboardingScreen(),
     );
   }
 }
