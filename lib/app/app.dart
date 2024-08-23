@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quran_app/core/utils/app_strings.dart';
 import 'package:quran_app/features/auth/presentation/screens/splash.dart';
 
 class QuranApp extends StatelessWidget {
@@ -8,7 +9,8 @@ class QuranApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: AppStrings.appName,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
