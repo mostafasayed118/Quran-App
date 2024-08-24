@@ -16,7 +16,10 @@ dependencies:
     sdk: flutter
   flutter_launcher_icons: null
   flutter_native_splash: ^2.4.1
+  scrollable_positioned_list: ^0.3.8
   shared_preferences: null
+  share_plus:
+  url_launcher:
 flutter_icons:
   android: true
   ios: true
@@ -50,13 +53,13 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Amiri
+    - family: quran
       fonts:
-        - asset: assets/fonts/quran_1.ttf
-        - asset: assets/fonts/quran_2.ttf
+        - asset: assets/fonts/HafsSmart_08.ttf
+       
     - family: me_quran
       fonts:
-        - asset: assets/fonts/me_quran Regular.ttf
+        - asset: assets/fonts/me_quran.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
