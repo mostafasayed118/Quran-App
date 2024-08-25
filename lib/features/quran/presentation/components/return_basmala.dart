@@ -6,15 +6,16 @@ class ReturnBasmala extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Stack(
+    return Stack(
       children: [
         Center(
           child: Text(
             'بسم الله الرحمن الرحيم',
-            style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: AppStrings.meQuranFontFamily),
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: AppStrings.meQuranFontFamily,
+                ),
             textDirection: TextDirection.rtl,
           ),
         ),

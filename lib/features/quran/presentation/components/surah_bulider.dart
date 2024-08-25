@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:quran_app/core/common/commons.dart';
 import 'package:quran_app/core/utils/app_strings.dart';
 import 'package:quran_app/features/quran/presentation/components/return_basmala.dart';
+import 'package:quran_app/features/quran/presentation/components/verse_builder.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/utils/app_colors.dart';
-
-final ItemScrollController itemScrollController = ItemScrollController();
-final ItemPositionsListener itemPositionsListener =
-    ItemPositionsListener.create();
-
-bool floatingButtonClicked = true;
 
 class SurahBuilder extends StatefulWidget {
   final surah;
@@ -44,60 +39,10 @@ class _SurahBuilderState extends State<SurahBuilder> {
     if (floatingButtonClicked) {
       itemScrollController.scrollTo(
           index: widget.ayah,
-          duration: const Duration(seconds: 1),
+          duration: const Duration(seconds: 2),
           curve: Curves.easeInOutCubic);
     }
     floatingButtonClicked = false;
-  }
-
-  saveBookMark(surah, ayah) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('surah', surah);
-    await prefs.setInt('ayah', ayah);
-  }
-
-  Row verseBuilder(int index, previousVerses) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                widget.arabic[index + previousVerses]['aya_text'],
-                style: TextStyle(
-                  fontSize: AppStrings.arabicFontSized,
-                  fontFamily: AppStrings.arabicFontFamily,
-                  color: AppColors.blackColor,
-                ),
-              ),
-              Column(
-                children: [
-                  Text(
-                    widget.arabic[index + previousVerses]['aya_number']
-                        .toString()
-                        .toArabicNumbers,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.blackColor,
-                    ),
-                  ),
-                  Text(
-                    widget.arabic[index + previousVerses]['sora_number']
-                        .toString()
-                        .toArabicNumbers,
-                    style: const TextStyle(
-                      fontSize: 10,
-                      color: AppColors.blackColor,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )
-      ],
-    );
   }
 
   SafeArea SingleSuraBuilder(LenghtOfSura) {
@@ -105,7 +50,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
     int previousVerses = 0;
     if (widget.surah + 1 != 1) {
       for (int i = widget.surah - 1; i >= 0; i--) {
-        previousVerses += previousVerses + noOfVerses[i];
+        previousVerses = previousVerses + noOfVerses[i];
       }
     }
     if (!isView) {
@@ -116,110 +61,98 @@ class _SurahBuilderState extends State<SurahBuilder> {
 
     return SafeArea(
       child: Container(
-          color: AppColors.whiteColor,
-          child: isView
-              ? ScrollablePositionedList.builder(
-                  itemCount: LenghtOfSura,
-                  itemScrollController: itemScrollController,
-                  itemPositionsListener: itemPositionsListener,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Column(
-                      children: [
-                        (index != 0 ||
-                                (widget.surah == 0) ||
-                                (widget.surah == 8))
-                            ? const Text('')
-                            : const ReturnBasmala(),
-                        Container(
-                          color: index % 2 == 0
-                              ? AppColors.whiteColor
-                              : AppColors.greyColor,
-                          child: PopupMenuButton(
-                            child: Padding(
-                              padding: const EdgeInsets.all(10),
-                              child: verseBuilder(index, previousVerses),
+        color: AppColors.whiteColor,
+        child: isView
+            ? ScrollablePositionedList.builder(
+                itemCount: LenghtOfSura,
+                itemScrollController: itemScrollController,
+                itemPositionsListener: itemPositionsListener,
+                itemBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: [
+                      (index != 0 || (widget.surah == 0) || (widget.surah == 8))
+                          ? const Text('')
+                          : const ReturnBasmala(),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        color: index % 2 == 0
+                            ? AppColors.whiteColor
+                            // : AppColors.greyColor.withOpacity(0.5),
+                            : AppColors.offWhiteOneColor,
+                        child: PopupMenuButton(
+                          color: AppColors.primaryColor,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: verseBuilder(index, previousVerses, widget),
+                          ),
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              onTap: () {
+                                saveBookMark(widget.surah + 1, index);
+                                setState(() {
+                                  isView = !isView;
+                                });
+                              },
+                              child: const Row(
+                                children: [
+                                  Icon(
+                                    Icons.bookmark,
+                                    color: AppColors.amberAccentColor,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    AppStrings.bookMark,
+                                    style:
+                                        TextStyle(color: AppColors.blackColor),
+                                  ),
+                                ],
+                              ),
                             ),
-                            itemBuilder: (context) => [
-                              PopupMenuItem(
-                                onTap: () {
-                                  saveBookMark(widget.surah + 1, index);
-                                  setState(() {
-                                    isView = !isView;
-                                  });
-                                },
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.bookmark,
-                                      color: AppColors.amberAccentColor,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      AppStrings.bookMark,
-                                      style: TextStyle(
-                                          color: AppColors.blackColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              PopupMenuItem(
-                                onTap: () {},
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.share,
-                                      color: AppColors.amberAccentColor,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      AppStrings.share,
-                                      style: TextStyle(
-                                          color: AppColors.blackColor),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
-                      ],
-                    );
-                  },
-                )
-              : ListView(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              widget.surah + 1 != 1 && widget.surah + 1 != 9
-                                  ? const ReturnBasmala()
-                                  : const Text(''),
-                              Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Text(
-                                  fullSura,
-                                  style: TextStyle(
-                                      fontSize: AppStrings.mushafFontSized,
-                                      fontFamily: AppStrings.arabicFontFamily,
-                                      color: AppColors.blackColor),
-                                  textAlign: TextAlign.center,
-                                  textDirection: TextDirection.rtl,
-                                ),
+                      ),
+                    ],
+                  );
+                },
+              )
+            : ListView(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            widget.surah + 1 != 1 && widget.surah + 1 != 9
+                                ? const ReturnBasmala()
+                                : const Text(''),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(10),
+                              child: Text(
+                                fullSura,
+                                style: TextStyle(
+                                    fontSize: mushafFontSized,
+                                    fontFamily: AppStrings.arabicFontFamily,
+                                    color: AppColors.blackColor),
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
                               ),
-                            ],
-                          ),
-                        )
-                      ],
-                    )
-                  ],
-                )),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+      ),
     );
   }
 
@@ -245,22 +178,24 @@ class _SurahBuilderState extends State<SurahBuilder> {
         centerTitle: true,
         title: Text(
           widget.surahName,
-          style: const TextStyle(
-            color: AppColors.whiteColor,
-            fontFamily: AppStrings.arabicFontFamily,
-            shadows: [
-              Shadow(
-                offset: Offset(1, 1),
-                color: AppColors.blackColor,
-                blurRadius: 2,
-              )
-            ],
-          ),
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              color: AppColors.greenColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 25),
           textAlign: TextAlign.center,
         ),
         backgroundColor: AppColors.primaryColor,
       ),
       body: SingleSuraBuilder(LengthOfSura),
+    );
+  }
+
+  void share(param0, int index, String fullSura) {
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    Share.share(
+      fullSura,
+      subject: widget.surahName,
+      sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
     );
   }
 }

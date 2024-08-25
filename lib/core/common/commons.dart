@@ -1,22 +1,78 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:quran_app/core/utils/app_strings.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+//! Variables
+final ItemScrollController itemScrollController = ItemScrollController();
+final ItemPositionsListener itemPositionsListener =
+    ItemPositionsListener.create();
+
+bool floatingButtonClicked = true;
+
+int bookmarkedSurah = 1;
+int bookmarkedAyah = 1;
+
+List arabic = [];
+List quran = [];
+double arabicFontSized = 28.0;
+double mushafFontSized = 40.0;
+
+//! Read Json
+Future readJson() async {
+  final String response =
+      await rootBundle.loadString('assets/json/hafs_smart_v8.json');
+  final data = await json.decode(response);
+  arabic = data['quran'];
+  return quran = [arabic];
+}
 
 //! Save Settings
 Future saveSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('arabicFontSize', AppStrings.arabicFontSized.toInt());
-  await prefs.setInt('mushafFontSize', AppStrings.mushafFontSized.toInt());
+  await prefs.setInt('arabicFontSize', arabicFontSized.toInt());
+  await prefs.setInt('mushafFontSize', mushafFontSized.toInt());
 }
 
 //! Get Settings
 Future getSettings() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   try {
-    AppStrings.arabicFontSized = prefs.getInt('arabicFontSize')!.toDouble();
-    AppStrings.mushafFontSized = prefs.getInt('mushafFontSize')!.toDouble();
+    arabicFontSized = prefs.getInt('arabicFontSize')!.toDouble();
+    mushafFontSized = prefs.getInt('mushafFontSize')!.toDouble();
   } catch (_) {
-    AppStrings.arabicFontSized = 28.0;
-    AppStrings.mushafFontSized = 40.0;
+    arabicFontSized = 28.0;
+    mushafFontSized = 40.0;
+  }
+}
+
+//! Save Bookmark
+saveBookMark(surah, ayah) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setInt('surah', surah);
+  await prefs.setInt('ayah', ayah);
+}
+
+//! read Bookmark
+
+readBookMark() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  try {
+    bookmarkedAyah = prefs.getInt('ayah')!;
+    bookmarkedSurah = prefs.getInt('surah')!;
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+Future<void> launchQuranAppLink() async {
+  final Uri uri = Uri.parse(AppStrings.quranAppLinkGithub);
+  if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+    throw 'Could not launch ${AppStrings.quranAppLinkGithub}';
   }
 }
 

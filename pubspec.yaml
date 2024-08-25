@@ -20,6 +20,7 @@ dependencies:
   shared_preferences: null
   share_plus:
   url_launcher:
+  device_preview:
 flutter_icons:
   android: true
   ios: true
@@ -39,19 +40,11 @@ flutter_native_splash:
 flutter:
 
   uses-material-design: true
-  # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/
     - assets/icons/
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
+    - assets/json/
+
   fonts:
     - family: quran
       fonts:

@@ -33,50 +33,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.blackColor,
+                    color: AppColors.greenColor,
                   ),
                 ),
                 Slider(
-                    value: AppStrings.arabicFontSized,
+                    activeColor: AppColors.orangeColor,
+                    inactiveColor: AppColors.primaryColor,
+                    value: arabicFontSized,
                     max: 40,
                     min: 20,
                     onChanged: (value) {
                       setState(() {
-                        AppStrings.arabicFontSized = value;
+                        arabicFontSized = value;
                       });
                     }),
                 Text(
                   "‏ ‏‏ ‏‏‏‏ ‏‏‏‏‏‏ ‏",
-                  style: TextStyle(
-                      fontFamily: 'quran',
-                      fontSize: AppStrings.arabicFontSized),
+                  style:
+                      TextStyle(fontFamily: 'quran', fontSize: arabicFontSized),
                   textDirection: TextDirection.rtl,
                 ),
                 const Padding(
                     padding: EdgeInsets.only(top: 10, bottom: 10),
                     child: Divider()),
                 const Text(
-                  "Mushaf Mode Font Size",
+                  AppStrings.mushafFontSizeText,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.blackColor,
+                    color: AppColors.greenColor,
                   ),
                 ),
                 Slider(
-                    value: AppStrings.mushafFontSized,
+                    activeColor: AppColors.orangeColor,
+                    inactiveColor: AppColors.primaryColor,
+                    value: mushafFontSized,
                     max: 50,
                     min: 20,
                     onChanged: (value) {
                       setState(() {
-                        AppStrings.mushafFontSized = value;
+                        mushafFontSized = value;
                       });
                     }),
                 Text(
                   "‏ ‏‏ ‏‏‏‏ ‏‏‏‏‏‏ ‏",
-                  style: TextStyle(
-                      fontFamily: 'quran',
-                      fontSize: AppStrings.mushafFontSized),
+                  style:
+                      TextStyle(fontFamily: 'quran', fontSize: mushafFontSized),
                   textDirection: TextDirection.rtl,
                 ),
                 const SizedBox(
@@ -88,8 +90,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          AppStrings.arabicFontSized = 28;
-                          AppStrings.mushafFontSized = 40;
+                          arabicFontSized = 28;
+                          mushafFontSized = 40;
                         });
                         saveSettings();
                       },

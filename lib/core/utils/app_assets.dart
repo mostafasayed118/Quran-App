@@ -1,5 +1,5 @@
 class AppAssets {
-  static const String basePathImage = 'assets/images/';
-  static const String logo = '${basePathImage}app_logo_2.png';
+  static const String basePathIcon = 'assets/icons/';
+  static const String logo = '${basePathIcon}app_icon_2.png';
 
 }
