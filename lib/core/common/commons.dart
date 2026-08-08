@@ -1,73 +1,34 @@
-import 'dart:convert';
-
-import 'package:flutter/services.dart';
 import 'package:quran_app/core/utils/app_strings.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-//! Variables
+import 'quran_state.dart';
+
+//! Scroll Controllers
 final ItemScrollController itemScrollController = ItemScrollController();
 final ItemPositionsListener itemPositionsListener =
     ItemPositionsListener.create();
 
+//! Navigation state
 bool floatingButtonClicked = true;
 
-int bookmarkedSurah = 1;
-int bookmarkedAyah = 1;
+//! Backward-compatible globals (delegate to QuranState)
+List get arabic => quranState.arabic;
+List get quran => quranState.quran;
+double get arabicFontSized => quranState.arabicFontSized;
+set arabicFontSized(double value) => quranState.arabicFontSized = value;
+double get mushafFontSized => quranState.mushafFontSized;
+set mushafFontSized(double value) => quranState.mushafFontSized = value;
+int get bookmarkedSurah => quranState.bookmarkedSurah;
+int get bookmarkedAyah => quranState.bookmarkedAyah;
 
-List arabic = [];
-List quran = [];
-double arabicFontSized = 28.0;
-double mushafFontSized = 40.0;
-
-//! Read Json
-Future readJson() async {
-  final String response =
-      await rootBundle.loadString('assets/json/hafs_smart_v8.json');
-  final data = await json.decode(response);
-  arabic = data['quran'];
-  return quran = [arabic];
-}
-
-//! Save Settings
-Future saveSettings() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('arabicFontSize', arabicFontSized.toInt());
-  await prefs.setInt('mushafFontSize', mushafFontSized.toInt());
-}
-
-//! Get Settings
-Future getSettings() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  try {
-    arabicFontSized = prefs.getInt('arabicFontSize')!.toDouble();
-    mushafFontSized = prefs.getInt('mushafFontSize')!.toDouble();
-  } catch (_) {
-    arabicFontSized = 28.0;
-    mushafFontSized = 40.0;
-  }
-}
-
-//! Save Bookmark
-saveBookMark(surah, ayah) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setInt('surah', surah);
-  await prefs.setInt('ayah', ayah);
-}
-
-//! read Bookmark
-
-readBookMark() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
-  try {
-    bookmarkedAyah = prefs.getInt('ayah')!;
-    bookmarkedSurah = prefs.getInt('surah')!;
-    return true;
-  } catch (_) {
-    return false;
-  }
-}
+//! Backward-compatible function delegates
+Future<void> readJson() => quranState.loadJson();
+Future<void> getSettings() => quranState.loadSettings();
+Future<void> saveSettings() => quranState.saveSettings();
+Future<bool> readBookMark() => quranState.loadBookmark();
+Future<void> saveBookMark(dynamic surah, dynamic ayah) =>
+    quranState.saveBookmark(surah as int, ayah as int);
 
 Future<void> launchQuranAppLink() async {
   final Uri uri = Uri.parse(AppStrings.quranAppLinkGithub);
@@ -119,8 +80,8 @@ extension StringExtensions on String {
   }
 }
 
-//! Arabic Names
-List<Map> arabicName = [
+//! Arabic Names (static data)
+const List<Map<String, dynamic>> arabicName = [
   {"surah": "1", "name": "الفاتحة"},
   {"surah": "2", "name": "البقرة"},
   {"surah": "3", "name": "آل عمران"},
@@ -234,122 +195,16 @@ List<Map> arabicName = [
   {"surah": "111", "name": "المسد"},
   {"surah": "112", "name": "الإخلاص"},
   {"surah": "113", "name": "الفلق"},
-  {"surah": "114", "name": "الناس"}
+  {"surah": "114", "name": "الناس"},
 ];
-//! no of verses
-List<int> noOfVerses = [
-  7,
-  286,
-  200,
-  176,
-  120,
-  165,
-  206,
-  75,
-  129,
-  109,
-  123,
-  111,
-  43,
-  52,
-  99,
-  128,
-  111,
-  110,
-  98,
-  135,
-  112,
-  78,
-  118,
-  64,
-  77,
-  227,
-  93,
-  88,
-  69,
-  60,
-  34,
-  30,
-  73,
-  54,
-  45,
-  83,
-  182,
-  88,
-  75,
-  85,
-  54,
-  53,
-  89,
-  59,
-  37,
-  35,
-  38,
-  29,
-  18,
-  45,
-  60,
-  49,
-  62,
-  55,
-  78,
-  96,
-  29,
-  22,
-  24,
-  13,
-  14,
-  11,
-  11,
-  18,
-  12,
-  12,
-  30,
-  52,
-  52,
-  44,
-  28,
-  28,
-  20,
-  56,
-  40,
-  31,
-  50,
-  40,
-  46,
-  42,
-  29,
-  19,
-  36,
-  25,
-  22,
-  17,
-  19,
-  26,
-  30,
-  20,
-  15,
-  21,
-  11,
-  8,
-  8,
-  19,
-  5,
-  8,
-  8,
-  11,
-  11,
-  8,
-  3,
-  9,
-  5,
-  4,
-  7,
-  3,
-  6,
-  3,
-  5,
-  4,
-  5,
-  6
+
+//! Number of verses per surah (static data)
+const List<int> noOfVerses = [
+  7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128,
+  111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73,
+  54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60,
+  49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52,
+  44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19,
+  26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3,
+  6, 3, 5, 4, 5, 6,
 ];

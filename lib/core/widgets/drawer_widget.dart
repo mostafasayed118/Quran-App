@@ -52,7 +52,8 @@ class DrawerWidget extends StatelessWidget {
             title: AppStrings.share,
             icon: const Icon(Icons.share, color: AppColors.orangeColor),
             onTap: () {
-              Share.share(AppStrings.quranAppLinkDrive.toString());
+              SharePlus.instance.share(
+                  ShareParams(text: AppStrings.quranAppLinkDrive.toString()));
 
               Navigator.pop(context);
             },

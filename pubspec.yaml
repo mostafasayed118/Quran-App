@@ -1,8 +1,6 @@
 name: quran_app
 description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -11,23 +9,24 @@ environment:
 
 dependencies:
   arabic_numbers: ^1.0.0
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.9
   flutter:
     sdk: flutter
-  flutter_launcher_icons: null
-  flutter_native_splash: ^2.4.1
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.8
   scrollable_positioned_list: ^0.3.8
-  shared_preferences: null
-  share_plus:
-  url_launcher:
-  device_preview:
-flutter_icons:
+  shared_preferences: ^2.5.5
+  share_plus: ^13.3.0
+  url_launcher: ^6.3.2
+  device_preview: ^1.3.1
+
+flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icons/app_icon_2.png"
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
+  lints: ^6.0.0
   flutter_test:
     sdk: flutter
 
@@ -41,7 +40,6 @@ flutter:
 
   uses-material-design: true
   assets:
-    - assets/images/
     - assets/icons/
     - assets/json/
 
@@ -49,12 +47,7 @@ flutter:
     - family: quran
       fonts:
         - asset: assets/fonts/HafsSmart_08.ttf
-       
+
     - family: me_quran
       fonts:
         - asset: assets/fonts/me_quran.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package

@@ -4,17 +4,16 @@ import 'package:quran_app/core/utils/app_strings.dart';
 import 'package:quran_app/features/quran/presentation/components/return_basmala.dart';
 import 'package:quran_app/features/quran/presentation/components/verse_builder.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/utils/app_colors.dart';
 
 class SurahBuilder extends StatefulWidget {
-  final surah;
-  final arabic;
-  final surahName;
-  int ayah;
+  final dynamic surah;
+  final dynamic arabic;
+  final dynamic surahName;
+  final int ayah;
 
-  SurahBuilder({
+  const SurahBuilder({
     super.key,
     this.surah,
     this.arabic,
@@ -23,19 +22,19 @@ class SurahBuilder extends StatefulWidget {
   });
 
   @override
-  _SurahBuilderState createState() => _SurahBuilderState();
+  State<SurahBuilder> createState() => _SurahBuilderState();
 }
 
 class _SurahBuilderState extends State<SurahBuilder> {
   bool isView = true;
-  @override
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => jumpToAyah());
     super.initState();
   }
 
-  jumpToAyah() {
+  void jumpToAyah() {
     if (floatingButtonClicked) {
       itemScrollController.scrollTo(
           index: widget.ayah,
@@ -45,7 +44,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
     floatingButtonClicked = false;
   }
 
-  SafeArea SingleSuraBuilder(LenghtOfSura) {
+  SafeArea _buildSurahContent(int lengthOfSurah) {
     String fullSura = '';
     int previousVerses = 0;
     if (widget.surah + 1 != 1) {
@@ -54,7 +53,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
       }
     }
     if (!isView) {
-      for (int i = 0; i < LenghtOfSura; i++) {
+      for (int i = 0; i < lengthOfSurah; i++) {
         fullSura += widget.arabic[i + previousVerses]['aya_text'];
       }
     }
@@ -64,7 +63,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
         color: AppColors.whiteColor,
         child: isView
             ? ScrollablePositionedList.builder(
-                itemCount: LenghtOfSura,
+                itemCount: lengthOfSurah,
                 itemScrollController: itemScrollController,
                 itemPositionsListener: itemPositionsListener,
                 itemBuilder: (BuildContext context, int index) {
@@ -73,13 +72,10 @@ class _SurahBuilderState extends State<SurahBuilder> {
                       (index != 0 || (widget.surah == 0) || (widget.surah == 8))
                           ? const Text('')
                           : const ReturnBasmala(),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Container(
                         color: index % 2 == 0
                             ? AppColors.whiteColor
-                            // : AppColors.greyColor.withOpacity(0.5),
                             : AppColors.offWhiteOneColor,
                         child: PopupMenuButton(
                           color: AppColors.primaryColor,
@@ -101,9 +97,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
                                     Icons.bookmark,
                                     color: AppColors.amberAccentColor,
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                                  SizedBox(width: 10),
                                   Text(
                                     AppStrings.bookMark,
                                     style:
@@ -130,9 +124,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
                             widget.surah + 1 != 1 && widget.surah + 1 != 9
                                 ? const ReturnBasmala()
                                 : const Text(''),
-                            const SizedBox(
-                              height: 20,
-                            ),
+                            const SizedBox(height: 20),
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Text(
@@ -158,7 +150,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
 
   @override
   Widget build(BuildContext context) {
-    int LengthOfSura = noOfVerses[widget.surah];
+    final int lengthOfSurah = noOfVerses[widget.surah];
     return Scaffold(
       appBar: AppBar(
         leading: Tooltip(
@@ -186,16 +178,7 @@ class _SurahBuilderState extends State<SurahBuilder> {
         ),
         backgroundColor: AppColors.primaryColor,
       ),
-      body: SingleSuraBuilder(LengthOfSura),
-    );
-  }
-
-  void share(param0, int index, String fullSura) {
-    final RenderBox box = context.findRenderObject() as RenderBox;
-    Share.share(
-      fullSura,
-      subject: widget.surahName,
-      sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size,
+      body: _buildSurahContent(lengthOfSurah),
     );
   }
 }

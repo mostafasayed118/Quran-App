@@ -26,6 +26,7 @@ class _IndexPageState extends State<IndexPage> {
         onPressed: () async {
           floatingButtonClicked = true;
           if (await readBookMark() == true) {
+            if (!mounted) return;
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -45,7 +46,6 @@ class _IndexPageState extends State<IndexPage> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-            //! "القرآن",
             AppStrings.quran,
             style: Theme.of(context).textTheme.titleLarge!.copyWith(shadows: [
               const Shadow(
@@ -56,92 +56,64 @@ class _IndexPageState extends State<IndexPage> {
             ])),
         backgroundColor: AppColors.primaryColor,
       ),
-      body: FutureBuilder(
-        future: readJson(),
-        builder: (
-          BuildContext context,
-          AsyncSnapshot snapshot,
-        ) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-                child: CircularProgressIndicator(
-              color: AppColors.amberAccentColor,
-            ));
-          } else if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return const Text(AppStrings.error);
-            } else if (snapshot.hasData) {
-              return indexCreator(snapshot.data, context);
-            } else {
-              return const Text(AppStrings.empty);
-            }
-          } else {
-            return Text('State: ${snapshot.connectionState}');
-          }
-        },
-      ),
+      body: quran.isEmpty
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.amberAccentColor,
+              ),
+            )
+          : _buildSurahList(),
     );
   }
 
-  Container indexCreator(quran, context) {
+  Widget _buildSurahList() {
     return Container(
       color: AppColors.blueColor,
-      child: ListView(
-        children: [
-          for (int i = 0; i < 114; i++)
-            Container(
-              color: i % 2 == 0
-                  ? AppColors.offWhiteOneColor
-                  : AppColors.offWhiteTwoColor,
-              child: TextButton(
-                child: Row(
-                  children: [
-                    ArabicSoraNumber(
-                      soraNumber: i,
+      child: ListView.builder(
+        itemCount: 114,
+        itemBuilder: (context, i) {
+          return Container(
+            color: i % 2 == 0
+                ? AppColors.offWhiteOneColor
+                : AppColors.offWhiteTwoColor,
+            child: TextButton(
+              child: Row(
+                children: [
+                  ArabicSoraNumber(soraNumber: i),
+                  const SizedBox(width: 5),
+                  const Expanded(child: SizedBox()),
+                  Text(
+                    arabicName[i]['name'],
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      shadows: [
+                        const Shadow(
+                          offset: Offset(.5, .5),
+                          blurRadius: 1.0,
+                          color: AppColors.greyColorTwo,
+                        )
+                      ],
+                      fontSize: 28,
                     ),
-                    const SizedBox(
-                      width: 5,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [],
-                      ),
-                    ),
-                    const Expanded(child: SizedBox()),
-                    Text(
-                      arabicName[i]['name'],
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        shadows: [
-                          const Shadow(
-                            offset: Offset(.5, .5),
-                            blurRadius: 1.0,
-                            color: AppColors.greyColorTwo,
-                          )
-                        ],
-                        fontSize: 28,
-                      ),
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
-                onPressed: () {
-                  floatingButtonClicked = false;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SurahBuilder(
-                              arabic: quran[0],
-                              surah: i,
-                              surahName: arabicName[i]['name'],
-                              ayah: 0,
-                            )),
-                  );
-                },
+                    textDirection: TextDirection.rtl,
+                  ),
+                ],
               ),
+              onPressed: () {
+                floatingButtonClicked = false;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => SurahBuilder(
+                            arabic: quran[0],
+                            surah: i,
+                            surahName: arabicName[i]['name'],
+                            ayah: 0,
+                          )),
+                );
+              },
             ),
-        ],
+          );
+        },
       ),
     );
   }
