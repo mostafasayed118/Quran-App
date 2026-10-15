@@ -222,4 +222,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get last7Days => 'Last 7 days';
+
+  @override
+  String get goldGrams => 'Gold (grams)';
+
+  @override
+  String get silverGrams => 'Silver (grams)';
+
+  @override
+  String get goldPrice => 'Gold price per gram';
+
+  @override
+  String get silverPrice => 'Silver price per gram';
+
+  @override
+  String get cash => 'On-hand cash';
+
+  @override
+  String get debts => 'Debts';
+
+  @override
+  String get nisabByGold => 'Threshold: gold';
+
+  @override
+  String get nisabBySilver => 'Threshold: silver';
+
+  @override
+  String get zakatDue => 'Zakat due';
+
+  @override
+  String get zakatNotDue => 'No zakat due';
+
+  @override
+  String get zakatFootnote =>
+      'The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.';
+
+  @override
+  String get zakatableLabel => 'Money subject to zakat';
+
+  @override
+  String get nisabLabel => 'Threshold';
 }

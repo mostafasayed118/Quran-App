@@ -487,6 +487,84 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'آخر ٧ أيام'**
   String get last7Days;
+
+  /// No description provided for @goldGrams.
+  ///
+  /// In ar, this message translates to:
+  /// **'ذهب (جرام)'**
+  String get goldGrams;
+
+  /// No description provided for @silverGrams.
+  ///
+  /// In ar, this message translates to:
+  /// **'فضة (جرام)'**
+  String get silverGrams;
+
+  /// No description provided for @goldPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'سعر جرام الذهب'**
+  String get goldPrice;
+
+  /// No description provided for @silverPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'سعر جرام الفضة'**
+  String get silverPrice;
+
+  /// No description provided for @cash.
+  ///
+  /// In ar, this message translates to:
+  /// **'النقد المعروض'**
+  String get cash;
+
+  /// No description provided for @debts.
+  ///
+  /// In ar, this message translates to:
+  /// **'الديون'**
+  String get debts;
+
+  /// No description provided for @nisabByGold.
+  ///
+  /// In ar, this message translates to:
+  /// **'العتبة: الذهب'**
+  String get nisabByGold;
+
+  /// No description provided for @nisabBySilver.
+  ///
+  /// In ar, this message translates to:
+  /// **'العتبة: الفضة'**
+  String get nisabBySilver;
+
+  /// No description provided for @zakatDue.
+  ///
+  /// In ar, this message translates to:
+  /// **'الزكاة الواجبة'**
+  String get zakatDue;
+
+  /// No description provided for @zakatNotDue.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا زكاة عليك'**
+  String get zakatNotDue;
+
+  /// No description provided for @zakatFootnote.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسبة ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك.'**
+  String get zakatFootnote;
+
+  /// No description provided for @zakatableLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'المال الزكوي'**
+  String get zakatableLabel;
+
+  /// No description provided for @nisabLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'العتبة'**
+  String get nisabLabel;
 }
 
 class _AppLocalizationsDelegate

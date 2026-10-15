@@ -20,6 +20,8 @@ import '../../features/tasbih/data/tasbih_repository.dart';
 import '../../features/tasbih/presentation/tasbih_cubit.dart';
 import '../../features/tracker/data/prayer_log_repository.dart';
 import '../../features/tracker/presentation/tracker_cubit.dart';
+import '../../features/zakat/data/zakat_calculator.dart';
+import '../../features/zakat/presentation/zakat_cubit.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
 import '../../features/recitation/data/audio_downloader.dart';
@@ -58,6 +60,8 @@ Future<void> configureDependencies({
       () => PrayerLogRepository(db));
   getIt.registerLazySingleton<TrackerCubit>(
       () => TrackerCubit(repo: getIt<PrayerLogRepository>()));
+  getIt.registerLazySingleton<ZakatCubit>(() => ZakatCubit());
+  getIt.registerLazySingleton<ZakatCalculator>(() => const ZakatCalculator());
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
         () => CityRepository(db: db, loader: citiesLoader));

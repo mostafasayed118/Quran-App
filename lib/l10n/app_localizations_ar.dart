@@ -222,4 +222,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get last7Days => 'آخر ٧ أيام';
+
+  @override
+  String get goldGrams => 'ذهب (جرام)';
+
+  @override
+  String get silverGrams => 'فضة (جرام)';
+
+  @override
+  String get goldPrice => 'سعر جرام الذهب';
+
+  @override
+  String get silverPrice => 'سعر جرام الفضة';
+
+  @override
+  String get cash => 'النقد المعروض';
+
+  @override
+  String get debts => 'الديون';
+
+  @override
+  String get nisabByGold => 'العتبة: الذهب';
+
+  @override
+  String get nisabBySilver => 'العتبة: الفضة';
+
+  @override
+  String get zakatDue => 'الزكاة الواجبة';
+
+  @override
+  String get zakatNotDue => 'لا زكاة عليك';
+
+  @override
+  String get zakatFootnote =>
+      'النسبة ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك.';
+
+  @override
+  String get zakatableLabel => 'المال الزكوي';
+
+  @override
+  String get nisabLabel => 'العتبة';
 }
