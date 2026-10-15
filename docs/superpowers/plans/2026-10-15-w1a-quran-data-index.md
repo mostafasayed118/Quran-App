@@ -6,7 +6,7 @@
 
 **Architecture:** A dev-time CLI tool (`tools/build_quran_db.dart`) builds `assets/db/quran.sqlite` from the legacy JSON + a quran.com-fetched surah-metadata cache. The app copies this asset to app storage on first launch and opens it with the W0 `AppDatabase`. Feature-first layers: repository (drift) → cubit (flutter_bloc) → screen (Material 3, D6 tokens).
 
-**Tech Stack:** W0 stack only — drift, flutter_bloc, get_it, go_router, gen-l10n; Freezed enters service (dep already present); dev: bloc_test.
+**Tech Stack:** W0 stack only — drift, flutter_bloc, get_it, go_router, gen-l10n; Freezed enters service (dep already present). No test-helper deps (Errata v4).
 
 **Spec:** `docs/superpowers/specs/2026-10-15-quran-yahdi-rebuild-design.md` (§5 schema, §6 design, D6 tokens). W0 plan conventions apply.
 
@@ -29,6 +29,13 @@ An S7 STOP proved a fifth defect: `dart run tools/build_quran_db.dart` executes 
 - **`lib/core/db/injector.dart`** (Task 2 Step 0b) wires `AppDatabase(LazyDatabase(openAppDatabase))` — identical runtime behavior, all W0 tests stay green (they inject executors explicitly or use the path_provider override through `configureDependencies`).
 - Task 3's `connection.dart` replacement keeps its exact scope (asset bootstrap + `openAppDatabase`) — the injector already points at it, so Task 3 makes NO DI edits.
 - The tool never imports `connection.dart` → pure-Dart chain (drift + meta + tables only).
+
+## PM Errata v4 — 2026-10-15 (after S8-STOP ruling)
+
+S8 proved defect #6: `flutter pub add --dev bloc_test` is UNINSTALLABLE in this dependency universe (pub solver exit 65 — flutter_test's pinned `test_api 0.7.12` + `build_runner 2.16.2`'s `analyzer ^14.3.0` leave no satisfying `bloc_test` release). Ruling = executor lead 1:
+
+- **NO bloc_test** (and no other replacement dep). Task 4's cubit test is REWRITTEN as a plain `test()` asserting `cubit.state` transitions — identical coverage (loading → loaded-with-2 → setQuery → loaded-with-1 + query field).
+- This plan's only allowed dependency commands are now: `flutter pub add http collection` (Task 2). The RESUME-2/PROMPT-2 line authorizing `--dev bloc_test` is VOID.
 
 ## Global Constraints
 
@@ -346,8 +353,8 @@ git commit -m "feat(w1a): first-launch quran.sqlite bootstrap from bundled asset
 **Files:**
 - Create: `lib/features/quran/data/surah_repository.dart`, `lib/features/quran/presentation/index/surah_index_state.dart`, `lib/features/quran/presentation/index/surah_index_cubit.dart`, generated `surah_index_state.freezed.dart`
 - Modify: `lib/core/di/injector.dart`
-- Modify: `pubspec.yaml` via `flutter pub add --dev bloc_test`
 - Test: `test/surah_repository_test.dart`, `test/surah_index_cubit_test.dart`
+- NO dependency changes in this task (Errata v4: no bloc_test).
 
 **Interfaces:**
 - Produces:
@@ -356,11 +363,7 @@ git commit -m "feat(w1a): first-launch quran.sqlite bootstrap from bundled asset
   - `SurahIndexCubit(SurahRepository repo)` — holds the latest surah list, registers a drift watch, exposes `void setQuery(String raw)` (trims; empty = all; matches nameAr prefix/contains, nameEn contains, or exact id string).
 - DI: `getIt<SurahRepository>()` registered. The cubit is NOT registered in DI — the router constructs it inside a `BlocProvider` (Task 5) so Flutter owns its lifecycle.
 
-- [ ] **Step 1: Deps + failing tests (both files verbatim)**
-
-```powershell
-flutter pub add --dev bloc_test
-```
+- [ ] **Step 1: Failing tests (both files verbatim; NO new dependencies — Errata v4)**
 
 `test/surah_repository_test.dart`:
 ```dart
@@ -402,7 +405,6 @@ void main() {
 
 `test/surah_index_cubit_test.dart`:
 ```dart
-import 'package:bloc_test/bloc_test.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -429,22 +431,22 @@ void main() {
 
   tearDown(() async => db.close());
 
-  blocTest<SurahIndexCubit, SurahIndexState>(
-    'loading then loaded; setQuery filters client-side',
-    build: () => SurahIndexCubit(SurahRepository(db)),
-    act: (cubit) async {
-      await Future<void>.delayed(Duration.zero);
-      await cubit.stream.firstWhere((s) => s is SurahIndexLoaded);
-      cubit.setQuery('بقرة');
-    },
-    expect: () => [
-      isA<SurahIndexLoading>(),
-      isA<SurahIndexLoaded>().having((s) => s.surahs.length, 'surahs', 2),
-      isA<SurahIndexLoaded>()
-          .having((s) => s.surahs.single.nameAr, 'filtered', 'البقرة')
-          .having((s) => s.query, 'query', 'بقرة'),
-    ],
-  );
+  test('loading then loaded; setQuery filters client-side', () async {
+    final cubit = SurahIndexCubit(SurahRepository(db));
+    expect(cubit.state, isA<SurahIndexLoading>());
+
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state, isA<SurahIndexLoaded>());
+    expect((cubit.state as SurahIndexLoaded).surahs.length, 2);
+
+    cubit.setQuery('بقرة');
+    await Future<void>.delayed(Duration.zero);
+    final loaded = cubit.state as SurahIndexLoaded;
+    expect(loaded.surahs.single.nameAr, 'البقرة');
+    expect(loaded.query, 'بقرة');
+
+    await cubit.close();
+  });
 
   test('whitespace-only query restores the full list', () async {
     final cubit = SurahIndexCubit(SurahRepository(db));
@@ -874,4 +876,4 @@ git commit -m "docs(w1a): mark plan checkboxes complete"
 - **Spec coverage (W1a slice):** §5 seed data (T2) + bootstrap (T3); §3 quran feature layers (T4–T5); offline model step-1 bundle (T2/T3); D6/l10n/i18n-style rules (T5); baseline 8-test suite grows with repo/cubit/widget tests. Reader, mushaf, bookmarks, khatma, pages/juz tabs = W1b (explicit non-goals).
 - **Placeholder scan:** none — every code block is complete and final; no fake guards, no TBD/TODO.
 - **Type consistency:** `SurahRepository`/`SurahIndexCubit`/`SurahIndexState` names stable across T4 tests, T5 screen/router/test; `Surah` always the drift data class from the single generated file; DI registers only `SurahRepository` (cubit lifecycle owned by BlocProvider — T5 Step 4 rationale box).
-- **Errata v2 + v3 applied everywhere:** `Value(...)` id-wrapping (tool + all three test files), `dart:math` min/max, `drift/native.dart` import, public `createSchemaForSeeding()`; `app_database.dart` pure-Dart with required-executor ctor + `LazyDatabase(openAppDatabase)` moved into the injector (W0've 8-test suite must stay green through Task 2 Step 0 gates).
+- **Errata v2 + v3 + v4 applied everywhere:** `Value(...)` id-wrapping (tool + all three test files), `dart:math` min/max, `drift/native.dart` import, public `createSchemaForSeeding()`; `app_database.dart` pure-Dart with required-executor ctor (disclosed mechanical `super.executor` accepted, same class as W0-D5) + `LazyDatabase(openAppDatabase)` in the injector; NO `bloc_test` anywhere (cubit test = plain `test()` state assertions).
