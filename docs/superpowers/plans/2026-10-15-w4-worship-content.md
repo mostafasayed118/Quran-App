@@ -191,3 +191,14 @@ git commit -m "docs(w4): mark plan checkboxes complete"
 - Test-count discipline: baseline 71; every new test listed per file; executor MEASURES (≈92), never extrapolates.
 - Arabic content direction/typography reuses the existing W1b/W3 patterns (no new text plumbing); Arabic-Indic numerals at call sites only.
 - Home grid already routes `/azkar` `/tasbih` `/duas` `/asma` — no home change required this wave (verify only).
+
+---
+
+## PM Errata & Adjudications (post-wave, committed by PM 2026-10-15)
+- All 6 disclosures ACCEPTED. Zero STOPs — third consecutive wave with the router paths-only assertion holding unedited.
+- D3 (plan named SurahRepository for ruqyah citation names; correct home is the existing AyahRepository.surahById — W1a) — plan slop, executor right; errata recorded here per protocol.
+- D4 (pubspec asset entries unnecessary: assets/data/ folder-registered since W3) — plan slop accepted.
+- D1/D2 (unused azkarBack conditional; all-chips replaced by re-tap pulse) — design-minor, accepted.
+- D5: repos ran TDD red-first (3/3); screen/cubit tests written post-impl and disclosed. Accepted this wave; preference recorded: cubits get red-first when state logic is non-trivial (not a hard rule).
+- D6 + two prior waves: stray-token write hits keep rising (W2b 3x, W3 2x, W4 6x) but never reached a gate thanks to read-after-write. Standing executor hygiene: script bulk writes with anchored uniqueness asserts.
+- Gates verified PM-side: analyze 0; suite 92/92; datasets probed (azkar 6/60/0-empty, duas 40/8, ruqyah 9=6quran+3dhikr with 0 bad refs + text==null invariants, asma 99 unique 1..99); debug rebuild exit 0 @ 206,153,619 B (delta 680 B, retired-determinism ballpark); release rebuilt exit 0 @ 64,637,154 B byte-EXACT (third consecutive); ticks 19/19 targeted with empty non-checkbox filter; messages verbatim; zero deps; home untouched.
