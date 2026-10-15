@@ -12,6 +12,12 @@ import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
+import '../features/prayer/data/city_repository.dart';
+import '../features/prayer/data/prayer_time_service.dart';
+import '../features/prayer/presentation/city_picker/city_picker_cubit.dart';
+import '../features/prayer/presentation/city_picker/city_picker_screen.dart';
+import '../features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
+import '../features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
 import '../features/recitation/presentation/downloads/downloads_cubit.dart';
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.dart';
@@ -41,7 +47,23 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(path: '/library', builder: (_, __) => const PlaceholderScreen(title: 'المكتبة')),
-      GoRoute(path: '/prayer-times', builder: (_, __) => const PlaceholderScreen(title: 'مواقيت الصلاة')),
+      GoRoute(
+        path: '/prayer-times',
+        builder: (_, __) => BlocProvider<PrayerTimesCubit>(
+          create: (_) => PrayerTimesCubit(
+            prayer: getIt<PrayerTimeService>(),
+            city: getIt<CityRepository>(),
+          ),
+          child: const PrayerTimesScreen(),
+        ),
+      ),
+      GoRoute(
+        path: '/prayer-times/city',
+        builder: (_, __) => BlocProvider<CityPickerCubit>(
+          create: (_) => CityPickerCubit(cityRepo: getIt<CityRepository>()),
+          child: const CityPickerScreen(),
+        ),
+      ),
       GoRoute(path: '/qibla', builder: (_, __) => const PlaceholderScreen(title: 'القبلة')),
       GoRoute(path: '/azkar', builder: (_, __) => const PlaceholderScreen(title: 'الأذكار')),
       GoRoute(path: '/tasbih', builder: (_, __) => const PlaceholderScreen(title: 'السبحة')),

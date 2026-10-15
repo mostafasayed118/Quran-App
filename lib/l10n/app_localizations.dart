@@ -355,6 +355,78 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذّر تشغيل التلاوة'**
   String get playbackFailed;
+
+  /// No description provided for @fajr.
+  ///
+  /// In ar, this message translates to:
+  /// **'فجر'**
+  String get fajr;
+
+  /// No description provided for @sunrise.
+  ///
+  /// In ar, this message translates to:
+  /// **'شروق'**
+  String get sunrise;
+
+  /// No description provided for @dhuhr.
+  ///
+  /// In ar, this message translates to:
+  /// **'الظهر'**
+  String get dhuhr;
+
+  /// No description provided for @asr.
+  ///
+  /// In ar, this message translates to:
+  /// **'العصر'**
+  String get asr;
+
+  /// No description provided for @maghrib.
+  ///
+  /// In ar, this message translates to:
+  /// **'المغرب'**
+  String get maghrib;
+
+  /// No description provided for @isha.
+  ///
+  /// In ar, this message translates to:
+  /// **'العشاء'**
+  String get isha;
+
+  /// No description provided for @remaining.
+  ///
+  /// In ar, this message translates to:
+  /// **'متبقٍ {duration}'**
+  String remaining(String duration);
+
+  /// No description provided for @selectCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر مدينتك'**
+  String get selectCity;
+
+  /// No description provided for @searchCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن مدينة…'**
+  String get searchCity;
+
+  /// No description provided for @noCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'لم تُحدَّد مدينة بعد'**
+  String get noCity;
+
+  /// No description provided for @qiblaDirection.
+  ///
+  /// In ar, this message translates to:
+  /// **'اتجاه القبلة'**
+  String get qiblaDirection;
+
+  /// No description provided for @degreesFromNorth.
+  ///
+  /// In ar, this message translates to:
+  /// **'{degrees}° عن الشمال'**
+  String degreesFromNorth(String degrees);
 }
 
 class _AppLocalizationsDelegate

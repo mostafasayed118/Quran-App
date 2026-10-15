@@ -146,4 +146,44 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get playbackFailed => 'تعذّر تشغيل التلاوة';
+
+  @override
+  String get fajr => 'فجر';
+
+  @override
+  String get sunrise => 'شروق';
+
+  @override
+  String get dhuhr => 'الظهر';
+
+  @override
+  String get asr => 'العصر';
+
+  @override
+  String get maghrib => 'المغرب';
+
+  @override
+  String get isha => 'العشاء';
+
+  @override
+  String remaining(String duration) {
+    return 'متبقٍ $duration';
+  }
+
+  @override
+  String get selectCity => 'اختر مدينتك';
+
+  @override
+  String get searchCity => 'ابحث عن مدينة…';
+
+  @override
+  String get noCity => 'لم تُحدَّد مدينة بعد';
+
+  @override
+  String get qiblaDirection => 'اتجاه القبلة';
+
+  @override
+  String degreesFromNorth(String degrees) {
+    return '$degrees° عن الشمال';
+  }
 }

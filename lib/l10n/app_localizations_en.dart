@@ -146,4 +146,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get playbackFailed => 'Could not play the recitation';
+
+  @override
+  String get fajr => 'Fajr';
+
+  @override
+  String get sunrise => 'Sunrise';
+
+  @override
+  String get dhuhr => 'Dhuhr';
+
+  @override
+  String get asr => 'Asr';
+
+  @override
+  String get maghrib => 'Maghrib';
+
+  @override
+  String get isha => 'Isha';
+
+  @override
+  String remaining(String duration) {
+    return '$duration remaining';
+  }
+
+  @override
+  String get selectCity => 'Select your city';
+
+  @override
+  String get searchCity => 'Search a city…';
+
+  @override
+  String get noCity => 'No city selected yet';
+
+  @override
+  String get qiblaDirection => 'Qibla direction';
+
+  @override
+  String degreesFromNorth(String degrees) {
+    return '$degrees° from north';
+  }
 }
