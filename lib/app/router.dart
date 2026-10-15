@@ -6,6 +6,8 @@ import '../core/widgets/placeholder_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/surah_repository.dart';
+import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
+import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
@@ -52,6 +54,13 @@ abstract final class AppRouter {
             child: const ReaderScreen(),
           );
         },
+      ),
+      GoRoute(
+        path: '/bookmarks',
+        builder: (_, __) => BlocProvider<BookmarksCubit>(
+          create: (_) => BookmarksCubit(getIt<AyahRepository>()),
+          child: const BookmarksScreen(),
+        ),
       ),
     ],
   );
