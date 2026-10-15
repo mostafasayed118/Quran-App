@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -11,7 +12,9 @@ import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
+import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
+import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
@@ -45,8 +48,16 @@ void main() {
     _StaticDownloadsCubit downloads,
   ) async {
     final repo = _StaticReciterRepository(db);
+    final playbackCubit = PlaybackCubit(
+      service: _FakePlaybackService(),
+      reciters: repo,
+      downloader:
+          AudioDownloader(db, audioRootResolver: () async => tempRoot),
+    );
+    addTearDown(playbackCubit.close);
     await tester.pumpWidget(MultiBlocProvider(
       providers: [
+        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
         BlocProvider<DownloadsCubit>.value(value: downloads),
         BlocProvider<ReciterSurahsCubit>(
           create: (_) => ReciterSurahsCubit(
@@ -119,6 +130,29 @@ class _StaticReciterRepository extends ReciterRepository {
 
   @override
   Future<void> selectMoshaf(String rowId) async {}
+}
+
+class _FakePlaybackService implements PlaybackService {
+  @override
+  Stream<bool> playingStream() => const Stream<bool>.empty();
+
+  @override
+  Stream<Duration> positionStream() => const Stream<Duration>.empty();
+
+  @override
+  Stream<Duration?> durationStream() => const Stream<Duration?>.empty();
+
+  @override
+  Future<void> loadAndPlay(PlaybackSource source) async {}
+
+  @override
+  Future<void> pause() async {}
+
+  @override
+  Future<void> resume() async {}
+
+  @override
+  Future<void> stop() async {}
 }
 
 class _StaticDownloadsCubit extends DownloadsCubit {

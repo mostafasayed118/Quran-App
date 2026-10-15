@@ -121,4 +121,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String surahCountLabel(String count) {
     return '$count سورة';
   }
+
+  @override
+  String nowPlaying(String name) {
+    return 'يُشغَّل الآن: $name';
+  }
+
+  @override
+  String get playTooltip => 'تشغيل';
+
+  @override
+  String get pauseTooltip => 'إيقاف مؤقت';
+
+  @override
+  String get stopTooltip => 'إيقاف';
+
+  @override
+  String get listenTooltip => 'استمع للسورة';
+
+  @override
+  String surahBadge(String number) {
+    return 'سورة $number';
+  }
+
+  @override
+  String get playbackFailed => 'تعذّر تشغيل التلاوة';
 }

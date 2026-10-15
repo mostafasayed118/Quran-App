@@ -18,6 +18,7 @@ import '../features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart';
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
 import '../features/recitation/presentation/reciters/reciters_screen.dart';
+import '../features/recitation/presentation/playback/playback_cubit.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -74,6 +75,9 @@ abstract final class AppRouter {
           final row = state.uri.queryParameters['row'] ?? '';
           return MultiBlocProvider(
             providers: [
+              BlocProvider<PlaybackCubit>.value(
+                value: getIt<PlaybackCubit>(),
+              ),
               BlocProvider<DownloadsCubit>.value(
                 value: getIt<DownloadsCubit>(),
               ),

@@ -10,7 +10,10 @@ import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
 import '../../features/recitation/data/audio_downloader.dart';
 import '../../features/recitation/data/reciter_repository.dart';
+import '../../features/recitation/playback/just_audio_playback_service.dart';
+import '../../features/recitation/playback/playback_service.dart';
 import '../../features/recitation/presentation/downloads/downloads_cubit.dart';
+import '../../features/recitation/presentation/playback/playback_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -27,6 +30,7 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
+  getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {
     getIt.registerLazySingleton<AudioDownloader>(
         () => AudioDownloader(db, audioRootResolver: audioRootResolver));
@@ -34,6 +38,11 @@ Future<void> configureDependencies({
         () => DownloadsCubit(
             downloader: getIt<AudioDownloader>(),
             reciters: getIt<ReciterRepository>()));
+    getIt.registerLazySingleton<PlaybackCubit>(() => PlaybackCubit(
+          service: getIt<PlaybackService>(),
+          reciters: getIt<ReciterRepository>(),
+          downloader: getIt<AudioDownloader>(),
+        ));
   }
   _configured = true;
 }

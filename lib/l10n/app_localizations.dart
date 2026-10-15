@@ -313,6 +313,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} سورة'**
   String surahCountLabel(String count);
+
+  /// No description provided for @nowPlaying.
+  ///
+  /// In ar, this message translates to:
+  /// **'يُشغَّل الآن: {name}'**
+  String nowPlaying(String name);
+
+  /// No description provided for @playTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل'**
+  String get playTooltip;
+
+  /// No description provided for @pauseTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف مؤقت'**
+  String get pauseTooltip;
+
+  /// No description provided for @stopTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get stopTooltip;
+
+  /// No description provided for @listenTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'استمع للسورة'**
+  String get listenTooltip;
+
+  /// No description provided for @surahBadge.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {number}'**
+  String surahBadge(String number);
+
+  /// No description provided for @playbackFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تشغيل التلاوة'**
+  String get playbackFailed;
 }
 
 class _AppLocalizationsDelegate

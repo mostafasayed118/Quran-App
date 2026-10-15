@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../../features/recitation/data/reciter_repository.dart';
 import '../downloads/downloads_cubit.dart';
 import '../downloads/downloads_state.dart';
+import '../playback/playback_cubit.dart';
+import '../playback/mini_player_bar.dart';
 import 'reciter_surahs_cubit.dart';
 import 'reciter_surahs_state.dart';
 
@@ -67,7 +71,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                 itemBuilder: (context, i) {
                   final n = surahNumbers[i];
                   return _SurahDownloadRow(
-                    rowId: row.id,
+                    reciter: row,
                     surahNumber: n,
                     name: names[n] ?? 'سورة ${n.toArabicIndic}',
                     teaser: previews[n],
@@ -78,6 +82,7 @@ class ReciterSurahsScreen extends StatelessWidget {
             ),
         },
       ),
+      bottomSheet: const MiniPlayerBar(),
     );
   }
 
@@ -95,14 +100,14 @@ class ReciterSurahsScreen extends StatelessWidget {
 
 class _SurahDownloadRow extends StatelessWidget {
   const _SurahDownloadRow({
-    required this.rowId,
+    required this.reciter,
     required this.surahNumber,
     required this.name,
     this.teaser,
     this.item,
   });
 
-  final String rowId;
+  final ReciterRow reciter;
   final int surahNumber;
   final String name;
   final String? teaser;
@@ -115,22 +120,7 @@ class _SurahDownloadRow extends StatelessWidget {
     final status = item?.status ?? 'none';
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-      leading: Container(
-        width: 38,
-        height: 38,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Text(
-          surahNumber.toArabicIndic,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: colors.primary,
-          ),
-        ),
-      ),
+      leading: _buildLeading(context, colors),
       title: Text(
         name,
         style: const TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20),
@@ -152,6 +142,35 @@ class _SurahDownloadRow extends StatelessWidget {
               textDirection: TextDirection.rtl,
             ),
       trailing: _buildTrailing(context, cubit, colors, status),
+    );
+  }
+
+  Widget _buildLeading(BuildContext context, ColorScheme colors) {
+    if (!parseSurahList(reciter.surahList).contains(surahNumber)) {
+      return Container(
+        width: 38,
+        height: 38,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: colors.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Text(
+          surahNumber.toArabicIndic,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: colors.primary,
+          ),
+        ),
+      );
+    }
+    return IconButton(
+      tooltip: AppLocalizations.of(context).playTooltip,
+      icon: Icon(Icons.play_arrow, color: colors.primary),
+      onPressed: () => context.read<PlaybackCubit>().playSurah(
+            reciter,
+            surahNumber,
+          ),
     );
   }
 
@@ -198,12 +217,12 @@ class _SurahDownloadRow extends StatelessWidget {
               .refreshIndicatorSemanticLabel,
           color: colors.error,
           icon: const Icon(Icons.refresh),
-          onPressed: () => cubit.enqueue(rowId, surahNumber),
+          onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
       default:
         return IconButton(
           icon: const Icon(Icons.download),
-          onPressed: () => cubit.enqueue(rowId, surahNumber),
+          onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
     }
   }
