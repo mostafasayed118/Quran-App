@@ -211,4 +211,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String namePosition(String n) {
     return 'Name $n of 99';
   }
+
+  @override
+  String streak(String days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String get trackerToday => 'Today\'s prayers';
+
+  @override
+  String get last7Days => 'Last 7 days';
 }

@@ -16,6 +16,9 @@ import '../features/duas/presentation/duas_screen.dart';
 import '../features/tasbih/data/tasbih_repository.dart';
 import '../features/tasbih/presentation/tasbih_cubit.dart';
 import '../features/tasbih/presentation/tasbih_screen.dart';
+import '../features/tracker/data/prayer_log_repository.dart';
+import '../features/tracker/presentation/tracker_cubit.dart';
+import '../features/tracker/presentation/tracker_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
@@ -130,7 +133,13 @@ abstract final class AppRouter {
           child: const DuasScreen(),
         ),
       ),
-      GoRoute(path: '/worship', builder: (_, __) => const PlaceholderScreen(title: 'تتبع العبادات')),
+      GoRoute(
+        path: '/worship',
+        builder: (_, __) => BlocProvider<TrackerCubit>(
+          create: (_) => TrackerCubit(repo: getIt<PrayerLogRepository>()),
+          child: const TrackerScreen(),
+        ),
+      ),
       GoRoute(path: '/zakat', builder: (_, __) => const PlaceholderScreen(title: 'الزكاة')),
       GoRoute(path: '/hijri', builder: (_, __) => const PlaceholderScreen(title: 'التقويم الهجري')),
       GoRoute(

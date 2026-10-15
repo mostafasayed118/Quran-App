@@ -1,0 +1,66 @@
+import 'package:drift/native.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/theme/app_theme.dart';
+import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
+import 'package:quran_yahdi/features/tracker/presentation/tracker_cubit.dart';
+import 'package:quran_yahdi/features/tracker/presentation/tracker_screen.dart';
+import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+void main() {
+  late AppDatabase db;
+  late PrayerLogRepository repo;
+
+  setUp(() async {
+    db = AppDatabase.test(NativeDatabase.memory());
+    repo = PrayerLogRepository(db);
+  });
+
+  tearDown(() async {
+    await db.close();
+  });
+
+  Future<void> pumpHost(WidgetTester tester) async {
+    final cubit = TrackerCubit(repo: repo);
+    addTearDown(cubit.close);
+    await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        home: const TrackerScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('five prayer toggle rows; tapping fajr fills the checkbox',
+      (tester) async {
+    await pumpHost(tester);
+
+    expect(find.text('صلوات اليوم'), findsOneWidget);
+    expect(find.text('فجر'), findsOneWidget);
+    expect(find.text('العشاء'), findsOneWidget);
+    expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(5));
+
+    await tester.tap(find.text('فجر'));
+    await tester.pumpAndSettle();
+    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(4));
+    expect(find.text('سلسلة ١ يوم'), findsOneWidget);
+
+    final marked = await repo.getForDay(DateTime.now());
+    expect(marked, isTrue);
+  });
+}

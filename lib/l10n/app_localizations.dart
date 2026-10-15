@@ -469,6 +469,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الاسم {n} من 99'**
   String namePosition(String n);
+
+  /// No description provided for @streak.
+  ///
+  /// In ar, this message translates to:
+  /// **'سلسلة {days} يوم'**
+  String streak(String days);
+
+  /// No description provided for @trackerToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'صلوات اليوم'**
+  String get trackerToday;
+
+  /// No description provided for @last7Days.
+  ///
+  /// In ar, this message translates to:
+  /// **'آخر ٧ أيام'**
+  String get last7Days;
 }
 
 class _AppLocalizationsDelegate

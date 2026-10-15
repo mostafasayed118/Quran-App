@@ -211,4 +211,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String namePosition(String n) {
     return 'الاسم $n من 99';
   }
+
+  @override
+  String streak(String days) {
+    return 'سلسلة $days يوم';
+  }
+
+  @override
+  String get trackerToday => 'صلوات اليوم';
+
+  @override
+  String get last7Days => 'آخر ٧ أيام';
 }
