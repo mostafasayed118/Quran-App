@@ -21,6 +21,15 @@ An executor STOP (S6) proved four plan defects; PM verified each at source and a
 
 If you are re-running after the S6 session: replace any pre-staged `tools/build_quran_db.dart` (old-plan transcription) with the amended code below before continuing.
 
+## PM Errata v3 — 2026-10-15 (after S7-STOP ruling; SUPERSEDES conflicting code below where edited)
+
+An S7 STOP proved a fifth defect: `dart run tools/build_quran_db.dart` executes on the pure Dart VM (no `dart:ui`), and the chain tool → `app_database.dart` → `connection.dart` → `path_provider` → flutter pulled the framework in. Ruling (executor lead 1, decouple):
+
+- **`lib/core/db/app_database.dart` becomes pure Dart**: it NO LONGER imports `connection.dart`; the default constructor takes a REQUIRED executor; the W0 `AppDatabase()` default-open path moves to the injector (`LazyDatabase(openAppDatabase)`).
+- **`lib/core/db/injector.dart`** (Task 2 Step 0b) wires `AppDatabase(LazyDatabase(openAppDatabase))` — identical runtime behavior, all W0 tests stay green (they inject executors explicitly or use the path_provider override through `configureDependencies`).
+- Task 3's `connection.dart` replacement keeps its exact scope (asset bootstrap + `openAppDatabase`) — the injector already points at it, so Task 3 makes NO DI edits.
+- The tool never imports `connection.dart` → pure-Dart chain (drift + meta + tables only).
+
 ## Global Constraints
 
 - W0 rules are binding here too: dependency freshness via `flutter pub add` only; analyze ends at 0 issues; TDD where stated; explicit-pathspec commits with the exact messages below; NO push; no packages beyond this plan; checkbox ticks in THIS plan file as tasks complete (committed in Task 6).
@@ -44,12 +53,66 @@ Expected: branch `main`, clean tree. Vertex expectation: `fc31fe1` or later (PM 
 
 **Files:**
 - Create: `tools/build_quran_db.dart`, `tools/chapters_cache.json` (tool-generated; committed after first successful run), `assets/db/quran.sqlite` (tool-generated artifact; committed)
-- Modify: `lib/core/db/app_database.dart` (add one public seeding method — Task 2 Step 1b)
+- Modify (Errata v3, Step 0): `lib/core/db/app_database.dart` (pure-Dart refactor), `lib/core/di/injector.dart` (LazyDatabase wiring)
 - Modify: `pubspec.yaml` — under `flutter: assets:` REPLACE the `- assets/json/` line with `- assets/db/` (`assets/icons/` stays; the 7.4 MB JSON remains repo-tracked as the tool input but must NOT bundle into the APK)
 
 **Interfaces:**
 - Produces: `assets/db/quran.sqlite` with all 8 W0 tables created; `surahs` = 114 rows (id 1..114; nameAr = quran.com `name_arabic`; nameEn = `name_simple`; revelationType = `revelation_place`; ayahCount = `verses_count`; pagesStart/pagesEnd = min/max of its ayah `page` values); `ayahs` = 6,236 rows (id = JSON `id`, surahId = `sura_no`, numberInSurah = `aya_no`, juz = `jozz`, page, lineStart = `line_start`, lineEnd = `line_end`, textUthmani = `aya_text`, textImlaei = `aya_text_emlaey`, sajda = false in v1). Bookmark/tracker/pack tables exist empty.
 - W1b contract: ayah indexing (id / page / juz) is authoritative from this DB only.
+
+- [ ] **Step 0 (Errata v3): decouple `app_database.dart` from Flutter + rewire the injector.**
+
+REPLACE `lib/core/db/app_database.dart` entirely (verbatim — pure Dart, no `connection.dart` import):
+```dart
+import 'package:drift/drift.dart';
+import 'package:meta/meta.dart';
+
+import 'tables.dart';
+
+part 'app_database.g.dart';
+
+@DriftDatabase(tables: [
+  Surahs,
+  Ayahs,
+  Bookmarks,
+  KhatmaProgress,
+  PrayerLog,
+  InstalledPacks,
+  Downloads,
+  SettingsTable,
+])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase(QueryExecutor executor) : super(executor);
+
+  @visibleForTesting
+  AppDatabase.test(super.e);
+
+  @override
+  int get schemaVersion => 1;
+
+  /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
+  /// a fresh executor. Wraps the protected migrator; public by design.
+  Future<void> createSchemaForSeeding() => createMigrator().createAll();
+}
+```
+REPLACE the AppDatabase registration inside `lib/core/di/injector.dart` (verbatim; imports for this task — `configureDependencies` keeps every W0 line that is not the AppDatabase registration):
+```dart
+  getIt.registerLazySingleton<AppDatabase>(
+      () => AppDatabase(LazyDatabase(openAppDatabase)));
+```
+```dart
+import 'package:drift/drift.dart' show LazyDatabase;
+
+import '../db/connection.dart';
+```
+Step-0 gates (before writing the tool):
+```powershell
+flutter test
+flutter analyze
+```
+Expected: 8/8 + 0 issues. Failure here = the refactor is wrong → STOP and report.
+
+Then DELETE the old inline `createSchemaForSeeding` note below if your transcription added it to `connection.dart` — the method lives in `app_database.dart` ONLY.
 
 - [ ] **Step 1: Write the tool — `tools/build_quran_db.dart` (verbatim)**
 
@@ -164,14 +227,7 @@ Future<void> main() async {
 ```
 (`min`/`max` come from `dart:math`; `groupBy`/`groupBy` extensions from `package:collection`; `NativeDatabase` from `package:drift/native.dart`; `Value`/companions/part-data-classes from `package:drift/drift.dart` + the generated `app_database.dart`.)
 
-- [ ] **Step 1b: Add the public seeding method to `lib/core/db/app_database.dart` (inside `AppDatabase`, after `schemaVersion`):**
-
-```dart
-  /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
-  /// a fresh executor. Wraps the protected migrator; public by design.
-  Future<void> createSchemaForSeeding() => createMigrator().createAll();
-```
-(Called from inside the class → no `@protected` / `@visibleForTesting` violation; keeps the 0-issue analyze gate without any `// ignore:` comments.)
+- [ ] **Step 1b (folded into Step 0 by Errata v3):** the `createSchemaForSeeding()` method now ships inside the Step-0 `app_database.dart` replacement above — nothing else to add.
 
 - [ ] **Step 2: Deps + run (internet needed once for the metadata cache)**
 
@@ -184,8 +240,8 @@ Expected: `surahs=114 ayahs=6236 bytes=<n>`, exit 0. Mismatch/HTTP failure → t
 - [ ] **Step 3: pubspec assets edit (as declared under Files) + commit**
 
 ```powershell
-git add tools/build_quran_db.dart tools/chapters_cache.json assets/db/quran.sqlite pubspec.yaml pubspec.lock
-git commit -m "feat(w1a): bundled quran sqlite build tool (114/6236 verified)"
+git add tools/build_quran_db.dart tools/chapters_cache.json assets/db/quran.sqlite lib/core/db/app_database.dart lib/core/di/injector.dart pubspec.yaml pubspec.lock
+git commit -m "feat(w1a): pure-dart db decouple + bundled quran sqlite (114/6236 verified)"
 ```
 
 ---
@@ -197,7 +253,8 @@ git commit -m "feat(w1a): bundled quran sqlite build tool (114/6236 verified)"
 - Test: `test/db_bootstrap_test.dart` (new)
 
 **Interfaces:**
-- Consumes: rootBundle. Produces: `copyDbAssetIfAbsent({required File target, required String assetKey, required Future<ByteData> Function(String) loadAsset})` — `@visibleForTesting` helper: copies only when `target` absent; `openAppDatabase()` uses it with `dbAssetKey = 'assets/db/quran.sqlite'` then opens as in W0. Accepted debt (recorded, do not fix now): the one-time ~7 MB copy runs on the main isolate.
+- Consumes: rootBundle. Produces: `copyDbAssetIfAbsent({required File target, required String assetKey, required Future<ByteData> Function(String) loadAsset})` — `@visibleForTesting` helper: copies only when `target` absent; `openAppDatabase()` uses it with `dbAssetKey = 'assets/db/quran.sqlite'` then opens via `NativeDatabase.createInBackground(file)`. Accepted debt (recorded, do not fix now): the one-time ~7 MB copy runs on the main isolate.
+- DI note (Errata v3): `injector.dart` already wires `LazyDatabase(openAppDatabase)` since Task 2 Step 0b — Task 3 makes ZERO DI edits; replacing `connection.dart` transparently upgrades first-launch behavior.
 
 - [ ] **Step 1: Failing test — `test/db_bootstrap_test.dart` (verbatim)**
 
@@ -817,4 +874,4 @@ git commit -m "docs(w1a): mark plan checkboxes complete"
 - **Spec coverage (W1a slice):** §5 seed data (T2) + bootstrap (T3); §3 quran feature layers (T4–T5); offline model step-1 bundle (T2/T3); D6/l10n/i18n-style rules (T5); baseline 8-test suite grows with repo/cubit/widget tests. Reader, mushaf, bookmarks, khatma, pages/juz tabs = W1b (explicit non-goals).
 - **Placeholder scan:** none — every code block is complete and final; no fake guards, no TBD/TODO.
 - **Type consistency:** `SurahRepository`/`SurahIndexCubit`/`SurahIndexState` names stable across T4 tests, T5 screen/router/test; `Surah` always the drift data class from the single generated file; DI registers only `SurahRepository` (cubit lifecycle owned by BlocProvider — T5 Step 4 rationale box).
-- **Errata v2 applied everywhere:** `Value(...)` id-wrapping (tool + all three test files), `dart:math` min/max, `drift/native.dart` import, and the public `createSchemaForSeeding()` (no ignores needed).
+- **Errata v2 + v3 applied everywhere:** `Value(...)` id-wrapping (tool + all three test files), `dart:math` min/max, `drift/native.dart` import, public `createSchemaForSeeding()`; `app_database.dart` pure-Dart with required-executor ctor + `LazyDatabase(openAppDatabase)` moved into the injector (W0've 8-test suite must stay green through Task 2 Step 0 gates).
