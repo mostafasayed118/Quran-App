@@ -8,6 +8,9 @@ import '../db/connection.dart';
 import '../../features/quran/data/surah_repository.dart';
 import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
+import '../../features/prayer/data/city_repository.dart';
+import '../../features/prayer/data/prayer_time_service.dart';
+import '../../features/qibla/data/qibla_service.dart';
 import '../../features/recitation/data/audio_downloader.dart';
 import '../../features/recitation/data/reciter_repository.dart';
 import '../../features/recitation/playback/just_audio_playback_service.dart';
@@ -21,6 +24,7 @@ bool _configured = false;
 
 Future<void> configureDependencies({
   Future<Directory> Function()? audioRootResolver,
+  Future<List<Map<String, dynamic>>> Function()? citiesLoader,
 }) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
@@ -30,6 +34,12 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
+  getIt.registerLazySingleton<PrayerTimeService>(() => const PrayerTimeService());
+  getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
+  if (citiesLoader != null) {
+    getIt.registerLazySingleton<CityRepository>(
+        () => CityRepository(db: db, loader: citiesLoader));
+  }
   getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {
     getIt.registerLazySingleton<AudioDownloader>(

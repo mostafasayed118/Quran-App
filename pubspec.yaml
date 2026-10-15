@@ -58,6 +58,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/db/
+    - assets/data/
 
   fonts:
     - family: quran
