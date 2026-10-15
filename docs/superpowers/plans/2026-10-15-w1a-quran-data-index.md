@@ -47,7 +47,7 @@ S8 proved defect #6: `flutter pub add --dev bloc_test` is UNINSTALLABLE in this 
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim, in the report**
+- [x] **Step 1: Record verbatim, in the report**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; flutter --version
@@ -67,7 +67,7 @@ Expected: branch `main`, clean tree. Vertex expectation: `fc31fe1` or later (PM 
 - Produces: `assets/db/quran.sqlite` with all 8 W0 tables created; `surahs` = 114 rows (id 1..114; nameAr = quran.com `name_arabic`; nameEn = `name_simple`; revelationType = `revelation_place`; ayahCount = `verses_count`; pagesStart/pagesEnd = min/max of its ayah `page` values); `ayahs` = 6,236 rows (id = JSON `id`, surahId = `sura_no`, numberInSurah = `aya_no`, juz = `jozz`, page, lineStart = `line_start`, lineEnd = `line_end`, textUthmani = `aya_text`, textImlaei = `aya_text_emlaey`, sajda = false in v1). Bookmark/tracker/pack tables exist empty.
 - W1b contract: ayah indexing (id / page / juz) is authoritative from this DB only.
 
-- [ ] **Step 0 (Errata v3): decouple `app_database.dart` from Flutter + rewire the injector.**
+- [x] **Step 0 (Errata v3): decouple `app_database.dart` from Flutter + rewire the injector.**
 
 REPLACE `lib/core/db/app_database.dart` entirely (verbatim — pure Dart, no `connection.dart` import):
 ```dart
@@ -121,7 +121,7 @@ Expected: 8/8 + 0 issues. Failure here = the refactor is wrong → STOP and repo
 
 Then DELETE the old inline `createSchemaForSeeding` note below if your transcription added it to `connection.dart` — the method lives in `app_database.dart` ONLY.
 
-- [ ] **Step 1: Write the tool — `tools/build_quran_db.dart` (verbatim)**
+- [x] **Step 1: Write the tool — `tools/build_quran_db.dart` (verbatim)**
 
 ```dart
 // Build-time generator: assets/db/quran.sqlite from the legacy JSON + surah metadata.
@@ -234,9 +234,9 @@ Future<void> main() async {
 ```
 (`min`/`max` come from `dart:math`; `groupBy`/`groupBy` extensions from `package:collection`; `NativeDatabase` from `package:drift/native.dart`; `Value`/companions/part-data-classes from `package:drift/drift.dart` + the generated `app_database.dart`.)
 
-- [ ] **Step 1b (folded into Step 0 by Errata v3):** the `createSchemaForSeeding()` method now ships inside the Step-0 `app_database.dart` replacement above — nothing else to add.
+- [x] **Step 1b (folded into Step 0 by Errata v3):** the `createSchemaForSeeding()` method now ships inside the Step-0 `app_database.dart` replacement above — nothing else to add.
 
-- [ ] **Step 2: Deps + run (internet needed once for the metadata cache)**
+- [x] **Step 2: Deps + run (internet needed once for the metadata cache)**
 
 ```powershell
 flutter pub add http collection
@@ -244,7 +244,7 @@ dart run tools/build_quran_db.dart
 ```
 Expected: `surahs=114 ayahs=6236 bytes=<n>`, exit 0. Mismatch/HTTP failure → tool exits nonzero with its stderr line → STOP and report.
 
-- [ ] **Step 3: pubspec assets edit (as declared under Files) + commit**
+- [x] **Step 3: pubspec assets edit (as declared under Files) + commit**
 
 ```powershell
 git add tools/build_quran_db.dart tools/chapters_cache.json assets/db/quran.sqlite lib/core/db/app_database.dart lib/core/di/injector.dart pubspec.yaml pubspec.lock
@@ -263,7 +263,7 @@ git commit -m "feat(w1a): pure-dart db decouple + bundled quran sqlite (114/6236
 - Consumes: rootBundle. Produces: `copyDbAssetIfAbsent({required File target, required String assetKey, required Future<ByteData> Function(String) loadAsset})` — `@visibleForTesting` helper: copies only when `target` absent; `openAppDatabase()` uses it with `dbAssetKey = 'assets/db/quran.sqlite'` then opens via `NativeDatabase.createInBackground(file)`. Accepted debt (recorded, do not fix now): the one-time ~7 MB copy runs on the main isolate.
 - DI note (Errata v3): `injector.dart` already wires `LazyDatabase(openAppDatabase)` since Task 2 Step 0b — Task 3 makes ZERO DI edits; replacing `connection.dart` transparently upgrades first-launch behavior.
 
-- [ ] **Step 1: Failing test — `test/db_bootstrap_test.dart` (verbatim)**
+- [x] **Step 1: Failing test — `test/db_bootstrap_test.dart` (verbatim)**
 
 ```dart
 import 'dart:io';
@@ -298,7 +298,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run → FAIL (helper missing). Then REPLACE `lib/core/db/connection.dart` entirely (verbatim):**
+- [x] **Step 2: Run → FAIL (helper missing). Then REPLACE `lib/core/db/connection.dart` entirely (verbatim):**
 
 ```dart
 import 'dart:io';
@@ -337,7 +337,7 @@ Future<QueryExecutor> openAppDatabase() async {
 }
 ```
 
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter test test/db_bootstrap_test.dart
@@ -363,7 +363,7 @@ git commit -m "feat(w1a): first-launch quran.sqlite bootstrap from bundled asset
   - `SurahIndexCubit(SurahRepository repo)` — holds the latest surah list, registers a drift watch, exposes `void setQuery(String raw)` (trims; empty = all; matches nameAr prefix/contains, nameEn contains, or exact id string).
 - DI: `getIt<SurahRepository>()` registered. The cubit is NOT registered in DI — the router constructs it inside a `BlocProvider` (Task 5) so Flutter owns its lifecycle.
 
-- [ ] **Step 1: Failing tests (both files verbatim; NO new dependencies — Errata v4)**
+- [x] **Step 1: Failing tests (both files verbatim; NO new dependencies — Errata v4)**
 
 `test/surah_repository_test.dart`:
 ```dart
@@ -463,7 +463,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run both → FAIL. Then implement the three files (verbatim).**
+- [x] **Step 2: Run both → FAIL. Then implement the three files (verbatim).**
 
 `lib/features/quran/data/surah_repository.dart`:
 ```dart
@@ -558,7 +558,7 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 ```
 (Drift's watch re-emits on any table change; `_latest`+`_emitFiltered` keeps a single emit path. Note the first drift event fires `[Surah]` async — hence the tests' `Duration.zero` tick.)
 
-- [ ] **Step 3: Generate + gates**
+- [x] **Step 3: Generate + gates**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -567,7 +567,7 @@ flutter analyze
 ```
 Expected: freezed generated; both files pass; analyze 0 issues.
 
-- [ ] **Step 4: DI — in `lib/core/di/injector.dart` append inside `configureDependencies` (after the AppDatabase registration) + imports:**
+- [x] **Step 4: DI — in `lib/core/di/injector.dart` append inside `configureDependencies` (after the AppDatabase registration) + imports:**
 
 ```dart
   final db = getIt<AppDatabase>();
@@ -577,7 +577,7 @@ Expected: freezed generated; both files pass; analyze 0 issues.
 import '../../features/quran/data/surah_repository.dart';
 ```
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add lib/features/quran lib/core/di/injector.dart test/surah_repository_test.dart test/surah_index_cubit_test.dart pubspec.yaml pubspec.lock
@@ -598,7 +598,7 @@ git commit -m "feat(w1a): surah repository + index cubit (freezed states, DI, te
 - l10n keys (additive, both locales): `surahIndexTitle`, `searchSurahHint`, `revelationMakkah`, `revelationMadinah`, `ayatCount(count)`.
 - Design contract: D6 tokens via Theme only (no AppColors imports in the screen); Arabic surah names in `QuranFonts.meQuran`; numbers via intl locale formatting (no manual Arabic-Indic conversions).
 
-- [ ] **Step 1: ARB additions (additive ONLY, appended before each file's closing brace)**
+- [x] **Step 1: ARB additions (additive ONLY, appended before each file's closing brace)**
 
 AR (`app_ar.arb`):
 ```json
@@ -619,7 +619,7 @@ EN (`app_en.arb`):
   "@ayatCount": { "placeholders": { "count": { "type": "int" } } }
 ```
 
-- [ ] **Step 2: Failing widget test FIRST — `test/surah_index_screen_test.dart` (verbatim, BOTH tests inside the same `main()`):**
+- [x] **Step 2: Failing widget test FIRST — `test/surah_index_screen_test.dart` (verbatim, BOTH tests inside the same `main()`):**
 
 ```dart
 import 'package:drift/drift.dart' show Value;
@@ -703,7 +703,7 @@ void main() {
 ```
 (Two notes: [1] If the generated AR string renders western digits — `7 آيات` vs `٧ آيات` — flex the WIDGET-TEST digit expectation only, never the app code; asserting Arabic names like above avoids the issue entirely. [2] `بقرة` matches `البقرة` via the cubit's `nameAr.contains` — if this search test fails, re-read the cubit logic; do NOT weaken the test.)
 
-- [ ] **Step 3: Implement the screen — `lib/features/quran/presentation/index/surah_index_screen.dart` (verbatim, complete file):**
+- [x] **Step 3: Implement the screen — `lib/features/quran/presentation/index/surah_index_screen.dart` (verbatim, complete file):**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -810,7 +810,7 @@ class _SurahRow extends StatelessWidget {
 ```
 (RTL note: `trailing: chevron_left` gives the mirrored affordance in the RTL list without any transform — Flutter layout stays logical; the icon glyph is directionally chosen here deliberately.)
 
-- [ ] **Step 4: Router — replace the `/quran` line in `lib/app/router.dart` with (verbatim):**
+- [x] **Step 4: Router — replace the `/quran` line in `lib/app/router.dart` with (verbatim):**
 
 ```dart
       GoRoute(
@@ -832,7 +832,7 @@ import '../features/quran/presentation/index/surah_index_screen.dart';
 ```
 (Lifecycle: BlocProvider owns the cubit and closes it on pop; drift watches cancel via cubit.close → repository stays shared through DI.)
 
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -848,7 +848,7 @@ Expected: analyze 0 issues; ALL tests pass (baseline was 8 — record the new ex
 
 ### Task 6: Close-out
 
-- [ ] **Step 1: Full end gates + artifact proof**
+- [x] **Step 1: Full end gates + artifact proof**
 
 ```powershell
 flutter gen-l10n
@@ -860,14 +860,14 @@ git status --porcelain
 ```
 Expected: analyze 0; all tests green (record count); apk exit 0; porcelain empty.
 
-- [ ] **Step 2: Checkbox commit**
+- [x] **Step 2: Checkbox commit**
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w1a-quran-data-index.md
 git commit -m "docs(w1a): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3: FINAL REPORT — the PROMPT-1 §8 six-section format, plus: the generated l10n note (which digit set the AR ayatCount produced), APK size, and unpushed count. NO push. WAIT for the PM.**
+- [x] **Step 3: FINAL REPORT — the PROMPT-1 §8 six-section format, plus: the generated l10n note (which digit set the AR ayatCount produced), APK size, and unpushed count. NO push. WAIT for the PM.**
 
 ---
 
