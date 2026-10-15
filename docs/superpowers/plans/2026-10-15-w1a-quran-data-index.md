@@ -10,6 +10,17 @@
 
 **Spec:** `docs/superpowers/specs/2026-10-15-quran-yahdi-rebuild-design.md` (§5 schema, §6 design, D6 tokens). W0 plan conventions apply.
 
+## PM Errata v2 — 2026-10-15 (post S6-STOP ruling; SUPERSEDES conflicting code below where edited)
+
+An executor STOP (S6) proved four plan defects; PM verified each at source and amended the plan in place:
+
+1. **`NativeDatabase`** is exported by `package:drift/native.dart`, NOT by `package:drift/drift.dart` → tool imports both.
+2. **`min`/`max`** come from `dart:math`, NOT `package:collection` → tool imports `dart:math` (`collection` still provides `groupBy`).
+3. **Drift companion `id` params are `Value<T>`** in this repo (explicit non-auto PKs; `app_database.g.dart:286,759`) → every `SurahsCompanion.insert`/`AyahsCompanion.insert` in THIS plan's code wraps `id:` in `Value(...)` (tool + all test files).
+4. **`createMigrator()` is `@protected @visibleForTesting`** (drift 2.35.2) → a public seeding method was added to `AppDatabase`: `createSchemaForSeeding()` (Task 2 Step 1b) — the tool calls that; NO `// ignore:` comments anywhere.
+
+If you are re-running after the S6 session: replace any pre-staged `tools/build_quran_db.dart` (old-plan transcription) with the amended code below before continuing.
+
 ## Global Constraints
 
 - W0 rules are binding here too: dependency freshness via `flutter pub add` only; analyze ends at 0 issues; TDD where stated; explicit-pathspec commits with the exact messages below; NO push; no packages beyond this plan; checkbox ticks in THIS plan file as tasks complete (committed in Task 6).
@@ -33,6 +44,7 @@ Expected: branch `main`, clean tree. Vertex expectation: `fc31fe1` or later (PM 
 
 **Files:**
 - Create: `tools/build_quran_db.dart`, `tools/chapters_cache.json` (tool-generated; committed after first successful run), `assets/db/quran.sqlite` (tool-generated artifact; committed)
+- Modify: `lib/core/db/app_database.dart` (add one public seeding method — Task 2 Step 1b)
 - Modify: `pubspec.yaml` — under `flutter: assets:` REPLACE the `- assets/json/` line with `- assets/db/` (`assets/icons/` stays; the 7.4 MB JSON remains repo-tracked as the tool input but must NOT bundle into the APK)
 
 **Interfaces:**
@@ -46,9 +58,11 @@ Expected: branch `main`, clean tree. Vertex expectation: `fc31fe1` or later (PM 
 // Run:  dart run tools/build_quran_db.dart
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show max, min;
 
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -98,7 +112,7 @@ Future<void> main() async {
   final dbFile = File(dbPath);
   if (dbFile.existsSync()) dbFile.deleteSync();
   final db = AppDatabase(NativeDatabase(dbFile));
-  await db.createMigrator().createAll();
+  await db.createSchemaForSeeding();
 
   final bySurah =
       groupBy(ayahList, (Map<String, dynamic> a) => (a['sura_no'] as num).toInt());
@@ -109,7 +123,7 @@ Future<void> main() async {
       final ayahs = bySurah[surahNo]!;
       final pages = ayahs.map((a) => (a['page'] as num).toInt()).toList();
       b.insert(db.surahs, SurahsCompanion.insert(
-        id: surahNo,
+        id: Value(surahNo),
         nameAr: ch['name_arabic'] as String,
         nameEn: ch['name_simple'] as String,
         revelationType: ch['revelation_place'] as String,
@@ -120,7 +134,7 @@ Future<void> main() async {
     }
     for (final a in ayahList) {
       b.insert(db.ayahs, AyahsCompanion.insert(
-        id: (a['id'] as num).toInt(),
+        id: Value((a['id'] as num).toInt()),
         surahId: (a['sura_no'] as num).toInt(),
         numberInSurah: (a['aya_no'] as num).toInt(),
         juz: (a['jozz'] as num).toInt(),
@@ -148,7 +162,16 @@ Future<void> main() async {
   }
 }
 ```
-(`min`/`max` and `groupBy` come from `package:collection/collection.dart`; `Value`/`Value.absent` come from the full `package:drift/drift.dart` import; companions and data classes come from the generated `app_database.dart`.)
+(`min`/`max` come from `dart:math`; `groupBy`/`groupBy` extensions from `package:collection`; `NativeDatabase` from `package:drift/native.dart`; `Value`/companions/part-data-classes from `package:drift/drift.dart` + the generated `app_database.dart`.)
+
+- [ ] **Step 1b: Add the public seeding method to `lib/core/db/app_database.dart` (inside `AppDatabase`, after `schemaVersion`):**
+
+```dart
+  /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
+  /// a fresh executor. Wraps the protected migrator; public by design.
+  Future<void> createSchemaForSeeding() => createMigrator().createAll();
+```
+(Called from inside the class → no `@protected` / `@visibleForTesting` violation; keeps the 0-issue analyze gate without any `// ignore:` comments.)
 
 - [ ] **Step 2: Deps + run (internet needed once for the metadata cache)**
 
@@ -299,13 +322,13 @@ void main() {
     db = AppDatabase.test(NativeDatabase.memory());
     await db.into(db.surahs).insertAll([
       SurahsCompanion.insert(
-          id: 1, nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
+          id: const Value(1), nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
           revelationType: 'makkah', ayahCount: 7, pagesStart: 1, pagesEnd: 1),
       SurahsCompanion.insert(
-          id: 2, nameAr: 'البقرة', nameEn: 'Al-Baqarah',
+          id: const Value(2), nameAr: 'البقرة', nameEn: 'Al-Baqarah',
           revelationType: 'madinah', ayahCount: 286, pagesStart: 2, pagesEnd: 49),
       SurahsCompanion.insert(
-          id: 3, nameAr: 'آل عمران', nameEn: 'Aal-i-Imraan',
+          id: const Value(3), nameAr: 'آل عمران', nameEn: 'Aal-i-Imraan',
           revelationType: 'madinah', ayahCount: 200, pagesStart: 50, pagesEnd: 76),
     ]);
     repo = SurahRepository(db);
@@ -323,6 +346,7 @@ void main() {
 `test/surah_index_cubit_test.dart`:
 ```dart
 import 'package:bloc_test/bloc_test.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -338,10 +362,10 @@ void main() {
     db = AppDatabase.test(NativeDatabase.memory());
     await db.into(db.surahs).insertAll([
       SurahsCompanion.insert(
-          id: 1, nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
+          id: const Value(1), nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
           revelationType: 'makkah', ayahCount: 7, pagesStart: 1, pagesEnd: 1),
       SurahsCompanion.insert(
-          id: 2, nameAr: 'البقرة', nameEn: 'Al-Baqarah',
+          id: const Value(2), nameAr: 'البقرة', nameEn: 'Al-Baqarah',
           revelationType: 'madinah', ayahCount: 286, pagesStart: 2, pagesEnd: 49),
     ]);
   });
@@ -560,13 +584,13 @@ void main() {
     db = AppDatabase.test(NativeDatabase.memory());
     await db.into(db.surahs).insertAll([
       SurahsCompanion.insert(
-          id: 1, nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
+          id: const Value(1), nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
           revelationType: 'makkah', ayahCount: 7, pagesStart: 1, pagesEnd: 1),
       SurahsCompanion.insert(
-          id: 2, nameAr: 'البقرة', nameEn: 'Al-Baqarah',
+          id: const Value(2), nameAr: 'البقرة', nameEn: 'Al-Baqarah',
           revelationType: 'madinah', ayahCount: 286, pagesStart: 2, pagesEnd: 49),
       SurahsCompanion.insert(
-          id: 3, nameAr: 'النمل', nameEn: 'An-Naml',
+          id: const Value(3), nameAr: 'النمل', nameEn: 'An-Naml',
           revelationType: 'makkah', ayahCount: 93, pagesStart: 377, pagesEnd: 385),
     ]);
   });
@@ -793,3 +817,4 @@ git commit -m "docs(w1a): mark plan checkboxes complete"
 - **Spec coverage (W1a slice):** §5 seed data (T2) + bootstrap (T3); §3 quran feature layers (T4–T5); offline model step-1 bundle (T2/T3); D6/l10n/i18n-style rules (T5); baseline 8-test suite grows with repo/cubit/widget tests. Reader, mushaf, bookmarks, khatma, pages/juz tabs = W1b (explicit non-goals).
 - **Placeholder scan:** none — every code block is complete and final; no fake guards, no TBD/TODO.
 - **Type consistency:** `SurahRepository`/`SurahIndexCubit`/`SurahIndexState` names stable across T4 tests, T5 screen/router/test; `Surah` always the drift data class from the single generated file; DI registers only `SurahRepository` (cubit lifecycle owned by BlocProvider — T5 Step 4 rationale box).
+- **Errata v2 applied everywhere:** `Value(...)` id-wrapping (tool + all three test files), `dart:math` min/max, `drift/native.dart` import, and the public `createSchemaForSeeding()` (no ignores needed).
