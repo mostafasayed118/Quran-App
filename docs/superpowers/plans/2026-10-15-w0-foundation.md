@@ -26,21 +26,21 @@
 **Files:**
 - Delete: `web/`, `linux/`, `windows/`, `macos/`
 
-- [ ] **Step 1: Record baseline (verbatim in final report)**
+- [x] **Step 1: Record baseline (verbatim in final report)**
 
 ```powershell
 git rev-parse HEAD; git status --porcelain; flutter --version
 ```
 Expected: HEAD = current `main` tip, clean tree.
 
-- [ ] **Step 2: Remove platforms**
+- [x] **Step 2: Remove platforms**
 
 ```powershell
 git rm -r --quiet web linux windows macos
 flutter pub get
 ```
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```powershell
 git commit -m "chore(w0): prune desktop/web platform dirs (mobile-only target)" -- web linux windows macos
@@ -57,16 +57,16 @@ git commit -m "chore(w0): prune desktop/web platform dirs (mobile-only target)" 
 - Produces: package set all later tasks consume — `flutter_bloc`, `freezed_annotation`, `go_router`, `drift`, `get_it`, `dio`, `connectivity_plus`, `shared_preferences`; dev: `build_runner`, `freezed`, `drift_dev`, `flutter_lints`; build-tools moved to dev: `flutter_launcher_icons`, `flutter_native_splash`.
 - Produces: importable package name `package:quran_yahdi/...` (Task 3+ use it).
 
-- [ ] **Step 1: Rename pubspec package** — in `pubspec.yaml` set `name: quran_yahdi` (replaces `quran_app`), keep `version: 1.0.0+1`. Update description to `Quran Yahdi - a complete offline-first Islamic companion app`.
+- [x] **Step 1: Rename pubspec package** — in `pubspec.yaml` set `name: quran_yahdi` (replaces `quran_app`), keep `version: 1.0.0+1`. Update description to `Quran Yahdi - a complete offline-first Islamic companion app`.
 
-- [ ] **Step 2: Add runtime deps (latest stable each)**
+- [x] **Step 2: Add runtime deps (latest stable each)**
 
 ```powershell
 flutter pub get
 flutter pub add flutter_bloc freezed_annotation go_router drift get_it dio connectivity_plus shared_preferences
 ```
 
-- [ ] **Step 3: Add dev deps + relocate build tools**
+- [x] **Step 3: Add dev deps + relocate build tools**
 
 ```powershell
 flutter pub add --dev build_runner freezed drift_dev flutter_lints
@@ -74,14 +74,14 @@ flutter pub remove flutter_launcher_icons flutter_native_splash
 flutter pub add --dev flutter_launcher_icons flutter_native_splash
 ```
 
-- [ ] **Step 4: Remove dead deps**
+- [x] **Step 4: Remove dead deps**
 
 ```powershell
 flutter pub remove arabic_numbers cupertino_icons device_preview share_plus url_launcher scrollable_positioned_list
 ```
 (share_plus/url_launcher/scrollable_positioned_list return with their features in later waves — YAGNI now)
 
-- [ ] **Step 5: Replace `analysis_options.yaml` entirely**
+- [x] **Step 5: Replace `analysis_options.yaml` entirely**
 
 ```yaml
 include: package:flutter_lints/flutter.yaml
@@ -98,7 +98,7 @@ linter:
     avoid_print: true
 ```
 
-- [ ] **Step 6: Android identity** — in `android/app/build.gradle` set both:
+- [x] **Step 6: Android identity** — in `android/app/build.gradle` set both:
 ```gradle
 namespace = "com.mostafasayed.quranyahdi"
 ```
@@ -109,7 +109,7 @@ applicationId = "com.mostafasayed.quranyahdi"
 In `android/app/src/main/AndroidManifest.xml` set `android:label="قرآن يَهدي"`.
 (If either file cannot be located at these exact paths, STOP and report — no guessing.)
 
-- [ ] **Step 7: Gates + commit**
+- [x] **Step 7: Gates + commit**
 
 ```powershell
 flutter pub outdated
@@ -132,13 +132,13 @@ git commit -m "chore(w0): package identity quran_yahdi, latest-stable 2026 deps,
 **Interfaces:**
 - Produces: `QuranYahdiApp` (root widget; Tasks 5–6 extend it in place).
 
-- [ ] **Step 1: Delete legacy code**
+- [x] **Step 1: Delete legacy code**
 
 ```powershell
 git rm -r --quiet lib
 ```
 
-- [ ] **Step 2: Write failing test** — `test/smoke_test.dart`:
+- [x] **Step 2: Write failing test** — `test/smoke_test.dart`:
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -153,13 +153,13 @@ void main() {
 }
 ```
 
-- [ ] **Step 3: Run → expect FAIL (missing files)**
+- [x] **Step 3: Run → expect FAIL (missing files)**
 
 ```powershell
 flutter test test/smoke_test.dart
 ```
 
-- [ ] **Step 4: Provisional `lib/core/theme/app_theme.dart`** (final theming lands in Task 4 — keep the snippet below exactly as shown)
+- [x] **Step 4: Provisional `lib/core/theme/app_theme.dart`** (final theming lands in Task 4 — keep the snippet below exactly as shown)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -170,7 +170,7 @@ abstract final class AppTheme {
 }
 ```
 
-- [ ] **Step 5: `lib/app/app.dart`**
+- [x] **Step 5: `lib/app/app.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -195,7 +195,7 @@ class QuranYahdiApp extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 6: `lib/main.dart`**
+- [x] **Step 6: `lib/main.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -207,7 +207,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 7: Gates + commit**
+- [x] **Step 7: Gates + commit**
 
 ```powershell
 flutter test test/smoke_test.dart
@@ -229,7 +229,7 @@ git commit -m "feat(w0): delete legacy lib; bootstrap QuranYahdiApp"
 **Interfaces:**
 - Produces: `AppColors` (static D6 tokens), `AppTheme.light`, `AppTheme.dark`, `QuranFonts.quran = 'HafsSmart'`, `QuranFonts.meQuran = 'me_quran'`, `QuranFonts.ui = 'Cairo'`.
 
-- [ ] **Step 1: Failing test** — `test/theme_test.dart`:
+- [x] **Step 1: Failing test** — `test/theme_test.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -263,9 +263,9 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run → expect FAIL (app_colors.dart missing)**
+- [x] **Step 2: Run → expect FAIL (app_colors.dart missing)**
 
-- [ ] **Step 3: Implement `lib/core/theme/app_colors.dart`**
+- [x] **Step 3: Implement `lib/core/theme/app_colors.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -287,7 +287,7 @@ abstract final class AppColors {
 }
 ```
 
-- [ ] **Step 4: Replace `lib/core/theme/app_theme.dart` entirely**
+- [x] **Step 4: Replace `lib/core/theme/app_theme.dart` entirely**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -349,7 +349,7 @@ abstract final class AppTheme {
 }
 ```
 
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 flutter test test/theme_test.dart
@@ -370,7 +370,7 @@ git commit -m "feat(w0): D6 design tokens + light/dark themes"
 **Interfaces:**
 - Produces: generated `AppLocalizations` (class name derives from `output-localization-file`). Canonical usage adopted by all later waves: **`AppLocalizations.of(context)`**. New keys are added to both ARB files only, in their waves.
 
-- [ ] **Step 1: Create `l10n.yaml`**
+- [x] **Step 1: Create `l10n.yaml`**
 
 ```yaml
 arb-dir: lib/l10n
@@ -379,7 +379,7 @@ output-localization-file: app_localizations.dart
 nullable-getter: false
 ```
 
-- [ ] **Step 2: Create `lib/l10n/app_ar.arb`**
+- [x] **Step 2: Create `lib/l10n/app_ar.arb`**
 
 ```json
 {
@@ -404,7 +404,7 @@ nullable-getter: false
 }
 ```
 
-- [ ] **Step 3: Create `lib/l10n/app_en.arb`** (same key set)
+- [x] **Step 3: Create `lib/l10n/app_en.arb`** (same key set)
 
 ```json
 {
@@ -429,14 +429,14 @@ nullable-getter: false
 }
 ```
 
-- [ ] **Step 4: Generate**
+- [x] **Step 4: Generate**
 
 ```powershell
 flutter gen-l10n
 ```
 Expected: `lib/l10n/app_localizations.dart` + `app_localizations_ar.dart` + `app_localizations_en.dart`.
 
-- [ ] **Step 5: Replace `lib/app/app.dart`** (routing still via `home:` — router arrives in Task 6)
+- [x] **Step 5: Replace `lib/app/app.dart`** (routing still via `home:` — router arrives in Task 6)
 
 ```dart
 import 'package:flutter/material.dart';
@@ -471,7 +471,7 @@ class QuranYahdiApp extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 6: `flutter pub add flutter_localizations intl --sdk=flutter` if not already present (intl arrives via flutter_localizations), then gates + commit**
+- [x] **Step 6: `flutter pub add flutter_localizations intl --sdk=flutter` if not already present (intl arrives via flutter_localizations), then gates + commit**
 
 ```powershell
 flutter pub add flutter_localizations --sdk=flutter
@@ -497,7 +497,7 @@ git commit -m "feat(w0): AR/EN localization scaffolding (ARB + delegates)"
 - Consumes: `AppTheme` (via app.dart), nothing else.
 - Produces: `AppRouter.router` (GoRouter). Named route paths (exact strings later waves deep-link against): `/home`, `/quran`, `/recitation`, `/library`, `/prayer-times`, `/qibla`, `/azkar`, `/tasbih`, `/duas`, `/worship`, `/zakat`, `/hijri`, `/asma`, `/settings`. Each placeholder screen later gets replaced in its own feature wave with `const XScreen({super.key})` signatures.
 
-- [ ] **Step 1: Failing test** — `test/router_test.dart`:
+- [x] **Step 1: Failing test** — `test/router_test.dart`:
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -515,9 +515,9 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run → expect FAIL**
+- [x] **Step 2: Run → expect FAIL**
 
-- [ ] **Step 3: Implement `lib/core/widgets/placeholder_screen.dart`**
+- [x] **Step 3: Implement `lib/core/widgets/placeholder_screen.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -542,7 +542,7 @@ class PlaceholderScreen extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 4: Implement `lib/app/router.dart`**
+- [x] **Step 4: Implement `lib/app/router.dart`**
 
 ```dart
 import 'package:go_router/go_router.dart';
@@ -573,13 +573,13 @@ abstract final class AppRouter {
 ```
 (Placeholder titles are temporary strings; feature waves replace them with `AppLocalizations` getters — no l10n import needed in this file.)
 
-- [ ] **Step 5: Wire `app.dart`** — in Task 5's `MaterialApp`, delete the `home:` line and add:
+- [x] **Step 5: Wire `app.dart`** — in Task 5's `MaterialApp`, delete the `home:` line and add:
 ```dart
       routerConfig: AppRouter.router,
 ```
 plus `import 'router.dart';`
 
-- [ ] **Step 6: Gates + commit**
+- [x] **Step 6: Gates + commit**
 
 ```powershell
 flutter test test/router_test.dart
@@ -601,13 +601,13 @@ git commit -m "feat(w0): go_router 14-route map + placeholder screens"
 **Interfaces:**
 - Produces: `AppDatabase` (drift `_$AppDatabase` base via `@DriftDatabase`), `AppDatabase.test(QueryExecutor)` for tests, `AppDatabase()` opening `quran_yahdi.sqlite` via `NativeDatabase.createInBackground` under `getApplicationSupportDirectory()`. Tables (exact names from spec §5): `Surahs`, `Ayahs`, `Bookmarks`, `KhatmaProgress`, `PrayerLog`, `InstalledPacks`, `Downloads`, `SettingsTable`. `schemaVersion = 1`.
 
-- [ ] **Step 1: Add deps**
+- [x] **Step 1: Add deps**
 
 ```powershell
 flutter pub add path_provider path
 ```
 
-- [ ] **Step 2: Failing test** — `test/db_migration_test.dart`:
+- [x] **Step 2: Failing test** — `test/db_migration_test.dart`:
 
 ```dart
 import 'package:drift/native.dart';
@@ -666,9 +666,9 @@ void main() {
 }
 ```
 
-- [ ] **Step 3: Run → expect FAIL (missing files)**
+- [x] **Step 3: Run → expect FAIL (missing files)**
 
-- [ ] **Step 4: Implement `lib/core/db/tables.dart`**
+- [x] **Step 4: Implement `lib/core/db/tables.dart`**
 
 ```dart
 import 'package:drift/drift.dart';
@@ -753,7 +753,7 @@ class SettingsTable extends Table {
 }
 ```
 
-- [ ] **Step 5: Implement `lib/core/db/connection.dart`**
+- [x] **Step 5: Implement `lib/core/db/connection.dart`**
 
 ```dart
 import 'dart:io';
@@ -770,7 +770,7 @@ Future<QueryExecutor> openAppDatabase() async {
 }
 ```
 
-- [ ] **Step 6: Implement `lib/core/db/app_database.dart`**
+- [x] **Step 6: Implement `lib/core/db/app_database.dart`**
 
 ```dart
 import 'package:drift/drift.dart';
@@ -804,14 +804,14 @@ class AppDatabase extends _$AppDatabase {
 ```
 (If `@visibleForTesting` needs an import, add `package:meta/meta.dart` or `package:flutter/foundation.dart` — use `package:meta/meta.dart` via `drift`'s transitive availability; if the analyzer complains, `flutter pub add meta` and import it.)
 
-- [ ] **Step 7: Generate code**
+- [x] **Step 7: Generate code**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
 ```
 Expected: `app_database.g.dart` created next to `app_database.dart`.
 
-- [ ] **Step 8: Gates + commit**
+- [x] **Step 8: Gates + commit**
 
 ```powershell
 flutter test test/db_migration_test.dart
@@ -833,7 +833,7 @@ git commit -m "feat(w0): drift schema v1 (8 tables) + real-file connection + mig
 - Consumes: `AppDatabase` (Task 7).
 - Produces: `getIt` (GetIt instance) and `Future<void> configureDependencies()`, idempotent; later waves register repositories here.
 
-- [ ] **Step 1: Failing test** — `test/injector_test.dart`:
+- [x] **Step 1: Failing test** — `test/injector_test.dart`:
 
 ```dart
 import 'dart:io';
@@ -865,9 +865,9 @@ void main() {
 ```
 (`path_provider_platform_interface` arrives transitively with `path_provider` — import it directly without adding it to pubspec.)
 
-- [ ] **Step 2: Run → expect FAIL (injector missing)**
+- [x] **Step 2: Run → expect FAIL (injector missing)**
 
-- [ ] **Step 3: Implement `lib/core/di/injector.dart`**
+- [x] **Step 3: Implement `lib/core/di/injector.dart`**
 
 ```dart
 import 'package:get_it/get_it.dart';
@@ -885,7 +885,7 @@ Future<void> configureDependencies() async {
 }
 ```
 
-- [ ] **Step 4: Replace `lib/main.dart`**
+- [x] **Step 4: Replace `lib/main.dart`**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -900,7 +900,7 @@ Future<void> main() async {
 }
 ```
 
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 flutter test test/injector_test.dart
@@ -917,7 +917,7 @@ git commit -m "feat(w0): get_it DI + AppDatabase registration"
 **Files:**
 - Create: `.github/workflows/ci.yml`
 
-- [ ] **Step 1: Write `.github/workflows/ci.yml`**
+- [x] **Step 1: Write `.github/workflows/ci.yml`**
 
 ```yaml
 name: ci
@@ -941,7 +941,7 @@ jobs:
       - run: flutter test
 ```
 
-- [ ] **Step 2: Commit (CI proof lands on the first approved push — note that in the report)**
+- [x] **Step 2: Commit (CI proof lands on the first approved push — note that in the report)**
 
 ```powershell
 git add .github/workflows/ci.yml
@@ -952,7 +952,7 @@ git commit -m "ci: analyze + test on push and PR"
 
 ### Task 10: Final gates + freshness audit + handoff report
 
-- [ ] **Step 1: Full suite + clean build output**
+- [x] **Step 1: Full suite + clean build output**
 
 ```powershell
 flutter gen-l10n
@@ -962,21 +962,21 @@ flutter analyze
 ```
 Expected: analyze 0 issues, all tests pass — record exact test count.
 
-- [ ] **Step 2: Freshness audit**
+- [x] **Step 2: Freshness audit**
 
 ```powershell
 flutter pub outdated
 ```
 Expected: all direct deps current; any "discontinued" = STOP and report.
 
-- [ ] **Step 3: Worktree must be clean**
+- [x] **Step 3: Worktree must be clean**
 
 ```powershell
 git status --porcelain
 ```
 Expected: empty.
 
-- [ ] **Step 4: Handoff report (terminal message)** — baseline HEAD, per-commit list (sha + message), final test count, analyze verdict, `pub outdated` verdict, worktree status. No push. PM takes over from here.
+- [x] **Step 4: Handoff report (terminal message)** — baseline HEAD, per-commit list (sha + message), final test count, analyze verdict, `pub outdated` verdict, worktree status. No push. PM takes over from here.
 
 ---
 
