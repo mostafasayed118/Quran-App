@@ -6,6 +6,7 @@ import '../db/connection.dart';
 import '../../features/quran/data/surah_repository.dart';
 import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
+import '../../features/recitation/data/reciter_repository.dart';
 
 final getIt = GetIt.instance;
 
@@ -19,5 +20,6 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<SurahRepository>(() => SurahRepository(db));
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
+  getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
   _configured = true;
 }
