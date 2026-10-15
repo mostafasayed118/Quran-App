@@ -237,3 +237,12 @@ git commit -m "docs(w3): mark plan checkboxes complete"
 - Teardown/fake pattern carried (FakePlaybackService precedent → fakes here: `FakePrayerTimeService`), `isClosed` discipline, pumpHost only.
 - Arabic-Indic rendering at call sites via the existing utility; l10n strictly additive and symmetric.
 - Home reuses existing l10n keys and existing routes — no new route count (router retains 14); placeholder text removals in the three upgraded builders are the only router surgery.
+
+---
+
+## PM Errata & Adjudications (post-wave, committed by PM 2026-10-15)
+- All 10 disclosures ACCEPTED. The in-session smoke-harness grant (§6/§5.6) RATIFIED post-hoc with full diff audit: frozen assertion + findsOneWidget VERBATIM; plumbing = test binding + temp-dir PathProviderPlatform override (injector_test pattern) + configureDependencies wiring + bounded double-pump (ledger fake-async stall class). Zero other frozen file touched (router_test green unedited — verified).
+- D1 stands as the model ruling: the PM's guessed Makkah band was refuted at first red and the executor re-asserted the STRUCTURAL property (finite + [0,360)) instead of compensating numbers — exactly what the no-fabricated-goldens law demands. Standing: guessed constants in spatial/temporal tests yield property re-assertions, never compensated goldens.
+- D3 accepted: typed (PrayerName, DateTime) over the plan-sketch String label — l10n law preserved.
+- GATE AMENDMENT (ledger-recorded): debug-APK byte-determinism is RETIRED (W2b internal re-run delta 463 B; W3 PM-side delta 543 B at 206,084,245 — audio_session-era zip nondeterminism). Debug gate = exit 0 + same-size ballpark. Release single-config stays byte-stable (PM reproduced 64,035,247 EXACT).
+- Compass/GPS/method-switch/hijri/keystore remain W7. Cities asset independently probed: 156 entries, 0 malformed, eg-*/sa-* convention sound.
