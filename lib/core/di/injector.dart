@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drift/drift.dart' show LazyDatabase;
 import 'package:get_it/get_it.dart';
 
@@ -6,13 +8,17 @@ import '../db/connection.dart';
 import '../../features/quran/data/surah_repository.dart';
 import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
+import '../../features/recitation/data/audio_downloader.dart';
 import '../../features/recitation/data/reciter_repository.dart';
+import '../../features/recitation/presentation/downloads/downloads_cubit.dart';
 
 final getIt = GetIt.instance;
 
 bool _configured = false;
 
-Future<void> configureDependencies() async {
+Future<void> configureDependencies({
+  Future<Directory> Function()? audioRootResolver,
+}) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
       () => AppDatabase(LazyDatabase(openAppDatabase)));
@@ -21,5 +27,13 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
+  if (audioRootResolver != null) {
+    getIt.registerLazySingleton<AudioDownloader>(
+        () => AudioDownloader(db, audioRootResolver: audioRootResolver));
+    getIt.registerLazySingleton<DownloadsCubit>(
+        () => DownloadsCubit(
+            downloader: getIt<AudioDownloader>(),
+            reciters: getIt<ReciterRepository>()));
+  }
   _configured = true;
 }
