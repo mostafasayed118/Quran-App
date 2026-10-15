@@ -25,6 +25,11 @@ class AyahRepository {
       (_db.select(_db.surahs)..where((s) => s.id.equals(surahId)))
           .getSingleOrNull();
 
+  /// Single ayah lookup for the home continue-reading card (W3).
+  Future<Ayah?> ayahById(int ayahId) =>
+      (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
+          .getSingleOrNull();
+
   Future<void> toggleBookmark(int ayahId) async {
     final existing = await (_db.select(_db.bookmarks)
           ..where((b) => b.ayahId.equals(ayahId)))

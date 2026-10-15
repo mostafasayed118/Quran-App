@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
 import '../core/widgets/placeholder_screen.dart';
+import '../features/home/presentation/home_cubit.dart';
+import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/surah_repository.dart';
@@ -33,7 +35,18 @@ abstract final class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/home',
     routes: [
-      GoRoute(path: '/home', builder: (_, __) => const PlaceholderScreen(title: 'الرئيسية')),
+      GoRoute(
+        path: '/home',
+        builder: (_, __) => BlocProvider<HomeCubit>(
+          create: (_) => HomeCubit(
+            lastRead: getIt<LastReadRepository>(),
+            ayahs: getIt<AyahRepository>(),
+            prayer: getIt<PrayerTimeService>(),
+            city: getIt<CityRepository>(),
+          ),
+          child: const HomeScreen(),
+        ),
+      ),
       GoRoute(
         path: '/quran',
         builder: (_, __) => BlocProvider<SurahIndexCubit>(
