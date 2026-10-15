@@ -1,31 +1,31 @@
-# Quran Yahdi — Wave 1b (Reader + Mushaf + Bookmarks + Last-Read) Implementation Plan
+# Quran Yahdi ? Wave 1b (Reader + Mushaf + Bookmarks + Last-Read) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
-**Goal:** Ship the reading core: ayah reader (verse mode + mushaf page mode), per-ayah bookmarks (+ list screen), and reading-position persistence — all from the W1a bundled database.
+**Goal:** Ship the reading core: ayah reader (verse mode + mushaf page mode), per-ayah bookmarks (+ list screen), and reading-position persistence ? all from the W1a bundled database.
 
-**Architecture:** W1a pattern extended: `AyahRepository` + `LastReadRepository` (drift, pure Dart) → `ReaderCubit`/`BookmarksCubit` (flutter_bloc, Freezed sealed states) → screens (Material 3, D6 tokens). Mushaf mode = `PageView` over the surah's own content pages (ayahs grouped by `page` metadata; surah-scoped in v1 — a page shared with a neighboring surah renders only this surah's ayahs on it).
+**Architecture:** W1a pattern extended: `AyahRepository` + `LastReadRepository` (drift, pure Dart) ? `ReaderCubit`/`BookmarksCubit` (flutter_bloc, Freezed sealed states) ? screens (Material 3, D6 tokens). Mushaf mode = `PageView` over the surah's own content pages (ayahs grouped by `page` metadata; surah-scoped in v1 ? a page shared with a neighboring surah renders only this surah's ayahs on it).
 
-**Tech Stack:** W0/W1a stack only. ONE new package: `scrollable_positioned_list` (jump-to-ayah) — **resolvability pre-proven**: this repo's pre-W0 `pubspec.lock` resolved it at 0.3.8 on this same SDK. No test-helper deps (W1a Errata v4 lesson).
+**Tech Stack:** W0/W1a stack only. ONE new package: `scrollable_positioned_list` (jump-to-ayah) ? **resolvability pre-proven**: this repo's pre-W0 `pubspec.lock` resolved it at 0.3.8 on this same SDK. No test-helper deps (W1a Errata v4 lesson).
 
 **Spec:** `docs/superpowers/specs/2026-10-15-quran-yahdi-rebuild-design.md`. Prior waves: W1a plan conventions. PM campaign ledger pins the wave lessons.
 
 ## Global Constraints
 
-- All W0/W1a rules binding: add the ONE new package via `flutter pub add scrollable_positioned_list`; analyze ends 0 issues; TDD red→green where stated; explicit-pathspec commits with the exact messages below; NO push; checkbox ticks committed at close-out; one active writer on `main`.
-- **PM probe (basmond policy, verified 2026-10-15 against the committed sqlite):** ayah texts do NOT embed the basmala (Baqarah 1:1 = "الم"). Policy: render a basmala banner above the reading body for every surah EXCEPT 1 (Fatiha — its verse 1 IS the basmala) and 9 (At-Tawbah — by design).
-- **Wave lessons (binding, from the PM ledger):** drift companion PK columns wrap `Value(...)` (incl. `SettingsTableCompanion.insert(key: Value(...))`); class-specific drift imports (`package:drift/native.dart` for `NativeDatabase`); NO flutter import inside `data/`/cubits/states; seeding uses `db.batch((b) => b.insertAll(...))` (no `insertAll` on statements); widget tests must NOT hold a live drift watch — use the teardown-safe `Stream.value` repository override exactly as provided below; plain `test()` only; gen-l10n renders western digits for int placeholders — the page indicator therefore takes a pre-formatted String (Arabic-Indic via the Task 2 helper).
+- All W0/W1a rules binding: add the ONE new package via `flutter pub add scrollable_positioned_list`; analyze ends 0 issues; TDD red?green where stated; explicit-pathspec commits with the exact messages below; NO push; checkbox ticks committed at close-out; one active writer on `main`.
+- **PM probe (basmond policy, verified 2026-10-15 against the committed sqlite):** ayah texts do NOT embed the basmala (Baqarah 1:1 = "???"). Policy: render a basmala banner above the reading body for every surah EXCEPT 1 (Fatiha ? its verse 1 IS the basmala) and 9 (At-Tawbah ? by design).
+- **Wave lessons (binding, from the PM ledger):** drift companion PK columns wrap `Value(...)` (incl. `SettingsTableCompanion.insert(key: Value(...))`); class-specific drift imports (`package:drift/native.dart` for `NativeDatabase`); NO flutter import inside `data/`/cubits/states; seeding uses `db.batch((b) => b.insertAll(...))` (no `insertAll` on statements); widget tests must NOT hold a live drift watch ? use the teardown-safe `Stream.value` repository override exactly as provided below; plain `test()` only; gen-l10n renders western digits for int placeholders ? the page indicator therefore takes a pre-formatted String (Arabic-Indic via the Task 2 helper).
 
 ---
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; flutter --version
 ```
-Expected: HEAD `c2ae2fc` or later; intervening commits touch ONLY `docs/` (verify with `git log --oneline -4`); porcelain empty; branch `main`. Anything else → STOP.
+Expected: HEAD `c2ae2fc` or later; intervening commits touch ONLY `docs/` (verify with `git log --oneline -4`); porcelain empty; branch `main`. Anything else ? STOP.
 
 ---
 
@@ -36,9 +36,9 @@ Expected: HEAD `c2ae2fc` or later; intervening commits touch ONLY `docs/` (verif
 - Test: `test/arabic_numbers_test.dart`
 
 **Interfaces:**
-- Produces: `extension ArabicIndicInt on int { String get toArabicIndic; }` — converts the decimal representation of the int to Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩); non-digit characters pass through unchanged (there are none in an int, but the implementation iterates chars so `"12"`-style reuse stays possible).
+- Produces: `extension ArabicIndicInt on int { String get toArabicIndic; }` ? converts the decimal representation of the int to Arabic-Indic digits (??????????); non-digit characters pass through unchanged (there are none in an int, but the implementation iterates chars so `"12"`-style reuse stays possible).
 
-- [ ] **Step 1: Failing test — `test/arabic_numbers_test.dart` (verbatim)**
+- [x] **Step 1: Failing test ? `test/arabic_numbers_test.dart` (verbatim)**
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
@@ -47,32 +47,32 @@ import 'package:quran_yahdi/core/utils/arabic_numbers.dart';
 
 void main() {
   test('converts western digits to Arabic-Indic', () {
-    expect(0.toArabicIndic, '٠');
-    expect(7.toArabicIndic, '٧');
-    expect(12.toArabicIndic, '١٢');
-    expect(6236.toArabicIndic, '٦٢٣٦');
+    expect(0.toArabicIndic, '?');
+    expect(7.toArabicIndic, '?');
+    expect(12.toArabicIndic, '??');
+    expect(6236.toArabicIndic, '????');
   });
 }
 ```
 
-- [ ] **Step 2: Run → FAIL. Implement `lib/core/utils/arabic_numbers.dart` (verbatim)**
+- [x] **Step 2: Run ? FAIL. Implement `lib/core/utils/arabic_numbers.dart` (verbatim)**
 
 ```dart
 const List<String> _arabicIndicDigits = [
-  '٠',
-  '١',
-  '٢',
-  '٣',
-  '٤',
-  '٥',
-  '٦',
-  '٧',
-  '٨',
-  '٩',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
+  '?',
 ];
 
 extension ArabicIndicInt on int {
-  /// Renders this int with Arabic-Indic digits (٠-٩).
+  /// Renders this int with Arabic-Indic digits (?-?).
   String get toArabicIndic {
     final buffer = StringBuffer();
     for (final char in toString().split('')) {
@@ -84,7 +84,7 @@ extension ArabicIndicInt on int {
 }
 ```
 
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter test test/arabic_numbers_test.dart
@@ -104,15 +104,15 @@ git commit -m "feat(w1b): arabic-indic numeral helper"
 
 **Interfaces:**
 - Produces (`AyahRepository(AppDatabase db)`):
-  - `Future<List<Ayah>> surahAyahs(int surahId)` — ordered by `numberInSurah` ascending.
+  - `Future<List<Ayah>> surahAyahs(int surahId)` ? ordered by `numberInSurah` ascending.
   - `Future<Surah?> surahById(int surahId)`.
-  - `Future<void> toggleBookmark(int ayahId)` — inserts a bookmark row when absent, deletes it when present.
-  - `Stream<Set<int>> watchBookmarkedIds()` — live set of bookmarked global ayah ids.
-  - `Stream<List<BookmarkEntry>> watchBookmarkEntries()` — bookmarks joined with ayah rows, newest (highest bookmark id) first; `BookmarkEntry({required Ayah ayah})`.
+  - `Future<void> toggleBookmark(int ayahId)` ? inserts a bookmark row when absent, deletes it when present.
+  - `Stream<Set<int>> watchBookmarkedIds()` ? live set of bookmarked global ayah ids.
+  - `Stream<List<BookmarkEntry>> watchBookmarkEntries()` ? bookmarks joined with ayah rows, newest (highest bookmark id) first; `BookmarkEntry({required Ayah ayah})`.
 - Produces (`LastReadRepository(AppDatabase db)`): `Future<void> saveAyahId(int ayahId)` (upsert into the settings table under key `last_read_ayah_id`), `Future<int?> loadAyahId()`.
 - DI: both registered as lazy singletons on the existing `AppDatabase`.
 
-- [ ] **Step 1: Failing tests (verbatim)**
+- [x] **Step 1: Failing tests (verbatim)**
 
 `test/ayah_repository_test.dart`:
 ```dart
@@ -132,13 +132,13 @@ void main() {
     final ayahs = [
       AyahsCompanion.insert(
           id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          textUthmani: '???', textImlaei: '???'),
       AyahsCompanion.insert(
           id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          textUthmani: '??? ??????', textImlaei: '??? ??????'),
       AyahsCompanion.insert(
           id: const Value(10), surahId: 2, numberInSurah: 3, juz: 1, page: 3,
-          textUthmani: 'الذين يؤمنون', textImlaei: 'الذين يؤمنون'),
+          textUthmani: '????? ??????', textImlaei: '????? ??????'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, ayahs));
     repo = AyahRepository(db);
@@ -149,7 +149,7 @@ void main() {
   test('surahAyahs returns the surah ordered by numberInSurah', () async {
     final list = await repo.surahAyahs(2);
     expect(list.map((a) => a.numberInSurah).toList(), [1, 2, 3]);
-    expect(list.first.textImlaei, 'الم');
+    expect(list.first.textImlaei, '???');
   });
 
   test('toggleBookmark inserts then removes', () async {
@@ -199,7 +199,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Run both → FAIL. Implement the two repositories (verbatim).**
+- [x] **Step 2: Run both ? FAIL. Implement the two repositories (verbatim).**
 
 `lib/features/quran/data/ayah_repository.dart`:
 ```dart
@@ -295,9 +295,9 @@ class LastReadRepository {
   }
 }
 ```
-(`SettingsTable`'s PK is `key`, so `key:` takes `Value(...)` — W1a lesson, applied.)
+(`SettingsTable`'s PK is `key`, so `key:` takes `Value(...)` ? W1a lesson, applied.)
 
-- [ ] **Step 3: DI — append inside `configureDependencies` (after the existing three registrations), + imports**
+- [x] **Step 3: DI ? append inside `configureDependencies` (after the existing three registrations), + imports**
 
 ```dart
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
@@ -308,7 +308,7 @@ import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
 ```
 
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter test test/ayah_repository_test.dart test/last_read_repository_test.dart
@@ -326,14 +326,14 @@ git commit -m "feat(w1b): ayah + last-read repositories (bookmarks, joins, DI)"
 - Test: `test/mushaf_grouping_test.dart`, `test/reader_cubit_test.dart`
 
 **Interfaces:**
-- Produces (`mushaf_page_block.dart`): `class MushafPageBlock { final int page; final List<Ayah> ayahs; }` + `List<MushafPageBlock> groupAyahsByPage(List<Ayah> ayahs)` — one block per distinct page (sorted ascending); ayahs inside sorted by `numberInSurah`; pages where the surah has no ayahs are omitted (surah-scoped mushaf, v1).
+- Produces (`mushaf_page_block.dart`): `class MushafPageBlock { final int page; final List<Ayah> ayahs; }` + `List<MushafPageBlock> groupAyahsByPage(List<Ayah> ayahs)` ? one block per distinct page (sorted ascending); ayahs inside sorted by `numberInSurah`; pages where the surah has no ayahs are omitted (surah-scoped mushaf, v1).
 - Produces (`reader_state.dart`): `enum ReaderMode { verses, mushaf }` and Freezed sealed:
   - `ReaderState.loading({required int surahId, required int initialAyah})`
   - `ReaderState.ready({required int surahId, required String surahName, required int initialAyah, required List<Ayah> ayahs, required List<MushafPageBlock> mushafPages, ReaderMode mode = verses, Set<int> bookmarkedAyahIds = {}, bool showBasmala = true})`
   - `ReaderState.error({required String message})`
 - Produces (`reader_cubit.dart`): `ReaderCubit({required AyahRepository ayahRepository, required LastReadRepository lastReadRepository, required int surahId, required int initialAyah})`; methods `void toggleMode()`, `Future<void> toggleBookmark(int ayahId)` (DB toggle; state updates arrive via the bookmarks watch), `Future<void> onMushafPageChanged(int blockIndex)` (persists the block's first ayah id as last-read). On load: emits ready, persists the start-ayah id as last-read, and derives `showBasmala = surahId != 1 && surahId != 9` (PM probe policy).
 
-- [ ] **Step 1: Failing tests (verbatim)**
+- [x] **Step 1: Failing tests (verbatim)**
 
 `test/mushaf_grouping_test.dart`:
 ```dart
@@ -353,22 +353,22 @@ void main() {
     final ayahs = [
       AyahsCompanion.insert(
           id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          textUthmani: '???', textImlaei: '???'),
       AyahsCompanion.insert(
           id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          textUthmani: '??? ??????', textImlaei: '??? ??????'),
       AyahsCompanion.insert(
           id: const Value(10), surahId: 2, numberInSurah: 3, juz: 1, page: 3,
-          textUthmani: 'الذين يؤمنون', textImlaei: 'الذين يؤمنون'),
+          textUthmani: '????? ??????', textImlaei: '????? ??????'),
       AyahsCompanion.insert(
           id: const Value(11), surahId: 2, numberInSurah: 4, juz: 1, page: 4,
-          textUthmani: 'وبما رزقناهم', textImlaei: 'وبما رزقناهم'),
+          textUthmani: '???? ???????', textImlaei: '???? ???????'),
       AyahsCompanion.insert(
           id: const Value(12), surahId: 2, numberInSurah: 5, juz: 1, page: 4,
-          textUthmani: 'وبالآخرة هم يقينون', textImlaei: 'وبالآخرة هم يقينون'),
+          textUthmani: '???????? ?? ??????', textImlaei: '???????? ?? ??????'),
       AyahsCompanion.insert(
           id: const Value(13), surahId: 2, numberInSurah: 6, juz: 1, page: 4,
-          textUthmani: 'أولئك على هدى', textImlaei: 'أولئك على هدى'),
+          textUthmani: '????? ??? ???', textImlaei: '????? ??? ???'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, ayahs));
   });
@@ -409,32 +409,32 @@ void main() {
     final fatiha = [
       AyahsCompanion.insert(
           id: const Value(1), surahId: 1, numberInSurah: 1, juz: 1, page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم', textImlaei: 'بسم الله الرحمن الرحيم'),
+          textUthmani: '??? ???? ?????? ??????', textImlaei: '??? ???? ?????? ??????'),
       AyahsCompanion.insert(
           id: const Value(2), surahId: 1, numberInSurah: 2, juz: 1, page: 1,
-          textUthmani: 'الحمد لله رب العالمين', textImlaei: 'الحمد لله رب العالمين'),
+          textUthmani: '????? ??? ?? ????????', textImlaei: '????? ??? ?? ????????'),
       AyahsCompanion.insert(
           id: const Value(3), surahId: 1, numberInSurah: 3, juz: 1, page: 1,
-          textUthmani: 'الرحمن الرحيم', textImlaei: 'الرحمن الرحيم'),
+          textUthmani: '?????? ??????', textImlaei: '?????? ??????'),
     ];
     final baqarah = [
       AyahsCompanion.insert(
           id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          textUthmani: '???', textImlaei: '???'),
       AyahsCompanion.insert(
           id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          textUthmani: '??? ??????', textImlaei: '??? ??????'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     await db.into(db.surahs).insert(
           SurahsCompanion.insert(
-              id: const Value(1), nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
+              id: const Value(1), nameAr: '???????', nameEn: 'Al-Fatihah',
               revelationType: 'makkah', ayahCount: 3, pagesStart: 1, pagesEnd: 1),
         );
     await db.into(db.surahs).insert(
           SurahsCompanion.insert(
-              id: const Value(2), nameAr: 'البقرة', nameEn: 'Al-Baqarah',
+              id: const Value(2), nameAr: '??????', nameEn: 'Al-Baqarah',
               revelationType: 'madinah', ayahCount: 2, pagesStart: 2, pagesEnd: 2),
         );
     ayahs = AyahRepository(db);
@@ -450,7 +450,7 @@ void main() {
     final ready = await cubit.stream
         .firstWhere((s) => s is ReaderReady) as ReaderReady;
     expect(ready.showBasmala, isTrue);
-    expect(ready.surahName, 'البقرة');
+    expect(ready.surahName, '??????');
     expect(ready.mushafPages, isNotEmpty);
     await cubit.close();
 
@@ -494,7 +494,7 @@ void main() {
   });
 }
 ```
-- [ ] **Step 2: Run both → FAIL. Implement the three files (verbatim).**
+- [x] **Step 2: Run both ? FAIL. Implement the three files (verbatim).**
 
 `lib/features/quran/presentation/reader/mushaf_page_block.dart`:
 ```dart
@@ -662,7 +662,7 @@ class ReaderCubit extends Cubit<ReaderState> {
 }
 ```
 
-- [ ] **Step 3: Generate + gates + commit**
+- [x] **Step 3: Generate + gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -678,7 +678,7 @@ Expected: both test files pass (the ready transition races are settled via `stre
 ### Task 5: Reader screen + mushaf pager (UI)
 
 **Files:**
-- Modify (dependency): `pubspec.yaml`/`pubspec.lock` — `flutter pub add scrollable_positioned_list` (pre-proven resolvable in this repo's pre-W0 lock at 0.3.8)
+- Modify (dependency): `pubspec.yaml`/`pubspec.lock` ? `flutter pub add scrollable_positioned_list` (pre-proven resolvable in this repo's pre-W0 lock at 0.3.8)
 - Create: `lib/features/quran/presentation/reader/reader_screen.dart`
 - Modify: `lib/app/router.dart` (`/quran/reader` route), `lib/features/quran/presentation/index/surah_index_screen.dart` (wire the W1a-inert row tap), `lib/l10n/app_ar.arb` + `lib/l10n/app_en.arb` (additive), regenerate l10n
 - Test: `test/reader_screen_test.dart`
@@ -687,17 +687,17 @@ Expected: both test files pass (the ready transition races are settled via `stre
 - Consumes: `ReaderCubit` (Task 4), `ArabicIndicInt` (Task 2), `AppLocalizations`.
 - Produces: route `/quran/reader?surah=N&ayah=M` (ints parsed in the router; `ayah` 0 = top). Index rows push it via `context.push`.
 
-- [ ] **Step 1: l10n keys (additive only, both files)**
+- [x] **Step 1: l10n keys (additive only, both files)**
 
 AR appended:
 ```json
-  "mushafMode": "وضع المصحف",
-  "versesMode": "وضع الآيات",
-  "bookmarks": "العلامات المرجعية",
-  "bookmarkSave": "احفظ الآية",
-  "bookmarkRemove": "أزل الحفظ",
-  "noBookmarks": "لا توجد علامات مرجعية بعد",
-  "pageIndicator": "صفحة {page}",
+  "mushafMode": "??? ??????",
+  "versesMode": "??? ??????",
+  "bookmarks": "???????? ????????",
+  "bookmarkSave": "???? ?????",
+  "bookmarkRemove": "??? ?????",
+  "noBookmarks": "?? ???? ?????? ?????? ???",
+  "pageIndicator": "???? {page}",
   "@pageIndicator": { "placeholders": { "page": { "type": "String" } } }
 ```
 EN appended:
@@ -712,16 +712,16 @@ EN appended:
   "@pageIndicator": { "placeholders": { "page": { "type": "String" } } }
 ```
 
-- [ ] **Step 2: Dep + regenerate**
+- [x] **Step 2: Dep + regenerate**
 
 ```powershell
 flutter pub add scrollable_positioned_list
 flutter pub get
 flutter gen-l10n
 ```
-(Solver failure → STOP with evidence; no substitute improv.)
+(Solver failure ? STOP with evidence; no substitute improv.)
 
-- [ ] **Step 3: Router — add inside the routes list (verbatim), + imports**
+- [x] **Step 3: Router ? add inside the routes list (verbatim), + imports**
 
 ```dart
       GoRoute(
@@ -750,14 +750,14 @@ import '../features/quran/presentation/reader/reader_screen.dart';
 ```
 (`flutter_bloc`, `getIt`, `AyahRepository` imports already exist from W1a.)
 
-- [ ] **Step 4: Wire the W1a index row tap — in `surah_index_screen.dart`:**
+- [x] **Step 4: Wire the W1a index row tap ? in `surah_index_screen.dart`:**
   Add import `import 'package:go_router/go_router.dart';` and replace the `// W1b:` inert comment inside `_SurahRow` `onTap` with:
 ```dart
         onTap: () => context
             .push('/quran/reader?surah=${surah.id}&ayah=0'),
 ```
 
-- [ ] **Step 5: Widget test FIRST — `test/reader_screen_test.dart` (verbatim; teardown-safe override baked in per the ledger lesson)**
+- [x] **Step 5: Widget test FIRST ? `test/reader_screen_test.dart` (verbatim; teardown-safe override baked in per the ledger lesson)**
 
 ```dart
 import 'package:drift/drift.dart' show Value;
@@ -793,18 +793,18 @@ void main() {
     final baqarah = [
       AyahsCompanion.insert(
           id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          textUthmani: '???', textImlaei: '???'),
       AyahsCompanion.insert(
           id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          textUthmani: '??? ??????', textImlaei: '??? ??????'),
       AyahsCompanion.insert(
           id: const Value(10), surahId: 2, numberInSurah: 3, juz: 1, page: 3,
-          textUthmani: 'الذين يؤمنون', textImlaei: 'الذين يؤمنون'),
+          textUthmani: '????? ??????', textImlaei: '????? ??????'),
     ];
     final fatiha = [
       AyahsCompanion.insert(
           id: const Value(1), surahId: 1, numberInSurah: 1, juz: 1, page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم', textImlaei: 'بسم الله الرحمن الرحيم'),
+          textUthmani: '??? ???? ?????? ??????', textImlaei: '??? ???? ?????? ??????'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
@@ -847,9 +847,9 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'), findsOneWidget);
-    expect(find.text('الم'), findsOneWidget);
-    expect(find.text('بسم الله الرحمن الرحيم'), findsNothing,
+    expect(find.text('?????? ??????? ???????????? ??????????'), findsOneWidget);
+    expect(find.text('???'), findsOneWidget);
+    expect(find.text('??? ???? ?????? ??????'), findsNothing,
         reason: 'Fatiha text is not part of surah 2');
   });
 
@@ -894,16 +894,16 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('وضع المصحف'));
+    await tester.tap(find.byTooltip('??? ??????'));
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('صفحة'), findsOneWidget);
+    expect(find.textContaining('????'), findsOneWidget);
   });
 }
 ```
 (The two tests above share the same delegate setup via the local helper lambdas; no further wiring is needed.)
 
-- [ ] **Step 6: Implement `lib/features/quran/presentation/reader/reader_screen.dart` (verbatim, complete)**
+- [x] **Step 6: Implement `lib/features/quran/presentation/reader/reader_screen.dart` (verbatim, complete)**
 
 ```dart
 import 'package:flutter/material.dart';
@@ -969,7 +969,7 @@ class _ReadyView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
-                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                '?????? ??????? ???????????? ??????????',
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 22,
@@ -1058,7 +1058,7 @@ class _AyahCard extends StatelessWidget {
             textDirection: TextDirection.rtl,
             children: [
               Text(
-                '﴿${ayah.numberInSurah.toArabicIndic}﴾',
+                '?${ayah.numberInSurah.toArabicIndic}?',
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 16,
@@ -1130,7 +1130,7 @@ class _MushafPagerState extends State<_MushafPager> {
       itemBuilder: (context, i) {
         final block = pages[i];
         final text = block.ayahs
-            .map((a) => '${a.textUthmani} ﴿${a.numberInSurah.toArabicIndic}﴾')
+            .map((a) => '${a.textUthmani} ?${a.numberInSurah.toArabicIndic}?')
             .join(' ');
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -1151,7 +1151,7 @@ class _MushafPagerState extends State<_MushafPager> {
                 ),
               ),
               Text(
-                '﴿ ${loc.pageIndicator(block.page.toArabicIndic)} ﴾',
+                '? ${loc.pageIndicator(block.page.toArabicIndic)} ?',
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   color: Theme.of(context).colorScheme.secondary,
@@ -1166,7 +1166,7 @@ class _MushafPagerState extends State<_MushafPager> {
 }
 ```
 
-- [ ] **Step 7: Gates + commit**
+- [x] **Step 7: Gates + commit**
 
 ```powershell
 flutter test test/reader_screen_test.dart
@@ -1175,7 +1175,7 @@ flutter analyze
 git add lib/features/quran/presentation/reader lib/app/router.dart lib/features/quran/presentation/index/surah_index_screen.dart lib/l10n pubspec.yaml pubspec.lock test/reader_screen_test.dart
 git commit -m "feat(w1b): reader screen (verse + mushaf pager, bookmarks, routes, l10n)"
 ```
-(The middle `flutter test test` runs the WHOLE suite — record the exact running total in the report; expect ≥ 24 with the T2/T3/T4 additions.)
+(The middle `flutter test test` runs the WHOLE suite ? record the exact running total in the report; expect ? 24 with the T2/T3/T4 additions.)
 
 ---
 
@@ -1188,10 +1188,10 @@ git commit -m "feat(w1b): reader screen (verse + mushaf pager, bookmarks, routes
 
 **Interfaces:**
 - Consumes: `AyahRepository` (Task 3).
-- Produces: `BookmarksCubit(AyahRepository repo)` — watches `watchBookmarkEntries()`, exposes `Future<void> remove(int ayahId)`; `BookmarksState.loading/ready(entries)/error`.
+- Produces: `BookmarksCubit(AyahRepository repo)` ? watches `watchBookmarkEntries()`, exposes `Future<void> remove(int ayahId)`; `BookmarksState.loading/ready(entries)/error`.
 - Route: `/bookmarks`.
 
-- [ ] **Step 1: Failing widget test — `test/bookmarks_screen_test.dart` (verbatim; teardown-safe override again)**
+- [x] **Step 1: Failing widget test ? `test/bookmarks_screen_test.dart` (verbatim; teardown-safe override again)**
 
 ```dart
 import 'package:drift/native.dart';
@@ -1266,7 +1266,7 @@ void main() {
   });
 
   testWidgets('lists entries with verse info and removes on delete', (tester) async {
-    final text = 'ذلك الكتاب لا ريب فيه';
+    final text = '??? ?????? ?? ??? ???';
     final repo = _TeardownSafeAyahRepository(
       db,
       entries: [_entry(db, ayahId: 9, text: text)],
@@ -1290,7 +1290,7 @@ void main() {
 ```
 (The second test seeds the bookmarks table through the real DB so the delete can be verified against it; the joined entries stream arrives via the teardown-safe override.)
 
-- [ ] **Step 2: Run → FAIL. Implement the three files (verbatim).**
+- [x] **Step 2: Run ? FAIL. Implement the three files (verbatim).**
 
 `lib/features/quran/presentation/bookmarks/bookmarks_state.dart`:
 ```dart
@@ -1384,7 +1384,7 @@ class BookmarksScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final ayah = entries[index].ayah;
                       final snippet = ayah.textImlaei.length > 60
-                          ? '${ayah.textImlaei.substring(0, 60)}…'
+                          ? '${ayah.textImlaei.substring(0, 60)}?'
                           : ayah.textImlaei;
                       return ListTile(
                         leading: Text(
@@ -1393,7 +1393,7 @@ class BookmarksScreen extends StatelessWidget {
                         ),
                         title: Text(snippet),
                         subtitle: Text(
-                          '${ayah.surahId.toArabicIndic} · ${ayah.numberInSurah.toArabicIndic}',
+                          '${ayah.surahId.toArabicIndic} ? ${ayah.numberInSurah.toArabicIndic}',
                         ),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline),
@@ -1412,7 +1412,7 @@ class BookmarksScreen extends StatelessWidget {
 }
 ```
 
-- [ ] **Step 3: Router — add (verbatim) + import**
+- [x] **Step 3: Router ? add (verbatim) + import**
 
 ```dart
       GoRoute(
@@ -1428,7 +1428,7 @@ import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 ```
 
-- [ ] **Step 4: Generate + gates + commit**
+- [x] **Step 4: Generate + gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -1442,7 +1442,7 @@ git commit -m "feat(w1b): bookmarks screen + cubit (joined watch, delete, route)
 
 ### Task 7: Close-out
 
-- [ ] **Step 1: Full gates (verbatim in report)**
+- [x] **Step 1: Full gates (verbatim in report)**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -1453,22 +1453,22 @@ flutter build apk --debug
 git status --porcelain
 flutter pub outdated
 ```
-Expected: analyze 0; ALL tests pass — baseline 14 before this wave; expect ≈ 28 (record exact); apk exit 0 + record size; porcelain empty; all direct deps current & none discontinued.
+Expected: analyze 0; ALL tests pass ? baseline 14 before this wave; expect ? 28 (record exact); apk exit 0 + record size; porcelain empty; all direct deps current & none discontinued.
 
-- [ ] **Step 2: Checkbox commit**
+- [x] **Step 2: Checkbox commit**
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w1b-reader-mushaf-bookmarks.md
 git commit -m "docs(w1b): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3: FINAL REPORT — PROMPT-2 §7 format (digit-set note now EXPECTED: pageIndicator passed pre-formatted Arabic-Indic strings; confirm), APK size, unpushed count, plus the mechanical-fix disclosures section. NO PUSH. WAIT for the PM.**
+- [x] **Step 3: FINAL REPORT ? PROMPT-2 ?7 format (digit-set note now EXPECTED: pageIndicator passed pre-formatted Arabic-Indic strings; confirm), APK size, unpushed count, plus the mechanical-fix disclosures section. NO PUSH. WAIT for the PM.**
 
 ---
 
 ## Self-Review (PM, pre-dispatch)
 
-- **Spec coverage (W1b slice):** reader verse+mode toggle with jump via `initialScrollIndex` (mockup 4), mushaf PageView with page/juz footer (mockup 5 — juz merge deferred: footer shows page in v1), bookmarks toggle + list + delete (mockups 3/4), last-read persistence (spec §5) consumed now by nothing external (home/continue-chip consumers explicitly deferred to W3/W1c — recorded non-goals below), basmala policy from the PM probe (surahs 1 & 9 excluded).
+- **Spec coverage (W1b slice):** reader verse+mode toggle with jump via `initialScrollIndex` (mockup 4), mushaf PageView with page/juz footer (mockup 5 ? juz merge deferred: footer shows page in v1), bookmarks toggle + list + delete (mockups 3/4), last-read persistence (spec ?5) consumed now by nothing external (home/continue-chip consumers explicitly deferred to W3/W1c ? recorded non-goals below), basmala policy from the PM probe (surahs 1 & 9 excluded).
 - **Explicit non-goals:** tafsir/translation chips (W6, needs packs), audio play (W2), home-screen continue card (W3), juz surfer + global 604-page mushaf (W1c/later), Arabic-Indic digit theming of gen-l10n placeholders (W7 polish).
-- **Placeholder scan:** none — every code block is complete and final; no debris tokens, no TBDs.
+- **Placeholder scan:** none ? every code block is complete and final; no debris tokens, no TBDs.
 - **Type consistency:** `AyahRepository`/`LastReadRepository`/`ReaderCubit`/`ReaderState`/`BookmarksCubit`/`BookmarkEntry`/`MushafPageBlock` names used identically across tests/routers/screens; `ReaderReady` getters (`showBasmala`, `mushafPages`, `bookmarkedAyahIds`, `initialAyah`) consistent between cubit emits and widget reads; route strings identical between screen pushes and router registrations; l10n keys identical in both ARBs and in the screen usages (`mushafMode`, `versesMode`, `bookmarks`, `bookmarkSave`, `bookmarkRemove`, `noBookmarks`, `pageIndicator(String)`).
