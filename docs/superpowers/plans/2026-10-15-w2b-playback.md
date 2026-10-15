@@ -1,6 +1,6 @@
 # Quran Yahdi — Wave 2b (Foreground Playback) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Play a (reciter, surah) pair — from the local file when it is downloaded, otherwise streamed straight from the mp3quran server — with a thin playback facade over `just_audio`, a foreground-only `PlaybackCubit` singleton, a persistent mini player, and play affordances in the reciter's surah screen and the reader.
 
@@ -27,7 +27,7 @@
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version
@@ -51,7 +51,7 @@ Expected: HEAD `0d84a15` or later with intervening commits touching ONLY `docs/`
 - `JustAudioPlaybackService` maps these 1:1 onto `_player.playerStateStream.map((s) => s.playing)`, `positionStream`, `durationStream`, `setAudioSource(...)`+`play()`, `pause()`, `play()`, `stop()`.
 - `PlaybackState` (freezed, sealed): `PlaybackInitial` | `PlaybackLoading(reciterName, surahNumber)` | `PlaybackPlaying(reciterName, surahNumber, position, duration)` | `PlaybackPaused(reciterName, surahNumber, position, duration)` | `PlaybackFailed(FailureKind kind)` where `enum PlaybackFailureKind { network, noReciters }` (UI maps kinds to l10n — never raw message strings).
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 ```powershell
 flutter pub add just_audio
@@ -59,9 +59,9 @@ flutter pub add just_audio
 
 Disclose the resolved version in the report. MANDATORY ADMISSION (W1a lesson): run `flutter pub outdated` right after and disclose anything new this pulls in; `just_audio` brings `just_audio_platform_interface` (+ Android plugin). If gradle sync complains about minSdk, STOP with the exact error (default `flutter.minSdkVersion` 21+ is known-compatible with just_audio ≥ 0.10 — expect no issue).
 
-- [ ] **Step 2:** Create `playback_service.dart` with the interface + source/tick types exactly as specced above (pure Dart — dart:async + dart:io imports only).
+- [x] **Step 2:** Create `playback_service.dart` with the interface + source/tick types exactly as specced above (pure Dart — dart:async + dart:io imports only).
 
-- [ ] **Step 3:** Create `just_audio_playback_service.dart`. UTC constructor accepts an optional `AudioPlayer` (default `AudioPlayer()`). `loadAndPlay`:
+- [x] **Step 3:** Create `just_audio_playback_service.dart`. UTC constructor accepts an optional `AudioPlayer` (default `AudioPlayer()`). `loadAndPlay`:
 
 ```dart
   @override
@@ -79,9 +79,9 @@ Disclose the resolved version in the report. MANDATORY ADMISSION (W1a lesson): r
 
 (If this switch pattern needs adjustment for the analyzer, disclose — S6-class mechanical.)
 
-- [ ] **Step 4:** Create `playback_state.dart` freezed sealed classes (fields above; `PlaybackPlaying`/`Paused` carry `Duration position, Duration duration` with sensible DateTime-zero defaults) and run `dart run build_runner build --delete-conflicting-outputs`. THEN — MANDATORY COMPANION CHECKPOINT (W1b lesson) — open the generated `PlaybackState` factory signatures and confirm which params are required; adjust usages before compiling, disclose any drift.
+- [x] **Step 4:** Create `playback_state.dart` freezed sealed classes (fields above; `PlaybackPlaying`/`Paused` carry `Duration position, Duration duration` with sensible DateTime-zero defaults) and run `dart run build_runner build --delete-conflicting-outputs`. THEN — MANDATORY COMPANION CHECKPOINT (W1b lesson) — open the generated `PlaybackState` factory signatures and confirm which params are required; adjust usages before compiling, disclose any drift.
 
-- [ ] **Step 5:** Create `playback_cubit.dart`:
+- [x] **Step 5:** Create `playback_cubit.dart`:
 
 ```dart
 class PlaybackCubit extends Cubit<PlaybackState> {
@@ -111,14 +111,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 `toggle`: `Playing → _service.pause() → emit Paused`; `Paused → _service.resume() → emit Playing`; others = no-op.
 `stopAndReset`: `_service.stop()`, cancel subscriptions, `emit(PlaybackInitial)` (guarded).
 
-- [ ] **Step 6:** `test/playback_cubit_test.dart` — `FakePlaybackService implements PlaybackService` with `StreamController` fields + a `List<PlaybackSource> loaded` recorder. Tests (all plain `test()`, real `ReciterRepository` on `NativeDatabase.memory()`, seeded rows use `Value(...)`-wrapped companions — read `app_database.g.dart` for `RecitersCompanion.insert` if headers drifted):
+- [x] **Step 6:** `test/playback_cubit_test.dart` — `FakePlaybackService implements PlaybackService` with `StreamController` fields + a `List<PlaybackSource> loaded` recorder. Tests (all plain `test()`, real `ReciterRepository` on `NativeDatabase.memory()`, seeded rows use `Value(...)`-wrapped companions — read `app_database.g.dart` for `RecitersCompanion.insert` if headers drifted):
   1. `playSurah uses the downloaded file when the downloads row is done` (seed a `downloads` row via the real DB then `downloadedPath` picks it — or simpler: seed `downloads` with status `done` + path pointing to a temp file).
   2. `playSurah streams the server URL when nothing is downloaded` (expect `loaded.single.kind == url` and the URL uses `surahAudioUrl`).
   3. `service failure lands in Failed(network) and keeps state resettable` (make the fake `loadAndPlay` throw; then `stopAndReset` → initial).
   4. `playDefaultForSurah falls back to the first featured row when no selection exists` (seed rows for ids `55-55` and `51-53`; expect the `51-53` row name in state).
   5. `toggle pauses and resumes` (fake-driven).
 
-- [ ] **Step 7: Gates + commit**
+- [x] **Step 7: Gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -142,7 +142,7 @@ git commit -m "feat(w2b): playback facade + just_audio service + playback cubit 
 
 **l10n (additive, symmetric):** `nowPlaying` `يُشغَّل الآن: {name}` / `Now playing: {name}` (String placeholder) · `playTooltip` `تشغيل`/`Play` · `pauseTooltip` `إيقاف مؤقت`/`Pause` · `stopTooltip` `إيقاف`/`Stop` · `listenTooltip` `استمع للسورة`/`Listen to surah` · `surahBadge` `سورة {number}`/`Surah {number}` (String placeholder through `ArabicIndicInt.toArabicIndic` at the call site — western-digit gen-l10n caveat from the ledger).
 
-- [ ] **Step 1: DI**
+- [x] **Step 1: DI**
 
 ```dart
 import '../../features/recitation/playback/just_audio_playback_service.dart';
@@ -159,13 +159,13 @@ getIt.registerLazySingleton<PlaybackCubit>(() => PlaybackCubit(
 
 Lazy ONLY (`AudioPlayer` must not be constructed at boot — smoke test boots `/home`). Verify `injector_test` still passes; `ensureAudioBindings()` ordering unaffected.
 
-- [ ] **Step 2:** `MiniPlayerBar` — stateless, `BlocBuilder<PlaybackCubit, PlaybackState>`: `Initial/Failed` → `SizedBox.shrink()`; else a `Material` surface strip (D6 tokens): reciter name (`nowPlaying`), `surahBadge` with Arabic-Indic number, a thin `LinearProgressIndicator(position/duration)` (guard divide-by-zero), IconButton play/pause via `toggle()`, IconButton `Icons.close` tooltip `stopTooltip` via `stopAndReset()`. `Failed(kind)` surfaces a dismissible error strip mapping `network → playbackFailed` (new key `playbackFailed`: `تعذّر تشغيل التلاوة`/`Could not play the recitation`), `noReciters → noReciters` (existing W2a key — reuse, do NOT duplicate).
+- [x] **Step 2:** `MiniPlayerBar` — stateless, `BlocBuilder<PlaybackCubit, PlaybackState>`: `Initial/Failed` → `SizedBox.shrink()`; else a `Material` surface strip (D6 tokens): reciter name (`nowPlaying`), `surahBadge` with Arabic-Indic number, a thin `LinearProgressIndicator(position/duration)` (guard divide-by-zero), IconButton play/pause via `toggle()`, IconButton `Icons.close` tooltip `stopTooltip` via `stopAndReset()`. `Failed(kind)` surfaces a dismissible error strip mapping `network → playbackFailed` (new key `playbackFailed`: `تعذّر تشغيل التلاوة`/`Could not play the recitation`), `noReciters → noReciters` (existing W2a key — reuse, do NOT duplicate).
 
-- [ ] **Step 3: Wire the screen** — in `ReciterSurahsScreen`: `bottomSheet:` gets `const MiniPlayerBar()` BUT `bottomSheet` with a shrink-sized widget is harmless when idle. Provide the cubit: it arrives scoped through the route (Step 4). Add to each `ReciterSurahsReady` surah row a leading IconButton `Icons.play_arrow` tooltip `playTooltip`, visible only when `row.surahList` contains the number (`parseSurahList(row.surahList).contains(n)`) — absent rows keep the row as-is (download affordance unchanged, W2a-frozen test A asserts must keep passing WITHOUT edit). On tap: `context.read<PlaybackCubit>().playSurah(row, surahNumber)`.
+- [x] **Step 3: Wire the screen** — in `ReciterSurahsScreen`: `bottomSheet:` gets `const MiniPlayerBar()` BUT `bottomSheet` with a shrink-sized widget is harmless when idle. Provide the cubit: it arrives scoped through the route (Step 4). Add to each `ReciterSurahsReady` surah row a leading IconButton `Icons.play_arrow` tooltip `playTooltip`, visible only when `row.surahList` contains the number (`parseSurahList(row.surahList).contains(n)`) — absent rows keep the row as-is (download affordance unchanged, W2a-frozen test A asserts must keep passing WITHOUT edit). On tap: `context.read<PlaybackCubit>().playSurah(row, surahNumber)`.
 
-- [ ] **Step 4: Router** — add `BlocProvider<PlaybackCubit>.value(value: getIt<PlaybackCubit>())` to the existing `/recitation/reciter` MultiBlocProvider. `router_test` MUST stay green unedited — this route is not pinned by it (verify).
+- [x] **Step 4: Router** — add `BlocProvider<PlaybackCubit>.value(value: getIt<PlaybackCubit>())` to the existing `/recitation/reciter` MultiBlocProvider. `router_test` MUST stay green unedited — this route is not pinned by it (verify).
 
-- [ ] **Step 5: Gates + tests + commit**
+- [x] **Step 5: Gates + tests + commit**
 
 ```powershell
 flutter gen-l10n; dart run build_runner build --delete-conflicting-outputs
@@ -188,9 +188,9 @@ git commit -m "feat(w2b): mini player + DI + reciter-surahs play affordance (l10
 - Modify: `lib/app/router.dart` (add `BlocProvider<PlaybackCubit>.value(...)` to the `/quran/reader` bloc-only route — wrap in MultiBlocProvider)
 - Modify: `test/reader_screen_test.dart` ONLY if its harness must gain the provider — FROZEN otherwise; if any existing reader assertion breaks, STOP (per constraints) instead of editing.
 
-- [ ] **Step 1:** Reader AppBar trailing action (before any existing actions): `IconButton(Icons.headphones, tooltip: loc.listenTooltip, onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(state.surahId))` — wire against the ReaderCubit state that carries the surah id (read the current state shape first; guard for non-ready states).
-- [ ] **Step 2:** Router — convert the `/quran/reader` builder to a `MultiBlocProvider(ReaderCubit..., PlaybackCubit.value...)`, `bottomSheet: const MiniPlayerBar()` in the reader Scaffold.
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1:** Reader AppBar trailing action (before any existing actions): `IconButton(Icons.headphones, tooltip: loc.listenTooltip, onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(state.surahId))` — wire against the ReaderCubit state that carries the surah id (read the current state shape first; guard for non-ready states).
+- [x] **Step 2:** Router — convert the `/quran/reader` builder to a `MultiBlocProvider(ReaderCubit..., PlaybackCubit.value...)`, `bottomSheet: const MiniPlayerBar()` in the reader Scaffold.
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -206,7 +206,7 @@ git commit -m "feat(w2b): reader listen hook + mini player (l10n)"
 
 ### Task 5: Close-out
 
-- [ ] **Step 1: Full gates ONCE, in this order, all recorded**
+- [x] **Step 1: Full gates ONCE, in this order, all recorded**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -220,14 +220,14 @@ git rev-list --count origin/main..HEAD
 ```
 
 Expected: analyze 0; full suite baseline 41 + 5 (cubit) + 2 (mini player) = **≈48, MEASURE — do not trust, record exact per-file counts**; APK exit 0 + byte size; `just_audio` disclosed in outdated; porcelain empty.
-- [ ] **Step 2: Tick this plan** (`- [ ]` → `- [x]`, workflow-safe edit — PowerShell: .NET `UTF8Encoding($false)` write, NEVER `-Encoding ascii`), commit:
+- [x] **Step 2: Tick this plan** (`- [x]` → `- [x]`, workflow-safe edit — PowerShell: .NET `UTF8Encoding($false)` write, NEVER `-Encoding ascii`), commit:
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w2b-playback.md
 git commit -m "docs(w2b): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3:** Produce the §8-style final report (same section skeleton as the W2a report: start-gate verbatim, commit table, companion checkpoint quotes, gates table with measured numbers, itemized disclosures, STOPs, unpushed count, state). NO PUSH.
+- [x] **Step 3:** Produce the §8-style final report (same section skeleton as the W2a report: start-gate verbatim, commit table, companion checkpoint quotes, gates table with measured numbers, itemized disclosures, STOPs, unpushed count, state). NO PUSH.
 
 ## Explicit non-goals (this wave)
 
