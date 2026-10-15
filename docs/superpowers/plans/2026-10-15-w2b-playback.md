@@ -244,3 +244,10 @@ git commit -m "docs(w2b): mark plan checkboxes complete"
 - Frozen-test surface: `db_migration`, `router`, `reciters_screen` untouched by design; `reciter_surahs_screen`/`reader_screen` may need a provider line only, and both cases route through STOP-or-grant, never silent edits.
 - Teardown safety: singleton cubit with `isClosed` guards; tests own their DB/fixtures; no busy-waits.
 - l10n is additive + symmetric; Arabic-Indic numerals rendered at call sites (gen-l10n caveat respected).
+
+---
+
+## PM Errata & Adjudications (post-wave, committed by PM 2026-10-15)
+- All 8 disclosures ACCEPTED. Notable rulings: D3 (plan-sketch private tracking fields dropped in favor of freezed-state identity — correct for the 0-issue gate); D5 (plan Step-2 self-contradiction "shrink vs strip" resolved toward the error-strip intent — correct reading); D6 (leading slot: number badge KEPT for non-playable surahs, play button replaces it only for playable rows — verified at source, better than plan-literal).
+- In-session grant RATIFIED post-hoc with full diff audit (b1fa075..3930a94): the two frozen harnesses received ONLY imports + _FakePlaybackService + one BlocProvider.value line + ddTearDown each — ZERO assertion edits. Bug-fix class accepted.
+- v1 playback semantics now locked: streaming happens at play time for undownloaded surahs; offline listening requires a prior download (reciter-surahs affordance). Background audio / audio_session focus / media notification remain W7 line.
