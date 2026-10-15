@@ -58,13 +58,20 @@ abstract final class AppRouter {
               int.tryParse(state.uri.queryParameters['surah'] ?? '') ?? 1;
           final ayah =
               int.tryParse(state.uri.queryParameters['ayah'] ?? '') ?? 0;
-          return BlocProvider<ReaderCubit>(
-            create: (_) => ReaderCubit(
-              ayahRepository: getIt<AyahRepository>(),
-              lastReadRepository: getIt<LastReadRepository>(),
-              surahId: surah,
-              initialAyah: ayah,
-            ),
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<ReaderCubit>(
+                create: (_) => ReaderCubit(
+                  ayahRepository: getIt<AyahRepository>(),
+                  lastReadRepository: getIt<LastReadRepository>(),
+                  surahId: surah,
+                  initialAyah: ayah,
+                ),
+              ),
+              BlocProvider<PlaybackCubit>.value(
+                value: getIt<PlaybackCubit>(),
+              ),
+            ],
             child: const ReaderScreen(),
           );
         },

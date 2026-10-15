@@ -7,6 +7,8 @@ import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../recitation/presentation/playback/mini_player_bar.dart';
+import '../../../recitation/presentation/playback/playback_cubit.dart';
 import 'reader_cubit.dart';
 import 'reader_state.dart';
 
@@ -44,6 +46,14 @@ class _ReadyView extends StatelessWidget {
         title: Text(state.surahName),
         actions: [
           IconButton(
+            tooltip: loc.listenTooltip,
+            icon: const Icon(Icons.headphones),
+            onPressed: () =>
+                context.read<PlaybackCubit>().playDefaultForSurah(
+                      state.surahId,
+                    ),
+          ),
+          IconButton(
             tooltip: isVerses ? loc.mushafMode : loc.versesMode,
             icon: Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
             onPressed: cubit.toggleMode,
@@ -75,6 +85,7 @@ class _ReadyView extends StatelessWidget {
           ),
         ],
       ),
+      bottomSheet: const MiniPlayerBar(),
     );
   }
 }
