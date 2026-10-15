@@ -451,6 +451,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الهدف'**
   String get tasbihTarget;
+
+  /// No description provided for @duasTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأدعية'**
+  String get duasTab;
+
+  /// No description provided for @ruqyahTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرقية'**
+  String get ruqyahTab;
 }
 
 class _AppLocalizationsDelegate

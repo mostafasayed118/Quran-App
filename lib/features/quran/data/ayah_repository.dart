@@ -30,6 +30,17 @@ class AyahRepository {
       (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
           .getSingleOrNull();
 
+  /// Ordered range of ayahs for ruqyah references (W4 mirror query).
+  Future<List<Ayah>> ayahsForRange(int surahId, int fromAyah, int toAyah) {
+    final query = _db.select(_db.ayahs)
+      ..where((a) =>
+          a.surahId.equals(surahId) &
+          a.numberInSurah.isBiggerOrEqualValue(fromAyah) &
+          a.numberInSurah.isSmallerOrEqualValue(toAyah))
+      ..orderBy([(a) => OrderingTerm.asc(a.numberInSurah)]);
+    return query.get();
+  }
+
   Future<void> toggleBookmark(int ayahId) async {
     final existing = await (_db.select(_db.bookmarks)
           ..where((b) => b.ayahId.equals(ayahId)))

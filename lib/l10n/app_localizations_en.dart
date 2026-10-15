@@ -200,4 +200,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tasbihTarget => 'Target';
+
+  @override
+  String get duasTab => 'Duas';
+
+  @override
+  String get ruqyahTab => 'Ruqyah';
 }

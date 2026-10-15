@@ -200,4 +200,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tasbihTarget => 'الهدف';
+
+  @override
+  String get duasTab => 'الأدعية';
+
+  @override
+  String get ruqyahTab => 'الرقية';
 }

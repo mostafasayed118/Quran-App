@@ -10,6 +10,8 @@ Future<void> main() async {
     audioRootResolver: defaultAudioRootResolver,
     citiesLoader: defaultCitiesLoader,
     azkarLoader: defaultAzkarLoader,
+    duasLoader: defaultDuasLoader,
+    ruqyahLoader: defaultRuqyahLoader,
   );
   runApp(const QuranYahdiApp());
 }

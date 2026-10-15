@@ -10,6 +10,9 @@ import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
 import '../../features/azkar/data/azkar_repository.dart';
 import '../../features/azkar/presentation/azkar_cubit.dart';
+import '../../features/duas/data/dua_repository.dart';
+import '../../features/duas/data/ruqyah_repository.dart';
+import '../../features/duas/presentation/duas_cubit.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
 import '../../features/tasbih/presentation/tasbih_cubit.dart';
@@ -30,6 +33,8 @@ Future<void> configureDependencies({
   Future<Directory> Function()? audioRootResolver,
   Future<List<Map<String, dynamic>>> Function()? citiesLoader,
   Future<Map<String, dynamic>> Function()? azkarLoader,
+  Future<List<Map<String, dynamic>>> Function()? duasLoader,
+  Future<List<Map<String, dynamic>>> Function()? ruqyahLoader,
 }) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
@@ -53,6 +58,17 @@ Future<void> configureDependencies({
         () => AzkarRepository(loader: azkarLoader));
     getIt.registerLazySingleton<AzkarCubit>(
         () => AzkarCubit(repository: getIt<AzkarRepository>()));
+  }
+  if (duasLoader != null && ruqyahLoader != null) {
+    getIt.registerLazySingleton<DuaRepository>(
+        () => DuaRepository(loader: duasLoader));
+    getIt.registerLazySingleton<RuqyahRepository>(
+        () => RuqyahRepository(loader: ruqyahLoader));
+    getIt.registerLazySingleton<DuasCubit>(() => DuasCubit(
+          duas: getIt<DuaRepository>(),
+          ruqyah: getIt<RuqyahRepository>(),
+          ayahs: getIt<AyahRepository>(),
+        ));
   }
   getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {
