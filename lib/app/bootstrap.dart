@@ -8,6 +8,7 @@ const citiesAssetKey = 'assets/data/cities.json';
 const azkarAssetKey = 'assets/data/azkar.json';
 const duasAssetKey = 'assets/data/duas.json';
 const ruqyahAssetKey = 'assets/data/ruqyah.json';
+const asmaAssetKey = 'assets/data/asma.json';
 
 Future<Directory> defaultAudioRootResolver() async {
   final dir = await getApplicationSupportDirectory();
@@ -31,5 +32,10 @@ Future<List<Map<String, dynamic>>> defaultDuasLoader() async {
 
 Future<List<Map<String, dynamic>>> defaultRuqyahLoader() async {
   final raw = await rootBundle.loadString(ruqyahAssetKey);
+  return (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+}
+
+Future<List<Map<String, dynamic>>> defaultAsmaLoader() async {
+  final raw = await rootBundle.loadString(asmaAssetKey);
   return (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
 }

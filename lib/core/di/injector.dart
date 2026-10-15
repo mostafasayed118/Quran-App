@@ -10,6 +10,8 @@ import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
 import '../../features/azkar/data/azkar_repository.dart';
 import '../../features/azkar/presentation/azkar_cubit.dart';
+import '../../features/asma/data/asma_repository.dart';
+import '../../features/asma/presentation/asma_cubit.dart';
 import '../../features/duas/data/dua_repository.dart';
 import '../../features/duas/data/ruqyah_repository.dart';
 import '../../features/duas/presentation/duas_cubit.dart';
@@ -35,6 +37,7 @@ Future<void> configureDependencies({
   Future<Map<String, dynamic>> Function()? azkarLoader,
   Future<List<Map<String, dynamic>>> Function()? duasLoader,
   Future<List<Map<String, dynamic>>> Function()? ruqyahLoader,
+  Future<List<Map<String, dynamic>>> Function()? asmaLoader,
 }) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
@@ -69,6 +72,12 @@ Future<void> configureDependencies({
           ruqyah: getIt<RuqyahRepository>(),
           ayahs: getIt<AyahRepository>(),
         ));
+  }
+  if (asmaLoader != null) {
+    getIt.registerLazySingleton<AsmaRepository>(
+        () => AsmaRepository(loader: asmaLoader));
+    getIt.registerLazySingleton<AsmaCubit>(
+        () => AsmaCubit(repository: getIt<AsmaRepository>()));
   }
   getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {

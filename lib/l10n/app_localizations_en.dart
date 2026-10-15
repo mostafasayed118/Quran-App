@@ -206,4 +206,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ruqyahTab => 'Ruqyah';
+
+  @override
+  String namePosition(String n) {
+    return 'Name $n of 99';
+  }
 }

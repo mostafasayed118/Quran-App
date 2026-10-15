@@ -463,6 +463,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الرقية'**
   String get ruqyahTab;
+
+  /// No description provided for @namePosition.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاسم {n} من 99'**
+  String namePosition(String n);
 }
 
 class _AppLocalizationsDelegate

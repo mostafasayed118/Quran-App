@@ -6,6 +6,9 @@ import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
 import '../features/azkar/presentation/azkar_screen.dart';
+import '../features/asma/data/asma_repository.dart';
+import '../features/asma/presentation/asma_cubit.dart';
+import '../features/asma/presentation/asma_screen.dart';
 import '../features/duas/data/dua_repository.dart';
 import '../features/duas/data/ruqyah_repository.dart';
 import '../features/duas/presentation/duas_cubit.dart';
@@ -130,7 +133,13 @@ abstract final class AppRouter {
       GoRoute(path: '/worship', builder: (_, __) => const PlaceholderScreen(title: 'تتبع العبادات')),
       GoRoute(path: '/zakat', builder: (_, __) => const PlaceholderScreen(title: 'الزكاة')),
       GoRoute(path: '/hijri', builder: (_, __) => const PlaceholderScreen(title: 'التقويم الهجري')),
-      GoRoute(path: '/asma', builder: (_, __) => const PlaceholderScreen(title: 'أسماء الله الحسنى')),
+      GoRoute(
+        path: '/asma',
+        builder: (_, __) => BlocProvider<AsmaCubit>(
+          create: (_) => AsmaCubit(repository: getIt<AsmaRepository>()),
+          child: const AsmaScreen(),
+        ),
+      ),
       GoRoute(path: '/settings', builder: (_, __) => const PlaceholderScreen(title: 'الإعدادات')),
       GoRoute(
         path: '/quran/reader',
