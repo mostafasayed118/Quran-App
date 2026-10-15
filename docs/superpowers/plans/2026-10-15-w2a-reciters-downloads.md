@@ -1,6 +1,6 @@
 # Quran Yahdi — Wave 2a (Recitation Catalog + Offline Downloads) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship the recitation catalog: ALL 243 reciters (mp3quran API, cached in drift v2), featured-above-list ordering from PM-verified ids, per-surah mp3 downloads into app storage with a sequential queue, live statuses — playable catalog ready for the W2b playback wave.
 
