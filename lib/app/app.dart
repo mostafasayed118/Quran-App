@@ -3,13 +3,14 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import '../core/theme/app_theme.dart';
 import '../l10n/app_localizations.dart';
+import 'router.dart';
 
 class QuranYahdiApp extends StatelessWidget {
   const QuranYahdiApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       onGenerateTitle: (context) => AppLocalizations.of(context).appName,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
@@ -22,9 +23,7 @@ class QuranYahdiApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const Scaffold(
-        body: Center(child: Text('قرآن يَهدي')),
-      ),
+      routerConfig: AppRouter.router,
     );
   }
 }
