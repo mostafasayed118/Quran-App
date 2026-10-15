@@ -26,7 +26,7 @@
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version
@@ -50,10 +50,10 @@ Expected: HEAD `89a3946` or later with intervening commits touching ONLY `docs/`
 - `PrayerLogRepository(db)`: `Future<bool> getForDay(DateTime day)` → whether any prayer marked; `Future<void> togglePrayer(DateTime day, PrayerSlot slot)` (upsert row, flip bool, write normalized day); `Stream<PrayerLogCompanion-free day projection> watchToday()` — preferred shape: `Stream<bool Function(PrayerSlot)>` is NOT a stream type; instead emit `Stream<TrackerDay>` where `TrackerDay` = simple class with the five bools + `bool get anyMarked`; `Future<List<DateTime>> markedDaysRange(DateTime fromInclusive, int daysBack)` (for the strip + streak — return normalized days with ≥1 marked).
 - `TrackerCubit(repo)`: `TrackerReady(toggle day flags, streakDays int, last7 List<bool>)` + initial/loading; loads today + streak on create; `toggle(slot)` → optimistic-ish recompute from repo truth; `streak` = consecutive marked days ending today-or-yesterday (PM ruling recorded here; test it explicitly for both anchors).
 
-- [ ] **Step 1 (red-first — repos AND cubit):** repository tests (memory DB): toggle-on persists and re-reads; toggle-all-off keeps the row with `anyMarked=false` (upsert semantics — assert rows count stays 1 per day); day normalization: repo called with `DateTime.now()` must match a row written with `dateOnly(now)` (the classic PK trap). Cubit tests: fresh state all-false; toggling fajr flips + streak 1; seeded previous 3 days → streak 4; seeded gap → streak resets (test today-anchored and yesterday-anchored cases per ruling).
-- [ ] **Step 2 (green):** implement. `TrackerScreen`: today date header (Gregorian + Arabic-Indic; Hijri arrives in T4 — do NOT couple), five toggle rows using existing `fajr…isha` l10n keys with check affordances (D6 primary when on), 7-day dot strip (marked = filled), streak badge `streak {days}` label.
-- [ ] **Step 3: l10n (additive):** `streak` سلسلة {days} يوم/{days}-day streak (String placeholder) · `trackerToday` علِمت اليوم/Today's prayers (fresh key, do not collide with existing `worshipTracker` title) · `last7Days` آخر ٧ أيام/Last 7 days (western 7 literal in source; render Arabic-Indic at call site or plain — String placeholder justified).
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 1 (red-first — repos AND cubit):** repository tests (memory DB): toggle-on persists and re-reads; toggle-all-off keeps the row with `anyMarked=false` (upsert semantics — assert rows count stays 1 per day); day normalization: repo called with `DateTime.now()` must match a row written with `dateOnly(now)` (the classic PK trap). Cubit tests: fresh state all-false; toggling fajr flips + streak 1; seeded previous 3 days → streak 4; seeded gap → streak resets (test today-anchored and yesterday-anchored cases per ruling).
+- [x] **Step 2 (green):** implement. `TrackerScreen`: today date header (Gregorian + Arabic-Indic; Hijri arrives in T4 — do NOT couple), five toggle rows using existing `fajr…isha` l10n keys with check affordances (D6 primary when on), 7-day dot strip (marked = filled), streak badge `streak {days}` label.
+- [x] **Step 3: l10n (additive):** `streak` سلسلة {days} يوم/{days}-day streak (String placeholder) · `trackerToday` علِمت اليوم/Today's prayers (fresh key, do not collide with existing `worshipTracker` title) · `last7Days` آخر ٧ أيام/Last 7 days (western 7 literal in source; render Arabic-Indic at call site or plain — String placeholder justified).
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -76,10 +76,10 @@ git commit -m "feat(w5): prayer tracker (PrayerLog upsert, week strip, streak)"
 - Create: `test/zakat_calculator_test.dart`, `test/zakat_screen_test.dart`
 
 **Interface:** `ZakatInput({double goldGrams, double silverGrams, double cash, double debts, bool nisabBySilver})` (all default 0/false); `ZakatResult compute(ZakatInput, {required double goldPricePerGram, required double silverPricePerGram})` → `ZakatResult({double zakatable, double nisabValue, bool due, double amount})`; constants `goldNisabGrams = 87.48`, `silverNisabGrams = 612.36`, `zakatRate = 0.025` (const, cited).
-- [ ] **Step 1 (red-first — REAL goldens allowed, deterministic arithmetic):** 1) below silver nisab → due=false, amount=0; 2) above gold nisab with silver toggle → nisabValue = 87.48×goldPrice; 3) below-gold/above-silver boundary with silver default → due=true, amount = 2.5% of zakatable; 4) debts subtract; 5) comma-decimal parse normalization (`"1,000.50"` and `"1000,50"` → 1000.5 — helper test).
-- [ ] **Step 2 (green):** calculator; `ZakatScreen`: numeric fields (gold grams, silver grams, gold price/g, silver price/g, cash, debts) + nisab toggle + results card (zakatable, nisab value, `zakatDue`/`zakatNotDue`, amount highlighted, footnote citing the constants + "شرعاً — تحقق من أهلك" clarity line via `zakatFootnote` key). Input changes recompute live (cubit state, no submit button).
-- [ ] **Step 3: l10n (additive):** `goldGrams` ذهب (جرام)/Gold (grams) · `silverGrams` فضة (جرام)/Silver (grams) · `goldPrice` سعر جرام الذهب/Gold price per gram · `silverPrice` سعر جرام الفضة/Silver price per gram · `cash` النقد المعروض/On-hand cash · `debts` الديون/Debts · `nisabByGold` العتبة: الذهب/Threshold: gold · `nisabBySilver` العتبة: الفضة/Threshold: silver · `zakatDue` الزكاة الواجبة/Zakat due · `zakatNotDue` لا زكاة عليك/No zakat due · `zakatFootnote` النسب ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك/The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 1 (red-first — REAL goldens allowed, deterministic arithmetic):** 1) below silver nisab → due=false, amount=0; 2) above gold nisab with silver toggle → nisabValue = 87.48×goldPrice; 3) below-gold/above-silver boundary with silver default → due=true, amount = 2.5% of zakatable; 4) debts subtract; 5) comma-decimal parse normalization (`"1,000.50"` and `"1000,50"` → 1000.5 — helper test).
+- [x] **Step 2 (green):** calculator; `ZakatScreen`: numeric fields (gold grams, silver grams, gold price/g, silver price/g, cash, debts) + nisab toggle + results card (zakatable, nisab value, `zakatDue`/`zakatNotDue`, amount highlighted, footnote citing the constants + "شرعاً — تحقق من أهلك" clarity line via `zakatFootnote` key). Input changes recompute live (cubit state, no submit button).
+- [x] **Step 3: l10n (additive):** `goldGrams` ذهب (جرام)/Gold (grams) · `silverGrams` فضة (جرام)/Silver (grams) · `goldPrice` سعر جرام الذهب/Gold price per gram · `silverPrice` سعر جرام الفضة/Silver price per gram · `cash` النقد المعروض/On-hand cash · `debts` الديون/Debts · `nisabByGold` العتبة: الذهب/Threshold: gold · `nisabBySilver` العتبة: الفضة/Threshold: silver · `zakatDue` الزكاة الواجبة/Zakat due · `zakatNotDue` لا زكاة عليك/No zakat due · `zakatFootnote` النسب ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك/The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -100,11 +100,11 @@ git commit -m "feat(w5): zakat calculator (nisab gold/silver, live inputs)"
 - Modify: ARBs (+regenerated)
 - Create: `test/hijri_service_test.dart`, `test/hijri_screen_test.dart`
 
-- [ ] **Step 1: dependency admission** — per Tech Stack order; quote the pub-cache class surface you found BEFORE usage; disclose version + transitives + purity check.
-- [ ] **Step 2 (red-first, PROPERTY tests — no cross-calendar goldens):** 1) today roundtrip: gregorian(t) → hijri → gregorian == t (package must be exact — if the chosen package is only ±1 day, STOP, that fails the bar); 2) sanity band: hijri year for 2026-10-15 ∈ {1447, 1448} (single loose band, justified); 3) month-length validity: every reported month length ∈ {29, 30}; 4) known-span ordering: 1 Muh 1447 < 1 Muh 1448 in gregorian time.
-- [ ] **Step 3 (green):** `HijriService` wrapper + `HijriCubit` (current month state `month/year/offsets/grid` — build with `dateOnly` semantics) + `HijriScreen`: header `hijriLabel` + today's `hijriDate` line (formatted Arabic-Indic), month grid (weekday-aligned, gregorian day number rendered subtly under hijri number — same-cell dual label), prev/next month arrows + `jumpToToday` action.
-- [ ] **Step 4: l10n (additive):** `hijriDate` الشهر {month} سنة {year}/{month} {year} AH (two String placeholders) · `gregorianEquivalent` يوافق {date}/= {date} (String placeholder) · `jumpToToday` اليوم/Today · `hijriMonths` are CONTENT — render hijri month names from the value (Umm al-Qura naming arrives with the package locale OR map 12 canonical names in a constant inside the cubit file with AR/EN pairs — content like asma precedent, cite source character).
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 1: dependency admission** — per Tech Stack order; quote the pub-cache class surface you found BEFORE usage; disclose version + transitives + purity check.
+- [x] **Step 2 (red-first, PROPERTY tests — no cross-calendar goldens):** 1) today roundtrip: gregorian(t) → hijri → gregorian == t (package must be exact — if the chosen package is only ±1 day, STOP, that fails the bar); 2) sanity band: hijri year for 2026-10-15 ∈ {1447, 1448} (single loose band, justified); 3) month-length validity: every reported month length ∈ {29, 30}; 4) known-span ordering: 1 Muh 1447 < 1 Muh 1448 in gregorian time.
+- [x] **Step 3 (green):** `HijriService` wrapper + `HijriCubit` (current month state `month/year/offsets/grid` — build with `dateOnly` semantics) + `HijriScreen`: header `hijriLabel` + today's `hijriDate` line (formatted Arabic-Indic), month grid (weekday-aligned, gregorian day number rendered subtly under hijri number — same-cell dual label), prev/next month arrows + `jumpToToday` action.
+- [x] **Step 4: l10n (additive):** `hijriDate` الشهر {month} سنة {year}/{month} {year} AH (two String placeholders) · `gregorianEquivalent` يوافق {date}/= {date} (String placeholder) · `jumpToToday` اليوم/Today · `hijriMonths` are CONTENT — render hijri month names from the value (Umm al-Qura naming arrives with the package locale OR map 12 canonical names in a constant inside the cubit file with AR/EN pairs — content like asma precedent, cite source character).
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -119,7 +119,7 @@ git commit -m "feat(w5): hijri calendar (month grid, property-tested service)"
 
 ### Task 5: Close-out
 
-- [ ] **Step 1: Full gates ONCE, all recorded**
+- [x] **Step 1: Full gates ONCE, all recorded**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs 2>&1 | Select-Object -Last 1
@@ -134,14 +134,14 @@ git rev-list --count origin/main..HEAD
 ```
 
 Expected: analyze 0; suite baseline 92 + ~11 (tracker: 4 repo + 4 cubit + 2-3 screen) + ~6 (zakat: 5 calc + 1 screen) + ~6 (hijri: 4 service + 1-2 screen) = **≈115; MEASURE, per-file exact**; debug exit 0 ballpark; release exit 0 + bytes (byte-exact expected); pub outdated with the ONE hijri admission disclosed; porcelain empty.
-- [ ] **Step 2: Tick this plan** — targeted line edits ONLY (header PROSE contains a literal `- [ ]`), .NET UTF8-no-BOM, numstat + non-checkbox filter recorded.
+- [x] **Step 2: Tick this plan** — targeted line edits ONLY (header PROSE contains a literal `- [ ]`), .NET UTF8-no-BOM, numstat + non-checkbox filter recorded.
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w5-tracker-zakat-hijri.md
 git commit -m "docs(w5): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3:** Final report — §1–§10 skeleton (start-gate verbatim · commit table · hijri package-checkpoint quotes + admission verdict · PrayerLog companion-checkpoint quotes · gates table · itemized disclosures · STOPs · incidents self-caught · unpushed · state · NO PUSH).
+- [x] **Step 3:** Final report — §1–§10 skeleton (start-gate verbatim · commit table · hijri package-checkpoint quotes + admission verdict · PrayerLog companion-checkpoint quotes · gates table · itemized disclosures · STOPs · incidents self-caught · unpushed · state · NO PUSH).
 
 ## Explicit non-goals (this wave)
 
