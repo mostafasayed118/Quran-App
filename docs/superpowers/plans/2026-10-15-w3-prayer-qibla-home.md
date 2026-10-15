@@ -29,7 +29,7 @@
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version
@@ -52,7 +52,7 @@ Expected: HEAD `400551b` or later with intervening commits touching ONLY `docs/`
 - `PrayerTimeService.today(CityCoordinates c, DateTime dayLocal)` → ordered list of the 6 `(PrayerName, DateTime)`.
 - `QiblaService.bearingDeg(CityCoordinates c)` → degrees clockwise from true north.
 
-- [ ] **Step 1:** `flutter pub add adhan` — disclose resolved version + transitives. MANDATORY: open the package exports in the pub cache; quote the exact symbol names you found (`Coordinates(c1, c2)`, prayer fields, method enum, Qibla symbol or its absence) in the report BEFORE writing usage code. If `Qibla` is NOT exported, implement the bearing inline in `qibla_service.dart`:
+- [x] **Step 1:** `flutter pub add adhan` — disclose resolved version + transitives. MANDATORY: open the package exports in the pub cache; quote the exact symbol names you found (`Coordinates(c1, c2)`, prayer fields, method enum, Qibla symbol or its absence) in the report BEFORE writing usage code. If `Qibla` is NOT exported, implement the bearing inline in `qibla_service.dart`:
 
 ```dart
   double bearingDeg(CityCoordinates c) {
@@ -68,7 +68,7 @@ Expected: HEAD `400551b` or later with intervening commits touching ONLY `docs/`
 
 (rectify trig helpers though the real code imports `dart:math` normally — the sketch shows intent, write idiomatic code).
 
-- [ ] **Step 2 (TDD red):** write the two test files FIRST against the interfaces above.
+- [x] **Step 2 (TDD red):** write the two test files FIRST against the interfaces above.
 
 `prayer_time_service_test.dart` (property-based, plain `test()`):
 1. `ordering: fajr < sunrise < dhuhr < asr < maghrib < isha for Cairo on a sample day` (`CityCoordinates(30.0444, 31.2357)`, fixed local DateTime like `DateTime(2026, 3, 15)`).
@@ -80,9 +80,9 @@ Expected: HEAD `400551b` or later with intervening commits touching ONLY `docs/`
 1. `Cairo bearing lands in the 130–145° band` (public-geography sanity; do not tighten).
 2. `makkah itself returns a value in [340, 360)∪[0,20)` (degenerate-zone band, generous).
 
-- [ ] **Step 3 (green):** implement both services to green. `flutter test test/prayer_time_service_test.dart test/qibla_service_test.dart`.
+- [x] **Step 3 (green):** implement both services to green. `flutter test test/prayer_time_service_test.dart test/qibla_service_test.dart`.
 
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter analyze
@@ -110,9 +110,9 @@ Curate ~150 entries: ALL 27 Egyptian governorate capitals (correct Arabic names)
 
 **Interfaces:** `CityRepository(loaded from the bundled asset via a rootBundle-free injection: constructor takes `Future<List<Map<String, dynamic>>> Function()` loader so VM tests inject a fixture loader — bootstrap.dart keeps rootBundle wiring (bundle ownership, W0 pattern)). `Future<List<City>> search(String query)` (client-side filter over nameAr/nameEn substring); `Future<String?> selectedCityJson()` / `Future<void> select(City c)` via the settings table key `selected_city` (companion check: settings text-PK `required String key` — W1b lesson, `insertOnConflictUpdate`). `City` freezed-style simple class: id/nameAr/nameEn/lat/lng (+`CityCoordinates` accessor).
 
-- [ ] **Step 1 (red):** `city_repository_test.dart` — fixture loader with 5 fake cities; tests: search matches both locales + whitespace-insensitive trim; select persists + round-trips (memory DB); empty/missing selection returns null. Asset-wellformedness test: load the REAL `assets/data/cities.json` via `File('assets/data/cities.json')` and assert ≥150 entries + every entry has all 5 fields + lat in [-90,90], lng in [-180,180] (guards typos in curated data — this is the ONE place File-based asset reading in tests is justified; if the working dir resolves differently in CI, SKIP with disclosure rather than contort).
-- [ ] **Step 2 (green):** implement; add asset + pubspec entry; DI registrations (lazy; services need no resolver closure — pure).
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** `city_repository_test.dart` — fixture loader with 5 fake cities; tests: search matches both locales + whitespace-insensitive trim; select persists + round-trips (memory DB); empty/missing selection returns null. Asset-wellformedness test: load the REAL `assets/data/cities.json` via `File('assets/data/cities.json')` and assert ≥150 entries + every entry has all 5 fields + lat in [-90,90], lng in [-180,180] (guards typos in curated data — this is the ONE place File-based asset reading in tests is justified; if the working dir resolves differently in CI, SKIP with disclosure rather than contort).
+- [x] **Step 2 (green):** implement; add asset + pubspec entry; DI registrations (lazy; services need no resolver closure — pure).
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter analyze
@@ -133,10 +133,10 @@ git commit -m "feat(w3): bundled city catalog + selection persistence (settings 
 
 **l10n (additive, symmetric):** `fajr` فجر/Fajr · `sunrise` شروق/Sunrise · `dhuhr` الظهر/Dhuhr · `asr` العصر/Asr · `maghrib` المغرب/Maghrib · `isha` العشاء/Isha · `sunriseAltNote` ملاحظة؟ NO — sunrise row gets its own visual weight only. `remaining` متبقٍ {duration}/{duration} remaining (String placeholder) · `selectCity` اختر مدينتك/Select your city · `searchCity` ابحث عن مدينة…/Search a city… · `noCity` لم تُحدَّد مدينة بعد/No city selected yet · `qiblaDirection` اتجاه القبلة/Qibla direction · `degreesFromNorth` {degrees}° عن الشمال/{degrees}° from north · `surahBadge` exists (W2b); Time strings pass through `toArabicIndic` at call sites.
 
-- [ ] **Step 1 (red):** cubit test — `PrayerTimesCubit(prayer: service, city: repo)`: no selection → `ready(cityState: none, entries: [])`; with selection → entries sorted with times + `next` anchor flagged (fake `PrayerTimeService` — hand-rolled, deterministic); after `select(city)` → reloads with new city. Screens: seeds via memory DB.
-- [ ] **Step 2 (green):** cubit + `PrayerTimesScreen`: header city row → picker; 6 rows (5 prayers + sunrise dimmed); next-prayer row highlighted (D6 primary) + `remaining` text (H:mm) computed from the service; Arabic-Indic H:mm per row. `CityPickerScreen`: search field + live list (existing live-filter pattern from W1a index) + tap → `select` → pop.
-- [ ] **Step 3: Router** — `/prayer-times` builder provides `PrayerTimesCubit` + nothing else; `/prayer-times/city` provides `CityPickerCubit`; grid/placeholder removals limited to those two builders. If router_test breaks → STOP (constraint).
-- [ ] **Step 4: Gates + commit** (record per-file counts)
+- [x] **Step 1 (red):** cubit test — `PrayerTimesCubit(prayer: service, city: repo)`: no selection → `ready(cityState: none, entries: [])`; with selection → entries sorted with times + `next` anchor flagged (fake `PrayerTimeService` — hand-rolled, deterministic); after `select(city)` → reloads with new city. Screens: seeds via memory DB.
+- [x] **Step 2 (green):** cubit + `PrayerTimesScreen`: header city row → picker; 6 rows (5 prayers + sunrise dimmed); next-prayer row highlighted (D6 primary) + `remaining` text (H:mm) computed from the service; Arabic-Indic H:mm per row. `CityPickerScreen`: search field + live list (existing live-filter pattern from W1a index) + tap → `select` → pop.
+- [x] **Step 3: Router** — `/prayer-times` builder provides `PrayerTimesCubit` + nothing else; `/prayer-times/city` provides `CityPickerCubit`; grid/placeholder removals limited to those two builders. If router_test breaks → STOP (constraint).
+- [x] **Step 4: Gates + commit** (record per-file counts)
 
 ```powershell
 flutter gen-l10n
@@ -157,9 +157,9 @@ git commit -m "feat(w3): prayer times + city picker screens (l10n, next-prayer h
 - Modify: ARBs + regenerated
 - Create: `test/qibla_screen_test.dart`
 
-- [ ] **Step 1 (red):** `QiblaCubit(prayer's cityRepository, qibla service)`: none → `ready(cityState: none, bearing: null)`; selection → bearing double. Screen test: with seeded city → degrees text visible + arrow `Transform.rotate(angle present)`; without → `noCity` prompt + button routes to picker.
-- [ ] **Step 2 (green):** Screen shows: city row, big circular dial (CustomPaint acceptable; keep it one-file simple), vector arrow `Transform.rotate(angle: bearing rad)` pointing up at bearing 0, `degreesFromNorth` text with Arabic-Indic. A "live compass" note is NOT rendered (W7 owns it silently).
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** `QiblaCubit(prayer's cityRepository, qibla service)`: none → `ready(cityState: none, bearing: null)`; selection → bearing double. Screen test: with seeded city → degrees text visible + arrow `Transform.rotate(angle present)`; without → `noCity` prompt + button routes to picker.
+- [x] **Step 2 (green):** Screen shows: city row, big circular dial (CustomPaint acceptable; keep it one-file simple), vector arrow `Transform.rotate(angle: bearing rad)` pointing up at bearing 0, `degreesFromNorth` text with Arabic-Indic. A "live compass" note is NOT rendered (W7 owns it silently).
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -180,9 +180,9 @@ git commit -m "feat(w3): qibla screen (bearing dial, city-scoped, compass W7)"
 - Create: `test/home_cubit_test.dart`, `test/home_screen_test.dart`
 
 **Interface:** `HomeCubit(lastRead: LastReadRepository, ayahs: AyahRepository, prayer: PrayerTimeService, city: CityRepository)` → freezed `HomeState.ready(lastRead: ({int surahId, String surahName, int ayahNumber})?, nextPrayer: ({String label, String timeText})?, greeting is UI-only)`; reload() after nav returns (screen calls on push-return via `.then` or simply on init — v1: load-once on create + manual refresh on tap; no stream subscriptions beyond repos).
-- [ ] **Step 1 (red):** cubit tests (memory DB): no last-read & no city → both cards null; seeded last-read → surahName+ayah populated (seed settings row like W1b tests do); seeded city → nextPrayer label/time from fake service.
-- [ ] **Step 2 (green):** `HomeScreen`: app bar with appName; "continue reading" card (existing `continueReading` key + surahName + ayah via Arabic-Indic → pushes `/quran/reader?surah=..&ayah=..`, hidden when null); next-prayer card (existing `nextPrayer` key + name + H:mm → pushes `/prayer-times`, hidden when null); D6 features grid (3 columns, existing l10n keys ONLY: quran/azkar/tasbih/duasAndRuqyah/worshipTracker/zakat/hijriCalendar/asmaUlHusna/library/recitations/prayerTimes/qibla/settings — each pushes its existing route; unimplemented features keep their placeholder routes, that is by design). NO new l10n keys needed here (reuse) — if the executor finds one unavoidable, additive grant implicit but disclose.
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** cubit tests (memory DB): no last-read & no city → both cards null; seeded last-read → surahName+ayah populated (seed settings row like W1b tests do); seeded city → nextPrayer label/time from fake service.
+- [x] **Step 2 (green):** `HomeScreen`: app bar with appName; "continue reading" card (existing `continueReading` key + surahName + ayah via Arabic-Indic → pushes `/quran/reader?surah=..&ayah=..`, hidden when null); next-prayer card (existing `nextPrayer` key + name + H:mm → pushes `/prayer-times`, hidden when null); D6 features grid (3 columns, existing l10n keys ONLY: quran/azkar/tasbih/duasAndRuqyah/worshipTracker/zakat/hijriCalendar/asmaUlHusna/library/recitations/prayerTimes/qibla/settings — each pushes its existing route; unimplemented features keep their placeholder routes, that is by design). NO new l10n keys needed here (reuse) — if the executor finds one unavoidable, additive grant implicit but disclose.
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -196,7 +196,7 @@ git commit -m "feat(w3): home screen (continue reading, next prayer, features gr
 
 ### Task 7: Close-out
 
-- [ ] **Step 1: Full gates ONCE, in order, all recorded**
+- [x] **Step 1: Full gates ONCE, in order, all recorded**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -212,14 +212,14 @@ git rev-list --count origin/main..HEAD
 
 Expected: analyze 0; suite baseline 48 + 7 (prayer/qibla services) + 3 (city repo) + ~6 (prayer cubit/screens/picker) + 2 (qibla) + ~4 (home) = **≈70; MEASURE, record exact per-file**; APK debug exit 0 + bytes; `--release` exit 0 (first release build gate — file size + exit code only, no keystore signing beyond debug defaults; if release fails on a signing step, disclose the error text verbatim — signing/keystore is W7 anyway, a debug-signed release success is the target). Porcelain empty.
 
-- [ ] **Step 2: Tick this plan** (`- [ ]` → `- [x]`; .NET `UTF8Encoding($false)` write; NEVER blanket replaceAll — W2b lesson: the plan header PROSE contains a literal `- [ ]` token, target lines only), commit:
+- [x] **Step 2: Tick this plan** (`- [ ]` → `- [x]`; .NET `UTF8Encoding($false)` write; NEVER blanket replaceAll — W2b lesson: the plan header PROSE contains a literal `- [ ]` token, target lines only), commit:
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w3-prayer-qibla-home.md
 git commit -m "docs(w3): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3:** Final report — same §1–§10 skeleton as W2a/W2b (start-gate verbatim · commit table · package-companion checkpoint quotes for adhan · gates table with measured numbers + per-file counts · itemized disclosures · STOPs · incidents self-caught · unpushed count measured · state at close · NO PUSH).
+- [x] **Step 3:** Final report — same §1–§10 skeleton as W2a/W2b (start-gate verbatim · commit table · package-companion checkpoint quotes for adhan · gates table with measured numbers + per-file counts · itemized disclosures · STOPs · incidents self-caught · unpushed count measured · state at close · NO PUSH).
 
 ## Explicit non-goals (this wave)
 
