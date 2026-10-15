@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -68,9 +69,8 @@ class _SurahRow extends StatelessWidget {
     final isMakkah = surah.revelationType == 'makkah';
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-      onTap: () {
-        // W1b: navigate to the reader for this surah.
-      },
+      onTap: () => context
+          .push('/quran/reader?surah=${surah.id}&ayah=0'),
       leading: Container(
         width: 38,
         height: 38,

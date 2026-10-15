@@ -75,4 +75,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String ayatCount(int count) {
     return '$count آيات';
   }
+
+  @override
+  String get mushafMode => 'وضع المصحف';
+
+  @override
+  String get versesMode => 'وضع الآيات';
+
+  @override
+  String get bookmarks => 'العلامات المرجعية';
+
+  @override
+  String get bookmarkSave => 'احفظ الآية';
+
+  @override
+  String get bookmarkRemove => 'أزل الحفظ';
+
+  @override
+  String get noBookmarks => 'لا توجد علامات مرجعية بعد';
+
+  @override
+  String pageIndicator(String page) {
+    return 'صفحة $page';
+  }
 }

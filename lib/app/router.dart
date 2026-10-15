@@ -3,9 +3,13 @@ import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
 import '../core/widgets/placeholder_screen.dart';
+import '../features/quran/data/ayah_repository.dart';
+import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/surah_repository.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
+import '../features/quran/presentation/reader/reader_cubit.dart';
+import '../features/quran/presentation/reader/reader_screen.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -31,6 +35,24 @@ abstract final class AppRouter {
       GoRoute(path: '/hijri', builder: (_, __) => const PlaceholderScreen(title: 'التقويم الهجري')),
       GoRoute(path: '/asma', builder: (_, __) => const PlaceholderScreen(title: 'أسماء الله الحسنى')),
       GoRoute(path: '/settings', builder: (_, __) => const PlaceholderScreen(title: 'الإعدادات')),
+      GoRoute(
+        path: '/quran/reader',
+        builder: (context, state) {
+          final surah =
+              int.tryParse(state.uri.queryParameters['surah'] ?? '') ?? 1;
+          final ayah =
+              int.tryParse(state.uri.queryParameters['ayah'] ?? '') ?? 0;
+          return BlocProvider<ReaderCubit>(
+            create: (_) => ReaderCubit(
+              ayahRepository: getIt<AyahRepository>(),
+              lastReadRepository: getIt<LastReadRepository>(),
+              surahId: surah,
+              initialAyah: ayah,
+            ),
+            child: const ReaderScreen(),
+          );
+        },
+      ),
     ],
   );
 }

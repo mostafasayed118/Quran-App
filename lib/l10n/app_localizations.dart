@@ -229,6 +229,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} آيات'**
   String ayatCount(int count);
+
+  /// No description provided for @mushafMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع المصحف'**
+  String get mushafMode;
+
+  /// No description provided for @versesMode.
+  ///
+  /// In ar, this message translates to:
+  /// **'وضع الآيات'**
+  String get versesMode;
+
+  /// No description provided for @bookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'العلامات المرجعية'**
+  String get bookmarks;
+
+  /// No description provided for @bookmarkSave.
+  ///
+  /// In ar, this message translates to:
+  /// **'احفظ الآية'**
+  String get bookmarkSave;
+
+  /// No description provided for @bookmarkRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'أزل الحفظ'**
+  String get bookmarkRemove;
+
+  /// No description provided for @noBookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد علامات مرجعية بعد'**
+  String get noBookmarks;
+
+  /// No description provided for @pageIndicator.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة {page}'**
+  String pageIndicator(String page);
 }
 
 class _AppLocalizationsDelegate

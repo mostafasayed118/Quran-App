@@ -75,4 +75,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String ayatCount(int count) {
     return '$count verses';
   }
+
+  @override
+  String get mushafMode => 'Mushaf Mode';
+
+  @override
+  String get versesMode => 'Verses Mode';
+
+  @override
+  String get bookmarks => 'Bookmarks';
+
+  @override
+  String get bookmarkSave => 'Bookmark this ayah';
+
+  @override
+  String get bookmarkRemove => 'Remove bookmark';
+
+  @override
+  String get noBookmarks => 'No bookmarks yet';
+
+  @override
+  String pageIndicator(String page) {
+    return 'Page $page';
+  }
 }
