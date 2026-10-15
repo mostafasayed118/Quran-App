@@ -262,4 +262,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get nisabLabel => 'العتبة';
+
+  @override
+  String hijriDate(String month, String year) {
+    return 'الشهر $month سنة $year';
+  }
+
+  @override
+  String gregorianEquivalent(String date) {
+    return 'يوافق $date';
+  }
+
+  @override
+  String get jumpToToday => 'اليوم';
 }

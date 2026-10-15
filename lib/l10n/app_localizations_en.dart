@@ -262,4 +262,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nisabLabel => 'Threshold';
+
+  @override
+  String hijriDate(String month, String year) {
+    return '$month $year AH';
+  }
+
+  @override
+  String gregorianEquivalent(String date) {
+    return '= $date';
+  }
+
+  @override
+  String get jumpToToday => 'Today';
 }

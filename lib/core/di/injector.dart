@@ -15,6 +15,8 @@ import '../../features/asma/presentation/asma_cubit.dart';
 import '../../features/duas/data/dua_repository.dart';
 import '../../features/duas/data/ruqyah_repository.dart';
 import '../../features/duas/presentation/duas_cubit.dart';
+import '../../features/hijri/data/hijri_service.dart';
+import '../../features/hijri/presentation/hijri_cubit.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
 import '../../features/tasbih/presentation/tasbih_cubit.dart';
@@ -62,6 +64,9 @@ Future<void> configureDependencies({
       () => TrackerCubit(repo: getIt<PrayerLogRepository>()));
   getIt.registerLazySingleton<ZakatCubit>(() => ZakatCubit());
   getIt.registerLazySingleton<ZakatCalculator>(() => const ZakatCalculator());
+  getIt.registerLazySingleton<HijriService>(() => HijriService());
+  getIt.registerLazySingleton<HijriCubit>(
+      () => HijriCubit(service: getIt<HijriService>()));
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
         () => CityRepository(db: db, loader: citiesLoader));

@@ -1,0 +1,120 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../l10n/app_localizations.dart';
+import 'hijri_cubit.dart';
+import 'hijri_state.dart';
+
+class HijriScreen extends StatelessWidget {
+  const HijriScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(loc.hijriCalendar)),
+      body: BlocBuilder<HijriCubit, HijriState>(
+        builder: (context, state) => switch (state) {
+          HijriLoading() => const Center(child: CircularProgressIndicator()),
+          HijriReady(:final monthName, :final year, :final offset,
+              :final cells, :final todayHeader) =>
+            ListView(
+              padding: const EdgeInsets.all(12),
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Text(
+                          todayHeader,
+                          style: const TextStyle(
+                            fontFamily: QuranFonts.meQuran,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Row(
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.chevron_right),
+                      onPressed: () => context.read<HijriCubit>().next(),
+                    ),
+                    Expanded(
+                      child: Text(
+                        loc.hijriDate(monthName, year.toArabicIndic),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: loc.jumpToToday,
+                      icon: const Icon(Icons.today),
+                      onPressed: () => context.read<HijriCubit>().jumpToToday(),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.chevron_left),
+                      onPressed: () => context.read<HijriCubit>().prev(),
+                    ),
+                  ],
+                ),
+                GridView.count(
+                  crossAxisCount: 7,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 4,
+                  crossAxisSpacing: 4,
+                  childAspectRatio: 0.82,
+                  padding: const EdgeInsets.only(top: 8),
+                  children: [
+                    for (var i = 0; i < offset; i++) const SizedBox.shrink(),
+                    for (final cell in cells)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: cell.isToday
+                              ? Theme.of(context).colorScheme.primaryContainer
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              cell.hDay.toArabicIndic,
+                              style: const TextStyle(
+                                fontFamily: QuranFonts.meQuran,
+                                fontSize: 17,
+                              ),
+                            ),
+                            Text(
+                              cell.gDay.toArabicIndic,
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+        },
+      ),
+    );
+  }
+}

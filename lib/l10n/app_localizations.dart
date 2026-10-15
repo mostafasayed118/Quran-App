@@ -565,6 +565,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'العتبة'**
   String get nisabLabel;
+
+  /// No description provided for @hijriDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر {month} سنة {year}'**
+  String hijriDate(String month, String year);
+
+  /// No description provided for @gregorianEquivalent.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوافق {date}'**
+  String gregorianEquivalent(String date);
+
+  /// No description provided for @jumpToToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get jumpToToday;
 }
 
 class _AppLocalizationsDelegate
