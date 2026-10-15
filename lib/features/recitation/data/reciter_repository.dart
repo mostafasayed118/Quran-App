@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:drift/drift.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/db/app_database.dart';
@@ -117,5 +118,23 @@ class ReciterRepository {
           ..where((s) => s.key.equals(selectedMoshafKey)))
         .getSingleOrNull();
     return row?.value;
+  }
+
+  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {
+    if (surahIds.isEmpty) return {};
+    final rows = await (_db.select(_db.surahs)
+          ..where((s) => s.id.isIn(surahIds)))
+        .get();
+    return {for (final s in rows) s.id: s.nameAr};
+  }
+
+  /// Opening-ayah teasers for the reciter's surah rows (W2a plan T6 shape),
+  /// keyed by surah id from the bundled ayahs table.
+  Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async {
+    if (surahIds.isEmpty) return {};
+    final rows = await (_db.select(_db.ayahs)
+          ..where((a) => a.surahId.isIn(surahIds) & a.numberInSurah.equals(1)))
+        .get();
+    return {for (final a in rows) a.surahId: a.textUthmani};
   }
 }

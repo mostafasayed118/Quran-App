@@ -13,6 +13,9 @@ import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
+import '../features/recitation/presentation/downloads/downloads_cubit.dart';
+import '../features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.dart';
+import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart';
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
 import '../features/recitation/presentation/reciters/reciters_screen.dart';
 
@@ -62,6 +65,27 @@ abstract final class AppRouter {
               initialAyah: ayah,
             ),
             child: const ReaderScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/recitation/reciter',
+        builder: (context, state) {
+          final row = state.uri.queryParameters['row'] ?? '';
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider<DownloadsCubit>.value(
+                value: getIt<DownloadsCubit>(),
+              ),
+              BlocProvider<ReciterSurahsCubit>(
+                create: (_) => ReciterSurahsCubit(
+                  reciters: getIt<ReciterRepository>(),
+                  downloads: getIt<DownloadsCubit>(),
+                  rowId: row,
+                ),
+              ),
+            ],
+            child: const ReciterSurahsScreen(),
           );
         },
       ),
