@@ -125,6 +125,9 @@ Accessibility: 48px min touch targets, Semantics on all interactive elements, te
 
 ## 7. Quality Gates (every wave, no exceptions)
 
+- **Dependency freshness (owner requirement):** every package MUST be the latest stable version
+  at the time its wave runs (verify on pub.dev before adding; no deprecated/unmaintained packages;
+  `pubspec.lock` committed every wave). Re-check freshness at W7 before release.
 - `flutter analyze` = 0 issues (flutter_lints from day one)
 - `dart format` — clean
 - Unit tests REQUIRED for computational logic: prayer calculation, zakat, hijri conversion,
