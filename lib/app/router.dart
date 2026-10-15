@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
 import '../core/widgets/placeholder_screen.dart';
+import '../features/azkar/data/azkar_repository.dart';
+import '../features/azkar/presentation/azkar_cubit.dart';
+import '../features/azkar/presentation/azkar_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
@@ -90,7 +93,15 @@ abstract final class AppRouter {
           child: const QiblaScreen(),
         ),
       ),
-      GoRoute(path: '/azkar', builder: (_, __) => const PlaceholderScreen(title: 'الأذكار')),
+      GoRoute(
+        path: '/azkar',
+        builder: (_, __) => BlocProvider<AzkarCubit>(
+          create: (_) => AzkarCubit(
+            repository: getIt<AzkarRepository>(),
+          ),
+          child: const AzkarScreen(),
+        ),
+      ),
       GoRoute(path: '/tasbih', builder: (_, __) => const PlaceholderScreen(title: 'السبحة')),
       GoRoute(path: '/duas', builder: (_, __) => const PlaceholderScreen(title: 'الأدعية والرقية')),
       GoRoute(path: '/worship', builder: (_, __) => const PlaceholderScreen(title: 'تتبع العبادات')),

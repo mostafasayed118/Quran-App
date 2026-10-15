@@ -186,4 +186,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String degreesFromNorth(String degrees) {
     return '$degrees° from north';
   }
+
+  @override
+  String azkarItemsCount(String count) {
+    return '$count items';
+  }
+
+  @override
+  String get azkarDone => 'Done';
 }

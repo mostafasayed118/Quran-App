@@ -186,4 +186,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String degreesFromNorth(String degrees) {
     return '$degrees° عن الشمال';
   }
+
+  @override
+  String azkarItemsCount(String count) {
+    return '$count ذكر';
+  }
+
+  @override
+  String get azkarDone => 'تم بحمد الله';
 }

@@ -427,6 +427,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{degrees}° عن الشمال'**
   String degreesFromNorth(String degrees);
+
+  /// No description provided for @azkarItemsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} ذكر'**
+  String azkarItemsCount(String count);
+
+  /// No description provided for @azkarDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم بحمد الله'**
+  String get azkarDone;
 }
 
 class _AppLocalizationsDelegate

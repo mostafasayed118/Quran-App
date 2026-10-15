@@ -9,6 +9,7 @@ Future<void> main() async {
   await configureDependencies(
     audioRootResolver: defaultAudioRootResolver,
     citiesLoader: defaultCitiesLoader,
+    azkarLoader: defaultAzkarLoader,
   );
   runApp(const QuranYahdiApp());
 }
