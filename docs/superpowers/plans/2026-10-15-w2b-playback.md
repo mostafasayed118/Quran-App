@@ -1,6 +1,6 @@
 # Quran Yahdi — Wave 2b (Foreground Playback) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Play a (reciter, surah) pair — from the local file when it is downloaded, otherwise streamed straight from the mp3quran server — with a thin playback facade over `just_audio`, a foreground-only `PlaybackCubit` singleton, a persistent mini player, and play affordances in the reciter's surah screen and the reader.
 
