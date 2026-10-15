@@ -18,6 +18,8 @@ dependencies:
   get_it: ^9.3.0
   dio: ^5.11.1
   connectivity_plus: ^7.3.2
+  flutter_localizations:
+    sdk: flutter
 
 flutter_launcher_icons:
   android: true
@@ -44,6 +46,7 @@ flutter_native_splash:
 flutter:
 
   uses-material-design: true
+  generate: true
   assets:
     - assets/icons/
     - assets/json/
