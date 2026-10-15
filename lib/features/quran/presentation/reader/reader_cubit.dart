@@ -1,0 +1,98 @@
+import 'dart:async';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../../core/db/app_database.dart';
+import '../../data/ayah_repository.dart';
+import '../../data/last_read_repository.dart';
+import 'mushaf_page_block.dart';
+import 'reader_state.dart';
+
+class ReaderCubit extends Cubit<ReaderState> {
+  ReaderCubit({
+    required AyahRepository ayahRepository,
+    required LastReadRepository lastReadRepository,
+    required int surahId,
+    required int initialAyah,
+  })  : _ayahRepository = ayahRepository,
+        _lastReadRepository = lastReadRepository,
+        _surahId = surahId,
+        _initialAyah = initialAyah,
+        super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah)) {
+    _bookmarksSub = ayahRepository.watchBookmarkedIds().listen(_onBookmarks);
+    _load();
+  }
+
+  final AyahRepository _ayahRepository;
+  final LastReadRepository _lastReadRepository;
+  final int _surahId;
+  final int _initialAyah;
+  StreamSubscription<Set<int>>? _bookmarksSub;
+  final Set<int> _bookmarkedIds = <int>{};
+
+  Future<void> _load() async {
+    try {
+      final results =
+          await Future.wait([_ayahRepository.surahById(_surahId), _ayahRepository.surahAyahs(_surahId)]);
+      final surah = results[0] as Surah?;
+      final ayahs = results[1] as List<Ayah>;
+      final startList = ayahs
+          .where((a) => a.numberInSurah == _initialAyah)
+          .toList();
+      _lastReadRepository
+          .saveAyahId(startList.isNotEmpty ? startList.first.id : (ayahs.isNotEmpty ? ayahs.first.id : 0));
+      if (isClosed) return;
+      emit(ReaderState.ready(
+        surahId: _surahId,
+        surahName: surah?.nameAr ?? '',
+        initialAyah: _initialAyah,
+        ayahs: ayahs,
+        mushafPages: groupAyahsByPage(ayahs),
+        bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
+        showBasmala: _surahId != 1 && _surahId != 9,
+      ));
+    } on Object catch (error) {
+      if (isClosed) return;
+      emit(ReaderState.error(message: error.toString()));
+    }
+  }
+
+  void _onBookmarks(Set<int> ids) {
+    _bookmarkedIds
+      ..clear()
+      ..addAll(ids);
+    final current = state;
+    if (current is ReaderReady && !isClosed) {
+      emit(current.copyWith(bookmarkedAyahIds: Set<int>.of(_bookmarkedIds)));
+    }
+  }
+
+  void toggleMode() {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    emit(current.copyWith(
+      mode: current.mode == ReaderMode.verses
+          ? ReaderMode.mushaf
+          : ReaderMode.verses,
+    ));
+  }
+
+  Future<void> toggleBookmark(int ayahId) async {
+    await _ayahRepository.toggleBookmark(ayahId);
+  }
+
+  Future<void> onMushafPageChanged(int blockIndex) async {
+    final current = state;
+    if (current is! ReaderReady) return;
+    if (blockIndex < 0 || blockIndex >= current.mushafPages.length) return;
+    final pageAyahs = current.mushafPages[blockIndex].ayahs;
+    if (pageAyahs.isEmpty) return;
+    await _lastReadRepository.saveAyahId(pageAyahs.first.id);
+  }
+
+  @override
+  Future<void> close() {
+    _bookmarksSub?.cancel();
+    return super.close();
+  }
+}
