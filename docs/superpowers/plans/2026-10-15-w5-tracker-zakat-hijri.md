@@ -157,3 +157,13 @@ git commit -m "docs(w5): mark plan checkboxes complete"
 - Zakat is deterministic arithmetic → real goldens allowed (contrast with the temporal/spatial property rule — both documented in the ledger, opposite sides of the same law).
 - Router placeholder surgery ×3 with the three-times-proven read-first + STOP-or-grant rule; home untouched; no frozen edits granted.
 - Red-first mandated for repository and cubit layers across all three tasks; screens may go green-first as established.
+
+---
+
+## PM Errata & Adjudications (post-wave, committed by PM 2026-10-15)
+- All 7 disclosures ACCEPTED. Zero STOPs — router_test unedited FOURTH consecutive wave (diff-verified). Package intake gate worked as designed: HijriCalendar (not the plan-sketch name) accepted because the checkpoint verification — not assumption — drove it; purity scan re-confirmed PM-side (zero flutter imports in the package lib).
+- D3 streak cap 400 days (bounded markedDaysRange query, stats unbounded = W7) — accepted, rational bound.
+- D5 ZakatCalculator registered-but-inline-computed — harmless slop; W7 either wires it or removes the registration.
+- D4 setLocal('ar') package-global — v1 default-AR fine; locale-aware switch = W7 line.
+- Companion checkpoint PM-reproduced: PrayerLogCompanion.insert required DateTime day (g.dart:1611-1619) — the report's quote was accurate to the line.
+- Gates PM-reproduced: analyze 0; suite 113/113; debug rebuild exit 0 @ 206,245,214 B (delta 173 B, retired-determinism ballpark); release rebuilt exit 0 @ 65,014,586 B byte-EXACT (FOURTH consecutive); hijri 3.0.1 sole dep; ticks 17/17 targeted; self-caught logic bug (hijri gregorian/hijri ctor swap) never reached green-claim — exemplary.
