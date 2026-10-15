@@ -1,6 +1,6 @@
 # Quran Yahdi — Wave 2a (Recitation Catalog + Offline Downloads) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Ship the recitation catalog: ALL 243 reciters (mp3quran API, cached in drift v2), featured-above-list ordering from PM-verified ids, per-surah mp3 downloads into app storage with a sequential queue, live statuses — playable catalog ready for the W2b playback wave.
 
@@ -24,7 +24,7 @@
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; flutter --version
@@ -45,7 +45,7 @@ Expected: HEAD `7cb37bd` or later with intervening commits touching ONLY `docs/`
 - Produces: `@DataClassName('ReciterRow')` table `Reciters` (id TEXT PK = `"$reciterId-$moshafId"`, reciterName, moshafName, server, surahList TEXT, surahTotal INT); `schemaVersion = 2`; upgradefrom v1 creates only missing tables.
 - IMPORTANT drift migration note: `{Reciters}` must be added to the `@DriftDatabase(tables: [...])` list too, else onUpgrade create misses it.
 
-- [ ] **Step 1: Append to `lib/core/db/tables.dart`**
+- [x] **Step 1: Append to `lib/core/db/tables.dart`**
 
 ```dart
 @DataClassName('ReciterRow')
@@ -62,7 +62,7 @@ class Reciters extends Table {
 ```
 NOTE: `@DataClassName` needs NO new import (it is a drift annotation via the existing import).
 
-- [ ] **Step 2: Edit `lib/core/db/app_database.dart`** — add `Reciters,` to the `@DriftDatabase(tables: [...])` list, set `schemaVersion` to `2`, and add:
+- [x] **Step 2: Edit `lib/core/db/app_database.dart`** — add `Reciters,` to the `@DriftDatabase(tables: [...])` list, set `schemaVersion` to `2`, and add:
 ```dart
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,9 +75,9 @@ NOTE: `@DataClassName` needs NO new import (it is a drift annotation via the exi
 ```
 (`MigrationStrategy` arrives via the existing `package:drift/drift.dart` import.)
 
-- [ ] **Step 3: Frozen-test granted edit — in `test/db_migration_test.dart` change ONLY the count assertion `expect(db.allTables.length, 8)` → `expect(db.allTables.length, 9)` with a trailing comment `// w2a: + reciters (PM grant)`.**
+- [x] **Step 3: Frozen-test granted edit — in `test/db_migration_test.dart` change ONLY the count assertion `expect(db.allTables.length, 8)` → `expect(db.allTables.length, 9)` with a trailing comment `// w2a: + reciters (PM grant)`.**
 
-- [ ] **Step 4: Regenerate + extend the test file with a reciters CRUD probe (add ONE test, verbatim)**
+- [x] **Step 4: Regenerate + extend the test file with a reciters CRUD probe (add ONE test, verbatim)**
 
 ```dart
 import 'package:drift/drift.dart' show Value;
@@ -108,7 +108,7 @@ already present — now append inside `main()`:
 ```
 MANDATORY VERIFICATION STEP before this compiles confidently: after `dart run build_runner build`, OPEN `app_database.g.dart` and locate `RecitersCompanion.insert` — CONFIRM which params are `required` vs `Value(...)`. If `id` differs from `required String` (text-PK precedent), disclose + adjust ALL usages in this plan accordingly (single-token fixes, W1b acceptance class).
 
-- [ ] **Step 5: Rebuild the bundled asset (v2) + gates + commit**
+- [x] **Step 5: Rebuild the bundled asset (v2) + gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -140,7 +140,7 @@ git commit -m "feat(w2a): drift schema v2 (reciters catalog table) + rebuilt bun
     - `Future<void> selectMoshaf(String rowId)` / `Future<String?> loadSelectedMoshaf()` — settings key `selected_moshaf_row` (plain `key:` — settings text-PK precedent).
 - DI: `ReciterRepository` singleton (client default real; tests pass `IOClient` or rely on the local-server override pattern below).
 
-- [ ] **Step 1: Failing tests — `test/reciter_repository_test.dart` (verbatim)**
+- [x] **Step 1: Failing tests — `test/reciter_repository_test.dart` (verbatim)**
 
 ```dart
 import 'dart:convert';
@@ -240,7 +240,7 @@ ReciterRow _row({required String id, required String name}) => ReciterRow(
     );
 ```
 
-- [ ] **Step 2: Run → FAIL. Implement `lib/features/recitation/data/reciter_repository.dart` (verbatim)**
+- [x] **Step 2: Run → FAIL. Implement `lib/features/recitation/data/reciter_repository.dart` (verbatim)**
 
 ```dart
 import 'dart:io';
@@ -364,7 +364,7 @@ class ReciterRepository {
 NOTE at top of file (add): `import 'dart:convert';` for `jsonDecode`.
 VERIFICATION (Errata-lesson, mandatory): after `build_runner`, open `app_database.g.dart` → `RecitersCompanion.insert`. Text-PK precedent says `required String id` (plain) — the code above assumes EXACTLY that. If the generated signature differs, adjust ONLY these usages, disclose in the report.
 
-- [ ] **Step 3: DI — append inside `configureDependencies`:**
+- [x] **Step 3: DI — append inside `configureDependencies`:**
 
 ```dart
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
@@ -373,7 +373,7 @@ VERIFICATION (Errata-lesson, mandatory): after `build_runner`, open `app_databas
 import '../../features/recitation/data/reciter_repository.dart';
 ```
 
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter test test/reciter_repository_test.dart
@@ -406,7 +406,7 @@ git commit -m "feat(w2a): reciter repository (mp3quran cache, featured sort, sel
   `await configureDependencies(audioRootResolver: defaultAudioRootResolver);` where `defaultAudioRootResolver` lives in `lib/app/bootstrap.dart` (imports path_provider; app-layer = flutter-allowed). `configureDependencies({Future<Directory> Function()? audioRootResolver})` — if null, downloader registration is SKIPPED and re-attempted by `ensureAudioBindings(audioRootResolver)` called from main BEFORE runApp; W0 `injector_test` never calls audio bits (still passes on the VM).
 - APPROVED detail: `Queue drain failure = mark failed + continue next task` (never throw out of the drain loop).
 
-- [ ] **Step 1: Failing tests — `test/audio_downloader_test.dart` (verbatim — local ephemeral server pattern)**
+- [x] **Step 1: Failing tests — `test/audio_downloader_test.dart` (verbatim — local ephemeral server pattern)**
 
 ```dart
 import 'dart:io';
@@ -514,7 +514,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 2: Failing queue test — `test/downloads_cubit_test.dart` (verbatim)**
+- [x] **Step 2: Failing queue test — `test/downloads_cubit_test.dart` (verbatim)**
 
 ```dart
 import 'dart:io';
@@ -620,7 +620,7 @@ void main() {
 }
 ```
 
-- [ ] **Step 3: Run all four → FAIL. Implement (verbatim).**
+- [x] **Step 3: Run all four → FAIL. Implement (verbatim).**
 
 `lib/features/recitation/data/audio_downloader.dart`:
 ```dart
@@ -908,7 +908,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
       (_db.select(_db.downloads)..where((d) => d.status.equals('done'))).get();
 ```
 
-- [ ] **Step 4: DI (bootstrap split, S7-safe)**
+- [x] **Step 4: DI (bootstrap split, S7-safe)**
 
 `lib/core/di/injector.dart` — accept the resolver and register ONLY when provided:
 ```dart
@@ -950,7 +950,7 @@ Future<void> main() async {
 ```
 W0 injector_test unchanged (`configureDependencies()` with no resolver still legal; its `AppDatabase` path stays identical).
 
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -973,7 +973,7 @@ git commit -m "feat(w2a): audio downloader + sequential queue (dio streams, drif
 - `RecitersCubit({required ReciterRepository repo})` — state: `loading` → `ready(reciters, query)` → error; `refresh()` calls `refreshFromApi()` then live re-emits via `watchAll()`; `setQuery(String)`.
 - Route: `/recitations` → `BlocProvider(create: RecitersCubit(getIt<ReciterRepository>()))`.
 
-- [ ] **Step 1: l10n additive (AR)**
+- [x] **Step 1: l10n additive (AR)**
 ```json
   "recitationsTitle": "التلاوات",
   "searchReciters": "ابحث عن قارئ…",
@@ -996,11 +996,11 @@ EN:
   "@surahCountLabel": { "placeholders": { "count": { "type": "String" } } }
 ```
 
-- [ ] **Step 2: Implement cubit + state + screen** (state/implementations mirror W1a screen patterns exactly — sealed freezed loading/ready/error, FutureBuilder-free, `watchAll()` feed, `sortReciters` applied on ready, query-filtered by reciterName/moshafName contains, refresh button wired to `refresh()` with try/catch into an error banner). Screen rows: ornate initial letter, `reciterName` (`QuranFonts.ui` 16 bold), subtitle `moshafName`, trailing `surahTotal.toArabicIndic` + label; taps: `context.push('/recitations/reciter?row=${Uri.encodeComponent(row.id)}')`; a one-time `refresh()` kick on init when the underlying list is empty (offline-first: cached list shows instantly; the kick is a soft network refresh — failures land in a snack-bar, never a dead screen).
+- [x] **Step 2: Implement cubit + state + screen** (state/implementations mirror W1a screen patterns exactly — sealed freezed loading/ready/error, FutureBuilder-free, `watchAll()` feed, `sortReciters` applied on ready, query-filtered by reciterName/moshafName contains, refresh button wired to `refresh()` with try/catch into an error banner). Screen rows: ornate initial letter, `reciterName` (`QuranFonts.ui` 16 bold), subtitle `moshafName`, trailing `surahTotal.toArabicIndic` + label; taps: `context.push('/recitations/reciter?row=${Uri.encodeComponent(row.id)}')`; a one-time `refresh()` kick on init when the underlying list is empty (offline-first: cached list shows instantly; the kick is a soft network refresh — failures land in a snack-bar, never a dead screen).
 
-- [ ] **Step 3: Widget tests — `test/reciters_screen_test.dart` (2 tests, teardown-safe, verbatim shape):** a `_StaticReciterRepository extends ReciterRepository` with `watchAll() => Stream.value(seeded rows: '51-53' عبدالباسط + '55-55' تجربة)`; assert featured row appears FIRST (find.text('عبدالباسط عبدالصمد') at a LOWER Y offset than the other name), search field narrows to 1 row on 'عفاسي', error-free no-reciters state shows `noReciters` text with an unstyled empty list.
+- [x] **Step 3: Widget tests — `test/reciters_screen_test.dart` (2 tests, teardown-safe, verbatim shape):** a `_StaticReciterRepository extends ReciterRepository` with `watchAll() => Stream.value(seeded rows: '51-53' عبدالباسط + '55-55' تجربة)`; assert featured row appears FIRST (find.text('عبدالباسط عبدالصمد') at a LOWER Y offset than the other name), search field narrows to 1 row on 'عفاسي', error-free no-reciters state shows `noReciters` text with an unstyled empty list.
 
-- [ ] **Step 4: Router — REPLACE the `/recitations` placeholder GoRoute:**
+- [x] **Step 4: Router — REPLACE the `/recitations` placeholder GoRoute:**
 ```dart
       GoRoute(
         path: '/recitations',
@@ -1013,7 +1013,7 @@ EN:
 ```
 imports as needed.
 
-- [ ] **Step 5: Gates + commit**
+- [x] **Step 5: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -1036,10 +1036,10 @@ git commit -m "feat(w2a): reciters catalog screen (search, featured-first, refre
 - `ReciterSurahsCubit({required ReciterRepository reciters, required AyahRepository? no — surah names come from a new small method: ADD to Task-3 repo? NO — ADD here: `SurahNamesFor` in ReciterRepository via `_db.select(_db.surahs)..where isIn` returning `Map<int, String>`; produces `ready(row, surahNumbers, names map, items map from DownloadsCubit passthrough)`; enqueue/delete delegate to DownloadsCubit (pulled via getIt in the ROUTE BlocProvider chain — DownloadsCubit is a singleton; PROVIDE it as inherited `BlocProvider.value` in the route).
 - Route: `/recitations/reciter?row=` → wraps BOTH `DownloadsCubit.value(getIt<DownloadsCubit>())` + `BlocProvider(create: ReciterSurahsCubit(...))`.
 
-- [ ] **Step 1: Failing tests — `test/reciter_surahs_screen_test.dart` (2 tests, verbatim shape):** teardown-safe `_StaticReciterRepository` + `_StaticDownloader(downloaderStream fixed done/queued statuses)`; route-host pumps `MultiBlocProvider`; test A: rows render 'الم' + 'ذلك الكتاب' texts + names الفاتحة/البقرة from a names map; test B: tapping the download icon on surah 1 calls enqueue (the static wraps a mutable flag); no real network anywhere.
+- [x] **Step 1: Failing tests — `test/reciter_surahs_screen_test.dart` (2 tests, verbatim shape):** teardown-safe `_StaticReciterRepository` + `_StaticDownloader(downloaderStream fixed done/queued statuses)`; route-host pumps `MultiBlocProvider`; test A: rows render 'الم' + 'ذلك الكتاب' texts + names الفاتحة/البقرة from a names map; test B: tapping the download icon on surah 1 calls enqueue (the static wraps a mutable flag); no real network anywhere.
 
-- [ ] **Step 2: Implement the three files** — screen layout per approved mock 6: app-bar = reciterName + moshafName + set-default action (star icon → `selectMoshaf` + golden snackbar `تم تعيينه قارئك الافتراضي`), rows: ornate Arabic-Indic number, surah name (from names map, fallback `سورة N`), then a status widget column driven by the DownloadsState map: `done` → checks + gold bookmark border, `downloading` → `(received/total)` label + LinearProgressIndicator, `failed` → red retry icon, default → download icon. All download/delete actions delegate to `context.read<DownloadsCubit>()` (enqueue/removeDownload + refreshDone on init).
-- [ ] **Step 3: Add to Task-3 repo (one method, l10n-clean):**
+- [x] **Step 2: Implement the three files** — screen layout per approved mock 6: app-bar = reciterName + moshafName + set-default action (star icon → `selectMoshaf` + golden snackbar `تم تعيينه قارئك الافتراضي`), rows: ornate Arabic-Indic number, surah name (from names map, fallback `سورة N`), then a status widget column driven by the DownloadsState map: `done` → checks + gold bookmark border, `downloading` → `(received/total)` label + LinearProgressIndicator, `failed` → red retry icon, default → download icon. All download/delete actions delegate to `context.read<DownloadsCubit>()` (enqueue/removeDownload + refreshDone on init).
+- [x] **Step 3: Add to Task-3 repo (one method, l10n-clean):**
 ```dart
   Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
@@ -1049,7 +1049,7 @@ git commit -m "feat(w2a): reciters catalog screen (search, featured-first, refre
     return {for (final s in rows) s.id: s.nameAr};
   }
 ```
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -1063,7 +1063,7 @@ git commit -m "feat(w2a): reciter surahs screen (per-surah downloads, statuses, 
 
 ### Task 7: Close-out
 
-- [ ] **Step 1: Full gates (verbatim in report)**
+- [x] **Step 1: Full gates (verbatim in report)**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs
@@ -1076,14 +1076,14 @@ flutter pub outdated
 ```
 Expected: analyze 0; all pass — baseline 28, expect ≈ 36 (record exact); apk exit 0 + bytes; porcelain empty; deps current/no discontinued.
 
-- [ ] **Step 2: Checkbox commit**
+- [x] **Step 2: Checkbox commit**
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w2a-reciters-downloads.md
 git commit -m "docs(w2a): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3: FINAL REPORT — PROMPT-2 §8 format + the g.dart companion-signature verification transcript + the downloaded table row lifecycle (downloading→done/failed count) + APK size + unpushed count. NO PUSH. WAIT — W2b belongs to the PM.**
+- [x] **Step 3: FINAL REPORT — PROMPT-2 §8 format + the g.dart companion-signature verification transcript + the downloaded table row lifecycle (downloading→done/failed count) + APK size + unpushed count. NO PUSH. WAIT — W2b belongs to the PM.**
 
 ---
 
