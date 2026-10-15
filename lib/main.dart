@@ -14,6 +14,7 @@ Future<void> main() async {
     ruqyahLoader: defaultRuqyahLoader,
     asmaLoader: defaultAsmaLoader,
     libraryCatalogLoader: defaultLibraryCatalogLoader,
+    libraryRootResolver: defaultLibraryRootResolver,
   );
   runApp(const QuranYahdiApp());
 }

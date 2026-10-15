@@ -18,6 +18,7 @@ import '../../features/duas/presentation/duas_cubit.dart';
 import '../../features/hijri/data/hijri_service.dart';
 import '../../features/library/data/catalog_repository.dart';
 import '../../features/library/data/library_catalog.dart';
+import '../../features/library/data/pack_downloader.dart';
 import '../../features/hijri/presentation/hijri_cubit.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
@@ -47,6 +48,7 @@ Future<void> configureDependencies({
   Future<List<Map<String, dynamic>>> Function()? ruqyahLoader,
   Future<List<Map<String, dynamic>>> Function()? asmaLoader,
   Future<List<Map<String, dynamic>>> Function()? libraryCatalogLoader,
+  Future<Directory> Function()? libraryRootResolver,
 }) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
@@ -102,6 +104,12 @@ Future<void> configureDependencies({
         () => BundledCatalogSource(loader: libraryCatalogLoader));
     getIt.registerLazySingleton<CatalogRepository>(
         () => CatalogRepository(source: getIt<CatalogSource>()));
+  }
+  if (libraryCatalogLoader != null && libraryRootResolver != null) {
+    getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(
+          db,
+          libraryRootResolver: libraryRootResolver,
+        ));
   }
   getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {
