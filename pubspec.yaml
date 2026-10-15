@@ -23,6 +23,8 @@ dependencies:
   path_provider: ^2.1.6
   path: ^1.9.1
   meta: ^1.19.0
+  http: ^1.6.0
+  collection: ^1.19.1
 
 flutter_launcher_icons:
   android: true
@@ -52,7 +54,7 @@ flutter:
   generate: true
   assets:
     - assets/icons/
-    - assets/json/
+    - assets/db/
 
   fonts:
     - family: quran

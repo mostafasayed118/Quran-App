@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:meta/meta.dart';
 
-import 'connection.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -17,7 +16,7 @@ part 'app_database.g.dart';
   SettingsTable,
 ])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor]) : super(executor ?? _open());
+  AppDatabase(super.executor);
 
   @visibleForTesting
   AppDatabase.test(super.e);
@@ -25,5 +24,7 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1;
 
-  static QueryExecutor _open() => LazyDatabase(() => openAppDatabase());
+  /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
+  /// a fresh executor. Wraps the protected migrator; public by design.
+  Future<void> createSchemaForSeeding() => createMigrator().createAll();
 }
