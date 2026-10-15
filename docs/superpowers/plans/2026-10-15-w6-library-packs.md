@@ -199,3 +199,21 @@ git commit -m "docs(w6): mark plan checkboxes complete"
 - Frozen surface: router placeholder swap (`/library`) + one reader icon under the never-edit rule; everything else additive.
 - Restart of Supabase reality check: the seam keeps the locked thin-layer architecture honest without blocking on the owner's project.
 - Per-file test budget explicit; MEASURE rule standing (113 baseline; ≈129 predicted).
+
+---
+
+## PM RULING ON STOP W6-6 (Option A adopted + AR edition decision, 2026-10-15)
+PM independently re-probed the STOP evidence at source: 	afsir/ar-tafsir-muyassar/1.json @v1.2.2 → 200/5249 B and ra-sirajtafseer.min.json @1 → 200/2096723 B — the executor's probes reproduce byte-exactly. The single-URL single-file assumption in T3 is a PLAN DEFECT for the tafsir kind. **STOP ENDORSED; resume granted under the amended contract below.**
+
+### Amend T2 (catalog): tafsir entries gain two fields
+- Optional urlTemplate (e.g. .../tafsir/ar-tafsir-muyassar/{n}.json where {n} = surah number 1..114, zero-padded NOT assumed — probe-verified plain 1.json) and required-when-template ileCount: 114 (real packs) — fixtures may use small fileCounts. sourceUrl semantics: single-file kinds keep it; tafsir kinds carry urlTemplate instead. Wellformedness test updated accordingly (each of the 3 tafsir entries HAS urlTemplate+fileCount; translations/hadith have sourceUrl).
+
+### Amend T3 (downloader): kind-aware install
+- Single-file kinds (translation/hadith): UNCHANGED (stream one URL → .part → parse-sniff → promote → row).
+- tafsir kind (per STOP option A): sequential GET loop over urlTemplate ({n} = 1..fileCount), accumulating the real per-surah arrays ({"text","ayah","surah"} objects), then ONE documented wrapper {"pack": <id>, "tafsirs": [ {surah, ayah, text} ... flattened ] } written through the SAME discipline: content streamed into the single .part, parsed-validated at the end, promoted, InstalledPacks row installed with measured size; ANY GET failure at any step → delete .part, NO row (one-shot integrity — generator semantics, not streaming).
+- 	afsirFor adapter reads the WRAPPER convention; wrapper + per-surah inner shape are BOTH fixture-locked (excerpt fixture = the probed surah-1 array, 5,249 B — well under the 40 KB cap; wrapper fixture constructed around it).
+- Tests stay hermetic: local HttpServer serves per-N files (fixture fileCount small — e.g. 3 — production stays 114); real CDN never touched inside tests.
+
+### Catalog entry decision (the disputed AR "translation")
+- AR pick = **ra-sirajtafseer** (Mukhtasar at-Tafsir · quranenc · 2,096,723 B probed) as the Arabic meaning-of-the-Quran entry in the translations tab. EN pick = eng-safiurrahmanalm (Saheeh International, 1,083,013 B probed). Third translations-tab entry: executor discretion — ONE more edition whose slug is verified by the same probe discipline (report the GET probe; not the disputed ara-quransimple/kingfahad debate — pick any well-formed single-file EN/other edition to keep 3-per-kind symmetry).
+- Hadith trio unchanged (probes green: 9,409,647 / 4,821,289 / 3,940,216 B).
