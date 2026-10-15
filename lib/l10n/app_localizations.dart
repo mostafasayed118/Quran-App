@@ -199,6 +199,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'متابعة القراءة'**
   String get continueReading;
+
+  /// No description provided for @surahIndexTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن الكريم'**
+  String get surahIndexTitle;
+
+  /// No description provided for @searchSurahHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث بسورة…'**
+  String get searchSurahHint;
+
+  /// No description provided for @revelationMakkah.
+  ///
+  /// In ar, this message translates to:
+  /// **'مكية'**
+  String get revelationMakkah;
+
+  /// No description provided for @revelationMadinah.
+  ///
+  /// In ar, this message translates to:
+  /// **'مدنية'**
+  String get revelationMadinah;
+
+  /// No description provided for @ayatCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آيات'**
+  String ayatCount(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -58,4 +58,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueReading => 'Continue Reading';
+
+  @override
+  String get surahIndexTitle => 'The Noble Quran';
+
+  @override
+  String get searchSurahHint => 'Search a surah…';
+
+  @override
+  String get revelationMakkah => 'Meccan';
+
+  @override
+  String get revelationMadinah => 'Medinan';
+
+  @override
+  String ayatCount(int count) {
+    return '$count verses';
+  }
 }

@@ -1,13 +1,24 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/di/injector.dart';
 import '../core/widgets/placeholder_screen.dart';
+import '../features/quran/data/surah_repository.dart';
+import '../features/quran/presentation/index/surah_index_cubit.dart';
+import '../features/quran/presentation/index/surah_index_screen.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/home',
     routes: [
       GoRoute(path: '/home', builder: (_, __) => const PlaceholderScreen(title: 'الرئيسية')),
-      GoRoute(path: '/quran', builder: (_, __) => const PlaceholderScreen(title: 'القرآن الكريم')),
+      GoRoute(
+        path: '/quran',
+        builder: (_, __) => BlocProvider<SurahIndexCubit>(
+          create: (_) => SurahIndexCubit(getIt<SurahRepository>()),
+          child: const SurahIndexScreen(),
+        ),
+      ),
       GoRoute(path: '/recitation', builder: (_, __) => const PlaceholderScreen(title: 'التلاوات')),
       GoRoute(path: '/library', builder: (_, __) => const PlaceholderScreen(title: 'المكتبة')),
       GoRoute(path: '/prayer-times', builder: (_, __) => const PlaceholderScreen(title: 'مواقيت الصلاة')),

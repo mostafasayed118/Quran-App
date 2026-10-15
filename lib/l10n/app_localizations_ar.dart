@@ -58,4 +58,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get continueReading => 'متابعة القراءة';
+
+  @override
+  String get surahIndexTitle => 'القرآن الكريم';
+
+  @override
+  String get searchSurahHint => 'ابحث بسورة…';
+
+  @override
+  String get revelationMakkah => 'مكية';
+
+  @override
+  String get revelationMadinah => 'مدنية';
+
+  @override
+  String ayatCount(int count) {
+    return '$count آيات';
+  }
 }
