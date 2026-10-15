@@ -12,6 +12,9 @@ import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
+import '../features/recitation/data/reciter_repository.dart';
+import '../features/recitation/presentation/reciters/reciters_cubit.dart';
+import '../features/recitation/presentation/reciters/reciters_screen.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -25,7 +28,14 @@ abstract final class AppRouter {
           child: const SurahIndexScreen(),
         ),
       ),
-      GoRoute(path: '/recitation', builder: (_, __) => const PlaceholderScreen(title: 'التلاوات')),
+      GoRoute(
+        path: '/recitation',
+        builder: (_, __) => BlocProvider<RecitersCubit>(
+          create: (_) =>
+              RecitersCubit(repo: getIt<ReciterRepository>()),
+          child: const RecitersScreen(),
+        ),
+      ),
       GoRoute(path: '/library', builder: (_, __) => const PlaceholderScreen(title: 'المكتبة')),
       GoRoute(path: '/prayer-times', builder: (_, __) => const PlaceholderScreen(title: 'مواقيت الصلاة')),
       GoRoute(path: '/qibla', builder: (_, __) => const PlaceholderScreen(title: 'القبلة')),

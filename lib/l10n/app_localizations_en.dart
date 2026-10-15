@@ -98,4 +98,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String pageIndicator(String page) {
     return 'Page $page';
   }
+
+  @override
+  String get recitationsTitle => 'Recitations';
+
+  @override
+  String get searchReciters => 'Search a reciter…';
+
+  @override
+  String get featured => 'Featured';
+
+  @override
+  String get allReciters => 'All reciters';
+
+  @override
+  String get noReciters => 'Load the reciters index from the internet';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String surahCountLabel(String count) {
+    return '$count surahs';
+  }
 }

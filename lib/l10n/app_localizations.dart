@@ -271,6 +271,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'صفحة {page}'**
   String pageIndicator(String page);
+
+  /// No description provided for @recitationsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التلاوات'**
+  String get recitationsTitle;
+
+  /// No description provided for @searchReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن قارئ…'**
+  String get searchReciters;
+
+  /// No description provided for @featured.
+  ///
+  /// In ar, this message translates to:
+  /// **'مختارات'**
+  String get featured;
+
+  /// No description provided for @allReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل القرّاء'**
+  String get allReciters;
+
+  /// No description provided for @noReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'حمّل فهرس القرّاء من الإنترنت'**
+  String get noReciters;
+
+  /// No description provided for @refresh.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث'**
+  String get refresh;
+
+  /// No description provided for @surahCountLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} سورة'**
+  String surahCountLabel(String count);
 }
 
 class _AppLocalizationsDelegate

@@ -48,6 +48,11 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
   return sorted;
 }
 
+bool isFeaturedReciterRow(ReciterRow row) {
+  final leadingId = int.tryParse(row.id.split('-').first);
+  return leadingId != null && featuredReciterIds.contains(leadingId);
+}
+
 const recitersApiEndpoint = 'https://mp3quran.net/api/v3/reciters?language=ar';
 const selectedMoshafKey = 'selected_moshaf_row';
 

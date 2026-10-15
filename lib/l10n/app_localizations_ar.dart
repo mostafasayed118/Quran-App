@@ -98,4 +98,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String pageIndicator(String page) {
     return 'صفحة $page';
   }
+
+  @override
+  String get recitationsTitle => 'التلاوات';
+
+  @override
+  String get searchReciters => 'ابحث عن قارئ…';
+
+  @override
+  String get featured => 'مختارات';
+
+  @override
+  String get allReciters => 'كل القرّاء';
+
+  @override
+  String get noReciters => 'حمّل فهرس القرّاء من الإنترنت';
+
+  @override
+  String get refresh => 'تحديث';
+
+  @override
+  String surahCountLabel(String count) {
+    return '$count سورة';
+  }
 }
