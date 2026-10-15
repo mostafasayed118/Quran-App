@@ -78,3 +78,15 @@ class SettingsTable extends Table {
   @override
   Set<Column> get primaryKey => {key};
 }
+
+@DataClassName('ReciterRow')
+class Reciters extends Table {
+  TextColumn get id => text()(); // "reciterId-moshafId"
+  TextColumn get reciterName => text()();
+  TextColumn get moshafName => text()();
+  TextColumn get server => text()();
+  TextColumn get surahList => text()(); // "1,2,3,..."
+  IntColumn get surahTotal => integer()();
+  @override
+  Set<Column> get primaryKey => {id};
+}

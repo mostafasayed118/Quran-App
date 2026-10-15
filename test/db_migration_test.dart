@@ -16,7 +16,7 @@ void main() {
   });
 
   test('v1 schema creates all 8 tables and surah rows roundtrip', () async {
-    expect(db.allTables.length, 8);
+    expect(db.allTables.length, 9); // w2a: + reciters (PM grant)
 
     await db.into(db.surahs).insert(
       SurahsCompanion.insert(
@@ -51,5 +51,23 @@ void main() {
     final fetched = await db.select(db.ayahs).get();
     expect(fetched.single.textImlaei, 'بسم الله الرحمن الرحيم');
     expect(fetched.single.sajda, false);
+  });
+
+  test('v2 adds reciters table; companion roundtrips a row', () async {
+    final db2 = AppDatabase.test(NativeDatabase.memory());
+    await db2.into(db2.reciters).insert(
+          RecitersCompanion.insert(
+            id: '51-53',
+            reciterName: 'عبدالباسط عبدالصمد',
+            moshafName: 'حفص عن عاصم - مرتل',
+            server: 'https://server11.mp3quran.net/basit/',
+            surahList: '1,2,3',
+            surahTotal: 114,
+          ),
+        );
+    final row = await db2.select(db2.reciters).getSingle();
+    expect(row.id, '51-53');
+    expect(row.surahTotal, 114);
+    await db2.close();
   });
 }

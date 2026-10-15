@@ -2605,6 +2605,361 @@ class SettingsTableCompanion extends UpdateCompanion<SettingsTableData> {
   }
 }
 
+class $RecitersTable extends Reciters
+    with TableInfo<$RecitersTable, ReciterRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RecitersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+      'id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _reciterNameMeta =
+      const VerificationMeta('reciterName');
+  @override
+  late final GeneratedColumn<String> reciterName = GeneratedColumn<String>(
+      'reciter_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _moshafNameMeta =
+      const VerificationMeta('moshafName');
+  @override
+  late final GeneratedColumn<String> moshafName = GeneratedColumn<String>(
+      'moshaf_name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _serverMeta = const VerificationMeta('server');
+  @override
+  late final GeneratedColumn<String> server = GeneratedColumn<String>(
+      'server', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _surahListMeta =
+      const VerificationMeta('surahList');
+  @override
+  late final GeneratedColumn<String> surahList = GeneratedColumn<String>(
+      'surah_list', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _surahTotalMeta =
+      const VerificationMeta('surahTotal');
+  @override
+  late final GeneratedColumn<int> surahTotal = GeneratedColumn<int>(
+      'surah_total', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, reciterName, moshafName, server, surahList, surahTotal];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reciters';
+  @override
+  VerificationContext validateIntegrity(Insertable<ReciterRow> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('reciter_name')) {
+      context.handle(
+          _reciterNameMeta,
+          reciterName.isAcceptableOrUnknown(
+              data['reciter_name']!, _reciterNameMeta));
+    } else if (isInserting) {
+      context.missing(_reciterNameMeta);
+    }
+    if (data.containsKey('moshaf_name')) {
+      context.handle(
+          _moshafNameMeta,
+          moshafName.isAcceptableOrUnknown(
+              data['moshaf_name']!, _moshafNameMeta));
+    } else if (isInserting) {
+      context.missing(_moshafNameMeta);
+    }
+    if (data.containsKey('server')) {
+      context.handle(_serverMeta,
+          server.isAcceptableOrUnknown(data['server']!, _serverMeta));
+    } else if (isInserting) {
+      context.missing(_serverMeta);
+    }
+    if (data.containsKey('surah_list')) {
+      context.handle(_surahListMeta,
+          surahList.isAcceptableOrUnknown(data['surah_list']!, _surahListMeta));
+    } else if (isInserting) {
+      context.missing(_surahListMeta);
+    }
+    if (data.containsKey('surah_total')) {
+      context.handle(
+          _surahTotalMeta,
+          surahTotal.isAcceptableOrUnknown(
+              data['surah_total']!, _surahTotalMeta));
+    } else if (isInserting) {
+      context.missing(_surahTotalMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ReciterRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ReciterRow(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      reciterName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reciter_name'])!,
+      moshafName: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}moshaf_name'])!,
+      server: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}server'])!,
+      surahList: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}surah_list'])!,
+      surahTotal: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}surah_total'])!,
+    );
+  }
+
+  @override
+  $RecitersTable createAlias(String alias) {
+    return $RecitersTable(attachedDatabase, alias);
+  }
+}
+
+class ReciterRow extends DataClass implements Insertable<ReciterRow> {
+  final String id;
+  final String reciterName;
+  final String moshafName;
+  final String server;
+  final String surahList;
+  final int surahTotal;
+  const ReciterRow(
+      {required this.id,
+      required this.reciterName,
+      required this.moshafName,
+      required this.server,
+      required this.surahList,
+      required this.surahTotal});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['reciter_name'] = Variable<String>(reciterName);
+    map['moshaf_name'] = Variable<String>(moshafName);
+    map['server'] = Variable<String>(server);
+    map['surah_list'] = Variable<String>(surahList);
+    map['surah_total'] = Variable<int>(surahTotal);
+    return map;
+  }
+
+  RecitersCompanion toCompanion(bool nullToAbsent) {
+    return RecitersCompanion(
+      id: Value(id),
+      reciterName: Value(reciterName),
+      moshafName: Value(moshafName),
+      server: Value(server),
+      surahList: Value(surahList),
+      surahTotal: Value(surahTotal),
+    );
+  }
+
+  factory ReciterRow.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ReciterRow(
+      id: serializer.fromJson<String>(json['id']),
+      reciterName: serializer.fromJson<String>(json['reciterName']),
+      moshafName: serializer.fromJson<String>(json['moshafName']),
+      server: serializer.fromJson<String>(json['server']),
+      surahList: serializer.fromJson<String>(json['surahList']),
+      surahTotal: serializer.fromJson<int>(json['surahTotal']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'reciterName': serializer.toJson<String>(reciterName),
+      'moshafName': serializer.toJson<String>(moshafName),
+      'server': serializer.toJson<String>(server),
+      'surahList': serializer.toJson<String>(surahList),
+      'surahTotal': serializer.toJson<int>(surahTotal),
+    };
+  }
+
+  ReciterRow copyWith(
+          {String? id,
+          String? reciterName,
+          String? moshafName,
+          String? server,
+          String? surahList,
+          int? surahTotal}) =>
+      ReciterRow(
+        id: id ?? this.id,
+        reciterName: reciterName ?? this.reciterName,
+        moshafName: moshafName ?? this.moshafName,
+        server: server ?? this.server,
+        surahList: surahList ?? this.surahList,
+        surahTotal: surahTotal ?? this.surahTotal,
+      );
+  ReciterRow copyWithCompanion(RecitersCompanion data) {
+    return ReciterRow(
+      id: data.id.present ? data.id.value : this.id,
+      reciterName:
+          data.reciterName.present ? data.reciterName.value : this.reciterName,
+      moshafName:
+          data.moshafName.present ? data.moshafName.value : this.moshafName,
+      server: data.server.present ? data.server.value : this.server,
+      surahList: data.surahList.present ? data.surahList.value : this.surahList,
+      surahTotal:
+          data.surahTotal.present ? data.surahTotal.value : this.surahTotal,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ReciterRow(')
+          ..write('id: $id, ')
+          ..write('reciterName: $reciterName, ')
+          ..write('moshafName: $moshafName, ')
+          ..write('server: $server, ')
+          ..write('surahList: $surahList, ')
+          ..write('surahTotal: $surahTotal')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, reciterName, moshafName, server, surahList, surahTotal);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ReciterRow &&
+          other.id == this.id &&
+          other.reciterName == this.reciterName &&
+          other.moshafName == this.moshafName &&
+          other.server == this.server &&
+          other.surahList == this.surahList &&
+          other.surahTotal == this.surahTotal);
+}
+
+class RecitersCompanion extends UpdateCompanion<ReciterRow> {
+  final Value<String> id;
+  final Value<String> reciterName;
+  final Value<String> moshafName;
+  final Value<String> server;
+  final Value<String> surahList;
+  final Value<int> surahTotal;
+  final Value<int> rowid;
+  const RecitersCompanion({
+    this.id = const Value.absent(),
+    this.reciterName = const Value.absent(),
+    this.moshafName = const Value.absent(),
+    this.server = const Value.absent(),
+    this.surahList = const Value.absent(),
+    this.surahTotal = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  RecitersCompanion.insert({
+    required String id,
+    required String reciterName,
+    required String moshafName,
+    required String server,
+    required String surahList,
+    required int surahTotal,
+    this.rowid = const Value.absent(),
+  })  : id = Value(id),
+        reciterName = Value(reciterName),
+        moshafName = Value(moshafName),
+        server = Value(server),
+        surahList = Value(surahList),
+        surahTotal = Value(surahTotal);
+  static Insertable<ReciterRow> custom({
+    Expression<String>? id,
+    Expression<String>? reciterName,
+    Expression<String>? moshafName,
+    Expression<String>? server,
+    Expression<String>? surahList,
+    Expression<int>? surahTotal,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (reciterName != null) 'reciter_name': reciterName,
+      if (moshafName != null) 'moshaf_name': moshafName,
+      if (server != null) 'server': server,
+      if (surahList != null) 'surah_list': surahList,
+      if (surahTotal != null) 'surah_total': surahTotal,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  RecitersCompanion copyWith(
+      {Value<String>? id,
+      Value<String>? reciterName,
+      Value<String>? moshafName,
+      Value<String>? server,
+      Value<String>? surahList,
+      Value<int>? surahTotal,
+      Value<int>? rowid}) {
+    return RecitersCompanion(
+      id: id ?? this.id,
+      reciterName: reciterName ?? this.reciterName,
+      moshafName: moshafName ?? this.moshafName,
+      server: server ?? this.server,
+      surahList: surahList ?? this.surahList,
+      surahTotal: surahTotal ?? this.surahTotal,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (reciterName.present) {
+      map['reciter_name'] = Variable<String>(reciterName.value);
+    }
+    if (moshafName.present) {
+      map['moshaf_name'] = Variable<String>(moshafName.value);
+    }
+    if (server.present) {
+      map['server'] = Variable<String>(server.value);
+    }
+    if (surahList.present) {
+      map['surah_list'] = Variable<String>(surahList.value);
+    }
+    if (surahTotal.present) {
+      map['surah_total'] = Variable<int>(surahTotal.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RecitersCompanion(')
+          ..write('id: $id, ')
+          ..write('reciterName: $reciterName, ')
+          ..write('moshafName: $moshafName, ')
+          ..write('server: $server, ')
+          ..write('surahList: $surahList, ')
+          ..write('surahTotal: $surahTotal, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2616,6 +2971,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $InstalledPacksTable installedPacks = $InstalledPacksTable(this);
   late final $DownloadsTable downloads = $DownloadsTable(this);
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
+  late final $RecitersTable reciters = $RecitersTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2628,7 +2984,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         prayerLog,
         installedPacks,
         downloads,
-        settingsTable
+        settingsTable,
+        reciters
       ];
 }
 
@@ -4064,6 +4421,190 @@ typedef $$SettingsTableTableProcessedTableManager = ProcessedTableManager<
     ),
     SettingsTableData,
     PrefetchHooks Function()>;
+typedef $$RecitersTableCreateCompanionBuilder = RecitersCompanion Function({
+  required String id,
+  required String reciterName,
+  required String moshafName,
+  required String server,
+  required String surahList,
+  required int surahTotal,
+  Value<int> rowid,
+});
+typedef $$RecitersTableUpdateCompanionBuilder = RecitersCompanion Function({
+  Value<String> id,
+  Value<String> reciterName,
+  Value<String> moshafName,
+  Value<String> server,
+  Value<String> surahList,
+  Value<int> surahTotal,
+  Value<int> rowid,
+});
+
+class $$RecitersTableFilterComposer
+    extends Composer<_$AppDatabase, $RecitersTable> {
+  $$RecitersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get reciterName => $composableBuilder(
+      column: $table.reciterName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get moshafName => $composableBuilder(
+      column: $table.moshafName, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get server => $composableBuilder(
+      column: $table.server, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get surahList => $composableBuilder(
+      column: $table.surahList, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get surahTotal => $composableBuilder(
+      column: $table.surahTotal, builder: (column) => ColumnFilters(column));
+}
+
+class $$RecitersTableOrderingComposer
+    extends Composer<_$AppDatabase, $RecitersTable> {
+  $$RecitersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get reciterName => $composableBuilder(
+      column: $table.reciterName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get moshafName => $composableBuilder(
+      column: $table.moshafName, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get server => $composableBuilder(
+      column: $table.server, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get surahList => $composableBuilder(
+      column: $table.surahList, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get surahTotal => $composableBuilder(
+      column: $table.surahTotal, builder: (column) => ColumnOrderings(column));
+}
+
+class $$RecitersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RecitersTable> {
+  $$RecitersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get reciterName => $composableBuilder(
+      column: $table.reciterName, builder: (column) => column);
+
+  GeneratedColumn<String> get moshafName => $composableBuilder(
+      column: $table.moshafName, builder: (column) => column);
+
+  GeneratedColumn<String> get server =>
+      $composableBuilder(column: $table.server, builder: (column) => column);
+
+  GeneratedColumn<String> get surahList =>
+      $composableBuilder(column: $table.surahList, builder: (column) => column);
+
+  GeneratedColumn<int> get surahTotal => $composableBuilder(
+      column: $table.surahTotal, builder: (column) => column);
+}
+
+class $$RecitersTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $RecitersTable,
+    ReciterRow,
+    $$RecitersTableFilterComposer,
+    $$RecitersTableOrderingComposer,
+    $$RecitersTableAnnotationComposer,
+    $$RecitersTableCreateCompanionBuilder,
+    $$RecitersTableUpdateCompanionBuilder,
+    (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
+    ReciterRow,
+    PrefetchHooks Function()> {
+  $$RecitersTableTableManager(_$AppDatabase db, $RecitersTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RecitersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RecitersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RecitersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> id = const Value.absent(),
+            Value<String> reciterName = const Value.absent(),
+            Value<String> moshafName = const Value.absent(),
+            Value<String> server = const Value.absent(),
+            Value<String> surahList = const Value.absent(),
+            Value<int> surahTotal = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RecitersCompanion(
+            id: id,
+            reciterName: reciterName,
+            moshafName: moshafName,
+            server: server,
+            surahList: surahList,
+            surahTotal: surahTotal,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String id,
+            required String reciterName,
+            required String moshafName,
+            required String server,
+            required String surahList,
+            required int surahTotal,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              RecitersCompanion.insert(
+            id: id,
+            reciterName: reciterName,
+            moshafName: moshafName,
+            server: server,
+            surahList: surahList,
+            surahTotal: surahTotal,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$RecitersTable, ReciterRow>(table),
+                    BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>(
+                        db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$RecitersTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $RecitersTable,
+    ReciterRow,
+    $$RecitersTableFilterComposer,
+    $$RecitersTableOrderingComposer,
+    $$RecitersTableAnnotationComposer,
+    $$RecitersTableCreateCompanionBuilder,
+    $$RecitersTableUpdateCompanionBuilder,
+    (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
+    ReciterRow,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4084,4 +4625,6 @@ class $AppDatabaseManager {
       $$DownloadsTableTableManager(_db, _db.downloads);
   $$SettingsTableTableTableManager get settingsTable =>
       $$SettingsTableTableTableManager(_db, _db.settingsTable);
+  $$RecitersTableTableManager get reciters =>
+      $$RecitersTableTableManager(_db, _db.reciters);
 }
