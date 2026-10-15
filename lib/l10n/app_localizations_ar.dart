@@ -194,4 +194,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get azkarDone => 'تم بحمد الله';
+
+  @override
+  String get tasbihReset => 'تصفير';
+
+  @override
+  String get tasbihTarget => 'الهدف';
 }

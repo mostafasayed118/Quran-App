@@ -6,6 +6,9 @@ import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
 import '../features/azkar/presentation/azkar_screen.dart';
+import '../features/tasbih/data/tasbih_repository.dart';
+import '../features/tasbih/presentation/tasbih_cubit.dart';
+import '../features/tasbih/presentation/tasbih_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
@@ -102,7 +105,13 @@ abstract final class AppRouter {
           child: const AzkarScreen(),
         ),
       ),
-      GoRoute(path: '/tasbih', builder: (_, __) => const PlaceholderScreen(title: 'السبحة')),
+      GoRoute(
+        path: '/tasbih',
+        builder: (_, __) => BlocProvider<TasbihCubit>(
+          create: (_) => TasbihCubit(repo: getIt<TasbihRepository>()),
+          child: const TasbihScreen(),
+        ),
+      ),
       GoRoute(path: '/duas', builder: (_, __) => const PlaceholderScreen(title: 'الأدعية والرقية')),
       GoRoute(path: '/worship', builder: (_, __) => const PlaceholderScreen(title: 'تتبع العبادات')),
       GoRoute(path: '/zakat', builder: (_, __) => const PlaceholderScreen(title: 'الزكاة')),

@@ -194,4 +194,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get azkarDone => 'Done';
+
+  @override
+  String get tasbihReset => 'Reset';
+
+  @override
+  String get tasbihTarget => 'Target';
 }

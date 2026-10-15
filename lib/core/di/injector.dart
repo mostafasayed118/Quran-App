@@ -11,6 +11,8 @@ import '../../features/quran/data/last_read_repository.dart';
 import '../../features/azkar/data/azkar_repository.dart';
 import '../../features/azkar/presentation/azkar_cubit.dart';
 import '../../features/prayer/data/city_repository.dart';
+import '../../features/tasbih/data/tasbih_repository.dart';
+import '../../features/tasbih/presentation/tasbih_cubit.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
 import '../../features/recitation/data/audio_downloader.dart';
@@ -39,6 +41,9 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
   getIt.registerLazySingleton<PrayerTimeService>(() => const PrayerTimeService());
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
+  getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
+  getIt.registerLazySingleton<TasbihCubit>(
+      () => TasbihCubit(repo: getIt<TasbihRepository>()));
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
         () => CityRepository(db: db, loader: citiesLoader));

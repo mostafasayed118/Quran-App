@@ -439,6 +439,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم بحمد الله'**
   String get azkarDone;
+
+  /// No description provided for @tasbihReset.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصفير'**
+  String get tasbihReset;
+
+  /// No description provided for @tasbihTarget.
+  ///
+  /// In ar, this message translates to:
+  /// **'الهدف'**
+  String get tasbihTarget;
 }
 
 class _AppLocalizationsDelegate
