@@ -9,8 +9,14 @@ const azkarAssetKey = 'assets/data/azkar.json';
 const duasAssetKey = 'assets/data/duas.json';
 const ruqyahAssetKey = 'assets/data/ruqyah.json';
 const asmaAssetKey = 'assets/data/asma.json';
+const libraryCatalogAssetKey = 'assets/data/library_catalog.json';
 
 Future<Directory> defaultAudioRootResolver() async {
+  final dir = await getApplicationSupportDirectory();
+  return dir;
+}
+
+Future<Directory> defaultLibraryRootResolver() async {
   final dir = await getApplicationSupportDirectory();
   return dir;
 }
@@ -38,4 +44,10 @@ Future<List<Map<String, dynamic>>> defaultRuqyahLoader() async {
 Future<List<Map<String, dynamic>>> defaultAsmaLoader() async {
   final raw = await rootBundle.loadString(asmaAssetKey);
   return (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+}
+
+Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
+  final raw = await rootBundle.loadString(libraryCatalogAssetKey);
+  return ((jsonDecode(raw) as Map<String, dynamic>)['packs'] as List)
+      .cast<Map<String, dynamic>>();
 }

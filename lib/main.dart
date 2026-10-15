@@ -13,6 +13,7 @@ Future<void> main() async {
     duasLoader: defaultDuasLoader,
     ruqyahLoader: defaultRuqyahLoader,
     asmaLoader: defaultAsmaLoader,
+    libraryCatalogLoader: defaultLibraryCatalogLoader,
   );
   runApp(const QuranYahdiApp());
 }
