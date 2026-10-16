@@ -150,3 +150,13 @@ git commit -m "docs(w7a): mark plan checkboxes complete"
 - Headless test law prevents platform channels from ever entering `flutter test`; pure helpers (haversine nearest, heading mapping, init guard) take the test weight.
 - Fallback orders + STOP bars defined for all three admissions; no improvised MethodChannels.
 - Frozen surface unchanged; l10n small and symmetric; Arabic-Indic at call sites.
+
+---
+
+## PM RULINGS ON W7a REPORT (post-wave, committed by PM 2026-10-16)
+- Gates reproduced PM-side: analyze 0; suite 174/174 (155 + 3 guard + 6 location + 10 compass, per-file in run log); ticks 16/0 targeted; **release rebuilt exit 0 at 68,158,725 B — byte-EXACT (7th consecutive across waves)**; router_test unedited SEVENTH consecutive wave.
+- STOP #1 grant RATIFIED post-hoc (verified at source): manifest + MainActivity + mediaTitle-on-PlaybackSource — the interface stayed untouched, so all five existing test fakes survived with zero edits (the facade seam paying for itself).
+- P1 font hotfix (952b54a) RATIFIED: family name quran vs constant HafsSmart mismatch — verified in pubspec + app_theme.dart at source; the second launch-only/visual-only latent defect our gates could not see (after e340f7a). LESSON INSTITUTIONALIZED: unit+build gates verify compilation and logic; only device-smoke + visual inspection verifies presentation. W7b adds an adb-screencap visual pass to the device gate.
+- 12 disclosures ALL ACCEPTED: in-T5 grants, router wiring lines (construction-site class), build_runner placement, two W7b observations (prayer refresh-in-place, Arabic-Indic for index badges), compassLive wording, AnimatedRotation wrap note (v1), Kotlin daemon crash+retry (ledgered noise class; the daemon kill+retry recipe is now standard), pm revoke app-kill probe note, ZERO stray tokens (editor-tools writes only — the standing hygiene pattern that finally broke the streak).
+- Device hygiene confirmed: app force-stopped, location services restored OFF, permission denied as-found — probe-leave-no-trace held.
+- Message-translation rule HELD: all six commit messages byte-verbatim English (first wave after the UX-W1 violation — the rule works).
