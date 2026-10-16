@@ -63,7 +63,7 @@ flutter:
     - assets/data/
 
   fonts:
-    - family: quran
+    - family: HafsSmart
       fonts:
         - asset: assets/fonts/HafsSmart_08.ttf
 
