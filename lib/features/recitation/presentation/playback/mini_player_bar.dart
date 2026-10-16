@@ -159,6 +159,7 @@ class _FailedStrip extends StatelessWidget {
       kind == PlaybackFailureKind.network
           ? loc.playbackFailed
           : loc.noReciters,
+      dismissTooltip: loc.stopAction,
       onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
     );
   }

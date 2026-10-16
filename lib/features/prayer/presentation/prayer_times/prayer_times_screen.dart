@@ -13,6 +13,16 @@ import 'prayer_times_state.dart';
 class PrayerTimesScreen extends StatelessWidget {
   const PrayerTimesScreen({super.key});
 
+  /// W7b (W7a §6): reload in place when the picker returns a selection —
+  /// the picker pops `true` on a successful persist; zero state change.
+  static Future<void> _openCityPicker(BuildContext context) async {
+    final cubit = context.read<PrayerTimesCubit>();
+    final reloaded = await context.push<bool>('/prayer-times/city');
+    if (reloaded == true && context.mounted) {
+      await cubit.reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -28,7 +38,7 @@ class PrayerTimesScreen extends StatelessWidget {
                   Text(loc.noCity),
                   const SizedBox(height: 12),
                   FilledButton(
-                    onPressed: () => context.push('/prayer-times/city'),
+                    onPressed: () => _openCityPicker(context),
                     child: Text(loc.selectCity),
                   ),
                 ],
@@ -67,7 +77,7 @@ class _TimesList extends StatelessWidget {
               ),
               trailing: IconButton(
                 icon: const Icon(Icons.edit),
-                onPressed: () => context.push('/prayer-times/city'),
+                onPressed: () => PrayerTimesScreen._openCityPicker(context),
               ),
             ),
           );

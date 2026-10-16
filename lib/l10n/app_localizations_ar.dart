@@ -367,4 +367,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get settingsMinimalNote => 'الوضع الليلي واللغة من إعدادات جهازك';
+
+  @override
+  String get stopAction => 'وقف';
 }

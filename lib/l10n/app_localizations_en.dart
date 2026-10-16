@@ -368,4 +368,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsMinimalNote => 'Dark mode and language follow your device';
+
+  @override
+  String get stopAction => 'Stop';
 }

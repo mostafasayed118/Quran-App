@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/search_field.dart';
@@ -60,7 +61,7 @@ class _SurahRow extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       onTap: () => context
           .push('/quran/reader?surah=${surah.id}&ayah=0'),
-      leading: ArabicBadge('${surah.id}'),
+      leading: ArabicBadge(surah.id.toArabicIndic),
       title: Text(
         surah.nameAr,
         style: AppTheme.meQuranHead,
@@ -68,7 +69,7 @@ class _SurahRow extends StatelessWidget {
         textDirection: TextDirection.rtl,
       ),
       subtitle: Text(
-        '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.ayatCount(surah.ayahCount)}',
+        '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.ayatCount(surah.ayahCount).toArabicIndicDigits}',
         style: TextStyle(color: colors.onSurfaceVariant),
         textAlign: TextAlign.right,
       ),

@@ -59,7 +59,7 @@ class CityPickerScreen extends StatelessWidget {
                                     .read<CityPickerCubit>()
                                     .persist(city);
                                 if (context.mounted) {
-                                  Navigator.of(context).pop();
+                                  Navigator.of(context).pop(true);
                                 }
                               },
                             );
@@ -83,7 +83,7 @@ class CityPickerScreen extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
     final city = await cubit.locateNearest();
     if (city != null) {
-      navigator.pop();
+      navigator.pop(true);
     } else {
       messenger.showSnackBar(SnackBar(content: Text(loc.locationUnavailable)));
     }

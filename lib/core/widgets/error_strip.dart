@@ -8,6 +8,7 @@ class ErrorStrip extends StatelessWidget {
     this.onRetry,
     this.actionLabel,
     required this.onDismiss,
+    this.dismissTooltip,
   });
 
   final String message;
@@ -15,6 +16,10 @@ class ErrorStrip extends StatelessWidget {
   final VoidCallback? onRetry;
   final String? actionLabel;
   final VoidCallback onDismiss;
+
+  /// W7b (UX-W1 open item): optional wording for the dismiss affordance —
+  /// falls back to the generic material close tooltip when null.
+  final String? dismissTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +43,8 @@ class ErrorStrip extends StatelessWidget {
               if (actionLabel != null && onRetry != null)
                 TextButton(onPressed: onRetry, child: Text(actionLabel!)),
               IconButton(
-                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                tooltip: dismissTooltip ??
+                    MaterialLocalizations.of(context).closeButtonTooltip,
                 icon: const Icon(Icons.close),
                 onPressed: onDismiss,
               ),
