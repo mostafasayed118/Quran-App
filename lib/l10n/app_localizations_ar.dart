@@ -331,4 +331,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unknownInitial => '؟';
+
+  @override
+  String get hadithRead => 'اقرأ';
 }

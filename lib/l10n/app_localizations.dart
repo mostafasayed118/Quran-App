@@ -691,6 +691,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'؟'**
   String get unknownInitial;
+
+  /// No description provided for @hadithRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ'**
+  String get hadithRead;
 }
 
 class _AppLocalizationsDelegate

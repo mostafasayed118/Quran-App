@@ -332,4 +332,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unknownInitial => '؟';
+
+  @override
+  String get hadithRead => 'Read';
 }

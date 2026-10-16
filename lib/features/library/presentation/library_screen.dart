@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/widgets/async_view.dart';
@@ -153,6 +154,13 @@ class _PackRow extends StatelessWidget {
             Text(
               loc.libraryInstalled,
               style: TextStyle(color: colors.secondary, fontSize: 12),
+            ),
+          if (installed && pack.kind == LibraryPackKind.hadith)
+            IconButton(
+              tooltip: loc.hadithRead,
+              icon: const Icon(Icons.menu_book_outlined),
+              onPressed: () =>
+                  context.push('/library/hadith?pack=${pack.id}'),
             ),
           const SizedBox(width: 8),
           trailing,
