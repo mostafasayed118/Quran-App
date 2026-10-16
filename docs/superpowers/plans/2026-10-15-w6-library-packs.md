@@ -29,7 +29,7 @@
 
 ### Task 1: Start gate
 
-- [ ] **Step 1: Record verbatim**
+- [x] **Step 1: Record verbatim**
 
 ```powershell
 git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version
@@ -51,9 +51,9 @@ Expected: HEAD `0eef9f1` or later with intervening commits touching ONLY `docs/`
 
 **Interfaces:** `LibraryPackInfo({id, kind, language, titleAr, titleEn, sourceUrl, approxSizeMb, version})`; `CatalogSource.all()` / `byId(id)`; kind enum values exactly `translation|tafsir|hadith` (schema constraint discipline).
 
-- [ ] **Step 1 (red):** catalog repository tests with fixture loader: kind filtering, byId, malformed-entry rejection. Wellformedness probe on the REAL bundled catalog: exactly 9 entries, 3 per kind, every field non-empty, `sourceUrl` starts `https://cdn.jsdelivr.net/` AND contains a pinned tag NOT `/latest/`, id unique.
-- [ ] **Step 2 (green + URL probing):** curate the 9 packs by reading the live listing/documentation pages of the three APIs; probe each curated `sourceUrl` (curl/Invoke-WebRequest, GET) and quote status+bytes in the report; assemble the asset; implement repository to green.
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** catalog repository tests with fixture loader: kind filtering, byId, malformed-entry rejection. Wellformedness probe on the REAL bundled catalog: exactly 9 entries, 3 per kind, every field non-empty, `sourceUrl` starts `https://cdn.jsdelivr.net/` AND contains a pinned tag NOT `/latest/`, id unique.
+- [x] **Step 2 (green + URL probing):** curate the 9 packs by reading the live listing/documentation pages of the three APIs; probe each curated `sourceUrl` (curl/Invoke-WebRequest, GET) and quote status+bytes in the report; assemble the asset; implement repository to green.
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter analyze
@@ -74,9 +74,9 @@ git commit -m "feat(w6): curated library catalog (pinned CDN URLs) + Supabase se
 
 **Interfaces:** `PackDownloader(db, {Dio? dio, Future<Directory> Function()? libraryRootResolver})` — mirror AudioDownloader exactly: `Future<File> install(LibraryPackInfo pack, {void Function(int, int)? onProgress})` → stream URL → `library/<packId>.json` (write-then-promote: write `.part`, parse-validates JSON non-empty, rename over final, upsert InstalledPacks row with version+measured sizeMb, delete `.part` on any failure); `Future<void> uninstall(String packId)` (delete file + row); `Future<bool> isInstalled(packId, version)`; `Future<List<InstalledPack>> installedPacks()`.
 - Per-kind ADAPTERS live here too: `translationFor(packId, surah, ayah) → String?`, `tafsirFor(packId, surah, ayah) → String?`, `hadithPage(packId, int offset, int limit) → (List<(int, String)>, bool hasMore)` — implemented against the REAL fixture shapes copied in T2; shape mismatch = null/empty (never throw upward).
-- [ ] **Step 1 (red):** downloader tests with a local `HttpServer` (audio test pattern): happy path writes file + row with parsed sizeMb; 404 → no row, no partial left; corrupt JSON body → failed, partial deleted; uninstall removes both; `translationFor` reads the REAL fixture translation for a known ayah (e.g., 1:1) → non-null; `hadithPage` slices + hasMore flips at the fixture's end.
-- [ ] **Step 2 (green):** implement (injectable, pure-Dart headless); `ensureLibraryBindings()` + main wiring.
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** downloader tests with a local `HttpServer` (audio test pattern): happy path writes file + row with parsed sizeMb; 404 → no row, no partial left; corrupt JSON body → failed, partial deleted; uninstall removes both; `translationFor` reads the REAL fixture translation for a known ayah (e.g., 1:1) → non-null; `hadithPage` slices + hasMore flips at the fixture's end.
+- [x] **Step 2 (green):** implement (injectable, pure-Dart headless); `ensureLibraryBindings()` + main wiring.
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter analyze
@@ -96,10 +96,10 @@ git commit -m "feat(w6): pack downloader (install-or-fail integrity) + kind adap
 - Create: `test/library_screen_test.dart`
 
 **Screen:** app bar title `library` (existing key); segmented tabs tafsir/translation/hadith (`tafsirTab`/`translationsTab`/`hadithTab`); pack rows (bilingual title + `approxSizeMb` + version; per-row state: `libraryInstall` button with progress bar from cubit stream, or `libraryDelete` when installed (confirm dialog protective of content); `libraryInstalled` badge). Install failures surface a dismissible error strip (W2a error-banner pattern).
-- [ ] **Step 1 (red):** cubit tests (fake downloader + fake catalog source): filtering per tab; install flow → progress → installed; failure → error state with retry; delete removes row. Screen tests (fixture packs + local HttpServer for a REAL streaming row): install button starts download, progress visible, completion flips badge (pumpHost).
-- [ ] **Step 2 (green):** implement.
-- [ ] **Step 3: l10n (additive):** `tafsirTab` التفسير/Tafsir · `translationsTab` الترجمات/Translations · `hadithTab` الأحاديث/Hadith · `libraryInstall` تنزيل/Install · `libraryDelete` حذف/Delete · `libraryInstalled` مثبّت/Installed · `libraryFailed` تعذّر التنزيل/Download failed · `libraryRetry` أعِد المحاولة/Retry · `storageNote` (approxSizeMb title row already numeric — no extra key).
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 1 (red):** cubit tests (fake downloader + fake catalog source): filtering per tab; install flow → progress → installed; failure → error state with retry; delete removes row. Screen tests (fixture packs + local HttpServer for a REAL streaming row): install button starts download, progress visible, completion flips badge (pumpHost).
+- [x] **Step 2 (green):** implement.
+- [x] **Step 3: l10n (additive):** `tafsirTab` التفسير/Tafsir · `translationsTab` الترجمات/Translations · `hadithTab` الأحاديث/Hadith · `libraryInstall` تنزيل/Install · `libraryDelete` حذف/Delete · `libraryInstalled` مثبّت/Installed · `libraryFailed` تعذّر التنزيل/Download failed · `libraryRetry` أعِد المحاولة/Retry · `storageNote` (approxSizeMb title row already numeric — no extra key).
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -120,10 +120,10 @@ git commit -m "feat(w6): library screen (tabs, install progress, manage)"
 - Modify: ARBs (+regenerated)
 - Create: `test/ayah_sheet_test.dart`, add ONE focused test into a NEW file — reader_screen stays frozen; the affordance presence is asserted via the sheet tests + a pump of the reader in the sheet file's harness if needed WITHOUT editing reader_screen_test.
 
-- [ ] **Step 1 (red-first — cubit):** with fixture-installed packs → tafsir text for (1,1) + translation text; no packs → empty state; uninstalled-but-cataloged → treated as absent.
-- [ ] **Step 2 (green):** sheet UI: title row (ayah coordinates via `surahName(1)`-style + number), tabs, scrollable text (uthmani reading comfort sizing), `libraryEmptyHint` يوجد لا تفسير مثبّت — نزّل من المكتبة/No tafsir installed — get one from the Library + routing button.
-- [ ] **Step 3: l10n (additive):** `ayahSheetTafsir` تفسير/Tafsir · `ayahSheetTranslation` ترجمة/Translation · `libraryEmptyHint` (above) .
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 1 (red-first — cubit):** with fixture-installed packs → tafsir text for (1,1) + translation text; no packs → empty state; uninstalled-but-cataloged → treated as absent.
+- [x] **Step 2 (green):** sheet UI: title row (ayah coordinates via `surahName(1)`-style + number), tabs, scrollable text (uthmani reading comfort sizing), `libraryEmptyHint` يوجد لا تفسير مثبّت — نزّل من المكتبة/No tafsir installed — get one from the Library + routing button.
+- [x] **Step 3: l10n (additive):** `ayahSheetTafsir` تفسير/Tafsir · `ayahSheetTranslation` ترجمة/Translation · `libraryEmptyHint` (above) .
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -143,10 +143,10 @@ git commit -m "feat(w6): reader ayah sheet (installed tafsir/translation, librar
 - Modify: ARBs (+regenerated)
 - Create: `test/hadith_screen_test.dart`
 
-- [ ] **Step 1 (red):** cubit page-window tests over the bukhari fixture (offset arithmetic + hasMore); screen test renders a page from the fixture-installed pack.
-- [ ] **Step 2 (green):** numbered list rows (Arabic-Indic hadith numbers, `hadithNext/Prev` pagination buttons at the bottom, pack title + language badge in the app bar).
-- [ ] **Step 3: l10n (additive):** `hadithNext` التالي/Next · `hadithPrev` السابق/Previous.
-- [ ] **Step 4: Gates + commit**
+- [x] **Step 1 (red):** cubit page-window tests over the bukhari fixture (offset arithmetic + hasMore); screen test renders a page from the fixture-installed pack.
+- [x] **Step 2 (green):** numbered list rows (Arabic-Indic hadith numbers, `hadithNext/Prev` pagination buttons at the bottom, pack title + language badge in the app bar).
+- [x] **Step 3: l10n (additive):** `hadithNext` التالي/Next · `hadithPrev` السابق/Previous.
+- [x] **Step 4: Gates + commit**
 
 ```powershell
 flutter gen-l10n
@@ -160,7 +160,7 @@ git commit -m "feat(w6): hadith browse (paged numbered list, installed packs)"
 
 ### Task 7: Close-out
 
-- [ ] **Step 1: Full gates ONCE, all recorded**
+- [x] **Step 1: Full gates ONCE, all recorded**
 
 ```powershell
 dart run build_runner build --delete-conflicting-outputs 2>&1 | Select-Object -Last 1
@@ -175,14 +175,14 @@ git rev-list --count origin/main..HEAD
 ```
 
 Expected: analyze 0; suite baseline 113 + ~16 (catalog 3 + wellformedness, downloader 5, library 4, ayah sheet 3, hadith 2; MEASURE per-file exact, ≈129 predicted — never trusted); debug exit 0 ballpark; release exit 0 + bytes (byte-exact expected); outdated: NO new packages this wave (assert in report); porcelain empty.
-- [ ] **Step 2: Tick this plan** — targeted line edits ONLY (header PROSE contains a literal `- [ ]`), .NET `UTF8Encoding($false)`, numstat + non-checkbox filter recorded:
+- [x] **Step 2: Tick this plan** — targeted line edits ONLY (header PROSE contains a literal `- [ ]`), .NET `UTF8Encoding($false)`, numstat + non-checkbox filter recorded:
 
 ```powershell
 git add docs/superpowers/plans/2026-10-15-w6-library-packs.md
 git commit -m "docs(w6): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3:** Final report — §1–§10 skeleton (start-gate verbatim · commit table · the three CDN probe quotes (status+bytes) · InstalledPacks companion-checkpoint quote · adapter-shape documentation (one quoted tree fragment per kind fixture) · gates table + per-file counts · itemized disclosures · STOPs · incidents self-caught · unpushed · state · NO PUSH).
+- [x] **Step 3:** Final report — §1–§10 skeleton (start-gate verbatim · commit table · the three CDN probe quotes (status+bytes) · InstalledPacks companion-checkpoint quote · adapter-shape documentation (one quoted tree fragment per kind fixture) · gates table + per-file counts · itemized disclosures · STOPs · incidents self-caught · unpushed · state · NO PUSH).
 
 ## Explicit non-goals (this wave)
 
