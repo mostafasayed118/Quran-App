@@ -346,4 +346,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get compassLive => 'المقياس حي';
+
+  @override
+  String reminderNextPrayer(String prayer) {
+    return 'حان موعد صلاة $prayer';
+  }
+
+  @override
+  String get reminderAzkar => 'أذكار الصباح';
+
+  @override
+  String get notificationsEnabledHint =>
+      'إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك';
 }

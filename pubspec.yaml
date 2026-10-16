@@ -32,6 +32,8 @@ dependencies:
   just_audio_background: ^0.0.1-beta.17
   geolocator: ^14.0.1
   sensors_plus: ^7.1.1
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
 
 flutter_launcher_icons:
   android: true

@@ -721,6 +721,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المقياس حي'**
   String get compassLive;
+
+  /// No description provided for @reminderNextPrayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان موعد صلاة {prayer}'**
+  String reminderNextPrayer(String prayer);
+
+  /// No description provided for @reminderAzkar.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذكار الصباح'**
+  String get reminderAzkar;
+
+  /// No description provided for @notificationsEnabledHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'**
+  String get notificationsEnabledHint;
 }
 
 class _AppLocalizationsDelegate

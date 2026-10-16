@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
 import 'core/di/injector.dart';
+import 'features/notifications/data/notifications_binding.dart';
 import 'features/recitation/playback/background_init_guard.dart';
 
 Future<void> main() async {
@@ -26,5 +29,7 @@ Future<void> main() async {
       androidNotificationOngoing: true,
     ),
   );
+  await getIt<NotificationsBinding>().init();
+  unawaited(runBootReminderSchedule());
   runApp(const QuranYahdiApp());
 }

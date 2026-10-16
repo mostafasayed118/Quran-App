@@ -21,6 +21,9 @@ import '../../features/library/data/library_catalog.dart';
 import '../../features/library/data/pack_downloader.dart';
 import '../../features/library/presentation/library_cubit.dart';
 import '../../features/hijri/presentation/hijri_cubit.dart';
+import '../../features/notifications/data/notifications_binding.dart';
+import '../../features/notifications/data/reminder_scheduler.dart';
+import '../../features/notifications/data/reminder_settings.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/prayer/data/location_service.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
@@ -65,6 +68,9 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
+  getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(db));
+  getIt.registerLazySingleton<NotificationsBinding>(() => NotificationsBinding());
+  getIt.registerLazySingleton<ReminderScheduler>(() => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<TasbihCubit>(
       () => TasbihCubit(repo: getIt<TasbihRepository>()));

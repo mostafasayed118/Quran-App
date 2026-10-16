@@ -347,4 +347,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get compassLive => 'Dial follows your device';
+
+  @override
+  String reminderNextPrayer(String prayer) {
+    return 'Time for $prayer';
+  }
+
+  @override
+  String get reminderAzkar => 'Morning azkar';
+
+  @override
+  String get notificationsEnabledHint =>
+      'If reminders do not arrive, enable notifications permission in your device settings';
 }

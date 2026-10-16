@@ -4,6 +4,13 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
+import '../core/di/injector.dart';
+import '../features/notifications/data/reminder_scheduler.dart';
+import '../features/notifications/data/reminder_scheduling.dart';
+import '../features/notifications/data/reminder_settings.dart';
+import '../features/prayer/data/city_repository.dart';
+import '../features/prayer/data/prayer_time_service.dart';
+
 const citiesAssetKey = 'assets/data/cities.json';
 const azkarAssetKey = 'assets/data/azkar.json';
 const duasAssetKey = 'assets/data/duas.json';
@@ -51,3 +58,13 @@ Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
   return ((jsonDecode(raw) as Map<String, dynamic>)['packs'] as List)
       .cast<Map<String, dynamic>>();
 }
+
+/// W7b boot glue: recompute + reschedule reminders once per app start (PM
+/// ruling — no background isolate, no boot receiver in v1; missed-while-dead
+/// reminders are accepted). The shared helper is guarded and never throws.
+Future<void> runBootReminderSchedule() => scheduleReminders(
+      city: getIt<CityRepository>(),
+      prayer: getIt<PrayerTimeService>(),
+      settings: getIt<ReminderSettings>(),
+      scheduler: getIt<ReminderScheduler>(),
+    );
