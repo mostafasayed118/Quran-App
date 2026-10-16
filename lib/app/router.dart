@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
+import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
 import '../features/azkar/presentation/azkar_screen.dart';
@@ -61,10 +62,20 @@ import '../features/qibla/data/heading_service.dart';
 import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
+import '../l10n/app_localizations.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/home',
+    errorBuilder: (context, state) {
+      final loc = AppLocalizations.of(context);
+      return PlaceholderScreen(
+        title: loc.pageNotFound,
+        hint: loc.pageNotFoundHint,
+        actionLabel: loc.home,
+        onAction: () => context.go('/home'),
+      );
+    },
     routes: [
       GoRoute(
         path: '/home',
