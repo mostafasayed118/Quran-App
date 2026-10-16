@@ -359,4 +359,13 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsEnabledHint =>
       'If reminders do not arrive, enable notifications permission in your device settings';
+
+  @override
+  String get azkarReminder => 'Azkar reminder';
+
+  @override
+  String get reminderTime => 'Reminder time';
+
+  @override
+  String get settingsMinimalNote => 'Dark mode and language follow your device';
 }

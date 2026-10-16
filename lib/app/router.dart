@@ -2,8 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
-import '../l10n/app_localizations.dart';
-import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
 import '../features/azkar/presentation/azkar_screen.dart';
@@ -41,6 +39,10 @@ import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
+import '../features/notifications/data/reminder_scheduler.dart';
+import '../features/notifications/data/reminder_settings.dart';
+import '../features/settings/presentation/settings_cubit.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../features/prayer/data/city_repository.dart';
 import '../features/prayer/data/location_service.dart';
 import '../features/prayer/data/prayer_time_service.dart';
@@ -117,6 +119,8 @@ abstract final class AppRouter {
           create: (_) => PrayerTimesCubit(
             prayer: getIt<PrayerTimeService>(),
             city: getIt<CityRepository>(),
+            scheduler: getIt<ReminderScheduler>(),
+            reminderSettings: getIt<ReminderSettings>(),
           ),
           child: const PrayerTimesScreen(),
         ),
@@ -199,8 +203,14 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, _) => PlaceholderScreen(
-          title: AppLocalizations.of(context).settings,
+        builder: (_, __) => BlocProvider<SettingsCubit>(
+          create: (_) => SettingsCubit(
+            settings: getIt<ReminderSettings>(),
+            city: getIt<CityRepository>(),
+            prayer: getIt<PrayerTimeService>(),
+            scheduler: getIt<ReminderScheduler>(),
+          ),
+          child: const SettingsScreen(),
         ),
       ),
       GoRoute(

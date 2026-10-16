@@ -358,4 +358,13 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationsEnabledHint =>
       'إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك';
+
+  @override
+  String get azkarReminder => 'تذكير الأذكار';
+
+  @override
+  String get reminderTime => 'وقت التذكير';
+
+  @override
+  String get settingsMinimalNote => 'الوضع الليلي واللغة من إعدادات جهازك';
 }

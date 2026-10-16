@@ -739,6 +739,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'**
   String get notificationsEnabledHint;
+
+  /// No description provided for @azkarReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الأذكار'**
+  String get azkarReminder;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت التذكير'**
+  String get reminderTime;
+
+  /// No description provided for @settingsMinimalNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الوضع الليلي واللغة من إعدادات جهازك'**
+  String get settingsMinimalNote;
 }
 
 class _AppLocalizationsDelegate
