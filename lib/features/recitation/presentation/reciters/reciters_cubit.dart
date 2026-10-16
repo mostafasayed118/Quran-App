@@ -10,11 +10,17 @@ class RecitersCubit extends Cubit<RecitersState> {
   RecitersCubit({required ReciterRepository repo})
       : _repo = repo,
         super(const RecitersState.loading()) {
-    _sub = _repo.watchAll().listen((rows) {
-      _latest = rows;
-      _emitFiltered();
-      _kickOnce();
-    });
+    _sub = _repo.watchAll().listen(
+      (rows) {
+        _latest = rows;
+        _emitFiltered();
+        _kickOnce();
+      },
+      onError: (Object error) {
+        if (isClosed) return;
+        emit(RecitersState.error(message: error.toString()));
+      },
+    );
   }
 
   final ReciterRepository _repo;
