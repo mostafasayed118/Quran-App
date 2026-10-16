@@ -32,9 +32,15 @@ class DuaRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
+  List<DuaEntry>? _cache;
+
   Future<List<DuaEntry>> entries() async {
+    final cached = _cache;
+    if (cached != null) return cached;
     final raw = await _loader();
-    return [for (final row in raw) DuaEntry.fromJson(row)];
+    final entries = [for (final row in raw) DuaEntry.fromJson(row)];
+    _cache = entries;
+    return entries;
   }
 
   Future<List<DuaEntry>> byCategory(String categoryAr) async {

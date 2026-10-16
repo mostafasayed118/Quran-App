@@ -51,9 +51,17 @@ class AzkarRepository {
 
   final Future<Map<String, dynamic>> Function() _loader;
 
+  List<AzkarCollection>? _cache;
+
   Future<List<AzkarCollection>> collections() async {
+    final cached = _cache;
+    if (cached != null) return cached;
     final root = await _loader();
     final raw = (root['collections'] as List).cast<Map<String, dynamic>>();
-    return [for (final collection in raw) AzkarCollection.fromJson(collection)];
+    final collections = [
+      for (final collection in raw) AzkarCollection.fromJson(collection)
+    ];
+    _cache = collections;
+    return collections;
   }
 }
