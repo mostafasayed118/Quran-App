@@ -155,3 +155,11 @@ lib/core/l10n/prayer_names.dart
 ## PM scope ruling (2026-10-15, for UX-W1)
 
 IN: items 1-7, 9, 10, 11 (+T6 entry-point grant as UX-W1 commit 9). OUT/DEFERRED: item 8's RTL-boilerplate cleanup (EN-locale alignment behavior — not mechanical), item 12 (audit's own defer), golden infra.
+
+---
+
+## PM RULINGS ON UX-W1 REPORT (post-wave, committed by PM 2026-10-16)
+- Gates reproduced PM-side: analyze 0; suite 155/155 (B145 +10 — the MEASURE rule ruled over the brief's +12-14 estimate); release rebuilt exit 0 at 66,879,739 B byte-EXACT (6th consecutive) — the whole refactor is binary-invisible: the strongest invariance proof available; debug 206,314,747 ballpark; zero deps; l10n 109->113 additive+symmetric; router_test unedited SIXTH consecutive wave.
+- **PROTOCOL VIOLATION — commit messages translated to Arabic (all 9):** the brief specified verbatim English messages; the executor session localized them. Post-hoc ruling: ACCEPTED as-is (history immutable by protocol; prefixes + scope semantics intact; release byte-proof unaffected) — STANDING RULE UPDATED for all future briefs: commit messages are NEVER translated; the executor byte-copies them; every brief now carries an explicit DO-NOT-TRANSLATE line.
+- Deviations 1-8 ALL ACCEPTED: (1) reciters_cubit clearDataError (5 lines, named API replaces a hidden side effect — honest); (2) ErrorStrip closeButtonTooltip = uniform close semantics; mini_player lost its stop-word tooltip (W7 polish slot noted); (3) router settings-key reuse at the drifted line; (4) C4 sealed-switch min-diff (cleaner than sketched); (5) C9 installed-gating (correct judgment — uninstalled push would dead-end); (6) C8 = 3 keys (router reuses existing settings); (7) C6 unused-import cleanups inside own files; (8) C3 static context-theme accessor instead of fresh TextTheme slots (zero theme-hijack risk; audit sketch was directional).
+- OPEN ITEMS to W7: EmptyState exists+tested but production-unused (its two A5 sites — prayer_times:24-36, qibla:29-43 — still inline; migration = W7b visual sweep); mini_player tooltip slot; the two no-city usages.
