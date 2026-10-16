@@ -275,4 +275,31 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get jumpToToday => 'اليوم';
+
+  @override
+  String get tafsirTab => 'التفسير';
+
+  @override
+  String get translationsTab => 'الترجمات';
+
+  @override
+  String get hadithTab => 'الأحاديث';
+
+  @override
+  String get libraryInstall => 'تنزيل';
+
+  @override
+  String get libraryDelete => 'حذف';
+
+  @override
+  String get libraryInstalled => 'مثبّت';
+
+  @override
+  String get libraryFailed => 'تعذّر التنزيل';
+
+  @override
+  String get libraryRetry => 'أعِد المحاولة';
+
+  @override
+  String get cancel => 'إلغاء';
 }

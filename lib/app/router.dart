@@ -22,6 +22,8 @@ import '../features/tracker/presentation/tracker_screen.dart';
 import '../features/zakat/presentation/zakat_cubit.dart';
 import '../features/zakat/presentation/zakat_screen.dart';
 import '../features/hijri/data/hijri_service.dart';
+import '../features/library/presentation/library_cubit.dart';
+import '../features/library/presentation/library_screen.dart';
 import '../features/hijri/presentation/hijri_cubit.dart';
 import '../features/hijri/presentation/hijri_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
@@ -83,7 +85,13 @@ abstract final class AppRouter {
           child: const RecitersScreen(),
         ),
       ),
-      GoRoute(path: '/library', builder: (_, __) => const PlaceholderScreen(title: 'المكتبة')),
+      GoRoute(
+        path: '/library',
+        builder: (_, __) => BlocProvider<LibraryCubit>.value(
+          value: getIt<LibraryCubit>(),
+          child: const LibraryScreen(),
+        ),
+      ),
       GoRoute(
         path: '/prayer-times',
         builder: (_, __) => BlocProvider<PrayerTimesCubit>(

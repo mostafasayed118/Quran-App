@@ -19,6 +19,7 @@ import '../../features/hijri/data/hijri_service.dart';
 import '../../features/library/data/catalog_repository.dart';
 import '../../features/library/data/library_catalog.dart';
 import '../../features/library/data/pack_downloader.dart';
+import '../../features/library/presentation/library_cubit.dart';
 import '../../features/hijri/presentation/hijri_cubit.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
@@ -109,6 +110,10 @@ Future<void> configureDependencies({
     getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(
           db,
           libraryRootResolver: libraryRootResolver,
+        ));
+    getIt.registerLazySingleton<LibraryCubit>(() => LibraryCubit(
+          catalog: getIt<CatalogRepository>(),
+          downloader: getIt<PackDownloader>(),
         ));
   }
   getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());

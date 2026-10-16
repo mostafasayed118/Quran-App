@@ -583,6 +583,60 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اليوم'**
   String get jumpToToday;
+
+  /// No description provided for @tafsirTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'التفسير'**
+  String get tafsirTab;
+
+  /// No description provided for @translationsTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الترجمات'**
+  String get translationsTab;
+
+  /// No description provided for @hadithTab.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحاديث'**
+  String get hadithTab;
+
+  /// No description provided for @libraryInstall.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل'**
+  String get libraryInstall;
+
+  /// No description provided for @libraryDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get libraryDelete;
+
+  /// No description provided for @libraryInstalled.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثبّت'**
+  String get libraryInstalled;
+
+  /// No description provided for @libraryFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التنزيل'**
+  String get libraryFailed;
+
+  /// No description provided for @libraryRetry.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعِد المحاولة'**
+  String get libraryRetry;
+
+  /// No description provided for @cancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get cancel;
 }
 
 class _AppLocalizationsDelegate

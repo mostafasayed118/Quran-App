@@ -275,4 +275,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get jumpToToday => 'Today';
+
+  @override
+  String get tafsirTab => 'Tafsir';
+
+  @override
+  String get translationsTab => 'Translations';
+
+  @override
+  String get hadithTab => 'Hadith';
+
+  @override
+  String get libraryInstall => 'Install';
+
+  @override
+  String get libraryDelete => 'Delete';
+
+  @override
+  String get libraryInstalled => 'Installed';
+
+  @override
+  String get libraryFailed => 'Download failed';
+
+  @override
+  String get libraryRetry => 'Retry';
+
+  @override
+  String get cancel => 'Cancel';
 }
