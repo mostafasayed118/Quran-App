@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +37,7 @@ class LibraryScreen extends StatelessWidget {
             ),
             body: switch (state) {
               LibraryLoading() => const LoadingView(),
+              LibraryFailed(:final message) => _errorPane(loc, message),
               final LibraryReady ready => Column(
                   children: [
                     if (ready.failed.isNotEmpty && ready.progress.isEmpty)
@@ -80,6 +83,11 @@ class LibraryScreen extends StatelessWidget {
       onDismiss: () => cubit.dismissFailure(packId),
     );
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message) {
+  dev.log(message, name: 'quran_yahdi/library');
+  return ErrorView(loc.genericError);
 }
 
 extension on LibraryReady {

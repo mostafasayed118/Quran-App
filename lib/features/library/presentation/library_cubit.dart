@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/db/app_database.dart';
 import '../data/catalog_repository.dart';
 import '../data/library_catalog.dart';
 import '../data/pack_downloader.dart';
@@ -25,8 +26,16 @@ class LibraryCubit extends Cubit<LibraryState> {
   final PackDownloader _downloader;
 
   Future<void> load() async {
-    final packs = await _catalog.packs();
-    final rows = await _downloader.installedPacks();
+    final List<LibraryPackInfo> packs;
+    final List<InstalledPack> rows;
+    try {
+      packs = await _catalog.packs();
+      rows = await _downloader.installedPacks();
+    } on Object catch (error) {
+      if (isClosed) return;
+      emit(LibraryState.failed(message: error.toString()));
+      return;
+    }
     if (isClosed) return;
     emit(LibraryState.ready(
       packs: packs,

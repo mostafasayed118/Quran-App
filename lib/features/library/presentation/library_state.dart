@@ -15,4 +15,6 @@ sealed class LibraryState with _$LibraryState {
     @Default(<String, (int, int)>{}) Map<String, (int, int)> progress,
     @Default(<String>{}) Set<String> failed,
   }) = LibraryReady;
+
+  const factory LibraryState.failed({required String message}) = LibraryFailed;
 }

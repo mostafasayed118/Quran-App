@@ -53,6 +53,7 @@ extension LibraryStatePatterns on LibraryState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LibraryLoading value)? loading,
     TResult Function(LibraryReady value)? ready,
+    TResult Function(LibraryFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -61,6 +62,8 @@ extension LibraryStatePatterns on LibraryState {
         return loading(_that);
       case LibraryReady() when ready != null:
         return ready(_that);
+      case LibraryFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -83,6 +86,7 @@ extension LibraryStatePatterns on LibraryState {
   TResult map<TResult extends Object?>({
     required TResult Function(LibraryLoading value) loading,
     required TResult Function(LibraryReady value) ready,
+    required TResult Function(LibraryFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -90,6 +94,8 @@ extension LibraryStatePatterns on LibraryState {
         return loading(_that);
       case LibraryReady():
         return ready(_that);
+      case LibraryFailed():
+        return failed(_that);
     }
   }
 
@@ -109,6 +115,7 @@ extension LibraryStatePatterns on LibraryState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LibraryLoading value)? loading,
     TResult? Function(LibraryReady value)? ready,
+    TResult? Function(LibraryFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -116,6 +123,8 @@ extension LibraryStatePatterns on LibraryState {
         return loading(_that);
       case LibraryReady() when ready != null:
         return ready(_that);
+      case LibraryFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -148,6 +157,7 @@ extension LibraryStatePatterns on LibraryState {
                 progress,
             Set<String> failed)?
         ready,
+    TResult Function(String message)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -157,6 +167,8 @@ extension LibraryStatePatterns on LibraryState {
       case LibraryReady() when ready != null:
         return ready(
             _that.packs, _that.installed, _that.progress, _that.failed);
+      case LibraryFailed() when failed != null:
+        return failed(_that.message);
       case _:
         return orElse();
     }
@@ -190,6 +202,7 @@ extension LibraryStatePatterns on LibraryState {
                 progress,
             Set<String> failed)
         ready,
+    required TResult Function(String message) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -198,6 +211,8 @@ extension LibraryStatePatterns on LibraryState {
       case LibraryReady():
         return ready(
             _that.packs, _that.installed, _that.progress, _that.failed);
+      case LibraryFailed():
+        return failed(_that.message);
     }
   }
 
@@ -228,6 +243,7 @@ extension LibraryStatePatterns on LibraryState {
                 progress,
             Set<String> failed)?
         ready,
+    TResult? Function(String message)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -236,6 +252,8 @@ extension LibraryStatePatterns on LibraryState {
       case LibraryReady() when ready != null:
         return ready(
             _that.packs, _that.installed, _that.progress, _that.failed);
+      case LibraryFailed() when failed != null:
+        return failed(_that.message);
       case _:
         return null;
     }
@@ -418,6 +436,72 @@ class _$LibraryReadyCopyWithImpl<$Res> implements $LibraryReadyCopyWith<$Res> {
           ? _self._failed
           : failed // ignore: cast_nullable_to_non_nullable
               as Set<String>,
+    ));
+  }
+}
+
+/// @nodoc
+
+class LibraryFailed implements LibraryState {
+  const LibraryFailed({required this.message});
+
+  final String message;
+
+  /// Create a copy of LibraryState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $LibraryFailedCopyWith<LibraryFailed> get copyWith =>
+      _$LibraryFailedCopyWithImpl<LibraryFailed>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is LibraryFailed &&
+            (identical(other.message, message) || other.message == message));
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(runtimeType, message);
+  }
+
+  @override
+  String toString() {
+    return 'LibraryState.failed(message: $message)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $LibraryFailedCopyWith<$Res>
+    implements $LibraryStateCopyWith<$Res> {
+  factory $LibraryFailedCopyWith(
+          LibraryFailed value, $Res Function(LibraryFailed) _then) =
+      _$LibraryFailedCopyWithImpl;
+  @useResult
+  $Res call({String message});
+}
+
+/// @nodoc
+class _$LibraryFailedCopyWithImpl<$Res>
+    implements $LibraryFailedCopyWith<$Res> {
+  _$LibraryFailedCopyWithImpl(this._self, this._then);
+
+  final LibraryFailed _self;
+  final $Res Function(LibraryFailed) _then;
+
+  /// Create a copy of LibraryState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? message = null,
+  }) {
+    return _then(LibraryFailed(
+      message: null == message
+          ? _self.message
+          : message // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
