@@ -72,6 +72,15 @@ List<ScheduledReminder> planReminders({
   return List.unmodifiable(byId.values);
 }
 
+/// First-boot POST_NOTIFICATIONS grace (UX-FIX 2): ask only for a user who
+/// wants reminders and whose notifications are currently disabled. A granted
+/// OS (true) or an unknown state (null) stays silent — never re-prompt.
+bool shouldRequestBootPermission({
+  required bool? notificationsEnabled,
+  required bool azkarEnabled,
+}) =>
+    azkarEnabled && notificationsEnabled == false;
+
 /// Parses 'H:mm'/'HH:mm' 24-hour input; null on anything malformed.
 (int, int)? _parseHm(String? hm) {
   if (hm == null) return null;

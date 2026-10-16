@@ -1,6 +1,9 @@
 import 'dart:ui' show Locale;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:quran_yahdi/app/router.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
+    show shouldRequestBootPermission;
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -41,7 +44,9 @@ class NotificationsBinding implements ReminderScheduler {
   bool _ready = false;
   NotificationDetails? _details;
 
-  /// One-time plugin init; safe to call repeatedly, never rethrows.
+  /// One-time plugin init; safe to call repeatedly, never rethrows. A
+  /// notification tap hands the app to [onNotificationTap] (default-launch
+  /// to `/home` via the existing GoRouter — UX-FIX 2).
   Future<void> init() async {
     if (_ready) return;
     try {
@@ -50,6 +55,7 @@ class NotificationsBinding implements ReminderScheduler {
         settings: const InitializationSettings(
           android: AndroidInitializationSettings(defaultIcon),
         ),
+        onDidReceiveNotificationResponse: onNotificationTap,
       );
       _details = NotificationDetails(
         android: AndroidNotificationDetails(
@@ -63,6 +69,34 @@ class NotificationsBinding implements ReminderScheduler {
       _ready = true;
     } on Object {
       _ready = false;
+    }
+  }
+
+  /// Default tap-to-open (UX-FIX 2): v1 has no per-type payload→route map
+  /// (audit deferred that nuance), so every tap lands on the app's home.
+  void onNotificationTap(NotificationResponse response) {
+    AppRouter.router.go('/home');
+  }
+
+  /// First-boot POST_NOTIFICATIONS grace (UX-FIX 2): requests once when the
+  /// OS reports notifications currently disabled and the azkar toggle is on
+  /// (a user who opted out is never re-prompted). Never throws.
+  Future<void> requestBootPermission({required bool azkarEnabled}) async {
+    if (!_ready) return;
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android == null) return;
+      final enabled = await android.areNotificationsEnabled();
+      if (!shouldRequestBootPermission(
+        notificationsEnabled: enabled,
+        azkarEnabled: azkarEnabled,
+      )) {
+        return;
+      }
+      await android.requestNotificationsPermission();
+    } on Object {
+      // Best-effort v1: a refused/failed boot grace must never crash boot.
     }
   }
 
