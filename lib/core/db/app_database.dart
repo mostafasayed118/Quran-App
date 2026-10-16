@@ -32,6 +32,19 @@ class AppDatabase extends _$AppDatabase {
             await migrator.createAll();
           }
         },
+        beforeOpen: (details) async {
+          // Hot-path indexes. IF NOT EXISTS: asset-seeded databases ship
+          // without them, fresh databases just created their tables — one
+          // idempotent statement covers every open (ayahs.surah_id is the
+          // reader's per-surah query; the others are per-check lookups).
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_surah '
+              'ON ayahs(surah_id, number_in_surah)');
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_bookmarks_ayah '
+              'ON bookmarks(ayah_id)');
+          await customStatement(
+              'CREATE INDEX IF NOT EXISTS idx_downloads_lookup '
+              'ON downloads(reciter_id, surah_id)');
+        },
       );
 
   /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on

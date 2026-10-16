@@ -53,6 +53,23 @@ void main() {
     expect(fetched.single.sajda, false);
   });
 
+  test('hot-path indexes exist after open', () async {
+    // Force the first open: the beforeOpen hook must have run by the time
+    // this query executes.
+    await db.customSelect('SELECT 1').get();
+    final names = await db
+        .customSelect("SELECT name FROM sqlite_master WHERE type = 'index'")
+        .map((row) => row.read<String>('name'))
+        .get();
+    expect(
+        names,
+        containsAll(<String>[
+          'idx_ayahs_surah',
+          'idx_bookmarks_ayah',
+          'idx_downloads_lookup',
+        ]));
+  });
+
   test('v2 adds reciters table; companion roundtrips a row', () async {
     final db2 = AppDatabase.test(NativeDatabase.memory());
     await db2.into(db2.reciters).insert(
