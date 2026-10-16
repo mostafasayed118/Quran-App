@@ -5,6 +5,16 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// REL-1: optional external signing config. If the gitignored android/key.properties
+// exists, release builds are signed from it; otherwise builds fail soft with a loud
+// stdout notice and stay debug-signed (owner keystore intake = W7c).
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file("key.properties")
+def hasReleaseKeystore = keystorePropertiesFile.exists()
+if (hasReleaseKeystore) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace = "com.mostafasayed.quranyahdi"
     compileSdk = flutter.compileSdkVersion
@@ -32,11 +42,25 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        release {
+            if (hasReleaseKeystore) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            if (hasReleaseKeystore) {
+                signingConfig = signingConfigs.release
+            } else {
+                println "RELEASE NOT SIGNED (debug-signed artifact): android/key.properties not found - the owner keystore lands in W7c (docs/superpowers/plans/2026-10-16-w7c-release.md)"
+                signingConfig = signingConfigs.debug
+            }
         }
     }
 }
