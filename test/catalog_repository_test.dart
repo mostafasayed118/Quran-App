@@ -108,6 +108,66 @@ void main() {
     expect(packs, hasLength(3));
   });
 
+  test('missing kind is rejected, never crashing the loader', () async {
+    final repo2 = CatalogRepository(
+      source: BundledCatalogSource(
+        loader: () async => [
+          {
+            'id': 'x-nokind',
+            // Every other field present — only `kind` is missing.
+            'language': 'ar',
+            'titleAr': 'ع',
+            'titleEn': 'x',
+            'approxSizeMb': 1.0,
+            'version': '1',
+          },
+          ...fixturePacks(),
+        ],
+      ),
+    );
+    final packs = await repo2.packs();
+    expect(packs.map((p) => p.id), isNot(contains('x-nokind')));
+    expect(packs, hasLength(3));
+  });
+
+  test('unsafe entries are rejected: bad ids and non-https urls', () async {
+    final repo2 = CatalogRepository(
+      source: BundledCatalogSource(
+        loader: () async => [
+          {...fixturePacks()[0], 'id': '../evil'},
+          {
+            'id': 'http-pack',
+            'kind': 'translation',
+            'language': 'ar',
+            'titleAr': 'ع',
+            'titleEn': 'x',
+            'sourceUrl': 'http://insecure.example/x.json',
+            'approxSizeMb': 1.0,
+            'version': '1',
+          },
+          {
+            'id': 'ftp-pack',
+            'kind': 'tafsir',
+            'language': 'ar',
+            'titleAr': 'ع',
+            'titleEn': 'x',
+            'urlTemplate': 'ftp://insecure.example/{n}.json',
+            'fileCount': 114,
+            'approxSizeMb': 1.0,
+            'version': '1',
+          },
+          ...fixturePacks(),
+        ],
+      ),
+    );
+    final packs = await repo2.packs();
+    final ids = packs.map((p) => p.id).toSet();
+    expect(ids, isNot(contains('../evil')));
+    expect(ids, isNot(contains('http-pack')));
+    expect(ids, isNot(contains('ftp-pack')));
+    expect(packs, hasLength(3));
+  });
+
   test('bundled library catalog asset is well-formed (9 curated packs)',
       () async {
     final file = File('assets/data/library_catalog.json');

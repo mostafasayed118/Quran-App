@@ -21,7 +21,7 @@ const Map<String, dynamic> _hadithFixture = {
   'language': 'en',
   'titleAr': 'حديث تجريبي',
   'titleEn': 'Fixture Hadith',
-  'sourceUrl': 'http://127.0.0.1:9/x/h.json',
+  'sourceUrl': 'https://127.0.0.1:9/x/h.json',
   'approxSizeMb': 0.001,
   'version': '1',
 };

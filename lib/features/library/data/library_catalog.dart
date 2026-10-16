@@ -9,6 +9,13 @@
 /// downloader and the UI keep consuming this seam unchanged.
 enum LibraryPackKind { tafsir, translation, hadith }
 
+/// Pack ids compose filesystem paths (`<root>/library/<id>.json`), so they
+/// are restricted to a safe charset — this also guards the future remote
+/// catalog manifest seam against path traversal.
+final RegExp _packIdPattern = RegExp(r'^[a-z0-9][a-z0-9-]{0,63}$');
+
+bool _isHttps(String? url) => url == null || url.startsWith('https://');
+
 class LibraryPackInfo {
   const LibraryPackInfo({
     required this.id,
@@ -51,6 +58,9 @@ class LibraryPackInfo {
     final version = json['version'] as String?;
     if (id == null ||
         id.isEmpty ||
+        !_packIdPattern.hasMatch(id) ||
+        kindRaw == null ||
+        kindRaw.isEmpty ||
         language == null ||
         language.isEmpty ||
         titleAr == null ||
@@ -62,15 +72,13 @@ class LibraryPackInfo {
         version.isEmpty) {
       throw const FormatException('invalid library pack entry');
     }
-    LibraryPackKind kind;
-    try {
-      kind = kindFor(kindRaw!);
-    } on FormatException {
-      rethrow;
-    }
+    final kind = kindFor(kindRaw);
     final sourceUrl = json['sourceUrl'] as String?;
     final urlTemplate = json['urlTemplate'] as String?;
     final fileCount = json['fileCount'] as int?;
+    if (!_isHttps(sourceUrl) || !_isHttps(urlTemplate)) {
+      throw const FormatException('pack urls must be https');
+    }
     switch (kind) {
       case LibraryPackKind.tafsir:
         if (urlTemplate == null ||
