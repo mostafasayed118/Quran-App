@@ -366,7 +366,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reminderTime => 'وقت التذكير';
 
   @override
-  String get settingsMinimalNote => 'الوضع الليلي واللغة من إعدادات جهازك';
+  String get settingsMinimalNote => 'الوضع الليلي من إعدادات جهازك';
 
   @override
   String get stopAction => 'وقف';

@@ -64,7 +64,7 @@ void main() {
     expect(find.text('تذكير الأذكار'), findsOneWidget);
     expect(find.text('وقت التذكير'), findsOneWidget);
     expect(find.text('٠٦:٣٠'), findsOneWidget);
-    expect(find.text('الوضع الليلي واللغة من إعدادات جهازك'), findsOneWidget);
+    expect(find.text('الوضع الليلي من إعدادات جهازك'), findsOneWidget);
     expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
     expect(
       find.text('إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'),
