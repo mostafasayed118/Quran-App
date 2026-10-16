@@ -316,3 +316,10 @@ READ-ONLY COMPLETE — zero commits — awaiting PM triage.
 - Systemic 10-screens-no-error-state: regraded to a per-screen triage in Wave B/C (a screen without a real failure source does not need a decorative error state — blanket sweeps rejected).
 - WAVE GROUPING RATIFIED with corrections: Wave A (failure-safety) = the three confirmed items only. Wave B = integrations (notification boot permission + tap-to-open, Cairo font decision, download cancel/delete, language-note truth fix). Wave C = polish (contrast, semantics labels, EmptyState wiring, 404, mini-player coverage).
 - LESSON RECORDED: audit findings are DIRECTIONAL, not numerically authoritative — every accepted fix wave item re-verified at source first (this triage refuted 1 of 6 headline P1s).
+---
+
+## PM TRIAGE B (2026-10-17) — pre-Wave-C source re-verification
+- Line-based grep CANNOT count IconButton tooltips (params are multi-line; 23 sites showed 0 line-attached tooltips which is a MEASUREMENT artifact). Wave C item 2 mandates a multi-line-aware census BEFORE migration, and the real number is recorded in the report.
+- 404/unknown-route handling: confirmed ABSENT (no errorBuilder/onException in router.dart) — blank/untranslated default error ships today.
+- Gold-as-text contrast: gold is the scheme secondary (app_theme.dart:33); fix = a compliant TEXT tone per-mode (v1 ruling: light mode gets a darkened gold text tone at >=4.5:1; dark mode keeps the existing lighter gold if >=4.5:1 there — ratios COMPUTED and printed in the report, pure-Dart WCAG helper + test).
+- OUT of Wave C (unchanged): RTL boilerplate (device-gated), global mini player (shell decision W7c), zakat (refuted), mushaf (closed).
