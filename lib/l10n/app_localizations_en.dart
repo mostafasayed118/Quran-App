@@ -335,4 +335,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hadithRead => 'Read';
+
+  @override
+  String get useMyLocation => 'Use my location';
+
+  @override
+  String get locating => 'Locating…';
+
+  @override
+  String get locationUnavailable => 'Could not get location — pick manually';
 }

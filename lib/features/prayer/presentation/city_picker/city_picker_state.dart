@@ -11,5 +11,6 @@ sealed class CityPickerState with _$CityPickerState {
   const factory CityPickerState.ready({
     @Default('') String query,
     @Default(<City>[]) List<City> results,
+    @Default(false) bool locating,
   }) = CityPickerReady;
 }

@@ -334,4 +334,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hadithRead => 'اقرأ';
+
+  @override
+  String get useMyLocation => 'استخدم موقعي';
+
+  @override
+  String get locating => 'جارٍ تحديد الموقع…';
+
+  @override
+  String get locationUnavailable => 'تعذّر تحديد الموقع — اختر يدويًا';
 }

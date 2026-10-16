@@ -30,6 +30,7 @@ dependencies:
   adhan: ^2.0.0+1
   hijri: ^3.0.1
   just_audio_background: ^0.0.1-beta.17
+  geolocator: ^14.0.1
 
 flutter_launcher_icons:
   android: true

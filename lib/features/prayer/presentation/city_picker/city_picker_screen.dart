@@ -29,22 +29,44 @@ class CityPickerScreen extends StatelessWidget {
             child: BlocBuilder<CityPickerCubit, CityPickerState>(
               builder: (context, state) => switch (state) {
                 CityPickerLoading() => const LoadingView(),
-                CityPickerReady(:final results) => ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, i) {
-                      final city = results[i];
-                      return ListTile(
-                        title: Text(city.nameAr),
-                        subtitle: Text(city.nameEn),
-                        trailing: Text(city.id),
-                        onTap: () async {
-                          await context.read<CityPickerCubit>().persist(city);
-                          if (context.mounted) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      );
-                    },
+                CityPickerReady(:final results, :final locating) => Column(
+                    children: [
+                      ListTile(
+                        leading: locating
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.my_location),
+                        title: Text(locating ? loc.locating : loc.useMyLocation),
+                        onTap: locating ? null : () => _useMyLocation(context),
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: results.length,
+                          itemBuilder: (context, i) {
+                            final city = results[i];
+                            return ListTile(
+                              title: Text(city.nameAr),
+                              subtitle: Text(city.nameEn),
+                              trailing: Text(city.id),
+                              onTap: () async {
+                                await context
+                                    .read<CityPickerCubit>()
+                                    .persist(city);
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
               },
             ),
@@ -52,5 +74,18 @@ class CityPickerScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _useMyLocation(BuildContext context) async {
+    final loc = AppLocalizations.of(context);
+    final cubit = context.read<CityPickerCubit>();
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final city = await cubit.locateNearest();
+    if (city != null) {
+      navigator.pop();
+    } else {
+      messenger.showSnackBar(SnackBar(content: Text(loc.locationUnavailable)));
+    }
   }
 }

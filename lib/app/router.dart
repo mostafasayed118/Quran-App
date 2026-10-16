@@ -42,6 +42,7 @@ import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/prayer/data/city_repository.dart';
+import '../features/prayer/data/location_service.dart';
 import '../features/prayer/data/prayer_time_service.dart';
 import '../features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import '../features/prayer/presentation/city_picker/city_picker_screen.dart';
@@ -122,7 +123,10 @@ abstract final class AppRouter {
       GoRoute(
         path: '/prayer-times/city',
         builder: (_, __) => BlocProvider<CityPickerCubit>(
-          create: (_) => CityPickerCubit(cityRepo: getIt<CityRepository>()),
+          create: (_) => CityPickerCubit(
+            cityRepo: getIt<CityRepository>(),
+            location: getIt<LocationService>(),
+          ),
           child: const CityPickerScreen(),
         ),
       ),

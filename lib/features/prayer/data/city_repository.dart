@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import '../../../core/db/app_database.dart';
 import 'prayer_time_service.dart';
@@ -65,6 +66,42 @@ class CityRepository {
           city,
     ];
   }
+
+  Future<City> nearestTo(double lat, double lng) async {
+    final all = await _all();
+    if (all.isEmpty) {
+      throw StateError('No cities available to match against');
+    }
+    var best = all.first;
+    var bestDistance = _haversineKm(lat, lng, best.lat, best.lng);
+    for (final city in all.skip(1)) {
+      final distance = _haversineKm(lat, lng, city.lat, city.lng);
+      if (distance < bestDistance) {
+        best = city;
+        bestDistance = distance;
+      }
+    }
+    return best;
+  }
+
+  static double _haversineKm(
+    double lat1,
+    double lng1,
+    double lat2,
+    double lng2,
+  ) {
+    const earthRadiusKm = 6371.0088;
+    final dLat = _toRadians(lat2 - lat1);
+    final dLng = _toRadians(lng2 - lng1);
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_toRadians(lat1)) *
+            math.cos(_toRadians(lat2)) *
+            math.sin(dLng / 2) *
+            math.sin(dLng / 2);
+    return 2 * earthRadiusKm * math.asin(math.min(1, math.sqrt(a)));
+  }
+
+  static double _toRadians(double degrees) => degrees * math.pi / 180.0;
 
   Future<String?> selectedCityJson() async {
     final row = await (_db.select(_db.settingsTable)

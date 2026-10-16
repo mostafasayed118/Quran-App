@@ -697,6 +697,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'اقرأ'**
   String get hadithRead;
+
+  /// No description provided for @useMyLocation.
+  ///
+  /// In ar, this message translates to:
+  /// **'استخدم موقعي'**
+  String get useMyLocation;
+
+  /// No description provided for @locating.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تحديد الموقع…'**
+  String get locating;
+
+  /// No description provided for @locationUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحديد الموقع — اختر يدويًا'**
+  String get locationUnavailable;
 }
 
 class _AppLocalizationsDelegate
