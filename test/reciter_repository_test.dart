@@ -10,10 +10,10 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 const fixture = '''
 {"reciters":[
  {"id":51,"name":"عبدالباسط عبدالصمد","letter":"ع","moshaf":[
-   {"id":53,"name":"حفص عن عاصم - مرتل","server":"https://server11.example.net/basit/","surah_total":114,"surah_list":"1,2,3"},
-   {"id":51,"name":"المصحف المجود","server":"https://server11.example.net/mujawwad/","surah_total":114,"surah_list":"1,2"}]},
+   {"id":53,"name":"حفص عن عاصم - مرتل","server":"https://server11.mp3quran.net/basit/","surah_total":114,"surah_list":"1,2,3"},
+   {"id":51,"name":"المصحف المجود","server":"https://server11.mp3quran.net/mujawwad/","surah_total":114,"surah_list":"1,2"}]},
  {"id":123,"name":"مشاري العفاسي","letter":"م","moshaf":[
-   {"id":123,"name":"حفص عن عاصم - مرتل","server":"https://server8.example.net/afs/","surah_total":114,"surah_list":"2,1"}]}
+   {"id":123,"name":"حفص عن عاصم - مرتل","server":"https://server8.mp3quran.net/afs/","surah_total":114,"surah_list":"2,1"}]}
 ]}
 ''';
 
@@ -76,6 +76,37 @@ void main() {
     // Idempotent re-run: still 3 rows, no dupes.
     await netRepo.refreshFromApi();
     expect(await db.select(db.reciters).get(), hasLength(3));
+  });
+
+  test('moshaf rows with untrusted or non-https servers are dropped',
+      () async {
+    const evilFixture = '''
+    {"reciters":[
+     {"id":51,"name":"عبدالباسط عبدالصمد","letter":"ع","moshaf":[
+       {"id":53,"name":"حفص عن عاصم - مرتل","server":"https://server11.mp3quran.net/basit/","surah_total":114,"surah_list":"1,2,3"},
+       {"id":51,"name":"المصحف المجود","server":"http://server11.mp3quran.net/mujawwad/","surah_total":114,"surah_list":"1,2"},
+       {"id":52,"name":"مشبوه","server":"https://evil.example.net/x/","surah_total":114,"surah_list":"1"}]}
+    ]}
+    ''';
+    final server = await HttpServer.bind('127.0.0.1', 0);
+    server.listen((req) async {
+      req.response.headers.contentType = ContentType.json;
+      req.response.write(evilFixture);
+      await req.response.close();
+    });
+    addTearDown(() async => server.close(force: true));
+
+    final netRepo = ReciterRepository(
+      db,
+      client: http.Client(),
+      apiEndpointOverride:
+          'http://127.0.0.1:${server.port}/api/v3/reciters?language=ar',
+    );
+    await netRepo.refreshFromApi();
+
+    final rows = await db.select(db.reciters).get();
+    expect(rows, hasLength(1));
+    expect(rows.single.id, '51-53');
   });
 
   test('selection persists + loads', () async {

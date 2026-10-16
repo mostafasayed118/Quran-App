@@ -54,6 +54,17 @@ bool isFeaturedReciterRow(ReciterRow row) {
   return leadingId != null && featuredReciterIds.contains(leadingId);
 }
 
+/// The mp3quran API is the only writer of `server` values and its audio
+/// hosts live on mp3quran.net; anything else (http, foreign host, malformed)
+/// is dropped at parse time so it can never be streamed or downloaded.
+bool isTrustedAudioServer(String server) {
+  final uri = Uri.tryParse(server);
+  return uri != null &&
+      uri.scheme == 'https' &&
+      uri.host.isNotEmpty &&
+      (uri.host == 'mp3quran.net' || uri.host.endsWith('.mp3quran.net'));
+}
+
 const recitersApiEndpoint = 'https://mp3quran.net/api/v3/reciters?language=ar';
 const selectedMoshafKey = 'selected_moshaf_row';
 
@@ -86,11 +97,13 @@ class ReciterRepository {
           (reciter['moshaf'] as List? ?? const []).cast<Map<String, dynamic>>();
       for (final moshaf in moshafs) {
         final moshafId = (moshaf['id'] as num).toInt();
+        final server = (moshaf['server'] ?? '') as String;
+        if (!isTrustedAudioServer(server)) continue;
         rows.add(RecitersCompanion.insert(
           id: '$reciterId-$moshafId',
           reciterName: reciterName,
           moshafName: (moshaf['name'] ?? '') as String,
-          server: (moshaf['server'] ?? '') as String,
+          server: server,
           surahList: (moshaf['surah_list'] ?? '') as String,
           surahTotal: (moshaf['surah_total'] as num?)?.toInt() ?? 0,
         ));
