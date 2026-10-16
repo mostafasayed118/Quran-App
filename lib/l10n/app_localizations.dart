@@ -673,6 +673,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'السابق'**
   String get hadithPrev;
+
+  /// No description provided for @surahFallbackName.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {n}'**
+  String surahFallbackName(String n);
+
+  /// No description provided for @defaultReciterSet.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تعيينه قارئك الافتراضي'**
+  String get defaultReciterSet;
+
+  /// No description provided for @unknownInitial.
+  ///
+  /// In ar, this message translates to:
+  /// **'؟'**
+  String get unknownInitial;
 }
 
 class _AppLocalizationsDelegate

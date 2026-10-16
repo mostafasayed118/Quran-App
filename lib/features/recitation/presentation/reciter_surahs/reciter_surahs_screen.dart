@@ -72,7 +72,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                   return _SurahDownloadRow(
                     reciter: row,
                     surahNumber: n,
-                    name: names[n] ?? 'سورة ${n.toArabicIndic}',
+                    name: names[n] ?? loc.surahFallbackName(n.toArabicIndic),
                     teaser: previews[n],
                     item: dl.items['${row.id}-$n'],
                   );
@@ -90,7 +90,7 @@ class ReciterSurahsScreen extends StatelessWidget {
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('تم تعيينه قارئك الافتراضي'),
+        content: Text(AppLocalizations.of(context).defaultReciterSet),
         backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );

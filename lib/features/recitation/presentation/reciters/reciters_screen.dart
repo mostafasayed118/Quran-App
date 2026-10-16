@@ -103,7 +103,7 @@ class _ReciterRow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final trimmed = reciter.reciterName.trim();
     final initial = trimmed.isEmpty
-        ? '؟'
+        ? loc.unknownInitial
         : String.fromCharCode(trimmed.runes.first);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),

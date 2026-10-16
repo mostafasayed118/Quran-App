@@ -320,4 +320,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hadithPrev => 'السابق';
+
+  @override
+  String surahFallbackName(String n) {
+    return 'سورة $n';
+  }
+
+  @override
+  String get defaultReciterSet => 'تم تعيينه قارئك الافتراضي';
+
+  @override
+  String get unknownInitial => '؟';
 }

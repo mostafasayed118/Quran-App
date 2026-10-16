@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/di/injector.dart';
+import '../l10n/app_localizations.dart';
 import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
@@ -190,7 +191,12 @@ abstract final class AppRouter {
           child: const AsmaScreen(),
         ),
       ),
-      GoRoute(path: '/settings', builder: (_, __) => const PlaceholderScreen(title: 'الإعدادات')),
+      GoRoute(
+        path: '/settings',
+        builder: (context, _) => PlaceholderScreen(
+          title: AppLocalizations.of(context).settings,
+        ),
+      ),
       GoRoute(
         path: '/quran/reader',
         builder: (context, state) {
