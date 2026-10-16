@@ -661,6 +661,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا يوجد تفسير مثبّت — نزّل من المكتبة'**
   String get libraryEmptyHint;
+
+  /// No description provided for @hadithNext.
+  ///
+  /// In ar, this message translates to:
+  /// **'التالي'**
+  String get hadithNext;
+
+  /// No description provided for @hadithPrev.
+  ///
+  /// In ar, this message translates to:
+  /// **'السابق'**
+  String get hadithPrev;
 }
 
 class _AppLocalizationsDelegate

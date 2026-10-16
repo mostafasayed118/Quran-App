@@ -314,4 +314,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get libraryEmptyHint => 'لا يوجد تفسير مثبّت — نزّل من المكتبة';
+
+  @override
+  String get hadithNext => 'التالي';
+
+  @override
+  String get hadithPrev => 'السابق';
 }

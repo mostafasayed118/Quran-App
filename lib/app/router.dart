@@ -22,6 +22,9 @@ import '../features/tracker/presentation/tracker_screen.dart';
 import '../features/zakat/presentation/zakat_cubit.dart';
 import '../features/zakat/presentation/zakat_screen.dart';
 import '../features/hijri/data/hijri_service.dart';
+import '../features/library/presentation/hadith_browse/hadith_cubit.dart';
+import '../features/library/presentation/hadith_browse/hadith_screen.dart';
+import '../features/library/data/pack_downloader.dart';
 import '../features/library/presentation/library_cubit.dart';
 import '../features/library/presentation/library_screen.dart';
 import '../features/hijri/presentation/hijri_cubit.dart';
@@ -91,6 +94,19 @@ abstract final class AppRouter {
           value: getIt<LibraryCubit>(),
           child: const LibraryScreen(),
         ),
+      ),
+      GoRoute(
+        path: '/library/hadith',
+        builder: (context, state) {
+          final pack = state.uri.queryParameters['pack'] ?? '';
+          return BlocProvider<HadithCubit>(
+            create: (_) => HadithCubit(
+              downloader: getIt<PackDownloader>(),
+              packId: pack,
+            ),
+            child: const HadithScreen(),
+          );
+        },
       ),
       GoRoute(
         path: '/prayer-times',

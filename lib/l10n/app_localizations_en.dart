@@ -315,4 +315,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get libraryEmptyHint =>
       'No tafsir installed — get one from the Library';
+
+  @override
+  String get hadithNext => 'Next';
+
+  @override
+  String get hadithPrev => 'Previous';
 }
