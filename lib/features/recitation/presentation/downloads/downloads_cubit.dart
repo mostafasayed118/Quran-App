@@ -45,13 +45,16 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     }));
   }
 
-  Future<void> enqueue(String rowId, int surahNumber) async {    final key = _key(rowId, surahNumber);
+  Future<void> enqueue(String rowId, int surahNumber) async {
+    final key = _key(rowId, surahNumber);
     final current = state.items[key];
     if (current != null &&
         (current.status == 'downloading' || current.status == 'done')) {
       return;
     }
-    if (_queue.any((task) => task.$1 == rowId && task.$2 == surahNumber)) return;
+    if (_queue.any((task) => task.$1 == rowId && task.$2 == surahNumber)) {
+      return;
+    }
     _queue.add((rowId, surahNumber));
     emit(state.copyWith(
       items: {
@@ -83,7 +86,8 @@ class DownloadsCubit extends Cubit<DownloadsState> {
             surahNumber: surahNumber,
             onProgress: (received, total) {
               if (isClosed) return;
-              emit(_bump(key, status: 'downloading', received: received, total: total));
+              emit(_bump(key,
+                  status: 'downloading', received: received, total: total));
             },
           );
           if (isClosed) return;
@@ -103,7 +107,8 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     emit(_bump(key, status: 'failed'));
   }
 
-  DownloadsState _bump(String key, {required String status, int received = 0, int total = 0}) {
+  DownloadsState _bump(String key,
+      {required String status, int received = 0, int total = 0}) {
     final current = state.items[key] ?? const DownloadItem();
     return state.copyWith(
       items: {
