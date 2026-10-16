@@ -104,47 +104,13 @@ class _DuasView extends StatelessWidget {
                 itemCount: view.entries.length,
                 itemBuilder: (context, i) {
                   final entry = view.entries[i];
-                  return Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Text(
-                            entry.text,
-                            textAlign: TextAlign.right,
-                            style: const TextStyle(
-                              fontFamily: QuranFonts.meQuran,
-                              fontSize: 17,
-                              height: 1.8,
-                            ),
-                          ),
-                          if (entry.count > 1)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                '×${entry.count.toArabicIndic}',
-                                textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          if (entry.reference != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                entry.reference!,
-                                textAlign: TextAlign.right,
-                                style: AppTheme.mutedFootnote(context),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                  return DuaCard(
+                    text: entry.text,
+                    fontFamily: QuranFonts.meQuran,
+                    fontSize: 17,
+                    height: 1.8,
+                    count: entry.count,
+                    reference: entry.reference,
                   );
                 },
               ),
@@ -169,62 +135,95 @@ class _RuqyahView extends StatelessWidget {
           itemCount: view.entries.length,
           itemBuilder: (context, i) {
             final entry = view.entries[i];
-            final colors = Theme.of(context).colorScheme;
-            return Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (entry.citation != null)
-                      Text(
-                        entry.citation!,
-                        textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: colors.secondary,
-                        ),
-                      ),
-                    Text(
-                      entry.displayText,
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontFamily: entry.isQuran
-                            ? QuranFonts.quran
-                            : QuranFonts.meQuran,
-                        fontSize: 18,
-                        height: entry.isQuran ? 2.0 : 1.8,
-                      ),
-                    ),
-                    if (entry.count > 1)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '×${entry.count.toArabicIndic}',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: colors.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    if (entry.reference != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          entry.reference!,
-                          textAlign: TextAlign.right,
-                          style: AppTheme.mutedFootnote(context),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+            return DuaCard(
+              text: entry.displayText,
+              fontFamily:
+                  entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
+              fontSize: entry.isQuran ? 18 : 17,
+              height: entry.isQuran ? 2.0 : 1.8,
+              citation: entry.citation,
+              count: entry.count,
+              reference: entry.reference,
             );
           },
         );
       },
+    );
+  }
+}
+
+class DuaCard extends StatelessWidget {
+  const DuaCard({
+    super.key,
+    required this.text,
+    required this.fontFamily,
+    required this.fontSize,
+    required this.height,
+    this.citation,
+    this.count,
+    this.reference,
+  });
+
+  final String text;
+  final String fontFamily;
+  final double fontSize;
+  final double height;
+  final String? citation;
+  final int? count;
+  final String? reference;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (citation != null)
+              Text(
+                citation!,
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: colors.secondary,
+                ),
+              ),
+            Text(
+              text,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                fontFamily: fontFamily,
+                fontSize: fontSize,
+                height: height,
+              ),
+            ),
+            if (count != null && count! > 1)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  '×${count!.toArabicIndic}',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            if (reference != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  reference!,
+                  textAlign: TextAlign.right,
+                  style: AppTheme.mutedFootnote(context),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
