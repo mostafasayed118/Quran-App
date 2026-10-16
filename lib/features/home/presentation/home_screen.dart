@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../prayer/data/prayer_time_service.dart';
 import 'home_cubit.dart';
 import 'home_state.dart';
 
@@ -44,7 +44,7 @@ class HomeScreen extends StatelessWidget {
                   Card(
                     child: ListTile(
                       leading: Icon(Icons.schedule, color: colors.secondary),
-                      title: Text(_prayerLabel(context, nextPrayer.name)),
+                      title: Text(nextPrayer.name.label(loc)),
                       subtitle: Text(loc.nextPrayer),
                       trailing: Text(
                         formatHm(nextPrayer.time),
@@ -78,18 +78,6 @@ class HomeScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  String _prayerLabel(BuildContext context, PrayerName name) {
-    final loc = AppLocalizations.of(context);
-    return switch (name) {
-      PrayerName.fajr => loc.fajr,
-      PrayerName.sunrise => loc.sunrise,
-      PrayerName.dhuhr => loc.dhuhr,
-      PrayerName.asr => loc.asr,
-      PrayerName.maghrib => loc.maghrib,
-      PrayerName.isha => loc.isha,
-    };
   }
 }
 

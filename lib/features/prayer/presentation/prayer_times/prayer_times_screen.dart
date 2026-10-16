@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/prayer_time_service.dart';
 import 'prayer_times_cubit.dart';
 import 'prayer_times_state.dart';
 
@@ -50,14 +50,6 @@ class _TimesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    String label(PrayerName name) => switch (name) {
-          PrayerName.fajr => loc.fajr,
-          PrayerName.sunrise => loc.sunrise,
-          PrayerName.dhuhr => loc.dhuhr,
-          PrayerName.asr => loc.asr,
-          PrayerName.maghrib => loc.maghrib,
-          PrayerName.isha => loc.isha,
-        };
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: state.entries.length + 1,
@@ -89,7 +81,7 @@ class _TimesList extends StatelessWidget {
               color: entry.isNext ? colors.onPrimaryContainer : colors.outline,
             ),
             title: Text(
-              label(entry.name),
+              entry.name.label(loc),
               style: TextStyle(
                 fontWeight: entry.isNext ? FontWeight.bold : null,
               ),
