@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'city_picker_cubit.dart';
@@ -27,8 +28,7 @@ class CityPickerScreen extends StatelessWidget {
           Expanded(
             child: BlocBuilder<CityPickerCubit, CityPickerState>(
               builder: (context, state) => switch (state) {
-                CityPickerLoading() =>
-                  const Center(child: CircularProgressIndicator()),
+                CityPickerLoading() => const LoadingView(),
                 CityPickerReady(:final results) => ListView.builder(
                     itemCount: results.length,
                     itemBuilder: (context, i) {

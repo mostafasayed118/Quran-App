@@ -6,6 +6,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
@@ -20,11 +21,10 @@ class ReaderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ReaderCubit, ReaderState>(
       builder: (context, state) => switch (state) {
-        ReaderLoading() =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+        ReaderLoading() => const Scaffold(body: LoadingView()),
         ReaderError(:final message) => Scaffold(
             appBar: AppBar(),
-            body: Center(child: Text(message)),
+            body: ErrorView(message),
           ),
         ReaderReady() => _ReadyView(state: state),
       },

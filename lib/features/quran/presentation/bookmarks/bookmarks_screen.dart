@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'bookmarks_cubit.dart';
 import 'bookmarks_state.dart';
@@ -14,11 +15,10 @@ class BookmarksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<BookmarksCubit, BookmarksState>(
       builder: (context, state) => switch (state) {
-        BookmarksLoading() =>
-          const Scaffold(body: Center(child: CircularProgressIndicator())),
+        BookmarksLoading() => const Scaffold(body: LoadingView()),
         BookmarksError(:final message) => Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context).bookmarks)),
-            body: Center(child: Text(message)),
+            body: ErrorView(message),
           ),
         BookmarksReady(:final entries) => Scaffold(
             appBar: AppBar(

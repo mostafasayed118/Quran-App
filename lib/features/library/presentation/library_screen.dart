@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/download_progress.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/library_catalog.dart';
@@ -30,8 +31,7 @@ class LibraryScreen extends StatelessWidget {
               ),
             ),
             body: switch (state) {
-              LibraryLoading() =>
-                const Center(child: CircularProgressIndicator()),
+              LibraryLoading() => const LoadingView(),
               final LibraryReady ready => Column(
                   children: [
                     if (ready.failed.isNotEmpty && ready.progress.isEmpty)

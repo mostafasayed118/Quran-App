@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../prayer/data/prayer_time_service.dart';
 import 'home_cubit.dart';
@@ -20,7 +21,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.appName)),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) => switch (state) {
-          HomeLoading() => const Center(child: CircularProgressIndicator()),
+          HomeLoading() => const LoadingView(),
           HomeReady(:final lastRead, :final nextPrayer) => ListView(
               padding: const EdgeInsets.all(12),
               children: [

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'azkar_cubit.dart';
 import 'azkar_state.dart';
@@ -39,7 +40,7 @@ class AzkarScreen extends StatelessWidget {
       ),
       body: BlocBuilder<AzkarCubit, AzkarState>(
         builder: (context, state) => switch (state) {
-          AzkarLoading() => const Center(child: CircularProgressIndicator()),
+          AzkarLoading() => const LoadingView(),
           AzkarBrowsing(:final collections) => ListView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: collections.length,

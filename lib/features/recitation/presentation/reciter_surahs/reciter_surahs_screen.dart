@@ -5,6 +5,7 @@ import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/download_progress.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../features/recitation/data/reciter_repository.dart';
@@ -58,9 +59,8 @@ class ReciterSurahsScreen extends StatelessWidget {
       ),
       body: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
         builder: (context, state) => switch (state) {
-          ReciterSurahsLoading() =>
-            const Center(child: CircularProgressIndicator()),
-          ReciterSurahsError(:final message) => Center(child: Text(message)),
+          ReciterSurahsLoading() => const LoadingView(),
+          ReciterSurahsError(:final message) => ErrorView(message),
           ReciterSurahsReady(
               :final row,
               :final surahNumbers,

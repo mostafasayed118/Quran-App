@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/prayer_log_repository.dart';
 import 'tracker_cubit.dart';
@@ -18,7 +19,7 @@ class TrackerScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.worshipTracker)),
       body: BlocBuilder<TrackerCubit, TrackerState>(
         builder: (context, state) => switch (state) {
-          TrackerLoading() => const Center(child: CircularProgressIndicator()),
+          TrackerLoading() => const LoadingView(),
           TrackerReady(:final today, :final streakDays, :final last7) =>
             ListView(
               padding: const EdgeInsets.all(12),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/prayer_time_service.dart';
 import 'prayer_times_cubit.dart';
@@ -19,8 +20,7 @@ class PrayerTimesScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.prayerTimes)),
       body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
         builder: (context, state) => switch (state) {
-          PrayerTimesLoading() =>
-            const Center(child: CircularProgressIndicator()),
+          PrayerTimesLoading() => const LoadingView(),
           PrayerTimesReady() when state.city == null => Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,

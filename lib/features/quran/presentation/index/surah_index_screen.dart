@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'surah_index_cubit.dart';
@@ -20,9 +21,8 @@ class SurahIndexScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.surahIndexTitle)),
       body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
         builder: (context, state) => switch (state) {
-          SurahIndexLoading() =>
-            const Center(child: CircularProgressIndicator()),
-          SurahIndexError(:final message) => Center(child: Text(message)),
+          SurahIndexLoading() => const LoadingView(),
+          SurahIndexError(:final message) => ErrorView(message),
           SurahIndexLoaded(:final surahs) => Column(
               children: [
                 Padding(

@@ -6,7 +6,9 @@ import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/search_field.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/reciter_repository.dart';
 import 'reciters_cubit.dart';
@@ -31,9 +33,8 @@ class RecitersScreen extends StatelessWidget {
       ),
       body: BlocBuilder<RecitersCubit, RecitersState>(
         builder: (context, state) => switch (state) {
-          RecitersLoading() =>
-            const Center(child: CircularProgressIndicator()),
-          RecitersError(:final message) => Center(child: Text(message)),
+          RecitersLoading() => const LoadingView(),
+          RecitersError(:final message) => ErrorView(message),
           RecitersReady(:final reciters, :final dataError) => Column(
               children: [
                 if (dataError != null)
@@ -83,41 +84,16 @@ class _RecitersList extends StatelessWidget {
     for (final row in reciters) {
       final featured = isFeaturedReciterRow(row);
       if (featured && !featuredHeaderDone) {
-        children.add(_SectionHeader(title: loc.featured));
+        children.add(SectionHeader(title: loc.featured));
         featuredHeaderDone = true;
       }
       if (!featured && !allHeaderDone) {
-        children.add(_SectionHeader(title: loc.allReciters));
+        children.add(SectionHeader(title: loc.allReciters));
         allHeaderDone = true;
       }
       children.add(_ReciterRow(reciter: row));
     }
     return ListView(children: children);
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
-      child: Align(
-        alignment: AlignmentDirectional.centerEnd,
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: colors.onSurfaceVariant,
-          ),
-        ),
-      ),
-    );
   }
 }
 

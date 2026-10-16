@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'duas_cubit.dart';
 import 'duas_state.dart';
@@ -51,8 +52,7 @@ class DuasScreen extends StatelessWidget {
             ),
             Expanded(
               child: switch (state) {
-                DuasLoading() =>
-                  const Center(child: CircularProgressIndicator()),
+                DuasLoading() => const LoadingView(),
                 DuasInView() => const _DuasView(),
                 RuqyahInView() => const _RuqyahView(),
               },
