@@ -811,6 +811,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'عذرًا، حدث خطأ — حاول مرة أخرى'**
   String get genericError;
+
+  /// No description provided for @noResults.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا نتائج مطابقة'**
+  String get noResults;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'surah_index_cubit.dart';
@@ -34,10 +35,13 @@ class SurahIndexScreen extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: surahs.length,
-                    itemBuilder: (context, i) => _SurahRow(surah: surahs[i]),
-                  ),
+                  child: surahs.isEmpty
+                      ? EmptyState(loc.noResults)
+                      : ListView.builder(
+                          itemCount: surahs.length,
+                          itemBuilder: (context, i) =>
+                              _SurahRow(surah: surahs[i]),
+                        ),
                 ),
               ],
             ),

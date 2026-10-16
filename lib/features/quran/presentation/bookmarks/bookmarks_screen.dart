@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'bookmarks_cubit.dart';
 import 'bookmarks_state.dart';
@@ -25,8 +26,10 @@ class BookmarksScreen extends StatelessWidget {
               title: Text(AppLocalizations.of(context).bookmarks),
             ),
             body: entries.isEmpty
-                ? Center(
-                    child: Text(AppLocalizations.of(context).noBookmarks),
+                ? EmptyState(
+                    AppLocalizations.of(context).noBookmarks,
+                    actionLabel: AppLocalizations.of(context).quran,
+                    onAction: () => context.push('/quran'),
                   )
                 : ListView.builder(
                     itemCount: entries.length,

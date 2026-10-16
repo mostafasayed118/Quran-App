@@ -394,4 +394,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get genericError => 'عذرًا، حدث خطأ — حاول مرة أخرى';
+
+  @override
+  String get noResults => 'لا نتائج مطابقة';
 }

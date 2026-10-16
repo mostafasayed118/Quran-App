@@ -395,4 +395,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get genericError => 'Sorry, something went wrong — try again';
+
+  @override
+  String get noResults => 'No matching results';
 }

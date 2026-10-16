@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'city_picker_cubit.dart';
@@ -46,25 +47,27 @@ class CityPickerScreen extends StatelessWidget {
                       ),
                       const Divider(height: 1),
                       Expanded(
-                        child: ListView.builder(
-                          itemCount: results.length,
-                          itemBuilder: (context, i) {
-                            final city = results[i];
-                            return ListTile(
-                              title: Text(city.nameAr),
-                              subtitle: Text(city.nameEn),
-                              trailing: Text(city.id),
-                              onTap: () async {
-                                await context
-                                    .read<CityPickerCubit>()
-                                    .persist(city);
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(true);
-                                }
-                              },
-                            );
-                          },
-                        ),
+                        child: results.isEmpty
+                            ? EmptyState(loc.noResults)
+                            : ListView.builder(
+                                itemCount: results.length,
+                                itemBuilder: (context, i) {
+                                  final city = results[i];
+                                  return ListTile(
+                                    title: Text(city.nameAr),
+                                    subtitle: Text(city.nameEn),
+                                    trailing: Text(city.id),
+                                    onTap: () async {
+                                      await context
+                                          .read<CityPickerCubit>()
+                                          .persist(city);
+                                      if (context.mounted) {
+                                        Navigator.of(context).pop(true);
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),
