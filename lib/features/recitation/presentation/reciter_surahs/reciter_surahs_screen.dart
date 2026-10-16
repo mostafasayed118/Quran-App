@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/download_progress.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../features/recitation/data/reciter_repository.dart';
 import '../downloads/downloads_cubit.dart';
@@ -147,22 +149,7 @@ class _SurahDownloadRow extends StatelessWidget {
 
   Widget _buildLeading(BuildContext context, ColorScheme colors) {
     if (!parseSurahList(reciter.surahList).contains(surahNumber)) {
-      return Container(
-        width: 38,
-        height: 38,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Text(
-          surahNumber.toArabicIndic,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: colors.primary,
-          ),
-        ),
-      );
+      return ArabicBadge(surahNumber.toArabicIndic);
     }
     return IconButton(
       tooltip: AppLocalizations.of(context).playTooltip,
@@ -194,21 +181,14 @@ class _SurahDownloadRow extends StatelessWidget {
         );
       case 'downloading':
         final item = this.item!;
-        final progress = item.total > 0 ? item.received / item.total : null;
-        return SizedBox(
+        return DownloadProgressLabel(
+          received: item.received,
+          total: item.total,
           width: 96,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${item.received}/${item.total}',
-                style: TextStyle(
-                    fontSize: 11, color: colors.onSurfaceVariant),
-              ),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(value: progress),
-            ],
+          gap: 4,
+          labelStyle: TextStyle(
+            fontSize: 11,
+            color: colors.onSurfaceVariant,
           ),
         );
       case 'failed':

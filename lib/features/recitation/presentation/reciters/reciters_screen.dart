@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/reciter_repository.dart';
 import 'reciters_cubit.dart';
@@ -49,22 +51,9 @@ class RecitersScreen extends StatelessWidget {
                   ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-                  child: TextField(
+                  child: SearchField(
+                    hint: loc.searchReciters,
                     onChanged: context.read<RecitersCubit>().setQuery,
-                    textAlign: TextAlign.right,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: loc.searchReciters,
-                      filled: true,
-                      fillColor: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withValues(alpha: 0.08),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
                   ),
                 ),
                 Expanded(
@@ -149,22 +138,9 @@ class _ReciterRow extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       onTap: () => context.push(
           '/recitation/reciter?row=${Uri.encodeComponent(reciter.id)}'),
-      leading: Container(
-        width: 38,
-        height: 38,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Text(
-          initial,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: colors.primary,
-          ),
-        ),
+      leading: ArabicBadge(
+        initial,
+        textStyle: const TextStyle(fontSize: 16),
       ),
       title: Text(
         reciter.reciterName,

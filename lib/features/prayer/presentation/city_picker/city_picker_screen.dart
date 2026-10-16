@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'city_picker_cubit.dart';
 import 'city_picker_state.dart';
@@ -17,11 +18,8 @@ class CityPickerScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-            child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: loc.searchCity,
-              ),
+            child: SearchField(
+              hint: loc.searchCity,
               onChanged: (query) =>
                   context.read<CityPickerCubit>().search(query),
             ),

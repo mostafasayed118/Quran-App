@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/ar_badge.dart';
+import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'surah_index_cubit.dart';
 import 'surah_index_state.dart';
@@ -25,22 +27,9 @@ class SurahIndexScreen extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
-                  child: TextField(
+                  child: SearchField(
+                    hint: loc.searchSurahHint,
                     onChanged: context.read<SurahIndexCubit>().setQuery,
-                    textAlign: TextAlign.right,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: loc.searchSurahHint,
-                      filled: true,
-                      fillColor: Theme.of(context)
-                          .colorScheme
-                          .secondary
-                          .withValues(alpha: 0.08),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
                   ),
                 ),
                 Expanded(
@@ -71,19 +60,7 @@ class _SurahRow extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
       onTap: () => context
           .push('/quran/reader?surah=${surah.id}&ayah=0'),
-      leading: Container(
-        width: 38,
-        height: 38,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: colors.primary.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(11),
-        ),
-        child: Text(
-          '${surah.id}',
-          style: TextStyle(fontWeight: FontWeight.bold, color: colors.primary),
-        ),
-      ),
+      leading: ArabicBadge('${surah.id}'),
       title: Text(
         surah.nameAr,
         style: const TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20),

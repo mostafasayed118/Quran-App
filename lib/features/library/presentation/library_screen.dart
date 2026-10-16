@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/widgets/download_progress.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/library_catalog.dart';
 import 'library_cubit.dart';
@@ -152,21 +153,11 @@ class _PackRow extends StatelessWidget {
     final Widget trailing;
     if (progress != null) {
       final (received, total) = progress;
-      trailing = SizedBox(
-        width: 132,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              '${_mb(received).toArabicIndicDigits} / ${_mb(total).toArabicIndicDigits} MB',
-            ),
-            const SizedBox(height: 6),
-            LinearProgressIndicator(
-              value: total > 0 ? (received / total).clamp(0.0, 1.0) : null,
-            ),
-          ],
-        ),
+      trailing = DownloadProgressLabel(
+        received: received,
+        total: total,
+        format: (r, t) =>
+            '${_mb(r).toArabicIndicDigits} / ${_mb(t).toArabicIndicDigits} MB',
       );
     } else if (installed) {
       trailing = IconButton(
