@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../data/heading_service.dart';
 import 'qibla_cubit.dart';
 import 'qibla_state.dart';
 
@@ -20,10 +21,11 @@ class QiblaScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.qibla)),
       body: BlocBuilder<QiblaCubit, QiblaState>(
         builder: (context, state) {
-          final (:city, :bearing) = switch (state) {
+          final (:city, :bearing, :heading) = switch (state) {
             QiblaReady() => (
                 city: state.city,
                 bearing: state.bearing,
+                heading: state.heading,
               ),
           };
           if (city == null || bearing == null) {
@@ -63,8 +65,9 @@ class QiblaScreen extends StatelessWidget {
                     painter:
                         _DialPainter(colors: Theme.of(context).colorScheme),
                     child: Center(
-                      child: Transform.rotate(
-                        angle: bearing * math.pi / 180.0,
+                      child: AnimatedRotation(
+                        turns: dialAngleDeg(bearing, heading ?? 0) / 360.0,
+                        duration: const Duration(milliseconds: 180),
                         child: Icon(
                           Icons.navigation,
                           size: 72,
@@ -75,6 +78,15 @@ class QiblaScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              if (heading != null) ...[
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    loc.compassLive,
+                    style: AppTheme.mutedFootnote(context),
+                  ),
+                ),
+              ],
               const SizedBox(height: 16),
               Center(
                 child: Text(

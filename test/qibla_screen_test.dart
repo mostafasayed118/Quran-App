@@ -8,6 +8,7 @@ import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
+import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_cubit.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_screen.dart';
@@ -39,9 +40,17 @@ void main() {
     await db.close();
   });
 
-  Future<void> pumpHost(WidgetTester tester, {required bool seeded}) async {
+  Future<void> pumpHost(
+    WidgetTester tester, {
+    required bool seeded,
+    HeadingService? heading,
+  }) async {
     if (seeded) await repo.select(cairoCity);
-    final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
+    final cubit = QiblaCubit(
+      city: repo,
+      qibla: FakeQiblaService(),
+      heading: heading,
+    );
     addTearDown(cubit.close);
     await tester.pumpWidget(BlocProvider<QiblaCubit>.value(
       value: cubit,
@@ -91,5 +100,29 @@ void main() {
 
     expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
+  });
+
+  testWidgets('live heading rotates the dial by bearing minus heading',
+      (tester) async {
+    await pumpHost(
+      tester,
+      seeded: true,
+      heading: HeadingService(streamFactory: () => Stream.value(90.0)),
+    );
+
+    final rotation =
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
+    expect(rotation.turns, closeTo((137.2 - 90) / 360.0, 1e-9));
+    expect(find.text('المقياس حي'), findsOneWidget);
+  });
+
+  testWidgets('without a live heading the dial stays static and no hint shows',
+      (tester) async {
+    await pumpHost(tester, seeded: true);
+
+    final rotation =
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
+    expect(rotation.turns, closeTo(137.2 / 360.0, 1e-9));
+    expect(find.text('المقياس حي'), findsNothing);
   });
 }

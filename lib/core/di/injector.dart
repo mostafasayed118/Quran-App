@@ -30,6 +30,7 @@ import '../../features/tracker/presentation/tracker_cubit.dart';
 import '../../features/zakat/data/zakat_calculator.dart';
 import '../../features/zakat/presentation/zakat_cubit.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
+import '../../features/qibla/data/heading_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
 import '../../features/recitation/data/audio_downloader.dart';
 import '../../features/recitation/data/reciter_repository.dart';
@@ -62,6 +63,7 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
   getIt.registerLazySingleton<PrayerTimeService>(() => const PrayerTimeService());
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
+  getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<TasbihCubit>(

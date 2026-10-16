@@ -55,6 +55,7 @@ import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
 import '../features/recitation/presentation/reciters/reciters_screen.dart';
 import '../features/recitation/presentation/playback/playback_cubit.dart';
+import '../features/qibla/data/heading_service.dart';
 import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
@@ -136,6 +137,7 @@ abstract final class AppRouter {
           create: (_) => QiblaCubit(
             city: getIt<CityRepository>(),
             qibla: getIt<QiblaService>(),
+            heading: getIt<HeadingService>(),
           ),
           child: const QiblaScreen(),
         ),

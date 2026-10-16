@@ -17,6 +17,7 @@ T _$identity<T>(T value) => value;
 mixin _$QiblaState {
   City? get city;
   double? get bearing;
+  double? get heading;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -33,19 +34,21 @@ mixin _$QiblaState {
             other is QiblaState &&
             (identical(other.city, _this.city) || other.city == _this.city) &&
             (identical(other.bearing, _this.bearing) ||
-                other.bearing == _this.bearing));
+                other.bearing == _this.bearing) &&
+            (identical(other.heading, _this.heading) ||
+                other.heading == _this.heading));
   }
 
   @override
   int get hashCode {
     final _this = this as QiblaState;
-    return Object.hash(runtimeType, _this.city, _this.bearing);
+    return Object.hash(runtimeType, _this.city, _this.bearing, _this.heading);
   }
 
   @override
   String toString() {
     final _this = this as QiblaState;
-    return 'QiblaState(city: ${_this.city}, bearing: ${_this.bearing})';
+    return 'QiblaState(city: ${_this.city}, bearing: ${_this.bearing}, heading: ${_this.heading})';
   }
 }
 
@@ -55,7 +58,7 @@ abstract mixin class $QiblaStateCopyWith<$Res> {
           QiblaState value, $Res Function(QiblaState) _then) =
       _$QiblaStateCopyWithImpl;
   @useResult
-  $Res call({City? city, double? bearing});
+  $Res call({City? city, double? bearing, double? heading});
 }
 
 /// @nodoc
@@ -72,6 +75,7 @@ class _$QiblaStateCopyWithImpl<$Res> implements $QiblaStateCopyWith<$Res> {
   $Res call({
     Object? city = freezed,
     Object? bearing = freezed,
+    Object? heading = freezed,
   }) {
     return _then(QiblaState.ready(
       city: freezed == city
@@ -81,6 +85,10 @@ class _$QiblaStateCopyWithImpl<$Res> implements $QiblaStateCopyWith<$Res> {
       bearing: freezed == bearing
           ? _self.bearing
           : bearing // ignore: cast_nullable_to_non_nullable
+              as double?,
+      heading: freezed == heading
+          ? _self.heading
+          : heading // ignore: cast_nullable_to_non_nullable
               as double?,
     ));
   }
@@ -177,13 +185,13 @@ extension QiblaStatePatterns on QiblaState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(City? city, double? bearing)? ready,
+    TResult Function(City? city, double? bearing, double? heading)? ready,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case QiblaReady() when ready != null:
-        return ready(_that.city, _that.bearing);
+        return ready(_that.city, _that.bearing, _that.heading);
       case _:
         return orElse();
     }
@@ -204,12 +212,13 @@ extension QiblaStatePatterns on QiblaState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(City? city, double? bearing) ready,
+    required TResult Function(City? city, double? bearing, double? heading)
+        ready,
   }) {
     final _that = this;
     switch (_that) {
       case QiblaReady():
-        return ready(_that.city, _that.bearing);
+        return ready(_that.city, _that.bearing, _that.heading);
     }
   }
 
@@ -227,12 +236,12 @@ extension QiblaStatePatterns on QiblaState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(City? city, double? bearing)? ready,
+    TResult? Function(City? city, double? bearing, double? heading)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case QiblaReady() when ready != null:
-        return ready(_that.city, _that.bearing);
+        return ready(_that.city, _that.bearing, _that.heading);
       case _:
         return null;
     }
@@ -242,7 +251,8 @@ extension QiblaStatePatterns on QiblaState {
 /// @nodoc
 
 class QiblaReady implements QiblaState {
-  const QiblaReady({this.city = null, this.bearing = null});
+  const QiblaReady(
+      {this.city = null, this.bearing = null, this.heading = null});
 
   @override
   @JsonKey()
@@ -250,6 +260,9 @@ class QiblaReady implements QiblaState {
   @override
   @JsonKey()
   final double? bearing;
+  @override
+  @JsonKey()
+  final double? heading;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -265,17 +278,18 @@ class QiblaReady implements QiblaState {
         (other.runtimeType == runtimeType &&
             other is QiblaReady &&
             (identical(other.city, city) || other.city == city) &&
-            (identical(other.bearing, bearing) || other.bearing == bearing));
+            (identical(other.bearing, bearing) || other.bearing == bearing) &&
+            (identical(other.heading, heading) || other.heading == heading));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, city, bearing);
+    return Object.hash(runtimeType, city, bearing, heading);
   }
 
   @override
   String toString() {
-    return 'QiblaState.ready(city: $city, bearing: $bearing)';
+    return 'QiblaState.ready(city: $city, bearing: $bearing, heading: $heading)';
   }
 }
 
@@ -287,7 +301,7 @@ abstract mixin class $QiblaReadyCopyWith<$Res>
       _$QiblaReadyCopyWithImpl;
   @override
   @useResult
-  $Res call({City? city, double? bearing});
+  $Res call({City? city, double? bearing, double? heading});
 }
 
 /// @nodoc
@@ -304,6 +318,7 @@ class _$QiblaReadyCopyWithImpl<$Res> implements $QiblaReadyCopyWith<$Res> {
   $Res call({
     Object? city = freezed,
     Object? bearing = freezed,
+    Object? heading = freezed,
   }) {
     return _then(QiblaReady(
       city: freezed == city
@@ -313,6 +328,10 @@ class _$QiblaReadyCopyWithImpl<$Res> implements $QiblaReadyCopyWith<$Res> {
       bearing: freezed == bearing
           ? _self.bearing
           : bearing // ignore: cast_nullable_to_non_nullable
+              as double?,
+      heading: freezed == heading
+          ? _self.heading
+          : heading // ignore: cast_nullable_to_non_nullable
               as double?,
     ));
   }

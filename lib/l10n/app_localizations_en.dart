@@ -344,4 +344,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationUnavailable => 'Could not get location — pick manually';
+
+  @override
+  String get compassLive => 'Dial follows your device';
 }

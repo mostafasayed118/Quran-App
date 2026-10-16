@@ -343,4 +343,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationUnavailable => 'تعذّر تحديد الموقع — اختر يدويًا';
+
+  @override
+  String get compassLive => 'المقياس حي';
 }

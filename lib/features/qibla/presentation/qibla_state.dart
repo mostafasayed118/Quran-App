@@ -9,5 +9,6 @@ sealed class QiblaState with _$QiblaState {
   const factory QiblaState.ready({
     @Default(null) City? city,
     @Default(null) double? bearing,
+    @Default(null) double? heading,
   }) = QiblaReady;
 }

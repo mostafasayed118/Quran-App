@@ -715,6 +715,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذّر تحديد الموقع — اختر يدويًا'**
   String get locationUnavailable;
+
+  /// No description provided for @compassLive.
+  ///
+  /// In ar, this message translates to:
+  /// **'المقياس حي'**
+  String get compassLive;
 }
 
 class _AppLocalizationsDelegate
