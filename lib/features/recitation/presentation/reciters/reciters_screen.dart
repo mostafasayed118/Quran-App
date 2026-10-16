@@ -80,22 +80,31 @@ class _RecitersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final children = <Widget>[];
+    // Lightweight entries (headers + rows) built once per state; the heavy
+    // ListTile widgets now render lazily through the builder.
+    final entries = <Object>[];
     var featuredHeaderDone = false;
     var allHeaderDone = false;
     for (final row in reciters) {
       final featured = isFeaturedReciterRow(row);
       if (featured && !featuredHeaderDone) {
-        children.add(SectionHeader(title: loc.featured));
+        entries.add(loc.featured);
         featuredHeaderDone = true;
       }
       if (!featured && !allHeaderDone) {
-        children.add(SectionHeader(title: loc.allReciters));
+        entries.add(loc.allReciters);
         allHeaderDone = true;
       }
-      children.add(_ReciterRow(reciter: row));
+      entries.add(row);
     }
-    return ListView(children: children);
+    return ListView.builder(
+      itemCount: entries.length,
+      itemBuilder: (context, index) => switch (entries[index]) {
+        final String title => SectionHeader(title: title),
+        final ReciterRow row => _ReciterRow(reciter: row),
+        _ => const SizedBox.shrink(),
+      },
+    );
   }
 }
 
