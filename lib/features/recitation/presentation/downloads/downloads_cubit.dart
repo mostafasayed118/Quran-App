@@ -32,8 +32,20 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     emit(state.copyWith(items: items));
   }
 
-  Future<void> enqueue(String rowId, int surahNumber) async {
-    final key = _key(rowId, surahNumber);
+  /// Removes an installed download through the existing
+  /// [AudioDownloader.removeDownload] (file + DB row) and drops its entry
+  /// from the state so rows re-render — the delete affordance's refresh path
+  /// (UX-FIX 2; mirrors LibraryCubit.uninstall, no new state machinery).
+  Future<void> removeDone(String rowId, int surahNumber) async {
+    await _downloader.removeDownload(rowId, surahNumber);
+    if (isClosed) return;
+    emit(state.copyWith(items: {
+      for (final entry in state.items.entries)
+        if (entry.key != '$rowId-$surahNumber') entry.key: entry.value,
+    }));
+  }
+
+  Future<void> enqueue(String rowId, int surahNumber) async {    final key = _key(rowId, surahNumber);
     final current = state.items[key];
     if (current != null &&
         (current.status == 'downloading' || current.status == 'done')) {

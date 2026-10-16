@@ -144,6 +144,31 @@ class _SurahDownloadRow extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmDelete(
+      BuildContext context, DownloadsCubit cubit) async {
+    final loc = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(loc.libraryDelete),
+        content: Text(name),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(loc.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(loc.libraryDelete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await cubit.removeDone(reciter.id, surahNumber);
+    }
+  }
+
   Widget _buildLeading(BuildContext context, ColorScheme colors) {
     if (!parseSurahList(reciter.surahList).contains(surahNumber)) {
       return ArabicBadge(surahNumber.toArabicIndic);
@@ -166,15 +191,25 @@ class _SurahDownloadRow extends StatelessWidget {
   ) {
     switch (status) {
       case 'done':
-        return Container(
-          width: 38,
-          height: 38,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            border: Border.all(color: colors.secondary, width: 1.5),
-            borderRadius: BorderRadius.circular(11),
-          ),
-          child: Icon(Icons.check, color: colors.secondary, size: 20),
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(color: colors.secondary, width: 1.5),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(Icons.check, color: colors.secondary, size: 20),
+            ),
+            IconButton(
+              tooltip: AppLocalizations.of(context).libraryDelete,
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => _confirmDelete(context, cubit),
+            ),
+          ],
         );
       case 'downloading':
         final item = this.item!;

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,6 +106,63 @@ void main() {
 
     expect(downloads.enqueuedKey, '51-53-1');
   });
+
+  testWidgets('done row exposes delete; confirm delegates to removeDone',
+      (tester) async {
+    final dir =
+        Directory('${tempRoot.path}/audio/51-53')..createSync(recursive: true);
+    final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
+    await db.into(db.downloads).insert(DownloadsCompanion.insert(
+          reciterId: '51-53',
+          surahId: 1,
+          status: 'done',
+          path: file.path,
+          bytes: const Value(3),
+        ));
+    final downloads = _StaticDownloadsCubit(db, tempRoot);
+    addTearDown(downloads.close);
+    await pumpSurahsHost(tester, downloads);
+
+    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+    expect(find.byIcon(Icons.check), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.delete_outline));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+
+    await tester.tap(find.text('حذف').last);
+    await tester.pumpAndSettle();
+
+    expect(downloads.removedKeys, contains('51-53-1'));
+  });
+
+  test('removeDone removes file + DB row and drops the state entry',
+      () async {
+    final dir =
+        Directory('${tempRoot.path}/audio/51-53')..createSync(recursive: true);
+    final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
+    await db.into(db.downloads).insert(DownloadsCompanion.insert(
+          reciterId: '51-53',
+          surahId: 1,
+          status: 'done',
+          path: file.path,
+          bytes: const Value(3),
+        ));
+    final downloads = DownloadsCubit(
+      downloader:
+          AudioDownloader(db, audioRootResolver: () async => tempRoot),
+      reciters: _StaticReciterRepository(db),
+    );
+    addTearDown(downloads.close);
+    await downloads.refreshDone();
+    expect(downloads.state.items.containsKey('51-53-1'), isTrue);
+
+    await downloads.removeDone('51-53', 1);
+
+    expect(file.existsSync(), isFalse);
+    expect(await db.select(db.downloads).get(), isEmpty);
+    expect(downloads.state.items.containsKey('51-53-1'), isFalse);
+  });
 }
 
 class _StaticReciterRepository extends ReciterRepository {
@@ -167,9 +225,15 @@ class _StaticDownloadsCubit extends DownloadsCubit {
         );
 
   String? enqueuedKey;
+  final List<String> removedKeys = <String>[];
 
   @override
   Future<void> enqueue(String rowId, int surahNumber) async {
     enqueuedKey = '$rowId-$surahNumber';
+  }
+
+  @override
+  Future<void> removeDone(String rowId, int surahNumber) async {
+    removedKeys.add('$rowId-$surahNumber');
   }
 }
