@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -24,7 +26,8 @@ class SurahIndexScreen extends StatelessWidget {
       body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
         builder: (context, state) => switch (state) {
           SurahIndexLoading() => const LoadingView(),
-          SurahIndexError(:final message) => ErrorView(message),
+          SurahIndexError(:final message) =>
+            _errorPane(loc, message, 'surah_index'),
           SurahIndexLoaded(:final surahs) => Column(
               children: [
                 Padding(
@@ -49,6 +52,11 @@ class SurahIndexScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
 }
 
 class _SurahRow extends StatelessWidget {

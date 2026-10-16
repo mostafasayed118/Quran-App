@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,11 @@ import '../../../../l10n/app_localizations.dart';
 import '../../data/pack_downloader.dart';
 import 'ayah_sheet_cubit.dart';
 import 'ayah_sheet_state.dart';
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
+}
 
 /// Bottom sheet reading the INSTALLED tafsir/translation of one ayah;
 /// empty states route to /library. Resolves its deps via getIt so the
@@ -57,7 +64,8 @@ class _AyahSheetView extends StatelessWidget {
         final Widget content = switch (state) {
           AyahSheetLoading() =>
             const Center(child: CircularProgressIndicator()),
-          AyahSheetError(:final message) => ErrorView(message),
+          AyahSheetError(:final message) =>
+            _errorPane(loc, message, 'ayah_sheet'),
           final AyahSheetReady ready => DefaultTabController(
               length: 2,
               child: Column(

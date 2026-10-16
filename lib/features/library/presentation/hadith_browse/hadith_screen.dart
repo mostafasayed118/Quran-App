@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -7,6 +9,11 @@ import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hadith_cubit.dart';
 import 'hadith_state.dart';
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
+}
 
 class HadithScreen extends StatelessWidget {
   const HadithScreen({super.key});
@@ -46,7 +53,8 @@ class HadithScreen extends StatelessWidget {
           final Widget content = switch (state) {
             HadithLoading() =>
               const Center(child: CircularProgressIndicator()),
-            HadithError(message: final message) => ErrorView(message),
+            HadithError(message: final message) =>
+              _errorPane(loc, message, 'hadith'),
             final HadithReady ready => Column(
                 children: [
                   Expanded(

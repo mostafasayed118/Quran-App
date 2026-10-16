@@ -222,6 +222,34 @@ void main() {
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.textContaining('Zuhayr bin Harb'), findsOneWidget);
     });
+
+    testWidgets('error surface shows localized copy, never the raw message',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        home: BlocProvider<HadithCubit>.value(
+          value: HadithCubit(
+            downloader: _ThrowingPageDownloader(db),
+            packId: 'en-muslim',
+          ),
+          child: const HadithScreen(),
+        ),
+      ));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
+      expect(find.textContaining('page fetch failed'), findsNothing);
+    });
   });
 }
 
