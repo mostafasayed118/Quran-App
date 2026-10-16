@@ -258,6 +258,48 @@ void main() {
     expect(beyond.$2, isFalse);
   });
 
+  test('repeated reads are served from cache, not re-decoded', () async {
+    final fixture =
+        File('test/fixtures/translation_ara_sirajtafseer_excerpt.json');
+    if (!fixture.existsSync()) {
+      markTestSkipped('fixtures dir does not resolve from this runner');
+    }
+    await serve((_) async {});
+    final libraryDir = Directory('${tempRoot.path}/library');
+    await libraryDir.create(recursive: true);
+    await fixture.copy('${libraryDir.path}/tp1.json');
+    await seedRow('tp1', LibraryPackKind.translation);
+
+    final first = await downloader.translationFor('tp1', 1, 1);
+    expect(first, isNotNull);
+
+    // Mutate the file behind the downloader's back: a cached read must still
+    // serve the original text, proving the file was not re-read.
+    File('${libraryDir.path}/tp1.json')
+        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
+    expect(await downloader.translationFor('tp1', 1, 1), first);
+
+    // Uninstall clears the cache: the same id resolves from a fresh file.
+    await downloader.uninstall('tp1');
+    File('${libraryDir.path}/tp1.json')
+        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"FRESH"}]}');
+    await seedRow('tp1', LibraryPackKind.translation);
+    expect(await downloader.translationFor('tp1', 1, 1), 'FRESH');
+  });
+
+  test('install primes the read cache (no re-read after install)', () async {
+    await serve((req) async {
+      req.response.headers.contentType = ContentType.json;
+      req.response
+          .write('{"quran":[{"chapter":1,"verse":1,"text":"INSTALLED"}]}');
+      await req.response.close();
+    });
+    final file = await downloader.install(translationPack(id: 'tpc'));
+    file
+        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
+    expect(await downloader.translationFor('tpc', 1, 1), 'INSTALLED');
+  });
+
   test('uninstall removes both the file and the registry row', () async {
     await serve((req) async {
       req.response.headers.contentType = ContentType.json;

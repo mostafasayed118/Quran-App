@@ -42,6 +42,12 @@ class PackDownloader {
   final Dio _dio;
   final Future<Directory> Function()? _rootResolver;
 
+  /// Decoded-pack cache: the read API is called per ayah-sheet open and per
+  /// hadith page turn, and re-reading + re-decoding multi-MB pack files on
+  /// the UI isolate per call froze the app. Keyed by packId; the only writers
+  /// of pack files (install/uninstall) invalidate it.
+  final Map<String, dynamic> _decodedCache = {};
+
   static const libraryFolderName = 'library';
 
   Future<Directory> _root() async {
@@ -134,7 +140,7 @@ class PackDownloader {
       }
       await sink.close();
 
-      await _sniffIntegrity(pack.id, pack.kind, partFile);
+      final decoded = await _sniffIntegrity(pack.id, pack.kind, partFile);
 
       final promoted = await partFile.rename(partFile.path
           .substring(0, partFile.path.length - '.part'.length));
@@ -147,8 +153,10 @@ class PackDownloader {
         version: pack.version,
         sizeMb: sizeMb,
       );
+      _decodedCache[pack.id] = decoded;
       return promoted;
     } on Object {
+      _decodedCache.remove(pack.id);
       if (await partFile.exists()) {
         await partFile.delete();
       }
@@ -156,7 +164,9 @@ class PackDownloader {
     }
   }
 
-  Future<void> _sniffIntegrity(
+  /// Validates the downloaded shape and returns the decoded JSON so the
+  /// caller can prime the read cache instead of decoding the file again.
+  Future<dynamic> _sniffIntegrity(
       String packId, LibraryPackKind kind, File part) async {
     final raw = await part.readAsString();
     dynamic decoded;
@@ -186,6 +196,7 @@ class PackDownloader {
           throw PackFailure('wrapper for "$packId" has no tafsirs');
         }
     }
+    return decoded;
   }
 
   String _wrapperPrefix(String packId) =>
@@ -237,6 +248,7 @@ class PackDownloader {
             ..where((p) => p.packId.equals(packId)))
           .go();
     }
+    _decodedCache.remove(packId);
   }
 
   /// True when the pack is installed AND at exactly [version].
@@ -270,12 +282,18 @@ class PackDownloader {
   Future<dynamic> _decodeInstalled(String packId,
       {String? key, bool Function(List)? nonEmpty}) async {
     final path = await packPath(packId);
-    if (path == null) return null;
-    dynamic decoded;
-    try {
-      decoded = jsonDecode(File(path).readAsStringSync());
-    } on Object {
-      return null; // corrupted pack reads as absent, never throws upward
+    if (path == null) {
+      _decodedCache.remove(packId);
+      return null;
+    }
+    var decoded = _decodedCache[packId];
+    if (decoded == null) {
+      try {
+        decoded = jsonDecode(File(path).readAsStringSync());
+      } on Object {
+        return null; // corrupted pack reads as absent, never throws upward
+      }
+      _decodedCache[packId] = decoded;
     }
     if (key != null && decoded is Map<String, dynamic>) {
       final list = decoded[key];
