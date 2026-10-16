@@ -36,9 +36,9 @@
 # 5) adb logcat -d scan for "FATAL EXCEPTION" (fresh buffer: -c before start) -> none required (else FAIL 5)
 # 6) print DEVICE-SMOKE: PASS and exit 0; any failure prints DEVICE-SMOKE: FAIL <n> and exits nonzero
 ```
-- [ ] **Step 1:** start gate verbatim (`git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version`) — expected HEAD `b84776b` or later intervening `docs/superpowers/` only; record it. Baseline `flutter test` once → record B (expect 155; MEASURE).
-- [ ] **Step 2:** implement the tool; run it against the CURRENT W6-built debug APK (rebuild first if stale: `flutter build apk --debug`) → expect PASS on the Infinix. This also re-proves the workspace on-device before any change.
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1:** start gate verbatim (`git rev-parse --short=7 HEAD; git status --porcelain; git branch --show-current; flutter --version`) — expected HEAD `b84776b` or later intervening `docs/superpowers/` only; record it. Baseline `flutter test` once → record B (expect 155; MEASURE).
+- [x] **Step 2:** implement the tool; run it against the CURRENT W6-built debug APK (rebuild first if stale: `flutter build apk --debug`) → expect PASS on the Infinix. This also re-proves the workspace on-device before any change.
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 git add tools/device_smoke.ps1
@@ -56,9 +56,9 @@ git commit -m "feat(w7a): device smoke tool (install, launch, alive, fatal-scan)
 - Create: `test/background_init_guard_test.dart` (pure guard only — see below)
 
 **Design ruling (PM):** with `just_audio_background`, setAudioSource grows a required tag. The facade keeps its contract by threading an internal `_lastMediaItem` built from the cubit-provided metadata — playback_service.dart source stays pure; the CUBIT passes title fields through `loadAndPlay(source, mediaTitle: String, artist: String)` defaulting to empty. Contract change → EXACTLY one optional named param added to the interface + facade + both call sites (cubit passes from its state). If the real API needs more → STOP.
-- [ ] **Step 1 (red):** pure guard test — `BackgroundInitGuard.requiredInitCalled(bool)` style helper (file `lib/features/recitation/playback/background_init_guard.dart`, pure) that the app uses in `main.dart`: if `JustAudioBackground.init` throws/missed, run must STILL complete per package contract — quote the package's actual failure mode from cache source and test OUR wrapper decision against it (document the chosen semantics).
-- [ ] **Step 2:** admission + impl swap + init wiring; gates; then **DEVICE PROOF**: `tools/device_smoke.ps1` PASS, plus `adb shell dumpsys media_session | findstr quranyahdi` prints an active session while a surah plays, plus minimization keeps audio (record the two commands' outputs).
-- [ ] **Step 3: Gates + commit**
+- [x] **Step 1 (red):** pure guard test — `BackgroundInitGuard.requiredInitCalled(bool)` style helper (file `lib/features/recitation/playback/background_init_guard.dart`, pure) that the app uses in `main.dart`: if `JustAudioBackground.init` throws/missed, run must STILL complete per package contract — quote the package's actual failure mode from cache source and test OUR wrapper decision against it (document the chosen semantics).
+- [x] **Step 2:** admission + impl swap + init wiring; gates; then **DEVICE PROOF**: `tools/device_smoke.ps1` PASS, plus `adb shell dumpsys media_session | findstr quranyahdi` prints an active session while a surah plays, plus minimization keeps audio (record the two commands' outputs).
+- [x] **Step 3: Gates + commit**
 
 ```powershell
 flutter analyze
@@ -79,10 +79,10 @@ git commit -m "feat(w7a): background playback via just_audio_background (facade-
 - Create: `test/city_nearest_test.dart`, `test/location_service_test.dart` (fake channel absent — service tested via injected `Future<CityCoordinates?> Function()` resolver override pattern)
 
 **Rulings:** location failure (denied/offline/timeout) → neutral hint `locationUnavailable` + manual picker as-is; NO settings permissions page; nearest = **haversine over the 156 bundled cities** (no reverse geocoding, zero paid APIs); selection writes the SAME `selected_city` settings key (nameAr/nameEn from the matched city).
-- [ ] **Step 1 (red):** nearest-city goldens (fixture catalog of 5 cities on a plausible map — assert the mathematically nearest for 2 query points; equator/dateline-free); resolver-override service tests: granted→coords, denied→null.
-- [ ] **Step 2 (green):** implement + manifest permissions + picker action (loading spinner during fetch; on success selects + pops with the existing selection flow).
-- [ ] **Step 3: l10n:** `useMyLocation` استخدم موقعي/Use my location · `locating` جارٍ تحديد الموقع…/Locating… · `locationUnavailable` تعذّر تحديد الموقع — اختر يدويًا/Could not get location — pick manually.
-- [ ] **Step 4: Gates + COMMIT + DEVICE PROOF**
+- [x] **Step 1 (red):** nearest-city goldens (fixture catalog of 5 cities on a plausible map — assert the mathematically nearest for 2 query points; equator/dateline-free); resolver-override service tests: granted→coords, denied→null.
+- [x] **Step 2 (green):** implement + manifest permissions + picker action (loading spinner during fetch; on success selects + pops with the existing selection flow).
+- [x] **Step 3: l10n:** `useMyLocation` استخدم موقعي/Use my location · `locating` جارٍ تحديد الموقع…/Locating… · `locationUnavailable` تعذّر تحديد الموقع — اختر يدويًا/Could not get location — pick manually.
+- [x] **Step 4: Gates + COMMIT + DEVICE PROOF**
 
 ```powershell
 flutter gen-l10n
@@ -107,9 +107,9 @@ DEVICE PROOF extra (record outputs): grant location IN-UI (device dialog), tap t
 - Create: `test/heading_service_test.dart` (pure mapping test via injected `Stream<double> Function()`), extend `test/qibla_screen_test.dart` with a FAKE heading stream test (rotated angle assertion via AnimatedRotation's angle param)
 
 **Rulings:** sensors stream is subscribed ONLY on the main dart isolate via the service; no `streamSub` leaks (cancel in cubit close); screen keeps working headless (static) when the channel throws.
-- [ ] **Step 1 (red):** heading mapping (0/90/180/270 → dialed arrow transform values via the cubit state's `heading` field math) + service injection null-path.
-- [ ] **Step 2 (green):** implement + screen wiring + hint key.
-- [ ] **Step 3: Gates + COMMIT + DEVICE PROOF**
+- [x] **Step 1 (red):** heading mapping (0/90/180/270 → dialed arrow transform values via the cubit state's `heading` field math) + service injection null-path.
+- [x] **Step 2 (green):** implement + screen wiring + hint key.
+- [x] **Step 3: Gates + COMMIT + DEVICE PROOF**
 
 ```powershell
 flutter gen-l10n
@@ -126,15 +126,15 @@ DEVICE PROOF extra (record): with the qibla screen open, `adb shell dumpsys sens
 
 ### Task 5: Close-out
 
-- [ ] **Step 1: Full gates ONCE** — build_runner · gen-l10n · analyze (0) · FULL suite (B 155 → ≈165-170; MEASURE per-file) · pub outdated (3 admissions disclosed) · apk debug exit 0 ballpark · apk release exit 0 + bytes (byte-exact expectation NOTE: plugins change native code several times mid-wave; release determinism is expected only FROM the settled close-out tree — record ×2 to prove it) · porcelain empty · unpushed · **tools/device_smoke.ps1 final PASS**.
-- [ ] **Step 2: Tick this plan** (targeted lines only; the header PROSE holds a literal `- [ ]`; .NET UTF8-no-BOM; numstat + non-checkbox filter recorded):
+- [x] **Step 1: Full gates ONCE** — build_runner · gen-l10n · analyze (0) · FULL suite (B 155 → ≈165-170; MEASURE per-file) · pub outdated (3 admissions disclosed) · apk debug exit 0 ballpark · apk release exit 0 + bytes (byte-exact expectation NOTE: plugins change native code several times mid-wave; release determinism is expected only FROM the settled close-out tree — record ×2 to prove it) · porcelain empty · unpushed · **tools/device_smoke.ps1 final PASS**.
+- [x] **Step 2: Tick this plan** (targeted lines only; the header PROSE holds a literal `- [ ]`; .NET UTF8-no-BOM; numstat + non-checkbox filter recorded):
 
 ```powershell
 git add docs/superpowers/plans/2026-10-16-w7a-device-media.md
 git commit -m "docs(w7a): mark plan checkboxes complete"
 ```
 
-- [ ] **Step 3:** Final report §1-§10 (start-gate verbatim · baseline B · commit table · THREE package-intake quotes (versions+transitives+exact API surfaces read from cache) · gates table incl. EVERY device-smoke summary + the three DEVICE PROOF command outputs · itemized disclosures · STOPs · incidents · unpushed · state · NO PUSH).
+- [x] **Step 3:** Final report §1-§10 (start-gate verbatim · baseline B · commit table · THREE package-intake quotes (versions+transitives+exact API surfaces read from cache) · gates table incl. EVERY device-smoke summary + the three DEVICE PROOF command outputs · itemized disclosures · STOPs · incidents · unpushed · state · NO PUSH).
 
 ## Explicit non-goals (this wave)
 
