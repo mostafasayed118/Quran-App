@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -57,7 +59,8 @@ class ReciterSurahsScreen extends StatelessWidget {
       body: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
         builder: (context, state) => switch (state) {
           ReciterSurahsLoading() => const LoadingView(),
-          ReciterSurahsError(:final message) => ErrorView(message),
+          ReciterSurahsError(:final message) =>
+            _errorPane(loc, message, 'reciter_surahs'),
           ReciterSurahsReady(
               :final row,
               :final surahNumbers,
@@ -236,4 +239,9 @@ class _SurahDownloadRow extends StatelessWidget {
         );
     }
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
 }

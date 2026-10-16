@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -19,7 +21,7 @@ class BookmarksScreen extends StatelessWidget {
         BookmarksLoading() => const Scaffold(body: LoadingView()),
         BookmarksError(:final message) => Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context).bookmarks)),
-            body: ErrorView(message),
+            body: _errorPane(AppLocalizations.of(context), message, 'bookmarks'),
           ),
         BookmarksReady(:final entries) => Scaffold(
             appBar: AppBar(
@@ -63,4 +65,9 @@ class BookmarksScreen extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
 }

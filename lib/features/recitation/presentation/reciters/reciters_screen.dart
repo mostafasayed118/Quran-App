@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +37,7 @@ class RecitersScreen extends StatelessWidget {
       body: BlocBuilder<RecitersCubit, RecitersState>(
         builder: (context, state) => switch (state) {
           RecitersLoading() => const LoadingView(),
-          RecitersError(:final message) => ErrorView(message),
+          RecitersError(:final message) => _errorPane(loc, message, 'reciters'),
           RecitersReady(:final reciters, :final dataError) => Column(
               children: [
                 if (dataError != null)
@@ -63,6 +65,11 @@ class RecitersScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
 }
 
 class _RecitersList extends StatelessWidget {

@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -24,12 +26,17 @@ class ReaderScreen extends StatelessWidget {
         ReaderLoading() => const Scaffold(body: LoadingView()),
         ReaderError(:final message) => Scaffold(
             appBar: AppBar(),
-            body: ErrorView(message),
+            body: _errorPane(AppLocalizations.of(context), message, 'reader'),
           ),
         ReaderReady() => _ReadyView(state: state),
       },
     );
   }
+}
+
+Widget _errorPane(AppLocalizations loc, String message, String source) {
+  dev.log(message, name: 'quran_yahdi/$source');
+  return ErrorView(loc.genericError);
 }
 
 class _ReadyView extends StatelessWidget {
