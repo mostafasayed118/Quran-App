@@ -1,5 +1,11 @@
 # Quran-App Recovery Plan
 
+> **SUPERSEDED 2026-10-15 — historical pre-rebuild plan.** This file describes
+> the legacy app before the W0–W7 rebuild; its tracking table is NOT current
+> (every listed gap was closed by the rebuild — 209 tests, go_router, get_it
+> DI, drift DB, AR/EN l10n, release signing intake). The live, verified record
+> is `docs/campaign-ledger.md`.
+
 ## Executive Summary
 
 Quran-App is a functional Flutter app displaying the full Quran (114 surahs, ~6236 verses) in Arabic with two custom fonts. Loads 7.4MB JSON at startup, supports verse-by-verse and Mushaf reading modes, bookmarks, and font-size settings via SharedPreferences. Prior recovery modernized dependencies and fixed analyzer issues. Currently compiles and builds. Zero tests. Global mutable state, dynamic types, no routing, no DI.
