@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -31,7 +32,7 @@ class HadithScreen extends StatelessWidget {
                   Text(
                     s.language.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.secondary,
+                          color: AppTheme.goldText(context),
                         ),
                   ),
                 ],

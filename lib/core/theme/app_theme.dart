@@ -15,6 +15,11 @@ abstract final class AppTheme {
   static const TextStyle hafsAyah =
       TextStyle(fontFamily: QuranFonts.quran, fontSize: 24, height: 2);
 
+  static Color goldText(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.light
+          ? AppColors.goldText
+          : AppColors.gold;
+
   static TextStyle mutedFootnote(BuildContext context) => TextStyle(
         fontSize: 11,
         color: Theme.of(context).colorScheme.onSurfaceVariant,

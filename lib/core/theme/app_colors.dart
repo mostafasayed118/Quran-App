@@ -7,6 +7,7 @@ abstract final class AppColors {
   static const emeraldDark = Color(0xFF2E5244);
   static const emeraldLight = Color(0xFFE4EEE9);
   static const gold = Color(0xFFE3A53E);
+  static const goldText = Color(0xFF8A5A14);
   static const goldLight = Color(0xFFF7EAD2);
   static const pageBackground = Color(0xFFEFE9DA);
   static const ink = Color(0xFF232D28);

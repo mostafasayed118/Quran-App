@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/download_progress.dart';
@@ -113,7 +114,6 @@ class _PackRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<LibraryCubit>();
-    final colors = Theme.of(context).colorScheme;
     final progress = ready.progress[pack.id];
     final installed = ready.installed.contains(pack.id);
     final subtitle =
@@ -153,7 +153,7 @@ class _PackRow extends StatelessWidget {
           if (installed && progress == null)
             Text(
               loc.libraryInstalled,
-              style: TextStyle(color: colors.secondary, fontSize: 12),
+              style: TextStyle(color: AppTheme.goldText(context), fontSize: 12),
             ),
           if (installed && pack.kind == LibraryPackKind.hadith)
             IconButton(

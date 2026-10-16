@@ -76,7 +76,7 @@ class _ReadyView extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 22,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: AppTheme.goldText(context),
                 ),
                 textDirection: TextDirection.rtl,
               ),
@@ -165,7 +165,7 @@ class _AyahCard extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 16,
-                  color: colors.secondary,
+                  color: AppTheme.goldText(context),
                 ),
               ),
               const Spacer(),
@@ -271,7 +271,7 @@ class _MushafPagerState extends State<_MushafPager> {
                 '﴿ ${loc.pageIndicator(block.page.toArabicIndic)} ﴾',
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: AppTheme.goldText(context),
                 ),
               ),
             ],
