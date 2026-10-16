@@ -91,4 +91,10 @@ void main() {
     expect(await db.select(db.bookmarks).get(), isEmpty);
   });
 
+  testWidgets('delete button exposes a tooltip (a11y label census)', (tester) async {
+    final text = 'ذلك الكتاب لا ريب فيه';
+    await pump(tester, host([_entry(db, ayahId: 9, text: text)]));
+    expect(find.byTooltip('أزل الحفظ'), findsOneWidget);
+  });
+
 }

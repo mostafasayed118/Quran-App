@@ -45,6 +45,8 @@ class BookmarksScreen extends StatelessWidget {
                           '${ayah.surahId.toArabicIndic} · ${ayah.numberInSurah.toArabicIndic}',
                         ),
                         trailing: IconButton(
+                          tooltip:
+                              AppLocalizations.of(context).bookmarkRemove,
                           icon: const Icon(Icons.delete_outline),
                           onPressed: () =>
                               context.read<BookmarksCubit>().remove(ayah.id),

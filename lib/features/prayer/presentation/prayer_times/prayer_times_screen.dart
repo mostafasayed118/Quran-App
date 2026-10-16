@@ -76,6 +76,7 @@ class _TimesList extends StatelessWidget {
                 ),
               ),
               trailing: IconButton(
+                tooltip: loc.selectCity,
                 icon: const Icon(Icons.edit),
                 onPressed: () => PrayerTimesScreen._openCityPicker(context),
               ),

@@ -122,6 +122,7 @@ class _NameSheet extends StatelessWidget {
                     ),
                   ),
                   IconButton(
+                    tooltip: loc.clearSelection,
                     icon: const Icon(Icons.close),
                     onPressed: () => context.read<AsmaCubit>().select(null),
                   ),

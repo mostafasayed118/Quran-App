@@ -371,4 +371,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stopAction => 'Stop';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String get backTooltip => 'Back';
+
+  @override
+  String get downloadSurah => 'Download surah';
+
+  @override
+  String get pageNotFound => 'Page not found';
+
+  @override
+  String get pageNotFoundHint => 'The link you followed does not exist here';
+
+  @override
+  String get genericError => 'Sorry, something went wrong — try again';
 }

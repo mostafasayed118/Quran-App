@@ -41,6 +41,7 @@ class HijriScreen extends StatelessWidget {
                   textDirection: TextDirection.rtl,
                   children: [
                     IconButton(
+                      tooltip: loc.nextMonth,
                       icon: const Icon(Icons.chevron_right),
                       onPressed: () => context.read<HijriCubit>().next(),
                     ),
@@ -60,6 +61,7 @@ class HijriScreen extends StatelessWidget {
                       onPressed: () => context.read<HijriCubit>().jumpToToday(),
                     ),
                     IconButton(
+                      tooltip: loc.previousMonth,
                       icon: const Icon(Icons.chevron_left),
                       onPressed: () => context.read<HijriCubit>().prev(),
                     ),

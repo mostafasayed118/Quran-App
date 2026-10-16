@@ -370,4 +370,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get stopAction => 'وقف';
+
+  @override
+  String get previousMonth => 'الشهر السابق';
+
+  @override
+  String get nextMonth => 'الشهر التالي';
+
+  @override
+  String get clearSelection => 'مسح الاختيار';
+
+  @override
+  String get backTooltip => 'رجوع';
+
+  @override
+  String get downloadSurah => 'تنزيل السورة';
+
+  @override
+  String get pageNotFound => 'الصفحة غير موجودة';
+
+  @override
+  String get pageNotFoundHint => 'الرابط الذي فتحت غير موجود هنا';
+
+  @override
+  String get genericError => 'عذرًا، حدث خطأ — حاول مرة أخرى';
 }

@@ -763,6 +763,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'وقف'**
   String get stopAction;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر السابق'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشهر التالي'**
+  String get nextMonth;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح الاختيار'**
+  String get clearSelection;
+
+  /// No description provided for @backTooltip.
+  ///
+  /// In ar, this message translates to:
+  /// **'رجوع'**
+  String get backTooltip;
+
+  /// No description provided for @downloadSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل السورة'**
+  String get downloadSurah;
+
+  /// No description provided for @pageNotFound.
+  ///
+  /// In ar, this message translates to:
+  /// **'الصفحة غير موجودة'**
+  String get pageNotFound;
+
+  /// No description provided for @pageNotFoundHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرابط الذي فتحت غير موجود هنا'**
+  String get pageNotFoundHint;
+
+  /// No description provided for @genericError.
+  ///
+  /// In ar, this message translates to:
+  /// **'عذرًا، حدث خطأ — حاول مرة أخرى'**
+  String get genericError;
 }
 
 class _AppLocalizationsDelegate

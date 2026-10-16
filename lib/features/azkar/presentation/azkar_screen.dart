@@ -26,6 +26,7 @@ class AzkarScreen extends StatelessWidget {
           builder: (context, state) {
             final reciting = state is AzkarReciting;
             return IconButton(
+              tooltip: loc.backTooltip,
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 if (reciting) {

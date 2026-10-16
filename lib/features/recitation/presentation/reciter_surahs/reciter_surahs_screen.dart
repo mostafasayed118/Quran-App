@@ -230,6 +230,7 @@ class _SurahDownloadRow extends StatelessWidget {
         );
       default:
         return IconButton(
+          tooltip: AppLocalizations.of(context).downloadSurah,
           icon: const Icon(Icons.download),
           onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
