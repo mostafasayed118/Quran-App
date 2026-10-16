@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/db/app_database.dart';
 import '../../data/pack_downloader.dart';
 import 'hadith_state.dart';
 
@@ -20,12 +21,19 @@ class HadithCubit extends Cubit<HadithState> {
   final String _packId;
 
   Future<void> _load(int offset) async {
-    final rows = await _downloader.installedPacks();
-    final row = rows
-        .where((r) => r.packId == _packId)
-        .firstOrNull;
-    final (items, hasMore) =
-        await _downloader.hadithPage(_packId, offset, pageSize);
+    InstalledPack? row;
+    List<(int, String)> items;
+    var hasMore = false;
+    try {
+      final rows = await _downloader.installedPacks();
+      row = rows.where((r) => r.packId == _packId).firstOrNull;
+      (items, hasMore) =
+          await _downloader.hadithPage(_packId, offset, pageSize);
+    } catch (error) {
+      if (isClosed) return;
+      emit(HadithState.error(message: error.toString()));
+      return;
+    }
     if (isClosed) return;
     emit(HadithState.ready(
       packTitle: row?.title ?? _packId,

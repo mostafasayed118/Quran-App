@@ -16,4 +16,6 @@ sealed class HadithState with _$HadithState {
     required int offset,
     required bool hasMore,
   }) = HadithReady;
+
+  const factory HadithState.error({required String message}) = HadithError;
 }

@@ -26,23 +26,29 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
   final int _ayah;
 
   Future<void> _load() async {
-    final rows = await _downloader.installedPacks();
     final tafsirs = <AyahSheetEntry>[];
     final translations = <AyahSheetEntry>[];
-    for (final row in rows) {
-      if (row.kind == 'tafsir') {
-        final text = await _downloader.tafsirFor(row.packId, _surah, _ayah);
-        if (text != null) {
-          tafsirs.add((title: row.title, text: text));
+    try {
+      final rows = await _downloader.installedPacks();
+      for (final row in rows) {
+        if (row.kind == 'tafsir') {
+          final text = await _downloader.tafsirFor(row.packId, _surah, _ayah);
+          if (text != null) {
+            tafsirs.add((title: row.title, text: text));
+          }
+        } else if (row.kind == 'translation') {
+          final text =
+              await _downloader.translationFor(row.packId, _surah, _ayah);
+          if (text != null) {
+            translations.add((title: row.title, text: text));
+          }
         }
-      } else if (row.kind == 'translation') {
-        final text =
-            await _downloader.translationFor(row.packId, _surah, _ayah);
-        if (text != null) {
-          translations.add((title: row.title, text: text));
-        }
+        // hadith rows never feed the ayah sheet.
       }
-      // hadith rows never feed the ayah sheet.
+    } catch (error) {
+      if (isClosed) return;
+      emit(AyahSheetState.error(message: error.toString()));
+      return;
     }
     if (isClosed) return;
     emit(AyahSheetState.ready(

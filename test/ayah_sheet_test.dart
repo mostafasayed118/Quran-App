@@ -169,6 +169,21 @@ void main() {
       expect(ready.tafsirEntries, isEmpty);
       expect(ready.translationEntries, isEmpty);
     });
+
+    test('downloader failure lands in the error state, never hangs',
+        () async {
+      final cubit = AyahSheetCubit(
+        downloader: _ThrowingDownloader(db),
+        surah: 1,
+        ayah: 1,
+      );
+      addTearDown(cubit.close);
+
+      final failure = await cubit.stream.firstWhere((s) => s is AyahSheetError)
+          as AyahSheetError;
+
+      expect(failure.message, isNotEmpty);
+    });
   });
 
   group('LibrarySheet', () {
@@ -348,4 +363,12 @@ void main() {
       expect(find.textContaining('سميت الفاتحة'), findsOneWidget);
     });
   });
+}
+
+class _ThrowingDownloader extends PackDownloader {
+  _ThrowingDownloader(super.db);
+
+  @override
+  Future<List<InstalledPack>> installedPacks() =>
+      Future.error(PackFailure('registry read failed'));
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hadith_cubit.dart';
 import 'hadith_state.dart';
@@ -44,6 +45,7 @@ class HadithScreen extends StatelessWidget {
           final Widget content = switch (state) {
             HadithLoading() =>
               const Center(child: CircularProgressIndicator()),
+            HadithError(message: final message) => ErrorView(message),
             final HadithReady ready => Column(
                 children: [
                   Expanded(

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/pack_downloader.dart';
 import 'ayah_sheet_cubit.dart';
@@ -56,6 +57,7 @@ class _AyahSheetView extends StatelessWidget {
         final Widget content = switch (state) {
           AyahSheetLoading() =>
             const Center(child: CircularProgressIndicator()),
+          AyahSheetError(:final message) => ErrorView(message),
           final AyahSheetReady ready => DefaultTabController(
               length: 2,
               child: Column(

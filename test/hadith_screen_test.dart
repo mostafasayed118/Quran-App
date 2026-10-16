@@ -123,6 +123,20 @@ void main() {
       expect(ready.packTitle, 'ghost-pack');
       expect(ready.hasMore, isFalse);
     });
+
+    test('page-fetch failure lands in the error state, never hangs',
+        () async {
+      final c = HadithCubit(
+        downloader: _ThrowingPageDownloader(db),
+        packId: 'en-muslim',
+      );
+      addTearDown(c.close);
+      final failure =
+          await c.stream.firstWhere((s) => s is HadithError) as HadithError;
+
+      expect(failure.message, isNotEmpty);
+      expect(c.state, isA<HadithError>());
+    });
   });
 
   group('HadithScreen', () {
@@ -209,4 +223,13 @@ void main() {
       expect(find.textContaining('Zuhayr bin Harb'), findsOneWidget);
     });
   });
+}
+
+class _ThrowingPageDownloader extends PackDownloader {
+  _ThrowingPageDownloader(super.db);
+
+  @override
+  Future<(List<(int, String)>, bool)> hadithPage(
+          String packId, int offset, int limit) =>
+      Future.error(PackFailure('page fetch failed'));
 }
