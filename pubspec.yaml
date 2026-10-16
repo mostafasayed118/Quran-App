@@ -65,6 +65,7 @@ flutter:
     - assets/icons/
     - assets/db/
     - assets/data/
+    - assets/fonts/Cairo-OFL.txt
 
   fonts:
     - family: HafsSmart
@@ -74,3 +75,9 @@ flutter:
     - family: me_quran
       fonts:
         - asset: assets/fonts/me_quran.ttf
+
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
