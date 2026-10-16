@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -38,17 +39,11 @@ class RecitersScreen extends StatelessWidget {
           RecitersReady(:final reciters, :final dataError) => Column(
               children: [
                 if (dataError != null)
-                  Material(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                    child: ListTile(
-                      dense: true,
-                      leading: const Icon(Icons.wifi_off, size: 18),
-                      title: Text(
-                        dataError,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
+                  ErrorStrip(
+                    dataError,
+                    icon: Icons.wifi_off,
+                    onDismiss: () =>
+                        context.read<RecitersCubit>().clearDataError(),
                   ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),

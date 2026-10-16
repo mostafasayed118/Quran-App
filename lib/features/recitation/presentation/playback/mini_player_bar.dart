@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/error_strip.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'playback_state.dart';
@@ -154,36 +155,11 @@ class _FailedStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    return Material(
-      color: colors.errorContainer,
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                child: Text(
-                  kind == PlaybackFailureKind.network
-                      ? loc.playbackFailed
-                      : loc.noReciters,
-                  style: TextStyle(
-                    color: colors.onErrorContainer,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ),
-            IconButton(
-              tooltip: loc.stopTooltip,
-              icon: const Icon(Icons.close),
-              onPressed: () => context.read<PlaybackCubit>().stopAndReset(),
-            ),
-          ],
-        ),
-      ),
+    return ErrorStrip(
+      kind == PlaybackFailureKind.network
+          ? loc.playbackFailed
+          : loc.noReciters,
+      onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
     );
   }
 }

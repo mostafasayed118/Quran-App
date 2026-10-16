@@ -62,6 +62,14 @@ class RecitersCubit extends Cubit<RecitersState> {
     ));
   }
 
+  /// Dismisses the soft network failure banner until the next failure.
+  void clearDataError() {
+    if (isClosed) return;
+    final s = state;
+    if (s is! RecitersReady) return;
+    emit(RecitersState.ready(reciters: s.reciters, query: s.query));
+  }
+
   List<ReciterRow> _filter(List<ReciterRow> rows) {
     if (_query.isEmpty) return rows;
     return rows
