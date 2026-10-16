@@ -9,29 +9,22 @@ import '../../features/quran/data/surah_repository.dart';
 import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/last_read_repository.dart';
 import '../../features/azkar/data/azkar_repository.dart';
-import '../../features/azkar/presentation/azkar_cubit.dart';
 import '../../features/asma/data/asma_repository.dart';
-import '../../features/asma/presentation/asma_cubit.dart';
 import '../../features/duas/data/dua_repository.dart';
 import '../../features/duas/data/ruqyah_repository.dart';
-import '../../features/duas/presentation/duas_cubit.dart';
 import '../../features/hijri/data/hijri_service.dart';
 import '../../features/library/data/catalog_repository.dart';
 import '../../features/library/data/library_catalog.dart';
 import '../../features/library/data/pack_downloader.dart';
 import '../../features/library/presentation/library_cubit.dart';
-import '../../features/hijri/presentation/hijri_cubit.dart';
 import '../../features/notifications/data/notifications_binding.dart';
 import '../../features/notifications/data/reminder_scheduler.dart';
 import '../../features/notifications/data/reminder_settings.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/prayer/data/location_service.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
-import '../../features/tasbih/presentation/tasbih_cubit.dart';
 import '../../features/tracker/data/prayer_log_repository.dart';
-import '../../features/tracker/presentation/tracker_cubit.dart';
 import '../../features/zakat/data/zakat_calculator.dart';
-import '../../features/zakat/presentation/zakat_cubit.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
 import '../../features/qibla/data/heading_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
@@ -72,17 +65,10 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<NotificationsBinding>(() => NotificationsBinding());
   getIt.registerLazySingleton<ReminderScheduler>(() => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
-  getIt.registerLazySingleton<TasbihCubit>(
-      () => TasbihCubit(repo: getIt<TasbihRepository>()));
   getIt.registerLazySingleton<PrayerLogRepository>(
       () => PrayerLogRepository(db));
-  getIt.registerLazySingleton<TrackerCubit>(
-      () => TrackerCubit(repo: getIt<PrayerLogRepository>()));
-  getIt.registerLazySingleton<ZakatCubit>(() => ZakatCubit());
   getIt.registerLazySingleton<ZakatCalculator>(() => const ZakatCalculator());
   getIt.registerLazySingleton<HijriService>(() => HijriService());
-  getIt.registerLazySingleton<HijriCubit>(
-      () => HijriCubit(service: getIt<HijriService>()));
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
         () => CityRepository(db: db, loader: citiesLoader));
@@ -90,25 +76,16 @@ Future<void> configureDependencies({
   if (azkarLoader != null) {
     getIt.registerLazySingleton<AzkarRepository>(
         () => AzkarRepository(loader: azkarLoader));
-    getIt.registerLazySingleton<AzkarCubit>(
-        () => AzkarCubit(repository: getIt<AzkarRepository>()));
   }
   if (duasLoader != null && ruqyahLoader != null) {
     getIt.registerLazySingleton<DuaRepository>(
         () => DuaRepository(loader: duasLoader));
     getIt.registerLazySingleton<RuqyahRepository>(
         () => RuqyahRepository(loader: ruqyahLoader));
-    getIt.registerLazySingleton<DuasCubit>(() => DuasCubit(
-          duas: getIt<DuaRepository>(),
-          ruqyah: getIt<RuqyahRepository>(),
-          ayahs: getIt<AyahRepository>(),
-        ));
   }
   if (asmaLoader != null) {
     getIt.registerLazySingleton<AsmaRepository>(
         () => AsmaRepository(loader: asmaLoader));
-    getIt.registerLazySingleton<AsmaCubit>(
-        () => AsmaCubit(repository: getIt<AsmaRepository>()));
   }
   if (libraryCatalogLoader != null) {
     getIt.registerLazySingleton<CatalogSource>(
