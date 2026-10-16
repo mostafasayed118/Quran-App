@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
+import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
 class JustAudioPlaybackService implements PlaybackService {
@@ -39,14 +40,16 @@ class JustAudioPlaybackService implements PlaybackService {
     await _player.play();
   }
 
-  MediaItem _mediaItem({required String id, required PlaybackSource source}) =>
-      MediaItem(
-        id: id,
-        title: source.mediaTitle.isEmpty
-            ? 'قرآن يَهدي'
-            : 'قرآن يَهدي — ${source.mediaTitle}',
-        artist: source.artist.isEmpty ? null : source.artist,
-      );
+  MediaItem _mediaItem({required String id, required PlaybackSource source}) {
+    final appName = platformLocalizations().appName;
+    return MediaItem(
+      id: id,
+      title: source.mediaTitle.isEmpty
+          ? appName
+          : '$appName — ${source.mediaTitle}',
+      artist: source.artist.isEmpty ? null : source.artist,
+    );
+  }
 
   @override
   Future<void> pause() => _player.pause();

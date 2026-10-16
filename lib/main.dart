@@ -6,6 +6,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'app/app.dart';
 import 'app/bootstrap.dart';
 import 'core/di/injector.dart';
+import 'core/l10n/platform_localizations.dart';
 import 'features/notifications/data/notifications_binding.dart';
 import 'features/notifications/data/reminder_settings.dart';
 import 'features/recitation/playback/background_init_guard.dart';
@@ -22,11 +23,12 @@ Future<void> main() async {
     libraryCatalogLoader: defaultLibraryCatalogLoader,
     libraryRootResolver: defaultLibraryRootResolver,
   );
+  final loc = platformLocalizations();
   await BackgroundInitGuard.attempt(
     () => JustAudioBackground.init(
       androidNotificationChannelId:
           'com.mostafasayed.quranyahdi.channel.audio',
-      androidNotificationChannelName: 'تلاوات قرآن يَهدي',
+      androidNotificationChannelName: '${loc.recitationsTitle} — ${loc.appName}',
       androidNotificationOngoing: true,
     ),
   );
