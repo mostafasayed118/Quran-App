@@ -3,17 +3,19 @@ import 'dart:async';
 enum PlaybackSourceKind { file, url }
 
 class PlaybackSource {
-  const PlaybackSource.file(this.path)
+  const PlaybackSource.file(this.path, {this.mediaTitle = '', this.artist = ''})
       : kind = PlaybackSourceKind.file,
         uri = null;
 
-  const PlaybackSource.url(this.uri)
+  const PlaybackSource.url(this.uri, {this.mediaTitle = '', this.artist = ''})
       : kind = PlaybackSourceKind.url,
         path = null;
 
   final PlaybackSourceKind kind;
   final String? path;
   final Uri? uri;
+  final String mediaTitle;
+  final String artist;
 }
 
 abstract interface class PlaybackService {

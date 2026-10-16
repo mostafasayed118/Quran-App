@@ -38,9 +38,16 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     final downloaded = await _downloader.downloadedPath(row.id, surahNumber);
     if (isClosed) return;
     final source = downloaded != null
-        ? PlaybackSource.file(downloaded)
+        ? PlaybackSource.file(
+            downloaded,
+            mediaTitle: row.reciterName,
+            artist: row.reciterName,
+          )
         : PlaybackSource.url(
-            Uri.parse(surahAudioUrl(row.server, surahNumber)));
+            Uri.parse(surahAudioUrl(row.server, surahNumber)),
+            mediaTitle: row.reciterName,
+            artist: row.reciterName,
+          );
     _bindStreams();
     try {
       await _service.loadAndPlay(source);

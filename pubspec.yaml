@@ -29,6 +29,7 @@ dependencies:
   just_audio: ^0.10.6
   adhan: ^2.0.0+1
   hijri: ^3.0.1
+  just_audio_background: ^0.0.1-beta.17
 
 flutter_launcher_icons:
   android: true

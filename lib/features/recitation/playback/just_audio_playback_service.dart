@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 import 'playback_service.dart';
 
@@ -24,12 +25,28 @@ class JustAudioPlaybackService implements PlaybackService {
     switch (source.kind) {
       case PlaybackSourceKind.file:
         final file = File(source.path!);
-        await _player.setFilePath(file.path);
+        await _player.setFilePath(
+          file.path,
+          tag: _mediaItem(id: file.path, source: source),
+        );
       case PlaybackSourceKind.url:
-        await _player.setUrl(source.uri!.toString());
+        final id = source.uri!.toString();
+        await _player.setUrl(
+          id,
+          tag: _mediaItem(id: id, source: source),
+        );
     }
     await _player.play();
   }
+
+  MediaItem _mediaItem({required String id, required PlaybackSource source}) =>
+      MediaItem(
+        id: id,
+        title: source.mediaTitle.isEmpty
+            ? 'قرآن يَهدي'
+            : 'قرآن يَهدي — ${source.mediaTitle}',
+        artist: source.artist.isEmpty ? null : source.artist,
+      );
 
   @override
   Future<void> pause() => _player.pause();
