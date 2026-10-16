@@ -51,4 +51,22 @@ void main() {
     expect((cubit.state as SurahIndexLoaded).surahs.length, 2);
     await cubit.close();
   });
+
+  test('stream error lands in the existing error state', () async {
+    final cubit = SurahIndexCubit(_ThrowingSurahRepository(db));
+    expect(cubit.state, isA<SurahIndexLoading>());
+
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state, isA<SurahIndexError>());
+    expect((cubit.state as SurahIndexError).message, isNotEmpty);
+
+    await cubit.close();
+  });
+}
+
+class _ThrowingSurahRepository extends SurahRepository {
+  _ThrowingSurahRepository(super.db);
+
+  @override
+  Stream<List<Surah>> watchAll() => Stream.error(StateError('watch failed'));
 }

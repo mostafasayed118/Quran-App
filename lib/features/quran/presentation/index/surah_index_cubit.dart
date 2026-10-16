@@ -8,10 +8,16 @@ import 'surah_index_state.dart';
 
 class SurahIndexCubit extends Cubit<SurahIndexState> {
   SurahIndexCubit(this._repo) : super(const SurahIndexState.loading()) {
-    _sub = _repo.watchAll().listen((surahs) {
-      _latest = surahs;
-      _emitFiltered();
-    });
+    _sub = _repo.watchAll().listen(
+          (surahs) {
+            _latest = surahs;
+            _emitFiltered();
+          },
+          onError: (Object error) {
+            if (isClosed) return;
+            emit(SurahIndexState.error(message: error.toString()));
+          },
+        );
   }
 
   final SurahRepository _repo;
