@@ -302,4 +302,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get cancel => 'إلغاء';
+
+  @override
+  String get ayahSheetTitle => 'تفسير الآية وترجمتها';
+
+  @override
+  String get ayahSheetTafsir => 'تفسير';
+
+  @override
+  String get ayahSheetTranslation => 'ترجمة';
+
+  @override
+  String get libraryEmptyHint => 'لا يوجد تفسير مثبّت — نزّل من المكتبة';
 }

@@ -55,7 +55,10 @@ class PackDownloader {
     final root = await _root();
     final dir = Directory(
         '${root.path}${Platform.pathSeparator}$libraryFolderName');
-    await dir.create(recursive: true);
+    // Sync create: the read path must stay FakeAsync-safe for widget tests
+    // (a real async mkdir never completes under the test zone) and is a
+    // no-op when the folder already exists.
+    dir.createSync(recursive: true);
     return File('${dir.path}${Platform.pathSeparator}$packId.json');
   }
 
@@ -261,7 +264,7 @@ class PackDownloader {
         .getSingleOrNull();
     if (row == null) return null;
     final f = await _packFile(packId);
-    return (await f.exists()) ? f.path : null;
+    return f.existsSync() ? f.path : null;
   }
 
   Future<dynamic> _decodeInstalled(String packId,

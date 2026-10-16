@@ -637,6 +637,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إلغاء'**
   String get cancel;
+
+  /// No description provided for @ayahSheetTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفسير الآية وترجمتها'**
+  String get ayahSheetTitle;
+
+  /// No description provided for @ayahSheetTafsir.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفسير'**
+  String get ayahSheetTafsir;
+
+  /// No description provided for @ayahSheetTranslation.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترجمة'**
+  String get ayahSheetTranslation;
+
+  /// No description provided for @libraryEmptyHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يوجد تفسير مثبّت — نزّل من المكتبة'**
+  String get libraryEmptyHint;
 }
 
 class _AppLocalizationsDelegate

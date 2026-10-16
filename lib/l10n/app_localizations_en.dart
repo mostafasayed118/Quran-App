@@ -302,4 +302,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cancel => 'Cancel';
+
+  @override
+  String get ayahSheetTitle => 'Ayah tafsir & translation';
+
+  @override
+  String get ayahSheetTafsir => 'Tafsir';
+
+  @override
+  String get ayahSheetTranslation => 'Translation';
+
+  @override
+  String get libraryEmptyHint =>
+      'No tafsir installed — get one from the Library';
 }

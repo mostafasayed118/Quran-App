@@ -7,6 +7,7 @@ import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
 import '../../../recitation/presentation/playback/playback_cubit.dart';
 import 'reader_cubit.dart';
@@ -109,6 +110,7 @@ class _VersesList extends StatelessWidget {
         final ayah = state.ayahs[index];
         return _AyahCard(
           ayah: ayah,
+          surahName: state.surahName,
           bookmarked: state.bookmarkedAyahIds.contains(ayah.id),
           onToggle: () => cubit.toggleBookmark(ayah.id),
         );
@@ -120,11 +122,13 @@ class _VersesList extends StatelessWidget {
 class _AyahCard extends StatelessWidget {
   const _AyahCard({
     required this.ayah,
+    required this.surahName,
     required this.bookmarked,
     required this.onToggle,
   });
 
   final Ayah ayah;
+  final String surahName;
   final bool bookmarked;
   final VoidCallback onToggle;
 
@@ -169,6 +173,20 @@ class _AyahCard extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              IconButton(
+                tooltip: loc.ayahSheetTitle,
+                icon: const Icon(Icons.menu_book_outlined),
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  builder: (_) => LibrarySheet(
+                    surahId: ayah.surahId,
+                    surahName: surahName,
+                    ayah: ayah.numberInSurah,
+                  ),
+                ),
+              ),
               IconButton(
                 tooltip: bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
                 icon: Icon(
