@@ -1,64 +1,77 @@
-# The Quran App
+# قرآن يَهدي — Quran Yahdi
 
-A complete offline Quran reader for Flutter — all 114 surahs (~6,236 verses) bundled locally, with no network or API dependencies. Read verse-by-verse or in a full-page Mushaf layout, bookmark your place, and fine-tune the typography to your preference.
+رفيق إسلامي متكامل يعمل **بلا إنترنت أولًا**: مصحف كامل (114 سورة، 6236 آية) مضمّن داخل التطبيق، تلاوات صوتية تُبث أو تُنزَّل، أذكار وأدعية، مواقيت الصلاة والقبلة — بلا حسابات ولا إعلانات ولا تتبع. عربي أولًا مع دعم الإنجليزية والوضع الليلي.
 
-## Features
+Quran Yahdi is a complete, offline-first Quran companion for Android: the full Mushaf bundled on-device, audio recitations you can stream or download, adhkar, duas, prayer times and a live Qibla compass — with no accounts, no ads, and no data collection.
 
-- **Full Quran content, offline** — all 114 surahs and verses bundled as a local JSON asset (~7.4 MB); works without internet.
-- **Two reading modes** — switch between verse-by-verse scrolling and a traditional full-page Mushaf view.
-- **Surah index** — scrollable list of the 114 surahs with a bookmarks shortcut.
-- **Bookmarks** — save any ayah and jump straight back to it from the app drawer.
-- **Typography settings** — independent font-size sliders for both Arabic and Mushaf modes, persisted across restarts.
-- **Bundled Quran fonts** — `HafsSmart` and `me_quran` render the Arabic script correctly.
-- **Share & links** — share your reading position, plus quick links to external references from the drawer.
+> **الحالة الحالية (بأمانة):** MVP أندرويد مكتمل (v1.0.0 قيد التحضير للمتجر) · رفع iOS ومسودة عرض المتجر قيد التنفيذ — انظر `docs/store/` و`PRIVACY.md`.
 
-## Getting started
+## الميزات (إصدار v1)
 
-Requirements: Flutter 3.x / Dart 3.5+ (Android, iOS, Web, desktop).
+| # | الميزة | الوصف |
+|---|---|---|
+| 1 | الرئيسية | بطاقة الصلاة القادمة + متابعة القراءة + شبكة الميزات |
+| 2 | فهرس السور | 114 سورة مع بحث فوري بالاسم أو الرقم |
+| 3 | قارئ القرآن | قراءة آية-بآية أو وضع المصحف الصفحي التقليدي |
+| 4 | شاشة الآية | التفسير والترجمات وعلامة الحفظ من مكان واحد |
+| 5 | متابعة القراءة | حفظ آخر موضع وعلامات مرجعية متعددة |
+| 6 | التلاوات | أكثر من 240 قارئًا (خدمة mp3quran) — بث فوري أو تحميل كامل للأوفلاين |
+| 7 | المشغّل والتنزيلات | مشغّل مصغّر يلازمك + مدير تنزيلات بحالة كل ملف |
+| 8 | مواقيت الصلاة | أوقات دقيقة لاختيار مدينتك (أو أقرب مدينة تحديدًا على جهازك) + تنبيه صلاة اختياري |
+| 9 | القبلة | بوصلة بتوجيه حي من حساسات الهاتف |
+| 10 | الأذكار | أذكار مصنّفة مع عدّاد لكل ذكر |
+| 11 | السبحة | عدّاد إلكتروني دائري بأهداف قابلة للتبديل |
+| 12 | الأدعية والرقية | مختارات مرتبة من المصنفات التقليدية مع آيات النصوص |
+| 13 | متتبع العبادات | الصلوات الخمس اليومية وخطط الختمة |
+| 14 | الإعدادات والإضافات | وضع ليلي، أحجام خط وخط المصحف الأصلي، حساب الزكاة، التقويم الهجري، أسماء الله الحسنى |
+
+## لقطات الشاشات
+
+يُرفق المالك صور PNG حقيقية لاحقًا (المسودة وقائمة اللقطات في `docs/store/listing-ar.md` و`docs/store/listing-en.md`، والمستهدفات تحت `docs/store/screenshots/`):
+
+![الرئيسية](docs/store/screenshots/01-home.png)
+![فهرس السور](docs/store/screenshots/02-index.png)
+![القارئ](docs/store/screenshots/03-reader.png)
+![وضع المصحف](docs/store/screenshots/04-mushaf.png)
+![التلاوات](docs/store/screenshots/06-recitation.png)
+![مواقيت الصلاة](docs/store/screenshots/07-prayer-times.png)
+
+<!-- PLACEHOLDER LINKS — الملفات أعلاه غير موجودة بعد؛ تُستبدل عند إرفاق اللقطات -->
+
+## التقنيات
+
+Flutter · Dart ·
+**flutter_bloc** (إدارة الحالة) · **drift** (قاعدة بيانات محلية: النص، القُرّاء، الحِزم، التتبع) ·
+**go_router** · **just_audio** + **just_audio_background** (تشغيل التلاوات) · **adhan** (حساب المواقيت) ·
+**geolocator** (أقرب مدينة — المعالجة على الجهاز فقط) · **dio** (تنزيلات) ·
+**flutter_local_notifications** + **timezone** (التنبيهات) · **hijri** ·
+**freezed / build_runner** · **get_it** — ببنية كود مميزة Feature-first.
+
+## البناء والاختبار
 
 ```bash
 flutter pub get
-flutter run
+flutter gen-l10n
+dart run build_runner build --delete-conflicting-outputs
+
+flutter analyze        # بوابة الحملة: 0 مشكلات
+flutter test           # البوابة الكاملة: 209 اختبارات (تاريخ REL-1)
+
+flutter build apk --debug          # للتثبيت السريع على جهاز
+flutter build appbundle --release  # مخرجات المتجر
+tools/device_smoke.ps1             # بوابة دخان الجهاز: تثبيت + إقلاع بلا أخطاء قاتلة
 ```
 
-No configuration, API keys, or accounts are required — the text travels with the app.
+التوقيع عند الإصدار: إن وُجد `android/key.properties` (مستثنى من Git) وُقّعت المخرجات منه، وإلا يبنى التطبيق موقّعًا بـ debug مع تنبيه صريح في السجل حتى يستلم المالك مفتاحه (W7c).
 
-## Project structure
+## المحتوى والمصادر
 
-```
-lib/
-├── core/
-│   ├── common/          # shared singletons, static surah data, QuranState
-│   ├── widgets/         # drawer widget
-│   └── strings.dart
-└── features/
-    └── quran/
-        ├── data/        # JSON assets
-        └── presentation/
-            ├── screens/ # surah index, reader, settings
-            └── components/ # verse/surah builders, basmala
-```
+- نص القرآن الكريم (رواية حفص، نص عثماني وإملائي): مضمّن محليًا داخل التطبيق.
+- الأذكار والأدعية والرقية: تجميعات من المصنفات التقليدية المتداولة.
+- التلاوات الصوتية: من خدمة mp3quran.net المجانية.
+- الخطوط: Cairo برخصة SIL OFL (النص مرفق في `assets/fonts/Cairo-OFL.txt`) + خطا المصحف HafsSmart وme_quran بشروط نشر مجانية من ناشر المصحف.
+- التفاصيل الكاملة في `PRIVACY.md`.
 
-State is managed through a global `QuranState` singleton (settings + bookmark persistence over `shared_preferences`).
+## الرخصة
 
-## Test
-
-```bash
-flutter analyze   # 0 issues
-flutter test
-```
-
-## Roadmap (see `RECOVERY_PLAN.md`)
-
-- Typed data models + lazy JSON loading for faster startup
-- Migrate the global singleton to Riverpod
-- Dark mode + system theme support
-- Localization (AR/EN) and a proper router
-
-## Contributing
-
-Contributions are welcome — open an issue or submit a PR.
-
-## License
-
-All rights reserved. Portfolio/demo project.
+الكود: جميع الحقوق محفوظة لصاحب المشروع (مشروع بورتفوليو). محتوى التطبيق مفتوح المصدر وفق رخص المحتوى المذكورة أعلاه.
