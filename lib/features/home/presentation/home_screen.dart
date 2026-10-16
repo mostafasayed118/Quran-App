@@ -31,10 +31,7 @@ class HomeScreen extends StatelessWidget {
                       leading: Icon(Icons.menu_book, color: colors.primary),
                       title: Text(
                         lastRead.surahName,
-                        style: const TextStyle(
-                          fontFamily: QuranFonts.meQuran,
-                          fontSize: 20,
-                        ),
+                        style: AppTheme.meQuranHead,
                       ),
                       subtitle: Text(
                         '﴿${lastRead.ayahNumber.toArabicIndic}﴾ ${loc.continueReading}',

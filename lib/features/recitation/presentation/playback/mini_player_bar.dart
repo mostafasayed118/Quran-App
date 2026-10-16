@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
@@ -107,10 +108,7 @@ class _PlaybackStrip extends StatelessWidget {
                     ),
                     Text(
                       loc.surahBadge(surahNumber.toArabicIndic),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: AppTheme.mutedFootnote(context),
                     ),
                     LinearProgressIndicator(value: progress, minHeight: 3),
                   ],

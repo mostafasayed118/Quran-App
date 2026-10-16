@@ -63,7 +63,7 @@ class _SurahRow extends StatelessWidget {
       leading: ArabicBadge('${surah.id}'),
       title: Text(
         surah.nameAr,
-        style: const TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20),
+        style: AppTheme.meQuranHead,
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),

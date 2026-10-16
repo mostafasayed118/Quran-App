@@ -139,12 +139,7 @@ class _DuasView extends StatelessWidget {
                               child: Text(
                                 entry.reference!,
                                 textAlign: TextAlign.right,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                                style: AppTheme.mutedFootnote(context),
                               ),
                             ),
                         ],
@@ -220,10 +215,7 @@ class _RuqyahView extends StatelessWidget {
                         child: Text(
                           entry.reference!,
                           textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: colors.onSurfaceVariant,
-                          ),
+                          style: AppTheme.mutedFootnote(context),
                         ),
                       ),
                   ],

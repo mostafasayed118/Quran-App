@@ -140,21 +140,18 @@ class _RecitingList extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (item.virtue != null || item.reference != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              [
-                                if (item.virtue != null) item.virtue!,
-                                if (item.reference != null) item.reference!,
-                              ].join(' · '),
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: colors.onSurfaceVariant,
+                          if (item.virtue != null || item.reference != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                [
+                                  if (item.virtue != null) item.virtue!,
+                                  if (item.reference != null) item.reference!,
+                                ].join(' · '),
+                                textAlign: TextAlign.right,
+                                style: AppTheme.mutedFootnote(context),
                               ),
                             ),
-                          ),
                       ],
                     ),
                   ),

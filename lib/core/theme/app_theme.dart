@@ -9,6 +9,17 @@ abstract final class QuranFonts {
 }
 
 abstract final class AppTheme {
+  static const TextStyle meQuranHead =
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20);
+
+  static const TextStyle hafsAyah =
+      TextStyle(fontFamily: QuranFonts.quran, fontSize: 24, height: 2);
+
+  static TextStyle mutedFootnote(BuildContext context) => TextStyle(
+        fontSize: 11,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      );
+
   static ThemeData get light => _theme(Brightness.light);
   static ThemeData get dark => _theme(Brightness.dark);
 

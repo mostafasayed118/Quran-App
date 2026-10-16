@@ -153,11 +153,7 @@ class _AyahCard extends StatelessWidget {
         children: [
           Text(
             ayah.textUthmani,
-            style: const TextStyle(
-              fontFamily: QuranFonts.quran,
-              fontSize: 24,
-              height: 2,
-            ),
+            style: AppTheme.hafsAyah,
             textAlign: TextAlign.center,
             textDirection: TextDirection.rtl,
           ),

@@ -31,10 +31,7 @@ class HijriScreen extends StatelessWidget {
                       children: [
                         Text(
                           todayHeader,
-                          style: const TextStyle(
-                            fontFamily: QuranFonts.meQuran,
-                            fontSize: 20,
-                          ),
+                          style: AppTheme.meQuranHead,
                         ),
                       ],
                     ),

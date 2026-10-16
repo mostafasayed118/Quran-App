@@ -39,10 +39,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                   ),
                   Text(
                     row.moshafName,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    style: AppTheme.mutedFootnote(context),
                   ),
                 ],
               ),
@@ -125,7 +122,7 @@ class _SurahDownloadRow extends StatelessWidget {
       leading: _buildLeading(context, colors),
       title: Text(
         name,
-        style: const TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20),
+        style: AppTheme.meQuranHead,
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),
@@ -186,10 +183,7 @@ class _SurahDownloadRow extends StatelessWidget {
           total: item.total,
           width: 96,
           gap: 4,
-          labelStyle: TextStyle(
-            fontSize: 11,
-            color: colors.onSurfaceVariant,
-          ),
+          labelStyle: AppTheme.mutedFootnote(context),
         );
       case 'failed':
         return IconButton(

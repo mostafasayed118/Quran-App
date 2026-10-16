@@ -71,10 +71,7 @@ class AsmaScreen extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: colors.onSurfaceVariant,
-                                ),
+                                style: AppTheme.mutedFootnote(context),
                               ),
                             ),
                           ],
