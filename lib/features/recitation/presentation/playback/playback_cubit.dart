@@ -124,6 +124,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _durationSub = null;
   }
 
+  @override
+  Future<void> close() async {
+    await _unbindStreams();
+    return super.close();
+  }
+
   void _onPlayingChanged(bool playing) {
     if (isClosed) return;
     final state = this.state;

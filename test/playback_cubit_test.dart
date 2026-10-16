@@ -162,6 +162,20 @@ void main() {
     expect((cubit.state as PlaybackPlaying).reciterName, featured.reciterName);
   });
 
+  test('close() unbinds the service streams', () async {
+    final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
+    service = FakePlaybackService();
+    cubit = buildCubit(service);
+
+    await cubit.playSurah(row, 1);
+    expect(service.playing.hasListener, isTrue);
+
+    await cubit.close();
+    expect(service.playing.hasListener, isFalse);
+    expect(service.positionCtrl.hasListener, isFalse);
+    expect(service.durationCtrl.hasListener, isFalse);
+  });
+
   test('toggle pauses and resumes', () async {
     final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
     service = FakePlaybackService();
