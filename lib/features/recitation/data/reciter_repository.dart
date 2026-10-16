@@ -112,8 +112,10 @@ class ReciterRepository {
         ));
       }
     }
-    await _db.delete(_db.reciters).go();
-    await _db.batch((b) => b.insertAll(_db.reciters, rows));
+    await _db.transaction(() async {
+      await _db.delete(_db.reciters).go();
+      await _db.batch((b) => b.insertAll(_db.reciters, rows));
+    });
   }
 
   Stream<List<ReciterRow>> watchAll() => _db.select(_db.reciters).watch();
