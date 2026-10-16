@@ -17,7 +17,9 @@ class TasbihScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.tasbih)),
       body: BlocBuilder<TasbihCubit, TasbihState>(
         builder: (context, state) {
-          final ready = state as TasbihReady;
+          final TasbihReady ready = switch (state) {
+            TasbihReady() => state,
+          };
           final colors = Theme.of(context).colorScheme;
           return Column(
             children: [

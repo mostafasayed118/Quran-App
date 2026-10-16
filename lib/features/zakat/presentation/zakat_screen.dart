@@ -17,7 +17,9 @@ class ZakatScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.zakat)),
       body: BlocBuilder<ZakatCubit, ZakatState>(
         builder: (context, state) {
-          final ready = state as ZakatReady;
+          final ZakatReady ready = switch (state) {
+            ZakatReady() => state,
+          };
           final colors = Theme.of(context).colorScheme;
           return ListView(
             padding: const EdgeInsets.all(12),
