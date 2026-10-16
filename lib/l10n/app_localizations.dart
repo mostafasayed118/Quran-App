@@ -755,7 +755,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsMinimalNote.
   ///
   /// In ar, this message translates to:
-  /// **'الوضع الليلي واللغة من إعدادات جهازك'**
+  /// **'الوضع الليلي من إعدادات جهازك'**
   String get settingsMinimalNote;
 
   /// No description provided for @stopAction.
