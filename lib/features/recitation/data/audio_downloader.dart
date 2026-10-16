@@ -19,7 +19,11 @@ class AudioDownloader {
     this._db, {
     Dio? dio,
     Future<Directory> Function()? audioRootResolver,
-  })  : _dio = dio ?? Dio(),
+  })  : _dio = dio ??
+            Dio(BaseOptions(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(minutes: 2),
+            )),
         _audioRoot = audioRootResolver;
 
   final AppDatabase _db;
@@ -27,6 +31,12 @@ class AudioDownloader {
   final Future<Directory> Function()? _audioRoot;
 
   static const audioFolderName = 'audio';
+
+  /// Guard against a lying/compromised host streaming unbounded bytes:
+  /// up to 2x the sent content-length plus 64 KiB slack, or a 64 MiB hard
+  /// ceiling when no content-length is sent (a surah mp3 is ~1-2 MB).
+  static int _maxAcceptedBytes(int declaredTotal) =>
+      declaredTotal > 0 ? declaredTotal * 2 + 65536 : 64 << 20;
 
   Future<Directory> _root() async {
     final resolver = _audioRoot;
@@ -89,6 +99,9 @@ class AudioDownloader {
       try {
         await for (final chunk in res.data!.stream) {
           received += chunk.length;
+          if (received > _maxAcceptedBytes(total)) {
+            throw DownloadFailure('audio stream exceeded its declared size');
+          }
           sink.add(chunk);
           onProgress?.call(received, total);
         }

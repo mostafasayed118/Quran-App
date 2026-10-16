@@ -300,6 +300,21 @@ void main() {
     expect(await downloader.translationFor('tpc', 1, 1), 'INSTALLED');
   });
 
+  test('oversized single-file stream is aborted before promotion', () async {
+    await serve((req) async {
+      final filler = 'a' * (200 * 1024);
+      req.response.headers.contentType = ContentType.json;
+      req.response
+          .write('{"quran":[{"chapter":1,"verse":1,"text":"$filler"}]}');
+      await req.response.close();
+    });
+    await expectLater(downloader.install(translationPack(id: 'tover')),
+        throwsA(isA<PackFailure>()));
+    expect(await downloader.installedPacks(), isEmpty);
+    final leftovers = Directory('${tempRoot.path}/library').listSync();
+    expect(leftovers, isEmpty);
+  });
+
   test('uninstall removes both the file and the registry row', () async {
     await serve((req) async {
       req.response.headers.contentType = ContentType.json;

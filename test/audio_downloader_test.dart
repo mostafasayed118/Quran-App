@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' show Value;
@@ -7,6 +8,29 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
+
+/// Serves a stream far larger than the content-length it declares.
+class _LyingAdapter implements HttpClientAdapter {
+  _LyingAdapter(this.chunks);
+
+  final List<List<int>> chunks;
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    return ResponseBody(
+      Stream.fromIterable(chunks.map(Uint8List.fromList)),
+      200,
+      headers: {
+        Headers.contentLengthHeader: ['1000'],
+        Headers.contentTypeHeader: ['audio/mpeg'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
 
 void main() {
   late AppDatabase db;
@@ -78,6 +102,30 @@ void main() {
     expect(statuses.single.status, 'done');
     expect(statuses.single.bytes, 4096);
     expect(await downloader.isDownloaded('51-53', 2), isTrue);
+  });
+
+  test('a stream far beyond its declared size is aborted as failed',
+      () async {
+    await serve((_) async {});
+    final downloader = AudioDownloader(
+      db,
+      dio: Dio()..httpClientAdapter = _LyingAdapter([
+        for (var i = 0; i < 20; i++) List<int>.filled(100 * 1024, 7),
+      ]),
+      audioRootResolver: () async => tempRoot,
+    );
+    final reciter = await (db.select(db.reciters)).getSingle();
+
+    await expectLater(
+      downloader.downloadSurah(reciter: reciter, surahNumber: 3),
+      throwsA(isA<DownloadFailure>()),
+    );
+
+    final statuses = await (db.select(db.downloads)
+          ..where((d) => d.reciterId.equals('51-53')))
+        .get();
+    expect(statuses.single.status, 'failed');
+    expect(await downloader.isDownloaded('51-53', 3), isFalse);
   });
 
   test('server 404 marks failed and removes the partial file', () async {

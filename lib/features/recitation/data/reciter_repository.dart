@@ -70,7 +70,9 @@ class ReciterRepository {
   final String _endpoint;
 
   Future<void> refreshFromApi() async {
-    final res = await _client.get(Uri.parse(_endpoint));
+    final res = await _client
+        .get(Uri.parse(_endpoint))
+        .timeout(const Duration(seconds: 20));
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }

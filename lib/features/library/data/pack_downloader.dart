@@ -35,7 +35,11 @@ class PackDownloader {
     this._db, {
     Dio? dio,
     Future<Directory> Function()? libraryRootResolver,
-  })  : _dio = dio ?? Dio(),
+  })  : _dio = dio ??
+            Dio(BaseOptions(
+              connectTimeout: const Duration(seconds: 15),
+              receiveTimeout: const Duration(minutes: 2),
+            )),
         _rootResolver = libraryRootResolver;
 
   final AppDatabase _db;
@@ -49,6 +53,10 @@ class PackDownloader {
   final Map<String, dynamic> _decodedCache = {};
 
   static const libraryFolderName = 'library';
+
+  /// Guard against a lying/compromised host streaming unbounded bytes:
+  /// allow up to 2x the declared size plus 64 KiB slack.
+  static int _sizeCap(int expectedBytes) => expectedBytes * 2 + 65536;
 
   Future<Directory> _root() async {
     final resolver = _rootResolver;
@@ -100,6 +108,10 @@ class PackDownloader {
                 throw PackFailure('tafsir surah $n is empty or not an array');
               }
               received += utf8.encode(body).length;
+              if (received > _sizeCap(expectedBytes)) {
+                throw PackFailure(
+                    'pack "${pack.id}" exceeds its declared size');
+              }
               // Flatten: splice the per-surah array interior verbatim so the
               // wrapper's tafsirs list stays a flat (surah, ayah, text) list.
               final trimmed = body.trim();
@@ -129,6 +141,10 @@ class PackDownloader {
             final total = contentLength > 0 ? contentLength : expectedBytes;
             await for (final chunk in res.data!.stream) {
               received += chunk.length;
+              if (received > _sizeCap(expectedBytes)) {
+                throw PackFailure(
+                    'pack "${pack.id}" exceeds its declared size');
+              }
               sink.add(chunk);
               onProgress?.call(received, total);
             }
