@@ -1,0 +1,18 @@
+name: web-gates
+on:
+  push:
+    paths: ['web/**', 'tools/export_web_data.dart', '.github/workflows/web.yml']
+  pull_request:
+    paths: ['web/**', 'tools/export_web_data.dart']
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: web } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci
+      - run: npm run check
+      - run: npm run test
+      - run: npm run build
