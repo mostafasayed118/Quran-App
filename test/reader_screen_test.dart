@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
@@ -58,19 +58,39 @@ void main() {
     db = AppDatabase.test(NativeDatabase.memory());
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم'),
       AyahsCompanion.insert(
-          id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب'),
       AyahsCompanion.insert(
-          id: const Value(10), surahId: 2, numberInSurah: 3, juz: 1, page: 3,
-          textUthmani: 'الذين يؤمنون', textImlaei: 'الذين يؤمنون'),
+          id: const Value(10),
+          surahId: 2,
+          numberInSurah: 3,
+          juz: 1,
+          page: 3,
+          textUthmani: 'الذين يؤمنون',
+          textImlaei: 'الذين يؤمنون'),
     ];
     final fatiha = [
       AyahsCompanion.insert(
-          id: const Value(1), surahId: 1, numberInSurah: 1, juz: 1, page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم', textImlaei: 'بسم الله الرحمن الرحيم'),
+          id: const Value(1),
+          surahId: 1,
+          numberInSurah: 1,
+          juz: 1,
+          page: 1,
+          textUthmani: 'بسم الله الرحمن الرحيم',
+          textImlaei: 'بسم الله الرحمن الرحيم'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
@@ -84,12 +104,15 @@ void main() {
   Widget host(int surahId) {
     repo = _TeardownSafeAyahRepository(db);
     final cubit = ReaderCubit(
-        ayahRepository: repo, lastReadRepository: lastRead,
-        surahId: surahId, initialAyah: 0);
+        ayahRepository: repo,
+        lastReadRepository: lastRead,
+        surahId: surahId,
+        initialAyah: 0);
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db, audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(db,
+          audioRootResolver: () async => Directory.systemTemp),
     );
     addTearDown(playbackCubit.close);
     return MultiBlocProvider(

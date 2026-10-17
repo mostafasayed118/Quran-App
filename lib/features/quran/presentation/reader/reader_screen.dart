@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +7,7 @@ import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
@@ -26,17 +25,12 @@ class ReaderScreen extends StatelessWidget {
         ReaderLoading() => const Scaffold(body: LoadingView()),
         ReaderError(:final message) => Scaffold(
             appBar: AppBar(),
-            body: _errorPane(AppLocalizations.of(context), message, 'reader'),
+            body: errorPane(AppLocalizations.of(context), message, 'reader'),
           ),
         ReaderReady() => _ReadyView(state: state),
       },
     );
   }
-}
-
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
 }
 
 class _ReadyView extends StatelessWidget {
@@ -56,10 +50,9 @@ class _ReadyView extends StatelessWidget {
           IconButton(
             tooltip: loc.listenTooltip,
             icon: const Icon(Icons.headphones),
-            onPressed: () =>
-                context.read<PlaybackCubit>().playDefaultForSurah(
-                      state.surahId,
-                    ),
+            onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
+                  state.surahId,
+                ),
           ),
           IconButton(
             tooltip: isVerses ? loc.mushafMode : loc.versesMode,
@@ -89,7 +82,9 @@ class _ReadyView extends StatelessWidget {
               ),
             ),
           Expanded(
-            child: isVerses ? _VersesList(state: state) : _MushafPager(state: state),
+            child: isVerses
+                ? _VersesList(state: state)
+                : _MushafPager(state: state),
           ),
         ],
       ),
@@ -98,20 +93,29 @@ class _ReadyView extends StatelessWidget {
   }
 }
 
-class _VersesList extends StatelessWidget {
+class _VersesList extends StatefulWidget {
   const _VersesList({required this.state});
 
   final ReaderReady state;
 
   @override
+  State<_VersesList> createState() => _VersesListState();
+}
+
+class _VersesListState extends State<_VersesList> {
+  /// Hoisted to State: rebuilds (bookmark emissions) must not replace the
+  /// controller mid-scroll, which re-applied initialScrollIndex.
+  final ItemScrollController _controller = ItemScrollController();
+
+  @override
   Widget build(BuildContext context) {
     final cubit = context.read<ReaderCubit>();
+    final state = widget.state;
     final initialIndex =
         state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
-    final controller = ItemScrollController();
     return ScrollablePositionedList.builder(
       initialScrollIndex: initialIndex > 0 ? initialIndex : 0,
-      itemScrollController: controller,
+      itemScrollController: _controller,
       itemCount: state.ayahs.length,
       itemBuilder: (context, index) {
         final ayah = state.ayahs[index];

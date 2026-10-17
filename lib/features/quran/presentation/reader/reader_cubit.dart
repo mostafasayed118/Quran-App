@@ -1,8 +1,8 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../data/ayah_repository.dart';
 import '../../data/last_read_repository.dart';
 import 'mushaf_page_block.dart';
@@ -19,7 +19,15 @@ class ReaderCubit extends Cubit<ReaderState> {
         _surahId = surahId,
         _initialAyah = initialAyah,
         super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah)) {
-    _bookmarksSub = ayahRepository.watchBookmarkedIds().listen(_onBookmarks);
+    _bookmarksSub = ayahRepository.watchBookmarkedIds().listen(
+          _onBookmarks,
+          onError: (Object error, StackTrace stackTrace) => dev.log(
+            'bookmarks stream error',
+            name: 'quran_yahdi/reader',
+            error: error,
+            stackTrace: stackTrace,
+          ),
+        );
     _load();
   }
 
@@ -32,15 +40,15 @@ class ReaderCubit extends Cubit<ReaderState> {
 
   Future<void> _load() async {
     try {
-      final results =
-          await Future.wait([_ayahRepository.surahById(_surahId), _ayahRepository.surahAyahs(_surahId)]);
-      final surah = results[0] as Surah?;
-      final ayahs = results[1] as List<Ayah>;
-      final startList = ayahs
-          .where((a) => a.numberInSurah == _initialAyah)
-          .toList();
-      _lastReadRepository
-          .saveAyahId(startList.isNotEmpty ? startList.first.id : (ayahs.isNotEmpty ? ayahs.first.id : 0));
+      final (surah, ayahs) = await (
+        _ayahRepository.surahById(_surahId),
+        _ayahRepository.surahAyahs(_surahId),
+      ).wait;
+      final startList =
+          ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
+      _lastReadRepository.saveAyahId(startList.isNotEmpty
+          ? startList.first.id
+          : (ayahs.isNotEmpty ? ayahs.first.id : 0));
       if (isClosed) return;
       emit(ReaderState.ready(
         surahId: _surahId,
