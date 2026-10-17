@@ -298,6 +298,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryRetry => 'Retry';
 
   @override
+  String get retry => 'Retry';
+
+  @override
   String get cancel => 'Cancel';
 
   @override

@@ -23,12 +23,35 @@ class ReaderScreen extends StatelessWidget {
     return BlocBuilder<ReaderCubit, ReaderState>(
       builder: (context, state) => switch (state) {
         ReaderLoading() => const Scaffold(body: LoadingView()),
-        ReaderError(:final message) => Scaffold(
-            appBar: AppBar(),
-            body: errorPane(AppLocalizations.of(context), message, 'reader'),
-          ),
+        ReaderError(:final message) => _ReaderErrorView(message: message),
         ReaderReady() => _ReadyView(state: state),
       },
+    );
+  }
+}
+
+class _ReaderErrorView extends StatelessWidget {
+  const _ReaderErrorView({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(loc.quran)),
+      body: Column(
+        children: [
+          Expanded(child: errorPane(loc, message, 'reader')),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 32),
+            child: FilledButton(
+              onPressed: () => context.read<ReaderCubit>().reload(),
+              child: Text(loc.retry),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -44,11 +44,18 @@ class ReaderCubit extends Cubit<ReaderState> {
         _ayahRepository.surahById(_surahId),
         _ayahRepository.surahAyahs(_surahId),
       ).wait;
+      if (ayahs.isEmpty) {
+        if (isClosed) return;
+        emit(ReaderState.error(
+          message: 'surah $_surahId has no readable ayahs',
+        ));
+        return;
+      }
       final startList =
           ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      _lastReadRepository.saveAyahId(startList.isNotEmpty
-          ? startList.first.id
-          : (ayahs.isNotEmpty ? ayahs.first.id : 0));
+      _lastReadRepository.saveAyahId(
+        startList.isNotEmpty ? startList.first.id : ayahs.first.id,
+      );
       if (isClosed) return;
       emit(ReaderState.ready(
         surahId: _surahId,
@@ -63,6 +70,13 @@ class ReaderCubit extends Cubit<ReaderState> {
       if (isClosed) return;
       emit(ReaderState.error(message: error.toString()));
     }
+  }
+
+  /// Re-runs the load after a failure (error-state retry).
+  Future<void> reload() {
+    if (isClosed) return Future<void>.value();
+    emit(ReaderState.loading(surahId: _surahId, initialAyah: _initialAyah));
+    return _load();
   }
 
   void _onBookmarks(Set<int> ids) {

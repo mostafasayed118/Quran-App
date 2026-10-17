@@ -298,6 +298,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get libraryRetry => 'أعِد المحاولة';
 
   @override
+  String get retry => 'أعِد المحاولة';
+
+  @override
   String get cancel => 'إلغاء';
 
   @override

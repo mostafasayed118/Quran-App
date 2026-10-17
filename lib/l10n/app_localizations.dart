@@ -626,6 +626,12 @@ abstract class AppLocalizations {
   /// **'أعِد المحاولة'**
   String get libraryRetry;
 
+  /// No description provided for @retry.
+  ///
+  /// In ar, this message translates to:
+  /// **'أعِد المحاولة'**
+  String get retry;
+
   /// No description provided for @cancel.
   ///
   /// In ar, this message translates to:
