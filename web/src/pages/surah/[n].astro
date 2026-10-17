@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AyahBlock from '../../components/AyahBlock.astro';
+import { surahNeighbors } from '../../lib/surah-neighbors';
+import { t, defaultLocale } from '../../lib/strings';
+import surahs from '../../data/surahs.json';
+
+export function getStaticPaths() {
+  return surahs.surahs.map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
+}
+const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
+const locale = defaultLocale;
+const { prev, next } = surahNeighbors(surah.id);
+const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
+  surah: number;
+  ayahs: { n: number; juz: number; page: number; u: string; i: string; sajda: boolean }[];
+};
+const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
+---
+<BaseLayout title={title} preloadFont>
+  <article class="reader">
+    <header class="reader-head">
+      <h1>سورة {surah.nameAr}</h1>
+      <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {surah.ayahCount} آية</p>
+    </header>
+    <div class="ayahs">
+      {data.ayahs.map((a) => <AyahBlock n={a.n} text={a.u} sajda={a.sajda} />)}
+    </div>
+    <nav class="reader-nav">
+      {prev !== null ? <a href={`/surah/${prev}`}>{t(locale, 'readerPrev')}</a> : <a href="/quran">{t(locale, 'backToIndex')}</a>}
+      {next !== null && <a href={`/surah/${next}`}>{t(locale, 'readerNext')}</a>}
+    </nav>
+  </article>
+</BaseLayout>

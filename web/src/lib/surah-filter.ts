@@ -1,8 +1,11 @@
+const ARABIC_INDIC = '٠١٢٣٤٥٦٧٨٩';
+
 export function normalizeQuery(q: string): string {
   return q
     .trim()
     .toLowerCase()
-    .replace(/[\u064B-\u0652\u0670\u0640]/g, '')
+    .replace(/[٠-٩]/g, (d) => String(ARABIC_INDIC.indexOf(d)))
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '')
     .replace(/[أإآٱ]/g, 'ا')
     .replace(/ى/g, 'ي')
     .replace(/ة/g, 'ه');

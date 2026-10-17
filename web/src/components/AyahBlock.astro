@@ -1,0 +1,10 @@
+---
+import { toArabicDigits } from '../lib/arabic-digits';
+interface Props { n: number; text: string; sajda: boolean }
+const { n, text, sajda } = Astro.props;
+---
+<div class="ayah" id={`ayah-${n}`} data-n={n}>
+  <p class="ayah-text">
+    {text}<span class="medal" aria-hidden="true">{toArabicDigits(n)}</span>{sajda && <span class="sajda" title="سجدة">۩</span>}
+  </p>
+</div>

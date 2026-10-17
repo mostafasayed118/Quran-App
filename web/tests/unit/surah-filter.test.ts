@@ -24,4 +24,9 @@ describe('filterSurahs', () => {
     const ids = filterSurahs(list, 'النور').map((s) => s.id);
     expect(ids[0]).toBe(24);
   });
+  it('finds by Arabic-Indic digits', () => expect(filterSurahs(list, '١٨')[0].id).toBe(18));
+  it('finds decomposed-maddah surah name (ا + U+0653)', () => {
+    expect(filterSurahs(list, '\u0627\u0653\u0644 \u0639\u0645\u0631\u0627\u0646')[0].id).toBe(3);
+  });
+  it('multi-match ranking guard for الـم', () => expect(filterSurahs(list, 'الم')[0].id).toBe(5));
 });
