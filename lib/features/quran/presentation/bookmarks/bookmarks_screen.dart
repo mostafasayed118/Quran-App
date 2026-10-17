@@ -36,15 +36,17 @@ class BookmarksScreen extends StatelessWidget {
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
                       final ayah = entries[index].ayah;
-                      final snippet = ayah.textImlaei.length > 60
-                          ? '${ayah.textImlaei.substring(0, 60)}…'
-                          : ayah.textImlaei;
                       return ListTile(
                         leading: Text(
                           '${ayah.surahId.toArabicIndic}:${ayah.numberInSurah.toArabicIndic}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
+                          textDirection: TextDirection.rtl,
                         ),
-                        title: Text(snippet),
+                        title: Text(
+                          ayah.textImlaei,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                         trailing: IconButton(
                           tooltip: AppLocalizations.of(context).bookmarkRemove,
                           icon: const Icon(Icons.delete_outline),
