@@ -180,9 +180,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noCity => 'لم تُحدَّد مدينة بعد';
 
   @override
-  String get qiblaDirection => 'اتجاه القبلة';
-
-  @override
   String degreesFromNorth(String degrees) {
     return '$degrees° عن الشمال';
   }
@@ -266,11 +263,6 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String hijriDate(String month, String year) {
     return 'الشهر $month سنة $year';
-  }
-
-  @override
-  String gregorianEquivalent(String date) {
-    return 'يوافق $date';
   }
 
   @override

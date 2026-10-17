@@ -416,12 +416,6 @@ abstract class AppLocalizations {
   /// **'لم تُحدَّد مدينة بعد'**
   String get noCity;
 
-  /// No description provided for @qiblaDirection.
-  ///
-  /// In ar, this message translates to:
-  /// **'اتجاه القبلة'**
-  String get qiblaDirection;
-
   /// No description provided for @degreesFromNorth.
   ///
   /// In ar, this message translates to:
@@ -571,12 +565,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الشهر {month} سنة {year}'**
   String hijriDate(String month, String year);
-
-  /// No description provided for @gregorianEquivalent.
-  ///
-  /// In ar, this message translates to:
-  /// **'يوافق {date}'**
-  String gregorianEquivalent(String date);
 
   /// No description provided for @jumpToToday.
   ///
