@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/heading_service.dart';
 import 'qibla_cubit.dart';
@@ -29,18 +30,10 @@ class QiblaScreen extends StatelessWidget {
               ),
           };
           if (city == null || bearing == null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(loc.noCity),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: () => context.push('/prayer-times/city'),
-                    child: Text(loc.selectCity),
-                  ),
-                ],
-              ),
+            return EmptyState(
+              loc.noCity,
+              actionLabel: loc.selectCity,
+              onAction: () => context.push('/prayer-times/city'),
             );
           }
           return ListView(

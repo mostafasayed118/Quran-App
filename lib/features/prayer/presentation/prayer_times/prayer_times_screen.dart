@@ -6,6 +6,7 @@ import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'prayer_times_cubit.dart';
 import 'prayer_times_state.dart';
@@ -31,18 +32,10 @@ class PrayerTimesScreen extends StatelessWidget {
       body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
         builder: (context, state) => switch (state) {
           PrayerTimesLoading() => const LoadingView(),
-          PrayerTimesReady() when state.city == null => Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(loc.noCity),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: () => _openCityPicker(context),
-                    child: Text(loc.selectCity),
-                  ),
-                ],
-              ),
+          PrayerTimesReady() when state.city == null => EmptyState(
+              loc.noCity,
+              actionLabel: loc.selectCity,
+              onAction: () => _openCityPicker(context),
             ),
           PrayerTimesReady() => _TimesList(state: state),
         },
@@ -106,8 +99,7 @@ class _TimesList extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: entry.isNext ? FontWeight.bold : null,
-                    color:
-                        entry.isNext ? colors.onPrimaryContainer : null,
+                    color: entry.isNext ? colors.onPrimaryContainer : null,
                   ),
                 ),
                 if (entry.isNext && state.remaining != null)
