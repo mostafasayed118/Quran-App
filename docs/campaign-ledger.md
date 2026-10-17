@@ -156,3 +156,5 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - Zero STOPs. Disclosures accepted: incidental dart-format reflow inside whole-file commits; `pubspec.yaml` comment-only hunk; C11 `router.dart` format-only alongside the Zakat drop; pre-existing Gradle/AGP/Kotlin/CupertinoIcons toolchain warnings; expected unsigned fails-soft AAB path.
 - Deferred (owner-visible, unchanged): iOS-readiness audit (PROMPT 18 never dispatched), device proofs on the Infinix (device absent), W7c signing/listing/minima (owner-gated), licensing OPEN-FOR-OWNER decisions, CDN commit-SHA pinning + per-pack SHA-256, CI format/generated-diff gates.
 - State: closed main @ `0aaafd1` (+ this ledger commit), porcelain owner-debris only, **unpushed 14**. NO PUSH — window belongs to the owner.
+- Push window (owner GO): `e6ce8d5..e495893  main -> main` exit 0 · ls-remote `e495893172155334f90f68577b45230858cfcff7` == local HEAD · unpushed 0 · pre-push gates re-run: analyze 0 · suite **243/243**.
+- State after window: main @ `e495893` (+ this ledger commit), porcelain owner-debris only, **unpushed 0** after the follow-up docs push.
