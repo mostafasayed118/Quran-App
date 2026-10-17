@@ -50,15 +50,18 @@ class CityRepository {
   final AppDatabase _db;
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  List<City>? _cache;
+  Future<List<City>>? _cache;
 
-  Future<List<City>> _all() async {
-    final cached = _cache;
-    if (cached != null) return cached;
+  Future<List<City>> _all() {
+    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
+      _cache = null;
+      throw error;
+    });
+  }
+
+  Future<List<City>> _load() async {
     final raw = await _loader();
-    final cities = [for (final json in raw) City.fromJson(json)];
-    _cache = cities;
-    return cities;
+    return [for (final json in raw) City.fromJson(json)];
   }
 
   Future<List<City>> search(String query) async {

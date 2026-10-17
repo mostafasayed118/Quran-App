@@ -82,6 +82,22 @@ void main() {
     expect(loads, 1);
   });
 
+  test('concurrent first searches share one loader run', () async {
+    var loads = 0;
+    final concurrent = CityRepository(
+      db: db,
+      loader: () async {
+        loads += 1;
+        await Future<void>.delayed(Duration.zero);
+        return fixtureRows();
+      },
+    );
+
+    await Future.wait([concurrent.search('c'), concurrent.search('r')]);
+
+    expect(loads, 1);
+  });
+
   test('select persists and round-trips via the settings table', () async {
     const cairo = City(
         id: 'c1', nameAr: 'القاهرة', nameEn: 'Cairo', lat: 30.0444, lng: 31.2357);

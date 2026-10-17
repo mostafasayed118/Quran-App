@@ -29,15 +29,18 @@ class AsmaRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  List<AsmaName>? _cache;
+  Future<List<AsmaName>>? _cache;
 
-  Future<List<AsmaName>> names() async {
-    final cached = _cache;
-    if (cached != null) return cached;
+  Future<List<AsmaName>> names() {
+    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
+      _cache = null;
+      throw error;
+    });
+  }
+
+  Future<List<AsmaName>> _load() async {
     final raw = await _loader();
-    final names = [for (final row in raw) AsmaName.fromJson(row)]
+    return [for (final row in raw) AsmaName.fromJson(row)]
       ..sort((a, b) => a.n.compareTo(b.n));
-    _cache = names;
-    return names;
   }
 }

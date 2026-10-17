@@ -133,12 +133,17 @@ class BundledCatalogSource extends CatalogSource {
 
   final Future<List<Map<String, dynamic>>> Function() loader;
 
-  List<LibraryPackInfo>? _cache;
+  Future<List<LibraryPackInfo>>? _cache;
 
   @override
-  Future<List<LibraryPackInfo>> all() async {
-    final cached = _cache;
-    if (cached != null) return cached;
+  Future<List<LibraryPackInfo>> all() {
+    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
+      _cache = null;
+      throw error;
+    });
+  }
+
+  Future<List<LibraryPackInfo>> _load() async {
     final raw = await loader();
     final packs = <LibraryPackInfo>[];
     for (final entry in raw) {
@@ -148,7 +153,6 @@ class BundledCatalogSource extends CatalogSource {
         // Malformed catalog entries are rejected, never crash the app.
       }
     }
-    _cache = packs;
     return packs;
   }
 }

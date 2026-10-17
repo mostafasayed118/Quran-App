@@ -42,14 +42,17 @@ class RuqyahRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  List<RuqyahEntry>? _cache;
+  Future<List<RuqyahEntry>>? _cache;
 
-  Future<List<RuqyahEntry>> entries() async {
-    final cached = _cache;
-    if (cached != null) return cached;
+  Future<List<RuqyahEntry>> entries() {
+    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
+      _cache = null;
+      throw error;
+    });
+  }
+
+  Future<List<RuqyahEntry>> _load() async {
     final raw = await _loader();
-    final entries = [for (final row in raw) RuqyahEntry.fromJson(row)];
-    _cache = entries;
-    return entries;
+    return [for (final row in raw) RuqyahEntry.fromJson(row)];
   }
 }
