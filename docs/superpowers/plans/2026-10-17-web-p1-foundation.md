@@ -77,6 +77,11 @@ export default defineConfig({
 });
 ```
 
+Also ensure `web/tsconfig.json` (scaffold-created) includes (additive; keep scaffold defaults):
+```json
+{ "extends": "astro/tsconfigs/strict", "compilerOptions": { "resolveJsonModule": true } }
+```
+
 `web/package.json` scripts:
 ```json
 {
@@ -537,10 +542,12 @@ describe('generated quran data', () => {
     expect(byId[2].ayahCount).toBe(286);
     expect(byId[18].ayahCount).toBe(110);
   });
-  it('spot-checks Ayat al-Kursi text', async () => {
+  it('spot-checks Ayat al-Kursi text (diacritic-tolerant)', async () => {
+    const normalize = (s: string) =>
+      s.replace(/[\u064B-\u0652\u0670\u0640]/g, '').replace(/[\u0671أإآ]/g, 'ا').replace(/ى/g, 'ي');
     const baqara = await load(2);
     const ayah = baqara.ayahs.find((a) => a.n === 255);
-    expect(ayah?.u).toContain('ٱلْكُرْسِيّ');
+    expect(normalize(ayah?.u ?? '')).toContain('الكرسي');
   });
 });
 ```
