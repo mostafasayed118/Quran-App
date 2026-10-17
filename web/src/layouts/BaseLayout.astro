@@ -1,0 +1,38 @@
+---
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { Locale } from '../lib/strings';
+
+interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
+const { title, description = 'قرآن يَهدي — اقرأ واستمع وتدبّر، مجاناً وبلا حسابات.', locale = 'ar', preloadFont = false } = Astro.props;
+const dir = locale === 'ar' ? 'rtl' : 'ltr';
+---
+<!doctype html>
+<html lang={locale} dir={dir} data-theme="day">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+    {preloadFont && <link rel="preload" href="/fonts/HafsSmart_08.woff2" as="font" type="font/woff2" crossorigin />}
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('qy:theme');
+          var sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
+          document.documentElement.setAttribute('data-theme', saved || sys);
+        } catch (e) { /* keep day */ }
+      })();
+    </script>
+  </head>
+  <body>
+    <Header locale={locale} />
+    <main><slot /></main>
+    <Footer locale={locale} />
+  </body>
+</html>

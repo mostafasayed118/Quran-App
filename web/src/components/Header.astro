@@ -1,0 +1,17 @@
+---
+import ThemeToggle from './ThemeToggle.tsx';
+import { t, type Locale } from '../lib/strings';
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+---
+<header class="site-header">
+  <a class="brand" href="/">
+    <img src="/logo-64.png" alt={t(locale, 'appName')} width="27" height="27" />
+    <span>{t(locale, 'appName')}</span>
+  </a>
+  <nav>
+    <a href="/quran">{t(locale, 'navQuran')}</a>
+    <a href="/about">{t(locale, 'navAbout')}</a>
+  </nav>
+  <ThemeToggle locale={locale} client:load />
+</header>

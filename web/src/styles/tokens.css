@@ -2,6 +2,7 @@
   --bg-solid: #F2ECDD;
   --ink: #232D28;
   --muted: rgba(35, 45, 40, 0.6);
+  --muted-strong: rgba(35, 45, 40, 0.72);
   --hairline: rgba(35, 45, 40, 0.12);
   --frame: rgba(201, 169, 106, 0.85);
   --frame2: rgba(62, 107, 88, 0.30);
@@ -16,6 +17,7 @@
   --bg-solid: #012A27;
   --ink: #F0E0C6;
   --muted: rgba(240, 224, 198, 0.55);
+  --muted-strong: rgba(240, 224, 198, 0.62);
   --hairline: rgba(240, 224, 198, 0.13);
   --frame: rgba(201, 169, 106, 0.5);
   --frame2: rgba(201, 169, 106, 0.2);

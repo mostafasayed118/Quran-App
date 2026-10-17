@@ -27,6 +27,26 @@ function token(theme: 'day' | 'night', name: string): string {
   return m[1];
 }
 
+function tokenValue(theme: 'day' | 'night', name: string): string {
+  const block = theme === 'day'
+    ? css.match(/\[data-theme=['"]day['"]\][^}]*}/)?.[0] ?? ''
+    : css.match(/\[data-theme=['"]night['"]\][^}]*}/)?.[0] ?? '';
+  const m = block.match(new RegExp(`${name}\\s*:\\s*([^;]+);`));
+  if (!m) throw new Error(`token ${name} missing in ${theme}`);
+  return m[1].trim();
+}
+function rgba(value: string): { rgb: [number, number, number]; a: number } {
+  const m = value.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)$/);
+  if (!m) throw new Error(`not an rgba() color: ${value}`);
+  return { rgb: [+m[1], +m[2], +m[3]], a: m[4] === undefined ? 1 : parseFloat(m[4]) };
+}
+function compositeOver(fg: string, bgHex: string): string {
+  const { rgb, a } = rgba(fg);
+  const bg = hexToRgb(bgHex);
+  const out = rgb.map((c, i) => Math.round(c * a + bg[i] * (1 - a)));
+  return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
 const AA = 4.5;
 describe('WCAG AA contrast (token pairs, spec §3.9)', () => {
   it.each([
@@ -40,5 +60,19 @@ describe('WCAG AA contrast (token pairs, spec §3.9)', () => {
     ['night', '--btn-ink', '--btn-bg'],
   ] as const)('%s: %s on %s', (theme, fg, bg) => {
     expect(contrast(token(theme, fg), token(theme, bg))).toBeGreaterThanOrEqual(AA);
+  });
+});
+
+const nightGradientFirstStop = css.match(/linear-gradient\(180deg,\s*(#[0-9a-fA-F]{6})/)?.[1];
+describe('WCAG AA contrast (muted-strong chrome text, a11y ruling)', () => {
+  it('day: --muted-strong composited over --bg-solid', () => {
+    const bg = token('day', '--bg-solid');
+    expect(contrast(compositeOver(tokenValue('day', '--muted-strong'), bg), bg)).toBeGreaterThanOrEqual(AA);
+  });
+  it('night: --muted-strong composited over the night gradient first stop', () => {
+    if (!nightGradientFirstStop) throw new Error('night gradient first stop missing in tokens.css');
+    expect(
+      contrast(compositeOver(tokenValue('night', '--muted-strong'), nightGradientFirstStop), nightGradientFirstStop),
+    ).toBeGreaterThanOrEqual(AA);
   });
 });
