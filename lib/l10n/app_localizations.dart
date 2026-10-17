@@ -200,6 +200,12 @@ abstract class AppLocalizations {
   /// **'متابعة القراءة'**
   String get continueReading;
 
+  /// No description provided for @continueReadingAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'﴿{ayah}﴾ متابعة القراءة'**
+  String continueReadingAyah(String ayah);
+
   /// No description provided for @surahIndexTitle.
   ///
   /// In ar, this message translates to:

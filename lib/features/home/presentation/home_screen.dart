@@ -46,7 +46,9 @@ class HomeScreen extends StatelessWidget {
                         style: AppTheme.meQuranHead,
                       ),
                       subtitle: Text(
-                        '﴿${lastRead.ayahNumber.toArabicIndic}﴾ ${loc.continueReading}',
+                        loc.continueReadingAyah(
+                          lastRead.ayahNumber.toArabicIndic,
+                        ),
                       ),
                       onTap: () => context.push(
                           '/quran/reader?surah=${lastRead.surahId}&ayah=${lastRead.ayahNumber}'),

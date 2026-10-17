@@ -60,6 +60,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueReading => 'Continue Reading';
 
   @override
+  String continueReadingAyah(String ayah) {
+    return '﴿$ayah﴾ Continue Reading';
+  }
+
+  @override
   String get surahIndexTitle => 'The Noble Quran';
 
   @override
