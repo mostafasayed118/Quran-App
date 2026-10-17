@@ -168,3 +168,17 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - State: main @ `9dbc10b` (+ this ledger commit), porcelain owner-debris only, **unpushed 2**. NO PUSH — window belongs to the owner.
 - Push window (owner GO): `28db71d..a20bc22  main -> main` exit 0 · ls-remote `a20bc22cb8570f1318eadc27b27bab02d8a6f97e` == local HEAD · unpushed 0 · pre-push gates re-run: analyze 0 · suite **243/243**.
 - State after window: main @ `a20bc22` (+ this ledger commit), porcelain owner-debris only, **unpushed 0** after the follow-up docs push.
+
+## DEVICE-SESSION — Infinix X6882 deferred proofs — CLOSED 2026-10-17
+- Trigger: owner reattached the phone; the deferred UX-FIX 3 / W7b device proofs ran on the HEAD `48cb5aa` debug APK (215,746,350 B, built from the pushed tree).
+- Environment: adb 37.0.0 via the full platform-tools path; device `13372704AR007777` (Infinix X6882, Android 14/API 34, 1080×2460, dark mode as found). One mid-session `offline → unauthorized` drop; recovered by `adb reconnect offline` + owner USB-debugging Allow.
+- Proofs (evidence saved under `%TEMP%\opencode\device-20261017\`):
+  1. `tools/device_smoke.ps1`: **DEVICE-SMOKE: PASS** — install Success, launch, pid alive, zero FATAL.
+  2. Home UI tree: «قرآن يَهدي» + continue-reading «يوسف ﴿١﴾ متابعة القراءة» + «فجر ٠٥:٢٢» + all 14 feature tiles.
+  3. Gold tone (UX-FIX 3 fix) — objective pixel proof inside the reader basmala bounds: dark `(227,165,62)` = `#E3A53E` EXACT (5,404 px within d≤25); light `(138,90,20)` = `#8A5A14` EXACT (5,404 px); night mode restored as found (dark).
+  4. 404: launched via `am start --es route /definitely-not-a-route` → UI tree shows «الصفحة غير موجودة» + «الرابط الذي فتحت غير موجود هنا» + «الرئيسية» CTA.
+  5. Accessibility labels: uiautomator content-desc census on the reader — رجوع · استمع للسورة · وضع المصحف · العلامات المرجعية · تفسير الآية وترجمتها · احفظ الآية (TalkBack-consumable labels present).
+  6. Notifications end-to-end: DB temporarily set (azkar enabled / 19:41) → AlarmManager exact RTC_WAKEUP @19:41:42 (`ScheduledNotificationReceiver`) → `onEnqueueNotificationInternal res:true` (logcat) → notification «أذكار الصباح» visible in the shade → tap → app foreground + **HOME** route (settings markers gone) + auto-cancel (record removed).
+- Restore: DB pushed back to as-found (`azkar_reminder_enabled=true`, `azkar_reminder_time=22:56`) and verified by re-pull; `SCHEDULE_EXACT_ALARM` appop reset to default; night mode restored; app relaunched at home; zero repo files touched (porcelain still owner `.vscode` only).
+- Disclosed limitation: this session's model cannot read images; the visual proofs were done as UI-tree + pixel sampling and the screenshots (home / reader light+dark / shade / 404 / after-tap) are saved for owner review.
+- State: main @ `48cb5aa` (+ this ledger commit), porcelain owner-debris only, **unpushed 1**. NO PUSH — window belongs to the owner.
