@@ -342,6 +342,7 @@ npm run test
   --bg-solid: #F2ECDD;
   --ink: #232D28;
   --muted: rgba(35, 45, 40, 0.6);
+  --muted-strong: rgba(35, 45, 40, 0.72);
   --hairline: rgba(35, 45, 40, 0.12);
   --frame: rgba(201, 169, 106, 0.85);
   --frame2: rgba(62, 107, 88, 0.30);
@@ -356,6 +357,7 @@ npm run test
   --bg-solid: #012A27;
   --ink: #F0E0C6;
   --muted: rgba(240, 224, 198, 0.55);
+  --muted-strong: rgba(240, 224, 198, 0.62);
   --hairline: rgba(240, 224, 198, 0.13);
   --frame: rgba(201, 169, 106, 0.5);
   --frame2: rgba(201, 169, 106, 0.2);
@@ -721,7 +723,7 @@ export default function ThemeToggle({ locale }: { locale: Locale }) {
   const label = theme === 'day' ? t(locale, 'themeToNight') : t(locale, 'themeToDay');
   return (
     <button
-      class="theme-toggle"
+      className="theme-toggle"
       aria-label={label}
       onClick={() => {
         const next = otherTheme(theme);
@@ -813,7 +815,7 @@ const { locale = 'ar' } = Astro.props;
 </footer>
 ```
 
-Add minimal styles to `global.css` (append): header/footer flex rows with `border-bottom: 1px solid var(--hairline)`, padded container `max-width: 1080px; margin-inline: auto; padding: 14px 20px`, brand `display:flex; gap:9px; color: var(--accent); font-weight:700`, nav links `color: var(--muted)`, `.theme-toggle { background: var(--btn-bg); color: var(--btn-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-family: inherit; font-weight: 700; cursor: pointer; }`.
+Add minimal styles to `global.css` (append): header/footer flex rows with `border-bottom: 1px solid var(--hairline)`, padded container `max-width: 1080px; margin-inline: auto; padding: 14px 20px`, brand `display:flex; gap:9px; color: var(--accent); font-weight:700`, nav links `color: var(--muted-strong)`, `.theme-toggle { background: var(--btn-bg); color: var(--btn-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-family: inherit; font-weight: 700; cursor: pointer; }`.
 
 `web/src/pages/index.astro` (temporary shell until P3 landing):
 ```astro

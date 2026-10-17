@@ -119,12 +119,13 @@ Fallback hardening: the reciter list is snapshotted at build time (`web/src/data
 | `--bg` | `#F2ECDD` | gradient `#012E2B → #012A27 → #012321` |
 | `--ink` | `#232D28` | `#F0E0C6` |
 | `--muted` | `rgba(35,45,40,.6)` | `rgba(240,224,198,.55)` |
+| `--muted-strong` (added during P1 for AA on normal-size chrome text; --muted unchanged; enforced by the contrast test) | `rgba(35,45,40,.72)` | `rgba(240,224,198,.62)` |
 | `--hairline` | `rgba(35,45,40,.12)` | `rgba(240,224,198,.13)` |
 | `--frame` / `--frame2` | `rgba(201,169,106,.85)` / `rgba(62,107,88,.30)` | `rgba(201,169,106,.5)` / `rgba(201,169,106,.2)` |
 | `--accent` | `#3E6B58` | `#E3A53E` |
 | `--btn-bg` / `--btn-ink` | `#3E6B58` / `#F7F3E8` | `#E3A53E` / `#161006` |
 | `--gold-line` | `#C9A96A` | `rgba(216,179,106,.6)` |
-| `--gold-ink` (medal numerals) | `#8A6520` | `#D8B36A` |
+| `--gold-ink` (medal numerals) | `#7E5C1D` (AA margin — enforced by web/tests/unit/contrast.test.ts) | `#D8B36A` |
 | `--surface` (ring gap) | `#F2ECDD` | `#012A27` |
 
 - Origin: night green `#012A27` + cream `#F0E0C6` sampled **from the real logo file** (`Dark Green Quran Logo.png`, 1254×1254). Day family carried from the app tokens (beige paper).
