@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,12 +35,15 @@ class RecitersCubit extends Cubit<RecitersState> {
     _emitFiltered();
   }
 
-  /// Soft network refresh; failures never kill the cached list.
+  /// Soft network refresh; failures never kill the cached list. The raw
+  /// exception is logged, never surfaced: the banner shows localized copy.
   Future<void> refresh() async {
     try {
       await _repo.refreshFromApi();
-    } on Object catch (e) {
-      _failSoft('$e');
+    } on Object catch (error, stackTrace) {
+      dev.log('reciters refresh failed',
+          name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
+      _failSoft();
     }
   }
 
@@ -49,14 +53,14 @@ class RecitersCubit extends Cubit<RecitersState> {
     unawaited(refresh());
   }
 
-  void _failSoft(String message) {
+  void _failSoft() {
     if (isClosed) return;
     final s = state;
     if (s is RecitersReady) {
-      emit(s.copyWith(dataError: message));
+      emit(s.copyWith(dataError: true));
     } else {
       emit(RecitersState.ready(
-          reciters: const <ReciterRow>[], query: _query, dataError: message));
+          reciters: const <ReciterRow>[], query: _query, dataError: true));
     }
   }
 

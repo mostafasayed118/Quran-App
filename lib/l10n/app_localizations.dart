@@ -829,6 +829,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا نتائج مطابقة'**
   String get noResults;
+
+  /// No description provided for @recitersRefreshFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحديث قائمة القرّاء'**
+  String get recitersRefreshFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -407,4 +407,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get noResults => 'لا نتائج مطابقة';
+
+  @override
+  String get recitersRefreshFailed => 'تعذّر تحديث قائمة القرّاء';
 }

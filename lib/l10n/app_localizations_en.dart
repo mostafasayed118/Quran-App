@@ -408,4 +408,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noResults => 'No matching results';
+
+  @override
+  String get recitersRefreshFailed => 'Couldn\'t refresh the reciters list';
 }

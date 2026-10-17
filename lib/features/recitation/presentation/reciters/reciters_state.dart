@@ -11,7 +11,7 @@ sealed class RecitersState with _$RecitersState {
   const factory RecitersState.ready({
     @Default(<ReciterRow>[]) List<ReciterRow> reciters,
     @Default('') String query,
-    String? dataError,
+    @Default(false) bool dataError,
   }) = RecitersReady;
 
   const factory RecitersState.error({required String message}) = RecitersError;

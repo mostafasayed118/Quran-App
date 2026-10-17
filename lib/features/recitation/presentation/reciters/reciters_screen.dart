@@ -37,11 +37,12 @@ class RecitersScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           RecitersLoading() => const LoadingView(),
           RecitersError(:final message) => errorPane(loc, message, 'reciters'),
-          RecitersReady(:final reciters, :final dataError) => Column(
+          RecitersReady(:final reciters, :final query, :final dataError) =>
+            Column(
               children: [
-                if (dataError != null)
+                if (dataError)
                   ErrorStrip(
-                    dataError,
+                    loc.recitersRefreshFailed,
                     icon: Icons.wifi_off,
                     onDismiss: () =>
                         context.read<RecitersCubit>().clearDataError(),
@@ -55,7 +56,11 @@ class RecitersScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: reciters.isEmpty
-                      ? Center(child: Text(loc.noReciters))
+                      ? Center(
+                          child: Text(
+                            query.isEmpty ? loc.noReciters : loc.noResults,
+                          ),
+                        )
                       : _RecitersList(reciters: reciters),
                 ),
               ],
