@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/audio_downloader.dart';
@@ -20,6 +21,8 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   final ReciterRepository _reciters;
   final List<(String, int)> _queue = <(String, int)>[];
   bool _draining = false;
+  (String, int)? _active;
+  CancelToken? _activeToken;
 
   String _key(String rowId, int surahNumber) => '$rowId-$surahNumber';
 
@@ -90,18 +93,21 @@ class DownloadsCubit extends Cubit<DownloadsState> {
         final (rowId, surahNumber) = _queue.first;
         _queue.removeAt(0);
         final key = _key(rowId, surahNumber);
+        final token = CancelToken();
+        _active = (rowId, surahNumber);
+        _activeToken = token;
         try {
           final reciter = await _reciters.byId(rowId);
+          if (isClosed) return;
           if (reciter == null) {
-            if (isClosed) return;
             await _setFailed(key);
             continue;
           }
-          if (isClosed) return;
           emit(_bump(key, status: DownloadStatus.downloading));
           await _downloader.downloadSurah(
             reciter: reciter,
             surahNumber: surahNumber,
+            cancelToken: token,
             onProgress: (received, total) {
               if (isClosed) return;
               emit(_bump(key,
@@ -113,17 +119,67 @@ class DownloadsCubit extends Cubit<DownloadsState> {
           if (isClosed) return;
           emit(_bump(key, status: DownloadStatus.done));
         } on Object catch (error, stackTrace) {
-          dev.log('surah download failed',
-              name: 'quran_yahdi/downloads',
-              error: error,
-              stackTrace: stackTrace);
-          if (isClosed) return;
-          await _setFailed(key);
+          if (token.isCancelled) {
+            await _dropCancelled(rowId, surahNumber, key);
+          } else {
+            dev.log('surah download failed',
+                name: 'quran_yahdi/downloads',
+                error: error,
+                stackTrace: stackTrace);
+            if (isClosed) return;
+            await _setFailed(key);
+          }
+        } finally {
+          if (identical(_activeToken, token)) _activeToken = null;
+          if (_active == (rowId, surahNumber)) _active = null;
         }
       }
     } finally {
       _draining = false;
     }
+  }
+
+  /// Cancels a queued or in-flight download: a queued task leaves the queue,
+  /// the active task is aborted through its [CancelToken]. Either way the
+  /// state entry is dropped and the registry row + partial file are cleaned
+  /// up (mirrors [removeDone]). Idle or done rows are a no-op.
+  Future<void> cancelDownload(String rowId, int surahNumber) async {
+    final key = _key(rowId, surahNumber);
+    final status = state.items[key]?.status;
+    if (status != DownloadStatus.queued &&
+        status != DownloadStatus.downloading) {
+      return;
+    }
+    final queuedIndex =
+        _queue.indexWhere((task) => task.$1 == rowId && task.$2 == surahNumber);
+    if (queuedIndex >= 0) {
+      _queue.removeAt(queuedIndex);
+      _removeEntry(key);
+      return;
+    }
+    final active = _active;
+    if (active != null && active.$1 == rowId && active.$2 == surahNumber) {
+      _activeToken?.cancel('cancelled by user');
+      return; // the in-flight catch drops the entry and cleans up.
+    }
+    _removeEntry(key); // untracked entry (defensive): drop it from the map.
+  }
+
+  Future<void> _dropCancelled(String rowId, int surahNumber, String key) async {
+    try {
+      await _downloader.removeDownload(rowId, surahNumber);
+    } on Object catch (error, stackTrace) {
+      dev.log('cancelled download cleanup failed',
+          name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
+    }
+    _removeEntry(key);
+  }
+
+  void _removeEntry(String key) {
+    if (isClosed) return;
+    if (!state.items.containsKey(key)) return;
+    final items = {...state.items}..remove(key);
+    emit(state.copyWith(items: items));
   }
 
   Future<void> _setFailed(String key) async {

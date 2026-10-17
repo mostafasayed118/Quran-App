@@ -93,6 +93,7 @@ class AudioDownloader {
     required ReciterRow reciter,
     required int surahNumber,
     void Function(int received, int total)? onProgress,
+    CancelToken? cancelToken,
   }) async {
     final target = await _targetFile(reciter.id, surahNumber);
     final url = surahAudioUrl(reciter.server, surahNumber);
@@ -102,6 +103,7 @@ class AudioDownloader {
       final res = await _dio.get<ResponseBody>(
         url,
         options: Options(responseType: ResponseType.stream),
+        cancelToken: cancelToken,
       );
       final total =
           int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ??

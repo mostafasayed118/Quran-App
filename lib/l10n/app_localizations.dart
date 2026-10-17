@@ -835,6 +835,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذّر تحديث قائمة القرّاء'**
   String get recitersRefreshFailed;
+
+  /// No description provided for @downloadProgressReceived.
+  ///
+  /// In ar, this message translates to:
+  /// **'{received} م.ب'**
+  String downloadProgressReceived(String received);
+
+  /// No description provided for @downloadProgressOfTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'{received} من {total} م.ب'**
+  String downloadProgressOfTotal(String received, String total);
 }
 
 class _AppLocalizationsDelegate

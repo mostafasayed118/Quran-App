@@ -411,4 +411,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recitersRefreshFailed => 'Couldn\'t refresh the reciters list';
+
+  @override
+  String downloadProgressReceived(String received) {
+    return '$received MB';
+  }
+
+  @override
+  String downloadProgressOfTotal(String received, String total) {
+    return '$received of $total MB';
+  }
 }

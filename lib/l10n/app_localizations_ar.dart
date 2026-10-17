@@ -410,4 +410,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get recitersRefreshFailed => 'تعذّر تحديث قائمة القرّاء';
+
+  @override
+  String downloadProgressReceived(String received) {
+    return '$received م.ب';
+  }
+
+  @override
+  String downloadProgressOfTotal(String received, String total) {
+    return '$received من $total م.ب';
+  }
 }

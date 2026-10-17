@@ -172,6 +172,7 @@ class _SurahDownloadRow extends StatelessWidget {
     ColorScheme colors,
     DownloadStatus? status,
   ) {
+    final loc = AppLocalizations.of(context);
     switch (status) {
       case DownloadStatus.done:
         return Row(
@@ -196,28 +197,68 @@ class _SurahDownloadRow extends StatelessWidget {
         );
       case DownloadStatus.downloading:
         final item = this.item!;
-        return DownloadProgressLabel(
-          received: item.received,
-          total: item.total,
-          width: 96,
-          gap: 4,
-          labelStyle: AppTheme.mutedFootnote(context),
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            DownloadProgressLabel(
+              received: item.received,
+              total: item.total,
+              width: 96,
+              gap: 4,
+              labelStyle: AppTheme.mutedFootnote(context),
+              format: (received, total) =>
+                  downloadProgressLabel(loc, received, total),
+            ),
+            _CancelDownloadButton(
+              onPressed: () => cubit.cancelDownload(reciter.id, surahNumber),
+            ),
+          ],
         );
       case DownloadStatus.failed:
         return IconButton(
-          tooltip:
-              MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
+          tooltip: loc.retry,
           color: colors.error,
           icon: const Icon(Icons.refresh),
           onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
       case DownloadStatus.queued:
+        return _CancelDownloadButton(
+          onPressed: () => cubit.cancelDownload(reciter.id, surahNumber),
+        );
       case null:
         return IconButton(
-          tooltip: AppLocalizations.of(context).downloadSurah,
+          tooltip: loc.downloadSurah,
           icon: const Icon(Icons.download),
           onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
     }
   }
 }
+
+class _CancelDownloadButton extends StatelessWidget {
+  const _CancelDownloadButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: AppLocalizations.of(context).cancel,
+      icon: const Icon(Icons.close),
+      onPressed: onPressed,
+    );
+  }
+}
+
+/// One-decimal MB label with Arabic-Indic digits (recitation surfaces).
+/// A non-positive [total] means the server never declared a size: the
+/// received amount renders alone.
+@visibleForTesting
+String downloadProgressLabel(AppLocalizations loc, int received, int total) {
+  final receivedLabel = _megabytes(received).toArabicIndicDigits;
+  if (total <= 0) return loc.downloadProgressReceived(receivedLabel);
+  return loc.downloadProgressOfTotal(
+      receivedLabel, _megabytes(total).toArabicIndicDigits);
+}
+
+String _megabytes(int bytes) => (bytes / (1024 * 1024)).toStringAsFixed(1);
