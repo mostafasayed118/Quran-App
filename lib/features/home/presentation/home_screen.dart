@@ -14,6 +14,16 @@ import 'home_state.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
+  /// Same contract as the prayer-times screen: the picker pops `true` on a
+  /// successful persist, and Home reloads so the next-prayer card appears.
+  static Future<void> _openCityPicker(BuildContext context) async {
+    final cubit = context.read<HomeCubit>();
+    final reloaded = await context.push<bool>('/prayer-times/city');
+    if (reloaded == true && context.mounted) {
+      await cubit.reload();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -56,6 +66,18 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ),
                       onTap: () => context.push('/prayer-times'),
+                    ),
+                  )
+                else
+                  Card(
+                    child: ListTile(
+                      leading: Icon(
+                        Icons.location_on_outlined,
+                        color: colors.secondary,
+                      ),
+                      title: Text(loc.selectCity),
+                      subtitle: Text(loc.noCity),
+                      onTap: () => _openCityPicker(context),
                     ),
                   ),
                 const SizedBox(height: 8),
