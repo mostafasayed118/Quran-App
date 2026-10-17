@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SurahIndexFilter from '../components/SurahIndexFilter.tsx';
+import { t, defaultLocale } from '../lib/strings';
+---
+<BaseLayout title="المصحف — قرآن يَهدي">
+  <h1 class="page-title">{t(defaultLocale, 'surahIndexTitle')}</h1>
+  <SurahIndexFilter client:load />
+</BaseLayout>

@@ -22,3 +22,4 @@ body {
 .site-header nav { display: flex; gap: 16px; }
 .site-header nav a, .site-footer a { color: var(--muted-strong); text-decoration: none; }
 .theme-toggle { background: var(--btn-bg); color: var(--btn-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-family: inherit; font-weight: 700; cursor: pointer; }
+.surah-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; } .surah-list a { display: flex; gap: 14px; align-items: baseline; padding: 12px 4px; border-bottom: 1px solid var(--hairline); color: var(--ink); text-decoration: none; } .surah-num { color: var(--gold-ink); min-width: 2.2em; } .surah-meta { margin-inline-start: auto; color: var(--muted); font-size: .85em; }
