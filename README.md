@@ -55,7 +55,7 @@ flutter gen-l10n
 dart run build_runner build --delete-conflicting-outputs
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 209 اختبارات (تاريخ REL-1)
+flutter test           # البوابة الكاملة: 243 اختبارات
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
 flutter build appbundle --release  # مخرجات المتجر
