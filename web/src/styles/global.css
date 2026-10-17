@@ -1,0 +1,10 @@
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg-solid);
+  color: var(--ink);
+  font-family: 'Cairo', system-ui, sans-serif;
+  line-height: 1.7;
+  transition: color 0.45s ease;
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

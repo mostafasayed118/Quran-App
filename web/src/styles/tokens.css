@@ -1,0 +1,41 @@
+:root, [data-theme='day'] {
+  --bg-solid: #F2ECDD;
+  --ink: #232D28;
+  --muted: rgba(35, 45, 40, 0.6);
+  --hairline: rgba(35, 45, 40, 0.12);
+  --frame: rgba(201, 169, 106, 0.85);
+  --frame2: rgba(62, 107, 88, 0.30);
+  --accent: #3E6B58;
+  --btn-bg: #3E6B58;
+  --btn-ink: #F7F3E8;
+  --gold-line: #C9A96A;
+  --gold-ink: #7E5C1D;
+  --surface: #F2ECDD;
+}
+[data-theme='night'] {
+  --bg-solid: #012A27;
+  --ink: #F0E0C6;
+  --muted: rgba(240, 224, 198, 0.55);
+  --hairline: rgba(240, 224, 198, 0.13);
+  --frame: rgba(201, 169, 106, 0.5);
+  --frame2: rgba(201, 169, 106, 0.2);
+  --accent: #E3A53E;
+  --btn-bg: #E3A53E;
+  --btn-ink: #161006;
+  --gold-line: rgba(216, 179, 106, 0.6);
+  --gold-ink: #D8B36A;
+  --surface: #012A27;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #012E2B 0%, #012A27 45%, #012321 100%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+[data-theme='night'] body::before { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  body::before { transition: none; }
+}
