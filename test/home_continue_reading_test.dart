@@ -28,23 +28,23 @@ void main() {
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
     await db.into(db.surahs).insert(SurahsCompanion.insert(
-      id: const Value(2),
-      nameAr: 'البقرة',
-      nameEn: 'Al-Baqarah',
-      revelationType: 'Medinan',
-      ayahCount: 286,
-      pagesStart: 2,
-      pagesEnd: 49,
-    ));
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'Medinan',
+          ayahCount: 286,
+          pagesStart: 2,
+          pagesEnd: 49,
+        ));
     await db.into(db.ayahs).insert(AyahsCompanion.insert(
-      id: const Value(8),
-      surahId: 2,
-      numberInSurah: 5,
-      juz: 1,
-      page: 2,
-      textUthmani: 'ذلك الكتاب',
-      textImlaei: 'ذلك الكتاب',
-    ));
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 5,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ));
     await city.select(cairoCity);
     await lastRead.saveAyahId(8);
   });
@@ -53,7 +53,8 @@ void main() {
     await db.close();
   });
 
-  test('the continue-reading template lives in ARB with the digit at the '
+  test(
+      'the continue-reading template lives in ARB with the digit at the '
       'call site', () async {
     final ar = await AppLocalizations.delegate.load(const Locale('ar'));
     expect(ar.continueReadingAyah('٥'), '﴿٥﴾ متابعة القراءة');
@@ -62,7 +63,8 @@ void main() {
     expect(en.continueReadingAyah('5'), '﴿5﴾ Continue Reading');
   });
 
-  testWidgets('the home subtitle renders the ARB template with Arabic-Indic '
+  testWidgets(
+      'the home subtitle renders the ARB template with Arabic-Indic '
       'digits', (tester) async {
     final cubit = HomeCubit(
       lastRead: lastRead,
