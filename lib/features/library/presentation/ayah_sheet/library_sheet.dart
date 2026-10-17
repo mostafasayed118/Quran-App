@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,20 +5,16 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
-import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/pack_downloader.dart';
 import 'ayah_sheet_cubit.dart';
 import 'ayah_sheet_state.dart';
 
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
-}
-
 /// Bottom sheet reading the INSTALLED tafsir/translation of one ayah;
-/// empty states route to /library. Resolves its deps via getIt so the
-/// reader route stays untouched ([downloader] is a widget-test seam).
+/// empty states route to /library. [downloader] is a widget-test seam:
+/// production callers omit it and the registered singleton is resolved here,
+/// so the reader presentation never depends on the library data layer.
 class LibrarySheet extends StatelessWidget {
   const LibrarySheet({
     super.key,
@@ -65,7 +59,7 @@ class _AyahSheetView extends StatelessWidget {
           AyahSheetLoading() =>
             const Center(child: CircularProgressIndicator()),
           AyahSheetError(:final message) =>
-            _errorPane(loc, message, 'ayah_sheet'),
+            errorPane(loc, message, 'ayah_sheet'),
           final AyahSheetReady ready => DefaultTabController(
               length: 2,
               child: Column(

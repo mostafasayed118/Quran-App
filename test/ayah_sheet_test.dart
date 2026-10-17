@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
@@ -24,6 +25,11 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+/// FakeAsync-safe pack decoder: isolate completions never arrive under the
+/// widget-test zone, so these tests use the PackDownloader decoder seam.
+Future<dynamic> _syncDecode(String path) async =>
+    jsonDecode(File(path).readAsStringSync());
 
 class _TeardownSafeAyahRepository extends AyahRepository {
   _TeardownSafeAyahRepository(super.db);
@@ -99,8 +105,9 @@ void main() {
     test('resolves installed tafsir and translation for the ayah', () async {
       await seedPacks(db, tempRoot);
       final cubit = AyahSheetCubit(
-        downloader:
-            PackDownloader(db, libraryRootResolver: () async => tempRoot),
+        downloader: PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
         surah: 1,
         ayah: 1,
       );
@@ -119,8 +126,9 @@ void main() {
 
     test('no installed packs resolves empty entry lists', () async {
       final cubit = AyahSheetCubit(
-        downloader:
-            PackDownloader(db, libraryRootResolver: () async => tempRoot),
+        downloader: PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
         surah: 1,
         ayah: 1,
       );
@@ -156,8 +164,9 @@ void main() {
             version: '1',
           ));
       final cubit = AyahSheetCubit(
-        downloader:
-            PackDownloader(db, libraryRootResolver: () async => tempRoot),
+        downloader: PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
         surah: 1,
         ayah: 1,
       );
@@ -170,8 +179,7 @@ void main() {
       expect(ready.translationEntries, isEmpty);
     });
 
-    test('downloader failure lands in the error state, never hangs',
-        () async {
+    test('downloader failure lands in the error state, never hangs', () async {
       final cubit = AyahSheetCubit(
         downloader: _ThrowingDownloader(db),
         surah: 1,
@@ -194,8 +202,8 @@ void main() {
     setUp(() async {
       db = AppDatabase.test(NativeDatabase.memory());
       tempRoot = await Directory.systemTemp.createTemp('qy_ayah_sheet_wtest');
-      downloader =
-          PackDownloader(db, libraryRootResolver: () async => tempRoot);
+      downloader = PackDownloader(db,
+          libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode);
     });
 
     tearDown(() async {
@@ -236,7 +244,8 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
-      await tester.pumpAndSettle();      expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('الفاتحة ﴿١﴾'), findsOneWidget);
       expect(find.text('تفسير'), findsOneWidget);
       expect(find.text('ترجمة'), findsOneWidget);
@@ -299,7 +308,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      expect(find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'), findsOneWidget);
+      expect(
+          find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'), findsOneWidget);
 
       await tester.tap(find.text('المكتبة'));
       await tester.pump();
@@ -315,7 +325,9 @@ void main() {
       // sequentially here (awaited, test-scoped).
       await getIt.reset();
       getIt.registerLazySingleton<PackDownloader>(
-        () => PackDownloader(db, libraryRootResolver: () async => tempRoot),
+        () => PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
       );
       addTearDown(getIt.reset);
       final dbHarness = db;
@@ -329,7 +341,8 @@ void main() {
             textUthmani: 'بسم الله الرحمن الرحيم',
             textImlaei: 'بسم الله الرحمن الرحيم'),
       ];
-      await tester.runAsync(() async => dbHarness.batch((b) => b.insertAll(dbHarness.ayahs, fatiha)));
+      await tester.runAsync(() async =>
+          dbHarness.batch((b) => b.insertAll(dbHarness.ayahs, fatiha)));
       final cubit = ReaderCubit(
           ayahRepository: _TeardownSafeAyahRepository(dbHarness),
           lastReadRepository: LastReadRepository(dbHarness),
@@ -359,7 +372,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      await tester.pumpAndSettle();      expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('سميت الفاتحة'), findsOneWidget);
     });
   });

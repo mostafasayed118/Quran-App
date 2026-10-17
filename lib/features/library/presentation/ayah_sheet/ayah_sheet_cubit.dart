@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/db/app_database.dart';
 import '../../data/pack_downloader.dart';
 import 'ayah_sheet_state.dart';
 
@@ -26,34 +27,41 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
   final int _ayah;
 
   Future<void> _load() async {
-    final tafsirs = <AyahSheetEntry>[];
-    final translations = <AyahSheetEntry>[];
     try {
       final rows = await _downloader.installedPacks();
-      for (final row in rows) {
-        if (row.kind == 'tafsir') {
-          final text = await _downloader.tafsirFor(row.packId, _surah, _ayah);
-          if (text != null) {
-            tafsirs.add((title: row.title, text: text));
-          }
-        } else if (row.kind == 'translation') {
-          final text =
-              await _downloader.translationFor(row.packId, _surah, _ayah);
-          if (text != null) {
-            translations.add((title: row.title, text: text));
-          }
-        }
-        // hadith rows never feed the ayah sheet.
-      }
+      final tafsirs = await Future.wait([
+        for (final row in rows)
+          if (row.kind == 'tafsir') _tafsirEntry(row),
+      ]);
+      final translations = await Future.wait([
+        for (final row in rows)
+          if (row.kind == 'translation') _translationEntry(row),
+      ]);
+      if (isClosed) return;
+      emit(AyahSheetState.ready(
+        tafsirEntries: [
+          for (final entry in tafsirs)
+            if (entry != null) entry,
+        ],
+        translationEntries: [
+          for (final entry in translations)
+            if (entry != null) entry,
+        ],
+      ));
     } catch (error) {
       if (isClosed) return;
       emit(AyahSheetState.error(message: error.toString()));
       return;
     }
-    if (isClosed) return;
-    emit(AyahSheetState.ready(
-      tafsirEntries: tafsirs,
-      translationEntries: translations,
-    ));
+  }
+
+  Future<AyahSheetEntry?> _tafsirEntry(InstalledPack row) async {
+    final text = await _downloader.tafsirFor(row.packId, _surah, _ayah);
+    return text == null ? null : (title: row.title, text: text);
+  }
+
+  Future<AyahSheetEntry?> _translationEntry(InstalledPack row) async {
+    final text = await _downloader.translationFor(row.packId, _surah, _ayah);
+    return text == null ? null : (title: row.title, text: text);
   }
 }
