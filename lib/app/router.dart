@@ -99,8 +99,7 @@ abstract final class AppRouter {
       GoRoute(
         path: '/recitation',
         builder: (_, __) => BlocProvider<RecitersCubit>(
-          create: (_) =>
-              RecitersCubit(repo: getIt<ReciterRepository>()),
+          create: (_) => RecitersCubit(repo: getIt<ReciterRepository>()),
           child: const RecitersScreen(),
         ),
       ),

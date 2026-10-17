@@ -24,7 +24,6 @@ import '../../features/prayer/data/city_repository.dart';
 import '../../features/prayer/data/location_service.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
 import '../../features/tracker/data/prayer_log_repository.dart';
-import '../../features/zakat/data/zakat_calculator.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
 import '../../features/qibla/data/heading_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
@@ -57,17 +56,19 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
-  getIt.registerLazySingleton<PrayerTimeService>(() => const PrayerTimeService());
+  getIt.registerLazySingleton<PrayerTimeService>(
+      () => const PrayerTimeService());
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
   getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(db));
-  getIt.registerLazySingleton<NotificationsBinding>(() => NotificationsBinding());
-  getIt.registerLazySingleton<ReminderScheduler>(() => getIt<NotificationsBinding>());
+  getIt.registerLazySingleton<NotificationsBinding>(
+      () => NotificationsBinding());
+  getIt.registerLazySingleton<ReminderScheduler>(
+      () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<PrayerLogRepository>(
       () => PrayerLogRepository(db));
-  getIt.registerLazySingleton<ZakatCalculator>(() => const ZakatCalculator());
   getIt.registerLazySingleton<HijriService>(() => HijriService());
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
@@ -103,14 +104,14 @@ Future<void> configureDependencies({
           downloader: getIt<PackDownloader>(),
         ));
   }
-  getIt.registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
+  getIt
+      .registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
   if (audioRootResolver != null) {
     getIt.registerLazySingleton<AudioDownloader>(
         () => AudioDownloader(db, audioRootResolver: audioRootResolver));
-    getIt.registerLazySingleton<DownloadsCubit>(
-        () => DownloadsCubit(
-            downloader: getIt<AudioDownloader>(),
-            reciters: getIt<ReciterRepository>()));
+    getIt.registerLazySingleton<DownloadsCubit>(() => DownloadsCubit(
+        downloader: getIt<AudioDownloader>(),
+        reciters: getIt<ReciterRepository>()));
     getIt.registerLazySingleton<PlaybackCubit>(() => PlaybackCubit(
           service: getIt<PlaybackService>(),
           reciters: getIt<ReciterRepository>(),
