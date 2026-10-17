@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -63,18 +64,29 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   Future<void> playDefaultForSurah(int surahNumber) async {
-    final selectedId = await _reciters.loadSelectedMoshaf();
-    var row = selectedId == null ? null : await _reciters.byId(selectedId);
-    if (row == null) {
-      final all = sortReciters(await _reciters.watchAll().first);
-      if (isClosed) return;
-      if (all.isEmpty) {
-        emit(const PlaybackState.failed(
-          kind: PlaybackFailureKind.noReciters,
-        ));
-        return;
+    final ReciterRow row;
+    try {
+      final selectedId = await _reciters.loadSelectedMoshaf();
+      var candidate =
+          selectedId == null ? null : await _reciters.byId(selectedId);
+      if (candidate == null) {
+        final all = sortReciters(await _reciters.watchAll().first);
+        if (isClosed) return;
+        if (all.isEmpty) {
+          emit(const PlaybackState.failed(
+            kind: PlaybackFailureKind.noReciters,
+          ));
+          return;
+        }
+        candidate = all.first;
       }
-      row = all.first;
+      row = candidate;
+    } on Object catch (error, stackTrace) {
+      dev.log('reciter lookup failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
+      return;
     }
     await playSurah(row, surahNumber);
   }
@@ -82,7 +94,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   Future<void> toggle() async {
     final state = this.state;
     if (state is PlaybackPlaying) {
-      await _service.pause();
+      try {
+        await _service.pause();
+      } on Object catch (error, stackTrace) {
+        // Keep the playing state: the audio is still audible.
+        dev.log('pause failed',
+            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        return;
+      }
       if (isClosed) return;
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
@@ -91,7 +110,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         duration: state.duration,
       ));
     } else if (state is PlaybackPaused) {
-      await _service.resume();
+      try {
+        await _service.resume();
+      } on Object catch (error, stackTrace) {
+        // Keep the paused state: resume did not take effect.
+        dev.log('resume failed',
+            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        return;
+      }
       if (isClosed) return;
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
@@ -103,16 +129,32 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   Future<void> stopAndReset() async {
-    await _service.stop();
+    try {
+      await _service.stop();
+    } on Object catch (error, stackTrace) {
+      dev.log('stop failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+    }
     await _unbindStreams();
     if (isClosed) return;
     emit(const PlaybackState.initial());
   }
 
   void _bindStreams() {
-    _playingSub ??= _service.playingStream().listen(_onPlayingChanged);
-    _positionSub ??= _service.positionStream().listen(_onPositionChanged);
-    _durationSub ??= _service.durationStream().listen(_onDurationChanged);
+    _playingSub ??= _service
+        .playingStream()
+        .listen(_onPlayingChanged, onError: _onStreamError);
+    _positionSub ??= _service
+        .positionStream()
+        .listen(_onPositionChanged, onError: _onStreamError);
+    _durationSub ??= _service
+        .durationStream()
+        .listen(_onDurationChanged, onError: _onStreamError);
+  }
+
+  void _onStreamError(Object error, StackTrace stackTrace) {
+    dev.log('playback stream error',
+        name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
   }
 
   Future<void> _unbindStreams() async {

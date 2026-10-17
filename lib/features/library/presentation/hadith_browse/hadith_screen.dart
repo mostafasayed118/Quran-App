@@ -1,19 +1,12 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
-import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hadith_cubit.dart';
 import 'hadith_state.dart';
-
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
-}
 
 class HadithScreen extends StatelessWidget {
   const HadithScreen({super.key});
@@ -51,10 +44,9 @@ class HadithScreen extends StatelessWidget {
       body: BlocBuilder<HadithCubit, HadithState>(
         builder: (context, state) {
           final Widget content = switch (state) {
-            HadithLoading() =>
-              const Center(child: CircularProgressIndicator()),
+            HadithLoading() => const Center(child: CircularProgressIndicator()),
             HadithError(message: final message) =>
-              _errorPane(loc, message, 'hadith'),
+              errorPane(loc, message, 'hadith'),
             final HadithReady ready => Column(
                 children: [
                   Expanded(
@@ -91,8 +83,9 @@ class HadithScreen extends StatelessWidget {
                                   text,
                                   style: const TextStyle(
                                       fontSize: 15, height: 1.8),
-                                  textDirection:
-                                      rtl ? TextDirection.rtl : TextDirection.ltr,
+                                  textDirection: rtl
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
                                 ),
                               ),
                             ],
@@ -110,8 +103,9 @@ class HadithScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           TextButton(
-                            onPressed:
-                                ready.offset > 0 ? context.read<HadithCubit>().prev : null,
+                            onPressed: ready.offset > 0
+                                ? context.read<HadithCubit>().prev
+                                : null,
                             child: Text(loc.hadithPrev),
                           ),
                           TextButton(

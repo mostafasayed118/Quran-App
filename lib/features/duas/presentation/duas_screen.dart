@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'duas_cubit.dart';
 import 'duas_state.dart';
@@ -38,7 +39,9 @@ class DuasScreen extends StatelessWidget {
                         ),
                       ],
                       selected: {
-                        state is RuqyahInView
+                        state is RuqyahInView ||
+                                (state is DuasFailed &&
+                                    state.tab == DuasTab.ruqyah)
                             ? DuasTab.ruqyah
                             : DuasTab.duas,
                       },
@@ -53,6 +56,7 @@ class DuasScreen extends StatelessWidget {
             Expanded(
               child: switch (state) {
                 DuasLoading() => const LoadingView(),
+                DuasFailed() => errorPane(loc, 'duas load failed', 'duas'),
                 DuasInView() => const _DuasView(),
                 RuqyahInView() => const _RuqyahView(),
               },

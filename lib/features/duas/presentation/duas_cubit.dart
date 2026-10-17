@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,50 +27,64 @@ class DuasCubit extends Cubit<DuasState> {
   List<DuaEntry>? _allDuas;
 
   Future<void> showDuas() async {
-    final entries = await _duas.entries();
-    final categories = await _duas.categories();
-    _allDuas = entries;
-    if (isClosed) return;
-    emit(DuasState.duas(categories: categories, entries: entries));
+    try {
+      final entries = await _duas.entries();
+      final categories = await _duas.categories();
+      _allDuas = entries;
+      if (isClosed) return;
+      emit(DuasState.duas(categories: categories, entries: entries));
+    } on Object catch (error, stackTrace) {
+      dev.log('duas load failed',
+          name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const DuasState.failed());
+    }
   }
 
   Future<void> showRuqyah() async {
     if (isClosed) return;
     emit(const DuasState.loading(tab: DuasTab.ruqyah));
-    final resolved = <RuqyahResolved>[];
-    for (final entry in await _ruqyah.entries()) {
-      if (isClosed) return;
-      if (entry.isQuran &&
-          entry.surahId != null &&
-          entry.fromAyah != null &&
-          entry.toAyah != null) {
-        final ayahs = await _ayahs.ayahsForRange(
-          entry.surahId!,
-          entry.fromAyah!,
-          entry.toAyah!,
-        );
-        final surah = await _ayahs.surahById(entry.surahId!);
-        resolved.add(RuqyahResolved(
-          id: entry.id,
-          isQuran: true,
-          displayText: <String>[for (final ayah in ayahs) ayah.textUthmani]
-              .join(' '),
-          citation:
-              '﴿${surah?.nameAr ?? ''} ${entry.fromAyah}–${entry.toAyah}﴾',
-          reference: entry.reference,
-        ));
-      } else {
-        resolved.add(RuqyahResolved(
-          id: entry.id,
-          isQuran: false,
-          displayText: entry.text ?? '',
-          count: entry.count,
-          reference: entry.reference,
-        ));
+    try {
+      final resolved = <RuqyahResolved>[];
+      for (final entry in await _ruqyah.entries()) {
+        if (isClosed) return;
+        if (entry.isQuran &&
+            entry.surahId != null &&
+            entry.fromAyah != null &&
+            entry.toAyah != null) {
+          final ayahs = await _ayahs.ayahsForRange(
+            entry.surahId!,
+            entry.fromAyah!,
+            entry.toAyah!,
+          );
+          final surah = await _ayahs.surahById(entry.surahId!);
+          resolved.add(RuqyahResolved(
+            id: entry.id,
+            isQuran: true,
+            displayText: <String>[for (final ayah in ayahs) ayah.textUthmani]
+                .join(' '),
+            citation:
+                '﴿${surah?.nameAr ?? ''} ${entry.fromAyah}–${entry.toAyah}﴾',
+            reference: entry.reference,
+          ));
+        } else {
+          resolved.add(RuqyahResolved(
+            id: entry.id,
+            isQuran: false,
+            displayText: entry.text ?? '',
+            count: entry.count,
+            reference: entry.reference,
+          ));
+        }
       }
+      if (isClosed) return;
+      emit(DuasState.ruqyah(entries: resolved));
+    } on Object catch (error, stackTrace) {
+      dev.log('ruqyah load failed',
+          name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const DuasState.failed(tab: DuasTab.ruqyah));
     }
-    if (isClosed) return;
-    emit(DuasState.ruqyah(entries: resolved));
   }
 
   Future<void> selectTab(DuasTab tab) async {

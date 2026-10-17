@@ -11,24 +11,53 @@ import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+class _ThrowingSearchRepo extends CityRepository {
+  _ThrowingSearchRepo(AppDatabase db)
+      : super(db: db, loader: () async => const []);
+
+  @override
+  Future<List<City>> search(String query) => Future.error(StateError('boom'));
+}
+
 void main() {
   late AppDatabase db;
   late CityRepository repo;
 
   setUp(() async {
     db = AppDatabase.test(NativeDatabase.memory());
-    repo = CityRepository(db: db, loader: () async => [
-      {'id': 'cairo', 'nameAr': 'القاهرة', 'nameEn': 'Cairo', 'lat': 30.0444, 'lng': 31.2357},
-      {'id': 'riyadh', 'nameAr': 'الرياض', 'nameEn': 'Riyadh', 'lat': 24.7136, 'lng': 46.6753},
-      {'id': 'dubai', 'nameAr': 'دبي', 'nameEn': 'Dubai', 'lat': 25.2048, 'lng': 55.2708},
-    ]);
+    repo = CityRepository(
+        db: db,
+        loader: () async => [
+              {
+                'id': 'cairo',
+                'nameAr': 'القاهرة',
+                'nameEn': 'Cairo',
+                'lat': 30.0444,
+                'lng': 31.2357
+              },
+              {
+                'id': 'riyadh',
+                'nameAr': 'الرياض',
+                'nameEn': 'Riyadh',
+                'lat': 24.7136,
+                'lng': 46.6753
+              },
+              {
+                'id': 'dubai',
+                'nameAr': 'دبي',
+                'nameEn': 'Dubai',
+                'lat': 25.2048,
+                'lng': 55.2708
+              },
+            ]);
   });
 
   tearDown(() async {
     await db.close();
   });
 
-  testWidgets('search filters live and picking persists then pops', (tester) async {
+  testWidgets('search filters live and picking persists then pops',
+      (tester) async {
     final cubit = CityPickerCubit(cityRepo: repo);
     addTearDown(cubit.close);
     await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
@@ -82,5 +111,30 @@ void main() {
     final selected = await repo.selectedCity();
     expect(selected, isNotNull);
     expect(selected!.id, 'cairo');
+  });
+
+  testWidgets('a failing search shows the localized error pane, not a hang',
+      (tester) async {
+    final cubit = CityPickerCubit(cityRepo: _ThrowingSearchRepo(db));
+    addTearDown(cubit.close);
+    await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        home: const CityPickerScreen(),
+      ),
+    ));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
   });
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -30,6 +31,8 @@ class CityPickerScreen extends StatelessWidget {
             child: BlocBuilder<CityPickerCubit, CityPickerState>(
               builder: (context, state) => switch (state) {
                 CityPickerLoading() => const LoadingView(),
+                CityPickerFailed() =>
+                  errorPane(loc, 'city picker load failed', 'city_picker'),
                 CityPickerReady(:final results, :final locating) => Column(
                     children: [
                       ListTile(
@@ -42,7 +45,8 @@ class CityPickerScreen extends StatelessWidget {
                                 ),
                               )
                             : const Icon(Icons.my_location),
-                        title: Text(locating ? loc.locating : loc.useMyLocation),
+                        title:
+                            Text(locating ? loc.locating : loc.useMyLocation),
                         onTap: locating ? null : () => _useMyLocation(context),
                       ),
                       const Divider(height: 1),

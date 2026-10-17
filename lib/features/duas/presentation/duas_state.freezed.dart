@@ -52,6 +52,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(DuasLoading value)? loading,
+    TResult Function(DuasFailed value)? failed,
     TResult Function(DuasInView value)? duas,
     TResult Function(RuqyahInView value)? ruqyah,
     required TResult orElse(),
@@ -60,6 +61,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading() when loading != null:
         return loading(_that);
+      case DuasFailed() when failed != null:
+        return failed(_that);
       case DuasInView() when duas != null:
         return duas(_that);
       case RuqyahInView() when ruqyah != null:
@@ -85,6 +88,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(DuasLoading value) loading,
+    required TResult Function(DuasFailed value) failed,
     required TResult Function(DuasInView value) duas,
     required TResult Function(RuqyahInView value) ruqyah,
   }) {
@@ -92,6 +96,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading():
         return loading(_that);
+      case DuasFailed():
+        return failed(_that);
       case DuasInView():
         return duas(_that);
       case RuqyahInView():
@@ -114,6 +120,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(DuasLoading value)? loading,
+    TResult? Function(DuasFailed value)? failed,
     TResult? Function(DuasInView value)? duas,
     TResult? Function(RuqyahInView value)? ruqyah,
   }) {
@@ -121,6 +128,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading() when loading != null:
         return loading(_that);
+      case DuasFailed() when failed != null:
+        return failed(_that);
       case DuasInView() when duas != null:
         return duas(_that);
       case RuqyahInView() when ruqyah != null:
@@ -145,6 +154,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(DuasTab tab)? loading,
+    TResult Function(DuasTab tab)? failed,
     TResult Function(List<String> categories, List<DuaEntry> entries,
             String? selectedCategory)?
         duas,
@@ -155,6 +165,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading() when loading != null:
         return loading(_that.tab);
+      case DuasFailed() when failed != null:
+        return failed(_that.tab);
       case DuasInView() when duas != null:
         return duas(_that.categories, _that.entries, _that.selectedCategory);
       case RuqyahInView() when ruqyah != null:
@@ -180,6 +192,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(DuasTab tab) loading,
+    required TResult Function(DuasTab tab) failed,
     required TResult Function(List<String> categories, List<DuaEntry> entries,
             String? selectedCategory)
         duas,
@@ -189,6 +202,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading():
         return loading(_that.tab);
+      case DuasFailed():
+        return failed(_that.tab);
       case DuasInView():
         return duas(_that.categories, _that.entries, _that.selectedCategory);
       case RuqyahInView():
@@ -211,6 +226,7 @@ extension DuasStatePatterns on DuasState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(DuasTab tab)? loading,
+    TResult? Function(DuasTab tab)? failed,
     TResult? Function(List<String> categories, List<DuaEntry> entries,
             String? selectedCategory)?
         duas,
@@ -220,6 +236,8 @@ extension DuasStatePatterns on DuasState {
     switch (_that) {
       case DuasLoading() when loading != null:
         return loading(_that.tab);
+      case DuasFailed() when failed != null:
+        return failed(_that.tab);
       case DuasInView() when duas != null:
         return duas(_that.categories, _that.entries, _that.selectedCategory);
       case RuqyahInView() when ruqyah != null:
@@ -288,6 +306,72 @@ class _$DuasLoadingCopyWithImpl<$Res> implements $DuasLoadingCopyWith<$Res> {
     Object? tab = null,
   }) {
     return _then(DuasLoading(
+      tab: null == tab
+          ? _self.tab
+          : tab // ignore: cast_nullable_to_non_nullable
+              as DuasTab,
+    ));
+  }
+}
+
+/// @nodoc
+
+class DuasFailed implements DuasState {
+  const DuasFailed({this.tab = DuasTab.duas});
+
+  @JsonKey()
+  final DuasTab tab;
+
+  /// Create a copy of DuasState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  $DuasFailedCopyWith<DuasFailed> get copyWith =>
+      _$DuasFailedCopyWithImpl<DuasFailed>(this, _$identity);
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is DuasFailed &&
+            (identical(other.tab, tab) || other.tab == tab));
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(runtimeType, tab);
+  }
+
+  @override
+  String toString() {
+    return 'DuasState.failed(tab: $tab)';
+  }
+}
+
+/// @nodoc
+abstract mixin class $DuasFailedCopyWith<$Res>
+    implements $DuasStateCopyWith<$Res> {
+  factory $DuasFailedCopyWith(
+          DuasFailed value, $Res Function(DuasFailed) _then) =
+      _$DuasFailedCopyWithImpl;
+  @useResult
+  $Res call({DuasTab tab});
+}
+
+/// @nodoc
+class _$DuasFailedCopyWithImpl<$Res> implements $DuasFailedCopyWith<$Res> {
+  _$DuasFailedCopyWithImpl(this._self, this._then);
+
+  final DuasFailed _self;
+  final $Res Function(DuasFailed) _then;
+
+  /// Create a copy of DuasState
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? tab = null,
+  }) {
+    return _then(DuasFailed(
       tab: null == tab
           ? _self.tab
           : tab // ignore: cast_nullable_to_non_nullable

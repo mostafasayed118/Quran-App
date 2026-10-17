@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'bookmarks_cubit.dart';
 import 'bookmarks_state.dart';
@@ -21,7 +20,7 @@ class BookmarksScreen extends StatelessWidget {
         BookmarksLoading() => const Scaffold(body: LoadingView()),
         BookmarksError(:final message) => Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context).bookmarks)),
-            body: _errorPane(AppLocalizations.of(context), message, 'bookmarks'),
+            body: errorPane(AppLocalizations.of(context), message, 'bookmarks'),
           ),
         BookmarksReady(:final entries) => Scaffold(
             appBar: AppBar(
@@ -46,12 +45,8 @@ class BookmarksScreen extends StatelessWidget {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         title: Text(snippet),
-                        subtitle: Text(
-                          '${ayah.surahId.toArabicIndic} · ${ayah.numberInSurah.toArabicIndic}',
-                        ),
                         trailing: IconButton(
-                          tooltip:
-                              AppLocalizations.of(context).bookmarkRemove,
+                          tooltip: AppLocalizations.of(context).bookmarkRemove,
                           icon: const Icon(Icons.delete_outline),
                           onPressed: () =>
                               context.read<BookmarksCubit>().remove(ayah.id),
@@ -65,9 +60,4 @@ class BookmarksScreen extends StatelessWidget {
       },
     );
   }
-}
-
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
 }

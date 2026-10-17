@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../core/widgets/section_header.dart';
@@ -37,7 +36,7 @@ class RecitersScreen extends StatelessWidget {
       body: BlocBuilder<RecitersCubit, RecitersState>(
         builder: (context, state) => switch (state) {
           RecitersLoading() => const LoadingView(),
-          RecitersError(:final message) => _errorPane(loc, message, 'reciters'),
+          RecitersError(:final message) => errorPane(loc, message, 'reciters'),
           RecitersReady(:final reciters, :final dataError) => Column(
               children: [
                 if (dataError != null)
@@ -65,11 +64,6 @@ class RecitersScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
 }
 
 class _RecitersList extends StatelessWidget {
@@ -122,20 +116,16 @@ class _ReciterRow extends StatelessWidget {
         ? loc.unknownInitial
         : String.fromCharCode(trimmed.runes.first);
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-      onTap: () => context.push(
-          '/recitation/reciter?row=${Uri.encodeComponent(reciter.id)}'),
+      contentPadding: AppTheme.tileContentPadding,
+      onTap: () => context
+          .push('/recitation/reciter?row=${Uri.encodeComponent(reciter.id)}'),
       leading: ArabicBadge(
         initial,
         textStyle: const TextStyle(fontSize: 16),
       ),
       title: Text(
         reciter.reciterName,
-        style: const TextStyle(
-          fontFamily: QuranFonts.ui,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: AppTheme.rowTitle,
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),

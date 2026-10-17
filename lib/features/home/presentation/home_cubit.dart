@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,13 +29,20 @@ class HomeCubit extends Cubit<HomeState> {
   final CityRepository _city;
 
   Future<void> reload() async {
-    final lastReadCard = await _loadLastReadCard();
-    final nextPrayerCard = await _loadNextPrayerCard();
-    if (isClosed) return;
-    emit(HomeState.ready(
-      lastRead: lastReadCard,
-      nextPrayer: nextPrayerCard,
-    ));
+    try {
+      final lastReadCard = await _loadLastReadCard();
+      final nextPrayerCard = await _loadNextPrayerCard();
+      if (isClosed) return;
+      emit(HomeState.ready(
+        lastRead: lastReadCard,
+        nextPrayer: nextPrayerCard,
+      ));
+    } on Object catch (error, stackTrace) {
+      dev.log('home load failed',
+          name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const HomeState.failed());
+    }
   }
 
   Future<LastReadCard?> _loadLastReadCard() async {

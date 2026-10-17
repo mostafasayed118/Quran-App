@@ -53,6 +53,7 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(CityPickerLoading value)? loading,
+    TResult Function(CityPickerFailed value)? failed,
     TResult Function(CityPickerReady value)? ready,
     required TResult orElse(),
   }) {
@@ -60,6 +61,8 @@ extension CityPickerStatePatterns on CityPickerState {
     switch (_that) {
       case CityPickerLoading() when loading != null:
         return loading(_that);
+      case CityPickerFailed() when failed != null:
+        return failed(_that);
       case CityPickerReady() when ready != null:
         return ready(_that);
       case _:
@@ -83,12 +86,15 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(CityPickerLoading value) loading,
+    required TResult Function(CityPickerFailed value) failed,
     required TResult Function(CityPickerReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case CityPickerLoading():
         return loading(_that);
+      case CityPickerFailed():
+        return failed(_that);
       case CityPickerReady():
         return ready(_that);
     }
@@ -109,12 +115,15 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(CityPickerLoading value)? loading,
+    TResult? Function(CityPickerFailed value)? failed,
     TResult? Function(CityPickerReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case CityPickerLoading() when loading != null:
         return loading(_that);
+      case CityPickerFailed() when failed != null:
+        return failed(_that);
       case CityPickerReady() when ready != null:
         return ready(_that);
       case _:
@@ -137,6 +146,7 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(String query, List<City> results, bool locating)? ready,
     required TResult orElse(),
   }) {
@@ -144,6 +154,8 @@ extension CityPickerStatePatterns on CityPickerState {
     switch (_that) {
       case CityPickerLoading() when loading != null:
         return loading();
+      case CityPickerFailed() when failed != null:
+        return failed();
       case CityPickerReady() when ready != null:
         return ready(_that.query, _that.results, _that.locating);
       case _:
@@ -167,6 +179,7 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(String query, List<City> results, bool locating)
         ready,
   }) {
@@ -174,6 +187,8 @@ extension CityPickerStatePatterns on CityPickerState {
     switch (_that) {
       case CityPickerLoading():
         return loading();
+      case CityPickerFailed():
+        return failed();
       case CityPickerReady():
         return ready(_that.query, _that.results, _that.locating);
     }
@@ -194,12 +209,15 @@ extension CityPickerStatePatterns on CityPickerState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(String query, List<City> results, bool locating)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case CityPickerLoading() when loading != null:
         return loading();
+      case CityPickerFailed() when failed != null:
+        return failed();
       case CityPickerReady() when ready != null:
         return ready(_that.query, _that.results, _that.locating);
       case _:
@@ -225,6 +243,26 @@ class CityPickerLoading implements CityPickerState {
   @override
   String toString() {
     return 'CityPickerState.loading()';
+  }
+}
+
+/// @nodoc
+
+class CityPickerFailed implements CityPickerState {
+  const CityPickerFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is CityPickerFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'CityPickerState.failed()';
   }
 }
 

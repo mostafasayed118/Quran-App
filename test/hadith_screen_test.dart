@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/native.dart';
@@ -13,6 +14,11 @@ import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_c
 import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_screen.dart';
 import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_state.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+/// FakeAsync-safe pack decoder: isolate completions never arrive under the
+/// widget-test zone, so these tests use the PackDownloader decoder seam.
+Future<dynamic> _syncDecode(String path) async =>
+    jsonDecode(File(path).readAsStringSync());
 
 Future<void> seedHadithPack(AppDatabase db, Directory tempRoot) async {
   final libraryDir = Directory('${tempRoot.path}/library')
@@ -46,8 +52,9 @@ void main() {
     });
 
     HadithCubit cubit() => HadithCubit(
-          downloader:
-              PackDownloader(db, libraryRootResolver: () async => tempRoot),
+          downloader: PackDownloader(db,
+              libraryRootResolver: () async => tempRoot,
+              fileDecoder: _syncDecode),
           packId: 'en-muslim',
         );
 
@@ -112,8 +119,9 @@ void main() {
 
     test('missing pack resolves an empty page with packId as title', () async {
       final c = HadithCubit(
-        downloader:
-            PackDownloader(db, libraryRootResolver: () async => tempRoot),
+        downloader: PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
         packId: 'ghost-pack',
       );
       addTearDown(c.close);
@@ -124,8 +132,7 @@ void main() {
       expect(ready.hasMore, isFalse);
     });
 
-    test('page-fetch failure lands in the error state, never hangs',
-        () async {
+    test('page-fetch failure lands in the error state, never hangs', () async {
       final c = HadithCubit(
         downloader: _ThrowingPageDownloader(db),
         packId: 'en-muslim',
@@ -167,8 +174,9 @@ void main() {
         theme: AppTheme.light,
         home: BlocProvider<HadithCubit>(
           create: (_) => HadithCubit(
-            downloader:
-                PackDownloader(db, libraryRootResolver: () async => tempRoot),
+            downloader: PackDownloader(db,
+                libraryRootResolver: () async => tempRoot,
+                fileDecoder: _syncDecode),
             packId: 'en-muslim',
           ),
           child: const HadithScreen(),

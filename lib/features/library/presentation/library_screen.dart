@@ -1,5 +1,3 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/widgets/async_view.dart';
+import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
+import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/library_catalog.dart';
@@ -37,7 +37,8 @@ class LibraryScreen extends StatelessWidget {
             ),
             body: switch (state) {
               LibraryLoading() => const LoadingView(),
-              LibraryFailed(:final message) => _errorPane(loc, message),
+              LibraryFailed(:final message) =>
+                errorPane(loc, message, 'library'),
               final LibraryReady ready => Column(
                   children: [
                     if (ready.failed.isNotEmpty && ready.progress.isEmpty)
@@ -46,13 +47,12 @@ class LibraryScreen extends StatelessWidget {
                       child: TabBarView(
                         children: [
                           _PackList(
-                            packs: ready
-                                .packsWhere(LibraryPackKind.tafsir),
+                            packs: ready.packsWhere(LibraryPackKind.tafsir),
                             ready: ready,
                           ),
                           _PackList(
-                            packs: ready
-                                .packsWhere(LibraryPackKind.translation),
+                            packs:
+                                ready.packsWhere(LibraryPackKind.translation),
                             ready: ready,
                           ),
                           _PackList(
@@ -85,14 +85,11 @@ class LibraryScreen extends StatelessWidget {
   }
 }
 
-Widget _errorPane(AppLocalizations loc, String message) {
-  dev.log(message, name: 'quran_yahdi/library');
-  return ErrorView(loc.genericError);
-}
-
 extension on LibraryReady {
-  List<LibraryPackInfo> packsWhere(LibraryPackKind kind) =>
-      [for (final pack in packs) if (pack.kind == kind) pack];
+  List<LibraryPackInfo> packsWhere(LibraryPackKind kind) => [
+        for (final pack in packs)
+          if (pack.kind == kind) pack
+      ];
 }
 
 class _PackList extends StatelessWidget {
@@ -167,8 +164,7 @@ class _PackRow extends StatelessWidget {
             IconButton(
               tooltip: loc.hadithRead,
               icon: const Icon(Icons.menu_book_outlined),
-              onPressed: () =>
-                  context.push('/library/hadith?pack=${pack.id}'),
+              onPressed: () => context.push('/library/hadith?pack=${pack.id}'),
             ),
           const SizedBox(width: 8),
           trailing,
@@ -184,24 +180,12 @@ class _PackRow extends StatelessWidget {
 
   Future<void> _confirmDelete(
       BuildContext context, LibraryCubit cubit, AppLocalizations loc) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(loc.libraryDelete),
-        content: Text(pack.titleAr),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(loc.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(loc.libraryDelete),
-          ),
-        ],
-      ),
+    final confirmed = await confirmDeleteDialog(
+      context,
+      title: loc.libraryDelete,
+      body: pack.titleAr,
     );
-    if (confirmed == true) {
+    if (confirmed) {
       await cubit.uninstall(pack.id);
     }
   }

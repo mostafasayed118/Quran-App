@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
+import 'package:quran_yahdi/core/widgets/async_view.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
 import 'package:quran_yahdi/features/duas/presentation/duas_cubit.dart';
@@ -122,5 +123,35 @@ void main() {
         findsOneWidget);
     expect(find.textContaining('الإخلاص'), findsOneWidget);
     expect(find.text('×٣'), findsOneWidget);
+  });
+
+  testWidgets('duas load failure lands in the error pane, never hangs',
+      (tester) async {
+    final cubit = DuasCubit(
+      duas: DuaRepository(loader: () async => throw StateError('duas down')),
+      ruqyah: ruqyahRepo,
+      ayahs: AyahRepository(db),
+    );
+    addTearDown(cubit.close);
+    await tester.pumpWidget(BlocProvider<DuasCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        home: const DuasScreen(),
+      ),
+    ));
+    await tester.pump();
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ErrorView), findsOneWidget);
   });
 }

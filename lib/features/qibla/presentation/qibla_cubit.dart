@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,15 +28,22 @@ class QiblaCubit extends Cubit<QiblaState> {
   StreamSubscription<double>? _headingSub;
 
   Future<void> reload() async {
-    final selected = await _city.selectedCity();
-    if (isClosed) return;
-    final bearing =
-        selected == null ? null : _qibla.bearingDeg(selected.coordinates);
-    emit(QiblaState.ready(
-      city: selected,
-      bearing: bearing,
-      heading: state.heading,
-    ));
+    try {
+      final selected = await _city.selectedCity();
+      if (isClosed) return;
+      final bearing =
+          selected == null ? null : _qibla.bearingDeg(selected.coordinates);
+      emit(QiblaState.ready(
+        city: selected,
+        bearing: bearing,
+        heading: state.heading,
+      ));
+    } on Object catch (error, stackTrace) {
+      // The initial state is already a usable ready(): a failed reload keeps
+      // the compass on-screen instead of raising an unhandled async error.
+      dev.log('qibla reload failed',
+          name: 'quran_yahdi/qibla', error: error, stackTrace: stackTrace);
+    }
   }
 
   void _bindHeading() {
@@ -43,7 +51,12 @@ class QiblaCubit extends Cubit<QiblaState> {
     if (stream == null) return;
     _headingSub = stream.listen(
       _onHeading,
-      onError: (Object _) {},
+      onError: (Object error, StackTrace stackTrace) => dev.log(
+        'heading stream error',
+        name: 'quran_yahdi/qibla',
+        error: error,
+        stackTrace: stackTrace,
+      ),
     );
   }
 

@@ -52,6 +52,7 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(HomeLoading value)? loading,
+    TResult Function(HomeFailed value)? failed,
     TResult Function(HomeReady value)? ready,
     required TResult orElse(),
   }) {
@@ -59,6 +60,8 @@ extension HomeStatePatterns on HomeState {
     switch (_that) {
       case HomeLoading() when loading != null:
         return loading(_that);
+      case HomeFailed() when failed != null:
+        return failed(_that);
       case HomeReady() when ready != null:
         return ready(_that);
       case _:
@@ -82,12 +85,15 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(HomeLoading value) loading,
+    required TResult Function(HomeFailed value) failed,
     required TResult Function(HomeReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case HomeLoading():
         return loading(_that);
+      case HomeFailed():
+        return failed(_that);
       case HomeReady():
         return ready(_that);
     }
@@ -108,12 +114,15 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(HomeLoading value)? loading,
+    TResult? Function(HomeFailed value)? failed,
     TResult? Function(HomeReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case HomeLoading() when loading != null:
         return loading(_that);
+      case HomeFailed() when failed != null:
+        return failed(_that);
       case HomeReady() when ready != null:
         return ready(_that);
       case _:
@@ -136,6 +145,7 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)? ready,
     required TResult orElse(),
   }) {
@@ -143,6 +153,8 @@ extension HomeStatePatterns on HomeState {
     switch (_that) {
       case HomeLoading() when loading != null:
         return loading();
+      case HomeFailed() when failed != null:
+        return failed();
       case HomeReady() when ready != null:
         return ready(_that.lastRead, _that.nextPrayer);
       case _:
@@ -166,6 +178,7 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(
             LastReadCard? lastRead, NextPrayerCard? nextPrayer)
         ready,
@@ -174,6 +187,8 @@ extension HomeStatePatterns on HomeState {
     switch (_that) {
       case HomeLoading():
         return loading();
+      case HomeFailed():
+        return failed();
       case HomeReady():
         return ready(_that.lastRead, _that.nextPrayer);
     }
@@ -194,6 +209,7 @@ extension HomeStatePatterns on HomeState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)?
         ready,
   }) {
@@ -201,6 +217,8 @@ extension HomeStatePatterns on HomeState {
     switch (_that) {
       case HomeLoading() when loading != null:
         return loading();
+      case HomeFailed() when failed != null:
+        return failed();
       case HomeReady() when ready != null:
         return ready(_that.lastRead, _that.nextPrayer);
       case _:
@@ -226,6 +244,26 @@ class HomeLoading implements HomeState {
   @override
   String toString() {
     return 'HomeState.loading()';
+  }
+}
+
+/// @nodoc
+
+class HomeFailed implements HomeState {
+  const HomeFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HomeFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'HomeState.failed()';
   }
 }
 

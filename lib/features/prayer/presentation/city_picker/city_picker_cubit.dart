@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,9 +19,18 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   final LocationService? _location;
 
   Future<void> search(String query) async {
-    final results = await _cityRepo.search(query);
-    if (isClosed) return;
-    emit(CityPickerState.ready(query: query, results: results));
+    try {
+      final results = await _cityRepo.search(query);
+      if (isClosed) return;
+      emit(CityPickerState.ready(query: query, results: results));
+    } on Object catch (error, stackTrace) {
+      dev.log('city search failed',
+          name: 'quran_yahdi/city_picker',
+          error: error,
+          stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const CityPickerState.failed());
+    }
   }
 
   Future<void> persist(City city) => _cityRepo.select(city);
@@ -32,18 +42,27 @@ class CityPickerCubit extends Cubit<CityPickerState> {
     final location = _location;
     if (location == null || isClosed) return null;
     _emitLocating(true);
-    final coords = await location.currentPosition();
-    if (isClosed) return null;
-    if (coords == null) {
+    try {
+      final coords = await location.currentPosition();
+      if (isClosed) return null;
+      if (coords == null) {
+        _emitLocating(false);
+        return null;
+      }
+      final city = await _cityRepo.nearestTo(coords.latitude, coords.longitude);
+      if (isClosed) return null;
+      await _cityRepo.select(city);
+      if (isClosed) return null;
       _emitLocating(false);
+      return city;
+    } on Object catch (error, stackTrace) {
+      dev.log('nearest-city resolve failed',
+          name: 'quran_yahdi/city_picker',
+          error: error,
+          stackTrace: stackTrace);
+      if (!isClosed) _emitLocating(false);
       return null;
     }
-    final city = await _cityRepo.nearestTo(coords.latitude, coords.longitude);
-    if (isClosed) return null;
-    await _cityRepo.select(city);
-    if (isClosed) return null;
-    _emitLocating(false);
-    return city;
   }
 
   void _emitLocating(bool locating) {

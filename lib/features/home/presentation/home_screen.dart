@@ -6,6 +6,7 @@ import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'home_cubit.dart';
 import 'home_state.dart';
@@ -22,6 +23,7 @@ class HomeScreen extends StatelessWidget {
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) => switch (state) {
           HomeLoading() => const LoadingView(),
+          HomeFailed() => errorPane(loc, 'home load failed', 'home'),
           HomeReady(:final lastRead, :final nextPrayer) => ListView(
               padding: const EdgeInsets.all(12),
               children: [
@@ -81,11 +83,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-typedef _Feature = (
-  IconData,
-  String Function(AppLocalizations),
-  String
-);
+typedef _Feature = (IconData, String Function(AppLocalizations), String);
 
 const List<_Feature> _features = [
   (Icons.menu_book, _locQuran, '/quran'),
