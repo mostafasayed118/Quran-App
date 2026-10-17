@@ -1,4 +1,4 @@
-import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 extension PrayerNameLabel on PrayerName {

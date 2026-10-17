@@ -1,13 +1,16 @@
 import 'package:adhan/adhan.dart';
 
+import '../../../core/domain/prayer_name.dart';
+
+// Compat: existing importers of this file keep resolving [PrayerName].
+export '../../../core/domain/prayer_name.dart' show PrayerName;
+
 class CityCoordinates {
   const CityCoordinates(this.latitude, this.longitude);
 
   final double latitude;
   final double longitude;
 }
-
-enum PrayerName { fajr, sunrise, dhuhr, asr, maghrib, isha }
 
 class PrayerChoice {
   const PrayerChoice(this.name, this.time);
