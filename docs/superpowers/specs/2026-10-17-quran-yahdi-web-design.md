@@ -133,7 +133,7 @@ Fallback hardening: the reciter list is snapshotted at build time (`web/src/data
 - Typography: **HafsSmart** (Quran text — woff2, **never subset** — Quran shaping), **Cairo** reg/bold (UI). Arabic: no `letter-spacing`, line-height ≥1.6 body / 2.0+ for ayah display.
 - Ornaments: `۝` (U+06DD) hero ayah ends, `۞` (U+06DE) dividers, ayah-number **CSS double-ring medallion** with Arabic-Indic numerals (١٢٣).
 - Logo in nav: circular crop of the master file; on night it intentionally blends into the same-green canvas (cream calligraphy only visible) — locked behavior.
-- Light-theme gold text uses `--gold-ink` `#8A6520` (WCAG AA on paper); night uses `#D8B36A`. Contrast verified in implementation tests (§5).
+- Light-theme gold text uses `--gold-ink` `#7E5C1D` (WCAG AA on paper); night uses `#D8B36A`. Contrast verified in implementation tests (§5).
 
 ### 3.10 App integration (share links) — phase P4
 

@@ -276,7 +276,7 @@ git commit -m "feat(web): bilingual strings module with parity test"
 - Create (binary): `web/public/fonts/HafsSmart_08.woff2`, `Cairo-Regular.woff2`, `Cairo-Bold.woff2`, `me_quran.woff2`, plus `web/public/fonts/Cairo-OFL.txt` (copied)
 
 **Interfaces:**
-- Produces: CSS custom properties `--bg-solid, --ink, --muted, --hairline, --frame, --frame2, --accent, --btn-bg, --btn-ink, --gold-line, --gold-ink, --surface` for `:root`/`[data-theme='day']` and `[data-theme='night']`; `@font-face` families `HafsSmart`, `Cairo`, `me_quran`.
+- Produces: CSS custom properties `--bg-solid, --ink, --muted, --muted-strong, --hairline, --frame, --frame2, --accent, --btn-bg, --btn-ink, --gold-line, --gold-ink, --surface` for `:root`/`[data-theme='day']` and `[data-theme='night']`; `@font-face` families `HafsSmart`, `Cairo`, `me_quran`.
 
 - [ ] **Step 1: Write the failing test**
 
