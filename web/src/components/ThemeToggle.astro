@@ -1,0 +1,36 @@
+---
+import { t, type Locale } from '../lib/strings';
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+const toNight = t(locale, 'themeToNight');
+const toDay = t(locale, 'themeToDay');
+---
+<button
+  class="theme-toggle"
+  aria-label={toNight}
+  data-label-day={toNight}
+  data-label-night={toDay}
+>{toNight}</button>
+<script is:inline>
+  (function () {
+    var btn = document.currentScript.previousElementSibling;
+    if (!btn || !btn.classList.contains('theme-toggle')) {
+      btn = document.querySelector('.theme-toggle');
+    }
+    if (!btn) return;
+    function apply() {
+      var label = document.documentElement.getAttribute('data-theme') === 'night'
+        ? btn.dataset.labelNight
+        : btn.dataset.labelDay;
+      btn.textContent = label;
+      btn.setAttribute('aria-label', label);
+    }
+    apply();
+    btn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'night' ? 'day' : 'night';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('qy:theme', next); } catch (e) { /* private mode */ }
+      apply();
+    });
+  })();
+</script>

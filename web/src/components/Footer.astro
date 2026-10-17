@@ -4,6 +4,5 @@ interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 ---
 <footer class="site-footer">
-  <a href="/privacy">{t(locale, 'footerPrivacy')}</a>
-  <a href="/about">{t(locale, 'footerAbout')}</a>
+  <span>{t(locale, 'appName')}</span>
 </footer>

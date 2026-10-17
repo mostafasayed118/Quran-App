@@ -1,5 +1,5 @@
 ---
-import ThemeToggle from './ThemeToggle.tsx';
+import ThemeToggle from './ThemeToggle.astro';
 import { t, type Locale } from '../lib/strings';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
@@ -11,7 +11,6 @@ const { locale = 'ar' } = Astro.props;
   </a>
   <nav>
     <a href="/quran">{t(locale, 'navQuran')}</a>
-    <a href="/about">{t(locale, 'navAbout')}</a>
   </nav>
-  <ThemeToggle locale={locale} client:load />
+  <ThemeToggle locale={locale} />
 </header>

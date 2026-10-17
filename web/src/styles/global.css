@@ -22,11 +22,11 @@ body {
 .site-header nav { display: flex; gap: 16px; }
 .site-header nav a, .site-footer a { color: var(--muted-strong); text-decoration: none; }
 .theme-toggle { background: var(--btn-bg); color: var(--btn-ink); border: 0; border-radius: 999px; padding: 9px 18px; font-family: inherit; font-weight: 700; cursor: pointer; }
-.surah-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; } .surah-list a { display: flex; gap: 14px; align-items: baseline; padding: 12px 4px; border-bottom: 1px solid var(--hairline); color: var(--ink); text-decoration: none; } .surah-num { color: var(--gold-ink); min-width: 2.2em; } .surah-meta { margin-inline-start: auto; color: var(--muted); font-size: .85em; }
+.surah-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; } .surah-list a { display: flex; gap: 14px; align-items: baseline; padding: 12px 4px; border-bottom: 1px solid var(--hairline); color: var(--ink); text-decoration: none; } .surah-num { color: var(--gold-ink); min-width: 2.2em; } .surah-meta { margin-inline-start: auto; color: var(--muted-strong); font-size: .85em; }
 .reader { max-width: 760px; margin-inline: auto; padding: 26px 20px 60px; }
 .reader-head { text-align: center; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
 .reader-head h1 { margin: 0 0 6px; font-size: 1.7rem; }
-.reader-head .meta { margin: 0; color: var(--muted); font-size: .9rem; }
+.reader-head .meta { margin: 0; color: var(--muted-strong); font-size: .9rem; }
 .ayah { padding: 14px 2px; border-bottom: 1px solid var(--hairline); }
 .ayah-text {
   margin: 0;
@@ -44,3 +44,12 @@ body {
 .sajda { color: var(--gold-ink); margin-inline-start: 6px; }
 .reader-nav { display: flex; justify-content: space-between; margin-top: 22px; }
 .reader-nav a { color: var(--accent); text-decoration: none; font-weight: 700; }
+.page-title { width: min(760px, calc(100% - 40px)); margin: 28px auto 6px; font-size: 1.35rem; }
+.index-search {
+  display: block; width: min(760px, calc(100% - 40px)); margin: 14px auto 10px;
+  padding: 11px 16px; border: 1px solid var(--hairline); border-radius: 12px;
+  background: var(--surface); color: var(--ink); font: inherit;
+}
+.index-search::placeholder { color: var(--muted-strong); }
+.empty { width: min(760px, calc(100% - 40px)); margin: 20px auto; color: var(--muted-strong); text-align: center; }
+.surah-name { color: var(--ink); font-weight: 500; }
