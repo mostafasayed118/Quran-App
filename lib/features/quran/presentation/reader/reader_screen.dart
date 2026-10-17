@@ -195,12 +195,14 @@ class _AyahCard extends StatelessWidget {
             textDirection: TextDirection.rtl,
             children: [
               Text(
-                '﴿${ayah.numberInSurah.toArabicIndic}﴾',
+                loc.ornateBrackets(ayah.numberInSurah.toArabicIndic),
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 16,
                   color: AppTheme.goldText(context),
                 ),
+                semanticsLabel:
+                    loc.ayahNumberLabel(ayah.numberInSurah.toArabicIndic),
               ),
               const Spacer(),
               IconButton(
@@ -282,7 +284,8 @@ class _MushafPagerState extends State<_MushafPager> {
       itemBuilder: (context, i) {
         final block = pages[i];
         final text = block.ayahs
-            .map((a) => '${a.textUthmani} ﴿${a.numberInSurah.toArabicIndic}﴾')
+            .map((a) =>
+                '${a.textUthmani} ${loc.ornateBrackets(a.numberInSurah.toArabicIndic)}')
             .join(' ');
         return Padding(
           padding: const EdgeInsets.all(16),
@@ -303,7 +306,9 @@ class _MushafPagerState extends State<_MushafPager> {
                 ),
               ),
               Text(
-                '﴿ ${loc.pageIndicator(block.page.toArabicIndic)} ﴾',
+                loc.ornateBrackets(
+                  loc.pageIndicator(block.page.toArabicIndic),
+                ),
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   color: AppTheme.goldText(context),

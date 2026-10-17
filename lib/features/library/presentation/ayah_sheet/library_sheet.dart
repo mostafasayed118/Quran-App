@@ -78,7 +78,7 @@ class _AyahSheetView extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '$surahName ﴿${ayah.toArabicIndic}﴾',
+                          '$surahName ${loc.ornateBrackets(ayah.toArabicIndic)}',
                           style: TextStyle(
                             fontFamily: QuranFonts.meQuran,
                             fontSize: 15,

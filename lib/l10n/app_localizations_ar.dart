@@ -105,6 +105,16 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String ornateBrackets(String text) {
+    return '﴿$text﴾';
+  }
+
+  @override
+  String ayahNumberLabel(String number) {
+    return 'الآية $number';
+  }
+
+  @override
   String get recitationsTitle => 'التلاوات';
 
   @override

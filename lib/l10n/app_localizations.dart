@@ -278,6 +278,18 @@ abstract class AppLocalizations {
   /// **'صفحة {page}'**
   String pageIndicator(String page);
 
+  /// No description provided for @ornateBrackets.
+  ///
+  /// In ar, this message translates to:
+  /// **'﴿{text}﴾'**
+  String ornateBrackets(String text);
+
+  /// No description provided for @ayahNumberLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية {number}'**
+  String ayahNumberLabel(String number);
+
   /// No description provided for @recitationsTitle.
   ///
   /// In ar, this message translates to:

@@ -105,6 +105,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String ornateBrackets(String text) {
+    return '﴿$text﴾';
+  }
+
+  @override
+  String ayahNumberLabel(String number) {
+    return 'Ayah $number';
+  }
+
+  @override
   String get recitationsTitle => 'Recitations';
 
   @override
