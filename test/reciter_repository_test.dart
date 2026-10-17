@@ -78,6 +78,42 @@ void main() {
     expect(await db.select(db.reciters).get(), hasLength(3));
   });
 
+  test('malformed API entries are skipped, never crash the refresh', () async {
+    const messyFixture = '''
+    {"reciters":[
+     "not-a-map",
+     {"name":"no id","moshaf":[]},
+     {"id":"99","name":"bad id","moshaf":[]},
+     {"id":7,"name":"bad moshaf entries","moshaf":[
+       {"id":1,"name":"bad server","server":123},
+       {"id":2,"name":"missing server"}
+     ]},
+     {"id":51,"name":"عبدالباسط عبدالصمد","moshaf":[
+       {"id":53,"name":"حفص عن عاصم - مرتل","server":"https://server11.mp3quran.net/basit/","surah_total":114,"surah_list":"1,2,3"}
+     ]}
+    ]}
+    ''';
+    final server = await HttpServer.bind('127.0.0.1', 0);
+    server.listen((req) async {
+      req.response.headers.contentType = ContentType.json;
+      req.response.write(messyFixture);
+      await req.response.close();
+    });
+    addTearDown(() async => server.close(force: true));
+
+    final netRepo = ReciterRepository(
+      db,
+      client: http.Client(),
+      apiEndpointOverride:
+          'http://127.0.0.1:${server.port}/api/v3/reciters?language=ar',
+    );
+    await netRepo.refreshFromApi();
+
+    final rows = await db.select(db.reciters).get();
+    expect(rows, hasLength(1));
+    expect(rows.single.id, '51-53');
+  });
+
   test('moshaf rows with untrusted or non-https servers are dropped',
       () async {
     const evilFixture = '''

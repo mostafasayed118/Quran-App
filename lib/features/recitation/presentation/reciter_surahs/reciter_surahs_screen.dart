@@ -1,16 +1,15 @@
-import 'dart:developer' as dev;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
-import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/download_progress.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../../../features/recitation/data/reciter_repository.dart';
+import '../../data/download_status.dart';
 import '../downloads/downloads_cubit.dart';
 import '../downloads/downloads_state.dart';
 import '../playback/playback_cubit.dart';
@@ -33,11 +32,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                 children: [
                   Text(
                     row.reciterName,
-                    style: const TextStyle(
-                      fontFamily: QuranFonts.ui,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: AppTheme.rowTitle,
                   ),
                   Text(
                     row.moshafName,
@@ -60,13 +55,13 @@ class ReciterSurahsScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           ReciterSurahsLoading() => const LoadingView(),
           ReciterSurahsError(:final message) =>
-            _errorPane(loc, message, 'reciter_surahs'),
+            errorPane(loc, message, 'reciter_surahs'),
           ReciterSurahsReady(
-              :final row,
-              :final surahNumbers,
-              :final names,
-              :final previews,
-            ) =>
+            :final row,
+            :final surahNumbers,
+            :final names,
+            :final previews,
+          ) =>
             BlocBuilder<DownloadsCubit, DownloadsState>(
               builder: (context, dl) => ListView.builder(
                 itemCount: surahNumbers.length,
@@ -119,9 +114,9 @@ class _SurahDownloadRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final cubit = context.read<DownloadsCubit>();
-    final status = item?.status ?? 'none';
+    final status = item?.status;
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      contentPadding: AppTheme.tileContentPadding,
       leading: _buildLeading(context, colors),
       title: Text(
         name,
@@ -150,32 +145,17 @@ class _SurahDownloadRow extends StatelessWidget {
   Future<void> _confirmDelete(
       BuildContext context, DownloadsCubit cubit) async {
     final loc = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(loc.libraryDelete),
-        content: Text(name),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(loc.cancel),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(loc.libraryDelete),
-          ),
-        ],
-      ),
+    final confirmed = await confirmDeleteDialog(
+      context,
+      title: loc.libraryDelete,
+      body: name,
     );
-    if (confirmed == true) {
+    if (confirmed) {
       await cubit.removeDone(reciter.id, surahNumber);
     }
   }
 
   Widget _buildLeading(BuildContext context, ColorScheme colors) {
-    if (!parseSurahList(reciter.surahList).contains(surahNumber)) {
-      return ArabicBadge(surahNumber.toArabicIndic);
-    }
     return IconButton(
       tooltip: AppLocalizations.of(context).playTooltip,
       icon: Icon(Icons.play_arrow, color: colors.primary),
@@ -190,10 +170,10 @@ class _SurahDownloadRow extends StatelessWidget {
     BuildContext context,
     DownloadsCubit cubit,
     ColorScheme colors,
-    String status,
+    DownloadStatus? status,
   ) {
     switch (status) {
-      case 'done':
+      case DownloadStatus.done:
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -214,7 +194,7 @@ class _SurahDownloadRow extends StatelessWidget {
             ),
           ],
         );
-      case 'downloading':
+      case DownloadStatus.downloading:
         final item = this.item!;
         return DownloadProgressLabel(
           received: item.received,
@@ -223,15 +203,16 @@ class _SurahDownloadRow extends StatelessWidget {
           gap: 4,
           labelStyle: AppTheme.mutedFootnote(context),
         );
-      case 'failed':
+      case DownloadStatus.failed:
         return IconButton(
-          tooltip: MaterialLocalizations.of(context)
-              .refreshIndicatorSemanticLabel,
+          tooltip:
+              MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
           color: colors.error,
           icon: const Icon(Icons.refresh),
           onPressed: () => cubit.enqueue(reciter.id, surahNumber),
         );
-      default:
+      case DownloadStatus.queued:
+      case null:
         return IconButton(
           tooltip: AppLocalizations.of(context).downloadSurah,
           icon: const Icon(Icons.download),
@@ -239,9 +220,4 @@ class _SurahDownloadRow extends StatelessWidget {
         );
     }
   }
-}
-
-Widget _errorPane(AppLocalizations loc, String message, String source) {
-  dev.log(message, name: 'quran_yahdi/$source');
-  return ErrorView(loc.genericError);
 }

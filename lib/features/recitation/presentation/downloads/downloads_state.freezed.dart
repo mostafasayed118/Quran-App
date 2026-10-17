@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 
 /// @nodoc
 mixin _$DownloadItem {
-  String get status;
+  DownloadStatus get status;
   int get received;
   int get total;
 
@@ -60,7 +60,7 @@ abstract mixin class $DownloadItemCopyWith<$Res> {
           DownloadItem value, $Res Function(DownloadItem) _then) =
       _$DownloadItemCopyWithImpl;
   @useResult
-  $Res call({String status, int received, int total});
+  $Res call({DownloadStatus status, int received, int total});
 }
 
 /// @nodoc
@@ -83,7 +83,7 @@ class _$DownloadItemCopyWithImpl<$Res> implements $DownloadItemCopyWith<$Res> {
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DownloadStatus,
       received: null == received
           ? _self.received
           : received // ignore: cast_nullable_to_non_nullable
@@ -187,7 +187,8 @@ extension DownloadItemPatterns on DownloadItem {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(String status, int received, int total)? $default, {
+    TResult Function(DownloadStatus status, int received, int total)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
@@ -214,7 +215,7 @@ extension DownloadItemPatterns on DownloadItem {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(String status, int received, int total) $default,
+    TResult Function(DownloadStatus status, int received, int total) $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -237,7 +238,7 @@ extension DownloadItemPatterns on DownloadItem {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(String status, int received, int total)? $default,
+    TResult? Function(DownloadStatus status, int received, int total)? $default,
   ) {
     final _that = this;
     switch (_that) {
@@ -253,11 +254,11 @@ extension DownloadItemPatterns on DownloadItem {
 
 class _DownloadItem implements DownloadItem {
   const _DownloadItem(
-      {this.status = 'queued', this.received = 0, this.total = 0});
+      {this.status = DownloadStatus.queued, this.received = 0, this.total = 0});
 
   @override
   @JsonKey()
-  final String status;
+  final DownloadStatus status;
   @override
   @JsonKey()
   final int received;
@@ -303,7 +304,7 @@ abstract mixin class _$DownloadItemCopyWith<$Res>
       __$DownloadItemCopyWithImpl;
   @override
   @useResult
-  $Res call({String status, int received, int total});
+  $Res call({DownloadStatus status, int received, int total});
 }
 
 /// @nodoc
@@ -327,7 +328,7 @@ class __$DownloadItemCopyWithImpl<$Res>
       status: null == status
           ? _self.status
           : status // ignore: cast_nullable_to_non_nullable
-              as String,
+              as DownloadStatus,
       received: null == received
           ? _self.received
           : received // ignore: cast_nullable_to_non_nullable

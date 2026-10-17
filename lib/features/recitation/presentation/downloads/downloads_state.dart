@@ -1,11 +1,13 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../data/download_status.dart';
+
 part 'downloads_state.freezed.dart';
 
 @freezed
 sealed class DownloadItem with _$DownloadItem {
   const factory DownloadItem({
-    @Default('queued') String status,
+    @Default(DownloadStatus.queued) DownloadStatus status,
     @Default(0) int received,
     @Default(0) int total,
   }) = _DownloadItem;

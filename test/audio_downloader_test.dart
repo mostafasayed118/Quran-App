@@ -84,8 +84,7 @@ void main() {
       req.response.add(List<int>.generate(4096, (i) => i % 251));
       await req.response.close();
     });
-    final reciter =
-        await (db.select(db.reciters)).getSingle();
+    final reciter = await (db.select(db.reciters)).getSingle();
     final receivedTotal = <List<int>>[];
     final file = await downloader.downloadSurah(
       reciter: reciter,
@@ -102,16 +101,18 @@ void main() {
     expect(statuses.single.status, 'done');
     expect(statuses.single.bytes, 4096);
     expect(await downloader.isDownloaded('51-53', 2), isTrue);
+    expect(await downloader.downloadedPath('51-53', 2), file.path);
+    expect(await downloader.downloadedPath('51-53', 1), isNull);
   });
 
-  test('a stream far beyond its declared size is aborted as failed',
-      () async {
+  test('a stream far beyond its declared size is aborted as failed', () async {
     await serve((_) async {});
     final downloader = AudioDownloader(
       db,
-      dio: Dio()..httpClientAdapter = _LyingAdapter([
-        for (var i = 0; i < 20; i++) List<int>.filled(100 * 1024, 7),
-      ]),
+      dio: Dio()
+        ..httpClientAdapter = _LyingAdapter([
+          for (var i = 0; i < 20; i++) List<int>.filled(100 * 1024, 7),
+        ]),
       audioRootResolver: () async => tempRoot,
     );
     final reciter = await (db.select(db.reciters)).getSingle();
@@ -145,5 +146,52 @@ void main() {
         .get();
     expect(statuses.single.status, 'failed');
     expect(await downloader.isDownloaded('51-53', 1), isFalse);
+  });
+
+  group('maxAcceptedBytes (lying-host cap)', () {
+    test('no content-length → the 64 MiB absolute ceiling', () {
+      expect(AudioDownloader.maxAcceptedBytes(0), 64 << 20);
+    });
+    test('small declared length keeps the 2x + 64 KiB window', () {
+      expect(AudioDownloader.maxAcceptedBytes(1000), 1000 * 2 + 65536);
+    });
+    test('a host lying large cannot raise the cap past the ceiling', () {
+      expect(AudioDownloader.maxAcceptedBytes(1 << 30), 64 << 20);
+    });
+  });
+
+  test('removeDownload deletes an in-root file and its row', () async {
+    final downloader = await serve((req) async {
+      req.response.add(List<int>.generate(1024, (i) => i % 251));
+      await req.response.close();
+    });
+    final reciter = await (db.select(db.reciters)).getSingle();
+    final file =
+        await downloader.downloadSurah(reciter: reciter, surahNumber: 2);
+    expect(file.existsSync(), isTrue);
+
+    await downloader.removeDownload('51-53', 2);
+
+    expect(file.existsSync(), isFalse);
+    expect(await (db.select(db.downloads)).get(), isEmpty);
+  });
+
+  test('removeDownload never deletes outside the audio root (tampered row)',
+      () async {
+    final downloader = await serve((_) async {});
+    final outside = File('${tempRoot.path}/outside.mp3')
+      ..writeAsStringSync('x');
+    await db.into(db.downloads).insert(DownloadsCompanion.insert(
+          reciterId: '51-53',
+          surahId: 9,
+          status: 'done',
+          path: outside.path,
+          bytes: const Value(1),
+        ));
+
+    await downloader.removeDownload('51-53', 9);
+
+    expect(outside.existsSync(), isTrue);
+    expect(await (db.select(db.downloads)).get(), isEmpty);
   });
 }

@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/progress_throttle.dart';
 import 'library_catalog.dart';
 
 class PackFailure implements Exception {
@@ -35,22 +37,80 @@ class PackDownloader {
     this._db, {
     Dio? dio,
     Future<Directory> Function()? libraryRootResolver,
+    Future<dynamic> Function(String path)? fileDecoder,
   })  : _dio = dio ??
             Dio(BaseOptions(
               connectTimeout: const Duration(seconds: 15),
               receiveTimeout: const Duration(minutes: 2),
             )),
-        _rootResolver = libraryRootResolver;
+        _rootResolver = libraryRootResolver,
+        _fileDecoder = fileDecoder ?? _decodeFileInIsolate;
 
   final AppDatabase _db;
   final Dio _dio;
   final Future<Directory> Function()? _rootResolver;
 
+  /// Decodes a pack file at [path] to its JSON value.
+  ///
+  /// Defaults to [Isolate.run]: cold decodes of multi-MB packs (the catalog's
+  /// largest is ~82 MB) must never block the UI isolate. Widget tests inject
+  /// a plain synchronous decoder instead — isolate completions never arrive
+  /// under FakeAsync's fake clock (probe-verified), the same constraint that
+  /// keeps [_packFile]'s mkdir synchronous.
+  final Future<dynamic> Function(String path) _fileDecoder;
+
+  static Future<dynamic> _decodeFileInIsolate(String path) =>
+      Isolate.run(() => jsonDecode(File(path).readAsStringSync()));
+
   /// Decoded-pack cache: the read API is called per ayah-sheet open and per
-  /// hadith page turn, and re-reading + re-decoding multi-MB pack files on
-  /// the UI isolate per call froze the app. Keyed by packId; the only writers
-  /// of pack files (install/uninstall) invalidate it.
+  /// hadith page turn, and re-reading + re-decoding multi-MB pack files per
+  /// call froze the app. Keyed by packId; the only writers of pack files
+  /// (install/uninstall) invalidate it. Bounded: one decoded pack can be
+  /// tens of MB of heap, so at most two entries survive (the ayah sheet's
+  /// translation + tafsir pair), evicting least-recently-used first.
   final Map<String, dynamic> _decodedCache = {};
+
+  static const int _decodedCacheMaxEntries = 2;
+
+  /// Per-pack ayah lookup indexes (`surah * 1000 + ayah` → text), built once
+  /// from the decoded pack and evicted together with [_decodedCache] — the
+  /// flat tafsir wrapper holds up to ~6.2k entries and was scanned per sheet
+  /// open.
+  final Map<String, Map<int, String>> _ayahIndexCache = {};
+
+  static int _ayahKey(int surah, int ayah) => surah * 1000 + ayah;
+
+  void _dropAyahIndexes(String packId) {
+    _ayahIndexCache.removeWhere((key, _) => key.startsWith('$packId#'));
+  }
+
+  void _cacheDecoded(String packId, dynamic decoded) {
+    _decodedCache.remove(packId);
+    _decodedCache[packId] = decoded;
+    while (_decodedCache.length > _decodedCacheMaxEntries) {
+      final evicted = _decodedCache.keys.first;
+      _decodedCache.remove(evicted);
+      _dropAyahIndexes(evicted);
+    }
+  }
+
+  Map<int, String> _ayahIndex(String packId, String listKey, List list) {
+    final cacheKey = '$packId#$listKey';
+    return _ayahIndexCache.putIfAbsent(cacheKey, () {
+      final index = <int, String>{};
+      for (final entry in list) {
+        if (entry is! Map<String, dynamic>) continue;
+        final surah = entry['chapter'] ?? entry['surah'];
+        final ayah = entry['verse'] ?? entry['ayah'];
+        final text = entry['text'];
+        if (surah is! num || ayah is! num || text is! String || text.isEmpty) {
+          continue;
+        }
+        index[_ayahKey(surah.toInt(), ayah.toInt())] = text;
+      }
+      return index;
+    });
+  }
 
   static const libraryFolderName = 'library';
 
@@ -65,10 +125,18 @@ class PackDownloader {
         'libraryRootResolver not configured — register library bindings first');
   }
 
+  /// Pack ids compose filesystem paths (see `library_catalog.dart`); the
+  /// catalog already rejects unsafe ids, and this re-check keeps any future
+  /// caller (or a tampered registry row) from steering a write/delete.
+  static final RegExp _safePackId = RegExp(r'^[a-z0-9][a-z0-9-]{0,63}$');
+
   Future<File> _packFile(String packId) async {
+    if (!_safePackId.hasMatch(packId)) {
+      throw PackFailure('unsafe pack id "$packId"');
+    }
     final root = await _root();
-    final dir = Directory(
-        '${root.path}${Platform.pathSeparator}$libraryFolderName');
+    final dir =
+        Directory('${root.path}${Platform.pathSeparator}$libraryFolderName');
     // Sync create: the read path must stay FakeAsync-safe for widget tests
     // (a real async mkdir never completes under the test zone) and is a
     // no-op when the folder already exists.
@@ -88,6 +156,7 @@ class PackDownloader {
     final finalFile = await _packFile(pack.id);
     final partFile = File('${finalFile.path}.part');
     final expectedBytes = (pack.approxSizeMb * 1024 * 1024).round();
+    final throttle = ProgressThrottle();
     try {
       final sink = partFile.openWrite();
       var received = 0;
@@ -101,16 +170,26 @@ class PackDownloader {
             var separator = '';
             for (var n = 1; n <= pack.fileCount!; n++) {
               final url = pack.urlTemplate!.replaceFirst('{n}', '$n');
-              final dr = await _dio.get<String>(url);
-              final body = dr.data ?? '';
+              // Streamed, not buffered: a compromised/mutable upstream must
+              // not be able to force a full multi-MB body into memory before
+              // the size guard fires. The cap is checked per chunk.
+              final res = await _dio.get<ResponseBody>(
+                url,
+                options: Options(responseType: ResponseType.stream),
+              );
+              final bytes = <int>[];
+              await for (final chunk in res.data!.stream) {
+                received += chunk.length;
+                if (received > _sizeCap(expectedBytes)) {
+                  throw PackFailure(
+                      'pack "${pack.id}" exceeds its declared size');
+                }
+                bytes.addAll(chunk);
+              }
+              final body = utf8.decode(bytes);
               final perSurah = jsonDecode(body);
               if (perSurah is! List || perSurah.isEmpty) {
                 throw PackFailure('tafsir surah $n is empty or not an array');
-              }
-              received += utf8.encode(body).length;
-              if (received > _sizeCap(expectedBytes)) {
-                throw PackFailure(
-                    'pack "${pack.id}" exceeds its declared size');
               }
               // Flatten: splice the per-surah array interior verbatim so the
               // wrapper's tafsirs list stays a flat (surah, ayah, text) list.
@@ -124,7 +203,9 @@ class PackDownloader {
               }
               sink.write('$separator$interior');
               separator = ',';
-              onProgress?.call(received, expectedBytes);
+              if (throttle.shouldReport(received, expectedBytes)) {
+                onProgress?.call(received, expectedBytes);
+              }
             }
             sink.write(']}');
           case LibraryPackKind.translation:
@@ -136,8 +217,9 @@ class PackDownloader {
               pack.sourceUrl!,
               options: Options(responseType: ResponseType.stream),
             );
-            final contentLength =
-                int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ?? 0;
+            final contentLength = int.tryParse(
+                    res.headers.value(Headers.contentLengthHeader) ?? '') ??
+                0;
             final total = contentLength > 0 ? contentLength : expectedBytes;
             await for (final chunk in res.data!.stream) {
               received += chunk.length;
@@ -146,7 +228,9 @@ class PackDownloader {
                     'pack "${pack.id}" exceeds its declared size');
               }
               sink.add(chunk);
-              onProgress?.call(received, total);
+              if (throttle.shouldReport(received, total)) {
+                onProgress?.call(received, total);
+              }
             }
         }
         await sink.flush();
@@ -158,8 +242,8 @@ class PackDownloader {
 
       final decoded = await _sniffIntegrity(pack.id, pack.kind, partFile);
 
-      final promoted = await partFile.rename(partFile.path
-          .substring(0, partFile.path.length - '.part'.length));
+      final promoted = await partFile.rename(
+          partFile.path.substring(0, partFile.path.length - '.part'.length));
       final sizeMb = await promoted.length() / (1024 * 1024);
       await _upsertRow(
         packId: pack.id,
@@ -169,10 +253,11 @@ class PackDownloader {
         version: pack.version,
         sizeMb: sizeMb,
       );
-      _decodedCache[pack.id] = decoded;
+      _cacheDecoded(pack.id, decoded);
       return promoted;
     } on Object {
       _decodedCache.remove(pack.id);
+      _dropAyahIndexes(pack.id);
       if (await partFile.exists()) {
         await partFile.delete();
       }
@@ -184,26 +269,28 @@ class PackDownloader {
   /// caller can prime the read cache instead of decoding the file again.
   Future<dynamic> _sniffIntegrity(
       String packId, LibraryPackKind kind, File part) async {
-    final raw = await part.readAsString();
     dynamic decoded;
     try {
-      decoded = jsonDecode(raw);
+      decoded = await _fileDecoder(part.path);
     } on Object {
       throw PackFailure('downloaded pack "$packId" did not parse as JSON');
     }
+    final map = decoded;
+    if (map is! Map<String, dynamic>) {
+      throw PackFailure('downloaded pack "$packId" is not a JSON object');
+    }
     switch (kind) {
       case LibraryPackKind.translation:
-        final list = (decoded as Map<String, dynamic>)['quran'];
+        final list = map['quran'];
         if (list is! List || list.isEmpty) {
           throw PackFailure('pack "$packId" missing a non-empty quran list');
         }
       case LibraryPackKind.hadith:
-        final list = (decoded as Map<String, dynamic>)['hadiths'];
+        final list = map['hadiths'];
         if (list is! List || list.isEmpty) {
           throw PackFailure('pack "$packId" missing a non-empty hadiths list');
         }
       case LibraryPackKind.tafsir:
-        final map = decoded as Map<String, dynamic>;
         if (map['pack'] != packId) {
           throw PackFailure('wrapper pack mismatch for "$packId"');
         }
@@ -215,8 +302,7 @@ class PackDownloader {
     return decoded;
   }
 
-  String _wrapperPrefix(String packId) =>
-      '{"pack":"$packId","tafsirs":[';
+  String _wrapperPrefix(String packId) => '{"pack":"$packId","tafsirs":[';
 
   Future<void> _upsertRow({
     required String packId,
@@ -265,6 +351,7 @@ class PackDownloader {
           .go();
     }
     _decodedCache.remove(packId);
+    _dropAyahIndexes(packId);
   }
 
   /// True when the pack is installed AND at exactly [version].
@@ -300,16 +387,19 @@ class PackDownloader {
     final path = await packPath(packId);
     if (path == null) {
       _decodedCache.remove(packId);
+      _dropAyahIndexes(packId);
       return null;
     }
     var decoded = _decodedCache[packId];
-    if (decoded == null) {
+    if (decoded != null) {
+      _cacheDecoded(packId, decoded); // LRU touch
+    } else {
       try {
-        decoded = jsonDecode(File(path).readAsStringSync());
+        decoded = await _fileDecoder(path);
       } on Object {
         return null; // corrupted pack reads as absent, never throws upward
       }
-      _decodedCache[packId] = decoded;
+      _cacheDecoded(packId, decoded);
     }
     if (key != null && decoded is Map<String, dynamic>) {
       final list = decoded[key];
@@ -323,31 +413,14 @@ class PackDownloader {
   Future<String?> translationFor(String packId, int surah, int ayah) async {
     final list = await _decodeInstalled(packId, key: 'quran');
     if (list is! List) return null;
-    for (final entry in list) {
-      if (entry is Map<String, dynamic> &&
-          entry['chapter'] == surah &&
-          entry['verse'] == ayah) {
-        final text = entry['text'];
-        if (text is String && text.isNotEmpty) return text;
-      }
-    }
-    return null;
+    return _ayahIndex(packId, 'quran', list)[_ayahKey(surah, ayah)];
   }
 
   /// Tafsir text for an ayah from an installed tafsir wrapper.
   Future<String?> tafsirFor(String packId, int surah, int ayah) async {
-    final list =
-        await _decodeInstalled(packId, key: 'tafsirs');
+    final list = await _decodeInstalled(packId, key: 'tafsirs');
     if (list is! List) return null;
-    for (final entry in list) {
-      if (entry is Map<String, dynamic> &&
-          entry['surah'] == surah &&
-          entry['ayah'] == ayah) {
-        final text = entry['text'];
-        if (text is String && text.isNotEmpty) return text;
-      }
-    }
-    return null;
+    return _ayahIndex(packId, 'tafsirs', list)[_ayahKey(surah, ayah)];
   }
 
   /// A paged window of an installed hadith pack:
@@ -362,7 +435,8 @@ class PackDownloader {
     final out = <(int, String)>[];
     for (final entry in list.sublist(offset, end)) {
       if (entry is Map<String, dynamic>) {
-        final number = (entry['hadithnumber'] as num?)?.toInt();
+        final rawNumber = entry['hadithnumber'];
+        final number = rawNumber is num ? rawNumber.toInt() : null;
         final text = entry['text'];
         if (number != null && text is String) {
           out.add((number, text));

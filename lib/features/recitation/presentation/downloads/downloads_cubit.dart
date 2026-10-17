@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/audio_downloader.dart';
+import '../../data/download_status.dart';
 import '../../data/reciter_repository.dart';
 import 'downloads_state.dart';
 
@@ -22,14 +24,22 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   String _key(String rowId, int surahNumber) => '$rowId-$surahNumber';
 
   Future<void> refreshDone() async {
-    final rows = await _downloader.listDone();
-    var items = state.items;
-    for (final row in rows) {
-      final key = '${row.reciterId}-${row.surahId}';
-      items = {...items, key: const DownloadItem(status: 'done')};
+    try {
+      final rows = await _downloader.listDone();
+      final items = {
+        ...state.items,
+        for (final row in rows)
+          '${row.reciterId}-${row.surahId}':
+              const DownloadItem(status: DownloadStatus.done),
+      };
+      if (isClosed) return;
+      emit(state.copyWith(items: items));
+    } on Object catch (error, stackTrace) {
+      // Soft failure: the caller's screen keeps rendering; done rows are
+      // just missing until the next refresh.
+      dev.log('downloads refresh failed',
+          name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
     }
-    if (isClosed) return;
-    emit(state.copyWith(items: items));
   }
 
   /// Removes an installed download through the existing
@@ -37,7 +47,13 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   /// from the state so rows re-render — the delete affordance's refresh path
   /// (UX-FIX 2; mirrors LibraryCubit.uninstall, no new state machinery).
   Future<void> removeDone(String rowId, int surahNumber) async {
-    await _downloader.removeDownload(rowId, surahNumber);
+    try {
+      await _downloader.removeDownload(rowId, surahNumber);
+    } on Object catch (error, stackTrace) {
+      dev.log('download remove failed',
+          name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
+      return;
+    }
     if (isClosed) return;
     emit(state.copyWith(items: {
       for (final entry in state.items.entries)
@@ -49,7 +65,8 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     final key = _key(rowId, surahNumber);
     final current = state.items[key];
     if (current != null &&
-        (current.status == 'downloading' || current.status == 'done')) {
+        (current.status == DownloadStatus.downloading ||
+            current.status == DownloadStatus.done)) {
       return;
     }
     if (_queue.any((task) => task.$1 == rowId && task.$2 == surahNumber)) {
@@ -59,7 +76,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     emit(state.copyWith(
       items: {
         ...state.items,
-        key: const DownloadItem(status: 'queued'),
+        key: const DownloadItem(status: DownloadStatus.queued),
       },
     ));
     await _drain();
@@ -73,26 +90,33 @@ class DownloadsCubit extends Cubit<DownloadsState> {
         final (rowId, surahNumber) = _queue.first;
         _queue.removeAt(0);
         final key = _key(rowId, surahNumber);
-        final reciter = await _reciters.byId(rowId);
-        if (reciter == null) {
-          await _setFailed(key);
-          continue;
-        }
-        if (isClosed) return;
-        emit(_bump(key, status: 'downloading'));
         try {
+          final reciter = await _reciters.byId(rowId);
+          if (reciter == null) {
+            if (isClosed) return;
+            await _setFailed(key);
+            continue;
+          }
+          if (isClosed) return;
+          emit(_bump(key, status: DownloadStatus.downloading));
           await _downloader.downloadSurah(
             reciter: reciter,
             surahNumber: surahNumber,
             onProgress: (received, total) {
               if (isClosed) return;
               emit(_bump(key,
-                  status: 'downloading', received: received, total: total));
+                  status: DownloadStatus.downloading,
+                  received: received,
+                  total: total));
             },
           );
           if (isClosed) return;
-          emit(_bump(key, status: 'done'));
-        } on Object {
+          emit(_bump(key, status: DownloadStatus.done));
+        } on Object catch (error, stackTrace) {
+          dev.log('surah download failed',
+              name: 'quran_yahdi/downloads',
+              error: error,
+              stackTrace: stackTrace);
           if (isClosed) return;
           await _setFailed(key);
         }
@@ -104,11 +128,11 @@ class DownloadsCubit extends Cubit<DownloadsState> {
 
   Future<void> _setFailed(String key) async {
     // The failed status in the DB is owned by the downloader; mirror in state.
-    emit(_bump(key, status: 'failed'));
+    emit(_bump(key, status: DownloadStatus.failed));
   }
 
   DownloadsState _bump(String key,
-      {required String status, int received = 0, int total = 0}) {
+      {required DownloadStatus status, int received = 0, int total = 0}) {
     final current = state.items[key] ?? const DownloadItem();
     return state.copyWith(
       items: {

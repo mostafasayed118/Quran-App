@@ -90,25 +90,38 @@ class ReciterRepository {
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }
-    final data = jsonDecode(res.body) as Map<String, dynamic>;
-    final reciters = (data['reciters'] as List).cast<Map<String, dynamic>>();
+    final data = jsonDecode(res.body);
+    if (data is! Map<String, dynamic>) {
+      throw StateError('mp3quran payload is not a JSON object');
+    }
+    final reciters = data['reciters'];
+    if (reciters is! List) {
+      throw StateError('mp3quran payload is missing the reciters list');
+    }
     final rows = <RecitersCompanion>[];
     for (final reciter in reciters) {
-      final reciterId = (reciter['id'] as num).toInt();
-      final reciterName = (reciter['name'] ?? '') as String;
-      final moshafs =
-          (reciter['moshaf'] as List? ?? const []).cast<Map<String, dynamic>>();
+      if (reciter is! Map<String, dynamic>) continue;
+      final reciterId = reciter['id'];
+      if (reciterId is! num) continue;
+      final reciterName = reciter['name'];
+      final moshafs = reciter['moshaf'];
+      if (moshafs is! List) continue;
       for (final moshaf in moshafs) {
-        final moshafId = (moshaf['id'] as num).toInt();
-        final server = (moshaf['server'] ?? '') as String;
-        if (!isTrustedAudioServer(server)) continue;
+        if (moshaf is! Map<String, dynamic>) continue;
+        final moshafId = moshaf['id'];
+        if (moshafId is! num) continue;
+        final server = moshaf['server'];
+        if (server is! String || !isTrustedAudioServer(server)) continue;
+        final moshafName = moshaf['name'];
+        final surahList = moshaf['surah_list'];
+        final surahTotal = moshaf['surah_total'];
         rows.add(RecitersCompanion.insert(
-          id: '$reciterId-$moshafId',
-          reciterName: reciterName,
-          moshafName: (moshaf['name'] ?? '') as String,
+          id: '${reciterId.toInt()}-${moshafId.toInt()}',
+          reciterName: reciterName is String ? reciterName : '',
+          moshafName: moshafName is String ? moshafName : '',
           server: server,
-          surahList: (moshaf['surah_list'] ?? '') as String,
-          surahTotal: (moshaf['surah_total'] as num?)?.toInt() ?? 0,
+          surahList: surahList is String ? surahList : '',
+          surahTotal: surahTotal is num ? surahTotal.toInt() : 0,
         ));
       }
     }

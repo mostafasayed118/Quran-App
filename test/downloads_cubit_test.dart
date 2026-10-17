@@ -7,8 +7,17 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
+import 'package:quran_yahdi/features/recitation/data/download_status.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
+
+class _ThrowingListDownloader extends AudioDownloader {
+  _ThrowingListDownloader(super.db, {super.audioRootResolver});
+
+  @override
+  Future<List<Download>> listDone() =>
+      Future.error(StateError('registry down'));
+}
 
 void main() {
   late AppDatabase db;
@@ -45,7 +54,8 @@ void main() {
     addTearDown(() async => server.close(force: true));
 
     final base = 'http://127.0.0.1:${server.port}/';
-    await (db.update(db.reciters)).write(RecitersCompanion(server: Value(base)));
+    await (db.update(db.reciters))
+        .write(RecitersCompanion(server: Value(base)));
     final repo = ReciterRepository(db);
     final downloader = AudioDownloader(
       db,
@@ -57,8 +67,8 @@ void main() {
 
     // Broadcast stream: subscribe BEFORE the drains run, or emissions are lost.
     final bothDone = cubit.stream.firstWhere((s) =>
-        s.items['51-53-1']?.status == 'done' &&
-        s.items['51-53-2']?.status == 'done');
+        s.items['51-53-1']?.status == DownloadStatus.done &&
+        s.items['51-53-2']?.status == DownloadStatus.done);
     await cubit.enqueue('51-53', 1);
     await cubit.enqueue('51-53', 2);
     await bothDone;
@@ -83,7 +93,8 @@ void main() {
     addTearDown(() async => server.close(force: true));
 
     final base = 'http://127.0.0.1:${server.port}/';
-    await (db.update(db.reciters)).write(RecitersCompanion(server: Value(base)));
+    await (db.update(db.reciters))
+        .write(RecitersCompanion(server: Value(base)));
     final repo = ReciterRepository(db);
     final downloader = AudioDownloader(
       db,
@@ -95,10 +106,41 @@ void main() {
 
     // Broadcast stream: subscribe BEFORE the drains run, or emissions are lost.
     final settled = cubit.stream.firstWhere((s) =>
-        s.items['51-53-1']?.status == 'failed' &&
-        s.items['51-53-2']?.status == 'done');
+        s.items['51-53-1']?.status == DownloadStatus.failed &&
+        s.items['51-53-2']?.status == DownloadStatus.done);
     await cubit.enqueue('51-53', 1); // will fail
     await cubit.enqueue('51-53', 2); // must still complete
     await settled;
+  });
+
+  test('a failing refreshDone keeps the state and never crashes', () async {
+    final downloader =
+        _ThrowingListDownloader(db, audioRootResolver: () async => tempRoot);
+    final cubit =
+        DownloadsCubit(downloader: downloader, reciters: ReciterRepository(db));
+    addTearDown(cubit.close);
+
+    await cubit.refreshDone();
+
+    expect(cubit.state.items, isEmpty);
+  });
+
+  test('refreshDone mirrors completed DB rows into state', () async {
+    final downloader =
+        AudioDownloader(db, audioRootResolver: () async => tempRoot);
+    await db.into(db.downloads).insert(DownloadsCompanion.insert(
+          reciterId: '51-53',
+          surahId: 2,
+          status: 'done',
+          path: '${tempRoot.path}/audio/51-53/002.mp3',
+          bytes: const Value(64),
+        ));
+    final cubit =
+        DownloadsCubit(downloader: downloader, reciters: ReciterRepository(db));
+    addTearDown(cubit.close);
+
+    await cubit.refreshDone();
+
+    expect(cubit.state.items['51-53-2']?.status, DownloadStatus.done);
   });
 }

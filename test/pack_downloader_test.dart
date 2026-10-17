@@ -50,8 +50,8 @@ void main() {
         language: 'ar',
         titleAr: 'حزمة',
         titleEn: 'Pack',
-        sourceUrl: url ??
-            'http://127.0.0.1:${server.port}/translation/$id.min.json',
+        sourceUrl:
+            url ?? 'http://127.0.0.1:${server.port}/translation/$id.min.json',
         approxSizeMb: 0.001,
         version: '1',
       );
@@ -60,8 +60,8 @@ void main() {
       () async {
     await serve((req) async {
       req.response.headers.contentType = ContentType.json;
-      req.response.write(
-          '{"quran":[{"chapter":1,"verse":1,"text":"بسم الله"}]}');
+      req.response
+          .write('{"quran":[{"chapter":1,"verse":1,"text":"بسم الله"}]}');
       await req.response.close();
     });
     final pack = translationPack();
@@ -112,6 +112,22 @@ void main() {
     expect(leftovers, isEmpty);
   });
 
+  test('valid JSON with the wrong shape fails as PackFailure, not TypeError',
+      () async {
+    await serve((req) async {
+      req.response.headers.contentType = ContentType.json;
+      req.response.write('[]');
+      await req.response.close();
+    });
+
+    await expectLater(downloader.install(translationPack(id: 'tshape')),
+        throwsA(isA<PackFailure>()));
+
+    expect(await downloader.installedPacks(), isEmpty);
+    final leftovers = Directory('${tempRoot.path}/library').listSync();
+    expect(leftovers, isEmpty);
+  });
+
   test('tafsir install loops the template into the documented wrapper',
       () async {
     final requestLines = <String>[];
@@ -132,8 +148,7 @@ void main() {
       language: 'ar',
       titleAr: 'تفسير',
       titleEn: 'Tafsir',
-      urlTemplate:
-          'http://127.0.0.1:${server.port}/tafsir/tp3/{n}.json',
+      urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/tp3/{n}.json',
       fileCount: 3,
       approxSizeMb: 0.001,
       version: 'v1.2.2',
@@ -145,15 +160,14 @@ void main() {
     expect(requestLines.map((p) => p.split('/').last),
         containsAllInOrder(<String>['1.json', '2.json', '3.json']));
     expect(file.existsSync(), isTrue);
-    final decoded =
-        jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+    final decoded = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     expect(decoded['pack'], 'tp3');
     final tafsirs = decoded['tafsirs'] as List;
     expect(tafsirs, hasLength(6)); // 3 surah files x 2 ayahs
     expect((tafsirs.first as Map)['surah'], 1);
     expect((tafsirs.last as Map)['surah'], 1);
-    expect(await downloader.installedPacks().then((r) => r.single.kind),
-        'tafsir');
+    expect(
+        await downloader.installedPacks().then((r) => r.single.kind), 'tafsir');
     expect(progress, isNotEmpty);
   });
 
@@ -201,10 +215,10 @@ void main() {
         ));
   }
 
-  test(
-      'translationFor reads a real fixture excerpt for a known ayah (1:1)',
+  test('translationFor reads a real fixture excerpt for a known ayah (1:1)',
       () async {
-    final fixture = File('test/fixtures/translation_ara_sirajtafseer_excerpt.json');
+    final fixture =
+        File('test/fixtures/translation_ara_sirajtafseer_excerpt.json');
     if (!fixture.existsSync()) {
       markTestSkipped('fixtures dir does not resolve from this runner');
     }
@@ -234,6 +248,31 @@ void main() {
     expect(text, isNotNull);
     expect(await downloader.tafsirFor('wm1', 2, 1), isNull);
     expect(await downloader.tafsirFor('missing-pack', 1, 1), isNull);
+  });
+
+  test('hadithPage tolerates malformed entries instead of throwing', () async {
+    await serve((_) async {});
+    final libraryDir = Directory('${tempRoot.path}/library')
+      ..createSync(recursive: true);
+    File('${libraryDir.path}/hm-bad.json').writeAsStringSync(
+        '{"hadiths":[{"hadithnumber":"nope","text":"x"},{"hadithnumber":1,"text":"ok"},42]}');
+    await seedRow('hm-bad', LibraryPackKind.hadith);
+
+    final page = await downloader.hadithPage('hm-bad', 0, 10);
+
+    expect(page.$1, [(1, 'ok')]);
+    expect(page.$2, isFalse);
+  });
+
+  test('uninstall refuses unsafe pack ids (path traversal defense)', () async {
+    await serve((_) async {});
+    final outside = File('${tempRoot.path}/outside.json')
+      ..writeAsStringSync('keep');
+
+    await expectLater(
+        downloader.uninstall('../outside'), throwsA(isA<PackFailure>()));
+
+    expect(outside.existsSync(), isTrue);
   });
 
   test('hadithPage windows the real fixture and flips hasMore', () async {
@@ -275,14 +314,14 @@ void main() {
 
     // Mutate the file behind the downloader's back: a cached read must still
     // serve the original text, proving the file was not re-read.
-    File('${libraryDir.path}/tp1.json')
-        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
+    File('${libraryDir.path}/tp1.json').writeAsStringSync(
+        '{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
     expect(await downloader.translationFor('tp1', 1, 1), first);
 
     // Uninstall clears the cache: the same id resolves from a fresh file.
     await downloader.uninstall('tp1');
-    File('${libraryDir.path}/tp1.json')
-        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"FRESH"}]}');
+    File('${libraryDir.path}/tp1.json').writeAsStringSync(
+        '{"quran":[{"chapter":1,"verse":1,"text":"FRESH"}]}');
     await seedRow('tp1', LibraryPackKind.translation);
     expect(await downloader.translationFor('tp1', 1, 1), 'FRESH');
   });
@@ -295,8 +334,8 @@ void main() {
       await req.response.close();
     });
     final file = await downloader.install(translationPack(id: 'tpc'));
-    file
-        .writeAsStringSync('{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
+    file.writeAsStringSync(
+        '{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
     expect(await downloader.translationFor('tpc', 1, 1), 'INSTALLED');
   });
 
@@ -318,8 +357,7 @@ void main() {
   test('uninstall removes both the file and the registry row', () async {
     await serve((req) async {
       req.response.headers.contentType = ContentType.json;
-      req.response.write(
-          '{"quran":[{"chapter":1,"verse":1,"text":"text"}]}');
+      req.response.write('{"quran":[{"chapter":1,"verse":1,"text":"text"}]}');
       await req.response.close();
     });
     await downloader.install(translationPack(id: 'tp9'));
@@ -330,5 +368,81 @@ void main() {
     expect(await downloader.installedPacks(), isEmpty);
     expect(Directory('${tempRoot.path}/library').listSync(), isEmpty);
     expect(await downloader.packPath('tp9'), isNull);
+  });
+
+  test('decoded cache is bounded: a third pack evicts the least recently used',
+      () async {
+    await serve((req) async {
+      req.response.headers.contentType = ContentType.json;
+      req.response.write('{"quran":[{"chapter":1,"verse":1,"text":"CACHED"}]}');
+      await req.response.close();
+    });
+    final libraryDir = Directory('${tempRoot.path}/library');
+    await libraryDir.create(recursive: true);
+    await downloader.install(translationPack(id: 'lru-a'));
+    await downloader.install(translationPack(id: 'lru-b'));
+    await downloader.install(translationPack(id: 'lru-c'));
+
+    // 'lru-a' was the least recently used and must have been evicted: a
+    // mutated file proves the read re-decoded from disk.
+    File('${libraryDir.path}/lru-a.json').writeAsStringSync(
+        '{"quran":[{"chapter":1,"verse":1,"text":"FRESH-A"}]}');
+    expect(await downloader.translationFor('lru-a', 1, 1), 'FRESH-A');
+
+    // 'lru-c' is still cached: the mutated file must NOT be re-read.
+    File('${libraryDir.path}/lru-c.json').writeAsStringSync(
+        '{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
+    expect(await downloader.translationFor('lru-c', 1, 1), 'CACHED');
+  });
+
+  test('cold reads decode via the injected fileDecoder; warm reads do not',
+      () async {
+    await serve((_) async {});
+    final decodedPaths = <String>[];
+    final seam = PackDownloader(
+      db,
+      dio: Dio(),
+      libraryRootResolver: () async => tempRoot,
+      fileDecoder: (path) async {
+        decodedPaths.add(path);
+        return jsonDecode(File(path).readAsStringSync());
+      },
+    );
+    final libraryDir = Directory('${tempRoot.path}/library');
+    await libraryDir.create(recursive: true);
+    await File('test/fixtures/translation_ara_sirajtafseer_excerpt.json')
+        .copy('${libraryDir.path}/tp1.json');
+    await seedRow('tp1', LibraryPackKind.translation);
+
+    expect(await seam.translationFor('tp1', 1, 1), isNotNull);
+    expect(decodedPaths, hasLength(1));
+    expect(await seam.translationFor('tp1', 1, 1), isNotNull);
+    expect(decodedPaths, hasLength(1));
+  });
+
+  test('oversized tafsir surah body aborts before promotion', () async {
+    await serve((req) async {
+      req.response.headers.contentType = ContentType.json;
+      final filler = 'a' * (200 * 1024);
+      req.response.write('[{"text":"$filler","ayah":1,"surah":1}]');
+      await req.response.close();
+    });
+    final pack = LibraryPackInfo(
+      id: 'tpover',
+      kind: LibraryPackKind.tafsir,
+      language: 'ar',
+      titleAr: 'تفسير',
+      titleEn: 'Tafsir',
+      urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/tpover/{n}.json',
+      fileCount: 2,
+      approxSizeMb: 0.001,
+      version: 'v1.2.2',
+    );
+
+    await expectLater(downloader.install(pack), throwsA(isA<PackFailure>()));
+
+    expect(await downloader.installedPacks(), isEmpty);
+    final leftovers = Directory('${tempRoot.path}/library').listSync();
+    expect(leftovers, isEmpty);
   });
 }
