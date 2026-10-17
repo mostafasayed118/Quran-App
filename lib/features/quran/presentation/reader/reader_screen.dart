@@ -210,6 +210,7 @@ class _AyahCard extends StatelessWidget {
                   context: context,
                   useSafeArea: true,
                   isScrollControlled: true,
+                  showDragHandle: true,
                   builder: (_) => LibrarySheet(
                     surahId: ayah.surahId,
                     surahName: surahName,

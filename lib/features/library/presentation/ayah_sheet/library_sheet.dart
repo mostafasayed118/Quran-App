@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/di/injector.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/pack_downloader.dart';
@@ -56,8 +58,7 @@ class _AyahSheetView extends StatelessWidget {
     return BlocBuilder<AyahSheetCubit, AyahSheetState>(
       builder: (context, state) {
         final Widget content = switch (state) {
-          AyahSheetLoading() =>
-            const Center(child: CircularProgressIndicator()),
+          AyahSheetLoading() => const LoadingView(),
           AyahSheetError(:final message) =>
             errorPane(loc, message, 'ayah_sheet'),
           final AyahSheetReady ready => DefaultTabController(
@@ -81,7 +82,7 @@ class _AyahSheetView extends StatelessWidget {
                           style: TextStyle(
                             fontFamily: QuranFonts.meQuran,
                             fontSize: 15,
-                            color: colors.secondary,
+                            color: AppTheme.goldText(context),
                           ),
                           textDirection: TextDirection.rtl,
                         ),
@@ -131,24 +132,13 @@ class _SheetPane extends StatelessWidget {
   Widget build(BuildContext context) {
     if (entries.isEmpty) {
       final loc = AppLocalizations.of(context);
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(loc.libraryEmptyHint),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  context.push('/library');
-                },
-                child: Text(loc.library),
-              ),
-            ],
-          ),
-        ),
+      return EmptyState(
+        loc.libraryEmptyHint,
+        actionLabel: loc.library,
+        onAction: () {
+          Navigator.of(context).pop();
+          context.push('/library');
+        },
       );
     }
     return ListView.builder(
