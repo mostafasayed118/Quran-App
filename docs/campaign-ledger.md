@@ -182,3 +182,5 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - Restore: DB pushed back to as-found (`azkar_reminder_enabled=true`, `azkar_reminder_time=22:56`) and verified by re-pull; `SCHEDULE_EXACT_ALARM` appop reset to default; night mode restored; app relaunched at home; zero repo files touched (porcelain still owner `.vscode` only).
 - Disclosed limitation: this session's model cannot read images; the visual proofs were done as UI-tree + pixel sampling and the screenshots (home / reader light+dark / shade / 404 / after-tap) are saved for owner review.
 - State: main @ `48cb5aa` (+ this ledger commit), porcelain owner-debris only, **unpushed 1**. NO PUSH — window belongs to the owner.
+- Push window (owner GO): `48cb5aa..581750c  main -> main` exit 0 · ls-remote `581750c6ecb1b78d087ae39e22bffe175a07110a` == local HEAD · unpushed 0 · pre-push gates re-run: analyze 0 · suite **243/243**.
+- State after window: main @ `581750c` (+ this ledger commit), porcelain owner-debris only, **unpushed 0** after the follow-up docs push.
