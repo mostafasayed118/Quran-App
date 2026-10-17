@@ -1,7 +1,6 @@
-import 'dart:ui' show Locale;
+import 'dart:ui' show Locale, VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:quran_yahdi/app/router.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show shouldRequestBootPermission;
 import 'package:quran_yahdi/l10n/app_localizations.dart';
@@ -43,12 +42,14 @@ class NotificationsBinding implements ReminderScheduler {
 
   bool _ready = false;
   NotificationDetails? _details;
+  VoidCallback? _onTap;
 
   /// One-time plugin init; safe to call repeatedly, never rethrows. A
-  /// notification tap hands the app to [onNotificationTap] (default-launch
-  /// to `/home` via the existing GoRouter — UX-FIX 2).
-  Future<void> init() async {
+  /// notification tap fires the injected `onTap` callback — the app layer
+  /// wires it to the router, so this data class stays router-free.
+  Future<void> init({VoidCallback? onTap}) async {
     if (_ready) return;
+    _onTap = onTap;
     try {
       final loc = lookupAppLocalizations(const Locale('ar'));
       await _plugin.initialize(
@@ -73,9 +74,10 @@ class NotificationsBinding implements ReminderScheduler {
   }
 
   /// Default tap-to-open (UX-FIX 2): v1 has no per-type payload→route map
-  /// (audit deferred that nuance), so every tap lands on the app's home.
+  /// (audit deferred that nuance), so every tap fires the callback passed to
+  /// [init] (main.dart wires it to the app's home route).
   void onNotificationTap(NotificationResponse response) {
-    AppRouter.router.go('/home');
+    _onTap?.call();
   }
 
   /// First-boot POST_NOTIFICATIONS grace (UX-FIX 2): requests once when the

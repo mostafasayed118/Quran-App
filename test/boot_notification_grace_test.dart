@@ -78,8 +78,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(ZakatScreen), findsOneWidget);
 
-    NotificationsBinding()
-        .onNotificationTap(const NotificationResponse(
+    final binding = NotificationsBinding();
+    await binding.init(onTap: () => AppRouter.router.go('/home'));
+    binding.onNotificationTap(const NotificationResponse(
       notificationResponseType: NotificationResponseType.selectedNotification,
     ));
     await tester.pump();

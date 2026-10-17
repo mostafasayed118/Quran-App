@@ -5,6 +5,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
+import 'app/router.dart';
 import 'core/di/injector.dart';
 import 'core/l10n/platform_localizations.dart';
 import 'features/notifications/data/notifications_binding.dart';
@@ -26,13 +27,15 @@ Future<void> main() async {
   final loc = platformLocalizations();
   await BackgroundInitGuard.attempt(
     () => JustAudioBackground.init(
-      androidNotificationChannelId:
-          'com.mostafasayed.quranyahdi.channel.audio',
-      androidNotificationChannelName: '${loc.recitationsTitle} — ${loc.appName}',
+      androidNotificationChannelId: 'com.mostafasayed.quranyahdi.channel.audio',
+      androidNotificationChannelName:
+          '${loc.recitationsTitle} — ${loc.appName}',
       androidNotificationOngoing: true,
     ),
   );
-  await getIt<NotificationsBinding>().init();
+  await getIt<NotificationsBinding>().init(
+    onTap: () => AppRouter.router.go('/home'),
+  );
   unawaited(_requestBootNotificationGrace());
   unawaited(runBootReminderSchedule());
   runApp(const QuranYahdiApp());
