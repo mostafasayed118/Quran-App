@@ -15,6 +15,17 @@ abstract final class AppTheme {
   static const TextStyle hafsAyah =
       TextStyle(fontFamily: QuranFonts.quran, fontSize: 24, height: 2);
 
+  /// Bold Latin-font row title used by the reciter lists.
+  static const TextStyle rowTitle = TextStyle(
+    fontFamily: QuranFonts.ui,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
+  /// Shared content padding for tappable list rows.
+  static const EdgeInsets tileContentPadding =
+      EdgeInsets.symmetric(horizontal: 14, vertical: 2);
+
   static Color goldText(BuildContext context) =>
       Theme.of(context).brightness == Brightness.light
           ? AppColors.goldText
