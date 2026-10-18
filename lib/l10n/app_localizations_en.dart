@@ -244,6 +244,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get last7Days => 'Last 7 days';
 
   @override
+  String get trackerDotToday => 'Today';
+
+  @override
+  String get trackerDotYesterday => 'Yesterday';
+
+  @override
+  String get trackerDotTwoDaysAgo => '2 days ago';
+
+  @override
+  String trackerDotDaysAgo(String days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get trackerDotMarked => 'Logged';
+
+  @override
+  String get trackerDotUnmarked => 'Not logged';
+
+  @override
   String get goldGrams => 'Gold (grams)';
 
   @override

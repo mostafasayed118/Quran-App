@@ -512,6 +512,42 @@ abstract class AppLocalizations {
   /// **'آخر ٧ أيام'**
   String get last7Days;
 
+  /// No description provided for @trackerDotToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get trackerDotToday;
+
+  /// No description provided for @trackerDotYesterday.
+  ///
+  /// In ar, this message translates to:
+  /// **'أمس'**
+  String get trackerDotYesterday;
+
+  /// No description provided for @trackerDotTwoDaysAgo.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبل يومين'**
+  String get trackerDotTwoDaysAgo;
+
+  /// No description provided for @trackerDotDaysAgo.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبل {days} أيام'**
+  String trackerDotDaysAgo(String days);
+
+  /// No description provided for @trackerDotMarked.
+  ///
+  /// In ar, this message translates to:
+  /// **'مُسجَّل'**
+  String get trackerDotMarked;
+
+  /// No description provided for @trackerDotUnmarked.
+  ///
+  /// In ar, this message translates to:
+  /// **'غير مُسجَّل'**
+  String get trackerDotUnmarked;
+
   /// No description provided for @goldGrams.
   ///
   /// In ar, this message translates to:

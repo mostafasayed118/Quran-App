@@ -54,20 +54,23 @@ class TrackerScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 for (final slot in PrayerSlot.values)
                   Card(
-                    child: ListTile(
-                      leading: Icon(
-                        today.forSlot(slot)
-                            ? Icons.check_circle
-                            : Icons.radio_button_unchecked,
-                        color: today.forSlot(slot)
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.outline,
+                    child: Semantics(
+                      checked: today.forSlot(slot),
+                      child: ListTile(
+                        leading: Icon(
+                          today.forSlot(slot)
+                              ? Icons.check_circle
+                              : Icons.radio_button_unchecked,
+                          color: today.forSlot(slot)
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.outline,
+                        ),
+                        title: Text(_label(context, slot)),
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          context.read<TrackerCubit>().toggle(slot);
+                        },
                       ),
-                      title: Text(_label(context, slot)),
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        context.read<TrackerCubit>().toggle(slot);
-                      },
                     ),
                   ),
                 const SizedBox(height: 12),
@@ -82,15 +85,19 @@ class TrackerScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    for (final marked in last7)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Icon(
-                          marked ? Icons.circle : Icons.circle_outlined,
-                          size: 14,
-                          color: marked
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.outline,
+                    for (var i = 0; i < last7.length; i++)
+                      Semantics(
+                        container: true,
+                        label: _dotLabel(loc, i, last7[i]),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            last7[i] ? Icons.circle : Icons.circle_outlined,
+                            size: 14,
+                            color: last7[i]
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                       ),
                   ],
@@ -115,6 +122,16 @@ class TrackerScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  String _dotLabel(AppLocalizations loc, int index, bool marked) {
+    final day = switch (index) {
+      0 => loc.trackerDotToday,
+      1 => loc.trackerDotYesterday,
+      2 => loc.trackerDotTwoDaysAgo,
+      _ => loc.trackerDotDaysAgo(index.toArabicIndic),
+    };
+    return '$day: ${marked ? loc.trackerDotMarked : loc.trackerDotUnmarked}';
   }
 
   String _label(BuildContext context, PrayerSlot slot) {

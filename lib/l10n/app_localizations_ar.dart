@@ -244,6 +244,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get last7Days => 'آخر ٧ أيام';
 
   @override
+  String get trackerDotToday => 'اليوم';
+
+  @override
+  String get trackerDotYesterday => 'أمس';
+
+  @override
+  String get trackerDotTwoDaysAgo => 'قبل يومين';
+
+  @override
+  String trackerDotDaysAgo(String days) {
+    return 'قبل $days أيام';
+  }
+
+  @override
+  String get trackerDotMarked => 'مُسجَّل';
+
+  @override
+  String get trackerDotUnmarked => 'غير مُسجَّل';
+
+  @override
   String get goldGrams => 'ذهب (جرام)';
 
   @override
