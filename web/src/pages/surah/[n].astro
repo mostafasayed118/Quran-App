@@ -66,6 +66,7 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
     import { readSetting, writeSetting } from '../../lib/settings';
     import { fetchReciters, sortReciters, type MoshafRow } from '../../lib/reciters';
     import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
+    import { writeResume } from '../../lib/reader-resume';
     import { shareOrCopy } from '../../lib/share';
     import { surahUrl } from '../../lib/urls';
     import { t, defaultLocale } from '../../lib/strings';
@@ -214,6 +215,33 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
           void playSurah(s);
         }
       });
+
+      // --- resume point: qy:last-read keeps the topmost visible ayah (throttled ~1s) ---
+      try {
+        const surahId = Number(playBtn?.dataset.surah);
+        const blocks = Array.from(ayahs?.querySelectorAll<HTMLElement>('.ayah') ?? []);
+        if (Number.isInteger(surahId) && blocks.length > 0) {
+          writeResume(localStorage, { s: surahId, a: 1 });
+          const visible = new Set<HTMLElement>();
+          let flushTimer = 0;
+          const flush = (): void => {
+            flushTimer = 0;
+            const top = blocks.find((el) => visible.has(el));
+            const a = Number(top?.dataset.n);
+            if (Number.isInteger(a)) writeResume(localStorage, { s: surahId, a });
+          };
+          const observer = new IntersectionObserver((entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) visible.add(entry.target as HTMLElement);
+              else visible.delete(entry.target as HTMLElement);
+            }
+            if (flushTimer === 0) flushTimer = window.setTimeout(flush, 1000);
+          });
+          for (const el of blocks) observer.observe(el);
+        }
+      } catch {
+        /* storage or observer unavailable — reader keeps working */
+      }
 
       render();
     }

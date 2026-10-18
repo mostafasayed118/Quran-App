@@ -51,3 +51,28 @@ test('reader boot script re-applies seeded settings right after SPA entry', asyn
   const step = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--reader-step').trim());
   expect(step).toBe('2');
 });
+
+test('reader records the topmost visible ayah as the qy:last-read resume point', async ({ page }) => {
+  await page.goto('/surah/2/');
+  await page.waitForFunction(() => {
+    try {
+      const p = JSON.parse(localStorage.getItem('qy:last-read') ?? 'null');
+      return p !== null && p.s === 2 && Number.isInteger(p.a) && p.a >= 1;
+    } catch {
+      return false;
+    }
+  });
+  const initial = await page.evaluate(() => (JSON.parse(localStorage.getItem('qy:last-read')!) as { a: number }).a);
+  await page.locator('#ayah-50').scrollIntoViewIfNeeded();
+  await page.waitForFunction((prev) => {
+    try {
+      const p = JSON.parse(localStorage.getItem('qy:last-read') ?? 'null');
+      return p !== null && Number.isInteger(p.a) && p.a > prev;
+    } catch {
+      return false;
+    }
+  }, initial);
+  const resumed = await page.evaluate(() => JSON.parse(localStorage.getItem('qy:last-read')!) as { s: number; a: number });
+  expect(resumed.s).toBe(2);
+  expect(resumed.a).toBeGreaterThan(initial);
+});
