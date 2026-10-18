@@ -22,11 +22,13 @@ class QiblaScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.qibla)),
       body: BlocBuilder<QiblaCubit, QiblaState>(
         builder: (context, state) {
-          final (:city, :bearing, :heading) = switch (state) {
+          final (:city, :bearing, :heading, :compassUnavailable) =
+              switch (state) {
             QiblaReady() => (
                 city: state.city,
                 bearing: state.bearing,
                 heading: state.heading,
+                compassUnavailable: state.compassUnavailable,
               ),
           };
           if (city == null || bearing == null) {
@@ -76,6 +78,14 @@ class QiblaScreen extends StatelessWidget {
                 Center(
                   child: Text(
                     loc.compassLive,
+                    style: AppTheme.mutedFootnote(context),
+                  ),
+                ),
+              ] else if (compassUnavailable) ...[
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    loc.compassStatic,
                     style: AppTheme.mutedFootnote(context),
                   ),
                 ),

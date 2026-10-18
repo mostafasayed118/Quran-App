@@ -37,6 +37,7 @@ class QiblaCubit extends Cubit<QiblaState> {
         city: selected,
         bearing: bearing,
         heading: state.heading,
+        compassUnavailable: state.compassUnavailable,
       ));
     } on Object catch (error, stackTrace) {
       // The initial state is already a usable ready(): a failed reload keeps
@@ -48,16 +49,33 @@ class QiblaCubit extends Cubit<QiblaState> {
 
   void _bindHeading() {
     final stream = _headingService?.headingStream();
-    if (stream == null) return;
+    if (stream == null) {
+      _markCompassUnavailable();
+      return;
+    }
     _headingSub = stream.listen(
       _onHeading,
-      onError: (Object error, StackTrace stackTrace) => dev.log(
-        'heading stream error',
-        name: 'quran_yahdi/qibla',
-        error: error,
-        stackTrace: stackTrace,
-      ),
+      onError: (Object error, StackTrace stackTrace) {
+        dev.log(
+          'heading stream error',
+          name: 'quran_yahdi/qibla',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        _markCompassUnavailable();
+      },
     );
+  }
+
+  void _markCompassUnavailable() {
+    if (isClosed) return;
+    final state = this.state;
+    emit(QiblaState.ready(
+      city: state.city,
+      bearing: state.bearing,
+      heading: null,
+      compassUnavailable: true,
+    ));
   }
 
   void _onHeading(double degrees) {
@@ -67,6 +85,7 @@ class QiblaCubit extends Cubit<QiblaState> {
       city: state.city,
       bearing: state.bearing,
       heading: degrees,
+      compassUnavailable: false,
     ));
   }
 

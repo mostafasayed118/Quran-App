@@ -10,5 +10,6 @@ sealed class QiblaState with _$QiblaState {
     @Default(null) City? city,
     @Default(null) double? bearing,
     @Default(null) double? heading,
+    @Default(false) bool compassUnavailable,
   }) = QiblaReady;
 }

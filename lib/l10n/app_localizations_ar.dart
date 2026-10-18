@@ -358,6 +358,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get compassLive => 'المقياس حي';
 
   @override
+  String get compassStatic =>
+      'المقياس ثابت — لا يتوفر اتجاه مباشر على هذا الجهاز';
+
+  @override
   String reminderNextPrayer(String prayer) {
     return 'حان موعد صلاة $prayer';
   }

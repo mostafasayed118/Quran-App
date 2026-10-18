@@ -734,6 +734,12 @@ abstract class AppLocalizations {
   /// **'المقياس حي'**
   String get compassLive;
 
+  /// No description provided for @compassStatic.
+  ///
+  /// In ar, this message translates to:
+  /// **'المقياس ثابت — لا يتوفر اتجاه مباشر على هذا الجهاز'**
+  String get compassStatic;
+
   /// No description provided for @reminderNextPrayer.
   ///
   /// In ar, this message translates to:

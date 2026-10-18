@@ -359,6 +359,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get compassLive => 'Dial follows your device';
 
   @override
+  String get compassStatic =>
+      'Dial is static — live direction is not available on this device';
+
+  @override
   String reminderNextPrayer(String prayer) {
     return 'Time for $prayer';
   }
