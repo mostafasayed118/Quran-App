@@ -73,11 +73,10 @@ body {
 .mp-title { font-size: .9rem; font-weight: 700; }
 .mp-reciter { font-size: .78rem; color: var(--muted-strong); }
 .mp-track { flex: 1; min-width: 56px; }
-.mp-bar { position: relative; padding: 10px 0; cursor: pointer; }
+.mp-bar { position: relative; height: 44px; display: flex; align-items: center; cursor: pointer; }
 .mp-bar::before { content: ''; position: absolute; inset-inline: 0; top: 50%; height: 5px; transform: translateY(-50%); border-radius: 999px; background: var(--hairline); }
 .mp-bar i { position: absolute; top: 50%; left: 0; width: 0%; height: 5px; transform: translateY(-50%); border-radius: 999px; background: var(--accent); }
 .mp-time { flex: none; font-size: .78rem; color: var(--muted-strong); font-variant-numeric: tabular-nums; }
 @media (pointer: coarse) {
   .mp-btn { width: 48px; height: 48px; }
-  .mp-bar { padding: 20px 0; }
 }
