@@ -7,6 +7,23 @@ import '../../../../l10n/app_localizations.dart';
 import 'zakat_cubit.dart';
 import 'zakat_state.dart';
 
+const TextStyle _verdictStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  fontSize: 16,
+);
+
+const TextStyle _amountStyle = TextStyle(
+  fontSize: 28,
+  fontWeight: FontWeight.bold,
+);
+
+const TextStyle _lineLabelStyle = TextStyle(fontSize: 13);
+
+const TextStyle _lineValueStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  fontSize: 14,
+);
+
 class ZakatScreen extends StatelessWidget {
   const ZakatScreen({super.key});
 
@@ -44,12 +61,30 @@ class ZakatScreen extends StatelessWidget {
                         ),
               ),
               const SizedBox(height: 10),
-              _Field(label: loc.goldGrams, initial: ready.goldGrams, onChanged: context.read<ZakatCubit>().setGoldGrams),
-              _Field(label: loc.silverGrams, initial: ready.silverGrams, onChanged: context.read<ZakatCubit>().setSilverGrams),
-              _Field(label: loc.goldPrice, initial: ready.goldPrice, onChanged: context.read<ZakatCubit>().setGoldPrice),
-              _Field(label: loc.silverPrice, initial: ready.silverPrice, onChanged: context.read<ZakatCubit>().setSilverPrice),
-              _Field(label: loc.cash, initial: ready.cash, onChanged: context.read<ZakatCubit>().setCash),
-              _Field(label: loc.debts, initial: ready.debts, onChanged: context.read<ZakatCubit>().setDebts),
+              _Field(
+                  label: loc.goldGrams,
+                  initial: ready.goldGrams,
+                  onChanged: context.read<ZakatCubit>().setGoldGrams),
+              _Field(
+                  label: loc.silverGrams,
+                  initial: ready.silverGrams,
+                  onChanged: context.read<ZakatCubit>().setSilverGrams),
+              _Field(
+                  label: loc.goldPrice,
+                  initial: ready.goldPrice,
+                  onChanged: context.read<ZakatCubit>().setGoldPrice),
+              _Field(
+                  label: loc.silverPrice,
+                  initial: ready.silverPrice,
+                  onChanged: context.read<ZakatCubit>().setSilverPrice),
+              _Field(
+                  label: loc.cash,
+                  initial: ready.cash,
+                  onChanged: context.read<ZakatCubit>().setCash),
+              _Field(
+                  label: loc.debts,
+                  initial: ready.debts,
+                  onChanged: context.read<ZakatCubit>().setDebts),
               const SizedBox(height: 14),
               Card(
                 child: Padding(
@@ -57,15 +92,14 @@ class ZakatScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _line(context, loc.zakatableLabel, ready.result.zakatable),
+                      _line(
+                          context, loc.zakatableLabel, ready.result.zakatable),
                       _line(context, loc.nisabLabel, ready.result.nisabValue),
                       const SizedBox(height: 8),
                       Text(
                         ready.result.due ? loc.zakatDue : loc.zakatNotDue,
                         textAlign: TextAlign.right,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                        style: _verdictStyle.copyWith(
                           color: ready.result.due
                               ? colors.secondary
                               : colors.onSurfaceVariant,
@@ -73,14 +107,11 @@ class ZakatScreen extends StatelessWidget {
                       ),
                       if (ready.result.due)
                         Text(
-                          ready.result.amount.toStringAsFixed(2)
+                          ready.result.amount
+                              .toStringAsFixed(2)
                               .toArabicIndicDigits,
                           textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: colors.primary,
-                          ),
+                          style: _amountStyle.copyWith(color: colors.primary),
                         ),
                       const SizedBox(height: 8),
                       Text(
@@ -107,12 +138,12 @@ class ZakatScreen extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 13),
+              style: _lineLabelStyle,
             ),
           ),
           Text(
             value.toStringAsFixed(2).toArabicIndicDigits,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            style: _lineValueStyle,
           ),
         ],
       ),
@@ -136,8 +167,7 @@ class _Field extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: TextField(
-        keyboardType:
-            const TextInputType.numberWithOptions(decimal: true),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         decoration: InputDecoration(labelText: label),
         onChanged: onChanged,
       ),
