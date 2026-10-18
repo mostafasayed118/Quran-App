@@ -1,5 +1,26 @@
 import { test, expect } from '@playwright/test';
 
+test.describe('chrome a11y', () => {
+  test('skip link is the first focusable and targets #main', async ({ page }) => {
+    await page.goto('/');
+    await page.keyboard.press('Tab');
+    const skip = page.locator('.skip-link');
+    await expect(skip).toBeFocused();
+    await expect(skip).toHaveAttribute('href', '#main');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('main#main')).toBeFocused();
+  });
+
+  test('active nav link carries aria-current in both locales', async ({ page }) => {
+    await page.goto('/quran/');
+    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute('href', '/quran/');
+    await page.goto('/en/reciters/');
+    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute('href', '/en/reciters/');
+    await page.goto('/en/');
+    await expect(page.locator('header nav a[aria-current="page"]')).toHaveCount(0);
+  });
+});
+
 test.describe('404 locale from the /en prefix', () => {
   test('/en/no-such flips to the EN block with EN links', async ({ page }) => {
     await page.goto('/en/no-such');

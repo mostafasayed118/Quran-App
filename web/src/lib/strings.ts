@@ -58,6 +58,7 @@ const dict = {
     notFoundLead: 'تعذر العثور على الصفحة التي تبحث عنها.',
     notFoundSearchCta: 'ابحث في المصحف',
     notFoundHomeCta: 'الصفحة الرئيسية',
+    skipToContent: 'تخطَّ إلى المحتوى',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -115,6 +116,7 @@ const dict = {
     notFoundLead: "Couldn't find the page you're looking for.",
     notFoundSearchCta: 'Search the Quran',
     notFoundHomeCta: 'Home',
+    skipToContent: 'Skip to content',
   },
 } as const;
 

@@ -6,7 +6,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import MiniPlayer from '../components/MiniPlayer.astro';
 import { ClientRouter } from 'astro:transitions';
-import type { Locale } from '../lib/strings';
+import { t, type Locale } from '../lib/strings';
 import { altLocalePath } from '../lib/landing-content';
 
 interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
@@ -50,8 +50,9 @@ const ogImage = new URL('/og-base.png', Astro.site);
     <ClientRouter />
   </head>
   <body>
+    <a class="skip-link" href="#main">{t(locale, 'skipToContent')}</a>
     <Header locale={locale} />
-    <main><slot /></main>
+    <main id="main" tabindex="-1"><slot /></main>
     <div id="qy-player-region" transition:persist="qy-player">
       <MiniPlayer locale={locale} />
     </div>
