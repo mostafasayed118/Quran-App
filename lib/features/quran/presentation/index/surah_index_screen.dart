@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
@@ -11,6 +10,7 @@ import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../domain/surah_summary.dart';
 import 'surah_index_cubit.dart';
 import 'surah_index_state.dart';
 
@@ -56,7 +56,7 @@ class SurahIndexScreen extends StatelessWidget {
 class _SurahRow extends StatelessWidget {
   const _SurahRow({required this.surah});
 
-  final Surah surah;
+  final SurahSummary surah;
 
   @override
   Widget build(BuildContext context) {

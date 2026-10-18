@@ -5,7 +5,6 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../../app/deep_links.dart';
-import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -14,6 +13,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
 import '../../../recitation/presentation/playback/playback_cubit.dart';
+import '../../domain/verse.dart';
 import 'reader_cubit.dart';
 import 'reader_state.dart';
 
@@ -163,7 +163,7 @@ class _AyahCard extends StatelessWidget {
     required this.onToggle,
   });
 
-  final Ayah ayah;
+  final Verse ayah;
   final String surahName;
   final bool bookmarked;
   final VoidCallback onToggle;

@@ -3,24 +3,25 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/db/app_database.dart';
-import '../../data/surah_repository.dart';
+import '../../data/surah_source.dart';
+import '../../data/verse_mapping.dart';
 import 'surah_index_state.dart';
 
 class SurahIndexCubit extends Cubit<SurahIndexState> {
   SurahIndexCubit(this._repo) : super(const SurahIndexState.loading()) {
     _sub = _repo.watchAll().listen(
-          (surahs) {
-            _latest = surahs;
-            _emitFiltered();
-          },
-          onError: (Object error) {
-            if (isClosed) return;
-            emit(SurahIndexState.error(message: error.toString()));
-          },
-        );
+      (surahs) {
+        _latest = surahs;
+        _emitFiltered();
+      },
+      onError: (Object error) {
+        if (isClosed) return;
+        emit(SurahIndexState.error(message: error.toString()));
+      },
+    );
   }
 
-  final SurahRepository _repo;
+  final SurahSource _repo;
   List<Surah> _latest = [];
   String _query = '';
   StreamSubscription<List<Surah>>? _sub;
@@ -32,7 +33,10 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 
   void _emitFiltered() {
     if (isClosed) return;
-    emit(SurahIndexState.loaded(surahs: _filter(_latest), query: _query));
+    emit(SurahIndexState.loaded(
+      surahs: _filter(_latest).map((s) => s.toSummary()).toList(),
+      query: _query,
+    ));
   }
 
   List<Surah> _filter(List<Surah> surahs) {

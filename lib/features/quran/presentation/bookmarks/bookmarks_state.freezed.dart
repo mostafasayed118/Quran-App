@@ -145,7 +145,7 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<BookmarkEntry> entries)? ready,
+    TResult Function(List<Verse> entries)? ready,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -178,7 +178,7 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<BookmarkEntry> entries) ready,
+    required TResult Function(List<Verse> entries) ready,
     required TResult Function(String message) error,
   }) {
     final _that = this;
@@ -207,7 +207,7 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(List<BookmarkEntry> entries)? ready,
+    TResult? Function(List<Verse> entries)? ready,
     TResult? Function(String message)? error,
   }) {
     final _that = this;
@@ -247,11 +247,10 @@ class BookmarksLoading implements BookmarksState {
 /// @nodoc
 
 class BookmarksReady implements BookmarksState {
-  const BookmarksReady({required List<BookmarkEntry> entries})
-      : _entries = entries;
+  const BookmarksReady({required List<Verse> entries}) : _entries = entries;
 
-  final List<BookmarkEntry> _entries;
-  List<BookmarkEntry> get entries {
+  final List<Verse> _entries;
+  List<Verse> get entries {
     if (_entries is EqualUnmodifiableListView) return _entries;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_entries);
@@ -291,7 +290,7 @@ abstract mixin class $BookmarksReadyCopyWith<$Res>
           BookmarksReady value, $Res Function(BookmarksReady) _then) =
       _$BookmarksReadyCopyWithImpl;
   @useResult
-  $Res call({List<BookmarkEntry> entries});
+  $Res call({List<Verse> entries});
 }
 
 /// @nodoc
@@ -312,7 +311,7 @@ class _$BookmarksReadyCopyWithImpl<$Res>
       entries: null == entries
           ? _self._entries
           : entries // ignore: cast_nullable_to_non_nullable
-              as List<BookmarkEntry>,
+              as List<Verse>,
     ));
   }
 }

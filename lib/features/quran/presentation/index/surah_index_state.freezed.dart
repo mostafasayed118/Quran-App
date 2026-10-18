@@ -146,7 +146,7 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Surah> surahs, String query)? loaded,
+    TResult Function(List<SurahSummary> surahs, String query)? loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
@@ -179,7 +179,7 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Surah> surahs, String query) loaded,
+    required TResult Function(List<SurahSummary> surahs, String query) loaded,
     required TResult Function(String message) error,
   }) {
     final _that = this;
@@ -208,7 +208,7 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(List<Surah> surahs, String query)? loaded,
+    TResult? Function(List<SurahSummary> surahs, String query)? loaded,
     TResult? Function(String message)? error,
   }) {
     final _that = this;
@@ -249,12 +249,12 @@ class SurahIndexLoading implements SurahIndexState {
 
 class SurahIndexLoaded implements SurahIndexState {
   const SurahIndexLoaded(
-      {List<Surah> surahs = const <Surah>[], this.query = ''})
+      {List<SurahSummary> surahs = const <SurahSummary>[], this.query = ''})
       : _surahs = surahs;
 
-  final List<Surah> _surahs;
+  final List<SurahSummary> _surahs;
   @JsonKey()
-  List<Surah> get surahs {
+  List<SurahSummary> get surahs {
     if (_surahs is EqualUnmodifiableListView) return _surahs;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_surahs);
@@ -298,7 +298,7 @@ abstract mixin class $SurahIndexLoadedCopyWith<$Res>
           SurahIndexLoaded value, $Res Function(SurahIndexLoaded) _then) =
       _$SurahIndexLoadedCopyWithImpl;
   @useResult
-  $Res call({List<Surah> surahs, String query});
+  $Res call({List<SurahSummary> surahs, String query});
 }
 
 /// @nodoc
@@ -320,7 +320,7 @@ class _$SurahIndexLoadedCopyWithImpl<$Res>
       surahs: null == surahs
           ? _self._surahs
           : surahs // ignore: cast_nullable_to_non_nullable
-              as List<Surah>,
+              as List<SurahSummary>,
       query: null == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable

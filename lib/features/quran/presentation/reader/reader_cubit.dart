@@ -3,15 +3,16 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/ayah_repository.dart';
-import '../../data/last_read_repository.dart';
+import '../../data/ayah_source.dart';
+import '../../data/last_read_source.dart';
+import '../../data/verse_mapping.dart';
 import 'mushaf_page_block.dart';
 import 'reader_state.dart';
 
 class ReaderCubit extends Cubit<ReaderState> {
   ReaderCubit({
-    required AyahRepository ayahRepository,
-    required LastReadRepository lastReadRepository,
+    required AyahSource ayahRepository,
+    required LastReadSource lastReadRepository,
     required int surahId,
     required int initialAyah,
   })  : _ayahRepository = ayahRepository,
@@ -31,8 +32,8 @@ class ReaderCubit extends Cubit<ReaderState> {
     _load();
   }
 
-  final AyahRepository _ayahRepository;
-  final LastReadRepository _lastReadRepository;
+  final AyahSource _ayahRepository;
+  final LastReadSource _lastReadRepository;
   final int _surahId;
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
@@ -61,7 +62,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',
         initialAyah: _initialAyah,
-        ayahs: ayahs,
+        ayahs: ayahs.map((a) => a.toVerse()).toList(),
         mushafPages: groupAyahsByPage(ayahs),
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: _surahId != 1 && _surahId != 9,

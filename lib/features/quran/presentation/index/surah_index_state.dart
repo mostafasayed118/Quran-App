@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/db/app_database.dart';
+import '../../domain/surah_summary.dart';
 
 part 'surah_index_state.freezed.dart';
 
@@ -9,9 +9,10 @@ sealed class SurahIndexState with _$SurahIndexState {
   const factory SurahIndexState.loading() = SurahIndexLoading;
 
   const factory SurahIndexState.loaded({
-    @Default(<Surah>[]) List<Surah> surahs,
+    @Default(<SurahSummary>[]) List<SurahSummary> surahs,
     @Default('') String query,
   }) = SurahIndexLoaded;
 
-  const factory SurahIndexState.error({required String message}) = SurahIndexError;
+  const factory SurahIndexState.error({required String message}) =
+      SurahIndexError;
 }

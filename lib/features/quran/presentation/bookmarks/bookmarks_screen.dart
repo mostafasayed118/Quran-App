@@ -35,7 +35,7 @@ class BookmarksScreen extends StatelessWidget {
                 : ListView.builder(
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
-                      final ayah = entries[index].ayah;
+                      final ayah = entries[index];
                       return ListTile(
                         leading: Text(
                           '${ayah.surahId.toArabicIndic}:${ayah.numberInSurah.toArabicIndic}',

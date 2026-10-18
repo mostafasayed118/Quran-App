@@ -5,14 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../prayer/data/city_repository.dart';
 import '../../prayer/data/prayer_time_service.dart';
-import '../../quran/data/ayah_repository.dart';
-import '../../quran/data/last_read_repository.dart';
+import '../../quran/data/ayah_source.dart';
+import '../../quran/data/last_read_source.dart';
 import 'home_state.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit({
-    required LastReadRepository lastRead,
-    required AyahRepository ayahs,
+    required LastReadSource lastRead,
+    required AyahSource ayahs,
     required PrayerTimeService prayer,
     required CityRepository city,
   })  : _lastRead = lastRead,
@@ -23,8 +23,8 @@ class HomeCubit extends Cubit<HomeState> {
     unawaited(reload());
   }
 
-  final LastReadRepository _lastRead;
-  final AyahRepository _ayahs;
+  final LastReadSource _lastRead;
+  final AyahSource _ayahs;
   final PrayerTimeService _prayer;
   final CityRepository _city;
 

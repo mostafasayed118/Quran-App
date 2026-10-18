@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/db/app_database.dart';
+import '../../domain/verse.dart';
 import 'mushaf_page_block.dart';
 
 part 'reader_state.freezed.dart';
@@ -18,7 +18,7 @@ sealed class ReaderState with _$ReaderState {
     required int surahId,
     required String surahName,
     required int initialAyah,
-    required List<Ayah> ayahs,
+    required List<Verse> ayahs,
     required List<MushafPageBlock> mushafPages,
     @Default(ReaderMode.verses) ReaderMode mode,
     @Default(<int>{}) Set<int> bookmarkedAyahIds,

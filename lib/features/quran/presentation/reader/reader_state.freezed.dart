@@ -149,7 +149,7 @@ extension ReaderStatePatterns on ReaderState {
             int surahId,
             String surahName,
             int initialAyah,
-            List<Ayah> ayahs,
+            List<Verse> ayahs,
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
@@ -199,7 +199,7 @@ extension ReaderStatePatterns on ReaderState {
             int surahId,
             String surahName,
             int initialAyah,
-            List<Ayah> ayahs,
+            List<Verse> ayahs,
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
@@ -245,7 +245,7 @@ extension ReaderStatePatterns on ReaderState {
             int surahId,
             String surahName,
             int initialAyah,
-            List<Ayah> ayahs,
+            List<Verse> ayahs,
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
@@ -356,7 +356,7 @@ class ReaderReady implements ReaderState {
       {required this.surahId,
       required this.surahName,
       required this.initialAyah,
-      required List<Ayah> ayahs,
+      required List<Verse> ayahs,
       required List<MushafPageBlock> mushafPages,
       this.mode = ReaderMode.verses,
       Set<int> bookmarkedAyahIds = const <int>{},
@@ -368,8 +368,8 @@ class ReaderReady implements ReaderState {
   final int surahId;
   final String surahName;
   final int initialAyah;
-  final List<Ayah> _ayahs;
-  List<Ayah> get ayahs {
+  final List<Verse> _ayahs;
+  List<Verse> get ayahs {
     if (_ayahs is EqualUnmodifiableListView) return _ayahs;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_ayahs);
@@ -454,7 +454,7 @@ abstract mixin class $ReaderReadyCopyWith<$Res>
       {int surahId,
       String surahName,
       int initialAyah,
-      List<Ayah> ayahs,
+      List<Verse> ayahs,
       List<MushafPageBlock> mushafPages,
       ReaderMode mode,
       Set<int> bookmarkedAyahIds,
@@ -497,7 +497,7 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
       ayahs: null == ayahs
           ? _self._ayahs
           : ayahs // ignore: cast_nullable_to_non_nullable
-              as List<Ayah>,
+              as List<Verse>,
       mushafPages: null == mushafPages
           ? _self._mushafPages
           : mushafPages // ignore: cast_nullable_to_non_nullable
