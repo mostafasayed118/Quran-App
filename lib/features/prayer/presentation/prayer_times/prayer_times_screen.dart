@@ -30,7 +30,16 @@ class PrayerTimesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(loc.prayerTimes)),
+      appBar: AppBar(
+        title: Text(loc.prayerTimes),
+        actions: [
+          IconButton(
+            tooltip: loc.refresh,
+            icon: const Icon(Icons.refresh),
+            onPressed: () => context.read<PrayerTimesCubit>().reload(),
+          ),
+        ],
+      ),
       body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
         builder: (context, state) => switch (state) {
           PrayerTimesLoading() => const LoadingView(),
@@ -39,7 +48,10 @@ class PrayerTimesScreen extends StatelessWidget {
               actionLabel: loc.selectCity,
               onAction: () => _openCityPicker(context),
             ),
-          PrayerTimesReady() => _TimesList(state: state),
+          PrayerTimesReady() => RefreshIndicator(
+              onRefresh: () => context.read<PrayerTimesCubit>().reload(),
+              child: _TimesList(state: state),
+            ),
         },
       ),
     );
@@ -81,6 +93,7 @@ class _TimesListState extends State<_TimesList> {
     final state = widget.state;
     return ListView.builder(
       padding: const EdgeInsets.all(12),
+      physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.entries.length + 1,
       itemBuilder: (context, i) {
         if (i == 0) {
