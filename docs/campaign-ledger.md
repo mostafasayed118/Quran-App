@@ -387,3 +387,9 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **CI on `01bbf47`:** `web-gates` **39146899882** success (29s) · `ci` **39146899877** success (7m43s).
 - **Cloudflare:** production deployed; post-deploy probe: home serves the new MiniPlayer chunk `wg8mdG5_` (old `Dh15OWTr` gone — WEB-POLISH-1 LIVE); `/.well-known/assetlinks.json` still `application/json` 200; `/surah/2/` 200.
 - **State:** ledger commit follows (local-only). NO PUSH beyond the window.
+
+### P4-app-fix2 — same-route reader re-entry — CLOSED 2026-10-18
+- **Wave:** 2 commits — `75dd570` (ruled fix: `BlocProvider<ReaderCubit>` keyed `ValueKey('reader:$surah:$ayah')`; +2 lines in `lib/app/router.dart` incl. one required `flutter/foundation` import since the file has no material import; new `test/reader_route_reentry_test.dart`) + `948a683` (test-only hardening +69/−40, **appended** — amend was unsafe while HEAD carried foreign campaign commits).
+- **PM re-verification (independently re-derived at source; fresh gates):** router diff read at source = exactly import + key line; hardening touches only the wave's own new test; `git diff 90c8c90..HEAD --name-only -- test/` = exactly 1 path (zero frozen-test edits); the on-disk APK hashed = size **252,098,037** · SHA-256 **`DAC19C637A846663166F4CCB212A6BCBB1A5655D02C973A090676E40ADBE0748`** (byte-match with the report); `flutter analyze` **0** · `flutter test` **381/381** (EXIT=0; 380 → +1); app-code delta `948a683..HEAD` = zero at verification close. **Ratified:** (a) the extra import line (required, verified); (b) the append-instead-of-amend choice (correct fail-closed call).
+- **Device leg (third):** install the artifact above (its SHA-256 is the discriminator); it re-proves warm same-route re-entry on the fixed build.
+- **State:** ledger commit follows (local-only). NO PUSH — window belongs to the owner.
