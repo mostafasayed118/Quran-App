@@ -76,3 +76,35 @@ test('reader records the topmost visible ayah as the qy:last-read resume point',
   expect(resumed.s).toBe(2);
   expect(resumed.a).toBeGreaterThan(initial);
 });
+
+test('a pending resume flush cannot overwrite the next surah after a ClientRouter swap', async ({ page }) => {
+  await page.goto('/surah/2/');
+  await page.evaluate(() => {
+    const w = window as Window & { __qySamples?: (string | null)[] };
+    w.__qySamples = [];
+    window.setInterval(() => {
+      try {
+        w.__qySamples?.push(localStorage.getItem('qy:last-read'));
+      } catch {
+        /* storage unavailable */
+      }
+    }, 50);
+  });
+  await page.locator('#ayah-100').scrollIntoViewIfNeeded(); // arms the ~1s flush
+  await page.locator('.reader-nav a[href="/surah/3"]').click(); // SPA swap inside that throttle window
+  await page.waitForURL('**/surah/3**');
+  await page.waitForTimeout(2000); // covers any stale flush plus the new observer's first flush
+  const points = await page.evaluate(() => {
+    const w = window as Window & { __qySamples?: (string | null)[] };
+    return (w.__qySamples ?? []).map((raw) => {
+      try {
+        return JSON.parse(raw ?? 'null') as { s?: number } | null;
+      } catch {
+        return null;
+      }
+    });
+  });
+  const firstThree = points.findIndex((p) => p?.s === 3);
+  expect(firstThree).toBeGreaterThanOrEqual(0);
+  expect(points.slice(firstThree).some((p) => p?.s === 2)).toBe(false);
+});

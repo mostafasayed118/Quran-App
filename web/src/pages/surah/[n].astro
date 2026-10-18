@@ -226,6 +226,7 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
           let flushTimer = 0;
           const flush = (): void => {
             flushTimer = 0;
+            if (!box.isConnected) return; // a ClientRouter swap already moved on
             const top = blocks.find((el) => visible.has(el));
             const a = Number(top?.dataset.n);
             if (Number.isInteger(a)) writeResume(localStorage, { s: surahId, a });
@@ -238,6 +239,15 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
             if (flushTimer === 0) flushTimer = window.setTimeout(flush, 1000);
           });
           for (const el of blocks) observer.observe(el);
+          // ClientRouter swap: never let this surah's pending flush or detached nodes outlive the page
+          document.addEventListener(
+            'astro:before-swap',
+            () => {
+              window.clearTimeout(flushTimer);
+              observer.disconnect();
+            },
+            { once: true },
+          );
         }
       } catch {
         /* storage or observer unavailable — reader keeps working */
