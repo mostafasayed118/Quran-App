@@ -60,6 +60,8 @@ test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text',
   await expect(page.locator('.reader-head h1')).toContainText('البقرة');
   await expect(page.locator('[data-qy="reader-play"]')).toHaveText(t('en', 'readerPlay'));
   await expect(page.locator('[data-qy="reciter-pick"]')).toHaveAttribute('aria-label', t('en', 'readerPickReciter'));
+  // Per-ayah action chrome is EN too (AyahBlock locale plumbing).
+  await expect(page.locator('[data-ayah-action="copy"]').first()).toHaveText('Copy');
   // The ayah line keeps its RTL base direction even though the page chrome is LTR.
   const textDir = await page.locator('.ayah-text').first().evaluate((el) => getComputedStyle(el).direction);
   expect(textDir).toBe('rtl');

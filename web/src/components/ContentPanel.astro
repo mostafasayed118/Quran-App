@@ -4,7 +4,7 @@ import { t, type Locale } from '../lib/strings';
 interface Props { surah: number; locale?: Locale }
 const { surah, locale = 'ar' } = Astro.props;
 ---
-<section id="qy-content-panel" class="content-panel" data-surah={surah} hidden aria-label={t(locale, 'panelTitle')}>
+<section id="qy-content-panel" class="content-panel" data-surah={surah} data-locale={locale} hidden aria-label={t(locale, 'panelTitle')}>
   <label class="sr-only" for="qy-content-pick">{t(locale, 'panelTitle')}</label>
   <select id="qy-content-pick" data-qy="content-pick">
     <option value="">{t(locale, 'panelHide')}</option>
@@ -19,9 +19,11 @@ const { surah, locale = 'ar' } = Astro.props;
 <script>
   import { PACKS, fetchPackAyahs, type PackInfo } from '../lib/content-packs';
   import { readSetting, writeSetting } from '../lib/settings';
-  import { t, defaultLocale } from '../lib/strings';
+  import { t, type Locale } from '../lib/strings';
 
   const KEY = 'content';
+
+  let L: Locale = 'ar';
 
   const valueOf = (pack: PackInfo): string => `${pack.kind}:${pack.id}`;
   const packOf = (value: string): PackInfo | null => PACKS.find((p) => valueOf(p) === value) ?? null;
@@ -38,6 +40,7 @@ const { surah, locale = 'ar' } = Astro.props;
     const panel = document.querySelector<HTMLElement>('#qy-content-panel');
     const toggle = document.querySelector<HTMLButtonElement>('[data-qy="panel-toggle"]');
     if (!panel || !toggle || panel.dataset.qyReady) return;
+    L = panel.dataset.locale === 'en' ? 'en' : 'ar';
     panel.dataset.qyReady = '1';
     const surah = Number(panel.dataset.surah);
     const pick = panel.querySelector<HTMLSelectElement>('[data-qy="content-pick"]');
@@ -73,7 +76,7 @@ const { surah, locale = 'ar' } = Astro.props;
         const map = await fetchPackAyahs(pack, surah);
         if (current !== pack) return; // selection changed while loading
         renderNotes(map);
-        source.textContent = `${t(defaultLocale, 'panelSource')}: ${pack.titleAr} — jsDelivr`;
+        source.textContent = `${t(L, 'panelSource')}: ${pack.titleAr} — jsDelivr`;
         source.hidden = false;
       } catch {
         if (current !== pack) return;

@@ -43,7 +43,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
   </header>
   <ContentPanel surah={surah.id} locale={locale} />
   <div class="ayahs">
-    {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}
+    {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} locale={locale} />)}
   </div>
   <nav class="reader-nav">
     {prev !== null ? <a href={`${base}/surah/${prev}`}>{t(locale, 'readerPrev')}</a> : <a href={`${base}/quran`}>{t(locale, 'backToIndex')}</a>}
