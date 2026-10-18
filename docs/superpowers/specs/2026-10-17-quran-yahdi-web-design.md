@@ -72,7 +72,7 @@ Quran-App/
 - `tools/export_web_data.dart` — same pattern as the existing `tools/build_quran_db.dart` (Dart + drift native, proven on this machine): reads `assets/db/quran.sqlite` via the app's schema (`Surahs`, `Ayahs` tables) and writes:
   - `web/src/data/surahs.json` — 114 records (id, nameAr, nameEn, revelationType, ayahCount, pages)
   - `web/src/data/ayahs/<1..114>.json` — per surah: ayahs (numberInSurah, juz, page, textUthmani, textImlaei, sajda)
-  - `web/src/data/search-index.json` — normalized Arabic search records (§3.5)
+  - `web/src/data/search-index.json` — raw Imlaei `i` records; normalization applied client-side (§3.5 refinement)
 - **Sanity gates in the generator**: 114 surahs, 6236 ayahs, spot-checks vs known ayahs (الفاتحة، آية الكرسي tail, النور ٣٥); non-zero exit on mismatch.
 - Output is **committed** (Quran text is immutable); Cloudflare build needs only Node — no Dart on CI.
 - Regeneration is manual (`dart run tools/export_web_data.dart`) and documented in `web/README.md`.
@@ -188,7 +188,7 @@ Note: the approved mockup's nav showed «المكتبة» and «تدبّر» —
 | Phase | Scope | Exit gate |
 |---|---|---|
 | **P1 Foundation** | `web/` scaffold (Astro+React+TW4+TS), token layer + fonts + logo assets, data generator + committed data, `/surah/[n]` static reader (text only, AR), `/quran` index, theme switch, first deploy to `*.pages.dev` | live preview URL + gates green + Playwright smoke v1 |
-| **P2 Experience** ✅ *(implemented 2026-10-18 — web commits `5cc3149..3a58ea7`, 14 commits)* | audio player + reciters page, translations/tafsir panel, search, settings persistence, bookmarks/resume, copy/share builders, per-ayah actions | gates + perf budget + smoke v2 — met |
+| **P2 Experience** ✅ *(implemented 2026-10-18 — web commits `5cc3149..3a58ea7`, 14 commits)* | audio player + reciters page, translations/tafsir panel, search, settings persistence, bookmarks (resume → P3; `qy:last-read` storage deferred with its consumer), copy/share builders, per-ayah actions | gates + perf budget + smoke v2 — met |
 | **P3 Official site** | full landing, about, privacy (from PRIVACY.md), EN locale complete, SEO (sitemap/hreflang/OG basics), download CTAs | gates + Lighthouse ≥90 mobile + sitemap submitted |
 | **P4 App links** | assetlinks.json + Flutter intent-filter/deep-link/share (+ any app dependency = owner approval), verification on real device | verified open-in-app on device; docs updated |
 | **P5 Later (not v1)** | PWA offline reading, mushaf page mode (line data available in DB), per-ayah pages for SEO, per-ayah audio, OG images per surah, analytics opt-in, hadith library | new spec/plan per item |
