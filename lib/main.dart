@@ -29,19 +29,22 @@ Future<void> main() async {
     libraryRootResolver: defaultLibraryRootResolver,
   );
   final loc = platformLocalizations();
-  await BackgroundInitGuard.attempt(
-    () => JustAudioBackground.init(
-      androidNotificationChannelId: 'com.mostafasayed.quranyahdi.channel.audio',
-      androidNotificationChannelName:
-          '${loc.recitationsTitle} — ${loc.appName}',
-      androidNotificationOngoing: true,
+  await Future.wait<void>([
+    BackgroundInitGuard.attempt(
+      () => JustAudioBackground.init(
+        androidNotificationChannelId:
+            'com.mostafasayed.quranyahdi.channel.audio',
+        androidNotificationChannelName:
+            '${loc.recitationsTitle} — ${loc.appName}',
+        androidNotificationOngoing: true,
+      ),
     ),
-  );
-  await getIt<NotificationsBinding>().init(
-    onTap: () => AppRouter.router.go('/home'),
-    onTapPayload: (payload) =>
-        AppRouter.router.go(reminderRouteFor(payload) ?? '/home'),
-  );
+    getIt<NotificationsBinding>().init(
+      onTap: () => AppRouter.router.go('/home'),
+      onTapPayload: (payload) =>
+          AppRouter.router.go(reminderRouteFor(payload) ?? '/home'),
+    ),
+  ]);
   unawaited(_requestBootNotificationGrace());
   unawaited(_openReminderLaunchTarget());
   unawaited(_openDeepLinkLaunchTarget());
