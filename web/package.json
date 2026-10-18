@@ -12,7 +12,8 @@
     "check": "astro check",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "gates": "npm run check && npm run test && npm run build"
+    "budget": "node scripts/check-budgets.mjs",
+    "gates": "npm run check && npm run test && npm run build && npm run budget"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.0",
