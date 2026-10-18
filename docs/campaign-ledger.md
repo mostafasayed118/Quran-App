@@ -299,3 +299,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - Gates (re-run at close-out in `web/`): `check` **0/0/0** (55 files) · unit **108/108** (15 files) · e2e **13/13** (chromium) · build **117 pages** · budget **24.25 KB / 30 KB** reader JS gzip (8-file eager closure + 3 inline) + dist **144/2000** files. Docs truth-up in the same commit: `web/README.md` features + scripts table; spec §7 P2 row → implemented 2026-10-18 (`5cc3149..3a58ea7`) + §3.5 raw-`i`/client-normalization refinement + W5 Tailwind wired-but-unused note + §3.9 `--player-bg` row.
 - Parking (forward notes): final whole-branch review pending (per-task deferred minors await it); per-ayah audio deferred (needs an ayah-level source decision — P5 candidate); reader-resume storage (`qy:last-read`) promised in the plan's notes is **not present** in the shipped code — flagged for the final review (P3's «متابعة القراءة» depends on it); Tailwind adopt-or-drop = owner decision for a later wave.
 - State: main @ `08665fa` (F8 ledger commit; web tip `3a58ea7`) (+ this ledger commit), porcelain owner-debris only, **unpushed 51**. NO PUSH — push deferred to owner GO.
+
+### WEB-P2 — push window (2026-10-18)
+- **Range:** `fe91b0e..e31afc6` — 64 commits (18 web P2 + app waves F3–F10 incl. their close-outs).
+- **Pre-flight:** FF_OK=true; remote static at `fe91b0e` since P1 window; porcelain = owner debris + `?? INSTRUCTIONS.md` (not ours, untouched).
+- **Web gates (controller-run):** check 0/0/0 · unit 108/108 · e2e 16/16 · build 117 pages · budget 24.26KB/30KB + 144/2000.
+- **Push:** `git push origin main`; ls-remote proof: remote tip == local HEAD `e31afc6`.
+- **CI:** web-gates exit=0 (see runs 39132921979 / 39132921977).
+- **I3 (pack editions):** owner GO carried ratification of the five editions as shipped (swap-if-needed remains a small follow-up).
+- **Cloudflare:** production build auto-triggers on this push.
+- **State:** ledger commit follows (local-only).
