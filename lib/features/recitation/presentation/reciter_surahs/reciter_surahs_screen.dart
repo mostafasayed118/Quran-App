@@ -6,7 +6,6 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
-import '../../../../core/widgets/download_progress.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/download_status.dart';
@@ -200,15 +199,7 @@ class _SurahDownloadRow extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            DownloadProgressLabel(
-              received: item.received,
-              total: item.total,
-              width: 96,
-              gap: 4,
-              labelStyle: AppTheme.mutedFootnote(context),
-              format: (received, total) =>
-                  downloadProgressLabel(loc, received, total),
-            ),
+            _DownloadProgress(received: item.received, total: item.total),
             _CancelDownloadButton(
               onPressed: () => cubit.cancelDownload(reciter.id, surahNumber),
             ),
@@ -246,6 +237,42 @@ class _CancelDownloadButton extends StatelessWidget {
       tooltip: AppLocalizations.of(context).cancel,
       icon: const Icon(Icons.close),
       onPressed: onPressed,
+    );
+  }
+}
+
+/// Compact in-flight progress for a surah row: one-line label over a thin
+/// bar. The shared `DownloadProgressLabel` stacks an unbounded Text inside
+/// ListTile's height-bound trailing slot, which overflows at textScale 2.0;
+/// here the label ellipsizes and the bar keeps the truthful progress picture.
+class _DownloadProgress extends StatelessWidget {
+  const _DownloadProgress({required this.received, required this.total});
+
+  final int received;
+  final int total;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return SizedBox(
+      width: 96,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            downloadProgressLabel(loc, received, total),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.mutedFootnote(context),
+          ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: total > 0 ? (received / total).clamp(0.0, 1.0) : null,
+            minHeight: 3,
+          ),
+        ],
+      ),
     );
   }
 }
