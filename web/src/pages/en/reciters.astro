@@ -2,7 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RecitersPage from '../../components/pages/RecitersPage.astro';
 import { t } from '../../lib/strings';
+import { META_DESCRIPTIONS } from '../../lib/landing-content';
 ---
-<BaseLayout title={t('en', 'navReciters')} locale="en">
+<BaseLayout title={t('en', 'navReciters')} description={META_DESCRIPTIONS.en.reciters} locale="en">
   <RecitersPage locale="en" />
 </BaseLayout>

@@ -141,3 +141,19 @@ export const LANDING: { ar: LandingCopy; en: LandingCopy } = {
     },
   },
 };
+
+// Per-page meta descriptions (owner-review copy). EN pages must not inherit the AR default.
+export const META_DESCRIPTIONS = {
+  en: {
+    quran:
+      'Browse the full Quran — all 114 surahs with instant search by name or number, verse-by-verse reading, and audio recitation. Free, no ads, no tracking.',
+    reciters:
+      'Listen to the Quran recited by 240+ reciters — stream instantly or download for offline listening. Free, no ads, no tracking.',
+    privacy:
+      'Privacy policy for Quran Yahdi: no accounts, no ads, no analytics, no tracking — the app runs offline and collects nothing.',
+  },
+} as const;
+
+export function enReaderDescription(n: number, nameEn: string): string {
+  return `Surah ${n} — ${nameEn} · Quran Yahdi`;
+}

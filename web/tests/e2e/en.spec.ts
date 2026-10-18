@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
-import { LANDING } from '../../src/lib/landing-content';
+import { LANDING, META_DESCRIPTIONS, enReaderDescription } from '../../src/lib/landing-content';
 import { t } from '../../src/lib/strings';
 
 test('AR home carries locale head and the language switch', async ({ page }) => {
@@ -130,6 +130,18 @@ test('EN home resume card links to the stored last-read ayah', async ({ page }) 
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute('href', '/en/surah/36/#ayah-5');
   await expect(card).toContainText(t('en', 'resumeTitle'));
+});
+
+test('EN pages carry localized meta descriptions', async ({ page }) => {
+  const meta = page.locator('meta[name="description"]');
+  await page.goto('/en/quran');
+  await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.quran);
+  await page.goto('/en/reciters');
+  await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.reciters);
+  await page.goto('/en/surah/2');
+  await expect(meta).toHaveAttribute('content', enReaderDescription(2, 'Al-Baqarah'));
+  await page.goto('/en/privacy');
+  await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.privacy);
 });
 
 test('language switch round-trips between the AR and EN quran index', async ({ page }) => {
