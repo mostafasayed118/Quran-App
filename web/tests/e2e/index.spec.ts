@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
 
 test('index lists 114 surahs and filters', async ({ page }) => {
   await page.goto('/quran');
@@ -25,4 +26,15 @@ test('ayah search load failure shows a retry that recovers', async ({ page }) =>
   await page.unroute('**/search-index*');
   await retry.click();
   await expect(page.locator('.ayah-hits a[href="/surah/24#ayah-35"]')).toBeVisible();
+});
+
+test('ayah hit deep-link scrolls to the target anchor under SPA navigation', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.goto('/quran');
+  await page.getByRole('searchbox').fill('الله نور السماوات');
+  const hit = page.locator('.ayah-hits a[href="/surah/24#ayah-35"]');
+  await expect(hit).toBeVisible();
+  await hit.click();
+  await page.waitForURL('**/surah/24**');
+  await expect(page.locator('#ayah-35')).toBeInViewport();
 });
