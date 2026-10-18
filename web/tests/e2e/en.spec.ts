@@ -144,6 +144,17 @@ test('EN pages carry localized meta descriptions', async ({ page }) => {
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.privacy);
 });
 
+test('privacy page scopes the EN half to LTR', async ({ page }) => {
+  await page.goto('/privacy/');
+  const para = page.locator('.legal p:has(> #en-policy) ~ p').first();
+  await expect(para).toBeVisible();
+  const dir = await para.evaluate((el) => getComputedStyle(el).direction);
+  expect(dir).toBe('ltr');
+  const enTable = page.locator('.legal p:has(> #en-policy) ~ table').first();
+  await expect(enTable).toBeVisible();
+  expect(await enTable.locator('tr').count()).toBeGreaterThanOrEqual(4);
+});
+
 test('language switch round-trips between the AR and EN quran index', async ({ page }) => {
   await page.goto('/quran');
   await page.locator('header .lang-switch').click();

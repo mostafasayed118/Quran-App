@@ -47,7 +47,9 @@
 
 ---
 
-# Privacy Policy — Quran Yahdi
+<span id="en-policy"></span>
+
+## Privacy Policy — Quran Yahdi
 
 Last updated: 2026-10-16 · Applies to version 1.0.0
 

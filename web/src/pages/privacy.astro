@@ -26,4 +26,6 @@ const title = `${t('ar', 'footerPrivacy')} — ${t('ar', 'appName')}`;
   .legal th { color: var(--ink); background: color-mix(in srgb, var(--gold-line) 10%, transparent); }
   .legal hr { border: 0; border-top: 1px solid var(--hairline); margin: 30px 0; }
   .legal a { color: var(--accent); }
+  /* The markdown renderer wraps the raw #en-policy span in a paragraph; match either shape. */
+  :is(#en-policy, p:has(> #en-policy)) ~ * { direction: ltr; text-align: start; }
 </style>
