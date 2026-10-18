@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
@@ -166,6 +167,11 @@ class PackDownloader {
             if (pack.urlTemplate == null || pack.fileCount == null) {
               throw PackFailure('tafsir pack missing urlTemplate/fileCount');
             }
+            final perSurahHashes = pack.sha256PerSurah;
+            if (perSurahHashes != null &&
+                perSurahHashes.length != pack.fileCount) {
+              throw PackFailure('tafsir pack "${pack.id}" hash count mismatch');
+            }
             sink.write(_wrapperPrefix(pack.id));
             var separator = '';
             for (var n = 1; n <= pack.fileCount!; n++) {
@@ -185,6 +191,10 @@ class PackDownloader {
                       'pack "${pack.id}" exceeds its declared size');
                 }
                 bytes.addAll(chunk);
+              }
+              if (perSurahHashes != null &&
+                  sha256.convert(bytes).toString() != perSurahHashes[n - 1]) {
+                throw PackFailure('tafsir surah $n failed sha256 verification');
               }
               final body = utf8.decode(bytes);
               final perSurah = jsonDecode(body);
@@ -221,6 +231,8 @@ class PackDownloader {
                     res.headers.value(Headers.contentLengthHeader) ?? '') ??
                 0;
             final total = contentLength > 0 ? contentLength : expectedBytes;
+            final expectedSha = pack.sha256;
+            final hashBytes = expectedSha == null ? null : <int>[];
             await for (final chunk in res.data!.stream) {
               received += chunk.length;
               if (received > _sizeCap(expectedBytes)) {
@@ -228,9 +240,14 @@ class PackDownloader {
                     'pack "${pack.id}" exceeds its declared size');
               }
               sink.add(chunk);
+              hashBytes?.addAll(chunk);
               if (throttle.shouldReport(received, total)) {
                 onProgress?.call(received, total);
               }
+            }
+            if (expectedSha != null &&
+                sha256.convert(hashBytes!).toString() != expectedSha) {
+              throw PackFailure('pack "${pack.id}" failed sha256 verification');
             }
         }
         await sink.flush();

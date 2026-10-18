@@ -14,6 +14,9 @@ enum LibraryPackKind { tafsir, translation, hadith }
 /// catalog manifest seam against path traversal.
 final RegExp _packIdPattern = RegExp(r'^[a-z0-9][a-z0-9-]{0,63}$');
 
+/// Integrity hashes are lowercase-hex sha256 digests (64 chars).
+final RegExp _sha256Pattern = RegExp(r'^[0-9a-f]{64}$');
+
 bool _isHttps(String? url) => url == null || url.startsWith('https://');
 
 class LibraryPackInfo {
@@ -28,6 +31,8 @@ class LibraryPackInfo {
     this.sourceUrl,
     this.urlTemplate,
     this.fileCount,
+    this.sha256,
+    this.sha256PerSurah,
   });
 
   final String id;
@@ -47,6 +52,14 @@ class LibraryPackInfo {
 
   /// Tafsir kind only: number of per-surah files (114 for real packs).
   final int? fileCount;
+
+  /// Single-file kinds only: lowercase-hex sha256 of the exact served body,
+  /// verified before promotion when present. Absent = shape sniff only.
+  final String? sha256;
+
+  /// Tafsir kind only: lowercase-hex sha256 per surah file in `{n}` order
+  /// (index 0 = surah 1). Verified before decode/merge when present.
+  final List<String>? sha256PerSurah;
 
   factory LibraryPackInfo.fromJson(Map<String, dynamic> json) {
     final id = json['id'] as String?;
@@ -94,6 +107,30 @@ class LibraryPackInfo {
           throw FormatException('$kind pack requires sourceUrl');
         }
     }
+    final sha256Raw = json['sha256'];
+    final String? sha256;
+    if (sha256Raw == null) {
+      sha256 = null;
+    } else if (sha256Raw is String && _sha256Pattern.hasMatch(sha256Raw)) {
+      sha256 = sha256Raw;
+    } else {
+      throw const FormatException('invalid sha256 hash');
+    }
+    final sha256PerSurahRaw = json['sha256PerSurah'];
+    final List<String>? sha256PerSurah;
+    if (sha256PerSurahRaw == null) {
+      sha256PerSurah = null;
+    } else if (sha256PerSurahRaw is List &&
+        sha256PerSurahRaw
+            .every((h) => h is String && _sha256Pattern.hasMatch(h))) {
+      if (fileCount != null && sha256PerSurahRaw.length != fileCount) {
+        throw const FormatException(
+            'sha256PerSurah length must equal fileCount');
+      }
+      sha256PerSurah = sha256PerSurahRaw.cast<String>();
+    } else {
+      throw const FormatException('invalid sha256PerSurah hashes');
+    }
     return LibraryPackInfo(
       id: id,
       kind: kind,
@@ -105,6 +142,8 @@ class LibraryPackInfo {
       sourceUrl: sourceUrl,
       urlTemplate: urlTemplate,
       fileCount: fileCount,
+      sha256: sha256,
+      sha256PerSurah: sha256PerSurah,
     );
   }
 }
