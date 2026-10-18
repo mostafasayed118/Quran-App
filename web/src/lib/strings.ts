@@ -19,6 +19,13 @@ const dict = {
     footerPrivacy: 'سياسة الخصوصية',
     footerAbout: 'عن التطبيق',
     backToIndex: 'كل السور',
+    playerPlay: 'تشغيل',
+    playerPause: 'إيقاف مؤقت',
+    playerPrev: 'السابق',
+    playerNext: 'التالي',
+    playerSeek: 'شريط التقدم',
+    playerClose: 'إغلاق المشغل',
+    playerError: 'تعذّر التشغيل',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -37,6 +44,13 @@ const dict = {
     footerPrivacy: 'Privacy',
     footerAbout: 'About',
     backToIndex: 'All surahs',
+    playerPlay: 'Play',
+    playerPause: 'Pause',
+    playerPrev: 'Previous',
+    playerNext: 'Next',
+    playerSeek: 'Seek',
+    playerClose: 'Close player',
+    playerError: 'Playback error',
   },
 } as const;
 

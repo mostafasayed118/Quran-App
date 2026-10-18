@@ -1,0 +1,61 @@
+---
+import { t, type Locale } from '../lib/strings';
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+---
+<div class="mini-player" data-qy="bar" hidden>
+  <audio id="qy-audio" preload="none"></audio>
+  <button type="button" class="mp-btn" data-qy="prev" aria-label={t(locale, 'playerPrev')}>⏮</button>
+  <button type="button" class="mp-btn mp-main" data-qy="toggle" aria-label={t(locale, 'playerPlay')}>▶</button>
+  <button type="button" class="mp-btn" data-qy="next" aria-label={t(locale, 'playerNext')}>⏭</button>
+  <div class="mp-meta">
+    <span class="mp-title" data-qy="title"></span>
+    <span class="mp-reciter" data-qy="reciter"></span>
+  </div>
+  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" aria-label={t(locale, 'playerSeek')}><i></i></div></div>
+  <span class="mp-time" data-qy="time"></span>
+  <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>✕</button>
+</div>
+<script>
+  import { getPlayer } from '../lib/player';
+  import { toArabicDigits } from '../lib/arabic-digits';
+  import type { MoshafRow } from '../lib/reciters';
+
+  function init() {
+    const bar = document.querySelector('[data-qy="bar"]') as HTMLElement;
+    if (!bar || (bar as unknown as { __qyInit?: boolean }).__qyInit) return;
+    (bar as unknown as { __qyInit?: boolean }).__qyInit = true;
+    const player = getPlayer();
+    const $ = (sel: string) => bar.querySelector(`[data-qy="${sel}"]`) as HTMLElement;
+    const fmt = (s: number) => (Number.isFinite(s) ? toArabicDigits(Math.floor(s / 60)) + ':' + toArabicDigits(String(Math.floor(s % 60)).padStart(2, '0')) : '');
+
+    const render = () => {
+      const st = player.state();
+      if (!st.row || st.surah === null) { bar.hidden = true; return; }
+      bar.hidden = false;
+      $('title').textContent = st.row.reciterName;
+      $('reciter').textContent = st.row.moshafName;
+      $('time').textContent = st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
+      $('toggle').textContent = st.status === 'playing' ? '⏸' : '▶';
+      const i = bar.querySelector('[data-qy="seek"] i') as HTMLElement;
+      i.style.width = st.duration ? `${Math.min(100, (st.currentTime / st.duration) * 100)}%` : '0%';
+    };
+    player.subscribe(render);
+    $('toggle').addEventListener('click', () => player.toggle());
+    $('next').addEventListener('click', () => player.next());
+    $('prev').addEventListener('click', () => player.prev());
+    $('seek').addEventListener('click', (e) => {
+      const rect = $('seek').getBoundingClientRect();
+      player.seekRatio(((e as MouseEvent).clientX - rect.left) / rect.width);
+    });
+    $('close').addEventListener('click', () => { bar.hidden = true; });
+    document.addEventListener('qy:play', (e) => {
+      const { row, surah } = (e as CustomEvent<{ row: MoshafRow; surah: number }>).detail;
+      player.play(row, surah);
+    });
+    document.addEventListener('qy:toggle', () => player.toggle());
+    render();
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>

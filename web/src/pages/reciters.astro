@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="التلاوات — قرآن يَهدي">
+  <section class="reciters">
+    <h1 class="page-title">التلاوات</h1>
+    <p class="empty" id="reciters-status">جارٍ التحميل…</p>
+    <ul class="reciters-list" id="reciters-list"></ul>
+  </section>
+</BaseLayout>
+<script>
+  import { fetchReciters, type MoshafRow } from '../lib/reciters';
+
+  const rowsById = new Map<string, MoshafRow>();
+  const statusEl = document.getElementById('reciters-status');
+  const listEl = document.getElementById('reciters-list');
+
+  function renderRow(row: MoshafRow): HTMLLIElement {
+    const li = document.createElement('li');
+    const name = document.createElement('span');
+    name.className = 'reciter-name';
+    name.textContent = row.reciterName;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'reciter-play';
+    btn.dataset.reciterPlay = row.rowId;
+    btn.setAttribute('aria-label', `تشغيل ${row.reciterName}`);
+    btn.textContent = '▶';
+    rowsById.set(row.rowId, row);
+    li.append(name, btn);
+    return li;
+  }
+
+  listEl?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-reciter-play]');
+    const row = btn ? rowsById.get(btn.dataset.reciterPlay ?? '') : undefined;
+    if (row) document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah: 1 } }));
+  });
+
+  fetchReciters()
+    .then((rows) => {
+      listEl?.replaceChildren(...rows.slice(0, 2).map(renderRow));
+      if (statusEl) statusEl.textContent = '';
+    })
+    .catch(() => { if (statusEl) statusEl.textContent = 'تعذّر تحميل قائمة القرّاء.'; });
+</script>
+<style>
+  .reciters-list { list-style: none; margin: 0 auto; padding: 0; max-width: 760px; }
+  .reciters-list li {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; padding: 12px 4px; border-bottom: 1px solid var(--hairline);
+  }
+  .reciter-play {
+    flex: none; font: inherit; border: 1px solid var(--hairline); border-radius: 999px;
+    background: var(--btn-bg); color: var(--btn-ink); padding: 6px 16px; cursor: pointer;
+  }
+</style>

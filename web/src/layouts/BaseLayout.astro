@@ -4,6 +4,8 @@ import '../styles/fonts.css';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import MiniPlayer from '../components/MiniPlayer.astro';
+import { ClientRouter } from 'astro:transitions';
 import type { Locale } from '../lib/strings';
 
 interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
@@ -29,10 +31,14 @@ const dir = locale === 'ar' ? 'rtl' : 'ltr';
         } catch (e) { /* keep day */ }
       })();
     </script>
+    <ClientRouter />
   </head>
   <body>
     <Header locale={locale} />
     <main><slot /></main>
+    <div id="qy-player-region" transition:persist="qy-player">
+      <MiniPlayer locale={locale} />
+    </div>
     <Footer locale={locale} />
   </body>
 </html>

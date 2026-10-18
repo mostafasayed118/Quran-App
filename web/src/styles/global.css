@@ -53,3 +53,31 @@ body {
 .index-search::placeholder { color: var(--muted-strong); }
 .empty { width: min(760px, calc(100% - 40px)); margin: 20px auto; color: var(--muted-strong); text-align: center; }
 .surah-name { color: var(--ink); font-weight: 500; }
+:root, [data-theme='day'] { --player-bg: rgba(242, 236, 221, 0.92); }
+[data-theme='night'] { --player-bg: rgba(1, 42, 39, 0.92); }
+.mini-player {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--player-bg); border-top: 1px solid var(--hairline);
+  backdrop-filter: blur(10px);
+}
+.mini-player[hidden] { display: none; }
+.mp-btn {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--hairline); background: transparent; color: var(--ink);
+  font: inherit; font-size: 15px; cursor: pointer;
+}
+.mp-main { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
+.mp-meta { min-width: 0; display: flex; flex-direction: column; line-height: 1.35; }
+.mp-title, .mp-reciter { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-title { font-size: .9rem; font-weight: 700; }
+.mp-reciter { font-size: .78rem; color: var(--muted-strong); }
+.mp-track { flex: 1; min-width: 56px; }
+.mp-bar { position: relative; height: 5px; border-radius: 999px; background: var(--hairline); cursor: pointer; }
+.mp-bar i { position: absolute; top: 0; bottom: 0; left: 0; width: 0%; border-radius: 999px; background: var(--accent); }
+.mp-time { flex: none; font-size: .78rem; color: var(--muted-strong); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) {
+  .mp-btn { width: 48px; height: 48px; }
+}
