@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show ValueKey;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -233,6 +234,7 @@ abstract final class AppRouter {
           return MultiBlocProvider(
             providers: [
               BlocProvider<ReaderCubit>(
+                key: ValueKey('reader:$surah:$ayah'),
                 create: (_) => ReaderCubit(
                   ayahRepository: getIt<AyahRepository>(),
                   lastReadRepository: getIt<LastReadRepository>(),
