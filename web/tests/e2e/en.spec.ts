@@ -29,6 +29,7 @@ test('EN quran index shows the EN heading over 114 surah cards', async ({ page }
   await page.goto('/en/quran');
   await expect(page.locator('h1.page-title')).toHaveText(t('en', 'surahIndexTitle'));
   await expect(page.locator('.surah-list a')).toHaveCount(114);
+  expect(await page.locator('.surah-list a[href^="/en/surah/"]').count()).toBeGreaterThan(0);
 });
 
 test('EN reciters page resolves the loading state into EN content', async ({ page }) => {
