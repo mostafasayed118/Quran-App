@@ -28,6 +28,7 @@ Future<void> main() async {
 
     var total = 0;
     final surahRows = <Map<String, Object?>>[];
+    final searchRows = <Map<String, Object?>>[];
     for (final s in surahs) {
       final ayahs = await (db.select(db.ayahs)
             ..where((t) => t.surahId.equals(s.id))
@@ -44,6 +45,11 @@ Future<void> main() async {
         'revelationType': s.revelationType, 'ayahCount': s.ayahCount,
         'pagesStart': s.pagesStart, 'pagesEnd': s.pagesEnd,
       });
+      for (final a in ayahs) {
+        if (a.textImlaei.trim().isNotEmpty) {
+          searchRows.add({'s': s.id, 'a': a.numberInSurah, 't': a.textImlaei});
+        }
+      }
       File('${ayahDir.path}/${s.id}.json').writeAsStringSync(jsonEncode({
         'surah': s.id,
         'ayahs': [
@@ -60,6 +66,8 @@ Future<void> main() async {
     }
     File('${outDir.path}/surahs.json')
         .writeAsStringSync(jsonEncode({'surahs': surahRows}));
+    File('${outDir.path}/search-index.json')
+        .writeAsStringSync(jsonEncode({'ayahs': searchRows}));
     stdout.writeln('OK: wrote 114 surahs + $total ayahs to web/src/data');
   } finally {
     await db.close();
