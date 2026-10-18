@@ -181,6 +181,7 @@ class DuaCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
@@ -211,7 +212,7 @@ class DuaCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 4),
                 child: Text(
-                  '×${count!.toArabicIndic}',
+                  loc.duaRepeat(count!.toArabicIndic),
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 12,

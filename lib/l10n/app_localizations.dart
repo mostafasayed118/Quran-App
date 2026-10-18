@@ -482,6 +482,12 @@ abstract class AppLocalizations {
   /// **'الرقية'**
   String get ruqyahTab;
 
+  /// No description provided for @duaRepeat.
+  ///
+  /// In ar, this message translates to:
+  /// **'×{count}'**
+  String duaRepeat(String count);
+
   /// No description provided for @namePosition.
   ///
   /// In ar, this message translates to:

@@ -223,6 +223,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ruqyahTab => 'الرقية';
 
   @override
+  String duaRepeat(String count) {
+    return '×$count';
+  }
+
+  @override
   String namePosition(String n) {
     return 'الاسم $n من 99';
   }
