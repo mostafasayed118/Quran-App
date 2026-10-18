@@ -439,4 +439,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationSettings => 'Location settings';
+
+  @override
+  String get reminderChannelDescription => 'Prayer and azkar reminders';
 }

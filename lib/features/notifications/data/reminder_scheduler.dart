@@ -4,14 +4,17 @@ class ScheduledReminder {
     required this.id,
     required this.fireAt,
     required this.title,
-    required this.body,
+    this.body,
     this.payload,
   });
 
   final int id;
   final DateTime fireAt;
   final String title;
-  final String body;
+
+  /// Optional second line; null keeps the shade title-only (no duplicate
+  /// copy — audit §1.22).
+  final String? body;
 
   /// Tap-routing tag (planner payload constants); null = plain tap.
   final String? payload;

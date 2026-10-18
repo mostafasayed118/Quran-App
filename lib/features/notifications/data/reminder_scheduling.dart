@@ -34,7 +34,6 @@ Future<void> scheduleReminders({
         texts: ReminderTexts(
           prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
           azkarTitle: loc.reminderAzkar,
-          azkarBody: loc.reminderAzkar,
         ),
       ));
     }

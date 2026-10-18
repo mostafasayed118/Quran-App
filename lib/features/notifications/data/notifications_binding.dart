@@ -69,7 +69,7 @@ class NotificationsBinding implements ReminderScheduler {
         android: AndroidNotificationDetails(
           channelId,
           loc.appName,
-          channelDescription: loc.reminderAzkar,
+          channelDescription: loc.reminderChannelDescription,
           importance: Importance.high,
           priority: Priority.high,
         ),

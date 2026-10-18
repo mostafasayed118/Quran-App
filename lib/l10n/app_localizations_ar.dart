@@ -438,4 +438,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationSettings => 'إعدادات الموقع';
+
+  @override
+  String get reminderChannelDescription => 'تذكيرات الصلاة والأذكار';
 }

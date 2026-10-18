@@ -877,6 +877,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إعدادات الموقع'**
   String get locationSettings;
+
+  /// No description provided for @reminderChannelDescription.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكيرات الصلاة والأذكار'**
+  String get reminderChannelDescription;
 }
 
 class _AppLocalizationsDelegate

@@ -25,12 +25,14 @@ class ReminderTexts {
   const ReminderTexts({
     required this.prayerTitle,
     required this.azkarTitle,
-    required this.azkarBody,
+    this.azkarBody,
   });
 
   final String Function(PrayerName prayer) prayerTitle;
   final String azkarTitle;
-  final String azkarBody;
+
+  /// Optional shade body for the azkar reminder; null keeps it title-only.
+  final String? azkarBody;
 }
 
 /// Pure scheduling policy (PM ruling, keep it dumb): the next prayer still
@@ -54,7 +56,6 @@ List<ScheduledReminder> planReminders({
       id: prayerReminderId,
       fireAt: choice.time,
       title: title,
-      body: title,
       payload: prayerReminderPayload,
     );
     break;
