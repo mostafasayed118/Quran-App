@@ -25,55 +25,56 @@ class TasbihScreen extends StatelessWidget {
           return Column(
             children: [
               const SizedBox(height: 16),
-              GestureDetector(
-                key: const Key('tasbih_dial'),
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  context.read<TasbihCubit>().increment();
-                },
-                child: AnimatedScale(
-                  scale: done ? 1.06 : 1.0,
-                  duration: const Duration(milliseconds: 120),
-                  curve: Curves.easeOut,
-                  child: Container(
-                    width: 220,
-                    height: 220,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colors.primaryContainer,
-                      border: Border.all(
-                        color: colors.primary,
-                        width: 3,
-                      ),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          done ? Icons.check_circle : Icons.touch_app_outlined,
-                          color: colors.onPrimaryContainer,
-                        ),
-                        Flexible(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              ready.count.toArabicIndic,
-                              style: TextStyle(
-                                fontSize: 56,
-                                fontWeight: FontWeight.bold,
-                                color: colors.onPrimaryContainer,
+              AnimatedScale(
+                scale: done ? 1.06 : 1.0,
+                duration: const Duration(milliseconds: 120),
+                curve: Curves.easeOut,
+                child: Material(
+                  shape: CircleBorder(
+                    side: BorderSide(color: colors.primary, width: 3),
+                  ),
+                  color: colors.primaryContainer,
+                  child: InkWell(
+                    key: const Key('tasbih_dial'),
+                    customBorder: const CircleBorder(),
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      context.read<TasbihCubit>().increment();
+                    },
+                    child: SizedBox(
+                      width: 220,
+                      height: 220,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            done
+                                ? Icons.check_circle
+                                : Icons.touch_app_outlined,
+                            color: colors.onPrimaryContainer,
+                          ),
+                          Flexible(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                ready.count.toArabicIndic,
+                                style: TextStyle(
+                                  fontSize: 56,
+                                  fontWeight: FontWeight.bold,
+                                  color: colors.onPrimaryContainer,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        Text(
-                          '${loc.tasbihTarget}: ${ready.target.toArabicIndic}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: colors.onPrimaryContainer,
+                          Text(
+                            '${loc.tasbihTarget}: ${ready.target.toArabicIndic}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colors.onPrimaryContainer,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
