@@ -52,6 +52,7 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AsmaLoading value)? loading,
+    TResult Function(AsmaFailed value)? failed,
     TResult Function(AsmaReady value)? ready,
     required TResult orElse(),
   }) {
@@ -59,6 +60,8 @@ extension AsmaStatePatterns on AsmaState {
     switch (_that) {
       case AsmaLoading() when loading != null:
         return loading(_that);
+      case AsmaFailed() when failed != null:
+        return failed(_that);
       case AsmaReady() when ready != null:
         return ready(_that);
       case _:
@@ -82,12 +85,15 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AsmaLoading value) loading,
+    required TResult Function(AsmaFailed value) failed,
     required TResult Function(AsmaReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case AsmaLoading():
         return loading(_that);
+      case AsmaFailed():
+        return failed(_that);
       case AsmaReady():
         return ready(_that);
     }
@@ -108,12 +114,15 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AsmaLoading value)? loading,
+    TResult? Function(AsmaFailed value)? failed,
     TResult? Function(AsmaReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case AsmaLoading() when loading != null:
         return loading(_that);
+      case AsmaFailed() when failed != null:
+        return failed(_that);
       case AsmaReady() when ready != null:
         return ready(_that);
       case _:
@@ -136,6 +145,7 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(List<AsmaName> names, AsmaName? selected)? ready,
     required TResult orElse(),
   }) {
@@ -143,6 +153,8 @@ extension AsmaStatePatterns on AsmaState {
     switch (_that) {
       case AsmaLoading() when loading != null:
         return loading();
+      case AsmaFailed() when failed != null:
+        return failed();
       case AsmaReady() when ready != null:
         return ready(_that.names, _that.selected);
       case _:
@@ -166,12 +178,15 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(List<AsmaName> names, AsmaName? selected) ready,
   }) {
     final _that = this;
     switch (_that) {
       case AsmaLoading():
         return loading();
+      case AsmaFailed():
+        return failed();
       case AsmaReady():
         return ready(_that.names, _that.selected);
     }
@@ -192,12 +207,15 @@ extension AsmaStatePatterns on AsmaState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(List<AsmaName> names, AsmaName? selected)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case AsmaLoading() when loading != null:
         return loading();
+      case AsmaFailed() when failed != null:
+        return failed();
       case AsmaReady() when ready != null:
         return ready(_that.names, _that.selected);
       case _:
@@ -223,6 +241,26 @@ class AsmaLoading implements AsmaState {
   @override
   String toString() {
     return 'AsmaState.loading()';
+  }
+}
+
+/// @nodoc
+
+class AsmaFailed implements AsmaState {
+  const AsmaFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AsmaFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AsmaState.failed()';
   }
 }
 

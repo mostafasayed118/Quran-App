@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/asma_repository.dart';
 import 'asma_cubit.dart';
@@ -20,6 +22,9 @@ class AsmaScreen extends StatelessWidget {
       body: BlocBuilder<AsmaCubit, AsmaState>(
         builder: (context, state) => switch (state) {
           AsmaLoading() => const LoadingView(),
+          AsmaFailed() => errorPane(loc, 'asma load failed', 'asma'),
+          AsmaReady(:final names) when names.isEmpty =>
+            EmptyState(loc.noResults),
           AsmaReady(:final names, :final selected) => Stack(
               children: [
                 GridView.builder(

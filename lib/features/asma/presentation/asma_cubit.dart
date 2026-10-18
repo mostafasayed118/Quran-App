@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,9 +16,16 @@ class AsmaCubit extends Cubit<AsmaState> {
   final AsmaRepository _repository;
 
   Future<void> load() async {
-    final names = await _repository.names();
-    if (isClosed) return;
-    emit(AsmaState.ready(names: names));
+    try {
+      final names = await _repository.names();
+      if (isClosed) return;
+      emit(AsmaState.ready(names: names));
+    } on Object catch (error, stackTrace) {
+      dev.log('asma load failed',
+          name: 'quran_yahdi/asma', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const AsmaState.failed());
+    }
   }
 
   void select(AsmaName? name) {
