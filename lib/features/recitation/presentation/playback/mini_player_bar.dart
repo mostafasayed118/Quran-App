@@ -8,12 +8,34 @@ import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'playback_state.dart';
 
+/// Rebuild gate for the mini-player shell. Position ticks arrive ~5 Hz and
+/// only feed the progress row, which owns its own [BlocBuilder]; every other
+/// field change (track, status, duration, failure kind) rebuilds the shell.
+bool miniPlayerShellShouldRebuild(
+  PlaybackState previous,
+  PlaybackState current,
+) {
+  if (previous.runtimeType != current.runtimeType) return true;
+  return switch ((previous, current)) {
+    (final PlaybackPlaying a, final PlaybackPlaying b) =>
+      a.reciterName != b.reciterName ||
+          a.surahNumber != b.surahNumber ||
+          a.duration != b.duration,
+    (final PlaybackPaused a, final PlaybackPaused b) =>
+      a.reciterName != b.reciterName ||
+          a.surahNumber != b.surahNumber ||
+          a.duration != b.duration,
+    _ => previous != current,
+  };
+}
+
 class MiniPlayerBar extends StatelessWidget {
   const MiniPlayerBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PlaybackCubit, PlaybackState>(
+      buildWhen: miniPlayerShellShouldRebuild,
       builder: (context, state) => switch (state) {
         PlaybackInitial() => const SizedBox.shrink(),
         PlaybackFailed(:final kind) => _FailedStrip(kind: kind),
@@ -21,36 +43,20 @@ class MiniPlayerBar extends StatelessWidget {
           _PlaybackStrip(
             reciterName: reciterName,
             surahNumber: surahNumber,
-            position: null,
-            duration: null,
             busy: true,
             playing: false,
           ),
-        PlaybackPlaying(
-          :final reciterName,
-          :final surahNumber,
-          :final position,
-          :final duration,
-        ) =>
+        PlaybackPlaying(:final reciterName, :final surahNumber) =>
           _PlaybackStrip(
             reciterName: reciterName,
             surahNumber: surahNumber,
-            position: position,
-            duration: duration,
             busy: false,
             playing: true,
           ),
-        PlaybackPaused(
-          :final reciterName,
-          :final surahNumber,
-          :final position,
-          :final duration,
-        ) =>
+        PlaybackPaused(:final reciterName, :final surahNumber) =>
           _PlaybackStrip(
             reciterName: reciterName,
             surahNumber: surahNumber,
-            position: position,
-            duration: duration,
             busy: false,
             playing: false,
           ),
@@ -63,16 +69,12 @@ class _PlaybackStrip extends StatelessWidget {
   const _PlaybackStrip({
     required this.reciterName,
     required this.surahNumber,
-    required this.position,
-    required this.duration,
     required this.busy,
     required this.playing,
   });
 
   final String reciterName;
   final int surahNumber;
-  final Duration? position;
-  final Duration? duration;
   final bool busy;
   final bool playing;
 
@@ -80,10 +82,6 @@ class _PlaybackStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final dur = duration ?? Duration.zero;
-    final pos = position ?? Duration.zero;
-    final progress =
-        dur.inMilliseconds > 0 ? pos.inMilliseconds / dur.inMilliseconds : null;
     return Material(
       color: colors.surface,
       elevation: 4,
@@ -111,7 +109,33 @@ class _PlaybackStrip extends StatelessWidget {
                       loc.surahBadge(surahNumber.toArabicIndic),
                       style: AppTheme.mutedFootnote(context),
                     ),
-                    LinearProgressIndicator(value: progress, minHeight: 3),
+                    BlocBuilder<PlaybackCubit, PlaybackState>(
+                      builder: (context, state) {
+                        final (:position, :duration) = switch (state) {
+                          PlaybackPlaying(
+                            :final position,
+                            :final duration,
+                          ) =>
+                            (position: position, duration: duration),
+                          PlaybackPaused(
+                            :final position,
+                            :final duration,
+                          ) =>
+                            (position: position, duration: duration),
+                          _ => (
+                              position: Duration.zero,
+                              duration: Duration.zero,
+                            ),
+                        };
+                        final progress = duration.inMilliseconds > 0
+                            ? position.inMilliseconds / duration.inMilliseconds
+                            : null;
+                        return LinearProgressIndicator(
+                          value: progress,
+                          minHeight: 3,
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
