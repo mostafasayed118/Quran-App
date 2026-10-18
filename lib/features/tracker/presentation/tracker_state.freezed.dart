@@ -52,6 +52,7 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(TrackerLoading value)? loading,
+    TResult Function(TrackerFailed value)? failed,
     TResult Function(TrackerReady value)? ready,
     required TResult orElse(),
   }) {
@@ -59,6 +60,8 @@ extension TrackerStatePatterns on TrackerState {
     switch (_that) {
       case TrackerLoading() when loading != null:
         return loading(_that);
+      case TrackerFailed() when failed != null:
+        return failed(_that);
       case TrackerReady() when ready != null:
         return ready(_that);
       case _:
@@ -82,12 +85,15 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(TrackerLoading value) loading,
+    required TResult Function(TrackerFailed value) failed,
     required TResult Function(TrackerReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case TrackerLoading():
         return loading(_that);
+      case TrackerFailed():
+        return failed(_that);
       case TrackerReady():
         return ready(_that);
     }
@@ -108,12 +114,15 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(TrackerLoading value)? loading,
+    TResult? Function(TrackerFailed value)? failed,
     TResult? Function(TrackerReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case TrackerLoading() when loading != null:
         return loading(_that);
+      case TrackerFailed() when failed != null:
+        return failed(_that);
       case TrackerReady() when ready != null:
         return ready(_that);
       case _:
@@ -136,6 +145,7 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(TrackerDay today, int streakDays, List<bool> last7)? ready,
     required TResult orElse(),
   }) {
@@ -143,6 +153,8 @@ extension TrackerStatePatterns on TrackerState {
     switch (_that) {
       case TrackerLoading() when loading != null:
         return loading();
+      case TrackerFailed() when failed != null:
+        return failed();
       case TrackerReady() when ready != null:
         return ready(_that.today, _that.streakDays, _that.last7);
       case _:
@@ -166,6 +178,7 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(
             TrackerDay today, int streakDays, List<bool> last7)
         ready,
@@ -174,6 +187,8 @@ extension TrackerStatePatterns on TrackerState {
     switch (_that) {
       case TrackerLoading():
         return loading();
+      case TrackerFailed():
+        return failed();
       case TrackerReady():
         return ready(_that.today, _that.streakDays, _that.last7);
     }
@@ -194,6 +209,7 @@ extension TrackerStatePatterns on TrackerState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(TrackerDay today, int streakDays, List<bool> last7)?
         ready,
   }) {
@@ -201,6 +217,8 @@ extension TrackerStatePatterns on TrackerState {
     switch (_that) {
       case TrackerLoading() when loading != null:
         return loading();
+      case TrackerFailed() when failed != null:
+        return failed();
       case TrackerReady() when ready != null:
         return ready(_that.today, _that.streakDays, _that.last7);
       case _:
@@ -226,6 +244,26 @@ class TrackerLoading implements TrackerState {
   @override
   String toString() {
     return 'TrackerState.loading()';
+  }
+}
+
+/// @nodoc
+
+class TrackerFailed implements TrackerState {
+  const TrackerFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is TrackerFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'TrackerState.failed()';
   }
 }
 

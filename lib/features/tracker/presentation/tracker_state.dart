@@ -8,6 +8,8 @@ part 'tracker_state.freezed.dart';
 sealed class TrackerState with _$TrackerState {
   const factory TrackerState.loading() = TrackerLoading;
 
+  const factory TrackerState.failed() = TrackerFailed;
+
   const factory TrackerState.ready({
     required TrackerDay today,
     @Default(0) int streakDays,

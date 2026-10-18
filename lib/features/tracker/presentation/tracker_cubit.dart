@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -20,25 +21,35 @@ class TrackerCubit extends Cubit<TrackerState> {
   final PrayerLogRepository _repo;
 
   Future<void> _hydrate() async {
-    await reload();
-    if (!_loaded.isCompleted) _loaded.complete();
+    try {
+      await reload();
+    } finally {
+      if (!_loaded.isCompleted) _loaded.complete();
+    }
   }
 
   Future<void> reload() async {
-    final now = DateTime.now();
-    final today = await _repo.dayView(now);
-    final marked = await _repo.markedDaysRange(now, 400);
-    final last7 = <bool>[
-      for (var i = 0; i < 7; i++)
-        marked.any((d) => _sameDay(d, now.subtract(Duration(days: i)))),
-    ];
-    final streak = _computeStreak(marked, now);
-    if (isClosed) return;
-    emit(TrackerState.ready(
-      today: today,
-      streakDays: streak,
-      last7: last7,
-    ));
+    try {
+      final now = DateTime.now();
+      final today = await _repo.dayView(now);
+      final marked = await _repo.markedDaysRange(now, 400);
+      final last7 = <bool>[
+        for (var i = 0; i < 7; i++)
+          marked.any((d) => _sameDay(d, now.subtract(Duration(days: i)))),
+      ];
+      final streak = _computeStreak(marked, now);
+      if (isClosed) return;
+      emit(TrackerState.ready(
+        today: today,
+        streakDays: streak,
+        last7: last7,
+      ));
+    } on Object catch (error, stackTrace) {
+      dev.log('tracker load failed',
+          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const TrackerState.failed());
+    }
   }
 
   bool _sameDay(DateTime a, DateTime b) =>
@@ -65,7 +76,13 @@ class TrackerCubit extends Cubit<TrackerState> {
   String _key(DateTime day) => '${day.year}-${day.month}-${day.day}';
 
   Future<void> toggle(PrayerSlot slot) async {
-    await _repo.togglePrayer(DateTime.now(), slot);
+    try {
+      await _repo.togglePrayer(DateTime.now(), slot);
+    } on Object catch (error, stackTrace) {
+      dev.log('tracker toggle failed',
+          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      return;
+    }
     await reload();
   }
 }
