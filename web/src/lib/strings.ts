@@ -53,6 +53,10 @@ const dict = {
     panelSource: 'المصدر',
     landingFeaturesTitle: 'الميزات',
     resumeTitle: 'متابعة القراءة',
+    notFoundTitle: 'الصفحة غير موجودة',
+    notFoundLead: 'تعذر العثور على الصفحة التي تبحث عنها.',
+    notFoundSearchCta: 'ابحث في المصحف',
+    notFoundHomeCta: 'الصفحة الرئيسية',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -105,6 +109,10 @@ const dict = {
     panelSource: 'Source',
     landingFeaturesTitle: 'Features',
     resumeTitle: 'Continue reading',
+    notFoundTitle: 'Page not found',
+    notFoundLead: "Couldn't find the page you're looking for.",
+    notFoundSearchCta: 'Search the Quran',
+    notFoundHomeCta: 'Home',
   },
 } as const;
 

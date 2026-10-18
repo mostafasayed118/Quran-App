@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { t } from '../lib/strings';
+---
+<BaseLayout title={t('ar', 'notFoundTitle')} description={t('ar', 'notFoundLead')}>
+  <section class="nf" data-qy="not-found">
+    <h1 class="page-title nf-title">{t('ar', 'notFoundTitle')}</h1>
+    <p class="nf-lead">{t('ar', 'notFoundLead')}</p>
+    <div class="nf-actions">
+      <a class="rc-btn nf-btn nf-btn-primary" href="/quran">{t('ar', 'notFoundSearchCta')}</a>
+      <a class="rc-btn nf-btn" href="/">{t('ar', 'notFoundHomeCta')}</a>
+    </div>
+    <p class="nf-en" dir="ltr" lang="en">{t('en', 'notFoundTitle')}</p>
+  </section>
+</BaseLayout>
+<style is:global>
+  .nf { width: min(560px, calc(100% - 40px)); margin-inline: auto; padding: 64px 0 90px; text-align: center; }
+  .nf .nf-title { width: auto; margin: 0 0 10px; }
+  .nf-lead { margin: 0 0 26px; color: var(--muted-strong); line-height: 1.9; }
+  .nf-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+  .nf-btn { display: inline-flex; align-items: center; text-decoration: none; }
+  .nf-btn-primary { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
+  .nf-en { margin: 30px 0 0; color: var(--muted-strong); font-size: .85rem; }
+  @media (pointer: coarse) { .nf-btn { min-height: 44px; } }
+</style>
