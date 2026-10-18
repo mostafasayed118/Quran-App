@@ -1,5 +1,5 @@
 import { surahAudioUrl, type MoshafRow } from './reciters';
-import { readSetting, writeSetting } from './settings';
+import { writeSetting } from './settings';
 
 export interface PlayerState {
   row: MoshafRow | null;
