@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/arabic_numbers.dart';
 import '../data/dua_repository.dart';
 import '../data/ruqyah_repository.dart';
 import '../../quran/data/ayah_repository.dart';
@@ -70,8 +71,8 @@ class DuasCubit extends Cubit<DuasState> {
             isQuran: true,
             displayText:
                 <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
-            citation:
-                '﴿${surah?.nameAr ?? ''} ${entry.fromAyah}–${entry.toAyah}﴾',
+            citation: '${surah?.nameAr ?? ''} '
+                '${entry.fromAyah!.toArabicIndic}–${entry.toAyah!.toArabicIndic}',
             reference: entry.reference,
           ));
         } else {

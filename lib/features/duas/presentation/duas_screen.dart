@@ -134,9 +134,10 @@ class _RuqyahView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DuasCubit, DuasState>(
       builder: (context, state) {
+        final loc = AppLocalizations.of(context);
         final view = state as RuqyahInView;
         if (view.entries.isEmpty) {
-          return EmptyState(AppLocalizations.of(context).noResults);
+          return EmptyState(loc.noResults);
         }
         return ListView.builder(
           padding: const EdgeInsets.all(12),
@@ -148,7 +149,9 @@ class _RuqyahView extends StatelessWidget {
               fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
               fontSize: entry.isQuran ? 18 : 17,
               height: entry.isQuran ? 2.0 : 1.8,
-              citation: entry.citation,
+              citation: entry.citation == null
+                  ? null
+                  : loc.ornateBrackets(entry.citation!),
               count: entry.count,
               reference: entry.reference,
             );
