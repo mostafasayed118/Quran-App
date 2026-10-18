@@ -11,6 +11,31 @@ import '../data/asma_repository.dart';
 import 'asma_cubit.dart';
 import 'asma_state.dart';
 
+const TextStyle _gridNameArStyle = TextStyle(
+  fontFamily: QuranFonts.meQuran,
+  fontSize: 22,
+);
+
+const TextStyle _sheetNameArStyle = TextStyle(
+  fontFamily: QuranFonts.meQuran,
+  fontSize: 40,
+);
+
+const TextStyle _sheetMeaningArStyle = TextStyle(
+  fontFamily: QuranFonts.meQuran,
+  fontSize: 16,
+  height: 1.7,
+);
+
+TextStyle _mutedAt(ColorScheme colors, double fontSize) =>
+    TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
+
+TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: colors.primary,
+    );
+
 class AsmaScreen extends StatelessWidget {
   const AsmaScreen({super.key});
 
@@ -53,10 +78,7 @@ class AsmaScreen extends StatelessWidget {
                           children: [
                             Text(
                               name.n.toArabicIndic,
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: colors.onSurfaceVariant,
-                              ),
+                              style: _mutedAt(colors, 10),
                             ),
                             const SizedBox(height: 4),
                             FittedBox(
@@ -64,10 +86,7 @@ class AsmaScreen extends StatelessWidget {
                               child: Text(
                                 name.nameAr,
                                 textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontFamily: QuranFonts.meQuran,
-                                  fontSize: 22,
-                                ),
+                                style: _gridNameArStyle,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -140,10 +159,7 @@ class _NameSheet extends StatelessWidget {
                     Expanded(
                       child: Text(
                         loc.namePosition(name.n.toArabicIndic),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: colors.onSurfaceVariant,
-                        ),
+                        style: _mutedAt(colors, 12),
                       ),
                     ),
                     IconButton(
@@ -156,40 +172,26 @@ class _NameSheet extends StatelessWidget {
                 Text(
                   name.nameAr,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: QuranFonts.meQuran,
-                    fontSize: 40,
-                  ),
+                  style: _sheetNameArStyle,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   name.nameEn,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: colors.primary,
-                  ),
+                  style: _sheetNameEnStyle(colors),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   name.meaningAr,
                   textAlign: TextAlign.center,
                   textDirection: TextDirection.rtl,
-                  style: const TextStyle(
-                    fontFamily: QuranFonts.meQuran,
-                    fontSize: 16,
-                    height: 1.7,
-                  ),
+                  style: _sheetMeaningArStyle,
                 ),
                 const SizedBox(height: 6),
                 Text(
                   name.meaningEn,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.onSurfaceVariant,
-                  ),
+                  style: _mutedAt(colors, 13),
                 ),
               ],
             ),
