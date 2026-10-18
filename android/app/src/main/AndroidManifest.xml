@@ -33,6 +33,17 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- P4-app: claim quranyahdi.pages.dev content links (verified via
+                 web/.well-known/assetlinks.json). Path-scoped on purpose —
+                 future pages like /about and /privacy stay in the browser. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="quranyahdi.pages.dev" android:pathPrefix="/surah/" />
+                <data android:pathPrefix="/quran" />
+                <data android:pathPrefix="/reciters" />
+            </intent-filter>
         </activity>
         <service
             android:name="com.ryanheise.audioservice.AudioService"
