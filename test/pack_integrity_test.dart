@@ -205,4 +205,51 @@ void main() {
       expect(leftovers, isEmpty);
     });
   });
+
+  group('shipped catalog integrity', () {
+    test('every shipped pack is immutably pinned and fully hashed', () async {
+      final file = File('assets/data/library_catalog.json');
+      if (!file.existsSync()) {
+        markTestSkipped(
+            'working dir does not resolve the bundled asset from this runner');
+      }
+      final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+      final list = (json['packs'] as List).cast<Map<String, dynamic>>();
+      final packs = await BundledCatalogSource(loader: () async => list).all();
+
+      expect(packs, hasLength(9), reason: 'every shipped entry must parse');
+      expect(packs.map((p) => p.id).toSet(), hasLength(9));
+
+      final hex = RegExp(r'^[0-9a-f]{64}$');
+      for (final pack in packs) {
+        final url = pack.sourceUrl ?? pack.urlTemplate;
+        expect(url, isNotNull);
+        expect(url!, isNot(contains('@1/')),
+            reason: 'pack ${pack.id} must not float on the bare @1 ref');
+      }
+
+      final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
+      expect(tafsirs, hasLength(3));
+      for (final pack in tafsirs) {
+        final hashes = pack.sha256PerSurah;
+        expect(hashes, isNotNull,
+            reason: 'pack ${pack.id} needs per-surah hashes');
+        expect(hashes, hasLength(pack.fileCount));
+        expect(hashes, hasLength(114));
+        for (final hash in hashes!) {
+          expect(hex.hasMatch(hash), isTrue,
+              reason: 'pack ${pack.id} has a malformed surah hash');
+        }
+      }
+
+      final singles = packs.where((p) => p.kind != LibraryPackKind.tafsir);
+      expect(singles, hasLength(6));
+      for (final pack in singles) {
+        final hash = pack.sha256;
+        expect(hash, isNotNull, reason: 'pack ${pack.id} needs a sha256');
+        expect(hex.hasMatch(hash!), isTrue,
+            reason: 'pack ${pack.id} has a malformed sha256');
+      }
+    });
+  });
 }
