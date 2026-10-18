@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { LANDING } from '../../src/lib/landing-content';
 
 test('landing renders the hero with the provisional ayah and both CTAs', async ({ page }) => {
   await page.goto('/');
@@ -82,4 +83,23 @@ test('landing CTA section links GitHub Releases live and shows the Play badge as
   await expect(play).toHaveAttribute('aria-disabled', 'true');
   await expect(play).toHaveText('قريبًا على Google Play');
   await expect(page.locator('.cta a.cta-play, .cta button.cta-play')).toHaveCount(0);
+});
+
+test('about page renders the mission story paragraphs and the bullet list', async ({ page }) => {
+  await page.goto('/about');
+  await expect(page).toHaveTitle('عن التطبيق');
+  await expect(page.locator('.about .page-title')).toHaveText('عن التطبيق');
+  const story = page.locator('.about-story p');
+  await expect(story).toHaveCount(LANDING.ar.about.story.length);
+  await expect(story.first()).toHaveText(LANDING.ar.about.story[0]);
+  const bullets = page.locator('.about-bullets li');
+  await expect(bullets).toHaveCount(LANDING.ar.about.bullets.length);
+  await expect(bullets.first()).toHaveText(LANDING.ar.about.bullets[0]);
+});
+
+test('footer about link navigates from the landing to /about', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.site-footer a[href="/about"]').click();
+  await page.waitForURL((url) => url.pathname === '/about');
+  await expect(page.locator('.about .page-title')).toHaveText('عن التطبيق');
 });
