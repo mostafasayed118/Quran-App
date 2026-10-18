@@ -23,6 +23,15 @@ class LocationService {
     }
   }
 
+  /// Best-effort open of the device location settings; never throws upward.
+  Future<void> openLocationSettings() async {
+    try {
+      await Geolocator.openLocationSettings();
+    } on Object {
+      // Deliberately ignored — the manual picker remains the fallback.
+    }
+  }
+
   static Future<CityCoordinates?> resolveFromDevice() async {
     if (!await Geolocator.isLocationServiceEnabled()) return null;
     var permission = await Geolocator.checkPermission();

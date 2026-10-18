@@ -431,4 +431,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get currentCity => 'المدينة الحالية';
+
+  @override
+  String get locationSettings => 'إعدادات الموقع';
 }

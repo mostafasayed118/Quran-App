@@ -865,6 +865,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'المدينة الحالية'**
   String get currentCity;
+
+  /// No description provided for @locationSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الموقع'**
+  String get locationSettings;
 }
 
 class _AppLocalizationsDelegate

@@ -107,7 +107,13 @@ class CityPickerScreen extends StatelessWidget {
     if (city != null) {
       navigator.pop(true);
     } else {
-      messenger.showSnackBar(SnackBar(content: Text(loc.locationUnavailable)));
+      messenger.showSnackBar(SnackBar(
+        content: Text(loc.locationUnavailable),
+        action: SnackBarAction(
+          label: loc.locationSettings,
+          onPressed: () => cubit.openLocationSettings(),
+        ),
+      ));
     }
   }
 }

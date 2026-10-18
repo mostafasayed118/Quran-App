@@ -91,4 +91,9 @@ class CityPickerCubit extends Cubit<CityPickerState> {
       ));
     }
   }
+
+  /// Opens the device location settings after a failed locate (best-effort).
+  Future<void> openLocationSettings() async {
+    await _location?.openLocationSettings();
+  }
 }

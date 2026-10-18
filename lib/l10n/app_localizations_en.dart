@@ -432,4 +432,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentCity => 'Current city';
+
+  @override
+  String get locationSettings => 'Location settings';
 }
