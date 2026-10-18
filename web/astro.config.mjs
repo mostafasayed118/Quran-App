@@ -11,4 +11,5 @@ export default defineConfig({
     routing: { prefixDefaultLocale: false },
   },
   integrations: [react()],
+  vite: { server: { fs: { allow: ['..'] } } },
 });
