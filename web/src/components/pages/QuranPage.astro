@@ -1,0 +1,22 @@
+---
+import SurahIndexFilter from '../SurahIndexFilter.tsx';
+import { t, type Locale } from '../../lib/strings';
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+---
+<h1 class="page-title">{t(locale, 'surahIndexTitle')}</h1>
+<SurahIndexFilter client:load locale={locale} />
+<style is:global>
+  .ayah-search { width: min(760px, calc(100% - 40px)); margin: 26px auto 20px; }
+  .ayah-search-title { font-size: 1.05rem; font-weight: 700; color: var(--gold-ink); margin: 0 0 10px; }
+  .search-loading { color: var(--muted-strong); text-align: center; margin: 14px auto; }
+  .ayah-hits { list-style: none; margin: 0; padding: 0; }
+  .ayah-hits a {
+    display: block; padding: 11px 4px; border-bottom: 1px solid var(--hairline);
+    color: var(--ink); text-decoration: none; line-height: 1.95;
+  }
+  .ayah-hits mark {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: inherit; border-radius: 4px; padding: 0 3px;
+  }
+</style>

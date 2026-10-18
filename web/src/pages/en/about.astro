@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AboutPage from '../../components/pages/AboutPage.astro';
+import { t } from '../../lib/strings';
+import { LANDING } from '../../lib/landing-content';
+---
+<BaseLayout title={t('en', 'navAbout')} description={LANDING.en.about.story[0]} locale="en">
+  <AboutPage locale="en" />
+</BaseLayout>

@@ -1,34 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AboutPage from '../components/pages/AboutPage.astro';
 import { t } from '../lib/strings';
 import { LANDING } from '../lib/landing-content';
 
 const copy = LANDING.ar.about;
 ---
 <BaseLayout title={t('ar', 'navAbout')} description={copy.story[0]}>
-  <article class="about">
-    <h1 class="page-title">{t('ar', 'navAbout')}</h1>
-    <div class="about-story">
-      {copy.story.map((paragraph) => <p class="about-para">{paragraph}</p>)}
-    </div>
-    <ul class="about-bullets">
-      {copy.bullets.map((bullet) => <li class="about-bullet">{bullet}</li>)}
-    </ul>
-  </article>
+  <AboutPage locale="ar" />
 </BaseLayout>
-<style is:global>
-  .about { padding-bottom: 60px; }
-  .about-story { width: min(760px, calc(100% - 40px)); margin: 8px auto 0; }
-  .about-para { margin: 0 0 14px; color: var(--muted-strong); line-height: 1.9; }
-  .about-bullets {
-    list-style: none; width: min(760px, calc(100% - 40px));
-    margin: 20px auto 0; padding: 18px 22px;
-    display: grid; gap: 12px;
-    border: 1px solid var(--gold-line); border-radius: 14px;
-  }
-  .about-bullet { position: relative; padding-inline-start: 18px; color: var(--ink); line-height: 1.8; }
-  .about-bullet::before {
-    content: ''; position: absolute; inset-inline-start: 2px; top: .72em;
-    width: 7px; height: 7px; border-radius: 50%; background: var(--gold-line);
-  }
-</style>

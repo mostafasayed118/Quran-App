@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LandingPage from '../../components/pages/LandingPage.astro';
+import { t } from '../../lib/strings';
+import { LANDING } from '../../lib/landing-content';
+---
+<BaseLayout title={t('en', 'appName')} description={LANDING.en.hero.lead} locale="en" preloadFont>
+  <LandingPage locale="en" />
+</BaseLayout>

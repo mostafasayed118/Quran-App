@@ -1,8 +1,13 @@
-<div class="resume" data-qy="resume-mount" hidden></div>
+---
+import type { Locale } from '../lib/strings';
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+---
+<div class="resume" data-qy="resume-mount" data-locale={locale} hidden></div>
 <script>
   import { readResume, type ResumePoint } from '../lib/reader-resume';
   import { toArabicDigits } from '../lib/arabic-digits';
-  import { t, defaultLocale } from '../lib/strings';
+  import { t, type Locale } from '../lib/strings';
   import surahsData from '../data/surahs.json';
 
   const surahNames = new Map<number, string>(
@@ -15,6 +20,7 @@
     const mount = document.querySelector<HTMLElement>('[data-qy="resume-mount"]');
     if (!mount || mount.dataset.qyReady) return;
     mount.dataset.qyReady = '1';
+    const locale: Locale = mount.dataset.locale === 'en' ? 'en' : 'ar';
 
     let point: ResumePoint | null = null;
     try {
@@ -29,11 +35,11 @@
     const link = document.createElement('a');
     link.className = 'resume-link';
     link.dataset.qy = 'resume';
-    link.href = `/surah/${point.s}#ayah-${point.a}`;
+    link.href = `${locale === 'en' ? '/en' : ''}/surah/${point.s}#ayah-${point.a}`;
 
     const label = document.createElement('span');
     label.className = 'resume-label';
-    label.textContent = t(defaultLocale, 'resumeTitle');
+    label.textContent = t(locale, 'resumeTitle');
 
     const target = document.createElement('span');
     target.className = 'resume-target';
@@ -44,7 +50,7 @@
 
     const ayah = document.createElement('span');
     ayah.className = 'resume-ayah';
-    ayah.textContent = toArabicDigits(point.a);
+    ayah.textContent = locale === 'en' ? String(point.a) : toArabicDigits(point.a);
 
     target.append(surah, ayah);
     link.append(label, target);
