@@ -19,26 +19,31 @@ function HitText({ text, query }: { text: string; query: string }) {
 export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
   const [q, setQ] = useState('');
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hits, setHits] = useState<Hit[]>([]);
   const results = useMemo(() => filterSurahs(surahs.surahs, q), [q]);
   const active = q.trim().length >= 2;
 
   useEffect(() => {
-    if (!active || ready) return;
+    if (!active || ready || failed) return;
     let cancelled = false;
     setLoading(true);
     loadSearchIndex()
-      .catch(() => undefined)
       .then(() => {
         if (cancelled) return;
         setReady(true);
         setLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLoading(false);
+        setFailed(true);
       });
     return () => {
       cancelled = true;
     };
-  }, [active, ready]);
+  }, [active, ready, failed]);
 
   useEffect(() => {
     if (ready) setHits(searchAyahs(q));
@@ -68,7 +73,13 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
         <section className="ayah-search" aria-labelledby="ayah-search-title">
           <h2 id="ayah-search-title" className="ayah-search-title">{t(locale, 'searchAyahsTitle')}</h2>
           {loading && <p className="search-loading" role="status">{t(locale, 'searchLoading')}</p>}
-          {!loading && hits.length === 0 && <p className="empty">{t(locale, 'noResults')}</p>}
+          {failed && (
+            <div className="panel-error">
+              <span>{t(locale, 'panelError')}</span>
+              <button type="button" className="rc-btn" onClick={() => setFailed(false)}>{t(locale, 'panelRetry')}</button>
+            </div>
+          )}
+          {!loading && !failed && hits.length === 0 && <p className="empty">{t(locale, 'noResults')}</p>}
           <ol className="ayah-hits">
             {hits.map((h) => (
               <li key={`${h.s}:${h.a}`}>
