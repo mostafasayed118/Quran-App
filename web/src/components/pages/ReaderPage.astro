@@ -62,7 +62,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     type ReaderSettings,
   } from '../../lib/reader-settings';
   import { readSetting, writeSetting } from '../../lib/settings';
-  import { fetchReciters, sortReciters, type MoshafRow } from '../../lib/reciters';
+  import { fetchReciters, sortReciters, dedupeLabel, type MoshafRow } from '../../lib/reciters';
   import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
   import { writeResume } from '../../lib/reader-resume';
   import { shareOrCopy } from '../../lib/share';
@@ -134,7 +134,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
           ...rows.map((r) => {
             const opt = document.createElement('option');
             opt.value = r.rowId;
-            opt.textContent = `${r.reciterName} — ${r.moshafName}`;
+            opt.textContent = `${r.reciterName} — ${dedupeLabel(r.moshafName)}`;
             return opt;
           }),
         );

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  parseReciters, sortReciters, isTrustedAudioServer, surahAudioUrl, isFeaturedRow,
+  parseReciters, sortReciters, isTrustedAudioServer, surahAudioUrl, isFeaturedRow, dedupeLabel,
   FEATURED_RECITER_IDS, type MoshafRow,
 } from '../../src/lib/reciters';
 import snapshot from '../../src/data/reciters-snapshot.json';
@@ -55,6 +55,25 @@ describe('surahAudioUrl', () => {
   it('pads to 3 digits and normalizes the trailing slash', () => {
     expect(surahAudioUrl('https://cdn.mp3quran.net/a/r1/', 1)).toBe('https://cdn.mp3quran.net/a/r1/001.mp3');
     expect(surahAudioUrl('https://cdn.mp3quran.net/a/r1', 114)).toBe('https://cdn.mp3quran.net/a/r1/114.mp3');
+  });
+});
+
+describe('dedupeLabel', () => {
+  it('collapses a byte-equal "X - X" duplicate (real upstream shape)', () => {
+    expect(dedupeLabel('المصحف المجود - المصحف المجود')).toBe('المصحف المجود');
+    expect(dedupeLabel('المصحف المعلم - المصحف المعلم')).toBe('المصحف المعلم');
+  });
+  it('trims around the separator before comparing', () => {
+    expect(dedupeLabel('حفص  -  حفص ')).toBe('حفص');
+  });
+  it('keeps labels whose two sides differ', () => {
+    expect(dedupeLabel('حفص عن عاصم - مرتل')).toBe('حفص عن عاصم - مرتل');
+    expect(dedupeLabel('A - A - A')).toBe('A - A - A');
+  });
+  it('keeps labels without a separator untouched', () => {
+    expect(dedupeLabel('حفص')).toBe('حفص');
+    expect(dedupeLabel('')).toBe('');
+    expect(dedupeLabel(' - ')).toBe(' - ');
   });
 });
 

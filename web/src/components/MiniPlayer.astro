@@ -20,7 +20,7 @@ const { locale = 'ar' } = Astro.props;
   import { getPlayer } from '../lib/player';
   import { digitsFor } from '../lib/arabic-digits';
   import type { Locale } from '../lib/strings';
-  import type { MoshafRow } from '../lib/reciters';
+  import { dedupeLabel, type MoshafRow } from '../lib/reciters';
 
   let dismissed = false;
 
@@ -46,7 +46,7 @@ const { locale = 'ar' } = Astro.props;
       if (dismissed || !st.row || st.surah === null) { setVisible(false); return; }
       setVisible(true);
       $('title').textContent = st.row.reciterName;
-      $('reciter').textContent = st.row.moshafName;
+      $('reciter').textContent = dedupeLabel(st.row.moshafName);
       $('time').textContent = st.status === 'error'
         ? (bar.dataset.errorLabel ?? '')
         : st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
