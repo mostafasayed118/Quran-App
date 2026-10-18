@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://quranyahdi.pages.dev/sitemap.xml

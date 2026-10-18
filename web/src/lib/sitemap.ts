@@ -1,0 +1,46 @@
+export type SitemapEntry = { loc: string; alternates: { ar: string; en: string } };
+
+const STATIC_PATHS = ['/', '/quran', '/reciters', '/about', '/privacy'];
+
+function enPath(path: string): string {
+  return path === '/' ? '/en/' : `/en${path}`;
+}
+
+export function buildSitemapUrls(site: string, surahIds: number[]): SitemapEntry[] {
+  const origin = site.replace(/\/+$/, '');
+  const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}`)];
+  return paths.map((path) => {
+    const ar = `${origin}${path}`;
+    return { loc: ar, alternates: { ar, en: `${origin}${enPath(path)}` } };
+  });
+}
+
+const XML_ENTITIES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&apos;',
+};
+
+function xmlEscape(value: string): string {
+  return value.replace(/[&<>"']/g, (c) => XML_ENTITIES[c]);
+}
+
+export function toSitemapXml(entries: SitemapEntry[]): string {
+  const urls = entries
+    .map(
+      (entry) => `  <url>
+    <loc>${xmlEscape(entry.loc)}</loc>
+    <xhtml:link rel="alternate" hreflang="ar" href="${xmlEscape(entry.alternates.ar)}" />
+    <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(entry.alternates.en)}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(entry.alternates.ar)}" />
+  </url>`
+    )
+    .join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls}
+</urlset>
+`;
+}

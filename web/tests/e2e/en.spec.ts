@@ -89,3 +89,12 @@ test('EN index card resolves to the live EN reader route', async ({ page }) => {
   await expect(page.locator('.reader-head h1')).toContainText('الفاتحة');
   await expect(page.locator('.ayah').first()).toBeVisible();
 });
+
+test('sitemap.xml is served as XML with the EN alternates', async ({ request }) => {
+  const res = await request.get('/sitemap.xml');
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toMatch(/application\/xml|text\/xml/);
+  const body = await res.text();
+  expect(body).toContain('/en/surah/114');
+  expect(body).toContain('hreflang="en"');
+});
