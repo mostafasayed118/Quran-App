@@ -1,17 +1,25 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
 import { t, type Locale } from '../lib/strings';
+import { altLocalePath } from '../lib/landing-content';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
+const base = locale === 'en' ? '/en' : '';
+const other: Locale = locale === 'en' ? 'ar' : 'en';
 ---
 <header class="site-header">
-  <a class="brand" href="/">
+  <a class="brand" href={`${base}/`}>
     <img src="/logo-64.png" alt={t(locale, 'appName')} width="27" height="27" />
     <span>{t(locale, 'appName')}</span>
   </a>
   <nav>
-    <a href="/quran">{t(locale, 'navQuran')}</a>
-    <a href="/reciters">{t(locale, 'navReciters')}</a>
+    <a href={`${base}/quran`}>{t(locale, 'navQuran')}</a>
+    <a href={`${base}/reciters`}>{t(locale, 'navReciters')}</a>
   </nav>
+  <a class="lang-switch" href={altLocalePath(Astro.url.pathname, other)} rel="alternate">{t(locale, 'langSwitchTo')}</a>
   <ThemeToggle locale={locale} />
 </header>
+<style>
+  .lang-switch { color: var(--muted-strong); text-decoration: none; }
+  @media (pointer: coarse) { .lang-switch { display: inline-flex; align-items: center; min-height: 44px; } }
+</style>

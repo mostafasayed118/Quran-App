@@ -7,10 +7,16 @@ import Footer from '../components/Footer.astro';
 import MiniPlayer from '../components/MiniPlayer.astro';
 import { ClientRouter } from 'astro:transitions';
 import type { Locale } from '../lib/strings';
+import { altLocalePath } from '../lib/landing-content';
 
 interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
 const { title, description = 'قرآن يَهدي — اقرأ واستمع وتدبّر، مجاناً وبلا حسابات.', locale = 'ar', preloadFont = false } = Astro.props;
 const dir = locale === 'ar' ? 'rtl' : 'ltr';
+const pathname = Astro.url.pathname;
+const canonical = new URL(pathname, Astro.site);
+const alternateAr = new URL(altLocalePath(pathname, 'ar'), Astro.site);
+const alternateEn = new URL(altLocalePath(pathname, 'en'), Astro.site);
+const ogImage = new URL('/og-base.png', Astro.site);
 ---
 <!doctype html>
 <html lang={locale} dir={dir} data-theme="day">
@@ -19,6 +25,16 @@ const dir = locale === 'ar' ? 'rtl' : 'ltr';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="ar" href={alternateAr} />
+    <link rel="alternate" hreflang="en" href={alternateEn} />
+    <link rel="alternate" hreflang="x-default" href={alternateAr} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
     {preloadFont && <link rel="preload" href="/fonts/HafsSmart_08.woff2" as="font" type="font/woff2" crossorigin />}

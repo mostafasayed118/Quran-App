@@ -2,7 +2,12 @@
 import { t, type Locale } from '../lib/strings';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
+const base = locale === 'en' ? '/en' : '';
 ---
 <footer class="site-footer">
   <span>{t(locale, 'appName')}</span>
+  <span aria-hidden="true">·</span>
+  <a href={`${base}/about`}>{t(locale, 'navAbout')}</a>
+  <span aria-hidden="true">·</span>
+  <a href={`${base}/privacy`}>{t(locale, 'footerPrivacy')}</a>
 </footer>
