@@ -136,7 +136,7 @@ class _PlaybackStrip extends StatelessWidget {
                 ),
               IconButton(
                 tooltip: loc.stopTooltip,
-                icon: const Icon(Icons.close),
+                icon: const Icon(Icons.stop),
                 onPressed: () => context.read<PlaybackCubit>().stopAndReset(),
               ),
             ],
@@ -162,7 +162,7 @@ class _FailedStrip extends StatelessWidget {
     };
     return ErrorStrip(
       message,
-      dismissTooltip: loc.stopAction,
+      dismissTooltip: loc.stopTooltip,
       onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
     );
   }
