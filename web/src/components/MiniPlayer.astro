@@ -3,7 +3,7 @@ import { t, type Locale } from '../lib/strings';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 ---
-<div class="mini-player" data-qy="bar" hidden>
+<div class="mini-player" data-qy="bar" data-error-label={t(locale, 'playerError')} hidden>
   <audio id="qy-audio" preload="none"></audio>
   <button type="button" class="mp-btn" data-qy="prev" aria-label={t(locale, 'playerPrev')}>⏮</button>
   <button type="button" class="mp-btn mp-main" data-qy="toggle" data-play-label={t(locale, 'playerPlay')} data-pause-label={t(locale, 'playerPause')} aria-label={t(locale, 'playerPlay')}>▶</button>
@@ -45,7 +45,9 @@ const { locale = 'ar' } = Astro.props;
       setVisible(true);
       $('title').textContent = st.row.reciterName;
       $('reciter').textContent = st.row.moshafName;
-      $('time').textContent = st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
+      $('time').textContent = st.status === 'error'
+        ? (bar.dataset.errorLabel ?? '')
+        : st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
       const playing = st.status === 'playing';
       $('toggle').textContent = playing ? '⏸' : '▶';
       $('toggle').setAttribute('aria-label', (playing ? $('toggle').dataset.pauseLabel : $('toggle').dataset.playLabel) ?? '');

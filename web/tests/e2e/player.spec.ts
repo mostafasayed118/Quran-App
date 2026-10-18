@@ -38,3 +38,29 @@ test('player: close sticks while a track plays until a fresh play', async ({ pag
   await page.locator('[data-qy="reader-play"]').click();
   await expect(bar).toBeVisible();
 });
+
+test('player: audio error shows the localized message and toggle retries', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/surah/1/');
+  const bar = page.locator('[data-qy="bar"]');
+  const toggle = bar.locator('[data-qy="toggle"]');
+  await page.locator('[data-qy="reader-play"]').click();
+  await expect(bar).toBeVisible();
+  await expect(toggle).toHaveText('⏸');
+  // Settle into a real pause first, so the injected error lands on a paused element
+  // (that is the state in which ▶ is the retry affordance).
+  await toggle.click();
+  await expect(toggle).toHaveText('▶');
+  // Fault injection: a synthetic media error drives the exact listener the player
+  // lib uses for real failures (player.ts error -> status 'error').
+  await page.evaluate(() => {
+    const el = document.getElementById('qy-audio');
+    if (el) el.dispatchEvent(new Event('error'));
+  });
+  await expect(bar.locator('[data-qy="time"]')).toHaveText('تعذّر التشغيل');
+  await expect(toggle).toHaveText('▶');
+  await toggle.click(); // retry
+  await expect(toggle).toHaveText('⏸');
+  await expect(bar.locator('[data-qy="time"]')).not.toHaveText('تعذّر التشغيل');
+});
