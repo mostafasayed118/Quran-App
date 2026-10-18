@@ -11,7 +11,7 @@ const toDay = t(locale, 'themeToDay');
   data-label-day={toNight}
   data-label-night={toDay}
 >{toNight}</button>
-<script is:inline>
+<script is:inline data-astro-rerun>
   (function () {
     var btn = document.currentScript.previousElementSibling;
     if (!btn || !btn.classList.contains('theme-toggle')) {

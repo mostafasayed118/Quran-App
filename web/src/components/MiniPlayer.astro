@@ -21,6 +21,8 @@ const { locale = 'ar' } = Astro.props;
   import { toArabicDigits } from '../lib/arabic-digits';
   import type { MoshafRow } from '../lib/reciters';
 
+  let dismissed = false;
+
   function init() {
     const bar = document.querySelector('[data-qy="bar"]') as HTMLElement;
     if (!bar) return;
@@ -39,7 +41,7 @@ const { locale = 'ar' } = Astro.props;
 
     const render = () => {
       const st = player.state();
-      if (!st.row || st.surah === null) { setVisible(false); return; }
+      if (dismissed || !st.row || st.surah === null) { setVisible(false); return; }
       setVisible(true);
       $('title').textContent = st.row.reciterName;
       $('reciter').textContent = st.row.moshafName;
@@ -60,9 +62,10 @@ const { locale = 'ar' } = Astro.props;
       const rect = $('seek').getBoundingClientRect();
       player.seekRatio(((e as MouseEvent).clientX - rect.left) / rect.width);
     });
-    $('close').addEventListener('click', () => { setVisible(false); });
+    $('close').addEventListener('click', () => { dismissed = true; setVisible(false); });
     document.addEventListener('qy:play', (e) => {
       const { row, surah } = (e as CustomEvent<{ row: MoshafRow; surah: number }>).detail;
+      dismissed = false;
       player.play(row, surah);
     });
     document.addEventListener('qy:toggle', () => player.toggle());

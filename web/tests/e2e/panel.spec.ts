@@ -1,6 +1,11 @@
 import { test, expect } from '@playwright/test';
 import tafsirFixture from '../fixtures/tafsir-1.json' with { type: 'json' };
 import translationFixture from '../fixtures/translation-1.json' with { type: 'json' };
+import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
+
+test.beforeEach(async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+});
 
 test('content panel: curated packs render notes, switch, and persist across reload', async ({ page }) => {
   await page.route('**/cdn.jsdelivr.net/gh/spa5k/**', (r) => r.fulfill({ json: tafsirFixture }));

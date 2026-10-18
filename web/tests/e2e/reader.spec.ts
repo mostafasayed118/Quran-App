@@ -1,4 +1,9 @@
 import { test, expect } from '@playwright/test';
+import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
+
+test.beforeEach(async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+});
 
 test('surah 2 renders 286 ayahs with anchors and the real quran font', async ({ page }) => {
   await page.goto('/surah/2');

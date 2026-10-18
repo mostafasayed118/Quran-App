@@ -22,3 +22,19 @@ test('player: play from reciters page persists across SPA navigation', async ({ 
   await expect(page.locator('[data-qy="bar"]')).toBeVisible();
   await expect(page.locator('[data-qy="toggle"]')).toHaveText('⏸');
 });
+
+test('player: close sticks while a track plays until a fresh play', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/surah/1/');
+  const bar = page.locator('[data-qy="bar"]');
+  await page.locator('[data-qy="reader-play"]').click();
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('[data-qy="toggle"]')).toHaveText('⏸');
+  await bar.locator('[data-qy="close"]').click();
+  await expect(bar).toBeHidden();
+  await page.waitForTimeout(1500); // timeupdate emits ~4x/s must not re-show the bar
+  await expect(bar).toBeHidden();
+  await page.locator('[data-qy="reader-play"]').click();
+  await expect(bar).toBeVisible();
+});
