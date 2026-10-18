@@ -31,11 +31,8 @@ describe('assetlinks.json (Android App Links)', () => {
     for (const fp of fps) expect(fp).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
   });
 
-  it('pins the release keystore fingerprint', () => {
-    expect(statements[0].target.sha256_cert_fingerprints).toContain(RELEASE_FP);
-  });
-
-  it('keeps the local debug fingerprint for device testing', () => {
-    expect(statements[0].target.sha256_cert_fingerprints).toContain(DEBUG_FP);
+  it('pins the exact release + debug fingerprint set', () => {
+    const fps = [...statements[0].target.sha256_cert_fingerprints].sort();
+    expect(fps).toEqual([RELEASE_FP, DEBUG_FP].sort());
   });
 });
