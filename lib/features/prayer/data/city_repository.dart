@@ -68,13 +68,37 @@ class CityRepository {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return _all();
     final all = await _all();
+    final normalizedQuery = _normalizeArabic(q);
     return [
       for (final city in all)
         if (city.nameEn.toLowerCase().contains(q) ||
-            city.nameAr.contains(q))
+            _normalizeArabic(city.nameAr).contains(normalizedQuery))
           city,
     ];
   }
+
+  /// Folds Arabic letter variants (hamza forms, alef maqsura, ta marbuta)
+  /// and strips diacritics/tatweel so plain-keyboard queries match curated
+  /// names (e.g. «الاسكندرية» finds «الإسكندرية»).
+  static String _normalizeArabic(String input) {
+    final buffer = StringBuffer();
+    for (final rune in input.runes) {
+      if (_isArabicDiacritic(rune)) continue;
+      buffer.writeCharCode(_foldArabicLetter(rune));
+    }
+    return buffer.toString();
+  }
+
+  static bool _isArabicDiacritic(int rune) =>
+      (rune >= 0x064B && rune <= 0x065F) || rune == 0x0670 || rune == 0x0640;
+
+  static int _foldArabicLetter(int rune) => switch (rune) {
+        0x0622 || 0x0623 || 0x0625 || 0x0671 => 0x0627, // آ أ إ ٱ -> ا
+        0x0624 => 0x0648, // ؤ -> و
+        0x0626 || 0x0649 => 0x064A, // ئ ى -> ي
+        0x0629 => 0x0647, // ة -> ه
+        _ => rune,
+      };
 
   Future<City> nearestTo(double lat, double lng) async {
     final all = await _all();
