@@ -20,7 +20,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
 ---
 <BaseLayout title={title} preloadFont>
-  <script is:inline>
+  <script is:inline data-astro-rerun>
     (function () {
       try {
         var s = JSON.parse(localStorage.getItem('qy:reader') || 'null') || {};

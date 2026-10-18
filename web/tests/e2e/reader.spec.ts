@@ -39,3 +39,15 @@ test('imlaei toggle swaps the visible span and persists', async ({ page }) => {
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
 });
+
+test('reader boot script re-applies seeded settings right after SPA entry', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:reader', JSON.stringify({ view: 'imlaei', fontStep: 2 }));
+  });
+  await page.goto('/quran');
+  await page.locator('.surah-list a[href="/surah/1"]').click();
+  await page.waitForURL('**/surah/1**');
+  await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
+  const step = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--reader-step').trim());
+  expect(step).toBe('2');
+});
