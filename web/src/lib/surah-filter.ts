@@ -1,14 +1,7 @@
-const ARABIC_INDIC = '٠١٢٣٤٥٦٧٨٩';
+import { normalizeArabic } from './arabic';
 
 export function normalizeQuery(q: string): string {
-  return q
-    .trim()
-    .toLowerCase()
-    .replace(/[٠-٩]/g, (d) => String(ARABIC_INDIC.indexOf(d)))
-    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g, '')
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه');
+  return normalizeArabic(q);
 }
 
 export interface SurahLike { id: number; nameAr: string; nameEn: string }

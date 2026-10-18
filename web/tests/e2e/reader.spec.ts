@@ -18,3 +18,19 @@ test('prev/next edges', async ({ page }) => {
   await page.goto('/surah/114');
   await expect(page.getByRole('link', { name: 'السورة السابقة' })).toBeVisible();
 });
+
+test('ayah exposes plain Arabic to AT and Arabic digits in meta', async ({ page }) => {
+  await page.goto('/surah/2/');
+  const first = page.locator('.ayah').first();
+  await expect(first.locator('.ayah-i')).toHaveText(/.+/); // sr-only plain text exists
+  await expect(first.locator('.ayah-u')).toHaveAttribute('aria-hidden', 'true');
+  await expect(page.locator('.reader-head .meta')).toContainText('٢٨٦'); // Arabic-Indic, was 286
+});
+
+test('imlaei toggle swaps the visible span and persists', async ({ page }) => {
+  await page.goto('/surah/1/');
+  await page.getByRole('button', { name: 'إملائي' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
+});

@@ -26,6 +26,10 @@ const dict = {
     playerSeek: 'شريط التقدم',
     playerClose: 'إغلاق المشغل',
     playerError: 'تعذّر التشغيل',
+    readerViewMushaf: 'مصحفي',
+    readerViewImlaei: 'إملائي',
+    readerFontSmaller: 'تصغير الخط',
+    readerFontBigger: 'تكبير الخط',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -51,6 +55,10 @@ const dict = {
     playerSeek: 'Seek',
     playerClose: 'Close player',
     playerError: 'Playback error',
+    readerViewMushaf: 'Mushaf',
+    readerViewImlaei: 'Imlaei',
+    readerFontSmaller: 'Smaller text',
+    readerFontBigger: 'Larger text',
   },
 } as const;
 

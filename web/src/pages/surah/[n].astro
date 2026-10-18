@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import AyahBlock from '../../components/AyahBlock.astro';
 import { surahNeighbors } from '../../lib/surah-neighbors';
 import { t, defaultLocale } from '../../lib/strings';
+import { toArabicDigits } from '../../lib/arabic-digits';
 import surahs from '../../data/surahs.json';
 
 export function getStaticPaths() {
@@ -18,17 +19,80 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
 ---
 <BaseLayout title={title} preloadFont>
+  <script is:inline>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('qy:reader') || 'null') || {};
+        var step = s.fontStep === 1 || s.fontStep === 2 || s.fontStep === 3 ? s.fontStep : 0;
+        var view = s.view === 'imlaei' ? 'imlaei' : 'mushaf';
+        document.documentElement.setAttribute('data-reading-view', view);
+        document.documentElement.style.setProperty('--reader-step', String(step));
+      } catch (e) { /* defaults */ }
+    })();
+  </script>
   <article class="reader">
     <header class="reader-head">
       <h1>سورة {surah.nameAr}</h1>
-      <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {surah.ayahCount} آية</p>
+      <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {toArabicDigits(surah.ayahCount)} آية</p>
+      <div class="reader-controls">
+        <button type="button" class="rc-btn" data-qy-view="mushaf" aria-pressed="true">{t(locale, 'readerViewMushaf')}</button>
+        <button type="button" class="rc-btn" data-qy-view="imlaei" aria-pressed="false">{t(locale, 'readerViewImlaei')}</button>
+        <button type="button" class="rc-btn" data-qy-step="-1" aria-label={t(locale, 'readerFontSmaller')}>−</button>
+        <button type="button" class="rc-btn" data-qy-step="1" aria-label={t(locale, 'readerFontBigger')}>＋</button>
+      </div>
     </header>
     <div class="ayahs">
-      {data.ayahs.map((a) => <AyahBlock n={a.n} text={a.u} sajda={a.sajda} />)}
+      {data.ayahs.map((a) => <AyahBlock n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}
     </div>
     <nav class="reader-nav">
       {prev !== null ? <a href={`/surah/${prev}`}>{t(locale, 'readerPrev')}</a> : <a href="/quran">{t(locale, 'backToIndex')}</a>}
       {next !== null && <a href={`/surah/${next}`}>{t(locale, 'readerNext')}</a>}
     </nav>
   </article>
+  <script>
+    import {
+      readReaderSettings,
+      writeReaderSettings,
+      type FontStep,
+      type ReaderSettings,
+    } from '../../lib/reader-settings';
+
+    function clampStep(n: number): FontStep {
+      return (n < 0 ? 0 : n > 3 ? 3 : n) as FontStep;
+    }
+
+    function init() {
+      const box = document.querySelector<HTMLElement>('.reader-controls');
+      if (!box || box.dataset.qyReady) return;
+      box.dataset.qyReady = '1';
+      let settings: ReaderSettings = readReaderSettings();
+
+      const render = () => {
+        document.documentElement.setAttribute('data-reading-view', settings.view);
+        document.documentElement.style.setProperty('--reader-step', String(settings.fontStep));
+        box.querySelectorAll<HTMLButtonElement>('[data-qy-view]').forEach((b) => {
+          b.setAttribute('aria-pressed', String(b.dataset.qyView === settings.view));
+        });
+      };
+
+      box.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement | null)?.closest('button');
+        if (!btn) return;
+        const view = btn.dataset.qyView;
+        if (view === 'mushaf' || view === 'imlaei') {
+          settings = writeReaderSettings({ view });
+        } else {
+          const delta = Number(btn.dataset.qyStep);
+          if (Number.isFinite(delta) && delta !== 0) {
+            settings = writeReaderSettings({ fontStep: clampStep(settings.fontStep + delta) });
+          }
+        }
+        render();
+      });
+
+      render();
+    }
+    init();
+    document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  </script>
 </BaseLayout>

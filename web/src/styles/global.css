@@ -8,6 +8,7 @@ body {
   transition: color 0.45s ease;
 }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .site-header, .site-footer {
   display: flex;
   align-items: center;
@@ -27,11 +28,19 @@ body {
 .reader-head { text-align: center; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
 .reader-head h1 { margin: 0 0 6px; font-size: 1.7rem; }
 .reader-head .meta { margin: 0; color: var(--muted-strong); font-size: .9rem; }
+.reader-controls { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; }
+.rc-btn {
+  min-width: 40px; padding: 7px 14px; border-radius: 999px;
+  border: 1px solid var(--hairline); background: transparent; color: var(--ink);
+  font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer;
+}
+.rc-btn[aria-pressed='true'] { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
+@media (pointer: coarse) { .rc-btn { min-height: 44px; } }
 .ayah { padding: 14px 2px; border-bottom: 1px solid var(--hairline); }
 .ayah-text {
   margin: 0;
   font-family: 'HafsSmart', 'me_quran', serif;
-  font-size: 21px; line-height: 2.15; color: var(--ink);
+  font-size: var(--ayah-size); line-height: 2.15; color: var(--ink);
 }
 .medal {
   display: inline-flex; align-items: center; justify-content: center;
@@ -42,6 +51,11 @@ body {
   vertical-align: middle; margin-inline-start: 6px;
 }
 .sajda { color: var(--gold-ink); margin-inline-start: 6px; }
+html[data-reading-view='imlaei'] .ayah-u { display: none; }
+html[data-reading-view='imlaei'] .ayah-i {
+  position: static; width: auto; height: auto; clip-path: none;
+  font-family: 'Cairo', sans-serif; font-size: calc(var(--ayah-size) * 0.8); line-height: 2.1;
+}
 .reader-nav { display: flex; justify-content: space-between; margin-top: 22px; }
 .reader-nav a { color: var(--accent); text-decoration: none; font-weight: 700; }
 .page-title { width: min(760px, calc(100% - 40px)); margin: 28px auto 6px; font-size: 1.35rem; }
