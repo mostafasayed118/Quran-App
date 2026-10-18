@@ -823,6 +823,7 @@ git commit -m "docs(web): p2 close-out — readme, spec status, ledger entry"
 - **Field-name parity:** all mp3quran parsing/sorting/trust rules mirror `lib/features/recitation/data/reciter_repository.dart` verbatim in intent; the pinned featured ids are copied from it — do not extend.
 - **Per-ayah audio remains deferred** (needs an ayah-level source decision — P5 candidate). The per-ayah «استمع» opens the surah player (spec §3.6).
 - **Resume/last-read:** Task 5 stores `qy:last-read {s, a}` on reader open; the visible «متابعة القراءة» strip ships with the P3 landing — storage is written now so P3 reads it without migration.
+- **Superseded by `cebc8fc`:** `qy:last-read` storage deferred to P3 with its consumer (spec §7).
 - **EN locale:** routes arrive P3; all new strings ship AR+EN pairs now (parity test enforces).
 - **ClientRouter scope:** added to all pages (needed for the persistent player); reader inline JS stays ≤ budget; the `/quran` React island is unaffected.
 - **e2e fixtures are the network contract:** every external host is routed; no live calls in CI.
