@@ -18,3 +18,15 @@ test('theme toggle stays bound after ClientRouter navigation', async ({ page }) 
   await page.locator('.theme-toggle').click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
 });
+
+test('theme choice survives ClientRouter navigation', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.theme-toggle').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
+  await page.locator('header a[href="/quran"]').click();
+  await page.waitForURL('**/quran**');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
+  await page.locator('.surah-list a[href="/surah/1"]').click();
+  await page.waitForURL('**/surah/1**');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
+});
