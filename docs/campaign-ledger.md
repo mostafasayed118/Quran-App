@@ -208,3 +208,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - Gates (re-run at close-out in `web/`): `check` 0 errors · unit **42/42** · e2e **4/4** (chromium) · build **116 pages** · dist **133 files** (< 2,000 cap). Docs truth-up in the same wave: README (dev/data/deploy), spec token table (`--gold-ink` day `#7E5C1D` AA margin + new `--muted-strong` row), plan snippets (ThemeToggle `className`, chrome links `--muted-strong`, tokens blocks).
 - Deploy preview: pending owner step — Cloudflare Pages: root `web`, build `npm ci && npm run build`, output `dist`, `NODE_VERSION=22`, production branch `main`. Push: deferred to owner GO.
 - State: main @ `72faa73` (+ this ledger commit), porcelain owner-debris only, **unpushed 28**. NO PUSH — window belongs to the owner.
+
+### WEB-P1 — push window (2026-10-18)
+- **Range:** `aa02f0e..fe91b0e` — 30 commits (17 web-program + 13 app-side waves F1/F2/recitation).
+- **Pre-flight:** remote static at `aa02f0e`; porcelain = owner debris + foreign WIP (untouched, uncommitted).
+- **Web gates (controller-run):** check 0/0/0 · unit 42/42 · e2e 4/4 · build 116 pages.
+- **Push:** `git push origin main`; ls-remote proof: remote tip == local HEAD `fe91b0e`.
+- **CI:** web-gates ✅ (23s); app ci ✅ (see run 39109674942).
+- **Cloudflare Pages:** production build auto-triggers on this push (project root `web`, output `dist`) — owner watching.
+- **State:** ledger commit follows (local-only).
