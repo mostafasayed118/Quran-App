@@ -129,27 +129,22 @@ class _TimesListState extends State<_TimesList> {
                 fontWeight: entry.isNext ? FontWeight.bold : null,
               ),
             ),
-            trailing: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  formatHm(entry.time),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: entry.isNext ? FontWeight.bold : null,
-                    color: entry.isNext ? colors.onPrimaryContainer : null,
-                  ),
-                ),
-                if (entry.isNext && state.remaining != null)
-                  Text(
+            subtitle: entry.isNext && state.remaining != null
+                ? Text(
                     loc.remaining(formatDurationHm(state.remaining!)),
                     style: TextStyle(
                       fontSize: 11,
                       color: colors.onPrimaryContainer,
                     ),
-                  ),
-              ],
+                  )
+                : null,
+            trailing: Text(
+              formatHm(entry.time),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: entry.isNext ? FontWeight.bold : null,
+                color: entry.isNext ? colors.onPrimaryContainer : null,
+              ),
             ),
           ),
         );
