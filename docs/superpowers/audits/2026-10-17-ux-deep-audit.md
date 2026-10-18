@@ -323,3 +323,12 @@ READ-ONLY COMPLETE — zero commits — awaiting PM triage.
 - 404/unknown-route handling: confirmed ABSENT (no errorBuilder/onException in router.dart) — blank/untranslated default error ships today.
 - Gold-as-text contrast: gold is the scheme secondary (app_theme.dart:33); fix = a compliant TEXT tone per-mode (v1 ruling: light mode gets a darkened gold text tone at >=4.5:1; dark mode keeps the existing lighter gold if >=4.5:1 there — ratios COMPUTED and printed in the report, pure-Dart WCAG helper + test).
 - OUT of Wave C (unchanged): RTL boilerplate (device-gated), global mini player (shell decision W7c), zakat (refuted), mushaf (closed).
+
+---
+
+## PM CORRECTION (2026-10-18) — zakat P1: the TRIAGE refutation is OVERTURNED; the original finding stands
+- **Corrected item:** "REFUTED: P1 zakat first-run due" (TRIAGE above). **It was wrong.** The audit's P1 is CONFIRMED REAL and has been ruled to an immediate fix wave (F11b).
+- **Source verification (PM, re-derived personally):** `zakat_calculator.dart:89` is `due = zakatable > 0 && zakatable >= nisabValue` — there is NO `nisabValue > 0` gate; `zakat_state.dart:10` defaults `nisabBySilver: true`; on first run the active price field is blank ⇒ `parseDecimal('') = 0` ⇒ `nisabValue = 612.36 × 0 = 0` ⇒ for any positive cash the `>=` is trivially satisfied ⇒ `due = true` with a computed amount. The F11 executor's scratch probe matches exactly: cash 1000 → `zakatable=1000.0 nisab=0.0 due=true amount=25.0`.
+- **Why the original triage erred:** it read the state's `due:false` placeholder default as the live first-run verdict; the live verdict is recomputed by `ZakatCubit._recompute()` on every keystroke and flips to `due:true`.
+- **Frozen-test impact (PM-checked):** no frozen test pins the bug; the ruled F11b fix (gate `due` on `nisabValue > 0` + a neutral «أدخل سعر الذهب/الفضة لحساب النصاب» prompt when `zakatable > 0 && nisabValue <= 0`) keeps `zakat_calculator_test.dart` and `zakat_screen_test.dart` byte-green (their scenarios always supply a non-zero price before expecting «الزكاة الواجبة», and the fresh all-blank state keeps «لا زكاة عليك»).
+- **Lesson (extends the TRIAGE lesson):** a guard can be quoted verbatim and still be misjudged — verify the guard's BEHAVIOR on the exact scenario, not just its presence.
