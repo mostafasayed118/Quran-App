@@ -31,6 +31,8 @@ Non-negotiables (inherited from the app's charter): **free forever — no ads, n
 | W9 | Quality gates | `astro check` + `vitest` + `npm run build` green before every commit; small Playwright smoke; performance budget (§5). |
 | W10 | Deployment | Cloudflare Pages connected to GitHub — preview per branch, production from `main`. GitHub Actions runs the gates (workflow path-filtered to `web/**`). |
 
+Note (2026-10-18, P2 close-out): the W5 Tailwind v4 layer remains **wired-but-unused** through P2 — all styling is the token CSS layer (§3.9). Adopt-or-drop is a recorded owner decision for a later wave; this spec stands as-is either way.
+
 ## 3. Architecture
 
 ### 3.1 Stack detail
@@ -91,6 +93,7 @@ Fallback hardening: the reciter list is snapshotted at build time (`web/src/data
 - Index built by the generator: per ayah `{s, a, t}` where `t` = normalized text — tashkeel/tatweel removed, alef/hamza forms unified (أإآٱ→ا), ى→ي; ة kept as-is with a ه-variant indexed as alias (users often type ه).
 - Lazy-loaded (`/search-index.json`, ~gz 300–400KB expected) on first search; cached in `localStorage`/Cache Storage.
 - Matching: normalized substring + word-prefix match, ranked by (exact > prefix > contains), max 50 results, result → `/surah/{s}#ayah-{a}`.
+- **Refinement (as-built, 2026-10-18, P2 — supersedes the build-time-normalized wording above):** the generator emits **raw `i` records** (`{s, a, t}`, `t` = raw imlaei text) in `search-index.json`; normalization lives **once in TS** (`normalizeArabic`, `web/src/lib/arabic.ts`) and is applied **client-side at load**. A second, **alef-fold tolerant tier** (`foldArabic` — bare alefs dropped, `web/src/lib/search.ts`) additionally matches rasm spellings like «السموات» vs the typist «السماوات»; tolerant hits carry a rank offset so **strict hits always rank first**.
 
 ### 3.6 Audio (v1 = per-surah, parity with app)
 
@@ -127,6 +130,7 @@ Fallback hardening: the reciter list is snapshotted at build time (`web/src/data
 | `--gold-line` | `#C9A96A` | `rgba(216,179,106,.6)` |
 | `--gold-ink` (medal numerals) | `#7E5C1D` (AA margin — enforced by web/tests/unit/contrast.test.ts) | `#D8B36A` |
 | `--surface` (ring gap) | `#F2ECDD` | `#012A27` |
+| `--player-bg` (added during P2 — mini-player scrim; a tokens.css-only value, enforced by the token rule) | `rgba(242,236,221,.92)` | `rgba(1,42,39,.92)` |
 
 - Origin: night green `#012A27` + cream `#F0E0C6` sampled **from the real logo file** (`Dark Green Quran Logo.png`, 1254×1254). Day family carried from the app tokens (beige paper).
 - Theme switch: `data-theme` attribute + CSS vars; preference in `localStorage`; inline no-flash script; defaults to `prefers-color-scheme`.
@@ -184,7 +188,7 @@ Note: the approved mockup's nav showed «المكتبة» and «تدبّر» —
 | Phase | Scope | Exit gate |
 |---|---|---|
 | **P1 Foundation** | `web/` scaffold (Astro+React+TW4+TS), token layer + fonts + logo assets, data generator + committed data, `/surah/[n]` static reader (text only, AR), `/quran` index, theme switch, first deploy to `*.pages.dev` | live preview URL + gates green + Playwright smoke v1 |
-| **P2 Experience** | audio player + reciters page, translations/tafsir panel, search, settings persistence, bookmarks/resume, copy/share builders, per-ayah actions | gates + perf budget + smoke v2 |
+| **P2 Experience** ✅ *(implemented 2026-10-18 — web commits `5cc3149..3a58ea7`, 14 commits)* | audio player + reciters page, translations/tafsir panel, search, settings persistence, bookmarks/resume, copy/share builders, per-ayah actions | gates + perf budget + smoke v2 — met |
 | **P3 Official site** | full landing, about, privacy (from PRIVACY.md), EN locale complete, SEO (sitemap/hreflang/OG basics), download CTAs | gates + Lighthouse ≥90 mobile + sitemap submitted |
 | **P4 App links** | assetlinks.json + Flutter intent-filter/deep-link/share (+ any app dependency = owner approval), verification on real device | verified open-in-app on device; docs updated |
 | **P5 Later (not v1)** | PWA offline reading, mushaf page mode (line data available in DB), per-ayah pages for SEO, per-ayah audio, OG images per surah, analytics opt-in, hadith library | new spec/plan per item |
