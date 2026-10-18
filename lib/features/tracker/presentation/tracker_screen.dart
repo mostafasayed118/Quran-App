@@ -10,6 +10,16 @@ import '../data/prayer_log_repository.dart';
 import 'tracker_cubit.dart';
 import 'tracker_state.dart';
 
+const TextStyle _todayTitleStyle = TextStyle(
+  fontSize: 16,
+  fontWeight: FontWeight.bold,
+);
+
+const TextStyle _streakLabelStyle = TextStyle(fontSize: 12);
+
+TextStyle _mutedAt(ColorScheme colors, double fontSize) =>
+    TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
+
 class TrackerScreen extends StatelessWidget {
   const TrackerScreen({super.key});
 
@@ -34,18 +44,11 @@ class TrackerScreen extends StatelessWidget {
                         Text(
                           '${today.day.year}/${today.day.month}/${today.day.day}'
                               .toArabicIndicDigits,
-                          style: TextStyle(
-                            fontSize: 13,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
+                          style: _mutedAt(Theme.of(context).colorScheme, 13),
                         ),
                         Text(
                           loc.trackerToday,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: _todayTitleStyle,
                         ),
                       ],
                     ),
@@ -76,10 +79,7 @@ class TrackerScreen extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   loc.last7Days,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                  style: _mutedAt(Theme.of(context).colorScheme, 12),
                 ),
                 const SizedBox(height: 6),
                 Row(
@@ -113,7 +113,7 @@ class TrackerScreen extends StatelessWidget {
                       ),
                       label: Text(
                         loc.streak(streakDays.toArabicIndic),
-                        style: const TextStyle(fontSize: 12),
+                        style: _streakLabelStyle,
                       ),
                     ),
                   ),
