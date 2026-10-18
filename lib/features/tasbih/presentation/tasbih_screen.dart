@@ -89,8 +89,12 @@ class TasbihScreen extends StatelessWidget {
                     ChoiceChip(
                       label: Text(target.toArabicIndic),
                       selected: ready.target == target,
-                      onSelected: (_) =>
-                          context.read<TasbihCubit>().selectTarget(target),
+                      onSelected: (_) {
+                        context.read<TasbihCubit>().selectTarget(target);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(loc.tasbihTargetSet)),
+                        );
+                      },
                     ),
                 ],
               ),

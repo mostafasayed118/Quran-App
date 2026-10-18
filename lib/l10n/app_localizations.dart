@@ -464,6 +464,12 @@ abstract class AppLocalizations {
   /// **'الهدف'**
   String get tasbihTarget;
 
+  /// No description provided for @tasbihTargetSet.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم ضبط الهدف — بدأ العد من جديد'**
+  String get tasbihTargetSet;
+
   /// No description provided for @duasTab.
   ///
   /// In ar, this message translates to:

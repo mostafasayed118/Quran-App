@@ -214,6 +214,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tasbihTarget => 'الهدف';
 
   @override
+  String get tasbihTargetSet => 'تم ضبط الهدف — بدأ العد من جديد';
+
+  @override
   String get duasTab => 'الأدعية';
 
   @override

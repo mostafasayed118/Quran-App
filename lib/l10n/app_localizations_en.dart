@@ -214,6 +214,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tasbihTarget => 'Target';
 
   @override
+  String get tasbihTargetSet => 'Target set — count restarted';
+
+  @override
   String get duasTab => 'Duas';
 
   @override
