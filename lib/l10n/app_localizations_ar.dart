@@ -304,6 +304,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nisabLabel => 'العتبة';
 
   @override
+  String get zakatEnterPrice => 'أدخل سعر الذهب/الفضة لحساب النصاب';
+
+  @override
   String hijriDate(String month, String year) {
     return 'الشهر $month سنة $year';
   }

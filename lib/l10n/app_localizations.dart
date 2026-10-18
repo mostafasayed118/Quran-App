@@ -626,6 +626,12 @@ abstract class AppLocalizations {
   /// **'العتبة'**
   String get nisabLabel;
 
+  /// No description provided for @zakatEnterPrice.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل سعر الذهب/الفضة لحساب النصاب'**
+  String get zakatEnterPrice;
+
   /// No description provided for @hijriDate.
   ///
   /// In ar, this message translates to:

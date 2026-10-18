@@ -304,6 +304,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get nisabLabel => 'Threshold';
 
   @override
+  String get zakatEnterPrice =>
+      'Enter the gold/silver price to compute the nisab';
+
+  @override
   String hijriDate(String month, String year) {
     return '$month $year AH';
   }

@@ -38,6 +38,13 @@ class ZakatScreen extends StatelessWidget {
             ZakatReady() => state,
           };
           final colors = Theme.of(context).colorScheme;
+          final needsNisabPrice =
+              ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
+          final verdictText = needsNisabPrice
+              ? loc.zakatEnterPrice
+              : ready.result.due
+                  ? loc.zakatDue
+                  : loc.zakatNotDue;
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
@@ -91,7 +98,7 @@ class ZakatScreen extends StatelessWidget {
                       _line(context, loc.nisabLabel, ready.result.nisabValue),
                       const SizedBox(height: 8),
                       Text(
-                        ready.result.due ? loc.zakatDue : loc.zakatNotDue,
+                        verdictText,
                         textAlign: TextAlign.right,
                         style: _verdictStyle.copyWith(
                           color: ready.result.due
@@ -99,7 +106,7 @@ class ZakatScreen extends StatelessWidget {
                               : colors.onSurfaceVariant,
                         ),
                       ),
-                      if (ready.result.due)
+                      if (!needsNisabPrice && ready.result.due)
                         Text(
                           ready.result.amount
                               .toStringAsFixed(2)
