@@ -1,3 +1,5 @@
+import '../../../core/utils/cached_loader.dart';
+
 class AzkarItem {
   const AzkarItem({
     required this.text,
@@ -51,13 +53,11 @@ class AzkarRepository {
 
   final Future<Map<String, dynamic>> Function() _loader;
 
-  Future<List<AzkarCollection>>? _cache;
+  late final CachedLoader<List<AzkarCollection>> _collections =
+      CachedLoader(_load);
 
   Future<List<AzkarCollection>> collections() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _collections.load();
   }
 
   Future<List<AzkarCollection>> _load() async {

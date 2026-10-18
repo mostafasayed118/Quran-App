@@ -1,3 +1,5 @@
+import '../../../core/utils/cached_loader.dart';
+
 class DuaEntry {
   const DuaEntry({
     required this.id,
@@ -32,13 +34,10 @@ class DuaRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  Future<List<DuaEntry>>? _cache;
+  late final CachedLoader<List<DuaEntry>> _entries = CachedLoader(_load);
 
   Future<List<DuaEntry>> entries() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _entries.load();
   }
 
   Future<List<DuaEntry>> _load() async {

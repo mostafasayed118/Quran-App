@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/cached_loader.dart';
 import 'prayer_time_service.dart';
 
 const selectedCityKey = 'selected_city';
@@ -50,13 +51,10 @@ class CityRepository {
   final AppDatabase _db;
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  Future<List<City>>? _cache;
+  late final CachedLoader<List<City>> _cities = CachedLoader(_load);
 
   Future<List<City>> _all() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _cities.load();
   }
 
   Future<List<City>> _load() async {

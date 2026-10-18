@@ -1,3 +1,5 @@
+import '../../../core/utils/cached_loader.dart';
+
 class AsmaName {
   const AsmaName({
     required this.n,
@@ -29,13 +31,10 @@ class AsmaRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  Future<List<AsmaName>>? _cache;
+  late final CachedLoader<List<AsmaName>> _names = CachedLoader(_load);
 
   Future<List<AsmaName>> names() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _names.load();
   }
 
   Future<List<AsmaName>> _load() async {

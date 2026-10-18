@@ -1,3 +1,5 @@
+import '../../../core/utils/cached_loader.dart';
+
 /// Library content-pack catalog (bundled, curated, version-pinned).
 ///
 /// `CatalogSource` is the Supabase thin-layer seam locked in the W6 plan:
@@ -172,14 +174,11 @@ class BundledCatalogSource extends CatalogSource {
 
   final Future<List<Map<String, dynamic>>> Function() loader;
 
-  Future<List<LibraryPackInfo>>? _cache;
+  late final CachedLoader<List<LibraryPackInfo>> _packs = CachedLoader(_load);
 
   @override
   Future<List<LibraryPackInfo>> all() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _packs.load();
   }
 
   Future<List<LibraryPackInfo>> _load() async {

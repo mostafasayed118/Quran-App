@@ -1,3 +1,5 @@
+import '../../../core/utils/cached_loader.dart';
+
 class RuqyahEntry {
   const RuqyahEntry({
     required this.id,
@@ -42,13 +44,10 @@ class RuqyahRepository {
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
-  Future<List<RuqyahEntry>>? _cache;
+  late final CachedLoader<List<RuqyahEntry>> _entries = CachedLoader(_load);
 
   Future<List<RuqyahEntry>> entries() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _entries.load();
   }
 
   Future<List<RuqyahEntry>> _load() async {
