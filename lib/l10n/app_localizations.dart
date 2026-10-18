@@ -859,6 +859,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح'**
   String get playbackBackgroundFailed;
+
+  /// No description provided for @currentCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدينة الحالية'**
+  String get currentCity;
 }
 
 class _AppLocalizationsDelegate

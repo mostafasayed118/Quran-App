@@ -18,11 +18,22 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   final CityRepository _cityRepo;
   final LocationService? _location;
 
+  String? _selectedCityId;
+  bool _selectedLoaded = false;
+
   Future<void> search(String query) async {
     try {
       final results = await _cityRepo.search(query);
+      if (!_selectedLoaded) {
+        _selectedCityId = (await _cityRepo.selectedCity())?.id;
+        _selectedLoaded = true;
+      }
       if (isClosed) return;
-      emit(CityPickerState.ready(query: query, results: results));
+      emit(CityPickerState.ready(
+        query: query,
+        results: results,
+        selectedCityId: _selectedCityId,
+      ));
     } on Object catch (error, stackTrace) {
       dev.log('city search failed',
           name: 'quran_yahdi/city_picker',
@@ -33,7 +44,11 @@ class CityPickerCubit extends Cubit<CityPickerState> {
     }
   }
 
-  Future<void> persist(City city) => _cityRepo.select(city);
+  Future<void> persist(City city) async {
+    await _cityRepo.select(city);
+    _selectedCityId = city.id;
+    _selectedLoaded = true;
+  }
 
   /// Resolves the device position to the nearest bundled city, persists it and
   /// returns it — or null when unavailable (denied/disabled/offline), in which
@@ -72,6 +87,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
         query: state.query,
         results: state.results,
         locating: locating,
+        selectedCityId: state.selectedCityId,
       ));
     }
   }

@@ -428,4 +428,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get playbackBackgroundFailed =>
       'تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح';
+
+  @override
+  String get currentCity => 'المدينة الحالية';
 }

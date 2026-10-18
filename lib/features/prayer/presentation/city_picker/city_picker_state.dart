@@ -16,5 +16,6 @@ sealed class CityPickerState with _$CityPickerState {
     @Default('') String query,
     @Default(<City>[]) List<City> results,
     @Default(false) bool locating,
+    @Default(null) String? selectedCityId,
   }) = CityPickerReady;
 }

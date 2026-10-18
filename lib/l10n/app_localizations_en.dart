@@ -429,4 +429,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get playbackBackgroundFailed =>
       'Couldn\'t play the recitation — background audio is unavailable';
+
+  @override
+  String get currentCity => 'Current city';
 }

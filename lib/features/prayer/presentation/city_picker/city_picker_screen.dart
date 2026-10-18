@@ -33,7 +33,12 @@ class CityPickerScreen extends StatelessWidget {
                 CityPickerLoading() => const LoadingView(),
                 CityPickerFailed() =>
                   errorPane(loc, 'city picker load failed', 'city_picker'),
-                CityPickerReady(:final results, :final locating) => Column(
+                CityPickerReady(
+                  :final results,
+                  :final locating,
+                  :final selectedCityId,
+                ) =>
+                  Column(
                     children: [
                       ListTile(
                         leading: locating
@@ -57,10 +62,20 @@ class CityPickerScreen extends StatelessWidget {
                                 itemCount: results.length,
                                 itemBuilder: (context, i) {
                                   final city = results[i];
+                                  final isSelected = city.id == selectedCityId;
                                   return ListTile(
+                                    selected: isSelected,
                                     title: Text(city.nameAr),
                                     subtitle: Text(city.nameEn),
-                                    trailing: Text(city.id),
+                                    trailing: isSelected
+                                        ? Icon(
+                                            Icons.check_circle,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
+                                            semanticLabel: loc.currentCity,
+                                          )
+                                        : null,
                                     onTap: () async {
                                       await context
                                           .read<CityPickerCubit>()

@@ -147,7 +147,9 @@ extension CityPickerStatePatterns on CityPickerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(String query, List<City> results, bool locating)? ready,
+    TResult Function(String query, List<City> results, bool locating,
+            String? selectedCityId)?
+        ready,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -157,7 +159,8 @@ extension CityPickerStatePatterns on CityPickerState {
       case CityPickerFailed() when failed != null:
         return failed();
       case CityPickerReady() when ready != null:
-        return ready(_that.query, _that.results, _that.locating);
+        return ready(
+            _that.query, _that.results, _that.locating, _that.selectedCityId);
       case _:
         return orElse();
     }
@@ -180,7 +183,8 @@ extension CityPickerStatePatterns on CityPickerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(String query, List<City> results, bool locating)
+    required TResult Function(String query, List<City> results, bool locating,
+            String? selectedCityId)
         ready,
   }) {
     final _that = this;
@@ -190,7 +194,8 @@ extension CityPickerStatePatterns on CityPickerState {
       case CityPickerFailed():
         return failed();
       case CityPickerReady():
-        return ready(_that.query, _that.results, _that.locating);
+        return ready(
+            _that.query, _that.results, _that.locating, _that.selectedCityId);
     }
   }
 
@@ -210,7 +215,9 @@ extension CityPickerStatePatterns on CityPickerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(String query, List<City> results, bool locating)? ready,
+    TResult? Function(String query, List<City> results, bool locating,
+            String? selectedCityId)?
+        ready,
   }) {
     final _that = this;
     switch (_that) {
@@ -219,7 +226,8 @@ extension CityPickerStatePatterns on CityPickerState {
       case CityPickerFailed() when failed != null:
         return failed();
       case CityPickerReady() when ready != null:
-        return ready(_that.query, _that.results, _that.locating);
+        return ready(
+            _that.query, _that.results, _that.locating, _that.selectedCityId);
       case _:
         return null;
     }
@@ -272,7 +280,8 @@ class CityPickerReady implements CityPickerState {
   const CityPickerReady(
       {this.query = '',
       List<City> results = const <City>[],
-      this.locating = false})
+      this.locating = false,
+      this.selectedCityId = null})
       : _results = results;
 
   @JsonKey()
@@ -287,6 +296,8 @@ class CityPickerReady implements CityPickerState {
 
   @JsonKey()
   final bool locating;
+  @JsonKey()
+  final String? selectedCityId;
 
   /// Create a copy of CityPickerState
   /// with the given fields replaced by the non-null parameter values.
@@ -303,18 +314,24 @@ class CityPickerReady implements CityPickerState {
             (identical(other.query, query) || other.query == query) &&
             const DeepCollectionEquality().equals(other.results, _results) &&
             (identical(other.locating, locating) ||
-                other.locating == locating));
+                other.locating == locating) &&
+            (identical(other.selectedCityId, selectedCityId) ||
+                other.selectedCityId == selectedCityId));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, query,
-        const DeepCollectionEquality().hash(_results), locating);
+    return Object.hash(
+        runtimeType,
+        query,
+        const DeepCollectionEquality().hash(_results),
+        locating,
+        selectedCityId);
   }
 
   @override
   String toString() {
-    return 'CityPickerState.ready(query: $query, results: $results, locating: $locating)';
+    return 'CityPickerState.ready(query: $query, results: $results, locating: $locating, selectedCityId: $selectedCityId)';
   }
 }
 
@@ -325,7 +342,11 @@ abstract mixin class $CityPickerReadyCopyWith<$Res>
           CityPickerReady value, $Res Function(CityPickerReady) _then) =
       _$CityPickerReadyCopyWithImpl;
   @useResult
-  $Res call({String query, List<City> results, bool locating});
+  $Res call(
+      {String query,
+      List<City> results,
+      bool locating,
+      String? selectedCityId});
 }
 
 /// @nodoc
@@ -343,6 +364,7 @@ class _$CityPickerReadyCopyWithImpl<$Res>
     Object? query = null,
     Object? results = null,
     Object? locating = null,
+    Object? selectedCityId = freezed,
   }) {
     return _then(CityPickerReady(
       query: null == query
@@ -357,6 +379,10 @@ class _$CityPickerReadyCopyWithImpl<$Res>
           ? _self.locating
           : locating // ignore: cast_nullable_to_non_nullable
               as bool,
+      selectedCityId: freezed == selectedCityId
+          ? _self.selectedCityId
+          : selectedCityId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
