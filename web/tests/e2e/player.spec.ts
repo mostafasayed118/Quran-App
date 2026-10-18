@@ -66,6 +66,34 @@ test('player: audio error shows the localized message and toggle retries', async
   await expect(bar.locator('[data-qy="time"]')).not.toHaveText('تعذّر التشغيل');
 });
 
+test('player: keyboard-close returns focus to the reader play control', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/surah/1/');
+  await page.locator('[data-qy="reader-play"]').click();
+  const bar = page.locator('[data-qy="bar"]');
+  await expect(bar).toBeVisible();
+  await bar.locator('[data-qy="close"]').focus();
+  await page.keyboard.press('Enter');
+  await expect(bar).toBeHidden();
+  await expect(page.locator('body')).not.toBeFocused();
+  await expect(page.locator('[data-qy="reader-play"]')).toBeFocused();
+});
+
+test('player: close falls back to #main when there is no reader play control', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/reciters/');
+  await page.locator('[data-reciter-play]').first().click();
+  const bar = page.locator('[data-qy="bar"]');
+  await expect(bar).toBeVisible();
+  await bar.locator('[data-qy="close"]').focus();
+  await page.keyboard.press('Enter');
+  await expect(bar).toBeHidden();
+  await expect(page.locator('body')).not.toBeFocused();
+  await expect(page.locator('main#main')).toBeFocused();
+});
+
 test('player: seek slider is keyboard operable', async ({ page }) => {
   const wav = fs.readFileSync('tests/fixtures/silent.wav');
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));

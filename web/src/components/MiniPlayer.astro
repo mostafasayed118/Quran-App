@@ -74,7 +74,16 @@ const { locale = 'ar' } = Astro.props;
       ke.preventDefault();
       player.seekRatio(st.currentTime / st.duration + (ke.key === 'ArrowRight' ? 0.05 : -0.05));
     });
-    $('close').addEventListener('click', () => { dismissed = true; setVisible(false); });
+    $('close').addEventListener('click', () => {
+      dismissed = true;
+      setVisible(false);
+      // Never drop keyboard/AT focus to <body> when the bar hides: hand it to the reader's
+      // play control, or the main landmark (#main carries tabindex="-1").
+      const target =
+        document.querySelector<HTMLElement>('[data-qy="reader-play"]') ??
+        document.getElementById('main');
+      target?.focus();
+    });
     document.addEventListener('qy:play', (e) => {
       const { row, surah } = (e as CustomEvent<{ row: MoshafRow; surah: number }>).detail;
       dismissed = false;
