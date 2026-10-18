@@ -71,3 +71,15 @@ test('landing resume card survives a ClientRouter round-trip', async ({ page }) 
   await page.waitForURL((url) => url.pathname === '/');
   await expect(page.locator('[data-qy="resume"]')).toHaveCount(1);
 });
+
+test('landing CTA section links GitHub Releases live and shows the Play badge as coming-soon', async ({ page }) => {
+  await page.goto('/');
+  const github = page.locator('.cta a.cta-github');
+  await expect(github).toBeVisible();
+  await expect(github).toHaveAttribute('href', 'https://github.com/mostafasayed118/Quran-App/releases/latest');
+  const play = page.locator('.cta span.cta-play');
+  await expect(play).toHaveCount(1);
+  await expect(play).toHaveAttribute('aria-disabled', 'true');
+  await expect(play).toHaveText('قريبًا على Google Play');
+  await expect(page.locator('.cta a.cta-play, .cta button.cta-play')).toHaveCount(0);
+});

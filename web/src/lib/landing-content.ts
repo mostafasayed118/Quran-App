@@ -30,6 +30,7 @@ export interface LandingCopy {
   cta: { title: string; lead: string; githubLabel: string; playLabel: string; version: string };
 }
 
+// Store URL swap place: wire playLabel to the Google Play listing URL once published ([OWNER] publish step).
 export const GITHUB_RELEASES_URL = 'https://github.com/mostafasayed118/Quran-App/releases/latest';
 
 export const LANDING: { ar: LandingCopy; en: LandingCopy } = {

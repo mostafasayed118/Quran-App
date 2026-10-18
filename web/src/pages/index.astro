@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ResumeCard from '../components/ResumeCard.astro';
 import { t } from '../lib/strings';
-import { LANDING } from '../lib/landing-content';
+import { LANDING, GITHUB_RELEASES_URL } from '../lib/landing-content';
 
 const copy = LANDING.ar;
 ---
@@ -36,6 +36,15 @@ const copy = LANDING.ar;
     <ul class="promise-list">
       {copy.promise.map((p) => <li class="promise-item">{p}</li>)}
     </ul>
+  </section>
+
+  <section class="cta">
+    <h2 class="cta-title">{copy.cta.title}</h2>
+    <p class="cta-lead">{copy.cta.lead}</p>
+    <div class="cta-actions">
+      <a class="rc-btn cta-github" href={GITHUB_RELEASES_URL} rel="noopener">{copy.cta.githubLabel}</a>
+      <span class="cta-play" aria-disabled="true">{copy.cta.playLabel}</span>
+    </div>
   </section>
 </BaseLayout>
 <style is:global>
@@ -73,4 +82,17 @@ const copy = LANDING.ar;
     content: ''; position: absolute; inset-inline-start: 2px; top: .72em;
     width: 7px; height: 7px; border-radius: 50%; background: var(--gold-line);
   }
+  .cta { max-width: 760px; margin: 0 auto 60px; padding: 22px 20px; text-align: center; }
+  .cta-title { margin: 0 0 6px; font-size: 1.25rem; color: var(--ink); }
+  .cta-lead { margin: 0 0 18px; color: var(--muted-strong); }
+  .cta-actions { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .cta-github {
+    display: inline-flex; align-items: center; text-decoration: none;
+    background: var(--btn-bg); color: var(--btn-ink); border-color: transparent;
+  }
+  .cta-play {
+    display: inline-flex; align-items: center; padding: 7px 14px; border-radius: 999px;
+    border: 1px dashed var(--gold-line); color: var(--muted-strong); font-size: .85rem; font-weight: 700;
+  }
+  @media (pointer: coarse) { .cta-github { min-height: 44px; } }
 </style>
