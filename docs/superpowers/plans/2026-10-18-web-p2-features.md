@@ -546,7 +546,7 @@ with wave.open(r"web/tests/fixtures/silent.wav", "wb") as w:
 import { test, expect } from '@playwright/test';
 import reciters from '../fixtures/reciters-2.json'; // write this fixture: 2 reciters (featured 51 + one plain), trusted servers
 
-test('player: play from reciters page persists across navigation', async ({ page }) => {
+test('player: play from reciters page persists across SPA navigation', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
   await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
   await page.goto('/reciters/');
@@ -554,11 +554,14 @@ test('player: play from reciters page persists across navigation', async ({ page
   const bar = page.locator('[data-qy="bar"]');
   await expect(bar).toBeVisible();
   await expect(bar.locator('[data-qy="title"]')).not.toBeEmpty();
-  await page.goto('/surah/1/');
-  await expect(page.locator('[data-qy="bar"]')).toBeVisible();          // persisted
+  // Persistence is a CLIENT-ROUTER behavior: navigate via an in-app link, never page.goto (that reloads).
+  await page.locator('header a[href="/quran"]').click();
+  await page.waitForURL('**/quran/**');
+  await expect(page.locator('[data-qy="bar"]')).toBeVisible();          // persisted region survived
   await expect(page.locator('[data-qy="toggle"]')).toHaveText('⏸');     // still playing
 });
 ```
+NOTE for the implementer: also click a surah link from `/quran/` into `/surah/1/` and assert the bar persists there too (second SPA hop) before closing the test.
 Add `web/tests/fixtures/reciters-2.json` (2 reciters: id 51 featured + id 999, valid modern payload shape).
 
 - [ ] **Step 3: Run gates** — `npm run check && npm run test && npm run test:e2e && npm run build`; confirm reader page JS still ≤30KB gzip by eyeballing `dist/_astro/*.js` referenced by `dist/surah/2/index.html` (budget gate formalized in Task 9). NOTE: `/reciters` page is part of THIS task — the minimal list page with `[data-reciter-play]` buttons is created here (2 rows: featured name + play icon dispatching `qy:play` with surah 1) and fully built out in Task 8.
@@ -604,7 +607,7 @@ test('imlaei toggle swaps the visible span and persists', async ({ page }) => {
 - [ ] **Step 2: Implement**
   - `arabic.ts`: move the chain verbatim (`trim → lower → strip [\u064B-\u065F\u0670\u06D6-\u06ED\u0640] → [أإآٱ]→ا → ى→ي → ة→ه → digits`) as `normalizeArabic`; `surah-filter.ts` re-exports/imports it (its tests stay green, unchanged).
   - `reader-settings.ts` per interface.
-  - `AyahBlock.astro` new body (call-site update in `[n].astro` is REQUIRED in the same step: `{data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}`):
+  - `AyahBlock.astro` new body (call-site update in `[n].astro` is REQUIRED in the same step: `{data.ayahs.map((a) => <AyahBlock n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}` — Task 5 will ADD the `surah` prop when it adds the actions row):
 ```astro
 ---
 import { toArabicDigits } from '../lib/arabic-digits';
@@ -672,7 +675,16 @@ test('copy writes plain Arabic (not glyphs), share falls back to clipboard, book
   await page.reload();
   await expect(page.locator('[data-ayah-action="bookmark"]').nth(2)).toHaveAttribute('aria-pressed', 'true');
 });
-test('listen dispatches the player with the chosen reciter', ...)
+test('bookmark persists, listen dispatches the chosen reciter into the player', async ({ page }) => {
+  await page.route('**/mp3quran.net/**', (r) => r.fulfill({ json: reciters2 }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/surah/1/');
+  await page.locator('[data-qy="reciter-pick"]').selectOption({ index: 0 });
+  await page.locator('[data-ayah-action="listen"]').first().click();
+  const bar = page.locator('[data-qy="bar"]');
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('[data-qy="reciter"]')).not.toBeEmpty();
+});
 ```
 (Playwright headless without user activation may still allow clipboard with granted permissions; if `navigator.share` exists in the test browser, stub it: `await page.addInitScript(() => { Object.defineProperty(navigator, 'share', { value: undefined }); })` — documented in the spec file.)
 - [ ] **Step 4: Gates**; [ ] **Step 5: Commit**
