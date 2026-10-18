@@ -54,12 +54,17 @@ class TasbihScreen extends StatelessWidget {
                               : Icons.touch_app_outlined,
                           color: colors.onPrimaryContainer,
                         ),
-                        Text(
-                          ready.count.toArabicIndic,
-                          style: TextStyle(
-                            fontSize: 56,
-                            fontWeight: FontWeight.bold,
-                            color: colors.onPrimaryContainer,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              ready.count.toArabicIndic,
+                              style: TextStyle(
+                                fontSize: 56,
+                                fontWeight: FontWeight.bold,
+                                color: colors.onPrimaryContainer,
+                              ),
+                            ),
                           ),
                         ),
                         Text(
@@ -75,19 +80,17 @@ class TasbihScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   for (final target in TasbihCubit.targets)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: ChoiceChip(
-                        label: Text(target.toArabicIndic),
-                        selected: ready.target == target,
-                        onSelected: (_) => context
-                            .read<TasbihCubit>()
-                            .selectTarget(target),
-                      ),
+                    ChoiceChip(
+                      label: Text(target.toArabicIndic),
+                      selected: ready.target == target,
+                      onSelected: (_) =>
+                          context.read<TasbihCubit>().selectTarget(target),
                     ),
                 ],
               ),
