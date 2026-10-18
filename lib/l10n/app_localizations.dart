@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'أزل الحفظ'**
   String get bookmarkRemove;
 
+  /// No description provided for @shareAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة الآية'**
+  String get shareAyah;
+
   /// No description provided for @noBookmarks.
   ///
   /// In ar, this message translates to:

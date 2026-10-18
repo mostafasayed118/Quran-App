@@ -97,6 +97,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarkRemove => 'أزل الحفظ';
 
   @override
+  String get shareAyah => 'مشاركة الآية';
+
+  @override
   String get noBookmarks => 'لا توجد علامات مرجعية بعد';
 
   @override

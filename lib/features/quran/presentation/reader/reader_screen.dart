@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:share_plus/share_plus.dart';
 
+import '../../../../app/deep_links.dart';
 import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
@@ -227,6 +229,14 @@ class _AyahCard extends StatelessWidget {
                   color: bookmarked ? colors.secondary : null,
                 ),
                 onPressed: onToggle,
+              ),
+              IconButton(
+                tooltip: loc.shareAyah,
+                icon: const Icon(Icons.share_outlined),
+                onPressed: () => SharePlus.instance.share(ShareParams(
+                  text:
+                      '${ayah.textImlaei}\n\n${webSurahUrl(ayah.surahId, ayah.numberInSurah)}',
+                )),
               ),
             ],
           ),

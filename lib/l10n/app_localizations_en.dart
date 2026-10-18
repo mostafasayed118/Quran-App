@@ -97,6 +97,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkRemove => 'Remove bookmark';
 
   @override
+  String get shareAyah => 'Share verse';
+
+  @override
   String get noBookmarks => 'No bookmarks yet';
 
   @override
