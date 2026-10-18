@@ -23,16 +23,24 @@ const { locale = 'ar' } = Astro.props;
 
   function init() {
     const bar = document.querySelector('[data-qy="bar"]') as HTMLElement;
-    if (!bar || (bar as unknown as { __qyInit?: boolean }).__qyInit) return;
+    if (!bar) return;
+    if ((bar as unknown as { __qyInit?: boolean }).__qyInit) {
+      document.body.classList.toggle('has-player', !bar.hidden);
+      return;
+    }
     (bar as unknown as { __qyInit?: boolean }).__qyInit = true;
     const player = getPlayer();
     const $ = (sel: string) => bar.querySelector(`[data-qy="${sel}"]`) as HTMLElement;
     const fmt = (s: number) => (Number.isFinite(s) ? toArabicDigits(Math.floor(s / 60)) + ':' + toArabicDigits(String(Math.floor(s % 60)).padStart(2, '0')) : '');
+    const setVisible = (visible: boolean) => {
+      bar.hidden = !visible;
+      document.body.classList.toggle('has-player', visible);
+    };
 
     const render = () => {
       const st = player.state();
-      if (!st.row || st.surah === null) { bar.hidden = true; return; }
-      bar.hidden = false;
+      if (!st.row || st.surah === null) { setVisible(false); return; }
+      setVisible(true);
       $('title').textContent = st.row.reciterName;
       $('reciter').textContent = st.row.moshafName;
       $('time').textContent = st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
@@ -52,7 +60,7 @@ const { locale = 'ar' } = Astro.props;
       const rect = $('seek').getBoundingClientRect();
       player.seekRatio(((e as MouseEvent).clientX - rect.left) / rect.width);
     });
-    $('close').addEventListener('click', () => { bar.hidden = true; });
+    $('close').addEventListener('click', () => { setVisible(false); });
     document.addEventListener('qy:play', (e) => {
       const { row, surah } = (e as CustomEvent<{ row: MoshafRow; surah: number }>).detail;
       player.play(row, surah);
