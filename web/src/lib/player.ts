@@ -42,6 +42,7 @@ export function createPlayer(
 
   function load(row: MoshafRow, surah: number) {
     set({ row, surah, status: 'loading', currentTime: 0, duration: 0 });
+    // Written for a possible shell-restore; no reader yet — see campaign ledger.
     writeSetting('player:row', row.rowId);
     writeSetting('player:surah', surah);
     audio.src = urlFor(row, surah);
