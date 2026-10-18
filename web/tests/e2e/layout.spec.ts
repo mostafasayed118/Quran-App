@@ -1,5 +1,28 @@
 import { test, expect } from '@playwright/test';
 
+test.describe('404 locale from the /en prefix', () => {
+  test('/en/no-such flips to the EN block with EN links', async ({ page }) => {
+    await page.goto('/en/no-such');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+    const en = page.locator('[data-qy="not-found-en"]');
+    await expect(en).toBeVisible();
+    await expect(en.locator('h1')).toHaveText('Page not found');
+    await expect(en.locator('a[href="/en/quran/"]')).toBeVisible();
+    await expect(en.locator('a[href="/en/"]')).toBeVisible();
+    await expect(page.locator('[data-qy="not-found"]')).toBeHidden();
+  });
+
+  test('/no-such keeps the AR default', async ({ page }) => {
+    await page.goto('/no-such');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+    const ar = page.locator('[data-qy="not-found"]');
+    await expect(ar).toBeVisible();
+    await expect(ar.locator('h1')).toHaveText('الصفحة غير موجودة');
+    await expect(page.locator('[data-qy="not-found-en"]')).toBeHidden();
+  });
+});
+
 test.describe('no horizontal overflow at 360px', () => {
   test.use({ viewport: { width: 360, height: 800 } });
 
