@@ -30,5 +30,11 @@ Future<QueryExecutor> openAppDatabase() async {
     assetKey: dbAssetKey,
     loadAsset: rootBundle.load,
   );
-  return NativeDatabase.createInBackground(file);
+  return NativeDatabase.createInBackground(
+    file,
+    setup: (database) {
+      database.execute('PRAGMA journal_mode = WAL;');
+      database.execute('PRAGMA synchronous = NORMAL;');
+    },
+  );
 }
