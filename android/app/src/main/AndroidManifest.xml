@@ -44,6 +44,12 @@
                 <data android:pathPrefix="/quran" />
                 <data android:pathPrefix="/reciters" />
             </intent-filter>
+            <!-- P4-app fix: app_links + main.dart own link routing — opt out of
+                 Flutter's default deep-link handler (it pushed raw https URLs
+                 into go_router; warm links landed on the 404 page). -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false" />
         </activity>
         <service
             android:name="com.ryanheise.audioservice.AudioService"
