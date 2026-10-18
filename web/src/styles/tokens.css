@@ -12,6 +12,7 @@
   --gold-line: #C9A96A;
   --gold-ink: #7E5C1D;
   --surface: #F2ECDD;
+  --player-bg: rgba(242, 236, 221, 0.92);
 }
 [data-theme='night'] {
   --bg-solid: #012A27;
@@ -27,6 +28,7 @@
   --gold-line: rgba(216, 179, 106, 0.6);
   --gold-ink: #D8B36A;
   --surface: #012A27;
+  --player-bg: rgba(1, 42, 39, 0.92);
 }
 body::before {
   content: '';

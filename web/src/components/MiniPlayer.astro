@@ -6,13 +6,13 @@ const { locale = 'ar' } = Astro.props;
 <div class="mini-player" data-qy="bar" hidden>
   <audio id="qy-audio" preload="none"></audio>
   <button type="button" class="mp-btn" data-qy="prev" aria-label={t(locale, 'playerPrev')}>⏮</button>
-  <button type="button" class="mp-btn mp-main" data-qy="toggle" aria-label={t(locale, 'playerPlay')}>▶</button>
+  <button type="button" class="mp-btn mp-main" data-qy="toggle" data-play-label={t(locale, 'playerPlay')} data-pause-label={t(locale, 'playerPause')} aria-label={t(locale, 'playerPlay')}>▶</button>
   <button type="button" class="mp-btn" data-qy="next" aria-label={t(locale, 'playerNext')}>⏭</button>
   <div class="mp-meta">
     <span class="mp-title" data-qy="title"></span>
     <span class="mp-reciter" data-qy="reciter"></span>
   </div>
-  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" aria-label={t(locale, 'playerSeek')}><i></i></div></div>
+  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" aria-label={t(locale, 'playerSeek')} aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
   <span class="mp-time" data-qy="time"></span>
   <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>✕</button>
 </div>
@@ -36,9 +36,13 @@ const { locale = 'ar' } = Astro.props;
       $('title').textContent = st.row.reciterName;
       $('reciter').textContent = st.row.moshafName;
       $('time').textContent = st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
-      $('toggle').textContent = st.status === 'playing' ? '⏸' : '▶';
+      const playing = st.status === 'playing';
+      $('toggle').textContent = playing ? '⏸' : '▶';
+      $('toggle').setAttribute('aria-label', (playing ? $('toggle').dataset.pauseLabel : $('toggle').dataset.playLabel) ?? '');
+      const pct = st.duration ? Math.min(100, (st.currentTime / st.duration) * 100) : 0;
       const i = bar.querySelector('[data-qy="seek"] i') as HTMLElement;
-      i.style.width = st.duration ? `${Math.min(100, (st.currentTime / st.duration) * 100)}%` : '0%';
+      i.style.width = `${pct}%`;
+      $('seek').setAttribute('aria-valuenow', String(Math.round(pct)));
     };
     player.subscribe(render);
     $('toggle').addEventListener('click', () => player.toggle());
