@@ -10,6 +10,7 @@ import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
 import 'library_catalog.dart';
 import 'pack_reader.dart';
+import 'pack_store.dart';
 
 class PackFailure implements Exception {
   PackFailure(this.message);
@@ -61,37 +62,17 @@ class PackDownloader {
   late final PackReader _reader =
       PackReader(fileDecoder: _fileDecoder, packPath: packPath);
 
+  /// Filesystem side: safe pack-file resolution and the part-file lifecycle.
+  late final PackStore _store = PackStore(
+    rootResolver: _rootResolver,
+    folderName: libraryFolderName,
+  );
+
   static const libraryFolderName = 'library';
 
   /// Guard against a lying/compromised host streaming unbounded bytes:
   /// allow up to 2x the declared size plus 64 KiB slack.
   static int _sizeCap(int expectedBytes) => guardedByteCap(expectedBytes);
-
-  Future<Directory> _root() async {
-    final resolver = _rootResolver;
-    if (resolver != null) return resolver();
-    throw PackFailure(
-        'libraryRootResolver not configured — register library bindings first');
-  }
-
-  /// Pack ids compose filesystem paths (see `library_catalog.dart`); the
-  /// catalog already rejects unsafe ids, and this re-check keeps any future
-  /// caller (or a tampered registry row) from steering a write/delete.
-  static final RegExp _safePackId = RegExp(r'^[a-z0-9][a-z0-9-]{0,63}$');
-
-  Future<File> _packFile(String packId) async {
-    if (!_safePackId.hasMatch(packId)) {
-      throw PackFailure('unsafe pack id "$packId"');
-    }
-    final root = await _root();
-    final dir =
-        Directory('${root.path}${Platform.pathSeparator}$libraryFolderName');
-    // Sync create: the read path must stay FakeAsync-safe for widget tests
-    // (a real async mkdir never completes under the test zone) and is a
-    // no-op when the folder already exists.
-    dir.createSync(recursive: true);
-    return File('${dir.path}${Platform.pathSeparator}$packId.json');
-  }
 
   /// Installs a pack: download -> validate -> promote -> registry row.
   ///
@@ -102,8 +83,8 @@ class PackDownloader {
     LibraryPackInfo pack, {
     void Function(int received, int total)? onProgress,
   }) async {
-    final finalFile = await _packFile(pack.id);
-    final partFile = File('${finalFile.path}.part');
+    final finalFile = await _store.packFile(pack.id);
+    final partFile = _store.partFileFor(finalFile);
     final expectedBytes = (pack.approxSizeMb * 1024 * 1024).round();
     final throttle = ProgressThrottle();
     try {
@@ -207,8 +188,7 @@ class PackDownloader {
 
       final decoded = await _sniffIntegrity(pack.id, pack.kind, partFile);
 
-      final promoted = await partFile.rename(
-          partFile.path.substring(0, partFile.path.length - '.part'.length));
+      final promoted = await _store.promote(partFile);
       final sizeMb = await promoted.length() / (1024 * 1024);
       await _upsertRow(
         packId: pack.id,
@@ -222,9 +202,7 @@ class PackDownloader {
       return promoted;
     } on Object {
       _reader.invalidate(pack.id);
-      if (await partFile.exists()) {
-        await partFile.delete();
-      }
+      await _store.deleteIfExists(partFile);
       rethrow;
     }
   }
@@ -305,10 +283,8 @@ class PackDownloader {
     final row = await (_db.select(_db.installedPacks)
           ..where((p) => p.packId.equals(packId)))
         .getSingleOrNull();
-    final finalFile = await _packFile(packId);
-    if (await finalFile.exists()) {
-      await finalFile.delete();
-    }
+    final finalFile = await _store.packFile(packId);
+    await _store.deleteIfExists(finalFile);
     if (row != null) {
       await (_db.delete(_db.installedPacks)
             ..where((p) => p.packId.equals(packId)))
@@ -341,7 +317,7 @@ class PackDownloader {
           ..where((p) => p.packId.equals(packId)))
         .getSingleOrNull();
     if (row == null) return null;
-    final f = await _packFile(packId);
+    final f = await _store.packFile(packId);
     return f.existsSync() ? f.path : null;
   }
 
