@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mostafasayed.quranyahdi",
+      "sha256_cert_fingerprints": [
+        "D2:1E:83:DC:9F:B5:9F:6D:61:5A:A3:FF:A7:70:22:13:61:64:6A:8F:2B:70:50:FF:BE:24:DA:CC:1D:98:CB:DA",
+        "B9:95:23:DA:5E:E0:0C:8B:7D:0E:4F:6E:B8:3B:EB:ED:A2:97:3B:59:2D:9E:8C:E9:4A:0A:5B:34:66:F5:97:03"
+      ]
+    }
+  }
+]
