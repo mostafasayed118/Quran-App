@@ -73,3 +73,5 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 - [ ] `11-settings.png` — Settings (dark mode on in a second capture, if possible)
 
 Specs: phone (portrait) 16:9 or 9:16, no real personal data in frame, light theme preferred.
+
+> 2026-10-18 status: all 11 candidates captured from the real device (light theme — `11` dark) under `docs/store/screenshots/` at **1080×2160** (a 2:1 crop, Play-compliant). Final picks and ordering belong to the owner.
