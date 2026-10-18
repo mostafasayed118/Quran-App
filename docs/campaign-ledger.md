@@ -217,3 +217,8 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **CI:** web-gates ✅ (23s); app ci ✅ (see run 39109674942).
 - **Cloudflare Pages:** production build auto-triggers on this push (project root `web`, output `dist`) — owner watching.
 - **State:** ledger commit follows (local-only).
+
+### WEB-P1 — LIVE (2026-10-18)
+- Cloudflare Pages project `quranyahdi` deployed successfully (build on `fe91b0e`).
+- Live probes (controller, from local): `/` 200 + Arabic brand + rtl + theme script · `/quran/` 200 + 114 surah links (no-slash 308s to slash — CF Pages normalization, fragments preserved) · `/surah/2/` 200 + 286 ayah blocks + `#ayah-255` · `/surah/1/` 200 · fonts + logo 200.
+- URL: https://quranyahdi.pages.dev — production auto-deploys on future `main` pushes.
