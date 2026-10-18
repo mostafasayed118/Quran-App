@@ -45,9 +45,8 @@ class DuasScreen extends StatelessWidget {
                             ? DuasTab.ruqyah
                             : DuasTab.duas,
                       },
-                      onSelectionChanged: (selection) => context
-                          .read<DuasCubit>()
-                          .selectTab(selection.first),
+                      onSelectionChanged: (selection) =>
+                          context.read<DuasCubit>().selectTab(selection.first),
                     ),
                   ),
                 ],
@@ -78,11 +77,10 @@ class _DuasView extends StatelessWidget {
         final view = state as DuasInView;
         return Column(
           children: [
-            SizedBox(
-              height: 44,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
                 children: [
                   for (final category in view.categories)
                     Padding(
@@ -90,13 +88,12 @@ class _DuasView extends StatelessWidget {
                       child: ChoiceChip(
                         label: Text(category),
                         selected: view.selectedCategory == category,
-                        onSelected: (_) => context
-                            .read<DuasCubit>()
-                            .selectCategory(
-                              view.selectedCategory == category
-                                  ? null
-                                  : category,
-                            ),
+                        onSelected: (_) =>
+                            context.read<DuasCubit>().selectCategory(
+                                  view.selectedCategory == category
+                                      ? null
+                                      : category,
+                                ),
                       ),
                     ),
                 ],
@@ -141,8 +138,7 @@ class _RuqyahView extends StatelessWidget {
             final entry = view.entries[i];
             return DuaCard(
               text: entry.displayText,
-              fontFamily:
-                  entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
+              fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
               fontSize: entry.isQuran ? 18 : 17,
               height: entry.isQuran ? 2.0 : 1.8,
               citation: entry.citation,
