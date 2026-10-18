@@ -1,6 +1,6 @@
 # قرآن يَهدي — Quran Yahdi
 
-رفيق إسلامي متكامل يعمل **بلا إنترنت أولًا**: مصحف كامل (114 سورة، 6236 آية) مضمّن داخل التطبيق، تلاوات صوتية تُبث أو تُنزَّل، أذكار وأدعية، مواقيت الصلاة والقبلة — بلا حسابات ولا إعلانات ولا تتبع. عربي أولًا مع دعم الإنجليزية والوضع الليلي.
+رفيق إسلامي متكامل يعمل **بلا إنترنت أولًا**: مصحف كامل (114 سورة، 6236 آية) مضمّن داخل التطبيق، تلاوات صوتية تُبث أو تُنزَّل، أذكار وأدعية، مواقيت الصلاة والقبلة — بلا حسابات ولا إعلانات ولا تتبع. عربي أولًا مع الوضع الليلي.
 
 Quran Yahdi is a complete, offline-first Quran companion for Android: the full Mushaf bundled on-device, audio recitations you can stream or download, adhkar, duas, prayer times and a live Qibla compass — with no accounts, no ads, and no data collection.
 
@@ -23,7 +23,7 @@ Quran Yahdi is a complete, offline-first Quran companion for Android: the full M
 | 11 | السبحة | عدّاد إلكتروني دائري بأهداف قابلة للتبديل |
 | 12 | الأدعية والرقية | مختارات مرتبة من المصنفات التقليدية مع آيات النصوص |
 | 13 | متتبع العبادات | الصلوات الخمس اليومية وخطط الختمة |
-| 14 | الإعدادات والإضافات | وضع ليلي، أحجام خط وخط المصحف الأصلي، حساب الزكاة، التقويم الهجري، أسماء الله الحسنى |
+| 14 | الإعدادات والإضافات | وضع ليلي، حساب الزكاة، التقويم الهجري، أسماء الله الحسنى |
 
 ## لقطات الشاشات
 
@@ -55,7 +55,7 @@ flutter gen-l10n
 dart run build_runner build --delete-conflicting-outputs
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 243 اختبارات
+flutter test           # البوابة الكاملة: 381 اختبارات
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
 flutter build appbundle --release  # مخرجات المتجر
