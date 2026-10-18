@@ -5,9 +5,12 @@ import 'package:get_it/get_it.dart';
 
 import '../db/app_database.dart';
 import '../db/connection.dart';
-import '../../features/quran/data/surah_repository.dart';
 import '../../features/quran/data/ayah_repository.dart';
+import '../../features/quran/data/ayah_source.dart';
 import '../../features/quran/data/last_read_repository.dart';
+import '../../features/quran/data/last_read_source.dart';
+import '../../features/quran/data/surah_repository.dart';
+import '../../features/quran/data/surah_source.dart';
 import '../../features/azkar/data/azkar_repository.dart';
 import '../../features/asma/data/asma_repository.dart';
 import '../../features/duas/data/dua_repository.dart';
@@ -53,8 +56,12 @@ Future<void> configureDependencies({
       () => AppDatabase(LazyDatabase(openAppDatabase)));
   final db = getIt<AppDatabase>();
   getIt.registerLazySingleton<SurahRepository>(() => SurahRepository(db));
+  getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
+  getIt.registerLazySingleton<AyahSource>(() => getIt<AyahRepository>());
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
+  getIt
+      .registerLazySingleton<LastReadSource>(() => getIt<LastReadRepository>());
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
   getIt.registerLazySingleton<PrayerTimeService>(
       () => const PrayerTimeService());
