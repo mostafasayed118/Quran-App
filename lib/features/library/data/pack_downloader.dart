@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
 import 'library_catalog.dart';
 
@@ -117,7 +118,7 @@ class PackDownloader {
 
   /// Guard against a lying/compromised host streaming unbounded bytes:
   /// allow up to 2x the declared size plus 64 KiB slack.
-  static int _sizeCap(int expectedBytes) => expectedBytes * 2 + 65536;
+  static int _sizeCap(int expectedBytes) => guardedByteCap(expectedBytes);
 
   Future<Directory> _root() async {
     final resolver = _rootResolver;

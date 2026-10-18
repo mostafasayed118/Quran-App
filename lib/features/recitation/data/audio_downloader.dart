@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math' as math;
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
@@ -7,6 +6,7 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
 import 'download_status.dart';
 import 'reciter_repository.dart';
@@ -45,9 +45,8 @@ class AudioDownloader {
   static const int maxAcceptedBytesCeiling = 64 << 20;
 
   @visibleForTesting
-  static int maxAcceptedBytes(int declaredTotal) => declaredTotal > 0
-      ? math.min(declaredTotal * 2 + 65536, maxAcceptedBytesCeiling)
-      : maxAcceptedBytesCeiling;
+  static int maxAcceptedBytes(int declaredTotal) =>
+      guardedByteCap(declaredTotal, ceiling: maxAcceptedBytesCeiling);
 
   Future<Directory> _root() async {
     final resolver = _audioRoot;
