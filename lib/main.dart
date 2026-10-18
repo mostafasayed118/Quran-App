@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
+import 'app/deep_links.dart';
 import 'app/router.dart';
 import 'core/di/injector.dart';
 import 'core/l10n/platform_localizations.dart';
@@ -42,6 +44,8 @@ Future<void> main() async {
   );
   unawaited(_requestBootNotificationGrace());
   unawaited(_openReminderLaunchTarget());
+  unawaited(_openDeepLinkLaunchTarget());
+  _listenForDeepLinks();
   unawaited(runBootReminderSchedule());
   runApp(const QuranYahdiApp());
 }
@@ -80,4 +84,32 @@ Future<void> _requestBootNotificationGrace() async {
   } on Object {
     // Disclosed v1: silent boot-grace failure.
   }
+}
+
+/// Cold-start deep-link routing (P4-app): when the app was launched from a
+/// https://quranyahdi.pages.dev content link, land on its mapped route.
+/// Best-effort — a link read failure never breaks boot (W7b discipline).
+Future<void> _openDeepLinkLaunchTarget() async {
+  try {
+    final uri = await AppLinks().getInitialLink();
+    if (uri == null) return;
+    final route = deepLinkRouteFor(uri);
+    if (route == null) return;
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => AppRouter.router.go(route));
+  } on Object {
+    // Disclosed v1: silent cold-launch deep-link failure.
+  }
+}
+
+/// Warm deep links: every link that arrives while the app runs maps through
+/// the pure [deepLinkRouteFor] and navigates. Disclosed v1: the app-lifetime
+/// listener is never disposed, and on platforms that replay the initial link
+/// on the stream the second [AppRouter.router.go] to the same route is
+/// idempotent.
+void _listenForDeepLinks() {
+  AppLinks().uriLinkStream.listen((uri) {
+    final route = deepLinkRouteFor(uri);
+    if (route != null) AppRouter.router.go(route);
+  });
 }
