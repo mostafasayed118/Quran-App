@@ -86,7 +86,15 @@ class LibraryCubit extends Cubit<LibraryState> {
   void onInstalled(String packId) {}
 
   Future<void> uninstall(String packId) async {
-    await _downloader.uninstall(packId);
+    try {
+      await _downloader.uninstall(packId);
+    } on Object {
+      if (isClosed) return;
+      final ready = state;
+      if (ready is! LibraryReady) return;
+      emit(ready.copyWith(failed: {...ready.failed, packId}));
+      return;
+    }
     if (isClosed) return;
     final ready = state;
     if (ready is! LibraryReady) return;
