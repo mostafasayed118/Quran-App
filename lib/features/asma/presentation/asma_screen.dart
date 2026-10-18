@@ -59,12 +59,15 @@ class AsmaScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              name.nameAr,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontFamily: QuranFonts.meQuran,
-                                fontSize: 22,
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                name.nameAr,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontFamily: QuranFonts.meQuran,
+                                  fontSize: 22,
+                                ),
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -126,68 +129,70 @@ class _NameSheet extends StatelessWidget {
         color: colors.surface,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                textDirection: TextDirection.rtl,
-                children: [
-                  Expanded(
-                    child: Text(
-                      loc.namePosition(name.n.toArabicIndic),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: colors.onSurfaceVariant,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  textDirection: TextDirection.rtl,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        loc.namePosition(name.n.toArabicIndic),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ),
+                    IconButton(
+                      tooltip: loc.clearSelection,
+                      icon: const Icon(Icons.close),
+                      onPressed: () => context.read<AsmaCubit>().select(null),
+                    ),
+                  ],
+                ),
+                Text(
+                  name.nameAr,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: QuranFonts.meQuran,
+                    fontSize: 40,
                   ),
-                  IconButton(
-                    tooltip: loc.clearSelection,
-                    icon: const Icon(Icons.close),
-                    onPressed: () => context.read<AsmaCubit>().select(null),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  name.nameEn,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: colors.primary,
                   ),
-                ],
-              ),
-              Text(
-                name.nameAr,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: QuranFonts.meQuran,
-                  fontSize: 40,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                name.nameEn,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: colors.primary,
+                const SizedBox(height: 12),
+                Text(
+                  name.meaningAr,
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                  style: const TextStyle(
+                    fontFamily: QuranFonts.meQuran,
+                    fontSize: 16,
+                    height: 1.7,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                name.meaningAr,
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
-                style: const TextStyle(
-                  fontFamily: QuranFonts.meQuran,
-                  fontSize: 16,
-                  height: 1.7,
+                const SizedBox(height: 6),
+                Text(
+                  name.meaningEn,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: colors.onSurfaceVariant,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                name.meaningEn,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
