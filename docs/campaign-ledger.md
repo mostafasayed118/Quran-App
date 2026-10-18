@@ -378,3 +378,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Gates (PM-run):** check **0/0/0** (57 files) · unit **111/111** (16 files; 112→111 = W6 merged two pins into one exact-set) · build **117 pages** · budget **24.35 KB / 30 KB PASS** + dist **145 / 2000 PASS** (+0.09 KB = MiniPlayer chunk 1.26→1.35) · e2e **22/22** (five new legs, incl. fault-injection + keyboard + SPA legs). Zero SKIPs; W12 green-first (Astro ClientRouter already restores hash scroll — pinned by the new leg).
 - **No push:** ls-remote still `ce58fd2`; unpushed after this entry = 22 (app P4 batch + warm-fix + device ledger + web wave + ledger commits). Push window awaits owner GO.
 - **State:** ledger commit follows (local-only). NO PUSH — window belongs to the owner.
+
+### Push window — app P4 batch + WEB-POLISH-1 (ce58fd2..01bbf47) — 2026-10-18
+- **Range:** `ce58fd2..01bbf47` — 22 commits: P4-app wave ×3 + close-out · warm-links fix `37e4dc3` + device leg `bafd663` · WEB-POLISH-1 ×12 + close-out `01bbf47` · web review/ruling ledgers (`6071894`, `d468fe0`, `54766cd`).
+- **Pre-flight:** HEAD `01bbf47`; FF_OK=true; remote static at `ce58fd2`; porcelain = owner debris + `?? INSTRUCTIONS.md`; no competing processes; web tree unchanged since the controller gate run (`90c8c90..HEAD -- web/` = 0 — docs-only delta).
+- **Web gates (controller-run at `90c8c90`, cited per the docs-only exception):** check **0/0/0** (57 files) · unit **111/111** (16 files) · e2e **22/22** (chromium) · build **117 pages** · budget **24.35 KB / 30 KB** + dist **145 / 2000**. App-side rides on the recorded PM verifications (P4-app `380/380` · warm-fix `380/380` + device cold/warm PASS).
+- **Push:** `git push origin main` (guard aborted once on a PM typo in the tip pattern — no side effects; re-run clean); ls-remote proof: remote tip == `01bbf47`; unpushed 0.
+- **CI on `01bbf47`:** `web-gates` **39146899882** success (29s) · `ci` **39146899877** success (7m43s).
+- **Cloudflare:** production deployed; post-deploy probe: home serves the new MiniPlayer chunk `wg8mdG5_` (old `Dh15OWTr` gone — WEB-POLISH-1 LIVE); `/.well-known/assetlinks.json` still `application/json` 200; `/surah/2/` 200.
+- **State:** ledger commit follows (local-only). NO PUSH beyond the window.
