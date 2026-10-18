@@ -1,11 +1,23 @@
 ---
 import { toArabicDigits } from '../lib/arabic-digits';
-interface Props { n: number; textUthmani: string; textImlaei: string; sajda: boolean }
-const { n, textUthmani, textImlaei, sajda } = Astro.props;
+import { t, defaultLocale } from '../lib/strings';
+interface Props { surah: number; n: number; textUthmani: string; textImlaei: string; sajda: boolean }
+const { surah, n, textUthmani, textImlaei, sajda } = Astro.props;
+const copyLabel = t(defaultLocale, 'ayahCopy');
+const shareLabel = t(defaultLocale, 'ayahShare');
+const bookmarkLabel = t(defaultLocale, 'ayahBookmark');
+const listenLabel = t(defaultLocale, 'ayahListen');
 ---
 <div class="ayah" id={`ayah-${n}`} data-n={n}>
   <p class="ayah-text" style="--ayah-size: calc(19px + var(--reader-step, 1) * 3px)">
-    <span class="ayah-u" aria-hidden="true">{textUthmani}<span class="medal" aria-hidden="true">{toArabicDigits(n)}</span>{sajda && <span class="sajda" aria-hidden="true">۩</span>}</span>
+    <span class="ayah-u" aria-hidden="true">{textUthmani}{sajda && <span class="sajda" aria-hidden="true">۩</span>}</span>
     <span class="ayah-i sr-only">{textImlaei}</span>
+    <span class="medal" aria-hidden="true">{toArabicDigits(n)}</span>
   </p>
+  <div class="ayah-actions">
+    <button type="button" data-ayah-action="copy" data-surah={surah} data-ayah={n} aria-label={copyLabel}>{copyLabel}</button>
+    <button type="button" data-ayah-action="share" data-surah={surah} data-ayah={n} aria-label={shareLabel}>{shareLabel}</button>
+    <button type="button" data-ayah-action="bookmark" data-surah={surah} data-ayah={n} aria-label={bookmarkLabel} aria-pressed="false">{bookmarkLabel}</button>
+    <button type="button" data-ayah-action="listen" data-surah={surah} data-ayah={n} aria-label={listenLabel}>▶ {listenLabel}</button>
+  </div>
 </div>

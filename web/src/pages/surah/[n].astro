@@ -40,9 +40,13 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
         <button type="button" class="rc-btn" data-qy-step="-1" aria-label={t(locale, 'readerFontSmaller')}>−</button>
         <button type="button" class="rc-btn" data-qy-step="1" aria-label={t(locale, 'readerFontBigger')}>＋</button>
       </div>
+      <div class="reader-listen">
+        <select data-qy="reciter-pick" aria-label={t(locale, 'readerPickReciter')} disabled></select>
+        <button type="button" class="rc-btn" data-qy="reader-play" data-surah={surah.id}>{t(locale, 'readerPlay')}</button>
+      </div>
     </header>
     <div class="ayahs">
-      {data.ayahs.map((a) => <AyahBlock n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}
+      {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}
     </div>
     <nav class="reader-nav">
       {prev !== null ? <a href={`/surah/${prev}`}>{t(locale, 'readerPrev')}</a> : <a href="/quran">{t(locale, 'backToIndex')}</a>}
@@ -56,9 +60,38 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
       type FontStep,
       type ReaderSettings,
     } from '../../lib/reader-settings';
+    import { readSetting, writeSetting } from '../../lib/settings';
+    import { fetchReciters, sortReciters, type MoshafRow } from '../../lib/reciters';
+    import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
+    import { shareOrCopy } from '../../lib/share';
+    import { surahUrl } from '../../lib/urls';
+    import { t, defaultLocale } from '../../lib/strings';
 
     function clampStep(n: number): FontStep {
       return (n < 0 ? 0 : n > 3 ? 3 : n) as FontStep;
+    }
+
+    // The picker's rowId lives in the qy:reader object; these two helpers read it raw
+    // and re-merge it after writeReaderSettings (whose coerce keeps only known fields).
+    function readReciterRow(): string {
+      const raw = readSetting<unknown>('reader', null);
+      const v = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>).reciterRow : undefined;
+      return typeof v === 'string' ? v : '';
+    }
+    function persistReciterRow(rowId: string): void {
+      if (!rowId) return;
+      const raw = readSetting<unknown>('reader', null);
+      const base = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
+      writeSetting('reader', { ...base, reciterRow: rowId });
+    }
+
+    // Reciter rows are fetched once per page load and reused by the picker and listen actions.
+    let rowsPromise: Promise<MoshafRow[]> | null = null;
+    function loadRows(): Promise<MoshafRow[]> {
+      rowsPromise ??= fetchReciters()
+        .then((rows) => sortReciters(rows))
+        .catch(() => [] as MoshafRow[]);
+      return rowsPromise;
     }
 
     function init() {
@@ -66,6 +99,10 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
       if (!box || box.dataset.qyReady) return;
       box.dataset.qyReady = '1';
       let settings: ReaderSettings = readReaderSettings();
+
+      const pick = document.querySelector<HTMLSelectElement>('[data-qy="reciter-pick"]');
+      const playBtn = document.querySelector<HTMLButtonElement>('[data-qy="reader-play"]');
+      const ayahs = document.querySelector<HTMLElement>('.ayahs');
 
       const render = () => {
         document.documentElement.setAttribute('data-reading-view', settings.view);
@@ -75,19 +112,104 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
         });
       };
 
+      // --- header picker + play (featured-first via sortReciters) ---
+      const selectedRow = async (): Promise<MoshafRow | undefined> => {
+        const rows = await loadRows();
+        const wanted = pick?.value || readReciterRow();
+        return rows.find((r) => r.rowId === wanted) ?? rows[0];
+      };
+      const playSurah = async (s: number): Promise<void> => {
+        if (!Number.isFinite(s)) return;
+        const row = await selectedRow();
+        if (row) document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah: s } }));
+      };
+      if (pick) {
+        loadRows().then((rows) => {
+          pick.replaceChildren(
+            ...rows.map((r) => {
+              const opt = document.createElement('option');
+              opt.value = r.rowId;
+              opt.textContent = `${r.reciterName} — ${r.moshafName}`;
+              return opt;
+            }),
+          );
+          const stored = readReciterRow();
+          if (stored && rows.some((r) => r.rowId === stored)) pick.value = stored;
+          pick.disabled = rows.length === 0;
+        });
+        pick.addEventListener('change', () => persistReciterRow(pick.value));
+      }
+      playBtn?.addEventListener('click', () => {
+        void playSurah(Number(playBtn.dataset.surah));
+      });
+
       box.addEventListener('click', (e) => {
         const btn = (e.target as HTMLElement | null)?.closest('button');
         if (!btn) return;
+        const keepRow = pick?.value || readReciterRow();
         const view = btn.dataset.qyView;
         if (view === 'mushaf' || view === 'imlaei') {
           settings = writeReaderSettings({ view });
+          persistReciterRow(keepRow);
         } else {
           const delta = Number(btn.dataset.qyStep);
           if (Number.isFinite(delta) && delta !== 0) {
             settings = writeReaderSettings({ fontStep: clampStep(settings.fontStep + delta) });
+            persistReciterRow(keepRow);
           }
         }
         render();
+      });
+
+      // --- per-ayah actions (delegated; copy/share always use the plain-Arabic `.ayah-i`) ---
+      const saved = new Set(listBookmarks().map((b) => `${b.s}:${b.a}`));
+      const setBookmarkState = (btn: HTMLButtonElement, pressed: boolean): void => {
+        const label = t(defaultLocale, pressed ? 'ayahBookmarked' : 'ayahBookmark');
+        btn.setAttribute('aria-pressed', String(pressed));
+        btn.setAttribute('aria-label', label);
+        btn.textContent = label;
+      };
+      ayahs?.querySelectorAll<HTMLButtonElement>('[data-ayah-action="bookmark"]').forEach((btn) => {
+        setBookmarkState(btn, saved.has(`${btn.dataset.surah}:${btn.dataset.ayah}`));
+      });
+
+      const flashTimers = new WeakMap<HTMLElement, number>();
+      const flashCopied = (btn: HTMLElement): void => {
+        if (btn.dataset.origLabel === undefined) btn.dataset.origLabel = btn.textContent ?? '';
+        btn.textContent = t(defaultLocale, 'ayahCopied');
+        window.clearTimeout(flashTimers.get(btn));
+        flashTimers.set(
+          btn,
+          window.setTimeout(() => {
+            btn.textContent = btn.dataset.origLabel ?? '';
+            delete btn.dataset.origLabel;
+          }, 1500),
+        );
+      };
+
+      ayahs?.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>('[data-ayah-action]');
+        if (!btn) return;
+        const s = Number(btn.dataset.surah);
+        const a = Number(btn.dataset.ayah);
+        const text = btn.closest('.ayah')?.querySelector('.ayah-i')?.textContent ?? '';
+        const action = btn.dataset.ayahAction;
+        if (action === 'copy') {
+          navigator.clipboard
+            .writeText(text)
+            .then(() => flashCopied(btn))
+            .catch(() => { /* clipboard unavailable */ });
+        } else if (action === 'share') {
+          shareOrCopy(surahUrl(s, a), text)
+            .then((outcome) => {
+              if (outcome === 'copied') flashCopied(btn);
+            })
+            .catch(() => { /* clipboard unavailable */ });
+        } else if (action === 'bookmark') {
+          setBookmarkState(btn, toggleBookmark(s, a));
+        } else if (action === 'listen') {
+          void playSurah(s);
+        }
       });
 
       render();

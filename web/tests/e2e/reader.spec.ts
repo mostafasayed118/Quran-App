@@ -22,7 +22,7 @@ test('prev/next edges', async ({ page }) => {
 test('ayah exposes plain Arabic to AT and Arabic digits in meta', async ({ page }) => {
   await page.goto('/surah/2/');
   const first = page.locator('.ayah').first();
-  await expect(first.locator('.ayah-i')).toHaveText(/.+/); // sr-only plain text exists
+  await expect(first.locator('.ayah-i')).toHaveText(/^[^\uE000-\uF8FF]+$/); // sr-only text is plain Arabic — no PUA glyphs
   await expect(first.locator('.ayah-u')).toHaveAttribute('aria-hidden', 'true');
   await expect(page.locator('.reader-head .meta')).toContainText('٢٨٦'); // Arabic-Indic, was 286
 });

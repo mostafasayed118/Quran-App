@@ -36,6 +36,13 @@ body {
 }
 .rc-btn[aria-pressed='true'] { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
 @media (pointer: coarse) { .rc-btn { min-height: 44px; } }
+.reader-listen { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; }
+.reader-listen select {
+  max-width: min(340px, 62vw); padding: 7px 12px; border-radius: 999px;
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: .85rem;
+}
+@media (pointer: coarse) { .reader-listen select { min-height: 44px; } }
 .ayah { padding: 14px 2px; border-bottom: 1px solid var(--hairline); }
 .ayah-text {
   margin: 0;
@@ -51,6 +58,21 @@ body {
   vertical-align: middle; margin-inline-start: 6px;
 }
 .sajda { color: var(--gold-ink); margin-inline-start: 6px; }
+.ayah-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.ayah-actions button {
+  font: inherit; font-size: .8rem; font-weight: 700;
+  padding: 6px 14px; border-radius: 999px;
+  border: 1px solid var(--hairline); background: transparent; color: var(--muted-strong);
+  cursor: pointer;
+}
+.ayah-actions button[aria-pressed='true'] { background: var(--btn-bg); color: var(--btn-ink); border-color: transparent; }
+@media (pointer: fine) {
+  .ayah-actions { opacity: 0; }
+  .ayah:hover .ayah-actions, .ayah:focus-within .ayah-actions { opacity: 1; }
+}
+@media (pointer: coarse) {
+  .ayah-actions button { min-height: 44px; padding-inline: 18px; }
+}
 html[data-reading-view='imlaei'] .ayah-u { display: none; }
 html[data-reading-view='imlaei'] .ayah-i {
   position: static; width: auto; height: auto; clip-path: none;
