@@ -43,13 +43,20 @@ class NotificationsBinding implements ReminderScheduler {
   bool _ready = false;
   NotificationDetails? _details;
   VoidCallback? _onTap;
+  void Function(String payload)? _onTapPayload;
 
   /// One-time plugin init; safe to call repeatedly, never rethrows. A
-  /// notification tap fires the injected `onTap` callback — the app layer
-  /// wires it to the router, so this data class stays router-free.
-  Future<void> init({VoidCallback? onTap}) async {
+  /// notification tap fires the injected `onTap` callback (payloadless taps)
+  /// or `onTapPayload` when the tapped reminder carries a routing tag — the
+  /// app layer wires both to the router, so this data class stays
+  /// router-free.
+  Future<void> init({
+    VoidCallback? onTap,
+    void Function(String payload)? onTapPayload,
+  }) async {
     if (_ready) return;
     _onTap = onTap;
+    _onTapPayload = onTapPayload;
     try {
       final loc = lookupAppLocalizations(const Locale('ar'));
       await _plugin.initialize(
@@ -73,11 +80,29 @@ class NotificationsBinding implements ReminderScheduler {
     }
   }
 
-  /// Default tap-to-open (UX-FIX 2): v1 has no per-type payload→route map
-  /// (audit deferred that nuance), so every tap fires the callback passed to
-  /// [init] (main.dart wires it to the app's home route).
+  /// Warm tap: a reminder carrying a payload routes through [init]'s
+  /// `onTapPayload`; everything else keeps the default-launch callback.
+  /// A payloaded tap with no payload callback falls back to the default too.
   void onNotificationTap(NotificationResponse response) {
+    final payload = response.payload;
+    if (payload != null && payload.isNotEmpty && _onTapPayload != null) {
+      _onTapPayload!(payload);
+      return;
+    }
     _onTap?.call();
+  }
+
+  /// Cold-start payload: the tapped notification's tag when the app was
+  /// launched by a tap, else null. Never throws (best-effort v1); a null
+  /// result keeps the existing default-launch behavior.
+  Future<String?> launchPayload() async {
+    try {
+      final details = await _plugin.getNotificationAppLaunchDetails();
+      if (details == null || !details.didNotificationLaunchApp) return null;
+      return details.notificationResponse?.payload;
+    } on Object {
+      return null;
+    }
   }
 
   /// First-boot POST_NOTIFICATIONS grace (UX-FIX 2): requests once when the
@@ -134,6 +159,7 @@ class NotificationsBinding implements ReminderScheduler {
           id: reminder.id,
           title: reminder.title,
           body: reminder.body,
+          payload: reminder.payload,
           scheduledDate: tz.TZDateTime.from(reminder.fireAt.toUtc(), tz.UTC),
           notificationDetails: details,
           androidScheduleMode: mode,

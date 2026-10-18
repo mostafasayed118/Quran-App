@@ -5,12 +5,16 @@ class ScheduledReminder {
     required this.fireAt,
     required this.title,
     required this.body,
+    this.payload,
   });
 
   final int id;
   final DateTime fireAt;
   final String title;
   final String body;
+
+  /// Tap-routing tag (planner payload constants); null = plain tap.
+  final String? payload;
 }
 
 /// Injectable seam in front of the local-notifications plugin (W7b headless

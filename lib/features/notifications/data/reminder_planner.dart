@@ -8,6 +8,11 @@ import 'reminder_scheduler.dart';
 const int prayerReminderId = 1;
 const int azkarReminderId = 2;
 
+/// Tap payloads: cold/warm notification taps carry these tags so the app
+/// layer can route to the reminder's own screen (W7b non-goal closed).
+const String prayerReminderPayload = 'prayer';
+const String azkarReminderPayload = 'azkar';
+
 /// Fallback azkar time when `azkar_reminder_time` is unset or malformed.
 const String defaultAzkarTimeHm = '06:30';
 
@@ -50,6 +55,7 @@ List<ScheduledReminder> planReminders({
       fireAt: choice.time,
       title: title,
       body: title,
+      payload: prayerReminderPayload,
     );
     break;
   }
@@ -66,6 +72,7 @@ List<ScheduledReminder> planReminders({
       fireAt: fireAt,
       title: texts.azkarTitle,
       body: texts.azkarBody,
+      payload: azkarReminderPayload,
     );
   }
 
