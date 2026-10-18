@@ -40,6 +40,11 @@ const dict = {
     ayahCopied: 'تم النسخ',
     readerPlay: 'شغّل السورة',
     readerPickReciter: 'اختر القارئ',
+    panelTitle: 'التفسير والترجمة',
+    panelHide: 'إخفاء',
+    panelError: 'تعذر تحميل المحتوى',
+    panelRetry: 'إعادة المحاولة',
+    panelSource: 'المصدر',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -79,6 +84,11 @@ const dict = {
     ayahCopied: 'Copied',
     readerPlay: 'Play surah',
     readerPickReciter: 'Choose reciter',
+    panelTitle: 'Tafsir & Translation',
+    panelHide: 'Hide',
+    panelError: "Couldn't load content",
+    panelRetry: 'Retry',
+    panelSource: 'Source',
   },
 } as const;
 

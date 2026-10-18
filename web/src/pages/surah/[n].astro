@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import AyahBlock from '../../components/AyahBlock.astro';
+import ContentPanel from '../../components/ContentPanel.astro';
 import { surahNeighbors } from '../../lib/surah-neighbors';
 import { t, defaultLocale } from '../../lib/strings';
 import { toArabicDigits } from '../../lib/arabic-digits';
@@ -39,12 +40,14 @@ const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
         <button type="button" class="rc-btn" data-qy-view="imlaei" aria-pressed="false">{t(locale, 'readerViewImlaei')}</button>
         <button type="button" class="rc-btn" data-qy-step="-1" aria-label={t(locale, 'readerFontSmaller')}>−</button>
         <button type="button" class="rc-btn" data-qy-step="1" aria-label={t(locale, 'readerFontBigger')}>＋</button>
+        <button type="button" class="rc-btn" data-qy="panel-toggle" aria-pressed="false" aria-controls="qy-content-panel">{t(locale, 'panelTitle')}</button>
       </div>
       <div class="reader-listen">
         <select data-qy="reciter-pick" aria-label={t(locale, 'readerPickReciter')} disabled></select>
         <button type="button" class="rc-btn" data-qy="reader-play" data-surah={surah.id}>{t(locale, 'readerPlay')}</button>
       </div>
     </header>
+    <ContentPanel surah={surah.id} locale={locale} />
     <div class="ayahs">
       {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} />)}
     </div>

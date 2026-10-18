@@ -1,0 +1,119 @@
+---
+import { PACKS } from '../lib/content-packs';
+import { t, type Locale } from '../lib/strings';
+interface Props { surah: number; locale?: Locale }
+const { surah, locale = 'ar' } = Astro.props;
+---
+<section id="qy-content-panel" class="content-panel" data-surah={surah} hidden aria-label={t(locale, 'panelTitle')}>
+  <label class="sr-only" for="qy-content-pick">{t(locale, 'panelTitle')}</label>
+  <select id="qy-content-pick" data-qy="content-pick">
+    <option value="">{t(locale, 'panelHide')}</option>
+    {PACKS.map((p) => <option value={`${p.kind}:${p.id}`}>{p.titleAr}</option>)}
+  </select>
+  <p class="panel-source" data-qy="panel-source" hidden></p>
+  <div class="panel-error" data-qy="panel-error" hidden>
+    <span>{t(locale, 'panelError')}</span>
+    <button type="button" class="rc-btn" data-qy="panel-retry">{t(locale, 'panelRetry')}</button>
+  </div>
+</section>
+<script>
+  import { PACKS, fetchPackAyahs, type PackInfo } from '../lib/content-packs';
+  import { readSetting, writeSetting } from '../lib/settings';
+  import { t, defaultLocale } from '../lib/strings';
+
+  const KEY = 'content';
+
+  const valueOf = (pack: PackInfo): string => `${pack.kind}:${pack.id}`;
+  const packOf = (value: string): PackInfo | null => PACKS.find((p) => valueOf(p) === value) ?? null;
+
+  function readSelection(): PackInfo | null {
+    const raw = readSetting<unknown>(KEY, null);
+    if (typeof raw !== 'object' || raw === null) return null;
+    const sel = raw as { kind?: unknown; id?: unknown };
+    if (typeof sel.kind !== 'string' || typeof sel.id !== 'string') return null;
+    return packOf(`${sel.kind}:${sel.id}`);
+  }
+
+  function init() {
+    const panel = document.querySelector<HTMLElement>('#qy-content-panel');
+    const toggle = document.querySelector<HTMLButtonElement>('[data-qy="panel-toggle"]');
+    if (!panel || !toggle || panel.dataset.qyReady) return;
+    panel.dataset.qyReady = '1';
+    const surah = Number(panel.dataset.surah);
+    const pick = panel.querySelector<HTMLSelectElement>('[data-qy="content-pick"]');
+    const source = panel.querySelector<HTMLElement>('[data-qy="panel-source"]');
+    const errorBox = panel.querySelector<HTMLElement>('[data-qy="panel-error"]');
+    const retry = panel.querySelector<HTMLButtonElement>('[data-qy="panel-retry"]');
+    const ayahs = document.querySelector<HTMLElement>('.ayahs');
+    if (!pick || !source || !errorBox) return;
+
+    let current = readSelection();
+    if (current) pick.value = valueOf(current);
+
+    const clearNotes = () => {
+      ayahs?.querySelectorAll('.ayah-note').forEach((n) => n.remove());
+    };
+    const renderNotes = (map: Map<number, string>): void => {
+      clearNotes();
+      ayahs?.querySelectorAll<HTMLElement>('.ayah[data-n]').forEach((block) => {
+        const n = Number(block.dataset.n);
+        const text = map.get(n);
+        if (!text) return;
+        const note = document.createElement('div');
+        note.className = 'ayah-note';
+        note.dataset.ayah = String(n);
+        note.setAttribute('dir', 'auto');
+        note.textContent = text;
+        block.appendChild(note);
+      });
+    };
+    const load = async (pack: PackInfo): Promise<void> => {
+      errorBox.hidden = true;
+      try {
+        const map = await fetchPackAyahs(pack, surah);
+        if (current !== pack) return; // selection changed while loading
+        renderNotes(map);
+        source.textContent = `${t(defaultLocale, 'panelSource')}: ${pack.titleAr} — jsDelivr`;
+        source.hidden = false;
+      } catch {
+        if (current !== pack) return;
+        clearNotes();
+        source.hidden = true;
+        errorBox.hidden = false;
+      }
+    };
+    const apply = (pack: PackInfo | null): void => {
+      current = pack;
+      writeSetting(KEY, pack ? { kind: pack.kind, id: pack.id } : null);
+      if (pack) {
+        void load(pack);
+      } else {
+        clearNotes();
+        source.hidden = true;
+        errorBox.hidden = true;
+      }
+    };
+
+    toggle.addEventListener('click', () => {
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-pressed', String(open));
+      if (open && current) void load(current);
+    });
+    pick.addEventListener('change', () => {
+      const pack = packOf(pick.value);
+      if (!pack) {
+        apply(null);
+        panel.hidden = true;
+        toggle.setAttribute('aria-pressed', 'false');
+        return;
+      }
+      apply(pack);
+    });
+    retry?.addEventListener('click', () => {
+      if (current) void load(current);
+    });
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>

@@ -80,6 +80,47 @@ html[data-reading-view='imlaei'] .ayah-i {
 }
 .reader-nav { display: flex; justify-content: space-between; margin-top: 22px; }
 .reader-nav a { color: var(--accent); text-decoration: none; font-weight: 700; }
+.content-panel {
+  margin-top: 14px; padding: 12px 14px;
+  border: 1px solid var(--hairline); border-radius: 14px; background: var(--surface);
+}
+.content-panel[hidden] { display: none; }
+.content-panel select {
+  width: 100%; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--hairline); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: .9rem;
+}
+@media (pointer: coarse) { .content-panel select { min-height: 44px; } }
+.panel-source { margin: 10px 0 0; font-size: .78rem; color: var(--muted-strong); }
+.panel-source[hidden] { display: none; }
+.panel-error {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 10px; padding: 8px 12px; border-radius: 10px;
+  border: 1px solid var(--hairline); color: var(--muted-strong); font-size: .85rem;
+}
+.panel-error[hidden] { display: none; }
+.ayah-note {
+  margin-top: 10px; padding: 9px 12px; border-radius: 8px;
+  border-inline-start: 3px solid var(--gold-line);
+  background: color-mix(in srgb, var(--gold-line) 12%, transparent);
+  color: var(--ink); font-size: .92rem; line-height: 1.9;
+}
+@media (min-width: 1100px) {
+  .reader:has(.content-panel:not([hidden])) {
+    max-width: 1120px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas: 'head panel' 'ayahs panel' 'nav panel';
+    column-gap: 28px;
+    align-items: start;
+  }
+  .reader:has(.content-panel:not([hidden])) > .reader-head { grid-area: head; }
+  .reader:has(.content-panel:not([hidden])) > .ayahs { grid-area: ayahs; }
+  .reader:has(.content-panel:not([hidden])) > .reader-nav { grid-area: nav; }
+  .reader:has(.content-panel:not([hidden])) > .content-panel {
+    grid-area: panel; position: sticky; top: 16px; margin-top: 0;
+  }
+}
 .page-title { width: min(760px, calc(100% - 40px)); margin: 28px auto 6px; font-size: 1.35rem; }
 .index-search {
   display: block; width: min(760px, calc(100% - 40px)); margin: 14px auto 10px;

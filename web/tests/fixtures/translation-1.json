@@ -1,0 +1,11 @@
+{
+  "chapter": [
+    { "chapter": 1, "verse": 1, "text": "Sample translation — ayah 1" },
+    { "chapter": 1, "verse": 2, "text": "Sample translation — ayah 2" },
+    { "chapter": 1, "verse": 3, "text": "Sample translation — ayah 3" },
+    { "chapter": 1, "verse": 4, "text": "Sample translation — ayah 4" },
+    { "chapter": 1, "verse": 5, "text": "Sample translation — ayah 5" },
+    { "chapter": 1, "verse": 6, "text": "Sample translation — ayah 6" },
+    { "chapter": 1, "verse": 7, "text": "Sample translation — ayah 7" }
+  ]
+}
