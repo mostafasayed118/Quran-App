@@ -333,6 +333,21 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - Adjudications: the mid-wave foreign commit `9214c11` (p4-app executor brief, docs-only +130 lines) ACCEPTED as an exempt docs-only delta — the `*web*` glob edge noted for the next brief's sanction set; the commit-retry disclosure (untracked-file atomic reject, redone with explicit single-file add) accepted — final stats clean, no partial state.
 - State: main @ `a004686` (+ this ledger commit), porcelain owner-debris only, **unpushed 14** (13 + this entry). NO PUSH — window belongs to the owner.
 
+### P4-WEB — push window (e31afc6..ce58fd2) — 2026-10-18
+- **Range:** `e31afc6..ce58fd2` — 14 commits (1 web: `20495a3` assetlinks.json + pinning tests; F11 close-out + triage correction; F11b verdict-safety ×3 + close-out; p4-app executor brief; ledgers).
+- **Pre-flight:** HEAD `aaa51d7` = window tip `ce58fd2` + 3 in-flight P4-app commits (`d3fb368..aaa51d7`, zero `web/` touch) — explicitly EXCLUDED from the push (await their wave verification); FF_OK=true; remote static at `e31afc6`; porcelain = owner debris + `?? INSTRUCTIONS.md` (untouched); no competing processes at decision time.
+- **Web gates (controller re-run at the window state, 18:43):** check **0/0/0** (57 files) · unit **112/112** (16 files) · e2e **17/17** (chromium) · build **117 pages** · budget **24.26 KB / 30 KB** + dist **145 / 2000**. App-side commits ride on the recorded F11 (`365/365`) and F11b (`368/368`) PM verifications.
+- **Push:** explicit-range `git push origin ce58fd2:main` (not `HEAD`) — the 3 P4-app commits stay local; ls-remote proof: remote tip == `ce58fd2`.
+- **CI on `ce58fd2`:** `web-gates` **39142095533** success (31s) · `ci` **39142095498** success (5m46s).
+- **Cloudflare:** production auto-deployed; post-deploy probe: `/.well-known/assetlinks.json` → `application/json` 200 (442 B) with BOTH fingerprints (release `D2:1E:83…` + debug `B9:95:23…`) and package `com.mostafasayed.quranyahdi` — **P4 device leg UNBLOCKED**.
+- **State:** ledger commit follows (local-only; local ahead = 3 P4-app commits + this entry). NO PUSH beyond the window.
+
+### Owner rulings — web (2026-10-18, recorded this window)
+- **Tailwind v4 → DROP** (wired-but-unused through P2) — executes as a small hygiene commit (two deps + the vite plugin line only; zero visual delta); queued.
+- **`INSTRUCTIONS.md` → stays untracked, never committed** (personal notes; remains expected debris in start gates).
+- **P2 final whole-branch review → COMMISSIONED** (read-only; brief issued 2026-10-18).
+- **`qy:last-read` → keeps the spec-corrected deferral** (storage lands with its P3 consumer); the stale P2 plan note gets a one-line superseded marker in the hygiene wave.
+
 ## P4-app — Android App Links + Verse Share — CLOSED 2026-10-18
 - Trigger: owner directive (app-side P4 after the `20495a3` web leg landed). Brief committed at `9214c11` (`docs/superpowers/plans/2026-10-18-p4-app-links.md`); dispatched with pin `ce58fd2` once the F11b close-out satisfied its "F11b must be CLOSED first" precondition.
 - Landed (3 commits, `d3fb368..aaa51d7`): (1) `d3fb368` manifest `autoVerify` intent-filter — `https` · host `quranyahdi.pages.dev` · pathPrefix `/surah/` + `/quran` + `/reciters` (launcher filter and `launchMode="singleTop"` untouched) + `app_links ^7.2.2` + `share_plus ^13.3.1` (lock: 13 added entries, 0 deleted; resolved exactly 7.2.2 / 13.3.1); (2) `7e3a349` pure `deep_links.dart` (scheme+host gate · `/surah/{n∈1..114}` → `/quran/reader?surah=` · `#ayah-{m≥1}` → `&ayah=` · one trailing slash tolerated · `/quran`→`/quran` · `/reciters`→`/recitation` · else null; `webSurahUrl` = byte-mirror of `urls.ts`) + best-effort cold/warm wiring in `main.dart`; (3) `aaa51d7` reader share affordance on `_AyahCard` (`Icons.share_outlined`, tooltip `shareAyah`, `SharePlus.instance.share(ShareParams(text: imlaei + webSurahUrl(surahId, numberInSurah)))` — PUA law held: `textImlaei` ONLY) + additive `shareAyah` l10n (AR «مشاركة الآية» / EN "Share verse").
