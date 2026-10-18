@@ -16,6 +16,19 @@ test('reciters browser: featured-first, surah play + download, snapshot fallback
   await expect(first.locator('.reciter-moshaf')).toHaveText('حفص عن عاصم - مرتل');
   await expect(featured.locator('[data-reciter-row]').nth(1)).toHaveAttribute('data-reciter-row', '118-1');
 
+  // ClientRouter re-entry: leave and return in-session; the swapped-in shell must re-render and stay wired.
+  await page.locator('header a[href="/quran"]').click();
+  await page.waitForURL('**/quran**');
+  await page.locator('header a[href="/reciters"]').click();
+  await page.waitForURL('**/reciters**');
+  await expect(featured).toBeVisible();
+  await expect(featured).toContainText('مشاري العفاسي');
+  expect(await featured.locator('[data-reciter-row]').count()).toBeGreaterThan(0);
+  await featured.locator('[data-reciter-row="51-5"] [data-reciter-play]').click();
+  const bar = page.locator('[data-qy="bar"]');
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('[data-qy="title"]')).toHaveText('مشاري العفاسي');
+
   const all = page.locator('#reciters-all');
   await all.locator('summary').click();
   await expect(all.locator('[data-reciter-row="999-1"]')).toBeVisible();
@@ -38,7 +51,6 @@ test('reciters browser: featured-first, surah play + download, snapshot fallback
   await expect(download).toHaveAttribute('rel', 'noopener');
 
   await first.locator('[data-surah-row="1"] [data-reciter-play]').click();
-  const bar = page.locator('[data-qy="bar"]');
   await expect(bar).toBeVisible();
   await expect(page.locator('body')).toHaveClass(/has-player/);
   await expect(bar.locator('[data-qy="title"]')).toHaveText('مشاري العفاسي');

@@ -33,12 +33,6 @@ const L = defaultLocale;
   );
 
   const rowsById = new Map<string, MoshafRow>();
-  const statusEl = document.getElementById('reciters-status');
-  const contentEl = document.getElementById('reciters-content');
-  const featuredSection = document.getElementById('reciters-featured');
-  const featuredList = document.getElementById('reciters-featured-list');
-  const allSection = document.getElementById('reciters-all');
-  const allList = document.getElementById('reciters-all-list');
 
   function surahsOf(row: MoshafRow): number[] {
     return row.surahList.length > 0 ? row.surahList : Array.from({ length: 114 }, (_, i) => i + 1);
@@ -130,43 +124,59 @@ const L = defaultLocale;
     return li;
   }
 
-  contentEl?.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-
-    const playBtn = target.closest<HTMLButtonElement>('[data-reciter-play]');
-    if (playBtn) {
-      const row = rowsById.get(playBtn.dataset.reciterPlay ?? '');
-      if (!row) return;
-      const surah = playBtn.dataset.surah ? Number(playBtn.dataset.surah) : surahsOf(row)[0];
-      document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah } }));
-      return;
-    }
-
-    const toggleBtn = target.closest<HTMLButtonElement>('[data-reciter-toggle]');
-    const rowEl = toggleBtn?.closest<HTMLElement>('[data-reciter-row]');
-    const surahList = rowEl?.querySelector<HTMLUListElement>('.surah-sublist');
-    const row = rowEl ? rowsById.get(rowEl.dataset.reciterRow ?? '') : undefined;
-    if (!toggleBtn || !rowEl || !surahList || !row) return;
-    if (!surahList.dataset.qyBuilt) buildSurahList(row, surahList);
-    const open = toggleBtn.getAttribute('aria-expanded') === 'true';
-    toggleBtn.setAttribute('aria-expanded', String(!open));
-    surahList.hidden = open;
-  });
-
-  fetchReciters().then((rows) => {
+  function init() {
+    const statusEl = document.getElementById('reciters-status');
+    const contentEl = document.getElementById('reciters-content');
+    const featuredSection = document.getElementById('reciters-featured');
+    const featuredList = document.getElementById('reciters-featured-list');
+    const allSection = document.getElementById('reciters-all');
+    const allList = document.getElementById('reciters-all-list');
     if (!statusEl || !contentEl || !featuredSection || !featuredList || !allSection || !allList) return;
-    if (rows.length === 0) {
-      statusEl.textContent = t(L, 'noResults');
-      return;
-    }
-    const sorted = sortReciters(rows);
-    const featured = sorted.filter(isFeaturedRow);
-    const rest = sorted.filter((r) => !isFeaturedRow(r));
-    featuredList.replaceChildren(...featured.map(renderReciterRow));
-    allList.replaceChildren(...rest.map(renderReciterRow));
-    featuredSection.hidden = featured.length === 0;
-    allSection.hidden = rest.length === 0;
-    contentEl.hidden = false;
-    statusEl.hidden = true;
-  });
+    if (contentEl.dataset.qyReady) return;
+    contentEl.dataset.qyReady = '1';
+
+    rowsById.clear();
+
+    contentEl.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+
+      const playBtn = target.closest<HTMLButtonElement>('[data-reciter-play]');
+      if (playBtn) {
+        const row = rowsById.get(playBtn.dataset.reciterPlay ?? '');
+        if (!row) return;
+        const surah = playBtn.dataset.surah ? Number(playBtn.dataset.surah) : surahsOf(row)[0];
+        document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah } }));
+        return;
+      }
+
+      const toggleBtn = target.closest<HTMLButtonElement>('[data-reciter-toggle]');
+      const rowEl = toggleBtn?.closest<HTMLElement>('[data-reciter-row]');
+      const surahList = rowEl?.querySelector<HTMLUListElement>('.surah-sublist');
+      const row = rowEl ? rowsById.get(rowEl.dataset.reciterRow ?? '') : undefined;
+      if (!toggleBtn || !rowEl || !surahList || !row) return;
+      if (!surahList.dataset.qyBuilt) buildSurahList(row, surahList);
+      const open = toggleBtn.getAttribute('aria-expanded') === 'true';
+      toggleBtn.setAttribute('aria-expanded', String(!open));
+      surahList.hidden = open;
+    });
+
+    fetchReciters().then((rows) => {
+      if (rows.length === 0) {
+        statusEl.textContent = t(L, 'noResults');
+        return;
+      }
+      const sorted = sortReciters(rows);
+      const featured = sorted.filter(isFeaturedRow);
+      const rest = sorted.filter((r) => !isFeaturedRow(r));
+      featuredList.replaceChildren(...featured.map(renderReciterRow));
+      allList.replaceChildren(...rest.map(renderReciterRow));
+      featuredSection.hidden = featured.length === 0;
+      allSection.hidden = rest.length === 0;
+      contentEl.hidden = false;
+      statusEl.hidden = true;
+    });
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
 </script>
