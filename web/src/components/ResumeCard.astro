@@ -1,0 +1,71 @@
+<div class="resume" data-qy="resume-mount" hidden></div>
+<script>
+  import { readResume, type ResumePoint } from '../lib/reader-resume';
+  import { toArabicDigits } from '../lib/arabic-digits';
+  import { t, defaultLocale } from '../lib/strings';
+  import surahsData from '../data/surahs.json';
+
+  const surahNames = new Map<number, string>(
+    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string }> }).surahs.map(
+      (s): [number, string] => [s.id, s.nameAr],
+    ),
+  );
+
+  function init() {
+    const mount = document.querySelector<HTMLElement>('[data-qy="resume-mount"]');
+    if (!mount || mount.dataset.qyReady) return;
+    mount.dataset.qyReady = '1';
+
+    let point: ResumePoint | null = null;
+    try {
+      point = readResume(localStorage);
+    } catch {
+      point = null;
+    }
+    if (!point) return;
+    const surahName = surahNames.get(point.s);
+    if (!surahName) return;
+
+    const link = document.createElement('a');
+    link.className = 'resume-link';
+    link.dataset.qy = 'resume';
+    link.href = `/surah/${point.s}#ayah-${point.a}`;
+
+    const label = document.createElement('span');
+    label.className = 'resume-label';
+    label.textContent = t(defaultLocale, 'resumeTitle');
+
+    const target = document.createElement('span');
+    target.className = 'resume-target';
+
+    const surah = document.createElement('span');
+    surah.className = 'resume-surah';
+    surah.textContent = surahName;
+
+    const ayah = document.createElement('span');
+    ayah.className = 'resume-ayah';
+    ayah.textContent = toArabicDigits(point.a);
+
+    target.append(surah, ayah);
+    link.append(label, target);
+    mount.append(link);
+    mount.hidden = false;
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>
+<style is:global>
+  .resume { width: min(760px, calc(100% - 40px)); margin: 20px auto 0; }
+  .resume[hidden] { display: none; }
+  .resume-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; border: 1px solid var(--gold-line); border-radius: 14px;
+    background: var(--surface); color: var(--ink); text-decoration: none;
+  }
+  .resume-label { color: var(--gold-ink); font-size: .85rem; font-weight: 700; }
+  .resume-target { display: inline-flex; align-items: center; gap: 8px; margin-inline-start: auto; }
+  .resume-surah { font-weight: 700; }
+  .resume-ayah { color: var(--gold-ink); font-weight: 700; }
+  @media (pointer: coarse) { .resume-link { min-height: 44px; } }
+</style>

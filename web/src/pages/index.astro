@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ResumeCard from '../components/ResumeCard.astro';
 import { t } from '../lib/strings';
 import { LANDING } from '../lib/landing-content';
 
@@ -16,6 +17,8 @@ const copy = LANDING.ar;
       <a class="rc-btn hero-cta" href="/about">{copy.hero.ctaSecondary}</a>
     </div>
   </section>
+
+  <ResumeCard />
 
   <section class="features">
     <h2 class="page-title">{t('ar', 'landingFeaturesTitle')}</h2>

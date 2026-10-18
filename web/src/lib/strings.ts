@@ -52,6 +52,7 @@ const dict = {
     panelRetry: 'إعادة المحاولة',
     panelSource: 'المصدر',
     landingFeaturesTitle: 'الميزات',
+    resumeTitle: 'متابعة القراءة',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -103,6 +104,7 @@ const dict = {
     panelRetry: 'Retry',
     panelSource: 'Source',
     landingFeaturesTitle: 'Features',
+    resumeTitle: 'Continue reading',
   },
 } as const;
 

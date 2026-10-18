@@ -23,3 +23,51 @@ test('landing nav points to the quran index and reciters', async ({ page }) => {
   await expect(page.locator('header a[href="/quran"]')).toHaveCount(1);
   await expect(page.locator('header a[href="/reciters"]')).toHaveCount(1);
 });
+
+test('landing shows no resume card with empty storage', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('[data-qy="resume"]')).toHaveCount(0);
+});
+
+test('landing resume card links to the stored last-read ayah', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:last-read', '{"s":36,"a":5}');
+  });
+  await page.goto('/');
+  const card = page.locator('[data-qy="resume"]');
+  await expect(card).toHaveCount(1);
+  await expect(card).toHaveAttribute('href', '/surah/36#ayah-5');
+  await expect(card).toContainText('يس');
+});
+
+test('landing ignores a corrupt resume point', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:last-read', 'not-json');
+  });
+  await page.goto('/');
+  await expect(page.locator('[data-qy="resume"]')).toHaveCount(0);
+});
+
+test('landing resume card appears on ClientRouter entry from another page', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:last-read', '{"s":36,"a":5}');
+  });
+  await page.goto('/quran');
+  await page.locator('header .brand').click();
+  await page.waitForURL((url) => url.pathname === '/');
+  await expect(page.locator('.hero-ayah')).toBeVisible();
+  await expect(page.locator('[data-qy="resume"]')).toHaveCount(1);
+});
+
+test('landing resume card survives a ClientRouter round-trip', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:last-read', '{"s":36,"a":5}');
+  });
+  await page.goto('/');
+  await expect(page.locator('[data-qy="resume"]')).toHaveCount(1);
+  await page.locator('header a[href="/quran"]').click();
+  await page.waitForURL('**/quran**');
+  await page.locator('header .brand').click();
+  await page.waitForURL((url) => url.pathname === '/');
+  await expect(page.locator('[data-qy="resume"]')).toHaveCount(1);
+});
