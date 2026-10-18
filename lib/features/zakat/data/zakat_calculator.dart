@@ -86,7 +86,7 @@ class ZakatCalculator {
     final nisabValue = input.nisabBySilver
         ? silverNisabGrams * silverPricePerGram
         : goldNisabGrams * goldPricePerGram;
-    final due = zakatable > 0 && zakatable >= nisabValue;
+    final due = nisabValue > 0 && zakatable > 0 && zakatable >= nisabValue;
     return ZakatResult(
       zakatable: zakatable,
       nisabValue: nisabValue,
