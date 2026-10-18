@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'duas_cubit.dart';
@@ -75,6 +76,9 @@ class _DuasView extends StatelessWidget {
     return BlocBuilder<DuasCubit, DuasState>(
       builder: (context, state) {
         final view = state as DuasInView;
+        if (view.entries.isEmpty) {
+          return EmptyState(AppLocalizations.of(context).noResults);
+        }
         return Column(
           children: [
             SingleChildScrollView(
@@ -131,6 +135,9 @@ class _RuqyahView extends StatelessWidget {
     return BlocBuilder<DuasCubit, DuasState>(
       builder: (context, state) {
         final view = state as RuqyahInView;
+        if (view.entries.isEmpty) {
+          return EmptyState(AppLocalizations.of(context).noResults);
+        }
         return ListView.builder(
           padding: const EdgeInsets.all(12),
           itemCount: view.entries.length,
