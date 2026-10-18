@@ -63,27 +63,21 @@ class ZakatScreen extends StatelessWidget {
               const SizedBox(height: 10),
               _Field(
                   label: loc.goldGrams,
-                  initial: ready.goldGrams,
                   onChanged: context.read<ZakatCubit>().setGoldGrams),
               _Field(
                   label: loc.silverGrams,
-                  initial: ready.silverGrams,
                   onChanged: context.read<ZakatCubit>().setSilverGrams),
               _Field(
                   label: loc.goldPrice,
-                  initial: ready.goldPrice,
                   onChanged: context.read<ZakatCubit>().setGoldPrice),
               _Field(
                   label: loc.silverPrice,
-                  initial: ready.silverPrice,
                   onChanged: context.read<ZakatCubit>().setSilverPrice),
               _Field(
                   label: loc.cash,
-                  initial: ready.cash,
                   onChanged: context.read<ZakatCubit>().setCash),
               _Field(
                   label: loc.debts,
-                  initial: ready.debts,
                   onChanged: context.read<ZakatCubit>().setDebts),
               const SizedBox(height: 14),
               Card(
@@ -154,12 +148,10 @@ class ZakatScreen extends StatelessWidget {
 class _Field extends StatelessWidget {
   const _Field({
     required this.label,
-    required this.initial,
     required this.onChanged,
   });
 
   final String label;
-  final String initial;
   final ValueChanged<String> onChanged;
 
   @override
