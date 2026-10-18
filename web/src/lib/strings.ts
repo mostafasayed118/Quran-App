@@ -51,6 +51,7 @@ const dict = {
     panelError: 'تعذر تحميل المحتوى',
     panelRetry: 'إعادة المحاولة',
     panelSource: 'المصدر',
+    landingFeaturesTitle: 'الميزات',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -101,6 +102,7 @@ const dict = {
     panelError: "Couldn't load content",
     panelRetry: 'Retry',
     panelSource: 'Source',
+    landingFeaturesTitle: 'Features',
   },
 } as const;
 
