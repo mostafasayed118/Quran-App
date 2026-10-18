@@ -56,8 +56,8 @@ test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text',
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.locator('.ayah')).toHaveCount(286);
-  // Surah display name stays Arabic script (app parity); the chrome around it is EN.
-  await expect(page.locator('.reader-head h1')).toContainText('البقرة');
+  // EN chrome uses the English surah name (owner ruling 2026-10-19).
+  await expect(page.locator('.reader-head h1')).toContainText('Al-Baqarah');
   await expect(page.locator('[data-qy="reader-play"]')).toHaveText(t('en', 'readerPlay'));
   await expect(page.locator('[data-qy="reciter-pick"]')).toHaveAttribute('aria-label', t('en', 'readerPickReciter'));
   // Per-ayah action chrome is EN too (AyahBlock locale plumbing).
@@ -86,7 +86,7 @@ test('EN index card resolves to the live EN reader route', async ({ page }) => {
   await page.goto('/en/quran');
   await page.locator('.surah-list a[href="/en/surah/1"]').click();
   await page.waitForURL('**/en/surah/1**');
-  await expect(page.locator('.reader-head h1')).toContainText('الفاتحة');
+  await expect(page.locator('.reader-head h1')).toContainText('Al-Fatihah');
   await expect(page.locator('.ayah').first()).toBeVisible();
 });
 

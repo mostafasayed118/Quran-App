@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { filterSurahs } from '../lib/surah-filter';
 import { loadSearchIndex, matchSpan, searchAyahs, type Hit } from '../lib/search';
+import { surahDisplayName } from '../lib/surah-name';
 import { t, type Locale } from '../lib/strings';
 import surahs from '../data/surahs.json';
 
@@ -64,7 +65,7 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
           <li key={s.id}>
             <a href={`${base}/surah/${s.id}`}>
               <span className="surah-num">{s.id}</span>
-              <span className="surah-name">{s.nameAr}</span>
+              <span className="surah-name">{surahDisplayName(s, locale)}</span>
               <span className="surah-meta">{s.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {s.ayahCount}</span>
             </a>
           </li>

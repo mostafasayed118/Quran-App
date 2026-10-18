@@ -2,13 +2,14 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ReaderPage from '../../../components/pages/ReaderPage.astro';
 import { t } from '../../../lib/strings';
+import { surahDisplayName } from '../../../lib/surah-name';
 import surahs from '../../../data/surahs.json';
 
 export function getStaticPaths() {
   return surahs.surahs.map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
 }
 const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
-const title = `${surah.nameAr} — ${t('en', 'appName')}`;
+const title = `${surahDisplayName(surah, 'en')} — ${t('en', 'appName')}`;
 ---
 <BaseLayout title={title} locale="en" preloadFont>
   <ReaderPage locale="en" surah={surah} />

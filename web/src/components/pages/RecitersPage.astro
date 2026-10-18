@@ -19,14 +19,15 @@ const { locale = 'ar' } = Astro.props;
 </section>
 <script>
   import { fetchReciters, isFeaturedRow, sortReciters, surahAudioUrl, type MoshafRow } from '../../lib/reciters';
-  import { toArabicDigits } from '../../lib/arabic-digits';
+  import { digitsFor } from '../../lib/arabic-digits';
+  import { surahDisplayName } from '../../lib/surah-name';
   import { t, type Locale } from '../../lib/strings';
   import surahsData from '../../data/surahs.json';
 
   let L: Locale = 'ar';
-  const surahNames = new Map<number, string>(
-    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string }> }).surahs.map(
-      (s): [number, string] => [s.id, s.nameAr],
+  const surahNames = new Map<number, { nameAr: string; nameEn: string }>(
+    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string; nameEn: string }> }).surahs.map(
+      (s): [number, { nameAr: string; nameEn: string }] => [s.id, { nameAr: s.nameAr, nameEn: s.nameEn }],
     ),
   );
 
@@ -37,7 +38,9 @@ const { locale = 'ar' } = Astro.props;
   }
 
   function surahLabel(surah: number): string {
-    return `${toArabicDigits(surah)}. ${surahNames.get(surah) ?? ''}`;
+    const s = surahNames.get(surah);
+    const name = s ? surahDisplayName(s, L) : '';
+    return `${digitsFor(surah, L)}. ${name}`;
   }
 
   function buildSurahList(row: MoshafRow, list: HTMLUListElement): void {

@@ -3,6 +3,7 @@ import AyahBlock from '../AyahBlock.astro';
 import ContentPanel from '../ContentPanel.astro';
 import { surahNeighbors } from '../../lib/surah-neighbors';
 import { t, type Locale } from '../../lib/strings';
+import { surahDisplayName } from '../../lib/surah-name';
 import { toArabicDigits } from '../../lib/arabic-digits';
 import surahs from '../../data/surahs.json';
 interface Props { surah: (typeof surahs.surahs)[number]; locale?: Locale }
@@ -27,7 +28,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 </script>
 <article class="reader">
   <header class="reader-head">
-    <h1>{locale === 'ar' ? `سورة ${surah.nameAr}` : surah.nameAr}</h1>
+    <h1>{locale === 'ar' ? `سورة ${surah.nameAr}` : surahDisplayName(surah, locale)}</h1>
     <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {locale === 'en' ? surah.ayahCount : `${toArabicDigits(surah.ayahCount)} آية`}</p>
     <div class="reader-controls" data-locale={locale}>
       <button type="button" class="rc-btn" data-qy-view="mushaf" aria-pressed="true">{t(locale, 'readerViewMushaf')}</button>
