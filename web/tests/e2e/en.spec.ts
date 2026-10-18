@@ -32,6 +32,19 @@ test('EN quran index shows the EN heading over 114 surah cards', async ({ page }
   expect(await page.locator('.surah-list a[href^="/en/surah/"]').count()).toBeGreaterThan(0);
 });
 
+test('EN index search never fetches or shows the verse panel', async ({ page }) => {
+  const indexRequests: string[] = [];
+  page.on('request', (req) => {
+    if (req.url().includes('search-index')) indexRequests.push(req.url());
+  });
+  await page.goto('/en/quran');
+  await page.getByRole('searchbox').fill('Al-Fatihah');
+  await expect(page.locator('.surah-list a')).toHaveCount(1);
+  await expect(page.locator('.surah-list a').first()).toContainText('Al-Fatihah');
+  await expect(page.locator('.ayah-search')).toHaveCount(0);
+  expect(indexRequests).toHaveLength(0);
+});
+
 test('EN reciters page resolves the loading state into EN content', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
   await page.goto('/en/reciters');

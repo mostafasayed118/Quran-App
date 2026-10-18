@@ -26,9 +26,12 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
   const results = useMemo(() => filterSurahs(surahs.surahs, q), [q]);
   const active = q.trim().length >= 2;
   const base = locale === 'en' ? '/en' : '';
+  // Verse search is AR-only (EN chrome hides it and never loads the index) and is
+  // pointless for digit-only queries, which the surah-number filter already answers.
+  const showAyahSearch = active && locale !== 'en' && !/^[0-9٠-٩]+$/.test(q.trim());
 
   useEffect(() => {
-    if (!active || ready || failed) return;
+    if (!showAyahSearch || ready || failed) return;
     let cancelled = false;
     setLoading(true);
     loadSearchIndex()
@@ -45,7 +48,7 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
     return () => {
       cancelled = true;
     };
-  }, [active, ready, failed]);
+  }, [showAyahSearch, ready, failed]);
 
   useEffect(() => {
     if (ready) setHits(searchAyahs(q));
@@ -71,7 +74,7 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
           </li>
         ))}
       </ol>
-      {active && (
+      {showAyahSearch && (
         <section className="ayah-search" aria-labelledby="ayah-search-title">
           <h2 id="ayah-search-title" className="ayah-search-title">{t(locale, 'searchAyahsTitle')}</h2>
           {loading && <p className="search-loading" role="status">{t(locale, 'searchLoading')}</p>}

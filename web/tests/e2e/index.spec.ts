@@ -9,6 +9,19 @@ test('index lists 114 surahs and filters', async ({ page }) => {
   await expect(page.locator('.surah-list a')).toHaveAttribute('href', '/surah/18');
 });
 
+test('digit-only query filters surahs without the verse area or an index fetch', async ({ page }) => {
+  const indexRequests: string[] = [];
+  page.on('request', (req) => {
+    if (req.url().includes('search-index')) indexRequests.push(req.url());
+  });
+  await page.goto('/quran');
+  await page.getByRole('searchbox').fill('112');
+  await expect(page.locator('.surah-list a')).toHaveCount(1);
+  await expect(page.locator('.surah-list a').first()).toContainText('الإخلاص');
+  await expect(page.locator('.ayah-search')).toHaveCount(0);
+  expect(indexRequests).toHaveLength(0);
+});
+
 test('ayah search finds the Light verse and caps results at 50', async ({ page }) => {
   await page.goto('/quran');
   await page.getByRole('searchbox').fill('الله نور السماوات');
