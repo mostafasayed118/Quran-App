@@ -420,4 +420,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String downloadProgressOfTotal(String received, String total) {
     return '$received من $total م.ب';
   }
+
+  @override
+  String get playbackNoReciters =>
+      'تعذّر التشغيل — حمّل فهرس القرّاء من الإنترنت';
+
+  @override
+  String get playbackBackgroundFailed =>
+      'تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح';
 }

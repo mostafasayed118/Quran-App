@@ -155,10 +155,13 @@ class _FailedStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final message = switch (kind) {
+      PlaybackFailureKind.network => loc.playbackFailed,
+      PlaybackFailureKind.backgroundUnavailable => loc.playbackBackgroundFailed,
+      PlaybackFailureKind.noReciters => loc.playbackNoReciters,
+    };
     return ErrorStrip(
-      kind == PlaybackFailureKind.network
-          ? loc.playbackFailed
-          : loc.noReciters,
+      message,
       dismissTooltip: loc.stopAction,
       onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
     );

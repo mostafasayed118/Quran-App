@@ -13,9 +13,10 @@
 ///
 /// Chosen semantics: app startup must never fail because of background audio.
 /// [attempt] runs the initializer, never rethrows, and reports the outcome;
-/// `main` continues either way. If init failed, later playback attempts
-/// surface through the existing `PlaybackFailureKind.network` path in
-/// `PlaybackCubit` instead of crashing the launch.
+/// `main` continues either way. If init failed, later failed playback attempts
+/// are labelled `PlaybackFailureKind.backgroundUnavailable` by `PlaybackCubit`
+/// (instead of claiming a network failure), so the user gets a truthful
+/// signal that background audio is unavailable.
 class BackgroundInitGuard {
   BackgroundInitGuard._();
 

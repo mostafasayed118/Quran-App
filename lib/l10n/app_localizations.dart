@@ -847,6 +847,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{received} من {total} م.ب'**
   String downloadProgressOfTotal(String received, String total);
+
+  /// No description provided for @playbackNoReciters.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر التشغيل — حمّل فهرس القرّاء من الإنترنت'**
+  String get playbackNoReciters;
+
+  /// No description provided for @playbackBackgroundFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح'**
+  String get playbackBackgroundFailed;
 }
 
 class _AppLocalizationsDelegate

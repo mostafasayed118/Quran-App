@@ -421,4 +421,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String downloadProgressOfTotal(String received, String total) {
     return '$received of $total MB';
   }
+
+  @override
+  String get playbackNoReciters =>
+      'Couldn\'t play — load the reciters index from the internet';
+
+  @override
+  String get playbackBackgroundFailed =>
+      'Couldn\'t play the recitation — background audio is unavailable';
 }

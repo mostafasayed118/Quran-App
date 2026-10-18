@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/app_database.dart';
 import '../../data/audio_downloader.dart';
 import '../../data/reciter_repository.dart';
+import '../../playback/background_init_guard.dart';
 import '../../playback/playback_service.dart';
 import 'playback_state.dart';
 
@@ -14,16 +15,30 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     required PlaybackService service,
     required ReciterRepository reciters,
     required AudioDownloader downloader,
+    bool Function()? backgroundActive,
   })  : _service = service,
         _reciters = reciters,
         _downloader = downloader,
+        _backgroundActive = backgroundActive ?? _probeBackgroundInit,
         super(const PlaybackState.initial());
 
   final PlaybackService _service;
   final ReciterRepository _reciters;
   final AudioDownloader _downloader;
 
+  /// Whether the background-audio bootstrap succeeded. When it did not, a
+  /// failed load is labelled [PlaybackFailureKind.backgroundUnavailable]
+  /// instead of masquerading as a network failure.
+  final bool Function() _backgroundActive;
+
+  static bool _probeBackgroundInit() => BackgroundInitGuard.active;
+
   String _reciterName = '';
+
+  /// Monotonic play-attempt counter: bumped by every play attempt and by
+  /// [stopAndReset], so a hung attempt's late success/failure is discarded
+  /// once a newer attempt (or a stop) superseded it.
+  int _episode = 0;
 
   StreamSubscription<bool>? _playingSub;
   StreamSubscription<Duration>? _positionSub;
@@ -31,13 +46,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 
   Future<void> playSurah(ReciterRow row, int surahNumber) async {
     if (isClosed) return;
+    final episode = ++_episode;
     _reciterName = row.reciterName;
     emit(PlaybackState.loading(
       reciterName: row.reciterName,
       surahNumber: surahNumber,
     ));
     final downloaded = await _downloader.downloadedPath(row.id, surahNumber);
-    if (isClosed) return;
+    if (isClosed || episode != _episode) return;
     final source = downloaded != null
         ? PlaybackSource.file(
             downloaded,
@@ -52,18 +68,23 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _bindStreams();
     try {
       await _service.loadAndPlay(source);
-      if (isClosed) return;
+      if (isClosed || episode != _episode) return;
       emit(PlaybackState.playing(
         reciterName: _reciterName,
         surahNumber: surahNumber,
       ));
     } on Object {
-      if (isClosed) return;
-      emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
+      if (isClosed || episode != _episode) return;
+      emit(PlaybackState.failed(
+        kind: _backgroundActive()
+            ? PlaybackFailureKind.network
+            : PlaybackFailureKind.backgroundUnavailable,
+      ));
     }
   }
 
   Future<void> playDefaultForSurah(int surahNumber) async {
+    final episode = ++_episode;
     final ReciterRow row;
     try {
       final selectedId = await _reciters.loadSelectedMoshaf();
@@ -71,7 +92,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
           selectedId == null ? null : await _reciters.byId(selectedId);
       if (candidate == null) {
         final all = sortReciters(await _reciters.watchAll().first);
-        if (isClosed) return;
+        if (isClosed || episode != _episode) return;
         if (all.isEmpty) {
           emit(const PlaybackState.failed(
             kind: PlaybackFailureKind.noReciters,
@@ -84,10 +105,11 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     } on Object catch (error, stackTrace) {
       dev.log('reciter lookup failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || episode != _episode) return;
       emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
       return;
     }
+    if (isClosed || episode != _episode) return;
     await playSurah(row, surahNumber);
   }
 
@@ -129,6 +151,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   Future<void> stopAndReset() async {
+    _episode++;
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
