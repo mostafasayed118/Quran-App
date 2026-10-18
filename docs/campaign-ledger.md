@@ -399,3 +399,15 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Results (PM-run; screenshots in `C:\Users\ASUS\AppData\Local\Temp\opencode\p4app-device\`):** COLD `/surah/36#ayah-1` → reader يس:1 ✅ · **WARM same-route reader-يس → `/surah/2#ayah-255` → reader البقرة scrolled to آية ٢٥٥ ✅ (the fix2 acceptance — pre-fix this stayed on يس)** · WARM same-route back → `/surah/36#ayah-1` → يس:1 ✅ (both directions) · WARM cross-path `/reciters` → reciters ✅.
 - **Chain closed:** cold + warm cross-path + warm same-route are all device-proven on the final build; the P4-app deep-link acceptance (shared link → app at the exact content) is fully verified.
 - **State:** main @ `2045257` (+ this ledger commit), porcelain owner-debris only, **unpushed 10 → 11** (this entry). NO PUSH — window belongs to the owner.
+
+### Push window — P4-app fix chain + web P3 landing (01bbf47..fa63f73) — 2026-10-18
+- **Range:** `01bbf47..fa63f73` — 12 commits: P4-app-fix2 (`75dd570` fix + `948a683` hardening) + close-out `d0b0be3` + device-leg record `1035ed7` · web P3 landing wave (`55dbce9` plan · `55471e8` qy:last-read · `1a45b4b` resume flush · `784abdd` locale chrome · `30e1b8c` landing · `2045257` resume card · `fa63f73` download CTAs) · window ledger `8c756db`.
+- **Pre-flight:** HEAD `fa63f73`; FF_OK (`merge-base --is-ancestor` exit 0); remote static at `01bbf47`; porcelain = owner debris + `?? INSTRUCTIONS.md`; no competing processes.
+- **App gates (PM-run at `2045257`):** `flutter analyze` **0** · `flutter test` **381/381** (fix2 re-verification; zero app-code delta after `948a683`).
+- **Push:** `git push origin main`; ls-remote proof: remote tip == `fa63f732a18046fe0810a2866a5954a2f184d571` == local HEAD; unpushed 0.
+- **CI on `fa63f73`:** `web-gates` **39155567883** success (29s) · `ci` **39155567909** in-flight at close look.
+- **State:** ledger commit follows (local-only). NO PUSH beyond the window.
+
+### P4-app — verse-share device proof (end-to-end) — PASS 2026-10-18
+- **Procedure (PM, Infinix X6882, installed artifact `DAC19C63…`):** cold deep link → reader يس; `uiautomator` found 5 share nodes (`content-desc="مشاركة الآية"`, one per visible verse card); tapped the first (147,708) → the Android system share sheet opened with the verse text in the preview («يس» + «…» = text + the web-link line) and the full target list (WhatsApp/Facebook/…); dismissed via BACK. Screenshot: `…\p4app-device\share_sheet.png`. The exact payload (imlaei `textImlaei` + `webSurahUrl` `#ayah-{m}`, no trailing slash) stays pinned by the unit tests + source read; the system sheet omits full extras by design.
+- **State:** main @ `fa63f73` (+ this ledger commit — local-only), porcelain owner-debris only, **unpushed 0 → 1** (this entry). NO PUSH beyond the window.
