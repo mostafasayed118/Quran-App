@@ -1,4 +1,40 @@
 import { test, expect } from '@playwright/test';
+import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
+
+async function expectMinHeight(
+  page: import('@playwright/test').Page,
+  selector: string,
+): Promise<void> {
+  const heights = await page
+    .locator(selector)
+    .evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height));
+  expect(heights.length, `${selector} present`).toBeGreaterThan(0);
+  for (const h of heights) expect(h, selector).toBeGreaterThanOrEqual(44);
+}
+
+test.describe('coarse-pointer targets are at least 44px at 360', () => {
+  test.use({ viewport: { width: 360, height: 800 }, hasTouch: true });
+
+  test('header, chrome and hero controls', async ({ page }) => {
+    await page.goto('/');
+    for (const sel of ['header .brand', 'header nav a', 'header .lang-switch', 'header .theme-toggle', '.hero-cta']) {
+      await expectMinHeight(page, sel);
+    }
+  });
+
+  test('ayah actions, reader toolbar and reciter controls', async ({ page }) => {
+    await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+    await page.goto('/surah/2/');
+    for (const sel of ['.reader-controls .rc-btn', '.ayah-actions button', '[data-qy="reader-play"]']) {
+      await expectMinHeight(page, sel);
+    }
+    await page.goto('/reciters/');
+    await page.locator('[data-reciter-row]').first().locator('[data-reciter-toggle]').click();
+    for (const sel of ['[data-reciter-play]', '[data-surah-download]']) {
+      await expectMinHeight(page, sel);
+    }
+  });
+});
 
 test.describe('chrome a11y', () => {
   test('skip link is the first focusable and targets #main', async ({ page }) => {
