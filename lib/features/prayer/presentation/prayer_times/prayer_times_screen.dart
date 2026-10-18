@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -44,15 +46,39 @@ class PrayerTimesScreen extends StatelessWidget {
   }
 }
 
-class _TimesList extends StatelessWidget {
+class _TimesList extends StatefulWidget {
   const _TimesList({required this.state});
 
   final PrayerTimesReady state;
 
   @override
+  State<_TimesList> createState() => _TimesListState();
+}
+
+class _TimesListState extends State<_TimesList> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    final cubit = context.read<PrayerTimesCubit>();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      cubit.refreshCountdown();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    final state = widget.state;
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: state.entries.length + 1,

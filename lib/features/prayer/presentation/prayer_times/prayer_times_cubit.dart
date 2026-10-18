@@ -15,10 +15,12 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     required CityRepository city,
     ReminderScheduler? scheduler,
     ReminderSettings? reminderSettings,
+    DateTime Function()? clock,
   })  : _prayer = prayer,
         _city = city,
         _scheduler = scheduler,
         _reminderSettings = reminderSettings,
+        _clock = clock ?? DateTime.now,
         super(const PrayerTimesState.loading()) {
     unawaited(reload());
   }
@@ -27,6 +29,9 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
   final CityRepository _city;
   final ReminderScheduler? _scheduler;
   final ReminderSettings? _reminderSettings;
+  final DateTime Function() _clock;
+
+  DateTime? _loadedDay;
 
   Future<void> reload() async {
     final selected = await _city.selectedCity();
@@ -35,14 +40,17 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       emit(const PrayerTimesState.ready());
       return;
     }
-    final now = DateTime.now();
+    final now = _clock();
     final next = _prayer.nextPrayer(selected.coordinates, now);
     final entries = <PrayerEntry>[
       for (final choice in _prayer.today(selected.coordinates, now))
         PrayerEntry(
           name: choice.name,
           time: choice.time,
-          isNext: choice.name == next.name,
+          // Same-occurrence match: after Isha the service returns tomorrow's
+          // Fajr — it must not flag today's already-passed Fajr row.
+          isNext: choice.name == next.name &&
+              choice.time.isAtSameMomentAs(next.time),
         ),
     ];
     final nextEntry = entries
@@ -50,6 +58,7 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
         .fold<PrayerEntry?>(null, (best, e) => best ?? e);
     final remaining = nextEntry?.time.difference(now);
     if (isClosed) return;
+    _loadedDay = DateTime(now.year, now.month, now.day);
     emit(PrayerTimesState.ready(
       city: selected,
       entries: entries,
@@ -57,6 +66,41 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
           remaining != null && remaining > Duration.zero ? remaining : null,
     ));
     _scheduleReminders();
+  }
+
+  /// Recomputes the countdown while the screen is open (the screen owns the
+  /// 1 s ticker). Reloads when the flagged prayer passes or the day rolls
+  /// over so the highlight never stays on a passed row.
+  void refreshCountdown() {
+    if (isClosed) return;
+    final state = this.state;
+    if (state is! PrayerTimesReady || state.city == null) return;
+    final now = _clock();
+    final loaded = _loadedDay;
+    if (loaded == null ||
+        now.year != loaded.year ||
+        now.month != loaded.month ||
+        now.day != loaded.day) {
+      unawaited(reload());
+      return;
+    }
+    PrayerEntry? nextEntry;
+    for (final entry in state.entries) {
+      if (entry.isNext) {
+        nextEntry = entry;
+        break;
+      }
+    }
+    if (nextEntry == null) return;
+    final remaining = nextEntry.time.difference(now);
+    if (remaining <= Duration.zero) {
+      unawaited(reload());
+      return;
+    }
+    final current = state.remaining;
+    if (current == null || current.inMinutes != remaining.inMinutes) {
+      emit(state.copyWith(remaining: remaining));
+    }
   }
 
   /// W7b: reminders are (re)computed after every successful load (startup +
