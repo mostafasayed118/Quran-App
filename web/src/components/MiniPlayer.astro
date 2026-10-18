@@ -12,7 +12,7 @@ const { locale = 'ar' } = Astro.props;
     <span class="mp-title" data-qy="title"></span>
     <span class="mp-reciter" data-qy="reciter"></span>
   </div>
-  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" aria-label={t(locale, 'playerSeek')} aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
+  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" tabindex="0" aria-label={t(locale, 'playerSeek')} aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
   <span class="mp-time" data-qy="time"></span>
   <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>✕</button>
 </div>
@@ -63,6 +63,14 @@ const { locale = 'ar' } = Astro.props;
     $('seek').addEventListener('click', (e) => {
       const rect = $('seek').getBoundingClientRect();
       player.seekRatio(((e as MouseEvent).clientX - rect.left) / rect.width);
+    });
+    $('seek').addEventListener('keydown', (e) => {
+      const ke = e as KeyboardEvent;
+      if (ke.key !== 'ArrowLeft' && ke.key !== 'ArrowRight') return;
+      const st = player.state();
+      if (!(st.duration > 0)) return;
+      ke.preventDefault();
+      player.seekRatio(st.currentTime / st.duration + (ke.key === 'ArrowRight' ? 0.05 : -0.05));
     });
     $('close').addEventListener('click', () => { dismissed = true; setVisible(false); });
     document.addEventListener('qy:play', (e) => {

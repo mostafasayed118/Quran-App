@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
 import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
 
 test('player: play from reciters page persists across SPA navigation', async ({ page }) => {
@@ -63,4 +64,44 @@ test('player: audio error shows the localized message and toggle retries', async
   await toggle.click(); // retry
   await expect(toggle).toHaveText('⏸');
   await expect(bar.locator('[data-qy="time"]')).not.toHaveText('تعذّر التشغيل');
+});
+
+test('player: seek slider is keyboard operable', async ({ page }) => {
+  const wav = fs.readFileSync('tests/fixtures/silent.wav');
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  // Range-aware route: a plain 200 body is not seekable in Chromium (seekable collapses
+  // to [0,0] and every seek clamps to 0), which would nullify the feature under test.
+  // The real CDN serves byte ranges, so mirror that here.
+  await page.route('**/cdn.mp3quran.net/**', async (route) => {
+    const range = route.request().headers()['range'];
+    if (range) {
+      const m = /bytes=(\d+)-(\d*)/.exec(range);
+      const start = m ? Number(m[1]) : 0;
+      const end = m && m[2] ? Number(m[2]) : wav.length - 1;
+      await route.fulfill({ status: 206, headers: { 'Content-Type': 'audio/wav', 'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${start}-${end}/${wav.length}`, 'Content-Length': String(end - start + 1) }, body: wav.subarray(start, end + 1) });
+    } else {
+      await route.fulfill({ status: 200, headers: { 'Content-Type': 'audio/wav', 'Accept-Ranges': 'bytes', 'Content-Length': String(wav.length) }, body: wav });
+    }
+  });
+  await page.goto('/surah/1/');
+  const bar = page.locator('[data-qy="bar"]');
+  const seek = bar.locator('[data-qy="seek"]');
+  await page.locator('[data-qy="reader-play"]').click();
+  await expect(bar).toBeVisible();
+  await expect.poll(() => page.evaluate(() => (document.getElementById('qy-audio') as HTMLAudioElement).duration)).toBeGreaterThan(0);
+  // Freeze playback first: with the 1s fixture, natural time drift would move
+  // aria-valuenow on its own and fake a pass for the keypress assertion.
+  await page.evaluate(() => { const el = document.getElementById('qy-audio') as HTMLAudioElement | null; if (el) el.pause(); });
+  // Park the position at ~30% through the real click-to-seek path.
+  const box = await seek.boundingBox();
+  if (!box) throw new Error('seek slider has no box');
+  await seek.click({ position: { x: Math.floor(box.width * 0.3), y: Math.floor(box.height / 2) } });
+  const readPct = async () => Number(await seek.getAttribute('aria-valuenow'));
+  await expect.poll(readPct).toBeGreaterThanOrEqual(20);
+  await expect.poll(readPct).toBeLessThanOrEqual(40);
+  await seek.focus();
+  await expect(seek).toBeFocused();
+  const before = await readPct();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(readPct).toBeGreaterThanOrEqual(before + 3);
 });
