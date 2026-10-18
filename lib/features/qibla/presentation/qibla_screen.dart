@@ -12,6 +12,20 @@ import '../data/heading_service.dart';
 import 'qibla_cubit.dart';
 import 'qibla_state.dart';
 
+/// Rebuild gate for the qibla body. Heading samples arrive per sensor event;
+/// sub-degree jitter (same rounded heading) skips a rebuild, so the dial can
+/// trail by less than 1° until the next crossing. Every other field change
+/// rebuilds.
+bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
+  if (previous.runtimeType != current.runtimeType) return true;
+  return switch ((previous, current)) {
+    (final QiblaReady a, final QiblaReady b) => a.city != b.city ||
+        a.bearing != b.bearing ||
+        a.compassUnavailable != b.compassUnavailable ||
+        a.heading?.round() != b.heading?.round(),
+  };
+}
+
 class QiblaScreen extends StatelessWidget {
   const QiblaScreen({super.key});
 
@@ -21,6 +35,7 @@ class QiblaScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(loc.qibla)),
       body: BlocBuilder<QiblaCubit, QiblaState>(
+        buildWhen: qiblaBodyShouldRebuild,
         builder: (context, state) {
           final (:city, :bearing, :heading, :compassUnavailable) =
               switch (state) {
