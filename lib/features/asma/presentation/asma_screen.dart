@@ -85,7 +85,23 @@ class AsmaScreen extends StatelessWidget {
                     );
                   },
                 ),
-                if (selected != null) _NameSheet(name: selected),
+                if (selected != null) ...[
+                  Positioned.fill(
+                    child: ExcludeSemantics(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => context.read<AsmaCubit>().select(null),
+                        child: ColoredBox(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .scrim
+                              .withValues(alpha: 0.32),
+                        ),
+                      ),
+                    ),
+                  ),
+                  _NameSheet(name: selected),
+                ],
               ],
             ),
         },
