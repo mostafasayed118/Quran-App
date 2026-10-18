@@ -45,7 +45,7 @@ test('reader boot script re-applies seeded settings right after SPA entry', asyn
     localStorage.setItem('qy:reader', JSON.stringify({ view: 'imlaei', fontStep: 2 }));
   });
   await page.goto('/quran');
-  await page.locator('.surah-list a[href="/surah/1"]').click();
+  await page.locator('.surah-list a[href="/surah/1/"]').click();
   await page.waitForURL('**/surah/1**');
   await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
   const step = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--reader-step').trim());
@@ -91,7 +91,7 @@ test('a pending resume flush cannot overwrite the next surah after a ClientRoute
     }, 50);
   });
   await page.locator('#ayah-100').scrollIntoViewIfNeeded(); // arms the ~1s flush
-  await page.locator('.reader-nav a[href="/surah/3"]').click(); // SPA swap inside that throttle window
+  await page.locator('.reader-nav a[href="/surah/3/"]').click(); // SPA swap inside that throttle window
   await page.waitForURL('**/surah/3**');
   await page.waitForTimeout(2000); // covers any stale flush plus the new observer's first flush
   const points = await page.evaluate(() => {

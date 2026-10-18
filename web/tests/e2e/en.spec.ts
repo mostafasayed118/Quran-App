@@ -21,8 +21,8 @@ test('EN home renders LTR chrome with the EN hero lead and 14 features', async (
   await expect(page.locator('.hero-lead')).toHaveText(LANDING.en.hero.lead);
   await expect(page.locator('.feat-item')).toHaveCount(14);
   await expect(page.locator('.feat-item').first()).toContainText(LANDING.en.features[0].title);
-  await expect(page.locator('.hero a[href="/en/quran"]')).toBeVisible();
-  await expect(page.locator('.hero a[href="/en/about"]')).toBeVisible();
+  await expect(page.locator('.hero a[href="/en/quran/"]')).toBeVisible();
+  await expect(page.locator('.hero a[href="/en/about/"]')).toBeVisible();
 });
 
 test('EN quran index shows the EN heading over 114 surah cards', async ({ page }) => {
@@ -90,14 +90,14 @@ test('EN surah reader: mini-player plays and survives an in-app navigation', asy
   await expect(bar).toBeVisible();
   await expect(bar.locator('[data-qy="title"]')).not.toBeEmpty();
   // Persistence is a CLIENT-ROUTER behavior: hop via an in-app link, never page.goto.
-  await page.locator('header a[href="/en/quran"]').click();
+  await page.locator('header a[href="/en/quran/"]').click();
   await page.waitForURL('**/en/quran**');
   await expect(page.locator('[data-qy="bar"]')).toBeVisible();
 });
 
 test('EN index card resolves to the live EN reader route', async ({ page }) => {
   await page.goto('/en/quran');
-  await page.locator('.surah-list a[href="/en/surah/1"]').click();
+  await page.locator('.surah-list a[href="/en/surah/1/"]').click();
   await page.waitForURL('**/en/surah/1**');
   await expect(page.locator('.reader-head h1')).toContainText('Al-Fatihah');
   await expect(page.locator('.ayah').first()).toBeVisible();
@@ -128,7 +128,7 @@ test('EN home resume card links to the stored last-read ayah', async ({ page }) 
   const card = page.locator('[data-qy="resume"]');
   await expect(card).toHaveCount(1);
   await expect(card).toBeVisible();
-  await expect(card).toHaveAttribute('href', '/en/surah/36#ayah-5');
+  await expect(card).toHaveAttribute('href', '/en/surah/36/#ayah-5');
   await expect(card).toContainText(t('en', 'resumeTitle'));
 });
 

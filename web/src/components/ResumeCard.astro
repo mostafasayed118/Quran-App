@@ -35,7 +35,7 @@ const { locale = 'ar' } = Astro.props;
     const link = document.createElement('a');
     link.className = 'resume-link';
     link.dataset.qy = 'resume';
-    link.href = `${locale === 'en' ? '/en' : ''}/surah/${point.s}#ayah-${point.a}`;
+    link.href = `${locale === 'en' ? '/en' : ''}/surah/${point.s}/#ayah-${point.a}`;
 
     const label = document.createElement('span');
     label.className = 'resume-label';

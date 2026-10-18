@@ -47,8 +47,8 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} locale={locale} />)}
   </div>
   <nav class="reader-nav">
-    {prev !== null ? <a href={`${base}/surah/${prev}`}>{t(locale, 'readerPrev')}</a> : <a href={`${base}/quran`}>{t(locale, 'backToIndex')}</a>}
-    {next !== null && <a href={`${base}/surah/${next}`}>{t(locale, 'readerNext')}</a>}
+    {prev !== null ? <a href={`${base}/surah/${prev}/`}>{t(locale, 'readerPrev')}</a> : <a href={`${base}/quran/`}>{t(locale, 'backToIndex')}</a>}
+    {next !== null && <a href={`${base}/surah/${next}/`}>{t(locale, 'readerNext')}</a>}
   </nav>
 </article>
 <style is:global>

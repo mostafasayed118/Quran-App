@@ -1,6 +1,6 @@
 export type SitemapEntry = { loc: string; alternates: { ar: string; en: string } };
 
-const STATIC_PATHS = ['/', '/quran', '/reciters', '/about', '/privacy'];
+const STATIC_PATHS = ['/', '/quran/', '/reciters/', '/about/', '/privacy/'];
 
 function enPath(path: string): string {
   return path === '/' ? '/en/' : `/en${path}`;
@@ -8,7 +8,7 @@ function enPath(path: string): string {
 
 export function buildSitemapUrls(site: string, surahIds: number[]): SitemapEntry[] {
   const origin = site.replace(/\/+$/, '');
-  const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}`)];
+  const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}/`)];
   return paths.map((path) => {
     const ar = `${origin}${path}`;
     return { loc: ar, alternates: { ar, en: `${origin}${enPath(path)}` } };

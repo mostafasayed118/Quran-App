@@ -13,12 +13,12 @@ function stringsOf(value: unknown, path = ''): TextEntry[] {
 
 describe('altLocalePath', () => {
   it('prefixes AR paths for en', () => {
-    expect(altLocalePath('/quran', 'en')).toBe('/en/quran');
-    expect(altLocalePath('/surah/2', 'en')).toBe('/en/surah/2');
+    expect(altLocalePath('/quran', 'en')).toBe('/en/quran/');
+    expect(altLocalePath('/surah/2', 'en')).toBe('/en/surah/2/');
   });
   it('strips the en prefix for ar', () => {
-    expect(altLocalePath('/en/quran', 'ar')).toBe('/quran');
-    expect(altLocalePath('/en/surah/2', 'ar')).toBe('/surah/2');
+    expect(altLocalePath('/en/quran', 'ar')).toBe('/quran/');
+    expect(altLocalePath('/en/surah/2', 'ar')).toBe('/surah/2/');
   });
   it('maps both homes', () => {
     expect(altLocalePath('/', 'en')).toBe('/en/');
@@ -33,7 +33,7 @@ describe('altLocalePath', () => {
   });
   it('treats only the /en segment as the en prefix', () => {
     expect(altLocalePath('/enigma', 'ar')).toBe('/enigma');
-    expect(altLocalePath('/enigma', 'en')).toBe('/en/enigma');
+    expect(altLocalePath('/enigma', 'en')).toBe('/en/enigma/');
   });
   it('falls back to the target locale home for non-absolute input', () => {
     expect(altLocalePath('quran', 'en')).toBe('/en/');

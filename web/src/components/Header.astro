@@ -13,8 +13,8 @@ const other: Locale = locale === 'en' ? 'ar' : 'en';
     <span>{t(locale, 'appName')}</span>
   </a>
   <nav>
-    <a href={`${base}/quran`}>{t(locale, 'navQuran')}</a>
-    <a href={`${base}/reciters`}>{t(locale, 'navReciters')}</a>
+    <a href={`${base}/quran/`}>{t(locale, 'navQuran')}</a>
+    <a href={`${base}/reciters/`}>{t(locale, 'navReciters')}</a>
   </nav>
   <a class="lang-switch" href={altLocalePath(Astro.url.pathname, other)} rel="alternate">{t(locale, 'langSwitchTo')}</a>
   <ThemeToggle locale={locale} />

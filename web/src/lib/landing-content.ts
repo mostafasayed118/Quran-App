@@ -9,10 +9,16 @@ function homeFor(to: Locale): string {
 export function altLocalePath(pathname: string, to: Locale): string {
   if (!pathname.startsWith('/')) return homeFor(to);
   const isEn = pathname === EN_PREFIX || pathname.startsWith(`${EN_PREFIX}/`);
-  if (to === 'en') return isEn ? pathname : `${EN_PREFIX}${pathname}`;
+  if (to === 'en') return isEn ? pathname : withTrailingSlash(`${EN_PREFIX}${pathname}`);
   if (!isEn) return pathname;
   const stripped = pathname.slice(EN_PREFIX.length);
-  return stripped === '' || stripped === '/' ? '/' : stripped;
+  return stripped === '' || stripped === '/' ? '/' : withTrailingSlash(stripped);
+}
+
+// Canonical links point at the trailing-slash form (live pages 308 to it), so locale
+// switches must emit that form too — a direct hit otherwise costs a redirect hop.
+function withTrailingSlash(path: string): string {
+  return path.endsWith('/') ? path : `${path}/`;
 }
 
 export interface LandingCopy {

@@ -13,12 +13,12 @@ test('player: play from reciters page persists across SPA navigation', async ({ 
   expect(seekBox && seekBox.height).toBeGreaterThanOrEqual(44);
   await expect(bar.locator('[data-qy="title"]')).not.toBeEmpty();
   // Persistence is a CLIENT-ROUTER behavior: navigate via an in-app link, never page.goto (that reloads).
-  await page.locator('header a[href="/quran"]').click();
+  await page.locator('header a[href="/quran/"]').click();
   await page.waitForURL('**/quran**');
   await expect(page.locator('[data-qy="bar"]')).toBeVisible();
   await expect(page.locator('[data-qy="toggle"]')).toHaveText('⏸');
   // Second SPA hop: quran index -> surah reader; the persisted player must survive again.
-  await page.locator('.surah-list a[href="/surah/1"]').click();
+  await page.locator('.surah-list a[href="/surah/1/"]').click();
   await page.waitForURL('**/surah/1**');
   await expect(page.locator('[data-qy="bar"]')).toBeVisible();
   await expect(page.locator('[data-qy="toggle"]')).toHaveText('⏸');

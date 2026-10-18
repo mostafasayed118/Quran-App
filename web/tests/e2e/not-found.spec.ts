@@ -11,7 +11,7 @@ test('unknown route serves the localized 404 page, not the home fallback', async
 
   const searchCta = page.getByRole('link', { name: 'ابحث في المصحف' });
   await expect(searchCta).toBeVisible();
-  await expect(searchCta).toHaveAttribute('href', '/quran');
+  await expect(searchCta).toHaveAttribute('href', '/quran/');
 
   const homeCta = page.getByRole('link', { name: 'الصفحة الرئيسية' });
   await expect(homeCta).toBeVisible();

@@ -66,7 +66,7 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
       <ol className="surah-list">
         {results.map((s) => (
           <li key={s.id}>
-            <a href={`${base}/surah/${s.id}`}>
+            <a href={`${base}/surah/${s.id}/`}>
               <span className="surah-num">{s.id}</span>
               <span className="surah-name">{surahDisplayName(s, locale)}</span>
               <span className="surah-meta">{s.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {s.ayahCount}</span>
@@ -88,7 +88,7 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
           <ol className="ayah-hits">
             {hits.map((h) => (
               <li key={`${h.s}:${h.a}`}>
-                <a href={`${base}/surah/${h.s}#ayah-${h.a}`}>
+                <a href={`${base}/surah/${h.s}/#ayah-${h.a}`}>
                   <HitText text={h.text} query={q} />
                 </a>
               </li>

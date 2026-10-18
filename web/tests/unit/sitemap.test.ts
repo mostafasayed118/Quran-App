@@ -10,11 +10,11 @@ describe('sitemap urls', () => {
     const entries = buildSitemapUrls(SITE, IDS);
     expect(entries).toHaveLength(119);
     const locs = entries.map((e) => e.loc);
-    for (const path of ['/', '/quran', '/reciters', '/about', '/privacy']) {
+    for (const path of ['/', '/quran/', '/reciters/', '/about/', '/privacy/']) {
       expect(locs).toContain(`${SITE}${path}`);
     }
-    expect(locs).toContain(`${SITE}/surah/1`);
-    expect(locs).toContain(`${SITE}/surah/114`);
+    expect(locs).toContain(`${SITE}/surah/1/`);
+    expect(locs).toContain(`${SITE}/surah/114/`);
     for (const entry of entries) {
       expect(entry.alternates.ar).toBe(entry.loc);
     }
@@ -28,7 +28,7 @@ describe('sitemap urls', () => {
       expect(entry.alternates.en).toBe(`${SITE}${expected}`);
     }
     expect(entries.find((e) => e.alternates.ar === `${SITE}/`)?.alternates.en).toBe(`${SITE}/en/`);
-    expect(entries.find((e) => e.alternates.ar === `${SITE}/surah/114`)?.alternates.en).toBe(`${SITE}/en/surah/114`);
+    expect(entries.find((e) => e.alternates.ar === `${SITE}/surah/114/`)?.alternates.en).toBe(`${SITE}/en/surah/114/`);
   });
 
   it('has no duplicate locs', () => {

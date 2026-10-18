@@ -17,9 +17,9 @@ test('reciters browser: featured-first, surah play + download, snapshot fallback
   await expect(featured.locator('[data-reciter-row]').nth(1)).toHaveAttribute('data-reciter-row', '118-1');
 
   // ClientRouter re-entry: leave and return in-session; the swapped-in shell must re-render and stay wired.
-  await page.locator('header a[href="/quran"]').click();
+  await page.locator('header a[href="/quran/"]').click();
   await page.waitForURL('**/quran**');
-  await page.locator('header a[href="/reciters"]').click();
+  await page.locator('header a[href="/reciters/"]').click();
   await page.waitForURL('**/reciters**');
   await expect(featured).toBeVisible();
   await expect(featured).toContainText('مشاري العفاسي');
