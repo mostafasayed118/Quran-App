@@ -309,3 +309,9 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **I3 (pack editions):** owner GO carried ratification of the five editions as shipped (swap-if-needed remains a small follow-up).
 - **Cloudflare:** production build auto-triggers on this push.
 - **State:** ledger commit follows (local-only).
+
+### I3 — owner ratification: five content editions (2026-10-18)
+- **Decision:** The owner explicitly ratified ALL five shipped tafsir/translation editions as served by the web (`web/src/lib/content-packs.ts`):
+  `ar-tafsir-muyassar` · `ar-tafsir-al-jalalayn` · `ara-sirajtafseer` · `eng-safiurrahmanalm` · `eng-mustafakhattabg` (The Clear Quran).
+- **Scope:** covers the web P2 panel as shipped AND the app's bundled/streamed pack usage of the same editions (same decision).
+- **Record:** supersedes the `OPEN-FOR-OWNER` flags for these editions in the licensing review; swapping any edition later remains a small bounded follow-up (1 entry in `content-packs.ts` + fixtures + push).
