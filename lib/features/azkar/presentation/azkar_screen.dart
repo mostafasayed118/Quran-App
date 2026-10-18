@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'azkar_cubit.dart';
 import 'azkar_state.dart';
@@ -42,34 +44,37 @@ class AzkarScreen extends StatelessWidget {
       body: BlocBuilder<AzkarCubit, AzkarState>(
         builder: (context, state) => switch (state) {
           AzkarLoading() => const LoadingView(),
-          AzkarBrowsing(:final collections) => ListView.builder(
-              padding: const EdgeInsets.all(12),
-              itemCount: collections.length,
-              itemBuilder: (context, i) {
-                final collection = collections[i];
-                return Card(
-                  child: ListTile(
-                    title: Text(
-                      collection.nameAr,
-                      style: const TextStyle(
-                        fontFamily: QuranFonts.meQuran,
-                        fontSize: 19,
+          AzkarFailed() => errorPane(loc, 'azkar load failed', 'azkar'),
+          AzkarBrowsing(:final collections) => collections.isEmpty
+              ? EmptyState(loc.noResults)
+              : ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: collections.length,
+                  itemBuilder: (context, i) {
+                    final collection = collections[i];
+                    return Card(
+                      child: ListTile(
+                        title: Text(
+                          collection.nameAr,
+                          style: const TextStyle(
+                            fontFamily: QuranFonts.meQuran,
+                            fontSize: 19,
+                          ),
+                        ),
+                        subtitle: Text(collection.nameEn),
+                        trailing: Text(
+                          loc.azkarItemsCount(
+                              collection.items.length.toArabicIndic),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        onTap: () => context.read<AzkarCubit>().open(collection),
                       ),
-                    ),
-                    subtitle: Text(collection.nameEn),
-                    trailing: Text(
-                      loc.azkarItemsCount(
-                          collection.items.length.toArabicIndic),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    onTap: () => context.read<AzkarCubit>().open(collection),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
           AzkarReciting() => const _RecitingList(),
         },
       ),

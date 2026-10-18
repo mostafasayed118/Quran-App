@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/azkar_repository.dart';
 import 'azkar_state.dart';
+
 class AzkarCubit extends Cubit<AzkarState> {
   AzkarCubit({required AzkarRepository repository})
       : _repository = repository,
@@ -14,9 +16,16 @@ class AzkarCubit extends Cubit<AzkarState> {
   final AzkarRepository _repository;
 
   Future<void> load() async {
-    final collections = await _repository.collections();
-    if (isClosed) return;
-    emit(AzkarState.browsing(collections: collections));
+    try {
+      final collections = await _repository.collections();
+      if (isClosed) return;
+      emit(AzkarState.browsing(collections: collections));
+    } on Object catch (error, stackTrace) {
+      dev.log('azkar load failed',
+          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const AzkarState.failed());
+    }
   }
 
   void open(AzkarCollection collection) {

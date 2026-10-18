@@ -8,6 +8,10 @@ part 'azkar_state.freezed.dart';
 sealed class AzkarState with _$AzkarState {
   const factory AzkarState.loading() = AzkarLoading;
 
+  /// Load failed (a repository read threw): the screen shows the localized
+  /// error pane instead of hanging on [AzkarState.loading] forever.
+  const factory AzkarState.failed() = AzkarFailed;
+
   const factory AzkarState.browsing({
     @Default(<AzkarCollection>[]) List<AzkarCollection> collections,
   }) = AzkarBrowsing;

@@ -52,6 +52,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AzkarLoading value)? loading,
+    TResult Function(AzkarFailed value)? failed,
     TResult Function(AzkarBrowsing value)? browsing,
     TResult Function(AzkarReciting value)? reciting,
     required TResult orElse(),
@@ -60,6 +61,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading() when loading != null:
         return loading(_that);
+      case AzkarFailed() when failed != null:
+        return failed(_that);
       case AzkarBrowsing() when browsing != null:
         return browsing(_that);
       case AzkarReciting() when reciting != null:
@@ -85,6 +88,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AzkarLoading value) loading,
+    required TResult Function(AzkarFailed value) failed,
     required TResult Function(AzkarBrowsing value) browsing,
     required TResult Function(AzkarReciting value) reciting,
   }) {
@@ -92,6 +96,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading():
         return loading(_that);
+      case AzkarFailed():
+        return failed(_that);
       case AzkarBrowsing():
         return browsing(_that);
       case AzkarReciting():
@@ -114,6 +120,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AzkarLoading value)? loading,
+    TResult? Function(AzkarFailed value)? failed,
     TResult? Function(AzkarBrowsing value)? browsing,
     TResult? Function(AzkarReciting value)? reciting,
   }) {
@@ -121,6 +128,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading() when loading != null:
         return loading(_that);
+      case AzkarFailed() when failed != null:
+        return failed(_that);
       case AzkarBrowsing() when browsing != null:
         return browsing(_that);
       case AzkarReciting() when reciting != null:
@@ -145,6 +154,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(List<AzkarCollection> collections)? browsing,
     TResult Function(AzkarCollection collection, List<int> remaining)? reciting,
     required TResult orElse(),
@@ -153,6 +163,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading() when loading != null:
         return loading();
+      case AzkarFailed() when failed != null:
+        return failed();
       case AzkarBrowsing() when browsing != null:
         return browsing(_that.collections);
       case AzkarReciting() when reciting != null:
@@ -178,6 +190,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(List<AzkarCollection> collections) browsing,
     required TResult Function(AzkarCollection collection, List<int> remaining)
         reciting,
@@ -186,6 +199,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading():
         return loading();
+      case AzkarFailed():
+        return failed();
       case AzkarBrowsing():
         return browsing(_that.collections);
       case AzkarReciting():
@@ -208,6 +223,7 @@ extension AzkarStatePatterns on AzkarState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(List<AzkarCollection> collections)? browsing,
     TResult? Function(AzkarCollection collection, List<int> remaining)?
         reciting,
@@ -216,6 +232,8 @@ extension AzkarStatePatterns on AzkarState {
     switch (_that) {
       case AzkarLoading() when loading != null:
         return loading();
+      case AzkarFailed() when failed != null:
+        return failed();
       case AzkarBrowsing() when browsing != null:
         return browsing(_that.collections);
       case AzkarReciting() when reciting != null:
@@ -243,6 +261,26 @@ class AzkarLoading implements AzkarState {
   @override
   String toString() {
     return 'AzkarState.loading()';
+  }
+}
+
+/// @nodoc
+
+class AzkarFailed implements AzkarState {
+  const AzkarFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is AzkarFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'AzkarState.failed()';
   }
 }
 
