@@ -53,9 +53,9 @@ class ReaderCubit extends Cubit<ReaderState> {
       }
       final startList =
           ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      _lastReadRepository.saveAyahId(
+      unawaited(_lastReadRepository.saveAyahId(
         startList.isNotEmpty ? startList.first.id : ayahs.first.id,
-      );
+      ));
       if (isClosed) return;
       emit(ReaderState.ready(
         surahId: _surahId,
