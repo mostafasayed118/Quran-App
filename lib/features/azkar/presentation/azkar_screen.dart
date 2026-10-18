@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_theme.dart';
@@ -67,10 +68,12 @@ class AzkarScreen extends StatelessWidget {
                               collection.items.length.toArabicIndic),
                           style: TextStyle(
                             fontSize: 12,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        onTap: () => context.read<AzkarCubit>().open(collection),
+                        onTap: () =>
+                            context.read<AzkarCubit>().open(collection),
                       ),
                     );
                   },
@@ -104,7 +107,13 @@ class _RecitingList extends StatelessWidget {
                 color: done ? colors.surfaceContainerHighest : null,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
-                  onTap: done ? null : () => context.read<AzkarCubit>().tapItem(i),                  child: Padding(
+                  onTap: done
+                      ? null
+                      : () {
+                          HapticFeedback.selectionClick();
+                          context.read<AzkarCubit>().tapItem(i);
+                        },
+                  child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,18 +155,18 @@ class _RecitingList extends StatelessWidget {
                             ),
                           ],
                         ),
-                          if (item.virtue != null || item.reference != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                [
-                                  if (item.virtue != null) item.virtue!,
-                                  if (item.reference != null) item.reference!,
-                                ].join(' · '),
-                                textAlign: TextAlign.right,
-                                style: AppTheme.mutedFootnote(context),
-                              ),
+                        if (item.virtue != null || item.reference != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              [
+                                if (item.virtue != null) item.virtue!,
+                                if (item.reference != null) item.reference!,
+                              ].join(' · '),
+                              textAlign: TextAlign.right,
+                              style: AppTheme.mutedFootnote(context),
                             ),
+                          ),
                       ],
                     ),
                   ),
