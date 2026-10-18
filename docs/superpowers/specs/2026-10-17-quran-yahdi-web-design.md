@@ -119,7 +119,7 @@ Fallback hardening: the reciter list is snapshotted at build time (`web/src/data
 
 | Token | Day «ورقة المَصحف» | Night «أخضر اللوجو» |
 |---|---|---|
-| `--bg` | `#F2ECDD` | gradient `#012E2B → #012A27 → #012321` |
+| `--bg-solid` | `#F2ECDD` | gradient `#012E2B → #012A27 → #012321` |
 | `--ink` | `#232D28` | `#F0E0C6` |
 | `--muted` | `rgba(35,45,40,.6)` | `rgba(240,224,198,.55)` |
 | `--muted-strong` (added during P1 for AA on normal-size chrome text; --muted unchanged; enforced by the contrast test) | `rgba(35,45,40,.72)` | `rgba(240,224,198,.62)` |
