@@ -25,6 +25,7 @@ class DuasCubit extends Cubit<DuasState> {
   final AyahRepository _ayahs;
 
   List<DuaEntry>? _allDuas;
+  List<RuqyahResolved>? _resolvedRuqyah;
 
   Future<void> showDuas() async {
     try {
@@ -42,6 +43,12 @@ class DuasCubit extends Cubit<DuasState> {
   }
 
   Future<void> showRuqyah() async {
+    final cached = _resolvedRuqyah;
+    if (cached != null) {
+      if (isClosed) return;
+      emit(DuasState.ruqyah(entries: cached));
+      return;
+    }
     if (isClosed) return;
     emit(const DuasState.loading(tab: DuasTab.ruqyah));
     try {
@@ -61,8 +68,8 @@ class DuasCubit extends Cubit<DuasState> {
           resolved.add(RuqyahResolved(
             id: entry.id,
             isQuran: true,
-            displayText: <String>[for (final ayah in ayahs) ayah.textUthmani]
-                .join(' '),
+            displayText:
+                <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
             citation:
                 '﴿${surah?.nameAr ?? ''} ${entry.fromAyah}–${entry.toAyah}﴾',
             reference: entry.reference,
@@ -78,6 +85,7 @@ class DuasCubit extends Cubit<DuasState> {
         }
       }
       if (isClosed) return;
+      _resolvedRuqyah = resolved;
       emit(DuasState.ruqyah(entries: resolved));
     } on Object catch (error, stackTrace) {
       dev.log('ruqyah load failed',
