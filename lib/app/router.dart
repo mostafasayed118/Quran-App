@@ -228,9 +228,11 @@ abstract final class AppRouter {
         path: '/quran/reader',
         builder: (context, state) {
           final surah =
-              int.tryParse(state.uri.queryParameters['surah'] ?? '') ?? 1;
-          final ayah =
+              (int.tryParse(state.uri.queryParameters['surah'] ?? '') ?? 1)
+                  .clamp(1, 114);
+          final ayahParam =
               int.tryParse(state.uri.queryParameters['ayah'] ?? '') ?? 0;
+          final ayah = ayahParam < 0 ? 0 : ayahParam;
           return MultiBlocProvider(
             providers: [
               BlocProvider<ReaderCubit>(
