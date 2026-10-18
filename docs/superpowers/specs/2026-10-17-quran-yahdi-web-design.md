@@ -189,7 +189,7 @@ Note: the approved mockup's nav showed «المكتبة» and «تدبّر» —
 |---|---|---|
 | **P1 Foundation** | `web/` scaffold (Astro+React+TW4+TS), token layer + fonts + logo assets, data generator + committed data, `/surah/[n]` static reader (text only, AR), `/quran` index, theme switch, first deploy to `*.pages.dev` | live preview URL + gates green + Playwright smoke v1 |
 | **P2 Experience** ✅ *(implemented 2026-10-18 — web commits `5cc3149..3a58ea7`, 14 commits)* | audio player + reciters page, translations/tafsir panel, search, settings persistence, bookmarks (resume → P3; `qy:last-read` storage deferred with its consumer), copy/share builders, per-ayah actions | gates + perf budget + smoke v2 — met |
-| **P3 Official site** | full landing, about, privacy (from PRIVACY.md), EN locale complete, SEO (sitemap/hreflang/OG basics), download CTAs | gates + Lighthouse ≥90 mobile + sitemap submitted |
+| **P3 Official site** ✅ *(implemented 2026-10-18 — web commits `55471e8..429dcfa` + close-out)* | full landing, about, privacy (from PRIVACY.md), EN locale complete, SEO (sitemap/hreflang/OG basics), download CTAs | gates + Lighthouse ≥90 mobile — met; sitemap submission [OWNER] post-deploy |
 | **P4 App links** | assetlinks.json + Flutter intent-filter/deep-link/share (+ any app dependency = owner approval), verification on real device | verified open-in-app on device; docs updated |
 | **P5 Later (not v1)** | PWA offline reading, mushaf page mode (line data available in DB), per-ayah pages for SEO, per-ayah audio, OG images per surah, analytics opt-in, hadith library | new spec/plan per item |
 

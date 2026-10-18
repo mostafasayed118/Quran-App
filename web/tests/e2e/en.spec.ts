@@ -98,3 +98,35 @@ test('sitemap.xml is served as XML with the EN alternates', async ({ request }) 
   expect(body).toContain('/en/surah/114');
   expect(body).toContain('hreflang="en"');
 });
+
+test('EN home theme toggle flips to night with the EN label', async ({ page }) => {
+  await page.goto('/en/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'day');
+  await page.locator('.theme-toggle').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'night');
+  await expect(page.locator('.theme-toggle')).toHaveText(t('en', 'themeToDay'));
+});
+
+test('EN home resume card links to the stored last-read ayah', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:last-read', '{"s":36,"a":5}');
+  });
+  await page.goto('/en/');
+  const card = page.locator('[data-qy="resume"]');
+  await expect(card).toHaveCount(1);
+  await expect(card).toBeVisible();
+  await expect(card).toHaveAttribute('href', '/en/surah/36#ayah-5');
+  await expect(card).toContainText(t('en', 'resumeTitle'));
+});
+
+test('language switch round-trips between the AR and EN quran index', async ({ page }) => {
+  await page.goto('/quran');
+  await page.locator('header .lang-switch').click();
+  await page.waitForURL('**/en/quran**');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await page.locator('header .lang-switch').click();
+  await page.waitForURL((url) => url.pathname.replace(/\/+$/, '') === '/quran');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+});
