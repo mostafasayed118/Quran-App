@@ -1,21 +1,39 @@
 /// Locale-tolerant decimal parsing: accepts `,` and `.` as either the
-/// decimal or the thousands separator (last separator wins).
+/// decimal or the thousands separator (last separator wins). Arabic-Indic
+/// digits and separators (٠-٩، ٫، ٬) are normalized first so an Arabic
+/// keyboard entry parses instead of silently collapsing to 0.
 double parseDecimal(String raw) {
-  final s = raw.trim().replaceAll(' ', '');
+  final s = _toWesternNumerals(raw.trim()).replaceAll(' ', '');
   if (s.isEmpty) return 0;
   final hasComma = s.contains(',');
   final hasDot = s.contains('.');
   var normalized = s;
   if (hasComma && hasDot) {
-    final decimalSep =
-        s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
+    final decimalSep = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.';
     final thousandsSep = decimalSep == ',' ? '.' : ',';
-    normalized =
-        s.replaceAll(thousandsSep, '').replaceFirst(decimalSep, '.');
+    normalized = s.replaceAll(thousandsSep, '').replaceFirst(decimalSep, '.');
   } else if (hasComma) {
     normalized = s.replaceAll(',', '.');
   }
   return double.tryParse(normalized) ?? 0;
+}
+
+/// Maps Arabic-Indic digits (٠-٩) and the Arabic decimal/thousands
+/// separators (٫/٬) to their western equivalents.
+String _toWesternNumerals(String s) {
+  final buffer = StringBuffer();
+  for (final rune in s.runes) {
+    if (rune >= 0x0660 && rune <= 0x0669) {
+      buffer.writeCharCode(rune - 0x0660 + 0x30);
+    } else if (rune == 0x066B) {
+      buffer.write('.');
+    } else if (rune == 0x066C) {
+      buffer.write(',');
+    } else {
+      buffer.writeCharCode(rune);
+    }
+  }
+  return buffer.toString();
 }
 
 class ZakatInput {
