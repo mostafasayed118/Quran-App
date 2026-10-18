@@ -21,6 +21,7 @@ class TasbihScreen extends StatelessWidget {
             TasbihReady() => state,
           };
           final colors = Theme.of(context).colorScheme;
+          final done = ready.count >= ready.target;
           return Column(
             children: [
               const SizedBox(height: 16),
@@ -31,7 +32,7 @@ class TasbihScreen extends StatelessWidget {
                   context.read<TasbihCubit>().increment();
                 },
                 child: AnimatedScale(
-                  scale: ready.reachedTarget ? 1.06 : 1.0,
+                  scale: done ? 1.06 : 1.0,
                   duration: const Duration(milliseconds: 120),
                   curve: Curves.easeOut,
                   child: Container(
@@ -49,9 +50,7 @@ class TasbihScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          ready.reachedTarget
-                              ? Icons.check_circle
-                              : Icons.touch_app_outlined,
+                          done ? Icons.check_circle : Icons.touch_app_outlined,
                           color: colors.onPrimaryContainer,
                         ),
                         Flexible(
@@ -101,7 +100,7 @@ class TasbihScreen extends StatelessWidget {
                 label: Text(loc.tasbihReset),
               ),
               const SizedBox(height: 8),
-              if (ready.reachedTarget)
+              if (done)
                 Text(
                   loc.azkarDone,
                   style: TextStyle(color: colors.secondary, fontSize: 13),
