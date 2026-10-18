@@ -50,3 +50,40 @@ test('EN about page renders the EN mission copy', async ({ page }) => {
   await expect(page.locator('.about .page-title')).toHaveText(t('en', 'navAbout'));
   await expect(page.locator('.about-story p').first()).toHaveText(LANDING.en.about.story[0]);
 });
+
+test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text', async ({ page }) => {
+  await page.goto('/en/surah/2');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('.ayah')).toHaveCount(286);
+  // Surah display name stays Arabic script (app parity); the chrome around it is EN.
+  await expect(page.locator('.reader-head h1')).toContainText('البقرة');
+  await expect(page.locator('[data-qy="reader-play"]')).toHaveText(t('en', 'readerPlay'));
+  await expect(page.locator('[data-qy="reciter-pick"]')).toHaveAttribute('aria-label', t('en', 'readerPickReciter'));
+  // The ayah line keeps its RTL base direction even though the page chrome is LTR.
+  const textDir = await page.locator('.ayah-text').first().evaluate((el) => getComputedStyle(el).direction);
+  expect(textDir).toBe('rtl');
+});
+
+test('EN surah reader: mini-player plays and survives an in-app navigation', async ({ page }) => {
+  await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
+  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.goto('/en/surah/1');
+  await expect(page.locator('.reader')).toBeVisible();
+  const bar = page.locator('[data-qy="bar"]');
+  await page.locator('[data-qy="reader-play"]').click();
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('[data-qy="title"]')).not.toBeEmpty();
+  // Persistence is a CLIENT-ROUTER behavior: hop via an in-app link, never page.goto.
+  await page.locator('header a[href="/en/quran"]').click();
+  await page.waitForURL('**/en/quran**');
+  await expect(page.locator('[data-qy="bar"]')).toBeVisible();
+});
+
+test('EN index card resolves to the live EN reader route', async ({ page }) => {
+  await page.goto('/en/quran');
+  await page.locator('.surah-list a[href="/en/surah/1"]').click();
+  await page.waitForURL('**/en/surah/1**');
+  await expect(page.locator('.reader-head h1')).toContainText('الفاتحة');
+  await expect(page.locator('.ayah').first()).toBeVisible();
+});
