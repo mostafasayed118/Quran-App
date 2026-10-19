@@ -730,3 +730,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Goldens spike (empirical, Docker v29.8.0):** VERDICT **CI-GENERATED-ONLY** — Windows-generated goldens FAIL on Linux (shapes probe **0.07%**, Cairo/HafsSmart Arabic probe **0.37%** pixel diff; container-regenerated goldens then pass self-consistently); `matchesGoldenFile` docs (“Including Fonts”) attest platform + version sensitivity; confound disclosed (no `3.47.x` cirrus/instrumentisto image exists → Linux leg ran **3.44.0** vs Windows 3.47.5). If ever adopted: generate goldens on the CI OS in a pinned container (`--update-goldens` recipe captured in the spike report) + a `golden` tag, start report-only; alchemist = the deterministic alternative. PM recommendation: **defer goldens** (cost/benefit at this stage) — owner's call.
 - **Backup/restore spec committed as PROPOSED:** `docs/superpowers/specs/2026-10-19-backup-restore-design.md` (+ the S3-IT brief) — owner review + 4 decisions pending (`file_picker` grant · settings whitelist · pre/post-release timing · PRIVACY additive line).
 - **State:** main @ `3c619c6` (+ this ledger commit local); all S3-IT commits local — **NO PUSH**; worktree `qy-wt-s3it` retained pending cleanup.
+
+### Push window — S3-IT (integration tests + docs + close-out) — (e249ea7..41e56ee) — 2026-10-19
+- **Range:** `e249ea7..41e56ee` — 4 commits: S3-IT C1 `4ed8e7c` (harness + reader journey) · C2 `30b25f2` (prayer/city + azkar + the folded reader push-transition gate) · docs `3c619c6` (S3-IT brief + backup/restore spec) · S3-IT close-out ledger `41e56ee`.
+- **Pre-flight:** HEAD `41e56ee` (full `41e56ee10d71d9753e6c3a24ea5bd2634d57bb1a`); FF_OK=true; remote static at `e249ea7`; porcelain = owner debris only; unpushed exactly 4; zero `web/**` changes in range (only `ci` fired — web-gates is path-scoped); no competing processes.
+- **App gates (PM-run fresh at the exact tip, clean detached worktree `qy-verify-push`):** `flutter analyze` **0** (68.4s) · `flutter test` **498/498** (EXIT=0).
+- **Push:** `git push origin 41e56ee…:main` — `e249ea7..41e56ee`; ls-remote proof: remote tip == `41e56ee10d71d9753e6c3a24ea5bd2634d57bb1a` (MATCH=True); unpushed 0.
+- **CI on `41e56ee`:** `ci` **39311237031** success (bounded `gh run list`; `gh run watch` never used).
+- **Post-push interleave (tolerated):** `aba3187` (the A1b window ledger) landed during the CI watch — rides the NEXT window.
+- **State:** ledger commit follows (local-only); `qy-verify-push` removed after use; wave worktrees retained. NO PUSH beyond the window.
