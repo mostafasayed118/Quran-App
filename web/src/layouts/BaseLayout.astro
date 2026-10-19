@@ -8,6 +8,7 @@ import MiniPlayer from '../components/MiniPlayer.astro';
 import { ClientRouter } from 'astro:transitions';
 import { t, type Locale } from '../lib/strings';
 import { altLocalePath } from '../lib/landing-content';
+import { THEME_KEY } from '../lib/theme';
 
 interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
 const { title, description = 'قرآن يَهدي — اقرأ واستمع وتدبّر، مجاناً وبلا حسابات.', locale = 'ar', preloadFont = false } = Astro.props;
@@ -39,10 +40,10 @@ const ogImage = new URL('/og-base.png', Astro.site);
     <link rel="icon" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
     {preloadFont && <link rel="preload" href="/fonts/HafsSmart_08.woff2" as="font" type="font/woff2" crossorigin />}
-    <script is:inline data-astro-rerun>
+    <script is:inline data-astro-rerun define:vars={{ THEME_KEY }}>
       (function () {
         try {
-          var saved = localStorage.getItem('qy:theme');
+          var saved = localStorage.getItem(THEME_KEY);
           var sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
           document.documentElement.setAttribute('data-theme', saved || sys);
         } catch (e) { /* keep day */ }

@@ -1,5 +1,6 @@
 ---
 import { t, type Locale } from '../lib/strings';
+import { THEME_KEY } from '../lib/theme';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 const toNight = t(locale, 'themeToNight');
@@ -11,7 +12,7 @@ const toDay = t(locale, 'themeToDay');
   data-label-day={toNight}
   data-label-night={toDay}
 >{toNight}</button>
-<script is:inline data-astro-rerun>
+<script is:inline data-astro-rerun define:vars={{ THEME_KEY }}>
   (function () {
     var btn = document.currentScript.previousElementSibling;
     if (!btn || !btn.classList.contains('theme-toggle')) {
@@ -29,7 +30,7 @@ const toDay = t(locale, 'themeToDay');
     btn.addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'night' ? 'day' : 'night';
       document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem('qy:theme', next); } catch (e) { /* private mode */ }
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* private mode */ }
       apply();
     });
   })();
