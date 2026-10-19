@@ -51,7 +51,9 @@ export default function SurahIndexFilter({ locale = 'ar' as Locale }) {
   }, [showAyahSearch, ready, failed]);
 
   useEffect(() => {
-    if (ready) setHits(searchAyahs(q));
+    if (!ready) return;
+    const timer = setTimeout(() => setHits(searchAyahs(q)), 150);
+    return () => clearTimeout(timer);
   }, [ready, q]);
 
   return (

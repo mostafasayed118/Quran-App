@@ -37,20 +37,19 @@ function rankIn(text: string, query: string): number | null {
   return null;
 }
 
-export function rankAyahs(
+function rankCore(
   records: readonly SearchRecord[],
   normalized: readonly string[],
-  rawQuery: string,
-  limit = 50,
+  foldedForms: readonly string[] | null,
+  query: string,
+  limit: number,
 ): Hit[] {
-  const query = normalizeArabic(rawQuery);
-  if (!query) return [];
   const foldedQuery = stripAlef(query);
   const scored: { rank: number; s: number; a: number; text: string }[] = [];
   for (let i = 0; i < records.length; i += 1) {
     let rank = rankIn(normalized[i], query);
     if (rank === null && foldedQuery) {
-      const folded = rankIn(stripAlef(normalized[i]), foldedQuery);
+      const folded = rankIn(foldedForms ? foldedForms[i] : stripAlef(normalized[i]), foldedQuery);
       if (folded !== null) rank = folded + 3;
     }
     if (rank !== null) {
@@ -61,8 +60,20 @@ export function rankAyahs(
   return scored.slice(0, limit).map(({ s, a, text }) => ({ s, a, text }));
 }
 
+export function rankAyahs(
+  records: readonly SearchRecord[],
+  normalized: readonly string[],
+  rawQuery: string,
+  limit = 50,
+): Hit[] {
+  const query = normalizeArabic(rawQuery);
+  if (!query) return [];
+  return rankCore(records, normalized, null, query, limit);
+}
+
 let records: SearchRecord[] | null = null;
 let normalized: string[] = [];
+let foldedForms: string[] = [];
 let pending: Promise<SearchRecord[]> | null = null;
 
 /** Lazy-loads the committed index (code-split asset) once, then serves the module cache. */
@@ -72,6 +83,7 @@ export function loadSearchIndex(): Promise<SearchRecord[]> {
       const ayahs = (mod as { default: { ayahs: SearchRecord[] } }).default.ayahs;
       records = ayahs;
       normalized = ayahs.map((r) => normalizeArabic(r.t));
+      foldedForms = normalized.map((f) => stripAlef(f));
       return ayahs;
     })
     .catch((error: unknown) => {
@@ -83,7 +95,9 @@ export function loadSearchIndex(): Promise<SearchRecord[]> {
 
 export function searchAyahs(query: string, limit = 50): Hit[] {
   if (records === null) return [];
-  return rankAyahs(records, normalized, query, limit);
+  const normalizedQuery = normalizeArabic(query);
+  if (!normalizedQuery) return [];
+  return rankCore(records, normalized, foldedForms, normalizedQuery, limit);
 }
 
 function rawRange(
