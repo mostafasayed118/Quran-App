@@ -26,6 +26,7 @@ import '../../features/notifications/data/reminder_settings.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/prayer/data/location_service.dart';
 import '../../features/tasbih/data/tasbih_repository.dart';
+import '../../features/tracker/data/khatma_repository.dart';
 import '../../features/tracker/data/prayer_log_repository.dart';
 import '../../features/prayer/data/prayer_time_service.dart';
 import '../../features/qibla/data/heading_service.dart';
@@ -78,6 +79,7 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<PrayerLogRepository>(
       () => PrayerLogRepository(db));
+  getIt.registerLazySingleton<KhatmaRepository>(() => KhatmaRepository(db));
   getIt.registerLazySingleton<HijriService>(() => HijriService());
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(

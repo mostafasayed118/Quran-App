@@ -477,4 +477,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderChannelDescription => 'Prayer and azkar reminders';
+
+  @override
+  String get wirdTitle => 'Khatma wird';
+
+  @override
+  String get wirdSetupHint => 'Pick a khatma pace and start your daily wird';
+
+  @override
+  String get wirdStart => 'Start a khatma';
+
+  @override
+  String get wirdPaceSheetTitle => 'Khatma pace';
+
+  @override
+  String get wirdPaceMonthly => 'A khatma every month';
+
+  @override
+  String get wirdPaceTwoMonths => 'A khatma every 2 months';
+
+  @override
+  String get wirdPaceThreeMonths => 'A khatma every 3 months';
+
+  @override
+  String get wirdPaceFourMonths => 'A khatma every 4 months';
+
+  @override
+  String wirdDailyPages(String pages) {
+    return 'About $pages pages a day';
+  }
+
+  @override
+  String wirdProgress(String done, String total) {
+    return '$done of $total pages';
+  }
+
+  @override
+  String wirdTodayRange(String from, String to) {
+    return 'Today: from page $from to $to';
+  }
+
+  @override
+  String wirdRemainingDays(String days) {
+    return 'About $days days left';
+  }
+
+  @override
+  String get wirdOpenToday => 'Open the wird';
+
+  @override
+  String get wirdFinishToday => 'Finished today\'s wird';
+
+  @override
+  String get wirdCompleted => 'Khatma completed';
+
+  @override
+  String get wirdNewPlan => 'New khatma';
 }

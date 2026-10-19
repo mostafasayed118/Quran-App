@@ -286,5 +286,55 @@
   "playbackBackgroundFailed": "تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح",
   "currentCity": "المدينة الحالية",
   "locationSettings": "إعدادات الموقع",
-  "reminderChannelDescription": "تذكيرات الصلاة والأذكار"
+  "reminderChannelDescription": "تذكيرات الصلاة والأذكار",
+  "wirdTitle": "ورد الختمة",
+  "wirdSetupHint": "اختر وتيرة الختمة وابدأ وردك اليومي",
+  "wirdStart": "ابدأ ختمة",
+  "wirdPaceSheetTitle": "وتيرة الختمة",
+  "wirdPaceMonthly": "ختمة كل شهر",
+  "wirdPaceTwoMonths": "ختمة كل شهرين",
+  "wirdPaceThreeMonths": "ختمة كل ٣ شهور",
+  "wirdPaceFourMonths": "ختمة كل ٤ شهور",
+  "wirdDailyPages": "{pages} صفحة يوميًا تقريبًا",
+  "@wirdDailyPages": {
+    "placeholders": {
+      "pages": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdProgress": "{done} من {total} صفحة",
+  "@wirdProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdTodayRange": "اليوم: من صفحة {from} إلى {to}",
+  "@wirdTodayRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdRemainingDays": "باقي نحو {days} يوم",
+  "@wirdRemainingDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdOpenToday": "افتح الورد",
+  "wirdFinishToday": "أنهيت ورد اليوم",
+  "wirdCompleted": "أتممت الختمة",
+  "wirdNewPlan": "ختمة جديدة"
 }

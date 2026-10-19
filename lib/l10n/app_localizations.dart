@@ -943,6 +943,102 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تذكيرات الصلاة والأذكار'**
   String get reminderChannelDescription;
+
+  /// No description provided for @wirdTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ورد الختمة'**
+  String get wirdTitle;
+
+  /// No description provided for @wirdSetupHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر وتيرة الختمة وابدأ وردك اليومي'**
+  String get wirdSetupHint;
+
+  /// No description provided for @wirdStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ ختمة'**
+  String get wirdStart;
+
+  /// No description provided for @wirdPaceSheetTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'وتيرة الختمة'**
+  String get wirdPaceSheetTitle;
+
+  /// No description provided for @wirdPaceMonthly.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة كل شهر'**
+  String get wirdPaceMonthly;
+
+  /// No description provided for @wirdPaceTwoMonths.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة كل شهرين'**
+  String get wirdPaceTwoMonths;
+
+  /// No description provided for @wirdPaceThreeMonths.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة كل ٣ شهور'**
+  String get wirdPaceThreeMonths;
+
+  /// No description provided for @wirdPaceFourMonths.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة كل ٤ شهور'**
+  String get wirdPaceFourMonths;
+
+  /// No description provided for @wirdDailyPages.
+  ///
+  /// In ar, this message translates to:
+  /// **'{pages} صفحة يوميًا تقريبًا'**
+  String wirdDailyPages(String pages);
+
+  /// No description provided for @wirdProgress.
+  ///
+  /// In ar, this message translates to:
+  /// **'{done} من {total} صفحة'**
+  String wirdProgress(String done, String total);
+
+  /// No description provided for @wirdTodayRange.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم: من صفحة {from} إلى {to}'**
+  String wirdTodayRange(String from, String to);
+
+  /// No description provided for @wirdRemainingDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'باقي نحو {days} يوم'**
+  String wirdRemainingDays(String days);
+
+  /// No description provided for @wirdOpenToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتح الورد'**
+  String get wirdOpenToday;
+
+  /// No description provided for @wirdFinishToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنهيت ورد اليوم'**
+  String get wirdFinishToday;
+
+  /// No description provided for @wirdCompleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'أتممت الختمة'**
+  String get wirdCompleted;
+
+  /// No description provided for @wirdNewPlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'ختمة جديدة'**
+  String get wirdNewPlan;
 }
 
 class _AppLocalizationsDelegate

@@ -475,4 +475,60 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reminderChannelDescription => 'تذكيرات الصلاة والأذكار';
+
+  @override
+  String get wirdTitle => 'ورد الختمة';
+
+  @override
+  String get wirdSetupHint => 'اختر وتيرة الختمة وابدأ وردك اليومي';
+
+  @override
+  String get wirdStart => 'ابدأ ختمة';
+
+  @override
+  String get wirdPaceSheetTitle => 'وتيرة الختمة';
+
+  @override
+  String get wirdPaceMonthly => 'ختمة كل شهر';
+
+  @override
+  String get wirdPaceTwoMonths => 'ختمة كل شهرين';
+
+  @override
+  String get wirdPaceThreeMonths => 'ختمة كل ٣ شهور';
+
+  @override
+  String get wirdPaceFourMonths => 'ختمة كل ٤ شهور';
+
+  @override
+  String wirdDailyPages(String pages) {
+    return '$pages صفحة يوميًا تقريبًا';
+  }
+
+  @override
+  String wirdProgress(String done, String total) {
+    return '$done من $total صفحة';
+  }
+
+  @override
+  String wirdTodayRange(String from, String to) {
+    return 'اليوم: من صفحة $from إلى $to';
+  }
+
+  @override
+  String wirdRemainingDays(String days) {
+    return 'باقي نحو $days يوم';
+  }
+
+  @override
+  String get wirdOpenToday => 'افتح الورد';
+
+  @override
+  String get wirdFinishToday => 'أنهيت ورد اليوم';
+
+  @override
+  String get wirdCompleted => 'أتممت الختمة';
+
+  @override
+  String get wirdNewPlan => 'ختمة جديدة';
 }

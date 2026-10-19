@@ -146,7 +146,9 @@ extension TrackerStatePatterns on TrackerState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(TrackerDay today, int streakDays, List<bool> last7)? ready,
+    TResult Function(TrackerDay today, int streakDays, List<bool> last7,
+            bool khatmaAvailable, KhatmaProgress? khatma)?
+        ready,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -156,7 +158,8 @@ extension TrackerStatePatterns on TrackerState {
       case TrackerFailed() when failed != null:
         return failed();
       case TrackerReady() when ready != null:
-        return ready(_that.today, _that.streakDays, _that.last7);
+        return ready(_that.today, _that.streakDays, _that.last7,
+            _that.khatmaAvailable, _that.khatma);
       case _:
         return orElse();
     }
@@ -179,8 +182,8 @@ extension TrackerStatePatterns on TrackerState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(
-            TrackerDay today, int streakDays, List<bool> last7)
+    required TResult Function(TrackerDay today, int streakDays,
+            List<bool> last7, bool khatmaAvailable, KhatmaProgress? khatma)
         ready,
   }) {
     final _that = this;
@@ -190,7 +193,8 @@ extension TrackerStatePatterns on TrackerState {
       case TrackerFailed():
         return failed();
       case TrackerReady():
-        return ready(_that.today, _that.streakDays, _that.last7);
+        return ready(_that.today, _that.streakDays, _that.last7,
+            _that.khatmaAvailable, _that.khatma);
     }
   }
 
@@ -210,7 +214,8 @@ extension TrackerStatePatterns on TrackerState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(TrackerDay today, int streakDays, List<bool> last7)?
+    TResult? Function(TrackerDay today, int streakDays, List<bool> last7,
+            bool khatmaAvailable, KhatmaProgress? khatma)?
         ready,
   }) {
     final _that = this;
@@ -220,7 +225,8 @@ extension TrackerStatePatterns on TrackerState {
       case TrackerFailed() when failed != null:
         return failed();
       case TrackerReady() when ready != null:
-        return ready(_that.today, _that.streakDays, _that.last7);
+        return ready(_that.today, _that.streakDays, _that.last7,
+            _that.khatmaAvailable, _that.khatma);
       case _:
         return null;
     }
@@ -273,7 +279,9 @@ class TrackerReady implements TrackerState {
   const TrackerReady(
       {required this.today,
       this.streakDays = 0,
-      List<bool> last7 = const <bool>[]})
+      List<bool> last7 = const <bool>[],
+      this.khatmaAvailable = false,
+      this.khatma = null})
       : _last7 = last7;
 
   final TrackerDay today;
@@ -286,6 +294,11 @@ class TrackerReady implements TrackerState {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_last7);
   }
+
+  @JsonKey()
+  final bool khatmaAvailable;
+  @JsonKey()
+  final KhatmaProgress? khatma;
 
   /// Create a copy of TrackerState
   /// with the given fields replaced by the non-null parameter values.
@@ -302,18 +315,21 @@ class TrackerReady implements TrackerState {
             (identical(other.today, today) || other.today == today) &&
             (identical(other.streakDays, streakDays) ||
                 other.streakDays == streakDays) &&
-            const DeepCollectionEquality().equals(other.last7, _last7));
+            const DeepCollectionEquality().equals(other.last7, _last7) &&
+            (identical(other.khatmaAvailable, khatmaAvailable) ||
+                other.khatmaAvailable == khatmaAvailable) &&
+            (identical(other.khatma, khatma) || other.khatma == khatma));
   }
 
   @override
   int get hashCode {
     return Object.hash(runtimeType, today, streakDays,
-        const DeepCollectionEquality().hash(_last7));
+        const DeepCollectionEquality().hash(_last7), khatmaAvailable, khatma);
   }
 
   @override
   String toString() {
-    return 'TrackerState.ready(today: $today, streakDays: $streakDays, last7: $last7)';
+    return 'TrackerState.ready(today: $today, streakDays: $streakDays, last7: $last7, khatmaAvailable: $khatmaAvailable, khatma: $khatma)';
   }
 }
 
@@ -324,7 +340,12 @@ abstract mixin class $TrackerReadyCopyWith<$Res>
           TrackerReady value, $Res Function(TrackerReady) _then) =
       _$TrackerReadyCopyWithImpl;
   @useResult
-  $Res call({TrackerDay today, int streakDays, List<bool> last7});
+  $Res call(
+      {TrackerDay today,
+      int streakDays,
+      List<bool> last7,
+      bool khatmaAvailable,
+      KhatmaProgress? khatma});
 }
 
 /// @nodoc
@@ -341,6 +362,8 @@ class _$TrackerReadyCopyWithImpl<$Res> implements $TrackerReadyCopyWith<$Res> {
     Object? today = null,
     Object? streakDays = null,
     Object? last7 = null,
+    Object? khatmaAvailable = null,
+    Object? khatma = freezed,
   }) {
     return _then(TrackerReady(
       today: null == today
@@ -355,6 +378,14 @@ class _$TrackerReadyCopyWithImpl<$Res> implements $TrackerReadyCopyWith<$Res> {
           ? _self._last7
           : last7 // ignore: cast_nullable_to_non_nullable
               as List<bool>,
+      khatmaAvailable: null == khatmaAvailable
+          ? _self.khatmaAvailable
+          : khatmaAvailable // ignore: cast_nullable_to_non_nullable
+              as bool,
+      khatma: freezed == khatma
+          ? _self.khatma
+          : khatma // ignore: cast_nullable_to_non_nullable
+              as KhatmaProgress?,
     ));
   }
 }

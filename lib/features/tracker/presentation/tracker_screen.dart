@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../data/khatma_progress.dart';
 import '../data/prayer_log_repository.dart';
 import 'tracker_cubit.dart';
 import 'tracker_state.dart';
@@ -32,7 +34,13 @@ class TrackerScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           TrackerLoading() => const LoadingView(),
           TrackerFailed() => errorPane(loc),
-          TrackerReady(:final today, :final streakDays, :final last7) =>
+          TrackerReady(
+            :final today,
+            :final streakDays,
+            :final last7,
+            :final khatmaAvailable,
+            :final khatma,
+          ) =>
             ListView(
               padding: const EdgeInsets.all(12),
               children: [
@@ -48,6 +56,10 @@ class TrackerScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 _Last7Row(last7: last7),
                 if (streakDays > 0) _StreakChip(streakDays: streakDays),
+                if (khatmaAvailable) ...[
+                  const SizedBox(height: 12),
+                  _WirdCard(progress: khatma),
+                ],
               ],
             ),
         },
@@ -188,6 +200,148 @@ class _StreakChip extends StatelessWidget {
           loc.streak(streakDays.toArabicIndic),
           style: _streakLabelStyle,
         ),
+      ),
+    );
+  }
+}
+
+/// Reader route opening the wird at the plan's read-up-to pointer.
+String wirdReaderRoute(KhatmaProgress progress) =>
+    '/quran/reader?surah=${progress.readerSurahId}&ayah=${progress.readerAyahNumber}';
+
+class _WirdCard extends StatelessWidget {
+  const _WirdCard({required this.progress});
+
+  /// Active plan view; null while the card is in its setup state.
+  final KhatmaProgress? progress;
+
+  Future<void> _openSetupSheet(BuildContext context) async {
+    final cubit = context.read<TrackerCubit>();
+    final target = await showModalBottomSheet<int>(
+      context: context,
+      builder: (_) => const _WirdSetupSheet(),
+    );
+    if (target != null) await cubit.startKhatma(target);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final p = progress;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.menu_book, size: 18, color: colors.primary),
+                const SizedBox(width: 8),
+                Text(loc.wirdTitle, style: _todayTitleStyle),
+              ],
+            ),
+            if (p == null) ...[
+              const SizedBox(height: 6),
+              Text(loc.wirdSetupHint, style: _mutedAt(colors, 13)),
+              const SizedBox(height: 10),
+              FilledButton(
+                onPressed: () => _openSetupSheet(context),
+                child: Text(loc.wirdStart),
+              ),
+            ] else if (p.completed) ...[
+              const SizedBox(height: 6),
+              Text(loc.wirdCompleted, style: _mutedAt(colors, 13)),
+              const SizedBox(height: 10),
+              TextButton(
+                onPressed: () => context.read<TrackerCubit>().resetKhatma(),
+                child: Text(loc.wirdNewPlan),
+              ),
+            ] else ...[
+              const SizedBox(height: 10),
+              LinearProgressIndicator(value: p.fraction),
+              const SizedBox(height: 8),
+              Text(
+                loc.wirdProgress(
+                  p.pagesDone.toArabicIndic,
+                  KhatmaProgress.totalPages.toArabicIndic,
+                ),
+                style: _mutedAt(colors, 13),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.wirdTodayRange(
+                  p.todayStartPage.toArabicIndic,
+                  p.todayEndPage.toArabicIndic,
+                ),
+                style: _mutedAt(colors, 13),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                loc.wirdRemainingDays(p.remainingDays.toArabicIndic),
+                style: _mutedAt(colors, 13),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () =>
+                          context.read<TrackerCubit>().finishWirdToday(),
+                      child: Text(loc.wirdFinishToday),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => context.push(wirdReaderRoute(p)),
+                      child: Text(loc.wirdOpenToday),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WirdSetupSheet extends StatelessWidget {
+  const _WirdSetupSheet();
+
+  String _paceLabel(AppLocalizations loc, int targetPages) =>
+      switch (targetPages) {
+        604 => loc.wirdPaceMonthly,
+        302 => loc.wirdPaceTwoMonths,
+        201 => loc.wirdPaceThreeMonths,
+        _ => loc.wirdPaceFourMonths,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 16, 12, 6),
+            child: Text(loc.wirdPaceSheetTitle, style: _todayTitleStyle),
+          ),
+          for (final target in KhatmaProgress.targetChoices)
+            ListTile(
+              title: Text(_paceLabel(loc, target)),
+              subtitle: Text(
+                loc.wirdDailyPages(
+                  KhatmaProgress.dailyPagesFor(target).toArabicIndic,
+                ),
+              ),
+              onTap: () => Navigator.of(context).pop(target),
+            ),
+        ],
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../data/khatma_progress.dart';
 import '../data/prayer_log_repository.dart';
 
 part 'tracker_state.freezed.dart';
@@ -14,5 +15,7 @@ sealed class TrackerState with _$TrackerState {
     required TrackerDay today,
     @Default(0) int streakDays,
     @Default(<bool>[]) List<bool> last7,
+    @Default(false) bool khatmaAvailable,
+    @Default(null) KhatmaProgress? khatma,
   }) = TrackerReady;
 }

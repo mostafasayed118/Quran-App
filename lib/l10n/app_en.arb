@@ -272,5 +272,55 @@
   "playbackBackgroundFailed": "Couldn't play the recitation — background audio is unavailable",
   "currentCity": "Current city",
   "locationSettings": "Location settings",
-  "reminderChannelDescription": "Prayer and azkar reminders"
+  "reminderChannelDescription": "Prayer and azkar reminders",
+  "wirdTitle": "Khatma wird",
+  "wirdSetupHint": "Pick a khatma pace and start your daily wird",
+  "wirdStart": "Start a khatma",
+  "wirdPaceSheetTitle": "Khatma pace",
+  "wirdPaceMonthly": "A khatma every month",
+  "wirdPaceTwoMonths": "A khatma every 2 months",
+  "wirdPaceThreeMonths": "A khatma every 3 months",
+  "wirdPaceFourMonths": "A khatma every 4 months",
+  "wirdDailyPages": "About {pages} pages a day",
+  "@wirdDailyPages": {
+    "placeholders": {
+      "pages": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdProgress": "{done} of {total} pages",
+  "@wirdProgress": {
+    "placeholders": {
+      "done": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdTodayRange": "Today: from page {from} to {to}",
+  "@wirdTodayRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdRemainingDays": "About {days} days left",
+  "@wirdRemainingDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "wirdOpenToday": "Open the wird",
+  "wirdFinishToday": "Finished today's wird",
+  "wirdCompleted": "Khatma completed",
+  "wirdNewPlan": "New khatma"
 }

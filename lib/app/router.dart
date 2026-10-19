@@ -17,6 +17,7 @@ import '../features/duas/presentation/duas_screen.dart';
 import '../features/tasbih/data/tasbih_repository.dart';
 import '../features/tasbih/presentation/tasbih_cubit.dart';
 import '../features/tasbih/presentation/tasbih_screen.dart';
+import '../features/tracker/data/khatma_repository.dart';
 import '../features/tracker/data/prayer_log_repository.dart';
 import '../features/tracker/presentation/tracker_cubit.dart';
 import '../features/tracker/presentation/tracker_screen.dart';
@@ -187,7 +188,10 @@ abstract final class AppRouter {
       GoRoute(
         path: '/worship',
         builder: (_, __) => BlocProvider<TrackerCubit>(
-          create: (_) => TrackerCubit(repo: getIt<PrayerLogRepository>()),
+          create: (_) => TrackerCubit(
+            repo: getIt<PrayerLogRepository>(),
+            khatma: getIt<KhatmaRepository>(),
+          ),
           child: const TrackerScreen(),
         ),
       ),
