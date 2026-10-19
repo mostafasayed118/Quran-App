@@ -22,10 +22,12 @@ void main() {
       city('aswan', 'أسوان', 'Aswan', 24.0889, 32.8998),
       city('riyadh', 'الرياض', 'Riyadh', 24.7136, 46.6753),
     ];
-    repo = CityRepository(db: db, loader: () async => [for (final c in catalog) c.toJson()]);
+    repo = CityRepository(
+        db: db, loader: () async => [for (final c in catalog) c.toJson()]);
   });
 
-  test('point between Cairo and Giza picks the mathematically nearest', () async {
+  test('point between Cairo and Giza picks the mathematically nearest',
+      () async {
     final nearest = await repo.nearestTo(30.05, 31.22);
     expect(nearest.id, 'cairo');
   });

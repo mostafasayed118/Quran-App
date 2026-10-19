@@ -50,7 +50,8 @@ void main() {
     expect(find.text('٢ ذكر'), findsOneWidget);
   });
 
-  testWidgets('tapping a collection opens items; taps decrement the chip; done dims',
+  testWidgets(
+      'tapping a collection opens items; taps decrement the chip; done dims',
       (tester) async {
     final cubit = AzkarCubit(
       repository: AzkarRepository(loader: () async => fixtureRoot()),

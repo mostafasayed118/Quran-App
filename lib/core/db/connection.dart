@@ -54,7 +54,8 @@ Future<void> ensureContentCurrent(
       await db.transaction(() async {
         await db.customStatement('DELETE FROM ayahs');
         await db.customStatement('DELETE FROM surahs');
-        await db.customStatement('INSERT INTO surahs SELECT * FROM seed.surahs');
+        await db
+            .customStatement('INSERT INTO surahs SELECT * FROM seed.surahs');
         await db.customStatement('INSERT INTO ayahs SELECT * FROM seed.ayahs');
         // INSERT OR REPLACE, not upsert syntax: API 24 devices ship an old
         // system SQLite where ON CONFLICT DO UPDATE is unavailable.

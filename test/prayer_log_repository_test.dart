@@ -22,7 +22,8 @@ void main() {
     expect(day.anyMarked, isTrue);
   });
 
-  test('toggle-all-off keeps the row; anyMarked=false; row count stays 1', () async {
+  test('toggle-all-off keeps the row; anyMarked=false; row count stays 1',
+      () async {
     final now = DateTime.now();
     for (final slot in PrayerSlot.values) {
       await repo.togglePrayer(now, slot);
@@ -58,12 +59,9 @@ void main() {
     await repo.togglePrayer(twoDays, PrayerSlot.asr); // flips back off
 
     final marked = await repo.markedDaysRange(now, 7);
-    final keys = marked
-        .map((d) => '${d.year}-${d.month}-${d.day}')
-        .toSet();
+    final keys = marked.map((d) => '${d.year}-${d.month}-${d.day}').toSet();
     expect(keys, contains('${now.year}-${now.month}-${now.day}'));
-    expect(
-        keys,
+    expect(keys,
         contains('${yesterday.year}-${yesterday.month}-${yesterday.day}'));
     expect(keys, hasLength(2));
   });

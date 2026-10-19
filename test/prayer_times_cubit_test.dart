@@ -17,8 +17,7 @@ class FakePrayerTimeService implements PrayerTimeService {
       todayResult!;
 
   @override
-  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
-      nextResult!;
+  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) => nextResult!;
 }
 
 const cairoCity = City(
@@ -53,10 +52,12 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    repo = CityRepository(db: db, loader: () async => [cairoCity.toJson(), dubaiCity.toJson()]);
+    repo = CityRepository(
+        db: db, loader: () async => [cairoCity.toJson(), dubaiCity.toJson()]);
     fake = FakePrayerTimeService()
       ..todayResult = fakeDay()
-      ..nextResult = PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult =
+          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
   });
 
   test('no selection emits ready with no city and empty entries', () async {

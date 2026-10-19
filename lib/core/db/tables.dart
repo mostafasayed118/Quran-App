@@ -58,7 +58,8 @@ class InstalledPacks extends Table {
   TextColumn get title => text()();
   RealColumn get sizeMb => real()();
   TextColumn get version => text()();
-  DateTimeColumn get installedAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get installedAt =>
+      dateTime().withDefault(currentDateAndTime)();
   @override
   Set<Column> get primaryKey => {packId};
 }

@@ -18,7 +18,8 @@ void main() {
 
     await copyDbAssetIfAbsent(
         target: target, assetKey: 'assets/db/quran.sqlite', loadAsset: loader);
-    expect(await target.readAsBytes(), [1, 2, 3], reason: 'existing file untouched');
+    expect(await target.readAsBytes(), [1, 2, 3],
+        reason: 'existing file untouched');
 
     await target.delete();
     await copyDbAssetIfAbsent(

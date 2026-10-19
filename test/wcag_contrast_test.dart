@@ -64,6 +64,7 @@ void main() {
   });
 
   test('helper sanity: identical colors give a ratio of exactly 1', () {
-    expect(wcagContrastRatio(of(0xE3A53E), of(0xE3A53E)), moreOrLessEquals(1.0));
+    expect(
+        wcagContrastRatio(of(0xE3A53E), of(0xE3A53E)), moreOrLessEquals(1.0));
   });
 }

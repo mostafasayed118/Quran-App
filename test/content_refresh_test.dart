@@ -20,7 +20,8 @@ void main() {
   });
   tearDown(() => tempDir.deleteSync(recursive: true));
 
-  Future<File> buildSeed({required String version, required String nameAr}) async {
+  Future<File> buildSeed(
+      {required String version, required String nameAr}) async {
     final file = File(p.join(tempDir.path, 'seed.sqlite'));
     final db = AppDatabase(NativeDatabase(file));
     await db.createSchemaForSeeding();
@@ -51,7 +52,8 @@ void main() {
   Future<ByteData> loaderFor(File seed) async {
     loaderCalls++;
     final bytes = seed.readAsBytesSync();
-    return ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes);
+    return ByteData.view(
+        bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes);
   }
 
   Future<AppDatabase> staleDb() async {
@@ -69,7 +71,8 @@ void main() {
     return db;
   }
 
-  test('stale installed content is re-seeded; user rows survive; version bumps', () async {
+  test('stale installed content is re-seeded; user rows survive; version bumps',
+      () async {
     final seed = await buildSeed(version: '7', nameAr: 'مجدّد');
     final db = await staleDb();
     await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 1));
@@ -89,7 +92,8 @@ void main() {
     await db.close();
   });
 
-  test('a failing loader keeps the previous content and never throws', () async {
+  test('a failing loader keeps the previous content and never throws',
+      () async {
     final db = await staleDb();
     await ensureContentCurrent(db.executor,
         loadAsset: (_) => Future<ByteData>.error(StateError('asset missing')),

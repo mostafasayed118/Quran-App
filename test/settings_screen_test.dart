@@ -33,7 +33,8 @@ void main() {
     addTearDown(cubit.close);
     await pumpAppHost(
       tester,
-      wrap: (app) => BlocProvider<SettingsCubit>.value(value: cubit, child: app),
+      wrap: (app) =>
+          BlocProvider<SettingsCubit>.value(value: cubit, child: app),
       home: const SettingsScreen(),
     );
   }

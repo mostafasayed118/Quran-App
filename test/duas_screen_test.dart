@@ -24,51 +24,64 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    duaRepo = DuaRepository(loader: () async => [
-      {
-        'id': 'a1',
-        'categoryAr': 'المنزل',
-        'categoryEn': 'Home',
-        'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
-      },
-      {
-        'id': 'a2',
-        'categoryAr': 'السفر',
-        'categoryEn': 'Travel',
-        'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
-      },
-    ]);
-    ruqyahRepo = RuqyahRepository(loader: () async => [
-      {'id': 'r1', 'kind': 'dhikr', 'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ', 'count': 3},
-      {'id': 'r2', 'kind': 'quran', 'surahId': 112, 'fromAyah': 1, 'toAyah': 2},
-    ]);
+    duaRepo = DuaRepository(
+        loader: () async => [
+              {
+                'id': 'a1',
+                'categoryAr': 'المنزل',
+                'categoryEn': 'Home',
+                'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
+              },
+              {
+                'id': 'a2',
+                'categoryAr': 'السفر',
+                'categoryEn': 'Travel',
+                'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
+              },
+            ]);
+    ruqyahRepo = RuqyahRepository(
+        loader: () async => [
+              {
+                'id': 'r1',
+                'kind': 'dhikr',
+                'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
+                'count': 3
+              },
+              {
+                'id': 'r2',
+                'kind': 'quran',
+                'surahId': 112,
+                'fromAyah': 1,
+                'toAyah': 2
+              },
+            ]);
     await db.into(db.surahs).insert(SurahsCompanion.insert(
-      id: const Value(112),
-      nameAr: 'الإخلاص',
-      nameEn: 'Al-Ikhlas',
-      revelationType: 'Meccan',
-      ayahCount: 4,
-      pagesStart: 604,
-      pagesEnd: 604,
-    ));
+          id: const Value(112),
+          nameAr: 'الإخلاص',
+          nameEn: 'Al-Ikhlas',
+          revelationType: 'Meccan',
+          ayahCount: 4,
+          pagesStart: 604,
+          pagesEnd: 604,
+        ));
     await db.into(db.ayahs).insert(AyahsCompanion.insert(
-      id: const Value(6220),
-      surahId: 112,
-      numberInSurah: 1,
-      juz: 30,
-      page: 604,
-      textUthmani: 'قُلْ هُوَ اللَّهُ أَحَدٌ',
-      textImlaei: 'قل هو الله أحد',
-    ));
+          id: const Value(6220),
+          surahId: 112,
+          numberInSurah: 1,
+          juz: 30,
+          page: 604,
+          textUthmani: 'قُلْ هُوَ اللَّهُ أَحَدٌ',
+          textImlaei: 'قل هو الله أحد',
+        ));
     await db.into(db.ayahs).insert(AyahsCompanion.insert(
-      id: const Value(6221),
-      surahId: 112,
-      numberInSurah: 2,
-      juz: 30,
-      page: 604,
-      textUthmani: 'اللَّهُ الصَّمَدُ',
-      textImlaei: 'الله الصمد',
-    ));
+          id: const Value(6221),
+          surahId: 112,
+          numberInSurah: 2,
+          juz: 30,
+          page: 604,
+          textUthmani: 'اللَّهُ الصَّمَدُ',
+          textImlaei: 'الله الصمد',
+        ));
   });
 
   Future<void> pumpHost(WidgetTester tester) async {

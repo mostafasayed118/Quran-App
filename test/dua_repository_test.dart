@@ -54,9 +54,8 @@ void main() {
       markTestSkipped(
           'working dir does not resolve the bundled asset from this runner');
     }
-    final rows =
-        (jsonDecode(file.readAsStringSync()) as List)
-            .cast<Map<String, dynamic>>();
+    final rows = (jsonDecode(file.readAsStringSync()) as List)
+        .cast<Map<String, dynamic>>();
     expect(rows.length, greaterThanOrEqualTo(40));
     final categories = rows.map((r) => r['categoryAr'] as String).toSet();
     expect(categories.length, greaterThanOrEqualTo(6));

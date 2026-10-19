@@ -32,8 +32,8 @@ void main() {
     expect(surahAudioFileName(114), '114.mp3');
     expect(surahAudioUrl('https://srv.net/afs/', 1),
         'https://srv.net/afs/001.mp3');
-    expect(surahAudioUrl('https://srv.net/afs', 1),
-        'https://srv.net/afs/001.mp3');
+    expect(
+        surahAudioUrl('https://srv.net/afs', 1), 'https://srv.net/afs/001.mp3');
     expect(parseSurahList(' 1, 2 ,x,3 '), [1, 2, 3]);
 
     final sorted = sortReciters([
@@ -44,8 +44,8 @@ void main() {
     ]);
     // PM-verified featured order: 51 before 123 before 4 (W2a disclosure:
     // plan fixture line contradicted the embedded featuredReciterIds ranks).
-    expect(sorted.map((r) => r.id).toList(),
-        ['51-53', '123-123', '4-4', '55-55']);
+    expect(
+        sorted.map((r) => r.id).toList(), ['51-53', '123-123', '4-4', '55-55']);
   });
 
   test('refreshFromApi wipes + inserts moshaf rows (local server)', () async {
@@ -113,8 +113,7 @@ void main() {
     expect(rows.single.id, '51-53');
   });
 
-  test('moshaf rows with untrusted or non-https servers are dropped',
-      () async {
+  test('moshaf rows with untrusted or non-https servers are dropped', () async {
     const evilFixture = '''
     {"reciters":[
      {"id":51,"name":"عبدالباسط عبدالصمد","letter":"ع","moshaf":[

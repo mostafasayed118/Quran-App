@@ -25,9 +25,7 @@ class HijriCubit extends Cubit<HijriState> {
       for (var day = 1; day <= length; day++)
         HijriCell(
           hDay: day,
-          gDay: _service
-              .toGregorian(hijriYear, hijriMonth, day)
-              .day,
+          gDay: _service.toGregorian(hijriYear, hijriMonth, day).day,
           isToday: todayHijri.hYear == hijriYear &&
               todayHijri.hMonth == hijriMonth &&
               todayHijri.hDay == day,

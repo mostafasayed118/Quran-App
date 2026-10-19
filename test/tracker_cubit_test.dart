@@ -44,8 +44,7 @@ void main() {
   test('seeded previous 3 marked days → streak 4 (today-anchored)', () async {
     final now = DateTime.now();
     for (var i = 1; i <= 3; i++) {
-      await repo.togglePrayer(
-          now.subtract(Duration(days: i)), PrayerSlot.fajr);
+      await repo.togglePrayer(now.subtract(Duration(days: i)), PrayerSlot.fajr);
     }
     final cubit = await build();
     await cubit.toggle(PrayerSlot.dhuhr);
@@ -53,7 +52,8 @@ void main() {
     await cubit.close();
   });
 
-  test('seeded gap: marked y-day..d-3 with today empty → streak 3 (y-day anchor)',
+  test(
+      'seeded gap: marked y-day..d-3 with today empty → streak 3 (y-day anchor)',
       () async {
     final now = DateTime.now();
     for (var i = 1; i <= 3; i++) {
@@ -67,12 +67,12 @@ void main() {
 
   test('gap breaks the streak entirely (d-2 anchor only)', () async {
     final now = DateTime.now();
-    await repo.togglePrayer(now.subtract(const Duration(days: 1)),
-        PrayerSlot.fajr);
-    await repo.togglePrayer(now.subtract(const Duration(days: 2)),
-        PrayerSlot.fajr);
-    await repo.togglePrayer(now.subtract(const Duration(days: 3)),
-        PrayerSlot.fajr);
+    await repo.togglePrayer(
+        now.subtract(const Duration(days: 1)), PrayerSlot.fajr);
+    await repo.togglePrayer(
+        now.subtract(const Duration(days: 2)), PrayerSlot.fajr);
+    await repo.togglePrayer(
+        now.subtract(const Duration(days: 3)), PrayerSlot.fajr);
     // skip 3 days back to create a hole further back — sanity only
     final cubit = await build();
     expect((cubit.state as TrackerReady).streakDays, 3);

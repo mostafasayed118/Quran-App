@@ -19,8 +19,8 @@ void main() {
   test('catalog load failure lands in the failed state, not a hang', () async {
     final cubit = LibraryCubit(
       catalog: CatalogRepository(
-        source: BundledCatalogSource(
-            loader: () async => throw StateError('boom')),
+        source:
+            BundledCatalogSource(loader: () async => throw StateError('boom')),
       ),
       downloader: PackDownloader(db),
     );

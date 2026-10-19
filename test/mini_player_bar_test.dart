@@ -57,8 +57,7 @@ void main() {
     cubit = PlaybackCubit(
       service: fake,
       reciters: ReciterRepository(db),
-      downloader:
-          AudioDownloader(db, audioRootResolver: () async => tempRoot),
+      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
     );
   });
 
@@ -104,7 +103,8 @@ void main() {
     expect(find.byType(IconButton), findsNothing);
   });
 
-  testWidgets('playing state shows names, progress, and pause→resume flips the icon',
+  testWidgets(
+      'playing state shows names, progress, and pause→resume flips the icon',
       (tester) async {
     await seedRow();
     final row = (await ReciterRepository(db).byId('51-53'))!;

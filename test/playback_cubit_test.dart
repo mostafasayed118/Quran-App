@@ -122,8 +122,7 @@ void main() {
     expect(source.path, seededPath);
   });
 
-  test('playSurah streams the server URL when nothing is downloaded',
-      () async {
+  test('playSurah streams the server URL when nothing is downloaded', () async {
     final row = await seedRow(
         id: '55-55', name: 'ماهر المعيقلي', server: 'https://s.example/a');
     service = FakePlaybackService();
@@ -149,7 +148,8 @@ void main() {
     expect(cubit.state, isA<PlaybackInitial>());
   });
 
-  test('playDefaultForSurah falls back to the first featured row when no selection exists',
+  test(
+      'playDefaultForSurah falls back to the first featured row when no selection exists',
       () async {
     await seedRow(id: '55-55', name: 'ماهر المعيقلي');
     final featured = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');

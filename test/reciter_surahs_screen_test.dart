@@ -52,8 +52,7 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: repo,
-      downloader:
-          AudioDownloader(db, audioRootResolver: () async => tempRoot),
+      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
     );
     addTearDown(playbackCubit.close);
     await tester.pumpWidget(MultiBlocProvider(
@@ -84,8 +83,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('rows render surah names + opening ayah teasers',
-      (tester) async {
+  testWidgets('rows render surah names + opening ayah teasers', (tester) async {
     final downloads = _StaticDownloadsCubit(db, tempRoot);
     addTearDown(downloads.close);
     await pumpSurahsHost(tester, downloads);
@@ -109,8 +107,8 @@ void main() {
 
   testWidgets('done row exposes delete; confirm delegates to removeDone',
       (tester) async {
-    final dir =
-        Directory('${tempRoot.path}/audio/51-53')..createSync(recursive: true);
+    final dir = Directory('${tempRoot.path}/audio/51-53')
+      ..createSync(recursive: true);
     final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
     await db.into(db.downloads).insert(DownloadsCompanion.insert(
           reciterId: '51-53',
@@ -136,10 +134,9 @@ void main() {
     expect(downloads.removedKeys, contains('51-53-1'));
   });
 
-  test('removeDone removes file + DB row and drops the state entry',
-      () async {
-    final dir =
-        Directory('${tempRoot.path}/audio/51-53')..createSync(recursive: true);
+  test('removeDone removes file + DB row and drops the state entry', () async {
+    final dir = Directory('${tempRoot.path}/audio/51-53')
+      ..createSync(recursive: true);
     final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
     await db.into(db.downloads).insert(DownloadsCompanion.insert(
           reciterId: '51-53',
@@ -149,8 +146,7 @@ void main() {
           bytes: const Value(3),
         ));
     final downloads = DownloadsCubit(
-      downloader:
-          AudioDownloader(db, audioRootResolver: () async => tempRoot),
+      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: _StaticReciterRepository(db),
     );
     addTearDown(downloads.close);

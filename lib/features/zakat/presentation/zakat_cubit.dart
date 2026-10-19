@@ -13,10 +13,12 @@ class ZakatCubit extends Cubit<ZakatState> {
     _recompute();
   }
 
-  void setGoldGrams(String text) => _setField((s) => s.copyWith(goldGrams: text));
+  void setGoldGrams(String text) =>
+      _setField((s) => s.copyWith(goldGrams: text));
   void setSilverGrams(String text) =>
       _setField((s) => s.copyWith(silverGrams: text));
-  void setGoldPrice(String text) => _setField((s) => s.copyWith(goldPrice: text));
+  void setGoldPrice(String text) =>
+      _setField((s) => s.copyWith(goldPrice: text));
   void setSilverPrice(String text) =>
       _setField((s) => s.copyWith(silverPrice: text));
   void setCash(String text) => _setField((s) => s.copyWith(cash: text));

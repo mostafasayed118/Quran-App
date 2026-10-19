@@ -14,14 +14,29 @@ void main() {
     db = newTestDb();
     final ayahs = [
       AyahsCompanion.insert(
-          id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
-          textUthmani: 'الم', textImlaei: 'الم'),
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم'),
       AyahsCompanion.insert(
-          id: const Value(9), surahId: 2, numberInSurah: 2, juz: 1, page: 2,
-          textUthmani: 'ذلك الكتاب', textImlaei: 'ذلك الكتاب'),
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب'),
       AyahsCompanion.insert(
-          id: const Value(10), surahId: 2, numberInSurah: 3, juz: 1, page: 3,
-          textUthmani: 'الذين يؤمنون', textImlaei: 'الذين يؤمنون'),
+          id: const Value(10),
+          surahId: 2,
+          numberInSurah: 3,
+          juz: 1,
+          page: 3,
+          textUthmani: 'الذين يؤمنون',
+          textImlaei: 'الذين يؤمنون'),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, ayahs));
     repo = AyahRepository(db);

@@ -21,7 +21,8 @@ void main() {
     repo = TasbihRepository(db);
   });
 
-  testWidgets('dial shows count and target; tapping increments; chips switch target',
+  testWidgets(
+      'dial shows count and target; tapping increments; chips switch target',
       (tester) async {
     final cubit = TasbihCubit(repo: repo);
     addTearDown(cubit.close);
@@ -43,7 +44,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('٠'), findsOneWidget);
-    final targetLabels = [find.text('٣٣'), find.text('٩٩'), find.text('١٠٠'), find.text('٥٠٠')];
+    final targetLabels = [
+      find.text('٣٣'),
+      find.text('٩٩'),
+      find.text('١٠٠'),
+      find.text('٥٠٠')
+    ];
     for (final label in targetLabels) {
       expect(label, findsOneWidget);
     }

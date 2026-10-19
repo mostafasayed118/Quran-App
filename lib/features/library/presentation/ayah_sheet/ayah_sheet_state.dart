@@ -14,5 +14,6 @@ sealed class AyahSheetState with _$AyahSheetState {
     required List<AyahSheetEntry> translationEntries,
   }) = AyahSheetReady;
 
-  const factory AyahSheetState.error({required String message}) = AyahSheetError;
+  const factory AyahSheetState.error({required String message}) =
+      AyahSheetError;
 }

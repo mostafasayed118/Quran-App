@@ -43,9 +43,8 @@ void main() {
       markTestSkipped(
           'working dir does not resolve the bundled asset from this runner');
     }
-    final rows =
-        (jsonDecode(file.readAsStringSync()) as List)
-            .cast<Map<String, dynamic>>();
+    final rows = (jsonDecode(file.readAsStringSync()) as List)
+        .cast<Map<String, dynamic>>();
     expect(rows.length, 99);
     final numbers = rows.map((r) => r['n'] as int).toList()..sort();
     expect(numbers, [for (var i = 1; i <= 99; i++) i]);

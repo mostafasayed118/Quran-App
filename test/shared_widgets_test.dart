@@ -34,8 +34,7 @@ void main() {
     expect(find.byIcon(Icons.search), findsOneWidget);
   });
 
-  testWidgets('SearchField honors a provided controller',
-      (tester) async {
+  testWidgets('SearchField honors a provided controller', (tester) async {
     final controller = TextEditingController(text: 'الفاتحة');
     addTearDown(controller.dispose);
     await pump(
@@ -56,12 +55,10 @@ void main() {
 
   testWidgets('DownloadProgressLabel defaults format and indicator value',
       (tester) async {
-    await pump(
-        tester,
-        const DownloadProgressLabel(received: 50, total: 100));
+    await pump(tester, const DownloadProgressLabel(received: 50, total: 100));
     expect(find.text('50/100'), findsOneWidget);
-    final progress =
-        tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    final progress = tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
     expect(progress.value, 0.5);
   });
 
@@ -76,8 +73,8 @@ void main() {
           format: (r, t) => '$r bytes',
         ));
     expect(find.text('9999 bytes'), findsOneWidget);
-    final progress =
-        tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    final progress = tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
     expect(progress.value, 1.0);
   });
 }

@@ -104,7 +104,8 @@ void main() {
     );
     final packs = await repo2.packs();
     final ids = packs.map((p) => p.id).toSet();
-    expect(ids, containsAll(<String>['ar-tafsir-muyassar', 'ara-sirajtafseer']));
+    expect(
+        ids, containsAll(<String>['ar-tafsir-muyassar', 'ara-sirajtafseer']));
     expect(packs, hasLength(3));
   });
 
@@ -175,8 +176,7 @@ void main() {
       markTestSkipped(
           'working dir does not resolve the bundled asset from this runner');
     }
-    final json =
-        jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+    final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     final list = (json['packs'] as List).cast<Map<String, dynamic>>();
     expect(list.length, 9);
 
@@ -218,16 +218,18 @@ void main() {
 
     final ids = packs.map((p) => p.id).toSet();
     expect(ids.length, 9, reason: 'pack ids must be unique');
-    expect(ids, containsAll(<String>[
-      'ar-tafsir-muyassar',
-      'ar-tafsir-al-jalalayn',
-      'en-tafisr-ibn-kathir',
-      'ara-sirajtafseer',
-      'eng-safiurrahmanalm',
-      'eng-mustafakhattabg',
-      'ara-bukhari',
-      'eng-bukhari',
-      'eng-muslim',
-    ]));
+    expect(
+        ids,
+        containsAll(<String>[
+          'ar-tafsir-muyassar',
+          'ar-tafsir-al-jalalayn',
+          'en-tafisr-ibn-kathir',
+          'ara-sirajtafseer',
+          'eng-safiurrahmanalm',
+          'eng-mustafakhattabg',
+          'ara-bukhari',
+          'eng-bukhari',
+          'eng-muslim',
+        ]));
   });
 }

@@ -8,12 +8,14 @@ import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
 class JustAudioPlaybackService implements PlaybackService {
-  JustAudioPlaybackService([AudioPlayer? player]) : _player = player ?? AudioPlayer();
+  JustAudioPlaybackService([AudioPlayer? player])
+      : _player = player ?? AudioPlayer();
 
   final AudioPlayer _player;
 
   @override
-  Stream<bool> playingStream() => _player.playerStateStream.map((s) => s.playing);
+  Stream<bool> playingStream() =>
+      _player.playerStateStream.map((s) => s.playing);
 
   @override
   Stream<Duration> positionStream() => _player.positionStream;

@@ -19,16 +19,16 @@ void main() {
     expect(db.allTables.length, 9); // w2a: + reciters (PM grant)
 
     await db.into(db.surahs).insert(
-      SurahsCompanion.insert(
-        id: const Value(1),
-        nameAr: 'الفاتحة',
-        nameEn: 'Al-Fatihah',
-        revelationType: 'المكية',
-        ayahCount: 7,
-        pagesStart: 1,
-        pagesEnd: 1,
-      ),
-    );
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'المكية',
+            ayahCount: 7,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
 
     final fetched = await db.select(db.surahs).get();
     expect(fetched.single.nameAr, 'الفاتحة');
@@ -37,16 +37,16 @@ void main() {
 
   test('ayahs table roundtrips uthmani + imlaei text', () async {
     await db.into(db.ayahs).insert(
-      AyahsCompanion.insert(
-        id: const Value(1),
-        surahId: 1,
-        numberInSurah: 1,
-        juz: 1,
-        page: 1,
-        textUthmani: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
-        textImlaei: 'بسم الله الرحمن الرحيم',
-      ),
-    );
+          AyahsCompanion.insert(
+            id: const Value(1),
+            surahId: 1,
+            numberInSurah: 1,
+            juz: 1,
+            page: 1,
+            textUthmani: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+            textImlaei: 'بسم الله الرحمن الرحيم',
+          ),
+        );
 
     final fetched = await db.select(db.ayahs).get();
     expect(fetched.single.textImlaei, 'بسم الله الرحمن الرحيم');

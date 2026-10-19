@@ -17,8 +17,7 @@ void main() {
     ];
     for (final sample in samples) {
       final hijri = service.fromGregorian(sample);
-      final back = service.toGregorian(
-          hijri.hYear, hijri.hMonth, hijri.hDay);
+      final back = service.toGregorian(hijri.hYear, hijri.hMonth, hijri.hDay);
       expect(dateOnly(back), dateOnly(sample), reason: 'roundtrip $sample');
     }
   });
@@ -31,8 +30,7 @@ void main() {
   test('every month length of hijri year 1447 is 29 or 30', () {
     for (var month = 1; month <= 12; month++) {
       final length = service.daysInMonth(1447, month);
-      expect({29, 30}, contains(length),
-          reason: 'month $month length $length');
+      expect({29, 30}, contains(length), reason: 'month $month length $length');
     }
   });
 

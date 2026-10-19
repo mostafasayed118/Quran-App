@@ -19,8 +19,13 @@ class HijriScreen extends StatelessWidget {
       body: BlocBuilder<HijriCubit, HijriState>(
         builder: (context, state) => switch (state) {
           HijriLoading() => const LoadingView(),
-          HijriReady(:final monthName, :final year, :final offset,
-              :final cells, :final todayHeader) =>
+          HijriReady(
+            :final monthName,
+            :final year,
+            :final offset,
+            :final cells,
+            :final todayHeader
+          ) =>
             ListView(
               padding: const EdgeInsets.all(12),
               children: [

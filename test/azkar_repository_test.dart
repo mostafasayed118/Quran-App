@@ -44,8 +44,8 @@ void main() {
 
   test('collection lookup by id', () async {
     final collections = await repo.collections();
-    final evening =
-        collections.firstWhere((c) => c.id == 'c2', orElse: () => throw StateError('missing c2'));
+    final evening = collections.firstWhere((c) => c.id == 'c2',
+        orElse: () => throw StateError('missing c2'));
     expect(evening.nameEn, 'Evening');
     expect(evening.items.single.count, 7);
   });
@@ -56,8 +56,7 @@ void main() {
       markTestSkipped(
           'working dir does not resolve the bundled asset from this runner');
     }
-    final root =
-        jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+    final root = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     final list = (root['collections'] as List).cast<Map<String, dynamic>>();
     expect(list.length, greaterThanOrEqualTo(6));
 

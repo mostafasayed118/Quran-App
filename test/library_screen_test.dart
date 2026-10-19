@@ -68,8 +68,7 @@ class StreamingFakeDownloader extends PackDownloader {
     if (g != null) {
       await g.future;
     }
-    final dir = Directory('${root.path}/library')
-      ..createSync(recursive: true);
+    final dir = Directory('${root.path}/library')..createSync(recursive: true);
     final file = File('${dir.path}/${pack.id}.json')
       ..writeAsStringSync(
           '{"quran":[{"chapter":1,"verse":1,"text":"text one"}]}');
@@ -83,7 +82,8 @@ class StreamingFakeDownloader extends PackDownloader {
 
 /// Controllable fake: records calls, the test decides success/failure and
 /// drives progress manually.
-class ControllableFakeDownloader extends PackDownloader {  ControllableFakeDownloader(super.db) : super(libraryRootResolver: null);
+class ControllableFakeDownloader extends PackDownloader {
+  ControllableFakeDownloader(super.db) : super(libraryRootResolver: null);
 
   final Set<String> uninstalled = <String>{};
   final List<void Function(int, int)> capturedProgress =
@@ -155,8 +155,7 @@ void main() {
 
       // fake install captured the callback; complete the flow
       final state0 = cubit.state as LibraryReady;
-      expect(
-          state0.progress[pack.id]!.$2, (0.001 * 1024 * 1024).round());
+      expect(state0.progress[pack.id]!.$2, (0.001 * 1024 * 1024).round());
       await installing;
       final ready = cubit.state as LibraryReady;
       expect(ready.installed, contains(pack.id));
@@ -221,7 +220,8 @@ void main() {
     });
 
     LibraryCubit screenCubit(AppDatabase db,
-        {required CatalogRepository catalog, required PackDownloader downloader}) {
+        {required CatalogRepository catalog,
+        required PackDownloader downloader}) {
       final cubit = LibraryCubit(catalog: catalog, downloader: downloader);
       addTearDown(cubit.close);
       return cubit;
@@ -264,7 +264,8 @@ void main() {
       expect(find.text('ترجمة تجريبية'), findsOneWidget);
     });
 
-    testWidgets('install row: button -> progress -> installed badge (real file)',
+    testWidgets(
+        'install row: button -> progress -> installed badge (real file)',
         (tester) async {
       final catalogPack = {
         'id': 'real-stream',

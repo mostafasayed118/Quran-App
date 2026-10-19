@@ -15,7 +15,8 @@ Future<void> main() async {
   final db = AppDatabase(NativeDatabase(tmp));
   try {
     final outDir = Directory('$root/web/src/data')..createSync(recursive: true);
-    final ayahDir = Directory('${outDir.path}/ayahs')..createSync(recursive: true);
+    final ayahDir = Directory('${outDir.path}/ayahs')
+      ..createSync(recursive: true);
 
     final surahs = await (db.select(db.surahs)
           ..orderBy([(t) => OrderingTerm(expression: t.id)]))
@@ -35,15 +36,20 @@ Future<void> main() async {
             ..orderBy([(t) => OrderingTerm(expression: t.numberInSurah)]))
           .get();
       if (ayahs.length != s.ayahCount) {
-        stderr.writeln('surah ${s.id}: ${ayahs.length} ayahs != ${s.ayahCount}');
+        stderr
+            .writeln('surah ${s.id}: ${ayahs.length} ayahs != ${s.ayahCount}');
         exitCode = 1;
         return;
       }
       total += ayahs.length;
       surahRows.add({
-        'id': s.id, 'nameAr': s.nameAr, 'nameEn': s.nameEn,
-        'revelationType': s.revelationType, 'ayahCount': s.ayahCount,
-        'pagesStart': s.pagesStart, 'pagesEnd': s.pagesEnd,
+        'id': s.id,
+        'nameAr': s.nameAr,
+        'nameEn': s.nameEn,
+        'revelationType': s.revelationType,
+        'ayahCount': s.ayahCount,
+        'pagesStart': s.pagesStart,
+        'pagesEnd': s.pagesEnd,
       });
       for (final a in ayahs) {
         if (a.textImlaei.trim().isNotEmpty) {
@@ -54,8 +60,14 @@ Future<void> main() async {
         'surah': s.id,
         'ayahs': [
           for (final a in ayahs)
-            {'n': a.numberInSurah, 'juz': a.juz, 'page': a.page,
-             'u': a.textUthmani, 'i': a.textImlaei, 'sajda': a.sajda},
+            {
+              'n': a.numberInSurah,
+              'juz': a.juz,
+              'page': a.page,
+              'u': a.textUthmani,
+              'i': a.textImlaei,
+              'sajda': a.sajda
+            },
         ],
       }));
     }

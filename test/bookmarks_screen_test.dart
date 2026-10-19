@@ -19,7 +19,8 @@ class _TeardownSafeAyahRepository extends AyahRepository {
   Stream<List<BookmarkEntry>> watchBookmarkEntries() => Stream.value(entries);
 }
 
-BookmarkEntry _entry(AppDatabase db, {required int ayahId, required String text}) {
+BookmarkEntry _entry(AppDatabase db,
+    {required int ayahId, required String text}) {
   return BookmarkEntry(
     ayah: Ayah(
       id: ayahId,
@@ -41,10 +42,9 @@ void main() {
     db = newTestDb();
   });
 
-  Widget host(List<BookmarkEntry> entries) =>
-      BlocProvider<BookmarksCubit>(
-        create: (_) => BookmarksCubit(
-            _TeardownSafeAyahRepository(db, entries: entries)),
+  Widget host(List<BookmarkEntry> entries) => BlocProvider<BookmarksCubit>(
+        create: (_) =>
+            BookmarksCubit(_TeardownSafeAyahRepository(db, entries: entries)),
         child: const BookmarksScreen(),
       );
 
@@ -69,19 +69,20 @@ void main() {
     expect(find.byType(ListTile), findsNothing);
   });
 
-  testWidgets('lists entries with verse info and removes on delete', (tester) async {
+  testWidgets('lists entries with verse info and removes on delete',
+      (tester) async {
     final text = 'ذلك الكتاب لا ريب فيه';
     final repo = _TeardownSafeAyahRepository(
       db,
       entries: [_entry(db, ayahId: 9, text: text)],
     );
     // Seed one row so the real delete has something to remove.
-    await db.into(db.bookmarks)
-        .insert(BookmarksCompanion.insert(ayahId: 9));
+    await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 9));
     final cubit = BookmarksCubit(repo);
     await pump(
       tester,
-      BlocProvider<BookmarksCubit>.value(value: cubit, child: const BookmarksScreen()),
+      BlocProvider<BookmarksCubit>.value(
+          value: cubit, child: const BookmarksScreen()),
     );
 
     expect(find.textContaining(text), findsOneWidget);
@@ -90,10 +91,10 @@ void main() {
     expect(await db.select(db.bookmarks).get(), isEmpty);
   });
 
-  testWidgets('delete button exposes a tooltip (a11y label census)', (tester) async {
+  testWidgets('delete button exposes a tooltip (a11y label census)',
+      (tester) async {
     final text = 'ذلك الكتاب لا ريب فيه';
     await pump(tester, host([_entry(db, ayahId: 9, text: text)]));
     expect(find.byTooltip('أزل الحفظ'), findsOneWidget);
   });
-
 }

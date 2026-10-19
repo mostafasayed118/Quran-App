@@ -63,8 +63,7 @@ void main() {
     expect(await repo.search('   '), hasLength(5));
   });
 
-  test('the bundled loader is invoked once across repeated searches',
-      () async {
+  test('the bundled loader is invoked once across repeated searches', () async {
     var loads = 0;
     final counting = CityRepository(
       db: db,
@@ -97,7 +96,11 @@ void main() {
 
   test('select persists and round-trips via the settings table', () async {
     const cairo = City(
-        id: 'c1', nameAr: 'القاهرة', nameEn: 'Cairo', lat: 30.0444, lng: 31.2357);
+        id: 'c1',
+        nameAr: 'القاهرة',
+        nameEn: 'Cairo',
+        lat: 30.0444,
+        lng: 31.2357);
     await repo.select(cairo);
 
     final restored = await repo.selectedCity();

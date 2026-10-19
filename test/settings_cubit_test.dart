@@ -41,8 +41,7 @@ void main() {
   setUp(() async {
     db = newTestDb();
     settings = ReminderSettings(db);
-    city = CityRepository(
-        db: db, loader: () async => [cairoCity.toJson()]);
+    city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
     prayer = FakePrayerTimeService()
       ..todayResult = fakeDay()
       ..nextResult = fakeDay().first;
@@ -118,8 +117,8 @@ void main() {
     expect(await settings.azkarTimeHm(), '05:15');
     expect((cubit.state as SettingsReady).azkarTimeHm, '05:15');
     expect(scheduler.scheduleCalls, callsBefore + 1);
-    final azkar = scheduler.plans.last
-        .singleWhere((r) => r.id == azkarReminderId);
+    final azkar =
+        scheduler.plans.last.singleWhere((r) => r.id == azkarReminderId);
     expect(azkar.fireAt.hour, 5);
     expect(azkar.fireAt.minute, 15);
 

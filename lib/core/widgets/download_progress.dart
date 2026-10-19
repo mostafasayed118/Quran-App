@@ -32,8 +32,7 @@ class DownloadProgressLabel extends StatelessWidget {
           ),
           SizedBox(height: gap),
           LinearProgressIndicator(
-            value:
-                total > 0 ? (received / total).clamp(0.0, 1.0) : null,
+            value: total > 0 ? (received / total).clamp(0.0, 1.0) : null,
           ),
         ],
       ),

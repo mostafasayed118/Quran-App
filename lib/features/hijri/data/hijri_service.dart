@@ -7,8 +7,7 @@ class HijriService {
     HijriCalendar.setLocal('ar');
   }
 
-  HijriCalendar fromGregorian(DateTime date) =>
-      HijriCalendar.fromDate(date);
+  HijriCalendar fromGregorian(DateTime date) => HijriCalendar.fromDate(date);
 
   DateTime toGregorian(int hijriYear, int hijriMonth, int hijriDay) =>
       HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, hijriDay);
