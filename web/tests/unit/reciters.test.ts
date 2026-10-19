@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseReciters, sortReciters, isTrustedAudioServer, surahAudioUrl, isFeaturedRow,
-  FEATURED_RECITER_IDS, type MoshafRow,
+  fetchRecitersSnapshot, FEATURED_RECITER_IDS, type MoshafRow,
 } from '../../src/lib/reciters';
 import { dedupeLabel } from '../../src/lib/labels';
 import snapshot from '../../src/data/reciters-snapshot.json';
@@ -85,5 +85,11 @@ describe('committed snapshot', () => {
     for (const id of FEATURED_RECITER_IDS) {
       expect(rows.some((r) => r.reciterId === id), `featured ${id} in snapshot`).toBe(true);
     }
+  });
+  it('is served from a memoized snapshot accessor', async () => {
+    const first = await fetchRecitersSnapshot();
+    expect(first).toEqual(parseReciters(snapshot));
+    const second = await fetchRecitersSnapshot();
+    expect(second).toBe(first);
   });
 });

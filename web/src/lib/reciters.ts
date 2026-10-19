@@ -71,6 +71,16 @@ export function surahAudioUrl(server: string, surah: number): string {
   return `${base}${String(surah).padStart(3, '0')}.mp3`;
 }
 
+let snapshotRows: MoshafRow[] | null = null;
+
+/** Committed-snapshot rows (local chunk) - instant fallback source for play + fetch failures. */
+export async function fetchRecitersSnapshot(): Promise<MoshafRow[]> {
+  if (snapshotRows) return snapshotRows;
+  const { default: snapshot } = await import('../data/reciters-snapshot.json');
+  snapshotRows = parseReciters(snapshot);
+  return snapshotRows;
+}
+
 /** Live API with committed-snapshot fallback (spec §3.4). */
 export async function fetchReciters(): Promise<MoshafRow[]> {
   try {
@@ -80,7 +90,6 @@ export async function fetchReciters(): Promise<MoshafRow[]> {
     if (rows.length === 0) throw new Error('empty reciter payload');
     return rows;
   } catch {
-    const { default: snapshot } = await import('../data/reciters-snapshot.json');
-    return parseReciters(snapshot);
+    return fetchRecitersSnapshot();
   }
 }

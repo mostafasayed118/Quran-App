@@ -61,7 +61,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     type FontStep,
     type ReaderSettings,
   } from '../../lib/reader-settings';
-  import { fetchReciters, sortReciters, type MoshafRow } from '../../lib/reciters';
+  import { fetchReciters, fetchRecitersSnapshot, sortReciters, type MoshafRow } from '../../lib/reciters';
   import { dedupeLabel } from '../../lib/labels';
   import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
   import { writeResume } from '../../lib/reader-resume';
@@ -77,10 +77,11 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 
   // Reciter rows are fetched once per page load and reused by the picker and listen actions.
   let rowsPromise: Promise<MoshafRow[]> | null = null;
+  let resolvedRows: MoshafRow[] | null = null;
   function loadRows(): Promise<MoshafRow[]> {
     rowsPromise ??= fetchReciters()
-      .then((rows) => sortReciters(rows))
-      .catch(() => [] as MoshafRow[]);
+      .then((rows) => (resolvedRows = sortReciters(rows)))
+      .catch(() => (resolvedRows = [] as MoshafRow[]));
     return rowsPromise;
   }
 
@@ -105,8 +106,14 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 
     // --- header picker + play (featured-first via sortReciters) ---
     const selectedRow = async (): Promise<MoshafRow | undefined> => {
-      const rows = await loadRows();
       const wanted = pick?.value || settings.reciterRow;
+      if (wanted) {
+        const fromLive = resolvedRows?.find((r) => r.rowId === wanted);
+        if (fromLive) return fromLive;
+        const fromSnap = sortReciters(await fetchRecitersSnapshot()).find((r) => r.rowId === wanted);
+        if (fromSnap) return fromSnap;
+      }
+      const rows = await loadRows();
       return rows.find((r) => r.rowId === wanted) ?? rows[0];
     };
     const playSurah = async (s: number): Promise<void> => {
