@@ -476,3 +476,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Disclosed follow-ups (open, non-blocking):** footer overflows internally at 200% text on 360 (pre-existing; outside P1's header scope) · résumé-card surah name stays Arabic on EN · P9 census excludes footer/reader-nav links · AR meta descriptions untouched (optional) · production VIS-01 confirmation pending the push (live is still pre-fix).
 - **Foreign in-window:** app W5 (`1b1952b`, `105f10b`, `706fe8c`) — zero web contact; app PM-verified.
 - **State:** ledger commit follows (local-only). NO PUSH — the window awaits owner GO (25 unpushed + this entry).
+
+### Push window — WEB-POLISH-2 + app W3/W4/W5 — (aef881f..a49442b) — 2026-10-19
+- **Range:** `aef881f..a49442b` — 26 commits: WEB-POLISH-2 ×12 + close-out · app AUDIT-FIX 2: W3 (perf boot/playback/qibla ×3 + ledger) · W4 (CachedLoader + one cap rule + PackReader/PackStore split + ledger) · W5 (quran DIP pilot + ledger) · window-2 ledger (`04697bc`).
+- **Pre-flight:** HEAD `a49442b`; FF_OK=true; remote static at `aef881f`; porcelain = owner debris + **live app-side WIP (recitation DIP — uncommitted; deliberately excluded)**; **explicit-SHA push (`a49442b:main`) chosen to be immune to concurrent commits**; web drift since the controller gate run = 0 (`706fe8c..HEAD -- web/`).
+- **Web gates (controller-run at the wave tip, cited):** check **0/0/0** (87) · unit **145/145** (21) · e2e **67/67** · build **239** · budget **25.29 KB / 30 KB** + dist **272 / 2000**. App rides on recorded PM verifications.
+- **Push:** `git push origin a49442b:main`; ls-remote proof: remote tip == `a49442b`; unpushed 0.
+- **CI on `a49442b`:** `web-gates` **39213403566** success (27s) · `ci` **39213403628** success (5m29s).
+- **Cloudflare (post-deploy, PM probes — the audit's quick-win set closed ON PRODUCTION):** **VIS-01: docSW 360/360 at a 360px viewport (was 392) + the theme toggle fully in-viewport — re-measured with the same PM script that captured the pre-fix 392** · `/en/surah/2` 360 clean · EN 404 now `lang="en" dir="ltr"` + "Page not found" · sitemap locs slashed (`/quran/`, `/surah/1/`) · EN meta descriptions live · privacy `en-policy` anchor present.
+- **State:** ledger commit follows (local-only). NO PUSH beyond the window.
