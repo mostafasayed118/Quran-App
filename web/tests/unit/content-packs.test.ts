@@ -44,11 +44,15 @@ describe('PACKS catalog', () => {
 
   it('builds fawazahmed0 translation URLs verbatim', () => {
     expect(pack('ara-sirajtafseer').url(2)).toBe(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-sirajtafseer/2.json',
+      'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/ara-sirajtafseer/2.json',
     );
     expect(pack('eng-mustafakhattabg').url(108)).toBe(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/eng-mustafakhattabg/108.json',
+      'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions/eng-mustafakhattabg/108.json',
     );
+  });
+
+  it('never floats on a mutable ref - every pack base is tag- or commit-pinned', () => {
+    for (const p of PACKS) expect(p.url(1)).toMatch(/@(v\d+\.\d+\.\d+|[0-9a-f]{40})\//);
   });
 });
 

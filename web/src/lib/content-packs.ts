@@ -38,7 +38,8 @@ function parseTranslationChapter(json: unknown): Map<number, string> {
 }
 
 const SPA5K_BASE = 'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir';
-const FAWAZ_BASE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions';
+// Pinned to the app-parity commit SHA (quran-api carries no tags; the branch-head SHA is its only immutable ref). Never move it back to @1.
+const FAWAZ_BASE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions';
 
 function tafsirPack(id: string, titleAr: string): PackInfo {
   return { kind: 'tafsir', id, titleAr, url: (surah) => `${SPA5K_BASE}/${id}/${surah}.json`, parse: parseTafsirArray };
