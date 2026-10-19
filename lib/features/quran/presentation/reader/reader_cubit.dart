@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
 
 import '../../data/ayah_source.dart';
 import '../../data/last_read_source.dart';
@@ -15,8 +16,10 @@ class ReaderCubit extends Cubit<ReaderState> {
     required LastReadSource lastReadRepository,
     required int surahId,
     required int initialAyah,
+    WirdProgressSink? wirdProgress,
   })  : _ayahRepository = ayahRepository,
         _lastReadRepository = lastReadRepository,
+        _wirdProgress = wirdProgress,
         _surahId = surahId,
         _initialAyah = initialAyah,
         super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah)) {
@@ -34,6 +37,7 @@ class ReaderCubit extends Cubit<ReaderState> {
 
   final AyahSource _ayahRepository;
   final LastReadSource _lastReadRepository;
+  final WirdProgressSink? _wirdProgress;
   final int _surahId;
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
@@ -113,6 +117,14 @@ class ReaderCubit extends Cubit<ReaderState> {
     final pageAyahs = current.mushafPages[blockIndex].ayahs;
     if (pageAyahs.isEmpty) return;
     await _lastReadRepository.saveAyahId(pageAyahs.first.id);
+    final sink = _wirdProgress;
+    if (sink == null) return;
+    try {
+      await sink.advanceTo(pageAyahs.first.id);
+    } on Object catch (error, stackTrace) {
+      dev.log('wird progress advance failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+    }
   }
 
   @override

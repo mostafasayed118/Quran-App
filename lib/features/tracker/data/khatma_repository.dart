@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/domain/wird_progress_sink.dart';
 
 /// One active wird/khatma plan row (single-row by invariant).
 class KhatmaPlan {
@@ -18,7 +19,7 @@ class KhatmaPlan {
 }
 
 /// Persistence for the single khatma plan over [KhatmaProgress].
-class KhatmaRepository {
+class KhatmaRepository implements WirdProgressSink {
   KhatmaRepository(this._db);
 
   final AppDatabase _db;
@@ -49,6 +50,7 @@ class KhatmaRepository {
 
   /// Advances the read-up-to pointer to [ayahId]; max-wins (never backward)
   /// and a no-op while no plan is active.
+  @override
   Future<void> advanceTo(int ayahId) async {
     final row = await _row();
     if (row == null || ayahId <= row.ayahId) return;

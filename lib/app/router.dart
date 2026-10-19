@@ -246,6 +246,7 @@ abstract final class AppRouter {
                   lastReadRepository: getIt<LastReadRepository>(),
                   surahId: surah,
                   initialAyah: ayah,
+                  wirdProgress: getIt<KhatmaRepository>(),
                 ),
               ),
               BlocProvider<PlaybackCubit>.value(
