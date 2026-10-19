@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { LANDING } from '../../src/lib/landing-content';
 
-test('landing renders the hero with the provisional ayah and both CTAs', async ({ page }) => {
+test('landing renders the hero ayah and both CTAs', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('قرآن يَهدي');
   await expect(page.locator('.hero-ayah')).toBeVisible();
