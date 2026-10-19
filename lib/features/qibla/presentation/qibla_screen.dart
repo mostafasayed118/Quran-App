@@ -26,8 +26,41 @@ bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
   };
 }
 
-class QiblaScreen extends StatelessWidget {
+class QiblaScreen extends StatefulWidget {
   const QiblaScreen({super.key});
+
+  @override
+  State<QiblaScreen> createState() => _QiblaScreenState();
+}
+
+class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+    final cubit = context.read<QiblaCubit>();
+    switch (state) {
+      case AppLifecycleState.paused:
+        cubit.pause();
+      case AppLifecycleState.resumed:
+        cubit.resume();
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

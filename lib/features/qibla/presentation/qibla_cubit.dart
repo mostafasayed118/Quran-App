@@ -47,7 +47,23 @@ class QiblaCubit extends Cubit<QiblaState> {
     }
   }
 
+  /// Stops the sensor stream while the app is backgrounded. The last heading
+  /// stays displayed (no emission).
+  Future<void> pause() async {
+    final sub = _headingSub;
+    // Detach synchronously: a resume arriving while the cancel is still in
+    // flight must be able to bind a fresh stream, and the late continuation
+    // must not clobber that new subscription.
+    _headingSub = null;
+    await sub?.cancel();
+  }
+
+  /// Re-acquires the heading stream after a [pause] (the service hands out a
+  /// fresh stream per call).
+  void resume() => _bindHeading();
+
   void _bindHeading() {
+    if (_headingSub != null) return;
     final stream = _headingService?.headingStream();
     if (stream == null) {
       _markCompassUnavailable();
