@@ -13,9 +13,6 @@ const statements = JSON.parse(source) as Statement[];
 // apksigner verify --print-certs on the signed release APK must print this digest.
 const RELEASE_FP =
   'D2:1E:83:DC:9F:B5:9F:6D:61:5A:A3:FF:A7:70:22:13:61:64:6A:8F:2B:70:50:FF:BE:24:DA:CC:1D:98:CB:DA';
-// This machine's debug cert, kept so debug builds verify during device testing.
-const DEBUG_FP =
-  'B9:95:23:DA:5E:E0:0C:8B:7D:0E:4F:6E:B8:3B:EB:ED:A2:97:3B:59:2D:9E:8C:E9:4A:0A:5B:34:66:F5:97:03';
 
 describe('assetlinks.json (Android App Links)', () => {
   it('declares handle_all_urls for the app package', () => {
@@ -31,8 +28,7 @@ describe('assetlinks.json (Android App Links)', () => {
     for (const fp of fps) expect(fp).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
   });
 
-  it('pins the exact release + debug fingerprint set', () => {
-    const fps = [...statements[0].target.sha256_cert_fingerprints].sort();
-    expect(fps).toEqual([RELEASE_FP, DEBUG_FP].sort());
+  it('pins the release fingerprint only (debug FP removed by owner decision 2026-10-19)', () => {
+    expect(statements[0].target.sha256_cert_fingerprints).toEqual([RELEASE_FP]);
   });
 });
