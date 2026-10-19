@@ -66,8 +66,7 @@ class PrayerLogRepository {
     return row == null ? TrackerDay.empty(key) : TrackerDay.fromRow(row);
   }
 
-  Future<bool> getForDay(DateTime day) async =>
-      (await dayView(day)).anyMarked;
+  Future<bool> getForDay(DateTime day) async => (await dayView(day)).anyMarked;
 
   Future<void> togglePrayer(DateTime day, PrayerSlot slot) async {
     final key = dateOnly(day);
@@ -88,22 +87,14 @@ class PrayerLogRepository {
     await _db.into(_db.prayerLog).insertOnConflictUpdate(companion);
   }
 
-  Stream<TrackerDay> watchToday() {
-    final key = dateOnly(DateTime.now());
-    return (_db.select(_db.prayerLog)..where((p) => p.day.equals(key)))
-        .watchSingleOrNull()
-        .map((row) => row == null ? TrackerDay.empty(key) : TrackerDay.fromRow(row));
-  }
-
   Future<List<DateTime>> markedDaysRange(
       DateTime fromInclusive, int daysBack) async {
     final from = dateOnly(fromInclusive);
     final days = <DateTime>[
       for (var i = 0; i < daysBack; i++) from.subtract(Duration(days: i)),
     ];
-    final rows = await (_db.select(_db.prayerLog)
-          ..where((p) => p.day.isIn(days)))
-        .get();
+    final rows =
+        await (_db.select(_db.prayerLog)..where((p) => p.day.isIn(days))).get();
     final marked = <String>{
       for (final row in rows)
         if (TrackerDay.fromRow(row).anyMarked)
