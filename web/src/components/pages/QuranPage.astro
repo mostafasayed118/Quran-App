@@ -5,7 +5,7 @@ interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 ---
 <h1 class="page-title">{t(locale, 'surahIndexTitle')}</h1>
-<SurahIndexFilter client:load locale={locale} />
+<SurahIndexFilter client:idle locale={locale} />
 <style is:global>
   .ayah-search { width: min(760px, calc(100% - 40px)); margin: 26px auto 20px; }
   .ayah-search-title { font-size: 1.05rem; font-weight: 700; color: var(--gold-ink); margin: 0 0 10px; }
