@@ -238,6 +238,8 @@
   "azkarReminder": "Azkar reminder",
   "reminderTime": "Reminder time",
   "settingsMinimalNote": "Dark mode follows your device",
+  "settingsWirdReminder": "Wird reminder",
+  "settingsWirdReminderTime": "Wird reminder time",
   "stopAction": "Stop",
   "previousMonth": "Previous month",
   "nextMonth": "Next month",

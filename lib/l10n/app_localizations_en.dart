@@ -419,6 +419,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsMinimalNote => 'Dark mode follows your device';
 
   @override
+  String get settingsWirdReminder => 'Wird reminder';
+
+  @override
+  String get settingsWirdReminderTime => 'Wird reminder time';
+
+  @override
   String get stopAction => 'Stop';
 
   @override

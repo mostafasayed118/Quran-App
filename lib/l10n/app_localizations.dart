@@ -836,6 +836,18 @@ abstract class AppLocalizations {
   /// **'الوضع الليلي من إعدادات جهازك'**
   String get settingsMinimalNote;
 
+  /// No description provided for @settingsWirdReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الورد'**
+  String get settingsWirdReminder;
+
+  /// No description provided for @settingsWirdReminderTime.
+  ///
+  /// In ar, this message translates to:
+  /// **'وقت تذكير الورد'**
+  String get settingsWirdReminderTime;
+
   /// No description provided for @stopAction.
   ///
   /// In ar, this message translates to:

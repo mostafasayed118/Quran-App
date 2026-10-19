@@ -24,6 +24,8 @@ class SettingsScreen extends StatelessWidget {
           SettingsReady(
             :final azkarEnabled,
             :final azkarTimeHm,
+            :final wirdEnabled,
+            :final wirdTimeHm,
             :final permissionDenied,
           ) =>
             ListView(
@@ -48,6 +50,28 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   onTap: azkarEnabled
                       ? () => _pickTime(context, azkarTimeHm)
+                      : null,
+                ),
+                SwitchListTile(
+                  secondary: const Icon(Icons.notifications_outlined),
+                  title: Text(loc.settingsWirdReminder),
+                  value: wirdEnabled,
+                  onChanged: (value) =>
+                      context.read<SettingsCubit>().toggleWird(value),
+                ),
+                ListTile(
+                  enabled: wirdEnabled,
+                  leading: const Icon(Icons.schedule),
+                  title: Text(loc.settingsWirdReminderTime),
+                  trailing: Text(
+                    wirdTimeHm.toArabicIndicDigits,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onTap: wirdEnabled
+                      ? () => _pickWirdTime(context, wirdTimeHm)
                       : null,
                 ),
                 if (permissionDenied)
@@ -85,6 +109,21 @@ class SettingsScreen extends StatelessWidget {
     final picked = await showTimePicker(context: context, initialTime: initial);
     if (picked == null) return;
     await cubit.setTime(
+      '${picked.hour.toString().padLeft(2, '0')}:'
+      '${picked.minute.toString().padLeft(2, '0')}',
+    );
+  }
+
+  Future<void> _pickWirdTime(BuildContext context, String hm) async {
+    final cubit = context.read<SettingsCubit>();
+    final parts = hm.split(':');
+    final initial = TimeOfDay(
+      hour: int.tryParse(parts.first) ?? 20,
+      minute: int.tryParse(parts.length > 1 ? parts.last : '') ?? 0,
+    );
+    final picked = await showTimePicker(context: context, initialTime: initial);
+    if (picked == null) return;
+    await cubit.changeWirdTime(
       '${picked.hour.toString().padLeft(2, '0')}:'
       '${picked.minute.toString().padLeft(2, '0')}',
     );

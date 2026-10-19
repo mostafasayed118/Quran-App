@@ -23,6 +23,12 @@ void main() {
     scheduler = FakeReminderScheduler();
   });
 
+  /// The wird toggle (A1b) adds a second Switch; scope the azkar finder.
+  Finder azkarSwitch() => find.descendant(
+        of: find.widgetWithText(SwitchListTile, 'تذكير الأذكار'),
+        matching: find.byType(Switch),
+      );
+
   Future<void> pumpHost(WidgetTester tester) async {
     final cubit = SettingsCubit(
       settings: settings,
@@ -48,7 +54,7 @@ void main() {
     expect(find.text('وقت التذكير'), findsOneWidget);
     expect(find.text('٠٦:٣٠'), findsOneWidget);
     expect(find.text('الوضع الليلي من إعدادات جهازك'), findsOneWidget);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+    expect(tester.widget<Switch>(azkarSwitch()).value, isFalse);
     expect(
       find.text('إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'),
       findsNothing,
@@ -59,11 +65,11 @@ void main() {
       (tester) async {
     await pumpHost(tester);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(azkarSwitch());
     await tester.pumpAndSettle();
 
     expect(await settings.azkarEnabled(), isTrue);
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+    expect(tester.widget<Switch>(azkarSwitch()).value, isTrue);
     expect(scheduler.scheduleCalls, greaterThanOrEqualTo(1));
     expect(
       find.text('إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'),
@@ -75,7 +81,7 @@ void main() {
     scheduler.permissionsResult = false;
     await pumpHost(tester);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(azkarSwitch());
     await tester.pumpAndSettle();
 
     expect(
@@ -92,7 +98,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TimePickerDialog), findsNothing);
 
-    await tester.tap(find.byType(Switch));
+    await tester.tap(azkarSwitch());
     await tester.pumpAndSettle();
     await tester.tap(find.text('وقت التذكير'));
     await tester.pumpAndSettle();

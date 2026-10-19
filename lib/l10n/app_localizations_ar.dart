@@ -417,6 +417,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsMinimalNote => 'الوضع الليلي من إعدادات جهازك';
 
   @override
+  String get settingsWirdReminder => 'تذكير الورد';
+
+  @override
+  String get settingsWirdReminderTime => 'وقت تذكير الورد';
+
+  @override
   String get stopAction => 'وقف';
 
   @override
