@@ -65,8 +65,8 @@ void main() {
         RecitersCubit(repo: _InMemoryReciterSource(const [_other, _featured]));
     addTearDown(cubit.close);
 
-    final ready =
-        await cubit.stream.firstWhere((s) => s is RecitersReady) as RecitersReady;
+    final ready = await cubit.stream.firstWhere((s) => s is RecitersReady)
+        as RecitersReady;
 
     expect(ready.reciters, everyElement(isA<ReciterInfo>()));
     expect(ready.reciters.map((r) => r.reciterName).toList(),

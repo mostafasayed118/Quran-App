@@ -9,15 +9,22 @@ import 'reciter_source.dart';
 /// Featured reciters pinned by PM from the verified 2026-10-15 mp3quran dump
 /// (all حفص مرتل, 114 surahs each). Never extend without a PM grant.
 const List<int> featuredReciterIds = <int>[
-  51, 123, 118, 92, 102, 54, 30, 4, 5,
+  51,
+  123,
+  118,
+  92,
+  102,
+  54,
+  30,
+  4,
+  5,
 ];
 
 String surahAudioFileName(int surahNumber) =>
     '${surahNumber.toString().padLeft(3, '0')}.mp3';
 
 String surahAudioUrl(String server, int surahNumber) {
-  final base =
-      server.endsWith('/') ? server : '$server/';
+  final base = server.endsWith('/') ? server : '$server/';
   return '$base${surahAudioFileName(surahNumber)}';
 }
 
@@ -162,9 +169,8 @@ class ReciterRepository implements ReciterSource {
   @override
   Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
-    final rows = await (_db.select(_db.surahs)
-          ..where((s) => s.id.isIn(surahIds)))
-        .get();
+    final rows =
+        await (_db.select(_db.surahs)..where((s) => s.id.isIn(surahIds))).get();
     return {for (final s in rows) s.id: s.nameAr};
   }
 
