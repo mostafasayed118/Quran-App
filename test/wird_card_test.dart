@@ -77,7 +77,8 @@ void main() {
     addTearDown(cubit.close);
     await tester.pumpWidget(
       appShell(
-        wrap: (app) => BlocProvider<TrackerCubit>.value(value: cubit, child: app),
+        wrap: (app) =>
+            BlocProvider<TrackerCubit>.value(value: cubit, child: app),
         home: const TrackerScreen(),
       ),
     );

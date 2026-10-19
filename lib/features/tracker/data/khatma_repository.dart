@@ -79,9 +79,8 @@ class KhatmaRepository implements WirdProgressSink {
   /// Mushaf coordinates of [ayahId]; null when the id is unknown.
   Future<({int page, int surahId, int numberInSurah})?> anchorFor(
       int ayahId) async {
-    final row =
-        await (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
-            .getSingleOrNull();
+    final row = await (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
+        .getSingleOrNull();
     if (row == null) return null;
     return (
       page: row.page,

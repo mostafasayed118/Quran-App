@@ -164,8 +164,8 @@ void main() {
       now: DateTime(2026, 3, 15, 10, 0),
     );
 
-    final wird = scheduler.plans.single
-        .singleWhere((r) => r.id == wirdReminderId);
+    final wird =
+        scheduler.plans.single.singleWhere((r) => r.id == wirdReminderId);
     expect(wird.fireAt, DateTime(2026, 3, 15, 20, 30));
     expect(wird.payload, wirdReminderPayload);
   });

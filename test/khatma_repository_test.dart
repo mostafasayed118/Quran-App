@@ -98,8 +98,7 @@ void main() {
 
   test('pagesFromAyah and anchorFor resolve seeded rows', () async {
     expect(await repo.pagesFromAyah(8), 5);
-    expect(await repo.anchorFor(8),
-        (page: 5, surahId: 1, numberInSurah: 4));
+    expect(await repo.anchorFor(8), (page: 5, surahId: 1, numberInSurah: 4));
     expect(await repo.pagesFromAyah(9999), isNull);
     expect(await repo.anchorFor(9999), isNull);
   });
