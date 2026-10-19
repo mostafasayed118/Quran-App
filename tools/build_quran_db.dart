@@ -10,6 +10,7 @@ import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/db/content_version.dart';
 
 Future<void> main() async {
   final repoRoot = Directory.current.path;
@@ -94,6 +95,13 @@ Future<void> main() async {
       ));
     }
   });
+
+  await db.into(db.settingsTable).insertOnConflictUpdate(
+        SettingsTableCompanion.insert(
+          key: kContentVersionKey,
+          value: '$kContentVersion',
+        ),
+      );
 
   final surahCount = (await db.select(db.surahs).get()).length;
   final ayahCount = (await db.select(db.ayahs).get()).length;

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:meta/meta.dart';
 
+import 'content_version.dart';
 import 'tables.dart';
 
 part 'app_database.g.dart';
@@ -50,4 +51,13 @@ class AppDatabase extends _$AppDatabase {
   /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
   /// a fresh executor. Wraps the protected migrator; public by design.
   Future<void> createSchemaForSeeding() => createMigrator().createAll();
+
+  /// The bundled-content version stamped into the installed DB (0 when absent
+  /// — pre-versioning installs or a fresh schema). See content_version.dart.
+  Future<int> installedContentVersion() async {
+    final row = await (select(settingsTable)
+          ..where((s) => s.key.equals(kContentVersionKey)))
+        .getSingleOrNull();
+    return int.tryParse(row?.value ?? '') ?? 0;
+  }
 }
