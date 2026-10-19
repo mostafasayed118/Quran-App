@@ -1,4 +1,4 @@
-// Budgets (spec §5): reader ships ≤30KB gzip JS pre-interaction; quran index ≤100KB; dist < 2000 files.
+// Budgets (spec §5): reader ships ≤30KB gzip JS pre-interaction; quran index ≤25KB; dist < 2000 files.
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,7 +8,7 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DIST = join(ROOT, 'dist');
 
 const READER_JS_BUDGET_BYTES = 30 * 1024;
-const QURAN_JS_BUDGET_BYTES = 100 * 1024;
+const QURAN_JS_BUDGET_BYTES = 25 * 1024;
 const FILE_BUDGET = 2000;
 
 const PAGES = [
@@ -23,7 +23,7 @@ const PAGES = [
     rel: 'quran/index.html',
     budget: QURAN_JS_BUDGET_BYTES,
     label: 'quran',
-    note: 'surah index island',
+    note: 'surah index (island-free)',
     showFileCount: false,
   },
 ];
