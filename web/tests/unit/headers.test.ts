@@ -7,7 +7,7 @@ function parseBlocks(text: string): Map<string, Map<string, string>> {
   const blocks = new Map<string, Map<string, string>>();
   let current: Map<string, string> | null = null;
   for (const line of text.split(/\r?\n/)) {
-    if (line.trim() === '') continue;
+    if (line.trim() === '' || line.trim().startsWith('#')) continue;
     if (!/^\s/.test(line)) {
       current = new Map();
       blocks.set(line.trim(), current);
