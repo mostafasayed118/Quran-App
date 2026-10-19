@@ -30,8 +30,15 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> reload() async {
     try {
-      final lastReadCard = await _loadLastReadCard();
-      final nextPrayerCard = await _loadNextPrayerCard();
+      // The two cards are independent. The LIST form of Future.wait completes
+      // with the first error and consumes the rest, so a second failing chain
+      // can never surface as an unhandled async error.
+      final results = await Future.wait<Object?>([
+        _loadLastReadCard(),
+        _loadNextPrayerCard(),
+      ]);
+      final lastReadCard = results[0] as LastReadCard?;
+      final nextPrayerCard = results[1] as NextPrayerCard?;
       if (isClosed) return;
       emit(HomeState.ready(
         lastRead: lastReadCard,
