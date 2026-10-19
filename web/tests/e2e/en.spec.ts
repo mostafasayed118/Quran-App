@@ -148,6 +148,7 @@ test('EN pages carry localized meta descriptions', async ({ page }) => {
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.reciters);
   await page.goto('/en/surah/2');
   await expect(meta).toHaveAttribute('content', enReaderDescription(2, 'Al-Baqarah'));
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/surah\/2\.png$/);
   await page.goto('/en/privacy');
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.privacy);
 });

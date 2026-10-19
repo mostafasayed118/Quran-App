@@ -13,6 +13,6 @@ const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
 const nameEn = surahDisplayName(surah, 'en');
 const title = `${nameEn} — ${t('en', 'appName')}`;
 ---
-<BaseLayout title={title} description={enReaderDescription(surah.id, nameEn)} locale="en" preloadFont>
+<BaseLayout title={title} description={enReaderDescription(surah.id, nameEn)} locale="en" preloadFont ogImage={`/og/surah/${surah.id}.png`}>
   <ReaderPage locale="en" surah={surah} />
 </BaseLayout>

@@ -10,14 +10,14 @@ import { t, type Locale } from '../lib/strings';
 import { altLocalePath } from '../lib/landing-content';
 import { THEME_KEY } from '../lib/theme';
 
-interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; }
+interface Props { title: string; description?: string; locale?: Locale; preloadFont?: boolean; ogImage?: string; }
 const { title, description = 'قرآن يَهدي — اقرأ واستمع وتدبّر، مجاناً وبلا حسابات.', locale = 'ar', preloadFont = false } = Astro.props;
 const dir = locale === 'ar' ? 'rtl' : 'ltr';
 const pathname = Astro.url.pathname;
 const canonical = new URL(pathname, Astro.site);
 const alternateAr = new URL(altLocalePath(pathname, 'ar'), Astro.site);
 const alternateEn = new URL(altLocalePath(pathname, 'en'), Astro.site);
-const ogImage = new URL('/og-base.png', Astro.site);
+const ogImage = new URL(Astro.props.ogImage ?? '/og-base.png', Astro.site);
 ---
 <!doctype html>
 <html lang={locale} dir={dir} data-theme="day">

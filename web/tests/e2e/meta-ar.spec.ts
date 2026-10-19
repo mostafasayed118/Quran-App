@@ -12,6 +12,7 @@ test('AR pages carry localized meta descriptions', async ({ page }) => {
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.ar.reciters);
   await page.goto('/surah/2');
   await expect(meta).toHaveAttribute('content', arReaderDescription(2, 'البقرة'));
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/surah\/2\.png$/);
   await page.goto('/privacy');
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.ar.privacy);
 });
