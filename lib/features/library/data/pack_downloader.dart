@@ -47,16 +47,18 @@ class PackDownloader {
               receiveTimeout: const Duration(minutes: 2),
             )),
         _rootResolver = libraryRootResolver,
-        _fileDecoder = fileDecoder ?? PackReader.decodeFileInIsolate;
+        _fileDecoder = fileDecoder;
 
   final AppDatabase _db;
   final Dio _dio;
   final Future<Directory> Function()? _rootResolver;
 
-  /// The injectable decode seam, handed to the composed [PackReader] and used
-  /// by the install integrity sniff. Defaults to
-  /// [PackReader.decodeFileInIsolate]; tests inject a synchronous decoder.
-  final Future<dynamic> Function(String path) _fileDecoder;
+  /// The injectable decode seam (a TREE decoder), handed to the composed
+  /// [PackReader] and used by the install integrity sniff. Null in production
+  /// so the reader takes its isolate-projection read path; tests inject a
+  /// synchronous decoder. The sniff falls back to
+  /// [PackReader.decodeFileInIsolate].
+  final Future<dynamic> Function(String path)? _fileDecoder;
 
   /// Read side: bounded decoded-pack cache, ayah indexes and the read API.
   late final PackReader _reader =
@@ -198,7 +200,7 @@ class PackDownloader {
         version: pack.version,
         sizeMb: sizeMb,
       );
-      _reader.prime(pack.id, decoded);
+      _primeDecoded(pack.id, pack.kind, decoded);
       return promoted;
     } on Object {
       _reader.invalidate(pack.id);
@@ -213,7 +215,8 @@ class PackDownloader {
       String packId, LibraryPackKind kind, File part) async {
     dynamic decoded;
     try {
-      decoded = await _fileDecoder(part.path);
+      decoded =
+          await (_fileDecoder ?? PackReader.decodeFileInIsolate)(part.path);
     } on Object {
       throw PackFailure('downloaded pack "$packId" did not parse as JSON');
     }
@@ -242,6 +245,27 @@ class PackDownloader {
         }
     }
     return decoded;
+  }
+
+  /// Primes the read cache from an install-time decode: an ayah index for
+  /// translation/tafsir packs, the raw list for hadith packs.
+  void _primeDecoded(String packId, LibraryPackKind kind, dynamic decoded) {
+    if (decoded is! Map<String, dynamic>) return;
+    switch (kind) {
+      case LibraryPackKind.translation:
+        final list = decoded['quran'];
+        if (list is List) {
+          _reader.primeAyahIndex(packId, PackReader.buildAyahIndex(list));
+        }
+      case LibraryPackKind.hadith:
+        final list = decoded['hadiths'];
+        if (list is List) _reader.primeList(packId, list);
+      case LibraryPackKind.tafsir:
+        final list = decoded['tafsirs'];
+        if (list is List) {
+          _reader.primeAyahIndex(packId, PackReader.buildAyahIndex(list));
+        }
+    }
   }
 
   String _wrapperPrefix(String packId) => '{"pack":"$packId","tafsirs":[';
