@@ -146,7 +146,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(ReciterRow row, List<int> surahNumbers,
+    TResult Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)?
         ready,
     TResult Function(String message)? error,
@@ -182,7 +182,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(ReciterRow row, List<int> surahNumbers,
+    required TResult Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)
         ready,
     required TResult Function(String message) error,
@@ -214,7 +214,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(ReciterRow row, List<int> surahNumbers,
+    TResult? Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)?
         ready,
     TResult? Function(String message)? error,
@@ -266,7 +266,7 @@ class ReciterSurahsReady implements ReciterSurahsState {
         _names = names,
         _previews = previews;
 
-  final ReciterRow row;
+  final ReciterInfo row;
   final List<int> _surahNumbers;
   @JsonKey()
   List<int> get surahNumbers {
@@ -334,7 +334,7 @@ abstract mixin class $ReciterSurahsReadyCopyWith<$Res>
       _$ReciterSurahsReadyCopyWithImpl;
   @useResult
   $Res call(
-      {ReciterRow row,
+      {ReciterInfo row,
       List<int> surahNumbers,
       Map<int, String> names,
       Map<int, String> previews});
@@ -361,7 +361,7 @@ class _$ReciterSurahsReadyCopyWithImpl<$Res>
       row: null == row
           ? _self.row
           : row // ignore: cast_nullable_to_non_nullable
-              as ReciterRow,
+              as ReciterInfo,
       surahNumbers: null == surahNumbers
           ? _self._surahNumbers
           : surahNumbers // ignore: cast_nullable_to_non_nullable

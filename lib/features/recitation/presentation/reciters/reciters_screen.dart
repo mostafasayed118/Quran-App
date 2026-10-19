@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
@@ -12,7 +11,8 @@ import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/reciter_repository.dart';
+import '../../data/reciter_mapping.dart';
+import '../../domain/reciter_info.dart';
 import 'reciters_cubit.dart';
 import 'reciters_state.dart';
 
@@ -74,7 +74,7 @@ class RecitersScreen extends StatelessWidget {
 class _RecitersList extends StatelessWidget {
   const _RecitersList({required this.reciters});
 
-  final List<ReciterRow> reciters;
+  final List<ReciterInfo> reciters;
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +85,7 @@ class _RecitersList extends StatelessWidget {
     var featuredHeaderDone = false;
     var allHeaderDone = false;
     for (final row in reciters) {
-      final featured = isFeaturedReciterRow(row);
+      final featured = isFeaturedReciterInfo(row);
       if (featured && !featuredHeaderDone) {
         entries.add(loc.featured);
         featuredHeaderDone = true;
@@ -100,7 +100,7 @@ class _RecitersList extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) => switch (entries[index]) {
         final String title => SectionHeader(title: title),
-        final ReciterRow row => _ReciterRow(reciter: row),
+        final ReciterInfo row => _ReciterRow(reciter: row),
         _ => const SizedBox.shrink(),
       },
     );
@@ -110,7 +110,7 @@ class _RecitersList extends StatelessWidget {
 class _ReciterRow extends StatelessWidget {
   const _ReciterRow({required this.reciter});
 
-  final ReciterRow reciter;
+  final ReciterInfo reciter;
 
   @override
   Widget build(BuildContext context) {

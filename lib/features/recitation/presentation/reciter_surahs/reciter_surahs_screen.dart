@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -9,6 +8,7 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/download_status.dart';
+import '../../domain/reciter_info.dart';
 import '../downloads/downloads_cubit.dart';
 import '../downloads/downloads_state.dart';
 import '../playback/playback_cubit.dart';
@@ -103,7 +103,7 @@ class _SurahDownloadRow extends StatelessWidget {
     this.item,
   });
 
-  final ReciterRow reciter;
+  final ReciterInfo reciter;
   final int surahNumber;
   final String name;
   final String? teaser;
@@ -158,7 +158,7 @@ class _SurahDownloadRow extends StatelessWidget {
     return IconButton(
       tooltip: AppLocalizations.of(context).playTooltip,
       icon: Icon(Icons.play_arrow, color: colors.primary),
-      onPressed: () => context.read<PlaybackCubit>().playSurah(
+      onPressed: () => context.read<PlaybackCubit>().playReciter(
             reciter,
             surahNumber,
           ),

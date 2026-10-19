@@ -145,7 +145,7 @@ extension RecitersStatePatterns on RecitersState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<ReciterRow> reciters, String query, bool dataError)?
+    TResult Function(List<ReciterInfo> reciters, String query, bool dataError)?
         ready,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -180,7 +180,7 @@ extension RecitersStatePatterns on RecitersState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(
-            List<ReciterRow> reciters, String query, bool dataError)
+            List<ReciterInfo> reciters, String query, bool dataError)
         ready,
     required TResult Function(String message) error,
   }) {
@@ -210,7 +210,7 @@ extension RecitersStatePatterns on RecitersState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(List<ReciterRow> reciters, String query, bool dataError)?
+    TResult? Function(List<ReciterInfo> reciters, String query, bool dataError)?
         ready,
     TResult? Function(String message)? error,
   }) {
@@ -252,14 +252,14 @@ class RecitersLoading implements RecitersState {
 
 class RecitersReady implements RecitersState {
   const RecitersReady(
-      {List<ReciterRow> reciters = const <ReciterRow>[],
+      {List<ReciterInfo> reciters = const <ReciterInfo>[],
       this.query = '',
       this.dataError = false})
       : _reciters = reciters;
 
-  final List<ReciterRow> _reciters;
+  final List<ReciterInfo> _reciters;
   @JsonKey()
-  List<ReciterRow> get reciters {
+  List<ReciterInfo> get reciters {
     if (_reciters is EqualUnmodifiableListView) return _reciters;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_reciters);
@@ -307,7 +307,7 @@ abstract mixin class $RecitersReadyCopyWith<$Res>
           RecitersReady value, $Res Function(RecitersReady) _then) =
       _$RecitersReadyCopyWithImpl;
   @useResult
-  $Res call({List<ReciterRow> reciters, String query, bool dataError});
+  $Res call({List<ReciterInfo> reciters, String query, bool dataError});
 }
 
 /// @nodoc
@@ -330,7 +330,7 @@ class _$RecitersReadyCopyWithImpl<$Res>
       reciters: null == reciters
           ? _self._reciters
           : reciters // ignore: cast_nullable_to_non_nullable
-              as List<ReciterRow>,
+              as List<ReciterInfo>,
       query: null == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable

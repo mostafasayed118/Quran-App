@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/reciter_mapping.dart';
 import '../../data/reciter_repository.dart';
+import '../../data/reciter_source.dart';
 import '../downloads/downloads_cubit.dart';
 import 'reciter_surahs_state.dart';
 
 class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
   ReciterSurahsCubit({
-    required ReciterRepository reciters,
+    required ReciterSource reciters,
     required DownloadsCubit downloads,
     required String rowId,
   })  : _reciters = reciters,
@@ -18,7 +20,7 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
     unawaited(load());
   }
 
-  final ReciterRepository _reciters;
+  final ReciterSource _reciters;
   final DownloadsCubit _downloads;
   final String _rowId;
 
@@ -37,7 +39,7 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       await _downloads.refreshDone();
       if (isClosed) return;
       emit(ReciterSurahsState.ready(
-        row: row,
+        row: row.toInfo(),
         surahNumbers: surahs,
         names: names,
         previews: previews,

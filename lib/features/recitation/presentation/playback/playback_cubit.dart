@@ -6,6 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/db/app_database.dart';
 import '../../data/audio_downloader.dart';
 import '../../data/reciter_repository.dart';
+import '../../data/reciter_source.dart';
+import '../../domain/reciter_info.dart';
 import '../../playback/background_init_guard.dart';
 import '../../playback/playback_service.dart';
 import 'playback_state.dart';
@@ -13,7 +15,7 @@ import 'playback_state.dart';
 class PlaybackCubit extends Cubit<PlaybackState> {
   PlaybackCubit({
     required PlaybackService service,
-    required ReciterRepository reciters,
+    required ReciterSource reciters,
     required AudioDownloader downloader,
     bool Function()? backgroundActive,
   })  : _service = service,
@@ -23,7 +25,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         super(const PlaybackState.initial());
 
   final PlaybackService _service;
-  final ReciterRepository _reciters;
+  final ReciterSource _reciters;
   final AudioDownloader _downloader;
 
   /// Whether the background-audio bootstrap succeeded. When it did not, a
@@ -44,26 +46,38 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
 
-  Future<void> playSurah(ReciterRow row, int surahNumber) async {
+  /// Row-typed entry: the frozen recitation doubles call it with
+  /// `ReciterRow` literals, so the signature stays pinned; it funnels into
+  /// the same shared start path as [playReciter].
+  Future<void> playSurah(ReciterRow row, int surahNumber) =>
+      _start(row.id, row.reciterName, row.server, surahNumber);
+
+  /// Entity entry for the re-typed screens (ready states carry
+  /// [ReciterInfo], never drift rows).
+  Future<void> playReciter(ReciterInfo reciter, int surahNumber) =>
+      _start(reciter.id, reciter.reciterName, reciter.server, surahNumber);
+
+  Future<void> _start(
+      String rowId, String reciterName, String server, int surahNumber) async {
     if (isClosed) return;
     final episode = ++_episode;
-    _reciterName = row.reciterName;
+    _reciterName = reciterName;
     emit(PlaybackState.loading(
-      reciterName: row.reciterName,
+      reciterName: reciterName,
       surahNumber: surahNumber,
     ));
-    final downloaded = await _downloader.downloadedPath(row.id, surahNumber);
+    final downloaded = await _downloader.downloadedPath(rowId, surahNumber);
     if (isClosed || episode != _episode) return;
     final source = downloaded != null
         ? PlaybackSource.file(
             downloaded,
-            mediaTitle: row.reciterName,
-            artist: row.reciterName,
+            mediaTitle: reciterName,
+            artist: reciterName,
           )
         : PlaybackSource.url(
-            Uri.parse(surahAudioUrl(row.server, surahNumber)),
-            mediaTitle: row.reciterName,
-            artist: row.reciterName,
+            Uri.parse(surahAudioUrl(server, surahNumber)),
+            mediaTitle: reciterName,
+            artist: reciterName,
           );
     _bindStreams();
     try {

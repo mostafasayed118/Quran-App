@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/db/app_database.dart';
+import '../../domain/reciter_info.dart';
 
 part 'reciter_surahs_state.freezed.dart';
 
@@ -9,7 +9,7 @@ sealed class ReciterSurahsState with _$ReciterSurahsState {
   const factory ReciterSurahsState.loading() = ReciterSurahsLoading;
 
   const factory ReciterSurahsState.ready({
-    required ReciterRow row,
+    required ReciterInfo row,
     @Default(<int>[]) List<int> surahNumbers,
     @Default(<int, String>{}) Map<int, String> names,
     @Default(<int, String>{}) Map<int, String> previews,

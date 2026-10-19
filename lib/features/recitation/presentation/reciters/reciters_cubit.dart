@@ -3,17 +3,22 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
+import '../../data/reciter_mapping.dart';
 import '../../data/reciter_repository.dart';
+import '../../data/reciter_source.dart';
+import '../../domain/reciter_info.dart';
 import 'reciters_state.dart';
 
 class RecitersCubit extends Cubit<RecitersState> {
-  RecitersCubit({required ReciterRepository repo})
+  RecitersCubit({required ReciterSource repo})
       : _repo = repo,
         super(const RecitersState.loading()) {
-    _sub = _repo.watchAll().listen(
-      (rows) {
-        _latest = rows;
+    _sub = _repo
+        .watchAll()
+        .map((rows) => [for (final row in sortReciters(rows)) row.toInfo()])
+        .listen(
+      (reciters) {
+        _latest = reciters;
         _emitFiltered();
         _kickOnce();
       },
@@ -24,11 +29,11 @@ class RecitersCubit extends Cubit<RecitersState> {
     );
   }
 
-  final ReciterRepository _repo;
-  List<ReciterRow> _latest = [];
+  final ReciterSource _repo;
+  List<ReciterInfo> _latest = [];
   String _query = '';
   bool _kicked = false;
-  StreamSubscription<List<ReciterRow>>? _sub;
+  StreamSubscription<List<ReciterInfo>>? _sub;
 
   void setQuery(String raw) {
     _query = raw.trim();
@@ -60,14 +65,14 @@ class RecitersCubit extends Cubit<RecitersState> {
       emit(s.copyWith(dataError: true));
     } else {
       emit(RecitersState.ready(
-          reciters: const <ReciterRow>[], query: _query, dataError: true));
+          reciters: const <ReciterInfo>[], query: _query, dataError: true));
     }
   }
 
   void _emitFiltered() {
     if (isClosed) return;
     emit(RecitersState.ready(
-      reciters: sortReciters(_filter(_latest)),
+      reciters: _filter(_latest),
       query: _query,
     ));
   }
@@ -80,9 +85,9 @@ class RecitersCubit extends Cubit<RecitersState> {
     emit(RecitersState.ready(reciters: s.reciters, query: s.query));
   }
 
-  List<ReciterRow> _filter(List<ReciterRow> rows) {
-    if (_query.isEmpty) return rows;
-    return rows
+  List<ReciterInfo> _filter(List<ReciterInfo> reciters) {
+    if (_query.isEmpty) return reciters;
+    return reciters
         .where((r) =>
             r.reciterName.contains(_query) || r.moshafName.contains(_query))
         .toList();

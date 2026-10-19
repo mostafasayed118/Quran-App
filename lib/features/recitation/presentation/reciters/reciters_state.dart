@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../core/db/app_database.dart';
+import '../../domain/reciter_info.dart';
 
 part 'reciters_state.freezed.dart';
 
@@ -9,7 +9,7 @@ sealed class RecitersState with _$RecitersState {
   const factory RecitersState.loading() = RecitersLoading;
 
   const factory RecitersState.ready({
-    @Default(<ReciterRow>[]) List<ReciterRow> reciters,
+    @Default(<ReciterInfo>[]) List<ReciterInfo> reciters,
     @Default('') String query,
     @Default(false) bool dataError,
   }) = RecitersReady;
