@@ -532,3 +532,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Deep-link boot regression (on C; screenshots in `…\opencode\device-leg-1019\`):** COLD `/surah/36#ayah-1` → reader يس:1 (`c_cold_surah36.png`; TotalTime 4052) · WARM same-route `/surah/2#ayah-255` → البقرة at آية ٢٥٥ (`c_warm_surah2_255.png` — the fix2 behavior holds) · WARM cross-path `/reciters` → التلاوات (`c_warm_reciters.png`); all `Status: ok`, warm legs TotalTime 0.
 - **Qibla live render (`c_qibla.png`):** dial + rotated arrow + «المقياس حي» (live magnetometer, not the static fallback) + «١٣٦° عن الشمال» (data-driven for the live city row) + Cairo chip. Reached by visual navigation — `uiautomator dump` exposed no Flutter text this session (semantics not surfaced); fallback = screenshot + the verified `_features` grid order, tap map validated against a known tile.
 - **Cleanup:** device left clean (force-stop + HOME); C left installed; both worktrees removed (robocopy-mirror long-path delete). **State:** main @ `32604f1` (+ this ledger commit), porcelain owner-debris only, **unpushed 3 → 4**. NO PUSH — window belongs to the owner.
+
+### Push window — W6-W8 ledgers + web fixes ×2 + device-leg — (f401648..88f5f6d) — 2026-10-19
+- **Range:** `f401648..88f5f6d` — 4 commits: window ledger v1 (`67ecfa2`) · web fixes (`9af5176` footer/reader-nav 200% wrap + 44px coarse targets; `32604f1` EN resume-card surah name — both `web/**`-only, 5 files, +28/−16) · DEVICE LEG close-out (`88f5f6d`).
+- **Pre-flight:** HEAD `88f5f6d`; FF_OK=true; remote static at `f401648`; porcelain = owner debris only; no competing processes; explicit-SHA push.
+- **App gates (PM-run at the tip):** `flutter analyze` **0** (53.1s) · `flutter test` **424/424** (EXIT=0).
+- **Web gates (PM-run at the tip):** `npm run gates` exit 0 — check+unit+build+budget; build **239 pages**; budget **25.29 KB / 30 KB** + dist **273 / 2000** · e2e **67/67** (16.6s, incl. the new 200%-wrap footer/reader-nav + EN resume-card legs).
+- **Push:** `git push origin 88f5f6d:main`; ls-remote proof: remote tip == `88f5f6d05f369fd65c48d005ead803986d60658f`; unpushed 0.
+- **CI on `88f5f6d`:** `web-gates` **39237620479** success · `ci` **39237620533** success (~7.5m).
+- **State:** ledger commit follows (local-only). NO PUSH beyond the window.
