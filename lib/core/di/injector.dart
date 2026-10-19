@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 
 import '../db/app_database.dart';
 import '../db/connection.dart';
+import '../../features/backup/data/backup_service.dart';
 import '../../features/quran/data/ayah_repository.dart';
 import '../../features/quran/data/ayah_source.dart';
 import '../../features/quran/data/last_read_repository.dart';
@@ -22,6 +23,7 @@ import '../../features/library/data/pack_downloader.dart';
 import '../../features/library/presentation/library_cubit.dart';
 import '../../features/notifications/data/notifications_binding.dart';
 import '../../features/notifications/data/reminder_scheduler.dart';
+import '../../features/notifications/data/reminder_scheduling.dart';
 import '../../features/notifications/data/reminder_settings.dart';
 import '../../features/prayer/data/city_repository.dart';
 import '../../features/prayer/data/location_service.dart';
@@ -81,6 +83,17 @@ Future<void> configureDependencies({
       () => PrayerLogRepository(db));
   getIt.registerLazySingleton<KhatmaRepository>(() => KhatmaRepository(db));
   getIt.registerLazySingleton<HijriService>(() => HijriService());
+  // Restore reschedules reminders through the same guarded path as boot
+  // (`runBootReminderSchedule` composition; no feature import lands on backup).
+  getIt.registerLazySingleton<BackupService>(() => BackupService(
+        db: db,
+        reschedule: () => scheduleReminders(
+          city: getIt<CityRepository>(),
+          prayer: getIt<PrayerTimeService>(),
+          settings: getIt<ReminderSettings>(),
+          scheduler: getIt<ReminderScheduler>(),
+        ),
+      ));
   if (citiesLoader != null) {
     getIt.registerLazySingleton<CityRepository>(
         () => CityRepository(db: db, loader: citiesLoader));
