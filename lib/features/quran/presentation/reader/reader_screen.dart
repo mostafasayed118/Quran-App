@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../../../app/deep_links.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/deep_links.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';

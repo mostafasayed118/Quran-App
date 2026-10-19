@@ -1,7 +1,8 @@
 /// P4-app: pure mapping for https://quranyahdi.pages.dev links claimed by the
 /// Android manifest intent-filter. No Flutter imports on purpose — every
 /// decision is unit-testable (test/deep_link_routing_test.dart pins each row)
-/// and the boot wiring in main.dart stays trivial.
+/// and the boot wiring in main.dart stays trivial. Lives in core so both
+/// `app/` boot code and features can depend on it without inverting layering.
 library;
 
 /// Final host (owner decision 2026-10-18), mirrored from web/src/lib/urls.ts.

@@ -6,10 +6,10 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
-import 'app/deep_links.dart';
 import 'app/router.dart';
 import 'core/di/injector.dart';
 import 'core/l10n/platform_localizations.dart';
+import 'core/utils/deep_links.dart';
 import 'features/notifications/data/notifications_binding.dart';
 import 'features/notifications/data/reminder_planner.dart'
     show azkarReminderPayload, prayerReminderPayload;

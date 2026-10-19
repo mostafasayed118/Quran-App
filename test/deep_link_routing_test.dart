@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:quran_yahdi/app/deep_links.dart';
+import 'package:quran_yahdi/core/utils/deep_links.dart';
 
 void main() {
   const host = 'https://quranyahdi.pages.dev';
