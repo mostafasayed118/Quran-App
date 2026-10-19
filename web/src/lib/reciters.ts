@@ -1,5 +1,3 @@
-import snapshot from '../data/reciters-snapshot.json';
-
 /** PM-pinned featured reciters (parity with the app). Never extend without a grant. */
 export const FEATURED_RECITER_IDS = [51, 123, 118, 92, 102, 54, 30, 4, 5] as const;
 
@@ -73,15 +71,6 @@ export function surahAudioUrl(server: string, surah: number): string {
   return `${base}${String(surah).padStart(3, '0')}.mp3`;
 }
 
-/** Collapses upstream "X - X" duplicates; conservative — only when both sides are byte-equal after trim. */
-export function dedupeLabel(name: string): string {
-  const m = /^(.*?)\s+-\s+(.*)$/.exec(name);
-  if (!m) return name;
-  const left = m[1].trim();
-  const right = m[2].trim();
-  return left !== '' && left === right ? left : name;
-}
-
 /** Live API with committed-snapshot fallback (spec §3.4). */
 export async function fetchReciters(): Promise<MoshafRow[]> {
   try {
@@ -91,6 +80,7 @@ export async function fetchReciters(): Promise<MoshafRow[]> {
     if (rows.length === 0) throw new Error('empty reciter payload');
     return rows;
   } catch {
+    const { default: snapshot } = await import('../data/reciters-snapshot.json');
     return parseReciters(snapshot);
   }
 }

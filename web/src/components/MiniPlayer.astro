@@ -20,7 +20,8 @@ const { locale = 'ar' } = Astro.props;
   import { getPlayer } from '../lib/player';
   import { digitsFor } from '../lib/arabic-digits';
   import type { Locale } from '../lib/strings';
-  import { dedupeLabel, type MoshafRow } from '../lib/reciters';
+  import { dedupeLabel } from '../lib/labels';
+  import type { MoshafRow } from '../lib/reciters';
 
   let dismissed = false;
 

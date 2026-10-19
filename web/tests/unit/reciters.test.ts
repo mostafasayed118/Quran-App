@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
-  parseReciters, sortReciters, isTrustedAudioServer, surahAudioUrl, isFeaturedRow, dedupeLabel,
+  parseReciters, sortReciters, isTrustedAudioServer, surahAudioUrl, isFeaturedRow,
   FEATURED_RECITER_IDS, type MoshafRow,
 } from '../../src/lib/reciters';
+import { dedupeLabel } from '../../src/lib/labels';
 import snapshot from '../../src/data/reciters-snapshot.json';
 
 const good = {

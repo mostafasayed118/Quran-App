@@ -18,7 +18,8 @@ const { locale = 'ar' } = Astro.props;
   </div>
 </section>
 <script>
-  import { fetchReciters, isFeaturedRow, sortReciters, surahAudioUrl, dedupeLabel, type MoshafRow } from '../../lib/reciters';
+  import { fetchReciters, isFeaturedRow, sortReciters, surahAudioUrl, type MoshafRow } from '../../lib/reciters';
+  import { dedupeLabel } from '../../lib/labels';
   import { digitsFor } from '../../lib/arabic-digits';
   import { surahDisplayName } from '../../lib/surah-name';
   import { t, type Locale } from '../../lib/strings';
