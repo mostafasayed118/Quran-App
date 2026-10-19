@@ -27,7 +27,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(title: Text(loc.appName)),
       body: BlocBuilder<HomeCubit, HomeState>(
@@ -37,72 +36,112 @@ class HomeScreen extends StatelessWidget {
           HomeReady(:final lastRead, :final nextPrayer) => ListView(
               padding: const EdgeInsets.all(12),
               children: [
-                if (lastRead != null)
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.menu_book, color: colors.primary),
-                      title: Text(
-                        lastRead.surahName,
-                        style: AppTheme.meQuranHead,
-                      ),
-                      subtitle: Text(
-                        loc.continueReadingAyah(
-                          lastRead.ayahNumber.toArabicIndic,
-                        ),
-                      ),
-                      onTap: () => context.push(
-                          '/quran/reader?surah=${lastRead.surahId}&ayah=${lastRead.ayahNumber}'),
-                    ),
-                  ),
+                if (lastRead != null) _LastReadCard(lastRead: lastRead),
                 if (nextPrayer != null)
-                  Card(
-                    child: ListTile(
-                      leading: Icon(Icons.schedule, color: colors.secondary),
-                      title: Text(nextPrayer.name.label(loc)),
-                      subtitle: Text(loc.nextPrayer),
-                      trailing: Text(
-                        formatHm(nextPrayer.time),
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onTap: () => context.push('/prayer-times'),
-                    ),
-                  )
+                  _NextPrayerCard(prayer: nextPrayer)
                 else
-                  Card(
-                    child: ListTile(
-                      leading: Icon(
-                        Icons.location_on_outlined,
-                        color: colors.secondary,
-                      ),
-                      title: Text(loc.selectCity),
-                      subtitle: Text(loc.noCity),
-                      onTap: () => _openCityPicker(context),
-                    ),
-                  ),
+                  const _NoCityCard(),
                 const SizedBox(height: 8),
-                GridView.count(
-                  crossAxisCount: 3,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  childAspectRatio: 1.05,
-                  children: [
-                    for (final feature in _features)
-                      _FeatureTile(
-                        icon: feature.$1,
-                        label: feature.$2(AppLocalizations.of(context)),
-                        onTap: () => context.push(feature.$3),
-                      ),
-                  ],
-                ),
+                const _FeatureGrid(),
               ],
             ),
         },
       ),
+    );
+  }
+}
+
+class _LastReadCard extends StatelessWidget {
+  const _LastReadCard({required this.lastRead});
+
+  final LastReadCard lastRead;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.menu_book, color: colors.primary),
+        title: Text(
+          lastRead.surahName,
+          style: AppTheme.meQuranHead,
+        ),
+        subtitle: Text(
+          loc.continueReadingAyah(lastRead.ayahNumber.toArabicIndic),
+        ),
+        onTap: () => context.push(
+            '/quran/reader?surah=${lastRead.surahId}&ayah=${lastRead.ayahNumber}'),
+      ),
+    );
+  }
+}
+
+class _NextPrayerCard extends StatelessWidget {
+  const _NextPrayerCard({required this.prayer});
+
+  final NextPrayerCard prayer;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: ListTile(
+        leading: Icon(Icons.schedule, color: colors.secondary),
+        title: Text(prayer.name.label(loc)),
+        subtitle: Text(loc.nextPrayer),
+        trailing: Text(
+          formatHm(prayer.time),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        onTap: () => context.push('/prayer-times'),
+      ),
+    );
+  }
+}
+
+class _NoCityCard extends StatelessWidget {
+  const _NoCityCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: ListTile(
+        leading: Icon(
+          Icons.location_on_outlined,
+          color: colors.secondary,
+        ),
+        title: Text(loc.selectCity),
+        subtitle: Text(loc.noCity),
+        onTap: () => HomeScreen._openCityPicker(context),
+      ),
+    );
+  }
+}
+
+class _FeatureGrid extends StatelessWidget {
+  const _FeatureGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      childAspectRatio: 1.05,
+      children: [
+        for (final feature in _features)
+          _FeatureTile(
+            icon: feature.$1,
+            label: feature.$2(AppLocalizations.of(context)),
+            onTap: () => context.push(feature.$3),
+          ),
+      ],
     );
   }
 }

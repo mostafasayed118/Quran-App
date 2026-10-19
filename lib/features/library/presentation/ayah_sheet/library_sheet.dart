@@ -61,50 +61,10 @@ class _AyahSheetView extends StatelessWidget {
           AyahSheetLoading() => const LoadingView(),
           AyahSheetError(:final message) =>
             errorPane(loc, message, 'ayah_sheet'),
-          final AyahSheetReady ready => DefaultTabController(
-              length: 2,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
-                    child: Row(
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            loc.ayahSheetTitle,
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        Text(
-                          '$surahName ${loc.ornateBrackets(ayah.toArabicIndic)}',
-                          style: TextStyle(
-                            fontFamily: QuranFonts.meQuran,
-                            fontSize: 15,
-                            color: AppTheme.goldText(context),
-                          ),
-                          textDirection: TextDirection.rtl,
-                        ),
-                      ],
-                    ),
-                  ),
-                  TabBar(
-                    tabs: [
-                      Tab(text: loc.ayahSheetTafsir),
-                      Tab(text: loc.ayahSheetTranslation),
-                    ],
-                  ),
-                  Flexible(
-                    child: TabBarView(
-                      children: [
-                        _SheetPane(entries: ready.tafsirEntries),
-                        _SheetPane(entries: ready.translationEntries),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+          final AyahSheetReady ready => _SheetBody(
+              surahName: surahName,
+              ayah: ayah,
+              ready: ready,
             ),
         };
         return ConstrainedBox(
@@ -119,6 +79,81 @@ class _AyahSheetView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _SheetBody extends StatelessWidget {
+  const _SheetBody({
+    required this.surahName,
+    required this.ayah,
+    required this.ready,
+  });
+
+  final String surahName;
+  final int ayah;
+  final AyahSheetReady ready;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _SheetHeader(surahName: surahName, ayah: ayah),
+          TabBar(
+            tabs: [
+              Tab(text: loc.ayahSheetTafsir),
+              Tab(text: loc.ayahSheetTranslation),
+            ],
+          ),
+          Flexible(
+            child: TabBarView(
+              children: [
+                _SheetPane(entries: ready.tafsirEntries),
+                _SheetPane(entries: ready.translationEntries),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SheetHeader extends StatelessWidget {
+  const _SheetHeader({required this.surahName, required this.ayah});
+
+  final String surahName;
+  final int ayah;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+      child: Row(
+        textDirection: TextDirection.rtl,
+        children: [
+          Expanded(
+            child: Text(
+              loc.ayahSheetTitle,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ),
+          Text(
+            '$surahName ${loc.ornateBrackets(ayah.toArabicIndic)}',
+            style: TextStyle(
+              fontFamily: QuranFonts.meQuran,
+              fontSize: 15,
+              color: AppTheme.goldText(context),
+            ),
+            textDirection: TextDirection.rtl,
+          ),
+        ],
+      ),
     );
   }
 }

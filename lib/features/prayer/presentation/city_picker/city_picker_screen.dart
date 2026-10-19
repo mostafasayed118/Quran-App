@@ -6,6 +6,7 @@ import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../data/city_repository.dart';
 import 'city_picker_cubit.dart';
 import 'city_picker_state.dart';
 
@@ -19,14 +20,7 @@ class CityPickerScreen extends StatelessWidget {
       appBar: AppBar(title: Text(loc.selectCity)),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
-            child: SearchField(
-              hint: loc.searchCity,
-              onChanged: (query) =>
-                  context.read<CityPickerCubit>().search(query),
-            ),
-          ),
+          const _CitySearchField(),
           Expanded(
             child: BlocBuilder<CityPickerCubit, CityPickerState>(
               builder: (context, state) => switch (state) {
@@ -40,53 +34,13 @@ class CityPickerScreen extends StatelessWidget {
                 ) =>
                   Column(
                     children: [
-                      ListTile(
-                        leading: locating
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.my_location),
-                        title:
-                            Text(locating ? loc.locating : loc.useMyLocation),
-                        onTap: locating ? null : () => _useMyLocation(context),
-                      ),
+                      _MyLocationTile(locating: locating),
                       const Divider(height: 1),
                       Expanded(
-                        child: results.isEmpty
-                            ? EmptyState(loc.noResults)
-                            : ListView.builder(
-                                itemCount: results.length,
-                                itemBuilder: (context, i) {
-                                  final city = results[i];
-                                  final isSelected = city.id == selectedCityId;
-                                  return ListTile(
-                                    selected: isSelected,
-                                    title: Text(city.nameAr),
-                                    subtitle: Text(city.nameEn),
-                                    trailing: isSelected
-                                        ? Icon(
-                                            Icons.check_circle,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            semanticLabel: loc.currentCity,
-                                          )
-                                        : null,
-                                    onTap: () async {
-                                      await context
-                                          .read<CityPickerCubit>()
-                                          .persist(city);
-                                      if (context.mounted) {
-                                        Navigator.of(context).pop(true);
-                                      }
-                                    },
-                                  );
-                                },
-                              ),
+                        child: _CityResults(
+                          results: results,
+                          selectedCityId: selectedCityId,
+                        ),
                       ),
                     ],
                   ),
@@ -95,6 +49,44 @@ class CityPickerScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CitySearchField extends StatelessWidget {
+  const _CitySearchField();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+      child: SearchField(
+        hint: loc.searchCity,
+        onChanged: (query) => context.read<CityPickerCubit>().search(query),
+      ),
+    );
+  }
+}
+
+class _MyLocationTile extends StatelessWidget {
+  const _MyLocationTile({required this.locating});
+
+  final bool locating;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return ListTile(
+      leading: locating
+          ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.my_location),
+      title: Text(locating ? loc.locating : loc.useMyLocation),
+      onTap: locating ? null : () => _useMyLocation(context),
     );
   }
 
@@ -115,5 +107,57 @@ class CityPickerScreen extends StatelessWidget {
         ),
       ));
     }
+  }
+}
+
+class _CityResults extends StatelessWidget {
+  const _CityResults({required this.results, required this.selectedCityId});
+
+  final List<City> results;
+  final String? selectedCityId;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return results.isEmpty
+        ? EmptyState(loc.noResults)
+        : ListView.builder(
+            itemCount: results.length,
+            itemBuilder: (context, i) {
+              final city = results[i];
+              final isSelected = city.id == selectedCityId;
+              return _ResultTile(city: city, isSelected: isSelected);
+            },
+          );
+  }
+}
+
+class _ResultTile extends StatelessWidget {
+  const _ResultTile({required this.city, required this.isSelected});
+
+  final City city;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return ListTile(
+      selected: isSelected,
+      title: Text(city.nameAr),
+      subtitle: Text(city.nameEn),
+      trailing: isSelected
+          ? Icon(
+              Icons.check_circle,
+              color: Theme.of(context).colorScheme.primary,
+              semanticLabel: loc.currentCity,
+            )
+          : null,
+      onTap: () async {
+        await context.read<CityPickerCubit>().persist(city);
+        if (context.mounted) {
+          Navigator.of(context).pop(true);
+        }
+      },
+    );
   }
 }

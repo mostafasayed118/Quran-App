@@ -170,7 +170,6 @@ class _AyahCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -193,55 +192,92 @@ class _AyahCard extends StatelessWidget {
             textAlign: TextAlign.center,
             textDirection: TextDirection.rtl,
           ),
-          Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Text(
-                loc.ornateBrackets(ayah.numberInSurah.toArabicIndic),
-                style: TextStyle(
-                  fontFamily: QuranFonts.meQuran,
-                  fontSize: 16,
-                  color: AppTheme.goldText(context),
-                ),
-                semanticsLabel:
-                    loc.ayahNumberLabel(ayah.numberInSurah.toArabicIndic),
-              ),
-              const Spacer(),
-              IconButton(
-                tooltip: loc.ayahSheetTitle,
-                icon: const Icon(Icons.menu_book_outlined),
-                onPressed: () => showModalBottomSheet<void>(
-                  context: context,
-                  useSafeArea: true,
-                  isScrollControlled: true,
-                  showDragHandle: true,
-                  builder: (_) => LibrarySheet(
-                    surahId: ayah.surahId,
-                    surahName: surahName,
-                    ayah: ayah.numberInSurah,
-                  ),
-                ),
-              ),
-              IconButton(
-                tooltip: bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
-                icon: Icon(
-                  bookmarked ? Icons.bookmark : Icons.bookmark_border,
-                  color: bookmarked ? colors.secondary : null,
-                ),
-                onPressed: onToggle,
-              ),
-              IconButton(
-                tooltip: loc.shareAyah,
-                icon: const Icon(Icons.share_outlined),
-                onPressed: () => SharePlus.instance.share(ShareParams(
-                  text:
-                      '${ayah.textImlaei}\n\n${webSurahUrl(ayah.surahId, ayah.numberInSurah)}',
-                )),
-              ),
-            ],
+          _AyahActions(
+            ayah: ayah,
+            surahName: surahName,
+            bookmarked: bookmarked,
+            onToggle: onToggle,
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AyahActions extends StatelessWidget {
+  const _AyahActions({
+    required this.ayah,
+    required this.surahName,
+    required this.bookmarked,
+    required this.onToggle,
+  });
+
+  final Verse ayah;
+  final String surahName;
+  final bool bookmarked;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Row(
+      textDirection: TextDirection.rtl,
+      children: [
+        Text(
+          loc.ornateBrackets(ayah.numberInSurah.toArabicIndic),
+          style: TextStyle(
+            fontFamily: QuranFonts.meQuran,
+            fontSize: 16,
+            color: AppTheme.goldText(context),
+          ),
+          semanticsLabel: loc.ayahNumberLabel(ayah.numberInSurah.toArabicIndic),
+        ),
+        const Spacer(),
+        IconButton(
+          tooltip: loc.ayahSheetTitle,
+          icon: const Icon(Icons.menu_book_outlined),
+          onPressed: () => showModalBottomSheet<void>(
+            context: context,
+            useSafeArea: true,
+            isScrollControlled: true,
+            showDragHandle: true,
+            builder: (_) => LibrarySheet(
+              surahId: ayah.surahId,
+              surahName: surahName,
+              ayah: ayah.numberInSurah,
+            ),
+          ),
+        ),
+        IconButton(
+          tooltip: bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
+          icon: Icon(
+            bookmarked ? Icons.bookmark : Icons.bookmark_border,
+            color: bookmarked ? colors.secondary : null,
+          ),
+          onPressed: onToggle,
+        ),
+        _ShareAyahButton(ayah: ayah),
+      ],
+    );
+  }
+}
+
+class _ShareAyahButton extends StatelessWidget {
+  const _ShareAyahButton({required this.ayah});
+
+  final Verse ayah;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return IconButton(
+      tooltip: loc.shareAyah,
+      icon: const Icon(Icons.share_outlined),
+      onPressed: () => SharePlus.instance.share(ShareParams(
+        text:
+            '${ayah.textImlaei}\n\n${webSurahUrl(ayah.surahId, ayah.numberInSurah)}',
+      )),
     );
   }
 }
