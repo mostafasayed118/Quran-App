@@ -39,6 +39,7 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icons/app_icon_2.png"
+  remove_alpha_ios: true
 
 dev_dependencies:
   flutter_test:
