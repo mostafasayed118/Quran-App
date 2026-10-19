@@ -87,7 +87,9 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         reciterName: _reciterName,
         surahNumber: surahNumber,
       ));
-    } on Object {
+    } on Object catch (error, stackTrace) {
+      dev.log('playback load failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       if (isClosed || episode != _episode) return;
       emit(PlaybackState.failed(
         kind: _backgroundActive()

@@ -36,7 +36,7 @@ class RecitersScreen extends StatelessWidget {
       body: BlocBuilder<RecitersCubit, RecitersState>(
         builder: (context, state) => switch (state) {
           RecitersLoading() => const LoadingView(),
-          RecitersError(:final message) => errorPane(loc, message, 'reciters'),
+          RecitersError() => errorPane(loc),
           RecitersReady(:final reciters, :final query, :final dataError) =>
             Column(
               children: [

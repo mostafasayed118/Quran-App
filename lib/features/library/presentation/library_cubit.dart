@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +32,9 @@ class LibraryCubit extends Cubit<LibraryState> {
       packs = await _catalog.packs();
       final rows = await _downloader.installedPacks();
       installed = {for (final row in rows) row.packId};
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      dev.log('library load failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(LibraryState.failed(message: error.toString()));
       return;
@@ -68,7 +71,9 @@ class LibraryCubit extends Cubit<LibraryState> {
         progress: {...ready.progress}..remove(pack.id),
       ));
       onInstalled(pack.id);
-    } on Object {
+    } on Object catch (error, stackTrace) {
+      dev.log('library install failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       final ready = state;
       if (ready is! LibraryReady) return;
@@ -85,7 +90,9 @@ class LibraryCubit extends Cubit<LibraryState> {
   Future<void> uninstall(String packId) async {
     try {
       await _downloader.uninstall(packId);
-    } on Object {
+    } on Object catch (error, stackTrace) {
+      dev.log('library uninstall failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       final ready = state;
       if (ready is! LibraryReady) return;

@@ -25,8 +25,7 @@ class SurahIndexScreen extends StatelessWidget {
       body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
         builder: (context, state) => switch (state) {
           SurahIndexLoading() => const LoadingView(),
-          SurahIndexError(:final message) =>
-            errorPane(loc, message, 'surah_index'),
+          SurahIndexError() => errorPane(loc),
           SurahIndexLoaded(:final surahs) => Column(
               children: [
                 Padding(

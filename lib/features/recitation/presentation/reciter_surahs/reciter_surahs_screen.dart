@@ -53,8 +53,7 @@ class ReciterSurahsScreen extends StatelessWidget {
       body: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
         builder: (context, state) => switch (state) {
           ReciterSurahsLoading() => const LoadingView(),
-          ReciterSurahsError(:final message) =>
-            errorPane(loc, message, 'reciter_surahs'),
+          ReciterSurahsError() => errorPane(loc),
           ReciterSurahsReady(
             :final row,
             :final surahNumbers,

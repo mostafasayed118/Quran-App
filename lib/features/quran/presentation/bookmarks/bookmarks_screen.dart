@@ -18,9 +18,9 @@ class BookmarksScreen extends StatelessWidget {
     return BlocBuilder<BookmarksCubit, BookmarksState>(
       builder: (context, state) => switch (state) {
         BookmarksLoading() => const Scaffold(body: LoadingView()),
-        BookmarksError(:final message) => Scaffold(
+        BookmarksError() => Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context).bookmarks)),
-            body: errorPane(AppLocalizations.of(context), message, 'bookmarks'),
+            body: errorPane(AppLocalizations.of(context)),
           ),
         BookmarksReady(:final entries) => Scaffold(
             appBar: AppBar(

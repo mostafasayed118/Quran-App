@@ -59,8 +59,7 @@ class _AyahSheetView extends StatelessWidget {
       builder: (context, state) {
         final Widget content = switch (state) {
           AyahSheetLoading() => const LoadingView(),
-          AyahSheetError(:final message) =>
-            errorPane(loc, message, 'ayah_sheet'),
+          AyahSheetError() => errorPane(loc),
           final AyahSheetReady ready => _SheetBody(
               surahName: surahName,
               ayah: ayah,

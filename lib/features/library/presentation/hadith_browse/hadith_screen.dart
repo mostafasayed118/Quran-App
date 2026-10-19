@@ -20,8 +20,7 @@ class HadithScreen extends StatelessWidget {
         builder: (context, state) {
           final Widget content = switch (state) {
             HadithLoading() => const Center(child: CircularProgressIndicator()),
-            HadithError(message: final message) =>
-              errorPane(loc, message, 'hadith'),
+            HadithError() => errorPane(loc),
             final HadithReady ready => Column(
                 children: [
                   Expanded(child: _HadithVerses(ready: ready)),

@@ -31,7 +31,7 @@ class TrackerScreen extends StatelessWidget {
       body: BlocBuilder<TrackerCubit, TrackerState>(
         builder: (context, state) => switch (state) {
           TrackerLoading() => const LoadingView(),
-          TrackerFailed() => errorPane(loc, 'tracker load failed', 'tracker'),
+          TrackerFailed() => errorPane(loc),
           TrackerReady(:final today, :final streakDays, :final last7) =>
             ListView(
               padding: const EdgeInsets.all(12),

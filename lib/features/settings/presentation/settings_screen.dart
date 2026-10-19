@@ -20,8 +20,7 @@ class SettingsScreen extends StatelessWidget {
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) => switch (state) {
           SettingsLoading() => const LoadingView(),
-          SettingsFailed() =>
-            errorPane(loc, 'settings load failed', 'settings'),
+          SettingsFailed() => errorPane(loc),
           SettingsReady(
             :final azkarEnabled,
             :final azkarTimeHm,

@@ -44,8 +44,7 @@ class PrayerTimesScreen extends StatelessWidget {
       body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
         builder: (context, state) => switch (state) {
           PrayerTimesLoading() => const LoadingView(),
-          PrayerTimesFailed() =>
-            errorPane(loc, 'prayer times load failed', 'prayer_times'),
+          PrayerTimesFailed() => errorPane(loc),
           PrayerTimesReady() when state.city == null => EmptyState(
               loc.noCity,
               actionLabel: loc.selectCity,

@@ -25,8 +25,7 @@ class CityPickerScreen extends StatelessWidget {
             child: BlocBuilder<CityPickerCubit, CityPickerState>(
               builder: (context, state) => switch (state) {
                 CityPickerLoading() => const LoadingView(),
-                CityPickerFailed() =>
-                  errorPane(loc, 'city picker load failed', 'city_picker'),
+                CityPickerFailed() => errorPane(loc),
                 CityPickerReady(
                   :final results,
                   :final locating,

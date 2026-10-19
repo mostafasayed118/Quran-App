@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,8 +45,12 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
         names: names,
         previews: previews,
       ));
-    } on Object catch (e) {
-      if (!isClosed) emit(ReciterSurahsState.error(message: '$e'));
+    } on Object catch (error, stackTrace) {
+      dev.log('reciter surahs load failed',
+          name: 'quran_yahdi/reciter_surahs',
+          error: error,
+          stackTrace: stackTrace);
+      if (!isClosed) emit(ReciterSurahsState.error(message: '$error'));
     }
   }
 

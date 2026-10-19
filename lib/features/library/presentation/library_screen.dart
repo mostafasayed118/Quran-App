@@ -37,8 +37,7 @@ class LibraryScreen extends StatelessWidget {
             ),
             body: switch (state) {
               LibraryLoading() => const LoadingView(),
-              LibraryFailed(:final message) =>
-                errorPane(loc, message, 'library'),
+              LibraryFailed() => errorPane(loc),
               final LibraryReady ready => Column(
                   children: [
                     if (ready.failed.isNotEmpty && ready.progress.isEmpty)

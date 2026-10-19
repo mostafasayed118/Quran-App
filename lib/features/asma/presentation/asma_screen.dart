@@ -47,7 +47,7 @@ class AsmaScreen extends StatelessWidget {
       body: BlocBuilder<AsmaCubit, AsmaState>(
         builder: (context, state) => switch (state) {
           AsmaLoading() => const LoadingView(),
-          AsmaFailed() => errorPane(loc, 'asma load failed', 'asma'),
+          AsmaFailed() => errorPane(loc),
           AsmaReady(:final names) when names.isEmpty =>
             EmptyState(loc.noResults),
           AsmaReady(:final names, :final selected) => Stack(

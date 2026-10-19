@@ -67,7 +67,9 @@ class ReaderCubit extends Cubit<ReaderState> {
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: _surahId != 1 && _surahId != 9,
       ));
-    } on Object catch (error) {
+    } on Object catch (error, stackTrace) {
+      dev.log('reader load failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(ReaderState.error(message: error.toString()));
     }

@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/pack_downloader.dart';
@@ -48,7 +50,9 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
             if (entry != null) entry,
         ],
       ));
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
+      dev.log('ayah sheet load failed',
+          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(AyahSheetState.error(message: error.toString()));
       return;

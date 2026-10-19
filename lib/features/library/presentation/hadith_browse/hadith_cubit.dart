@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/pack_downloader.dart';
@@ -31,7 +33,9 @@ class HadithCubit extends Cubit<HadithState> {
       language = row?.language ?? '';
       (items, hasMore) =
           await _downloader.hadithPage(_packId, offset, pageSize);
-    } catch (error) {
+    } on Object catch (error, stackTrace) {
+      dev.log('hadith load failed',
+          name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(HadithState.error(message: error.toString()));
       return;

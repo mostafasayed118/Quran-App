@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) => switch (state) {
           HomeLoading() => const LoadingView(),
-          HomeFailed() => errorPane(loc, 'home load failed', 'home'),
+          HomeFailed() => errorPane(loc),
           HomeReady(:final lastRead, :final nextPrayer) => ListView(
               padding: const EdgeInsets.all(12),
               children: [

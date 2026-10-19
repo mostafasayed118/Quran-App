@@ -26,7 +26,7 @@ class AzkarScreen extends StatelessWidget {
       body: BlocBuilder<AzkarCubit, AzkarState>(
         builder: (context, state) => switch (state) {
           AzkarLoading() => const LoadingView(),
-          AzkarFailed() => errorPane(loc, 'azkar load failed', 'azkar'),
+          AzkarFailed() => errorPane(loc),
           AzkarBrowsing(:final collections) =>
             _BrowsingView(collections: collections),
           AzkarReciting() => const _RecitingList(),
