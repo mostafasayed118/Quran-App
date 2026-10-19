@@ -61,7 +61,6 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     type FontStep,
     type ReaderSettings,
   } from '../../lib/reader-settings';
-  import { readSetting, writeSetting } from '../../lib/settings';
   import { fetchReciters, sortReciters, type MoshafRow } from '../../lib/reciters';
   import { dedupeLabel } from '../../lib/labels';
   import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
@@ -74,20 +73,6 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 
   function clampStep(n: number): FontStep {
     return (n < 0 ? 0 : n > 3 ? 3 : n) as FontStep;
-  }
-
-  // The picker's rowId lives in the qy:reader object; these two helpers read it raw
-  // and re-merge it after writeReaderSettings (whose coerce keeps only known fields).
-  function readReciterRow(): string {
-    const raw = readSetting<unknown>('reader', null);
-    const v = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>).reciterRow : undefined;
-    return typeof v === 'string' ? v : '';
-  }
-  function persistReciterRow(rowId: string): void {
-    if (!rowId) return;
-    const raw = readSetting<unknown>('reader', null);
-    const base = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>) : {};
-    writeSetting('reader', { ...base, reciterRow: rowId });
   }
 
   // Reciter rows are fetched once per page load and reused by the picker and listen actions.
@@ -121,7 +106,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     // --- header picker + play (featured-first via sortReciters) ---
     const selectedRow = async (): Promise<MoshafRow | undefined> => {
       const rows = await loadRows();
-      const wanted = pick?.value || readReciterRow();
+      const wanted = pick?.value || settings.reciterRow;
       return rows.find((r) => r.rowId === wanted) ?? rows[0];
     };
     const playSurah = async (s: number): Promise<void> => {
@@ -139,11 +124,11 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
             return opt;
           }),
         );
-        const stored = readReciterRow();
+        const stored = settings.reciterRow;
         if (stored && rows.some((r) => r.rowId === stored)) pick.value = stored;
         pick.disabled = rows.length === 0;
       });
-      pick.addEventListener('change', () => persistReciterRow(pick.value));
+      pick.addEventListener('change', () => { settings = writeReaderSettings({ reciterRow: pick.value }); });
     }
     playBtn?.addEventListener('click', () => {
       void playSurah(Number(playBtn.dataset.surah));
@@ -152,16 +137,13 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     box.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement | null)?.closest('button');
       if (!btn) return;
-      const keepRow = pick?.value || readReciterRow();
       const view = btn.dataset.qyView;
       if (view === 'mushaf' || view === 'imlaei') {
         settings = writeReaderSettings({ view });
-        persistReciterRow(keepRow);
       } else {
         const delta = Number(btn.dataset.qyStep);
         if (Number.isFinite(delta) && delta !== 0) {
           settings = writeReaderSettings({ fontStep: clampStep(settings.fontStep + delta) });
-          persistReciterRow(keepRow);
         }
       }
       render();

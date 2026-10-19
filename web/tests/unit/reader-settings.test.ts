@@ -31,29 +31,31 @@ afterEach(() => {
 });
 
 describe('reader settings', () => {
-  it('defaults to fontStep 0 / mushaf when nothing is stored', () => {
-    expect(READER_DEFAULTS).toEqual({ fontStep: 0, view: 'mushaf' });
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf' });
+  it('defaults to fontStep 0 / mushaf / no reciter row when nothing is stored', () => {
+    expect(READER_DEFAULTS).toEqual({ fontStep: 0, view: 'mushaf', reciterRow: '' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf', reciterRow: '' });
   });
   it('round-trips through JSON under the qy:reader key', () => {
-    expect(writeReaderSettings({ view: 'imlaei' })).toEqual({ fontStep: 0, view: 'imlaei' });
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'imlaei' });
-    expect(JSON.parse(localStorage.getItem('qy:reader')!)).toEqual({ fontStep: 0, view: 'imlaei' });
-    expect(writeReaderSettings({ fontStep: 3 })).toEqual({ fontStep: 3, view: 'imlaei' });
-    expect(readReaderSettings()).toEqual({ fontStep: 3, view: 'imlaei' });
+    expect(writeReaderSettings({ view: 'imlaei' })).toEqual({ fontStep: 0, view: 'imlaei', reciterRow: '' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'imlaei', reciterRow: '' });
+    expect(JSON.parse(localStorage.getItem('qy:reader')!)).toEqual({ fontStep: 0, view: 'imlaei', reciterRow: '' });
+    expect(writeReaderSettings({ fontStep: 3 })).toEqual({ fontStep: 3, view: 'imlaei', reciterRow: '' });
+    expect(readReaderSettings()).toEqual({ fontStep: 3, view: 'imlaei', reciterRow: '' });
+    expect(writeReaderSettings({ reciterRow: '51-1' })).toEqual({ fontStep: 3, view: 'imlaei', reciterRow: '51-1' });
+    expect(readReaderSettings()).toEqual({ fontStep: 3, view: 'imlaei', reciterRow: '51-1' });
   });
   it('falls back to defaults on invalid payloads', () => {
     localStorage.setItem('qy:reader', 'not-json{');
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf', reciterRow: '' });
     localStorage.setItem('qy:reader', JSON.stringify({ fontStep: 9, view: 'wide' }));
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf', reciterRow: '' });
     localStorage.setItem('qy:reader', JSON.stringify(null));
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'mushaf', reciterRow: '' });
   });
   it('keeps the valid fields of a partial payload', () => {
     localStorage.setItem('qy:reader', JSON.stringify({ fontStep: 2 }));
-    expect(readReaderSettings()).toEqual({ fontStep: 2, view: 'mushaf' });
+    expect(readReaderSettings()).toEqual({ fontStep: 2, view: 'mushaf', reciterRow: '' });
     localStorage.setItem('qy:reader', JSON.stringify({ view: 'imlaei', fontStep: '1' }));
-    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'imlaei' });
+    expect(readReaderSettings()).toEqual({ fontStep: 0, view: 'imlaei', reciterRow: '' });
   });
 });
