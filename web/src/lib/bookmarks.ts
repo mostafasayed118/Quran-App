@@ -51,14 +51,10 @@ export function createBookmarkStore(storage: StorageLike): BookmarkStore {
     toggleBookmark(s, a) {
       const list = read();
       const i = list.findIndex((b) => b.s === s && b.a === a);
-      if (i >= 0) {
-        list.splice(i, 1);
-        write(list);
-        return false;
-      }
-      list.push({ s, a });
+      if (i >= 0) list.splice(i, 1);
+      else list.push({ s, a });
       write(list);
-      return true;
+      return read().some((b) => b.s === s && b.a === a);
     },
     listBookmarks() {
       return read();

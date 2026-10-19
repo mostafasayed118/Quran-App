@@ -25,6 +25,25 @@ function fakeStorage(): Storage {
   } as Storage;
 }
 
+function throwingStorage(seed: string | null = null): Storage {
+  const map = new Map<string, string>();
+  if (seed !== null) map.set(BOOKMARKS_KEY, seed);
+  return {
+    get length() {
+      return map.size;
+    },
+    clear: () => map.clear(),
+    getItem: (k: string) => (map.has(k) ? map.get(k)! : null),
+    key: (i: number) => Array.from(map.keys())[i] ?? null,
+    removeItem: (k: string) => {
+      map.delete(k);
+    },
+    setItem: () => {
+      throw new Error('QuotaExceededError');
+    },
+  } as Storage;
+}
+
 describe('bookmark store (injected storage)', () => {
   it('starts empty', () => {
     const store = createBookmarkStore(fakeStorage());
@@ -79,6 +98,18 @@ describe('bookmark store (injected storage)', () => {
     expect(store.listBookmarks()).toEqual([{ s: 2, a: 3 }]);
     expect(store.toggleBookmark(1, 2)).toBe(true);
     expect(JSON.parse(storage.getItem(BOOKMARKS_KEY)!)).toEqual([{ s: 2, a: 3 }, { s: 1, a: 2 }]);
+  });
+
+  it('reports not-saved when an add cannot be persisted', () => {
+    const store = createBookmarkStore(throwingStorage());
+    expect(store.toggleBookmark(1, 1)).toBe(false);
+  });
+
+  it('reports still-saved when a remove cannot be persisted', () => {
+    const working = fakeStorage();
+    createBookmarkStore(working).toggleBookmark(1, 1);
+    const store = createBookmarkStore(throwingStorage(working.getItem(BOOKMARKS_KEY)));
+    expect(store.toggleBookmark(1, 1)).toBe(true);
   });
 });
 
