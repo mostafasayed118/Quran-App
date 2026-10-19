@@ -4,6 +4,7 @@ import 'package:drift/drift.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/db/app_database.dart';
+import 'reciter_source.dart';
 
 /// Featured reciters pinned by PM from the verified 2026-10-15 mp3quran dump
 /// (all حفص مرتل, 114 surahs each). Never extend without a PM grant.
@@ -71,7 +72,7 @@ bool isTrustedAudioServer(String server) {
 const recitersApiEndpoint = 'https://mp3quran.net/api/v3/reciters?language=ar';
 const selectedMoshafKey = 'selected_moshaf_row';
 
-class ReciterRepository {
+class ReciterRepository implements ReciterSource {
   ReciterRepository(
     this._db, {
     http.Client? client,
@@ -83,6 +84,7 @@ class ReciterRepository {
   final http.Client _client;
   final String _endpoint;
 
+  @override
   Future<void> refreshFromApi() async {
     final res = await _client
         .get(Uri.parse(_endpoint))
@@ -131,12 +133,15 @@ class ReciterRepository {
     });
   }
 
+  @override
   Stream<List<ReciterRow>> watchAll() => _db.select(_db.reciters).watch();
 
+  @override
   Future<ReciterRow?> byId(String rowId) =>
       (_db.select(_db.reciters)..where((r) => r.id.equals(rowId)))
           .getSingleOrNull();
 
+  @override
   Future<void> selectMoshaf(String rowId) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
@@ -146,6 +151,7 @@ class ReciterRepository {
         );
   }
 
+  @override
   Future<String?> loadSelectedMoshaf() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(selectedMoshafKey)))
@@ -153,6 +159,7 @@ class ReciterRepository {
     return row?.value;
   }
 
+  @override
   Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
     final rows = await (_db.select(_db.surahs)
@@ -163,6 +170,7 @@ class ReciterRepository {
 
   /// Opening-ayah teasers for the reciter's surah rows (W2a plan T6 shape),
   /// keyed by surah id from the bundled ayahs table.
+  @override
   Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
     final rows = await (_db.select(_db.ayahs)

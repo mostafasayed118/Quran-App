@@ -32,6 +32,7 @@ import '../../features/qibla/data/heading_service.dart';
 import '../../features/qibla/data/qibla_service.dart';
 import '../../features/recitation/data/audio_downloader.dart';
 import '../../features/recitation/data/reciter_repository.dart';
+import '../../features/recitation/data/reciter_source.dart';
 import '../../features/recitation/playback/just_audio_playback_service.dart';
 import '../../features/recitation/playback/playback_service.dart';
 import '../../features/recitation/presentation/downloads/downloads_cubit.dart';
@@ -63,6 +64,7 @@ Future<void> configureDependencies({
   getIt
       .registerLazySingleton<LastReadSource>(() => getIt<LastReadRepository>());
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
+  getIt.registerLazySingleton<ReciterSource>(() => getIt<ReciterRepository>());
   getIt.registerLazySingleton<PrayerTimeService>(
       () => const PrayerTimeService());
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
