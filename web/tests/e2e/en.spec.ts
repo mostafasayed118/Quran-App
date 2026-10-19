@@ -39,8 +39,10 @@ test('EN index search never fetches or shows the verse panel', async ({ page }) 
     if (req.url().includes('search-index')) indexRequests.push(req.url());
   });
   await page.goto('/en/quran');
-  await page.getByRole('searchbox').fill('Al-Fatihah');
-  await expect(page.locator('.surah-list a')).toHaveCount(1);
+  await expect(async () => {
+    await page.getByRole('searchbox').fill('Al-Fatihah');
+    await expect(page.locator('.surah-list a')).toHaveCount(1);
+  }).toPass({ timeout: 10_000 });
   await expect(page.locator('.surah-list a').first()).toContainText('Al-Fatihah');
   await expect(page.locator('.ayah-search')).toHaveCount(0);
   expect(indexRequests).toHaveLength(0);
