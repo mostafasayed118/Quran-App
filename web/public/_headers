@@ -12,6 +12,8 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+# /fonts/* is unhashed with a 7-day TTL (owner-approved 2026-10-19): font files are stable; if one
+# ever changes, RENAME it (e.g. -v2) for an instant cache-bust — the TTL is only the fallback.
 /fonts/*
   Cache-Control: public, max-age=604800
 
