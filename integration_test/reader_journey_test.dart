@@ -6,6 +6,7 @@ import 'app_harness.dart';
 
 // Arabic UI copy pinned from lib/l10n/app_ar.arb and the reader surface.
 const String quranTile = 'القرآن الكريم';
+const String homeAppTitle = 'قرآن يَهدي';
 const String surahFatiha = 'الفاتحة';
 const String bookmarkSave = 'احفظ الآية';
 const String bookmarkRemove = 'أزل الحفظ';
@@ -56,8 +57,11 @@ void main() {
     (tester) async {
       await bootApp(tester);
 
-      // Home → Quran feature tile → surah index.
+      // Home → Quran feature tile → surah index. Gate on the home route
+      // going offstage so home's last-read card cannot false-match the
+      // index row during the push transition.
       await tester.tap(find.text(quranTile));
+      await _waitUntilGone(tester, find.text(homeAppTitle));
       await waitFor(tester, find.text(surahFatiha));
 
       // Index → «الفاتحة» → reader (defaults to the verses list).
