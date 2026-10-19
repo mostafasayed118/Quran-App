@@ -37,7 +37,6 @@ class ZakatScreen extends StatelessWidget {
           final ZakatReady ready = switch (state) {
             ZakatReady() => state,
           };
-          final colors = Theme.of(context).colorScheme;
           final needsNisabPrice =
               ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
           final verdictText = needsNisabPrice
@@ -48,25 +47,7 @@ class ZakatScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(12),
             children: [
-              SegmentedButton<bool>(
-                segments: [
-                  ButtonSegment(
-                    value: false,
-                    label: Text(loc.nisabByGold),
-                    icon: const Icon(Icons.workspace_premium),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    label: Text(loc.nisabBySilver),
-                    icon: const Icon(Icons.monetization_on_outlined),
-                  ),
-                ],
-                selected: {ready.nisabBySilver},
-                onSelectionChanged: (selection) =>
-                    context.read<ZakatCubit>().setNisabBySilver(
-                          selection.first,
-                        ),
-              ),
+              _NisabToggle(ready: ready),
               const SizedBox(height: 10),
               _Field(
                   label: loc.goldGrams,
@@ -87,41 +68,10 @@ class ZakatScreen extends StatelessWidget {
                   label: loc.debts,
                   onChanged: context.read<ZakatCubit>().setDebts),
               const SizedBox(height: 14),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _line(
-                          context, loc.zakatableLabel, ready.result.zakatable),
-                      _line(context, loc.nisabLabel, ready.result.nisabValue),
-                      const SizedBox(height: 8),
-                      Text(
-                        verdictText,
-                        textAlign: TextAlign.right,
-                        style: _verdictStyle.copyWith(
-                          color: ready.result.due
-                              ? colors.secondary
-                              : colors.onSurfaceVariant,
-                        ),
-                      ),
-                      if (!needsNisabPrice && ready.result.due)
-                        Text(
-                          ready.result.amount
-                              .toStringAsFixed(2)
-                              .toArabicIndicDigits,
-                          textAlign: TextAlign.right,
-                          style: _amountStyle.copyWith(color: colors.primary),
-                        ),
-                      const SizedBox(height: 8),
-                      Text(
-                        loc.zakatFootnote,
-                        style: AppTheme.mutedFootnote(context),
-                      ),
-                    ],
-                  ),
-                ),
+              _SummaryCard(
+                ready: ready,
+                needsNisabPrice: needsNisabPrice,
+                verdictText: verdictText,
               ),
             ],
           );
@@ -129,8 +79,98 @@ class ZakatScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _line(BuildContext context, String label, double value) {
+class _NisabToggle extends StatelessWidget {
+  const _NisabToggle({required this.ready});
+
+  final ZakatReady ready;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return SegmentedButton<bool>(
+      segments: [
+        ButtonSegment(
+          value: false,
+          label: Text(loc.nisabByGold),
+          icon: const Icon(Icons.workspace_premium),
+        ),
+        ButtonSegment(
+          value: true,
+          label: Text(loc.nisabBySilver),
+          icon: const Icon(Icons.monetization_on_outlined),
+        ),
+      ],
+      selected: {ready.nisabBySilver},
+      onSelectionChanged: (selection) =>
+          context.read<ZakatCubit>().setNisabBySilver(
+                selection.first,
+              ),
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({
+    required this.ready,
+    required this.needsNisabPrice,
+    required this.verdictText,
+  });
+
+  final ZakatReady ready;
+  final bool needsNisabPrice;
+  final String verdictText;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _ZakatLine(
+                label: loc.zakatableLabel, value: ready.result.zakatable),
+            _ZakatLine(label: loc.nisabLabel, value: ready.result.nisabValue),
+            const SizedBox(height: 8),
+            Text(
+              verdictText,
+              textAlign: TextAlign.right,
+              style: _verdictStyle.copyWith(
+                color: ready.result.due
+                    ? colors.secondary
+                    : colors.onSurfaceVariant,
+              ),
+            ),
+            if (!needsNisabPrice && ready.result.due)
+              Text(
+                ready.result.amount.toStringAsFixed(2).toArabicIndicDigits,
+                textAlign: TextAlign.right,
+                style: _amountStyle.copyWith(color: colors.primary),
+              ),
+            const SizedBox(height: 8),
+            Text(
+              loc.zakatFootnote,
+              style: AppTheme.mutedFootnote(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ZakatLine extends StatelessWidget {
+  const _ZakatLine({required this.label, required this.value});
+
+  final String label;
+  final double value;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
