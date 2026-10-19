@@ -9,8 +9,10 @@ describe('toArabicDigits', () => {
 });
 
 describe('surahUrl', () => {
-  it('builds surah url', () => expect(surahUrl(18)).toBe(`${SITE}/surah/18`));
-  it('builds ayah anchor url', () => expect(surahUrl(2, 255)).toBe(`${SITE}/surah/2#ayah-255`));
+  it('builds surah url', () => expect(surahUrl('ar', 18)).toBe(`${SITE}/surah/18`));
+  it('builds ayah anchor url', () => expect(surahUrl('ar', 2, 255)).toBe(`${SITE}/surah/2#ayah-255`));
+  it('prefixes the EN locale', () => expect(surahUrl('en', 18)).toBe(`${SITE}/en/surah/18`));
+  it('prefixes the EN locale on an ayah anchor', () => expect(surahUrl('en', 2, 255)).toBe(`${SITE}/en/surah/2#ayah-255`));
 });
 
 describe('surahNeighbors', () => {

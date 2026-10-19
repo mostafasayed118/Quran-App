@@ -206,7 +206,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
           .then(() => flashCopied(btn))
           .catch(() => { /* clipboard unavailable */ });
       } else if (action === 'share') {
-        shareOrCopy(surahUrl(s, a), text)
+        shareOrCopy(surahUrl(document.documentElement.lang === 'en' ? 'en' : 'ar', s, a), text)
           .then((outcome) => {
             if (outcome === 'copied') flashCopied(btn);
           })
