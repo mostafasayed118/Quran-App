@@ -540,4 +540,58 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get wirdNewPlan => 'ختمة جديدة';
+
+  @override
+  String get backupSectionTitle => 'النسخ الاحتياطي والاستعادة';
+
+  @override
+  String get backupExport => 'تصدير البيانات';
+
+  @override
+  String get backupImport => 'استيراد البيانات';
+
+  @override
+  String get backupPreviewTitle => 'مراجعة الاستيراد';
+
+  @override
+  String get backupMerge => 'دمج';
+
+  @override
+  String get backupExportSuccess => 'تم تصدير البيانات';
+
+  @override
+  String get backupImportSuccess => 'تم استيراد البيانات ودمجها';
+
+  @override
+  String get backupExportFailure => 'تعذّر تصدير البيانات';
+
+  @override
+  String get backupImportFailure => 'تعذّر استيراد البيانات';
+
+  @override
+  String get backupInvalidFile => 'الملف المختار ليس نسخة احتياطية صالحة';
+
+  @override
+  String backupPreviewBookmarks(String count) {
+    return '$count علامة جديدة';
+  }
+
+  @override
+  String get backupPreviewLastRead => 'سيُحدَّث موضع القراءة';
+
+  @override
+  String backupPreviewPrayerDays(String count) {
+    return '$count يوم عبادات';
+  }
+
+  @override
+  String get backupPreviewPlan => 'سيُحدَّث تقدّم الورد';
+
+  @override
+  String get backupPreviewTasbih => 'ستُدمج بيانات المسبحة';
+
+  @override
+  String backupPreviewSettings(String count) {
+    return '$count إعداد';
+  }
 }

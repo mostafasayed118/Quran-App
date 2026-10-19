@@ -10,7 +10,11 @@ import 'settings_cubit.dart';
 import 'settings_state.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, this.backupSection});
+
+  /// Backup & restore surface, composed by the app shell (router) so this
+  /// feature stays free of cross-feature imports (architecture guard).
+  final Widget? backupSection;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +88,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                if (backupSection != null) backupSection!,
                 const Divider(),
                 Padding(
                   padding: const EdgeInsets.all(16),

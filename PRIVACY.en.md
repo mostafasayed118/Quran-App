@@ -31,6 +31,7 @@ Everything the app stores stays **on your device only**, inside the app's privat
 - Your bookmarks and last-read position.
 - The audio files and text packs you downloaded.
 - Your worship-tracker and tasbih logs.
+- You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process.
 
 Uninstalling the app permanently deletes all of it. We keep no copy.
 

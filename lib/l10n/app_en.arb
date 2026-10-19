@@ -325,5 +325,42 @@
   "wirdOpenToday": "Open the wird",
   "wirdFinishToday": "Finished today's wird",
   "wirdCompleted": "Khatma completed",
-  "wirdNewPlan": "New khatma"
+  "wirdNewPlan": "New khatma",
+  "backupSectionTitle": "Backup & restore",
+  "backupExport": "Export data",
+  "backupImport": "Import data",
+  "backupPreviewTitle": "Review import",
+  "backupMerge": "Merge",
+  "backupExportSuccess": "Data exported",
+  "backupImportSuccess": "Data imported and merged",
+  "backupExportFailure": "Couldn't export the data",
+  "backupImportFailure": "Couldn't import the data",
+  "backupInvalidFile": "The selected file isn't a valid backup",
+  "backupPreviewBookmarks": "{count} new bookmarks",
+  "@backupPreviewBookmarks": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewLastRead": "Last-read position will be updated",
+  "backupPreviewPrayerDays": "{count} worship days",
+  "@backupPreviewPrayerDays": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewPlan": "Khatma progress will be updated",
+  "backupPreviewTasbih": "Tasbih data will be merged",
+  "backupPreviewSettings": "{count} settings",
+  "@backupPreviewSettings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  }
 }

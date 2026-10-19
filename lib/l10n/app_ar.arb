@@ -339,5 +339,42 @@
   "wirdOpenToday": "افتح الورد",
   "wirdFinishToday": "أنهيت ورد اليوم",
   "wirdCompleted": "أتممت الختمة",
-  "wirdNewPlan": "ختمة جديدة"
+  "wirdNewPlan": "ختمة جديدة",
+  "backupSectionTitle": "النسخ الاحتياطي والاستعادة",
+  "backupExport": "تصدير البيانات",
+  "backupImport": "استيراد البيانات",
+  "backupPreviewTitle": "مراجعة الاستيراد",
+  "backupMerge": "دمج",
+  "backupExportSuccess": "تم تصدير البيانات",
+  "backupImportSuccess": "تم استيراد البيانات ودمجها",
+  "backupExportFailure": "تعذّر تصدير البيانات",
+  "backupImportFailure": "تعذّر استيراد البيانات",
+  "backupInvalidFile": "الملف المختار ليس نسخة احتياطية صالحة",
+  "backupPreviewBookmarks": "{count} علامة جديدة",
+  "@backupPreviewBookmarks": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewLastRead": "سيُحدَّث موضع القراءة",
+  "backupPreviewPrayerDays": "{count} يوم عبادات",
+  "@backupPreviewPrayerDays": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewPlan": "سيُحدَّث تقدّم الورد",
+  "backupPreviewTasbih": "ستُدمج بيانات المسبحة",
+  "backupPreviewSettings": "{count} إعداد",
+  "@backupPreviewSettings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  }
 }

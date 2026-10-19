@@ -1057,6 +1057,102 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ختمة جديدة'**
   String get wirdNewPlan;
+
+  /// No description provided for @backupSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخ الاحتياطي والاستعادة'**
+  String get backupSectionTitle;
+
+  /// No description provided for @backupExport.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير البيانات'**
+  String get backupExport;
+
+  /// No description provided for @backupImport.
+  ///
+  /// In ar, this message translates to:
+  /// **'استيراد البيانات'**
+  String get backupImport;
+
+  /// No description provided for @backupPreviewTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مراجعة الاستيراد'**
+  String get backupPreviewTitle;
+
+  /// No description provided for @backupMerge.
+  ///
+  /// In ar, this message translates to:
+  /// **'دمج'**
+  String get backupMerge;
+
+  /// No description provided for @backupExportSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تصدير البيانات'**
+  String get backupExportSuccess;
+
+  /// No description provided for @backupImportSuccess.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم استيراد البيانات ودمجها'**
+  String get backupImportSuccess;
+
+  /// No description provided for @backupExportFailure.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تصدير البيانات'**
+  String get backupExportFailure;
+
+  /// No description provided for @backupImportFailure.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر استيراد البيانات'**
+  String get backupImportFailure;
+
+  /// No description provided for @backupInvalidFile.
+  ///
+  /// In ar, this message translates to:
+  /// **'الملف المختار ليس نسخة احتياطية صالحة'**
+  String get backupInvalidFile;
+
+  /// No description provided for @backupPreviewBookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} علامة جديدة'**
+  String backupPreviewBookmarks(String count);
+
+  /// No description provided for @backupPreviewLastRead.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيُحدَّث موضع القراءة'**
+  String get backupPreviewLastRead;
+
+  /// No description provided for @backupPreviewPrayerDays.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} يوم عبادات'**
+  String backupPreviewPrayerDays(String count);
+
+  /// No description provided for @backupPreviewPlan.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيُحدَّث تقدّم الورد'**
+  String get backupPreviewPlan;
+
+  /// No description provided for @backupPreviewTasbih.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستُدمج بيانات المسبحة'**
+  String get backupPreviewTasbih;
+
+  /// No description provided for @backupPreviewSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} إعداد'**
+  String backupPreviewSettings(String count);
 }
 
 class _AppLocalizationsDelegate

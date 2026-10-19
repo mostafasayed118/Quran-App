@@ -542,4 +542,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get wirdNewPlan => 'New khatma';
+
+  @override
+  String get backupSectionTitle => 'Backup & restore';
+
+  @override
+  String get backupExport => 'Export data';
+
+  @override
+  String get backupImport => 'Import data';
+
+  @override
+  String get backupPreviewTitle => 'Review import';
+
+  @override
+  String get backupMerge => 'Merge';
+
+  @override
+  String get backupExportSuccess => 'Data exported';
+
+  @override
+  String get backupImportSuccess => 'Data imported and merged';
+
+  @override
+  String get backupExportFailure => 'Couldn\'t export the data';
+
+  @override
+  String get backupImportFailure => 'Couldn\'t import the data';
+
+  @override
+  String get backupInvalidFile => 'The selected file isn\'t a valid backup';
+
+  @override
+  String backupPreviewBookmarks(String count) {
+    return '$count new bookmarks';
+  }
+
+  @override
+  String get backupPreviewLastRead => 'Last-read position will be updated';
+
+  @override
+  String backupPreviewPrayerDays(String count) {
+    return '$count worship days';
+  }
+
+  @override
+  String get backupPreviewPlan => 'Khatma progress will be updated';
+
+  @override
+  String get backupPreviewTasbih => 'Tasbih data will be merged';
+
+  @override
+  String backupPreviewSettings(String count) {
+    return '$count settings';
+  }
 }

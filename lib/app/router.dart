@@ -10,6 +10,9 @@ import '../features/azkar/presentation/azkar_screen.dart';
 import '../features/asma/data/asma_repository.dart';
 import '../features/asma/presentation/asma_cubit.dart';
 import '../features/asma/presentation/asma_screen.dart';
+import '../features/backup/data/backup_service.dart';
+import '../features/backup/presentation/backup_cubit.dart';
+import '../features/backup/presentation/backup_section.dart';
 import '../features/duas/data/dua_repository.dart';
 import '../features/duas/data/ruqyah_repository.dart';
 import '../features/duas/presentation/duas_cubit.dart';
@@ -218,14 +221,21 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: '/settings',
-        builder: (_, __) => BlocProvider<SettingsCubit>(
-          create: (_) => SettingsCubit(
-            settings: getIt<ReminderSettings>(),
-            city: getIt<CityRepository>(),
-            prayer: getIt<PrayerTimeService>(),
-            scheduler: getIt<ReminderScheduler>(),
-          ),
-          child: const SettingsScreen(),
+        builder: (_, __) => MultiBlocProvider(
+          providers: [
+            BlocProvider<SettingsCubit>(
+              create: (_) => SettingsCubit(
+                settings: getIt<ReminderSettings>(),
+                city: getIt<CityRepository>(),
+                prayer: getIt<PrayerTimeService>(),
+                scheduler: getIt<ReminderScheduler>(),
+              ),
+            ),
+            BlocProvider<BackupCubit>(
+              create: (_) => BackupCubit(service: getIt<BackupService>()),
+            ),
+          ],
+          child: const SettingsScreen(backupSection: BackupSection()),
         ),
       ),
       GoRoute(
