@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/features/settings/presentation/settings_screen.dart'
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, cairoCity;
 import 'settings_cubit_test.dart' show FakeReminderScheduler;
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
@@ -18,13 +18,9 @@ void main() {
   late FakeReminderScheduler scheduler;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     settings = ReminderSettings(db);
     scheduler = FakeReminderScheduler();
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpHost(WidgetTester tester) async {

@@ -1,11 +1,12 @@
 import 'dart:io';
 
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
+
+import 'support/test_db.dart';
 
 const fixture = '''
 {"reciters":[
@@ -22,11 +23,9 @@ void main() {
   late ReciterRepository repo;
 
   setUp(() {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = ReciterRepository(db);
   });
-
-  tearDown(() async => db.close());
 
   test('pure helpers: url building + parse + featured sort', () {
     expect(surahAudioFileName(2), '002.mp3');

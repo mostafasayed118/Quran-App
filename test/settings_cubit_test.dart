@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
 import 'prayer_times_cubit_test.dart'
     show FakePrayerTimeService, cairoCity, fakeDay;
+import 'support/test_db.dart';
 
 class FakeReminderScheduler implements ReminderScheduler {
   final plans = <List<ScheduledReminder>>[];
@@ -39,7 +39,7 @@ void main() {
   late FakeReminderScheduler scheduler;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     settings = ReminderSettings(db);
     city = CityRepository(
         db: db, loader: () async => [cairoCity.toJson()]);
@@ -47,10 +47,6 @@ void main() {
       ..todayResult = fakeDay()
       ..nextResult = fakeDay().first;
     scheduler = FakeReminderScheduler();
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   SettingsCubit build() => SettingsCubit(

@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,17 +10,15 @@ import 'package:quran_yahdi/features/tracker/presentation/tracker_cubit.dart';
 import 'package:quran_yahdi/features/tracker/presentation/tracker_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
   late PrayerLogRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = PrayerLogRepository(db);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpTracker(

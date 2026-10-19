@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:drift/native.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -13,6 +12,7 @@ import 'package:quran_yahdi/features/qibla/presentation/qibla_cubit.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_screen.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 const cairoCity = City(
   id: 'cairo',
@@ -32,12 +32,8 @@ void main() {
   late CityRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   group('QiblaCubit compass availability', () {

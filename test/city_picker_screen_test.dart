@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +9,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 class _ThrowingSearchRepo extends CityRepository {
   _ThrowingSearchRepo(AppDatabase db)
@@ -24,7 +25,7 @@ void main() {
   late CityRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(
         db: db,
         loader: () async => [
@@ -50,10 +51,6 @@ void main() {
                 'lng': 55.2708
               },
             ]);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   testWidgets('search filters live and picking persists then pops',

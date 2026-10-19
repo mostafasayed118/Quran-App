@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,6 +14,8 @@ import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/mini_player_bar.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 class _FailingPlaybackService implements PlaybackService {
   _FailingPlaybackService({this.loadError});
@@ -69,12 +70,11 @@ void main() {
   late Directory tempRoot;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_fail_copy_test');
   });
 
   tearDown(() async {
-    await db.close();
     if (await tempRoot.exists()) {
       await tempRoot.delete(recursive: true);
     }

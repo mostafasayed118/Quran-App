@@ -1,20 +1,17 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
+
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
   late PrayerLogRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = PrayerLogRepository(db);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   test('toggle-on persists and re-reads', () async {

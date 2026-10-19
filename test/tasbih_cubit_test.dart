@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -6,17 +5,15 @@ import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 import 'package:quran_yahdi/features/tasbih/presentation/tasbih_cubit.dart';
 import 'package:quran_yahdi/features/tasbih/presentation/tasbih_state.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
   late TasbihRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = TasbihRepository(db);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<TasbihCubit> build() async {

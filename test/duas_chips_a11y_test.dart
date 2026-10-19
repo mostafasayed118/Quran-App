@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/features/duas/presentation/duas_screen.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
@@ -18,7 +18,7 @@ void main() {
   late RuqyahRepository ruqyahRepo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     duaRepo = DuaRepository(
         loader: () async => [
               {
@@ -43,10 +43,6 @@ void main() {
                 'count': 3
               },
             ]);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpHost(WidgetTester tester, {double textScale = 1.0}) async {

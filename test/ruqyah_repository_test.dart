@@ -2,11 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
+
+import 'support/test_db.dart';
 
 List<Map<String, dynamic>> fixtureRows() => [
       {'id': 'f1', 'kind': 'dhikr', 'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ', 'count': 3},
@@ -18,7 +19,7 @@ void main() {
   late RuqyahRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = RuqyahRepository(loader: () async => fixtureRows());
     await db.into(db.surahs).insert(SurahsCompanion.insert(
       id: const Value(112),
@@ -47,10 +48,6 @@ void main() {
       textUthmani: 'اللَّهُ الصَّمَدُ',
       textImlaei: 'الله الصمد',
     ));
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   test('parses entries; dhikr passes through, quran carries ranges', () async {

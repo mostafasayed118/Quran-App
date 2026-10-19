@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,6 +14,7 @@ import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'home_cubit_test.dart' show FakePrayerTimeService, cairoCity;
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
@@ -23,14 +23,10 @@ void main() {
   late CityRepository city;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   testWidgets(

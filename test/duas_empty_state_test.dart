@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,16 +11,13 @@ import 'package:quran_yahdi/features/duas/presentation/duas_screen.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
-  });
-
-  tearDown(() async {
-    await db.close();
+    db = newTestDb();
   });
 
   Future<void> pumpHost(WidgetTester tester) async {

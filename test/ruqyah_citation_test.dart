@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,12 +10,13 @@ import 'package:quran_yahdi/features/duas/presentation/duas_screen.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     await db.into(db.surahs).insert(SurahsCompanion.insert(
           id: const Value(112),
           nameAr: 'الإخلاص',
@@ -44,10 +44,6 @@ void main() {
           textUthmani: 'اللَّهُ الصَّمَدُ',
           textImlaei: 'الله الصمد',
         ));
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpHost(WidgetTester tester) async {

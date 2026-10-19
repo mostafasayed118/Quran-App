@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -10,6 +9,8 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_state.dart';
+
+import 'support/test_db.dart';
 
 class FakePlaybackService implements PlaybackService {
   final playing = StreamController<bool>.broadcast();
@@ -55,13 +56,12 @@ void main() {
   late PlaybackCubit cubit;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_playback_test');
   });
 
   tearDown(() async {
     await cubit.close();
-    await db.close();
     if (await tempRoot.exists()) {
       await tempRoot.delete(recursive: true);
     }

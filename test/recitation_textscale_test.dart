@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -22,6 +21,8 @@ import 'package:quran_yahdi/features/recitation/presentation/reciter_surahs/reci
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 class _StaticReciterRepository extends ReciterRepository {
   _StaticReciterRepository(super.db, this._rows);
@@ -142,12 +143,11 @@ void main() {
   late Directory tempRoot;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_scale_test');
   });
 
   tearDown(() async {
-    await db.close();
     if (await tempRoot.exists()) {
       await tempRoot.delete(recursive: true);
     }

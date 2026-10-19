@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -26,6 +25,8 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 Future<dynamic> _syncDecode(String path) async =>
     jsonDecode(File(path).readAsStringSync());
@@ -79,7 +80,7 @@ void main() {
   late Directory tempRoot;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_quran_probe');
     await db.batch((b) => b.insertAll(db.surahs, [
           SurahsCompanion.insert(
@@ -129,7 +130,6 @@ void main() {
 
   tearDown(() async {
     await tempRoot.delete(recursive: true);
-    await db.close();
   });
 
   Widget localizedShell(Widget home,

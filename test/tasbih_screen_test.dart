@@ -9,19 +9,16 @@ import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 import 'package:quran_yahdi/features/tasbih/presentation/tasbih_cubit.dart';
 import 'package:quran_yahdi/features/tasbih/presentation/tasbih_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
-import 'package:drift/native.dart';
+
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
   late TasbihRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = TasbihRepository(db);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   testWidgets('dial shows count and target; tapping increments; chips switch target',

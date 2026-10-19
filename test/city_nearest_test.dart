@@ -1,8 +1,9 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
+
+import 'support/test_db.dart';
 
 City city(String id, String nameAr, String nameEn, double lat, double lng) =>
     City(id: id, nameAr: nameAr, nameEn: nameEn, lat: lat, lng: lng);
@@ -13,7 +14,7 @@ void main() {
   late List<City> catalog;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     catalog = [
       city('cairo', 'القاهرة', 'Cairo', 30.0444, 31.2357),
       city('giza', 'الجيزة', 'Giza', 30.0131, 31.2089),
@@ -22,10 +23,6 @@ void main() {
       city('riyadh', 'الرياض', 'Riyadh', 24.7136, 46.6753),
     ];
     repo = CityRepository(db: db, loader: () async => [for (final c in catalog) c.toJson()]);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   test('point between Cairo and Giza picks the mathematically nearest', () async {

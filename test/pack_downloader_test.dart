@@ -2,12 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
+
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
@@ -17,7 +18,7 @@ void main() {
   late PackDownloader downloader;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_library_test');
   });
 
@@ -26,7 +27,6 @@ void main() {
       await server.close(force: true);
     }
     await tempRoot.delete(recursive: true);
-    await db.close();
   });
 
   Future<void> serve(Future<void> Function(HttpRequest request) handler) async {

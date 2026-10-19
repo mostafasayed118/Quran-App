@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -12,12 +11,14 @@ import 'package:quran_yahdi/features/recitation/data/download_status.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
   late Directory tempRoot;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_cancel_test');
     await db.into(db.reciters).insert(
           RecitersCompanion.insert(
@@ -33,7 +34,6 @@ void main() {
 
   tearDown(() async {
     await tempRoot.delete(recursive: true);
-    await db.close();
   });
 
   Future<DownloadsCubit> buildCubit(String base) async {

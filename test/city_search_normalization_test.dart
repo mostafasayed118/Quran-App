@@ -1,8 +1,9 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
+
+import 'support/test_db.dart';
 
 List<Map<String, dynamic>> _rows() => [
       {
@@ -40,12 +41,8 @@ void main() {
   late CityRepository repo;
 
   setUp(() {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(db: db, loader: () async => _rows());
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   test('plain-alef query finds the hamza-alef name', () async {

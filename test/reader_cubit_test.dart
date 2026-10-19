@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -8,13 +7,15 @@ import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_state.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
   late AyahRepository ayahs;
   late LastReadRepository lastRead;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     final fatiha = [
       AyahsCompanion.insert(
           id: const Value(1), surahId: 1, numberInSurah: 1, juz: 1, page: 1,
@@ -49,8 +50,6 @@ void main() {
     ayahs = AyahRepository(db);
     lastRead = LastReadRepository(db);
   });
-
-  tearDown(() async => db.close());
 
   test('loads ready state; basmala banner policy per surah', () async {
     ReaderCubit? cubit = ReaderCubit(

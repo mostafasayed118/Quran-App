@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,12 +9,13 @@ import 'package:quran_yahdi/features/quran/presentation/index/surah_index_cubit.
 import 'package:quran_yahdi/features/quran/presentation/index/surah_index_screen.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     await db.batch((b) => b.insertAll(db.surahs, [
       SurahsCompanion.insert(
           id: const Value(1), nameAr: 'الفاتحة', nameEn: 'Al-Fatihah',
@@ -28,8 +28,6 @@ void main() {
           revelationType: 'makkah', ayahCount: 93, pagesStart: 377, pagesEnd: 385),
     ]));
   });
-
-  tearDown(() async => db.close());
 
   Widget host(SurahRepository repo) => BlocProvider<SurahIndexCubit>(
         create: (_) => SurahIndexCubit(repo),

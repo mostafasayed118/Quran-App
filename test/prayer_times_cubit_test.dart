@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -6,6 +5,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
+
+import 'support/test_db.dart';
 
 class FakePrayerTimeService implements PrayerTimeService {
   List<PrayerChoice>? todayResult;
@@ -51,15 +52,11 @@ void main() {
   late FakePrayerTimeService fake;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(db: db, loader: () async => [cairoCity.toJson(), dubaiCity.toJson()]);
     fake = FakePrayerTimeService()
       ..todayResult = fakeDay()
       ..nextResult = PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   test('no selection emits ready with no city and empty entries', () async {

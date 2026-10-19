@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,6 +15,7 @@ import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
@@ -23,7 +23,7 @@ void main() {
   late RuqyahRepository ruqyahRepo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     duaRepo = DuaRepository(loader: () async => [
       {
         'id': 'a1',
@@ -69,10 +69,6 @@ void main() {
       textUthmani: 'اللَّهُ الصَّمَدُ',
       textImlaei: 'الله الصمد',
     ));
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpHost(WidgetTester tester) async {

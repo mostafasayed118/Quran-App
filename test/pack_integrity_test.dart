@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
+
+import 'support/test_db.dart';
 
 Map<String, dynamic> singleEntry({Object? sha256}) => {
       'id': 'tpin',
@@ -90,7 +91,7 @@ void main() {
     late PackDownloader downloader;
 
     setUp(() async {
-      db = AppDatabase.test(NativeDatabase.memory());
+      db = newTestDb();
       tempRoot = await Directory.systemTemp.createTemp('qy_pack_integrity');
     });
 
@@ -99,7 +100,6 @@ void main() {
         await server.close(force: true);
       }
       await tempRoot.delete(recursive: true);
-      await db.close();
     });
 
     Future<void> serve(

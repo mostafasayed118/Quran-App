@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -18,6 +17,8 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 class _TeardownSafeAyahRepository extends AyahRepository {
   _TeardownSafeAyahRepository(super.db);
@@ -55,7 +56,7 @@ void main() {
   late LastReadRepository lastRead;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     final baqarah = [
       AyahsCompanion.insert(
           id: const Value(8),
@@ -95,10 +96,6 @@ void main() {
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
     lastRead = LastReadRepository(db);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Widget host(int surahId) {

@@ -3,11 +3,12 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
+
+import 'support/test_db.dart';
 
 /// Serves a stream far larger than the content-length it declares.
 class _LyingAdapter implements HttpClientAdapter {
@@ -39,7 +40,7 @@ void main() {
   late String base;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_audio_test');
     await db.into(db.reciters).insert(
           RecitersCompanion.insert(
@@ -55,7 +56,6 @@ void main() {
 
   tearDown(() async {
     await tempRoot.delete(recursive: true);
-    await db.close();
   });
 
   Future<AudioDownloader> serve(

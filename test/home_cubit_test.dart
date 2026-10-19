@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -9,6 +8,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+
+import 'support/test_db.dart';
 
 class FakePrayerTimeService implements PrayerTimeService {
   PrayerChoice? nextResult;
@@ -42,7 +43,7 @@ void main() {
   late FakePrayerTimeService fake;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
@@ -65,10 +66,6 @@ void main() {
           textImlaei: 'الم',
         ));
     fake = FakePrayerTimeService();
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<HomeCubit> build() async {

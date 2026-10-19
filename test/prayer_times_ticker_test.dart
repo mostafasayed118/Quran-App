@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_tim
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, cairoCity;
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 List<PrayerChoice> dayOn(int y, int m, int d) => [
       PrayerChoice(PrayerName.fajr, DateTime(y, m, d, 4, 45)),
@@ -26,13 +26,9 @@ void main() {
   late CityRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
     await repo.select(cairoCity);
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpScreen(WidgetTester tester, PrayerTimesCubit cubit) async {

@@ -1,16 +1,17 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/mushaf_page_block.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     final ayahs = [
       AyahsCompanion.insert(
           id: const Value(8), surahId: 2, numberInSurah: 1, juz: 1, page: 2,
@@ -33,8 +34,6 @@ void main() {
     ];
     await db.batch((b) => b.insertAll(db.ayahs, ayahs));
   });
-
-  tearDown(() async => db.close());
 
   test('groups surah ayahs into sorted page blocks', () async {
     final repo = AyahRepository(db);

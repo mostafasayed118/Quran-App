@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,13 +11,14 @@ import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'prayer_times_cubit_test.dart' show cairoCity;
+import 'support/test_db.dart';
 
 void main() {
   late AppDatabase db;
   late CityRepository repo;
 
   setUp(() async {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
     repo = CityRepository(
       db: db,
       loader: () async => [
@@ -32,10 +32,6 @@ void main() {
         },
       ],
     );
-  });
-
-  tearDown(() async {
-    await db.close();
   });
 
   Future<void> pumpPicker(WidgetTester tester, CityPickerCubit cubit) async {

@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_s
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_state.dart';
 
 import 'support/host.dart';
+import 'support/test_db.dart';
 
 class _StaticReciterRepository extends ReciterRepository {
   _StaticReciterRepository(super.db, this._rows);
@@ -43,10 +43,8 @@ void main() {
   late AppDatabase db;
 
   setUp(() {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
   });
-
-  tearDown(() async => db.close());
 
   Future<void> pumpScreen(WidgetTester tester, ReciterRepository repo) async {
     await pumpAppHost(

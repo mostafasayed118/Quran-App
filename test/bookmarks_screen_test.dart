@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,6 +9,8 @@ import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/test_db.dart';
 
 class _TeardownSafeAyahRepository extends AyahRepository {
   _TeardownSafeAyahRepository(super.db, {required this.entries});
@@ -37,10 +38,8 @@ void main() {
   late AppDatabase db;
 
   setUp(() {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
   });
-
-  tearDown(() async => db.close());
 
   Widget host(List<BookmarkEntry> entries) =>
       BlocProvider<BookmarksCubit>(

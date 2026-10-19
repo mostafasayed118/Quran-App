@@ -1,4 +1,3 @@
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -8,14 +7,14 @@ import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/library/presentation/library_cubit.dart';
 import 'package:quran_yahdi/features/library/presentation/library_state.dart';
 
+import 'support/test_db.dart';
+
 void main() {
   late AppDatabase db;
 
   setUp(() {
-    db = AppDatabase.test(NativeDatabase.memory());
+    db = newTestDb();
   });
-
-  tearDown(() async => db.close());
 
   test('catalog load failure lands in the failed state, not a hang', () async {
     final cubit = LibraryCubit(
