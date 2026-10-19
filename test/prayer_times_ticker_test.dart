@@ -1,19 +1,16 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
-
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, cairoCity;
+import 'support/host.dart';
 
 List<PrayerChoice> dayOn(int y, int m, int d) => [
       PrayerChoice(PrayerName.fajr, DateTime(y, m, d, 4, 45)),
@@ -40,22 +37,12 @@ void main() {
 
   Future<void> pumpScreen(WidgetTester tester, PrayerTimesCubit cubit) async {
     addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<PrayerTimesCubit>.value(
-      value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const PrayerTimesScreen(),
-      ),
-    ));
-    await tester.pumpAndSettle();
+    await pumpAppHost(
+      tester,
+      wrap: (app) =>
+          BlocProvider<PrayerTimesCubit>.value(value: cubit, child: app),
+      home: const PrayerTimesScreen(),
+    );
   }
 
   test('after Isha the already-passed Fajr row is not flagged as next',

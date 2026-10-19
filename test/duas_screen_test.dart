@@ -15,6 +15,8 @@ import 'package:quran_yahdi/features/duas/presentation/duas_screen.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
+
 void main() {
   late AppDatabase db;
   late DuaRepository duaRepo;
@@ -80,22 +82,11 @@ void main() {
       ayahs: AyahRepository(db),
     );
     addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<DuasCubit>.value(
-      value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const DuasScreen(),
-      ),
-    ));
-    await tester.pumpAndSettle();
+    await pumpAppHost(
+      tester,
+      wrap: (app) => BlocProvider<DuasCubit>.value(value: cubit, child: app),
+      home: const DuasScreen(),
+    );
   }
 
   testWidgets('duas tab lists entries and filters by category chip',

@@ -1,20 +1,18 @@
 import 'dart:async';
 
 import 'package:drift/native.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_cubit.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 const cairoCity = City(
   id: 'cairo',
@@ -126,22 +124,11 @@ void main() {
         heading: heading,
       );
       addTearDown(cubit.close);
-      await tester.pumpWidget(BlocProvider<QiblaCubit>.value(
-        value: cubit,
-        child: MaterialApp(
-          locale: const Locale('ar'),
-          supportedLocales: const [Locale('ar'), Locale('en')],
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          theme: AppTheme.light,
-          home: const QiblaScreen(),
-        ),
-      ));
-      await tester.pumpAndSettle();
+      await pumpAppHost(
+        tester,
+        wrap: (app) => BlocProvider<QiblaCubit>.value(value: cubit, child: app),
+        home: const QiblaScreen(),
+      );
     }
 
     testWidgets('without any sensor the screen explains the static dial',

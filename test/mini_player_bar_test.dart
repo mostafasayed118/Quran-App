@@ -4,17 +4,16 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/mini_player_bar.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 class FakePlaybackService implements PlaybackService {
   final playing = StreamController<bool>.broadcast();
@@ -72,23 +71,17 @@ void main() {
   });
 
   Future<void> pumpHost(WidgetTester tester) async {
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: cubit),
-      ],
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
+    await pumpAppHost(
+      tester,
+      wrap: (app) => MultiBlocProvider(
+        providers: [
+          BlocProvider<PlaybackCubit>.value(value: cubit),
         ],
-        theme: AppTheme.light,
-        home: const Scaffold(bottomSheet: MiniPlayerBar()),
+        child: app,
       ),
-    ));
+      home: const Scaffold(bottomSheet: MiniPlayerBar()),
+      settle: false,
+    );
   }
 
   Future<void> seedRow() async {

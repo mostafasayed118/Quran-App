@@ -1,15 +1,14 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 void main() {
   late AppDatabase db;
@@ -27,19 +26,7 @@ void main() {
 
   Future<void> pumpHost(WidgetTester tester, List<ReciterRow> rows) async {
     final repo = _StaticReciterRepository(db, rows);
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      home: host(repo),
-    ));
-    await tester.pumpAndSettle();
+    await pumpAppHost(tester, home: host(repo));
   }
 
   testWidgets('featured row appears first (lower Y), then the rest',

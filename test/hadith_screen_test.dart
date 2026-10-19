@@ -15,6 +15,8 @@ import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_s
 import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_state.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
+
 /// FakeAsync-safe pack decoder: isolate completions never arrive under the
 /// widget-test zone, so these tests use the PackDownloader decoder seam.
 Future<dynamic> _syncDecode(String path) async =>
@@ -162,16 +164,7 @@ void main() {
     });
 
     Future<void> pumpScreen(WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
+      await tester.pumpWidget(appShell(
         home: BlocProvider<HadithCubit>(
           create: (_) => HadithCubit(
             downloader: PackDownloader(db,

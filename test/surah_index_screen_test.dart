@@ -2,15 +2,14 @@ import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/index/surah_index_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/index/surah_index_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 void main() {
   late AppDatabase db;
@@ -40,19 +39,7 @@ void main() {
   Future<void> pumpHost(WidgetTester tester) async {
     final rows = await db.select(db.surahs).get();
     final repo = _TeardownSafeSurahRepository(db, rows);
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      home: host(repo),
-    ));
-    await tester.pumpAndSettle();
+    await pumpAppHost(tester, home: host(repo));
   }
 
   testWidgets('rows render arabic names + counts; search filters live',

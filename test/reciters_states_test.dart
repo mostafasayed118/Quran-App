@@ -1,17 +1,16 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/core/widgets/error_strip.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_screen.dart';
 import 'package:quran_yahdi/features/recitation/presentation/reciters/reciters_state.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 class _StaticReciterRepository extends ReciterRepository {
   _StaticReciterRepository(super.db, this._rows);
@@ -50,22 +49,13 @@ void main() {
   tearDown(() async => db.close());
 
   Future<void> pumpScreen(WidgetTester tester, ReciterRepository repo) async {
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
+    await pumpAppHost(
+      tester,
       home: BlocProvider<RecitersCubit>(
         create: (_) => RecitersCubit(repo: repo),
         child: const RecitersScreen(),
       ),
-    ));
-    await tester.pumpAndSettle();
+    );
   }
 
   test('soft refresh failure raises the flag and keeps the cached list',
