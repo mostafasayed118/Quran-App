@@ -30,8 +30,14 @@ class DuasCubit extends Cubit<DuasState> {
 
   Future<void> showDuas() async {
     try {
-      final entries = await _duas.entries();
-      final categories = await _duas.categories();
+      // Independent reads: run them concurrently (list form keeps the first
+      // error and consumes the other, so nothing leaks as unhandled).
+      final results = await Future.wait<Object>([
+        _duas.entries(),
+        _duas.categories(),
+      ]);
+      final entries = results[0] as List<DuaEntry>;
+      final categories = results[1] as List<String>;
       _allDuas = entries;
       if (isClosed) return;
       emit(DuasState.duas(categories: categories, entries: entries));
@@ -53,38 +59,12 @@ class DuasCubit extends Cubit<DuasState> {
     if (isClosed) return;
     emit(const DuasState.loading(tab: DuasTab.ruqyah));
     try {
-      final resolved = <RuqyahResolved>[];
-      for (final entry in await _ruqyah.entries()) {
-        if (isClosed) return;
-        if (entry.isQuran &&
-            entry.surahId != null &&
-            entry.fromAyah != null &&
-            entry.toAyah != null) {
-          final ayahs = await _ayahs.ayahsForRange(
-            entry.surahId!,
-            entry.fromAyah!,
-            entry.toAyah!,
-          );
-          final surah = await _ayahs.surahById(entry.surahId!);
-          resolved.add(RuqyahResolved(
-            id: entry.id,
-            isQuran: true,
-            displayText:
-                <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
-            citation: '${surah?.nameAr ?? ''} '
-                '${entry.fromAyah!.toArabicIndic}–${entry.toAyah!.toArabicIndic}',
-            reference: entry.reference,
-          ));
-        } else {
-          resolved.add(RuqyahResolved(
-            id: entry.id,
-            isQuran: false,
-            displayText: entry.text ?? '',
-            count: entry.count,
-            reference: entry.reference,
-          ));
-        }
-      }
+      final entries = await _ruqyah.entries();
+      // Entries are independent; Future.wait preserves list order and the
+      // per-entry call sequence (range read, then surah name) is unchanged.
+      final resolved = await Future.wait([
+        for (final entry in entries) _resolveEntry(entry),
+      ]);
       if (isClosed) return;
       _resolvedRuqyah = resolved;
       emit(DuasState.ruqyah(entries: resolved));
@@ -94,6 +74,36 @@ class DuasCubit extends Cubit<DuasState> {
       if (isClosed) return;
       emit(const DuasState.failed(tab: DuasTab.ruqyah));
     }
+  }
+
+  Future<RuqyahResolved> _resolveEntry(RuqyahEntry entry) async {
+    if (entry.isQuran &&
+        entry.surahId != null &&
+        entry.fromAyah != null &&
+        entry.toAyah != null) {
+      final ayahs = await _ayahs.ayahsForRange(
+        entry.surahId!,
+        entry.fromAyah!,
+        entry.toAyah!,
+      );
+      final surah = await _ayahs.surahById(entry.surahId!);
+      return RuqyahResolved(
+        id: entry.id,
+        isQuran: true,
+        displayText:
+            <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
+        citation: '${surah?.nameAr ?? ''} '
+            '${entry.fromAyah!.toArabicIndic}–${entry.toAyah!.toArabicIndic}',
+        reference: entry.reference,
+      );
+    }
+    return RuqyahResolved(
+      id: entry.id,
+      isQuran: false,
+      displayText: entry.text ?? '',
+      count: entry.count,
+      reference: entry.reference,
+    );
   }
 
   Future<void> selectTab(DuasTab tab) async {
