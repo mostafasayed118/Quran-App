@@ -4,6 +4,8 @@ import surahsData from '../../src/data/surahs.json' with { type: 'json' };
 import { LANDING, META_DESCRIPTIONS, enReaderDescription } from '../../src/lib/landing-content';
 import { t } from '../../src/lib/strings';
 
+test.describe.configure({ timeout: 60_000 });
+
 test('AR home carries locale head and the language switch', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
@@ -39,6 +41,7 @@ test('EN index search never fetches or shows the verse panel', async ({ page }) 
     if (req.url().includes('search-index')) indexRequests.push(req.url());
   });
   await page.goto('/en/quran');
+  await page.locator('astro-island:not([ssr])').waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('Al-Fatihah');
     await expect(page.locator('.surah-list a')).toHaveCount(1);
