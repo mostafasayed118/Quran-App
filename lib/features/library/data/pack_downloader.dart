@@ -89,6 +89,10 @@ class PackDownloader {
     final partFile = _store.partFileFor(finalFile);
     final expectedBytes = (pack.approxSizeMb * 1024 * 1024).round();
     final throttle = ProgressThrottle();
+    // Tafsir only: the ayah index merged from the per-surah bodies during the
+    // install loop, so the wrapper never has to be decoded again just to
+    // prime the read cache.
+    Map<int, String>? tafsirIndex;
     try {
       final sink = partFile.openWrite();
       var received = 0;
@@ -104,6 +108,8 @@ class PackDownloader {
               throw PackFailure('tafsir pack "${pack.id}" hash count mismatch');
             }
             sink.write(_wrapperPrefix(pack.id));
+            final mergedIndex = <int, String>{};
+            tafsirIndex = mergedIndex;
             var separator = '';
             for (var n = 1; n <= pack.fileCount!; n++) {
               final url = pack.urlTemplate!.replaceFirst('{n}', '$n');
@@ -132,6 +138,9 @@ class PackDownloader {
               if (perSurah is! List || perSurah.isEmpty) {
                 throw PackFailure('tafsir surah $n is empty or not an array');
               }
+              // Keys are global (`surah * 1000 + ayah`), so merging the
+              // per-surah indexes is exact and cannot collide.
+              mergedIndex.addAll(PackReader.buildAyahIndex(perSurah));
               // Flatten: splice the per-surah array interior verbatim so the
               // wrapper's tafsirs list stays a flat (surah, ayah, text) list.
               final trimmed = body.trim();
@@ -163,7 +172,12 @@ class PackDownloader {
                 0;
             final total = contentLength > 0 ? contentLength : expectedBytes;
             final expectedSha = pack.sha256;
-            final hashBytes = expectedSha == null ? null : <int>[];
+            // O(1) hashing: feed every chunk straight into the sha256 sink
+            // instead of accumulating the whole body in a second buffer.
+            final digestSink = expectedSha == null ? null : _DigestSink();
+            final hasher = digestSink == null
+                ? null
+                : sha256.startChunkedConversion(digestSink);
             await for (final chunk in res.data!.stream) {
               received += chunk.length;
               if (received > _sizeCap(expectedBytes)) {
@@ -171,14 +185,17 @@ class PackDownloader {
                     'pack "${pack.id}" exceeds its declared size');
               }
               sink.add(chunk);
-              hashBytes?.addAll(chunk);
+              hasher?.add(chunk);
               if (throttle.shouldReport(received, total)) {
                 onProgress?.call(received, total);
               }
             }
-            if (expectedSha != null &&
-                sha256.convert(hashBytes!).toString() != expectedSha) {
-              throw PackFailure('pack "${pack.id}" failed sha256 verification');
+            if (expectedSha != null) {
+              hasher!.close();
+              if (digestSink!.value.toString() != expectedSha) {
+                throw PackFailure(
+                    'pack "${pack.id}" failed sha256 verification');
+              }
             }
         }
         await sink.flush();
@@ -188,7 +205,15 @@ class PackDownloader {
       }
       await sink.close();
 
-      final decoded = await _sniffIntegrity(pack.id, pack.kind, partFile);
+      // A tafsir pack pinned per surah needs no end-of-install wrapper
+      // decode: every served byte was hash-verified and the wrapper itself is
+      // written here. Unpinned tafsirs keep the full-wrapper sniff as the
+      // validation gate.
+      final pinnedTafsir =
+          pack.kind == LibraryPackKind.tafsir && pack.sha256PerSurah != null;
+      final decoded = pinnedTafsir
+          ? null
+          : await _sniffIntegrity(pack.id, pack.kind, partFile);
 
       final promoted = await _store.promote(partFile);
       final sizeMb = await promoted.length() / (1024 * 1024);
@@ -200,7 +225,12 @@ class PackDownloader {
         version: pack.version,
         sizeMb: sizeMb,
       );
-      _primeDecoded(pack.id, pack.kind, decoded);
+      if (pack.kind == LibraryPackKind.tafsir) {
+        final index = tafsirIndex;
+        if (index != null) _reader.primeAyahIndex(pack.id, index);
+      } else {
+        _primeDecoded(pack.id, pack.kind, decoded);
+      }
       return promoted;
     } on Object {
       _reader.invalidate(pack.id);
@@ -358,4 +388,18 @@ class PackDownloader {
   Future<(List<(int, String)>, bool)> hadithPage(
           String packId, int offset, int limit) =>
       _reader.hadithPage(packId, offset, limit);
+}
+
+/// Collects the single digest produced by [sha256.startChunkedConversion].
+///
+/// The streaming install path feeds the digest sink chunk by chunk, so the
+/// whole body is never retained a second time just to hash it.
+class _DigestSink implements Sink<Digest> {
+  Digest? value;
+
+  @override
+  void add(Digest data) => value = data;
+
+  @override
+  void close() {}
 }
