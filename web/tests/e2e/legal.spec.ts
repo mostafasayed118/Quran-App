@@ -25,3 +25,15 @@ test('en privacy page renders PRIVACY.en.md — lang/dir, honesty summary and pe
   await expect(table).toBeVisible();
   expect(await table.locator('tr').count()).toBeGreaterThanOrEqual(4);
 });
+
+test('AR /privacy is Arabic-only (trimmed)', async ({ page }) => {
+  await page.goto('/privacy/');
+  const legal = page.locator('.legal');
+  expect(await page.locator('.legal #en-policy').count()).toBe(0);
+  await expect(legal).not.toContainText('Privacy Policy');
+  await expect(legal).not.toContainText('We collect no data');
+  await expect(legal).toContainText('لا نجمع أي بيانات');
+  const table = legal.locator('table').first();
+  await expect(table).toBeVisible();
+  expect(await table.locator('tr').count()).toBeGreaterThanOrEqual(4);
+});
