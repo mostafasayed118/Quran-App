@@ -62,6 +62,11 @@ class NotificationsBinding implements ReminderScheduler {
       await _plugin.initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings(defaultIcon),
+          iOS: DarwinInitializationSettings(
+            requestAlertPermission: false,
+            requestBadgePermission: false,
+            requestSoundPermission: false,
+          ),
         ),
         onDidReceiveNotificationResponse: onNotificationTap,
       );
@@ -133,10 +138,22 @@ class NotificationsBinding implements ReminderScheduler {
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
-      if (android == null) return true;
-      final notifications = await android.requestNotificationsPermission();
-      final exact = await android.requestExactAlarmsPermission();
-      return notifications != false && exact != false;
+      if (android != null) {
+        final notifications = await android.requestNotificationsPermission();
+        final exact = await android.requestExactAlarmsPermission();
+        return notifications != false && exact != false;
+      }
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        return await ios.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            ) ??
+            false;
+      }
+      return true;
     } on Object {
       return false;
     }
