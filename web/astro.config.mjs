@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 
 export default defineConfig({
   site: 'https://quranyahdi.pages.dev',
@@ -10,6 +9,5 @@ export default defineConfig({
     locales: ['ar', 'en'],
     routing: { prefixDefaultLocale: false },
   },
-  integrations: [react()],
   vite: { server: { fs: { allow: ['..'] } } },
 });

@@ -16,10 +16,7 @@
     "gates": "npm run check && npm run test && npm run build && npm run budget"
   },
   "dependencies": {
-    "@astrojs/react": "^7.1.0",
-    "astro": "^7.4.0",
-    "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "astro": "^7.4.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
