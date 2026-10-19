@@ -1,14 +1,14 @@
 ---
 import { toArabicDigits } from '../lib/arabic-digits';
 import { t, type Locale } from '../lib/strings';
-interface Props { surah: number; n: number; textUthmani: string; textImlaei: string; sajda: boolean; locale?: Locale }
-const { surah, n, textUthmani, textImlaei, sajda, locale = 'ar' } = Astro.props;
+interface Props { surah: number; n: number; page: number; textUthmani: string; textImlaei: string; sajda: boolean; locale?: Locale }
+const { surah, n, page, textUthmani, textImlaei, sajda, locale = 'ar' } = Astro.props;
 const copyLabel = t(locale, 'ayahCopy');
 const shareLabel = t(locale, 'ayahShare');
 const bookmarkLabel = t(locale, 'ayahBookmark');
 const listenLabel = t(locale, 'ayahListen');
 ---
-<div class="ayah" id={`ayah-${n}`} data-n={n}>
+<div class="ayah" id={`ayah-${n}`} data-n={n} data-page={page}>
   <p class="ayah-text" style="--ayah-size: calc(19px + var(--reader-step, 0) * 3px)">
     <span class="ayah-u" aria-hidden="true">{textUthmani}{sajda && <span class="sajda" aria-hidden="true">۩</span>}</span>
     <span class="ayah-i sr-only">{textImlaei}</span>

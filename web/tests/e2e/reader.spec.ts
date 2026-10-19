@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
+import surahsData from '../../src/data/surahs.json' with { type: 'json' };
+import baqara from '../../src/data/ayahs/2.json' with { type: 'json' };
+import { toArabicDigits } from '../../src/lib/arabic-digits';
+import { t } from '../../src/lib/strings';
 
 test.beforeEach(async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
@@ -107,4 +111,55 @@ test('a pending resume flush cannot overwrite the next surah after a ClientRoute
   const firstThree = points.findIndex((p) => p?.s === 3);
   expect(firstThree).toBeGreaterThanOrEqual(0);
   expect(points.slice(firstThree).some((p) => p?.s === 2)).toBe(false);
+});
+
+test('mushaf pages layout renders page cards and navigates', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:reader', JSON.stringify({ layout: 'pages' }));
+  });
+  const surah2 = (
+    surahsData as { surahs: ReadonlyArray<{ id: number; pagesStart: number; pagesEnd: number }> }
+  ).surahs.find((s) => s.id === 2)!;
+  const total = surah2.pagesEnd - surah2.pagesStart + 1;
+  const firstOfPage = (p: number) => baqara.ayahs.find((a) => a.page === p)!.n;
+
+  await page.goto('/surah/2');
+  await expect(page.locator('.mushaf-page')).toHaveCount(total);
+  const shown = page.locator('.mushaf-page:not([hidden])');
+  await expect(shown).toHaveCount(1);
+  await expect(shown).toHaveAttribute('data-page', String(surah2.pagesStart));
+  await expect(
+    page.getByRole('button', { name: t('ar', 'readerLayoutPages') }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-mushaf="prev"]')).toBeDisabled();
+  await expect(page.locator('[data-mushaf="pos"]')).toHaveText(
+    t('ar', 'readerPageOf')
+      .replace('{x}', toArabicDigits(surah2.pagesStart))
+      .replace('{y}', toArabicDigits(total)),
+  );
+
+  await page.locator('[data-mushaf="next"]').click();
+  await expect(shown).toHaveAttribute('data-page', String(surah2.pagesStart + 1));
+  await expect(page.locator('[data-mushaf="prev"]')).toBeEnabled();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem('qy:last-read') ?? 'null') as unknown,
+      ),
+    )
+    .toEqual({ s: 2, a: firstOfPage(surah2.pagesStart + 1) });
+});
+
+test('pages layout honors the #ayah deep link', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('qy:reader', JSON.stringify({ layout: 'pages' }));
+  });
+  const ayah200 = baqara.ayahs.find((a) => a.n === 200)!;
+
+  await page.goto('/surah/2#ayah-200');
+  await expect(page.locator('.mushaf-page:not([hidden])')).toHaveAttribute(
+    'data-page',
+    String(ayah200.page),
+  );
+  await expect(page.locator('#ayah-200')).toBeInViewport();
 });

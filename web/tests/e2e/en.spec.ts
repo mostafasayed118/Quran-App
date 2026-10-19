@@ -164,3 +164,25 @@ test('language switch round-trips between the AR and EN quran index', async ({ p
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
 });
+
+test('pages layout survives a ClientRouter round-trip', async ({ page }) => {
+  const surah2 = (
+    surahsData as { surahs: ReadonlyArray<{ id: number; pagesStart: number }> }
+  ).surahs.find((s) => s.id === 2)!;
+
+  await page.goto('/en/surah/2');
+  await page.getByRole('button', { name: t('en', 'readerLayoutPages') }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-reader-layout', 'pages');
+  await expect(page.locator('.mushaf-page:not([hidden])')).toHaveAttribute(
+    'data-page',
+    String(surah2.pagesStart),
+  );
+
+  await page.locator('header .lang-switch').click();
+  await page.waitForURL((url) => url.pathname.replace(/\/+$/, '') === '/surah/2');
+  await expect(page.locator('html')).toHaveAttribute('data-reader-layout', 'pages');
+  await expect(page.locator('.mushaf-page:not([hidden])')).toHaveAttribute(
+    'data-page',
+    String(surah2.pagesStart),
+  );
+});
