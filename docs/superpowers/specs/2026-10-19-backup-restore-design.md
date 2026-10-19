@@ -1,6 +1,6 @@
 # Backup & Restore (user-controlled file) — Design Spec
 
-Date: 2026-10-19 · Status: PROPOSED — awaiting owner review + decisions (§8)
+Date: 2026-10-19 · Status: APPROVED by owner (2026-10-19) — all four decisions resolved (§8); implementation wave S3-BR briefed
 Prepared by: PM session (Mode B artifact — English)
 
 ## 1. Why
@@ -14,17 +14,23 @@ and nothing ever reaches a server of ours.
 ## 2. Scope (v1)
 
 IN — **data-only merge**, one JSON file, share-sheet export, document-picker import.
-Entity inventory is **pinned at implementation time** from `lib/core/db/app_database.dart` +
-the repositories (a test pins the list so a future table cannot be silently forgotten):
+Entity inventory **verified at source (2026-10-19, pre-implementation)** from
+`lib/core/db/app_database.dart` + the feature repositories (a test pins the list so a
+future table/key cannot be silently forgotten):
 
-| Entity | Current home (verify at impl) | Merge rule (import into existing data) |
+| Entity | Verified home | Merge rule (import into existing data) |
 |---|---|---|
-| Bookmarks | `bookmarks` table | union by `ayahId` (dedupe) |
-| Last-read | last-read repository row | import wins (documented — the file is usually the newer device) |
-| Khatma/wird progress | `khatma_progress` (+ A1b wird persistence) | newer `updatedAt` wins (single-row state) |
-| Prayer log (worship tracker) | `prayer_log` table | OR-merge per day (`true` wins) |
-| Tasbih counters | as stored today (settings keys — confirm) | per-key `max(current, imported)` |
-| Settings (whitelist) | `settings_table` keys | import wins, key-by-key: city selection, reciter/moshaf row, reminder enable/flags/times, theme mode, font size |
+| Bookmarks | `bookmarks` table (`ayahId`, `createdAt`) | union by `ayahId` (dedupe; existing kept) |
+| Last-read | settings key `last_read_ayah_id` (int string) | import wins when present & valid (1..6236) |
+| Khatma/wird plan | `khatma_progress` single row (`ayahId`, `targetPages`, `updatedAt`) | newer `updatedAt` wins |
+| Prayer log (worship tracker) | `prayer_log` table (day PK + 5 bools) | OR-merge per day (`true` wins) |
+| Tasbih | settings key `tasbih_state` (JSON `{count,target}`) | `count` = max(current, imported); `target` = import wins (valid > 0) |
+| Settings (whitelist) | `settings_table` keys, enumerated from the source key constants at implementation | import wins, key-by-key |
+
+Feature-owned key names are used by backup **as string literals in one inventory file**
+(production stays free of cross-feature imports — the architecture guard stays green);
+a pinning test imports the real source constants and asserts equality, so a rename fails
+loudly.
 
 OUT (v1): downloaded audio/packs (re-downloadable, huge), cached CDN content, seeds,
 cloud/auto backup (D9 future), encryption/password (plain JSON — user-mediated),
@@ -87,13 +93,13 @@ manual path entry (hostile UX). `share_plus` (export) is already in the dependen
   no UI) → **B2** export UI + share → **B3** import UI + preview + merge + reminder
   reschedule.
 
-## 8. Open for owner
+## 8. Owner decisions — RESOLVED 2026-10-19
 
-1. Grant `file_picker` (the single new dependency).
-2. Settings whitelist confirm (§2 row) — default: include.
-3. Timing: implement before the first store upload, or post-release? (PM note: the code is
-   independent of the release path; pre-release keeps the privacy story cleaner at launch.)
-4. PRIVACY.md addition wording — to be drafted for owner sign-off in the wave brief.
+1. `file_picker` — **GRANTED** (the single new dependency; latest stable at add time).
+2. Settings whitelist — **INCLUDED** (§2 row).
+3. Timing — **implement before the first store upload**.
+4. PRIVACY.md addition — additive lines drafted in the S3-BR brief; **owner text review at
+   the wave close-out** (committed as drafted; amendable by a follow-up commit).
 
 ## 9. Explicit non-goals
 
