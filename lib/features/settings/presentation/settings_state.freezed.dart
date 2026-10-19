@@ -146,8 +146,8 @@ extension SettingsStatePatterns on SettingsState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(
-            bool azkarEnabled, String azkarTimeHm, bool permissionDenied)?
+    TResult Function(bool azkarEnabled, String azkarTimeHm, bool wirdEnabled,
+            String wirdTimeHm, bool permissionDenied)?
         ready,
     required TResult orElse(),
   }) {
@@ -158,8 +158,8 @@ extension SettingsStatePatterns on SettingsState {
       case SettingsFailed() when failed != null:
         return failed();
       case SettingsReady() when ready != null:
-        return ready(
-            _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
+        return ready(_that.azkarEnabled, _that.azkarTimeHm, _that.wirdEnabled,
+            _that.wirdTimeHm, _that.permissionDenied);
       case _:
         return orElse();
     }
@@ -182,8 +182,8 @@ extension SettingsStatePatterns on SettingsState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(
-            bool azkarEnabled, String azkarTimeHm, bool permissionDenied)
+    required TResult Function(bool azkarEnabled, String azkarTimeHm,
+            bool wirdEnabled, String wirdTimeHm, bool permissionDenied)
         ready,
   }) {
     final _that = this;
@@ -193,8 +193,8 @@ extension SettingsStatePatterns on SettingsState {
       case SettingsFailed():
         return failed();
       case SettingsReady():
-        return ready(
-            _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
+        return ready(_that.azkarEnabled, _that.azkarTimeHm, _that.wirdEnabled,
+            _that.wirdTimeHm, _that.permissionDenied);
     }
   }
 
@@ -214,8 +214,8 @@ extension SettingsStatePatterns on SettingsState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(
-            bool azkarEnabled, String azkarTimeHm, bool permissionDenied)?
+    TResult? Function(bool azkarEnabled, String azkarTimeHm, bool wirdEnabled,
+            String wirdTimeHm, bool permissionDenied)?
         ready,
   }) {
     final _that = this;
@@ -225,8 +225,8 @@ extension SettingsStatePatterns on SettingsState {
       case SettingsFailed() when failed != null:
         return failed();
       case SettingsReady() when ready != null:
-        return ready(
-            _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
+        return ready(_that.azkarEnabled, _that.azkarTimeHm, _that.wirdEnabled,
+            _that.wirdTimeHm, _that.permissionDenied);
       case _:
         return null;
     }
@@ -279,12 +279,18 @@ class SettingsReady implements SettingsState {
   const SettingsReady(
       {this.azkarEnabled = false,
       this.azkarTimeHm = defaultAzkarTimeHm,
+      this.wirdEnabled = false,
+      this.wirdTimeHm = defaultWirdTimeHm,
       this.permissionDenied = false});
 
   @JsonKey()
   final bool azkarEnabled;
   @JsonKey()
   final String azkarTimeHm;
+  @JsonKey()
+  final bool wirdEnabled;
+  @JsonKey()
+  final String wirdTimeHm;
   @JsonKey()
   final bool permissionDenied;
 
@@ -304,19 +310,23 @@ class SettingsReady implements SettingsState {
                 other.azkarEnabled == azkarEnabled) &&
             (identical(other.azkarTimeHm, azkarTimeHm) ||
                 other.azkarTimeHm == azkarTimeHm) &&
+            (identical(other.wirdEnabled, wirdEnabled) ||
+                other.wirdEnabled == wirdEnabled) &&
+            (identical(other.wirdTimeHm, wirdTimeHm) ||
+                other.wirdTimeHm == wirdTimeHm) &&
             (identical(other.permissionDenied, permissionDenied) ||
                 other.permissionDenied == permissionDenied));
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-        runtimeType, azkarEnabled, azkarTimeHm, permissionDenied);
+    return Object.hash(runtimeType, azkarEnabled, azkarTimeHm, wirdEnabled,
+        wirdTimeHm, permissionDenied);
   }
 
   @override
   String toString() {
-    return 'SettingsState.ready(azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, permissionDenied: $permissionDenied)';
+    return 'SettingsState.ready(azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, wirdEnabled: $wirdEnabled, wirdTimeHm: $wirdTimeHm, permissionDenied: $permissionDenied)';
   }
 }
 
@@ -327,7 +337,12 @@ abstract mixin class $SettingsReadyCopyWith<$Res>
           SettingsReady value, $Res Function(SettingsReady) _then) =
       _$SettingsReadyCopyWithImpl;
   @useResult
-  $Res call({bool azkarEnabled, String azkarTimeHm, bool permissionDenied});
+  $Res call(
+      {bool azkarEnabled,
+      String azkarTimeHm,
+      bool wirdEnabled,
+      String wirdTimeHm,
+      bool permissionDenied});
 }
 
 /// @nodoc
@@ -344,6 +359,8 @@ class _$SettingsReadyCopyWithImpl<$Res>
   $Res call({
     Object? azkarEnabled = null,
     Object? azkarTimeHm = null,
+    Object? wirdEnabled = null,
+    Object? wirdTimeHm = null,
     Object? permissionDenied = null,
   }) {
     return _then(SettingsReady(
@@ -354,6 +371,14 @@ class _$SettingsReadyCopyWithImpl<$Res>
       azkarTimeHm: null == azkarTimeHm
           ? _self.azkarTimeHm
           : azkarTimeHm // ignore: cast_nullable_to_non_nullable
+              as String,
+      wirdEnabled: null == wirdEnabled
+          ? _self.wirdEnabled
+          : wirdEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
+      wirdTimeHm: null == wirdTimeHm
+          ? _self.wirdTimeHm
+          : wirdTimeHm // ignore: cast_nullable_to_non_nullable
               as String,
       permissionDenied: null == permissionDenied
           ? _self.permissionDenied

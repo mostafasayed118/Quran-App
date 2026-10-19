@@ -56,4 +56,19 @@ class ReminderSettings {
         .getSingleOrNull();
     return row?.value;
   }
+
+  Future<void> setWirdEnabled(bool enabled) async {
+    await _db.into(_db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(
+            key: wirdReminderEnabledKey,
+            value: enabled ? 'true' : 'false',
+          ),
+        );
+  }
+
+  Future<void> setWirdTime(String hm) async {
+    await _db.into(_db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(key: wirdReminderTimeKey, value: hm),
+        );
+  }
 }

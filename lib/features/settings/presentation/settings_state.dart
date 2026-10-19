@@ -13,6 +13,8 @@ sealed class SettingsState with _$SettingsState {
   const factory SettingsState.ready({
     @Default(false) bool azkarEnabled,
     @Default(defaultAzkarTimeHm) String azkarTimeHm,
+    @Default(false) bool wirdEnabled,
+    @Default(defaultWirdTimeHm) String wirdTimeHm,
     @Default(false) bool permissionDenied,
   }) = SettingsReady;
 }
