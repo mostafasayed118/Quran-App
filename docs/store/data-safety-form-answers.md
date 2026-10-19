@@ -1,10 +1,10 @@
 # Play Console — Data Safety Form Answers (v1.0.0)
 
-> Derived verbatim from `PRIVACY.md` (single source of truth) plus a live permission
-> census of the codebase. Evidence-or-silence rule: every answer below cites its
+> Derived verbatim from the privacy sources — `PRIVACY.md` (AR) / `PRIVACY.en.md` (EN) — plus a live
+> permission census of the codebase. Evidence-or-silence rule: every answer below cites its
 > source fact. Anything not citable would be flagged `OPEN-FOR-OWNER` — there are none.
 
-Last updated: 2026-10-17 · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+1
+Last updated: 2026-10-19 · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+1
 
 ## 1. Permission census (run live against the code)
 
@@ -12,15 +12,15 @@ Release manifest `android/app/src/main/AndroidManifest.xml`:
 
 | Permission | Location | Why it exists |
 |---|---|---|
-| `INTERNET` | `AndroidManifest.xml:3` | Audio recitation streaming/download (mp3quran CDN) + text-pack downloads (pinned jsDelivr endpoints). `lib/features/recitation/data/reciter_repository.dart:57` (`https://mp3quran.net/api/v3/reciters?language=ar`), `assets/data/library_catalog.json` (jsDelivr URLs). Cited in `PRIVACY.md` lines 20/69. |
-| `ACCESS_COARSE_LOCATION` | `AndroidManifest.xml:7` | Nearest-city detection for prayer times & Qibla — **processed on-device only, never transmitted** (`lib/features/prayer/data/location_service.dart:27-36`; bundled 156-city list `assets/data/cities.json`; `PRIVACY.md` lines 19/68). |
+| `INTERNET` | `AndroidManifest.xml:3` | Audio recitation streaming/download (mp3quran CDN) + text-pack downloads (pinned jsDelivr endpoints). `lib/features/recitation/data/reciter_repository.dart:57` (`https://mp3quran.net/api/v3/reciters?language=ar`), `assets/data/library_catalog.json` (jsDelivr URLs). Cited in `PRIVACY.md` line 20 (AR) / `PRIVACY.en.md` line 20 (EN). |
+| `ACCESS_COARSE_LOCATION` | `AndroidManifest.xml:7` | Nearest-city detection for prayer times & Qibla — **processed on-device only, never transmitted** (`lib/features/prayer/data/location_service.dart:27-36`; bundled 156-city list `assets/data/cities.json`; `PRIVACY.md` line 19 (AR) / `PRIVACY.en.md` line 19 (EN)). |
 | `ACCESS_FINE_LOCATION` | `AndroidManifest.xml:8` | Same flow as coarse (higher accuracy for the same on-device computation). |
-| `SCHEDULE_EXACT_ALARM` | `AndroidManifest.xml:9` | User-enabled prayer/azkar reminders, computed and scheduled locally (`PRIVACY.md` lines 21/70). |
+| `SCHEDULE_EXACT_ALARM` | `AndroidManifest.xml:9` | User-enabled prayer/azkar reminders, computed and scheduled locally (`PRIVACY.md` line 21 (AR) / `PRIVACY.en.md` line 21 (EN)). |
 
 Also present on the release manifest but **not user-data related**: `WAKE_LOCK` (:4),
 `FOREGROUND_SERVICE` (:5), `FOREGROUND_SERVICE_MEDIA_PLAYBACK` (:6) — background audio
 playback plumbing for the recitation player (media notification with reciter/surah name,
-stays on-device; `PRIVACY.md` lines 22/71).
+stays on-device; `PRIVACY.md` line 22 (AR) / `PRIVACY.en.md` line 22 (EN)).
 
 `POST_NOTIFICATIONS` is **not declared in any of our manifests**: it comes from the
 resolved plugin's own manifest, merged at build time —
@@ -41,10 +41,10 @@ the release artifact.
 
 Play's definition of "collect" is **data transmitted off the user's device**. The app is
 offline-first: it operates no user-data server, includes no analytics SDKs, no ads, and
-no tracking (`PRIVACY.md` lines 5–13 AR / 54–62 EN). The only network traffic is
+no tracking (`PRIVACY.md` lines 5–13 (AR) / `PRIVACY.en.md` lines 5–13 (EN)). The only network traffic is
 **user-initiated content downloads** (audio recitations, tafsir/translation/hadith text
 packs) from pinned, hardcoded CDN endpoints — no device identifiers or personal data are
-attached (`PRIVACY.md` line 20/69).
+attached (`PRIVACY.md` line 20 (AR) / `PRIVACY.en.md` line 20 (EN)).
 
 ### Q: "Is this data shared with third parties?"
 
@@ -68,32 +68,32 @@ which is why the top-level answer above is NO.
 
 **Answer: Nothing is stored remotely.** All app data lives in app-private storage on the
 device (settings, bookmarks, last-read, downloads, worship logs) and **uninstalling the
-app permanently deletes all of it; no copy exists anywhere else** (`PRIVACY.md` lines
-35/84). In-app deletion of downloads/packs is also available.
+app permanently deletes all of it; no copy exists anywhere else** (`PRIVACY.md`
+line 35 (AR) / `PRIVACY.en.md` line 35 (EN)). In-app deletion of downloads/packs is also available.
 
 ### Q: Account deletion URL
 
-**N/A — the app has no accounts and no sign-in** (`PRIVACY.md` lines 10/58).
+**N/A — the app has no accounts and no sign-in** (`PRIVACY.md` line 10 (AR) / `PRIVACY.en.md` line 10 (EN)).
 
 ### Q: "Is data encrypted in transit?"
 
 **N/A — nothing is transmitted** (the form skips this when the top-level answer is NO).
 
-## 3. Cross-check against PRIVACY.md (single source of truth)
+## 3. Cross-check against `PRIVACY.md` (AR) / `PRIVACY.en.md` (EN)
 
-| PRIVACY.md claim | Form answer | Verdict |
+| Privacy-source claim | Form answer | Verdict |
 |---|---|---|
-| "لا نجمع أي بيانات عنك، إطلاقًا" / "We collect no data about you. At all." (l.5/54) | "Does your app collect or share…?" → NO | MATCH |
-| Location on-device only, never sent/stored/shared (l.19/68) | Location matrix: accessed, never transmitted | MATCH |
-| Connections limited to pinned CDN endpoints, no identifiers (l.20/69) | Network = content downloads only | MATCH |
-| Reminders computed & scheduled locally (l.21/70) | `SCHEDULE_EXACT_ALARM` justification | MATCH |
-| "Uninstalling the app permanently deletes all of it. We keep no copy." (l.35/84) | Deletion answer | MATCH |
-| Foreground audio playback info stays on device (l.22/71) | WAKE_LOCK / FOREGROUND_SERVICE census note | MATCH |
+| "لا نجمع أي بيانات عنك، إطلاقًا" / "We collect no data about you. At all." (l.5 AR / `PRIVACY.en.md` l.5 EN) | "Does your app collect or share…?" → NO | MATCH |
+| Location on-device only, never sent/stored/shared (l.19 AR / `PRIVACY.en.md` l.19 EN) | Location matrix: accessed, never transmitted | MATCH |
+| Connections limited to pinned CDN endpoints, no identifiers (l.20 AR / `PRIVACY.en.md` l.20 EN) | Network = content downloads only | MATCH |
+| Reminders computed & scheduled locally (l.21 AR / `PRIVACY.en.md` l.21 EN) | `SCHEDULE_EXACT_ALARM` justification | MATCH |
+| "Uninstalling the app permanently deletes all of it. We keep no copy." (l.35 AR / `PRIVACY.en.md` l.35 EN) | Deletion answer | MATCH |
+| Foreground audio playback info stays on device (l.22 AR / `PRIVACY.en.md` l.22 EN) | WAKE_LOCK / FOREGROUND_SERVICE census note | MATCH |
 
-**Result: no mismatch found — `PRIVACY.md` required no edits in this wave.**
+**Result: no mismatch found — the privacy sources required no data-safety edits.**
 
 ## 4. OPEN-FOR-OWNER
 
-None. Every answer above is citable to `PRIVACY.md` or to a file/line in the codebase.
+None. Every answer above is citable to `PRIVACY.md` / `PRIVACY.en.md` or to a file/line in the codebase.
 If the owner later adds any backend, analytics, or ads, this document must be re-answered
 from scratch.
