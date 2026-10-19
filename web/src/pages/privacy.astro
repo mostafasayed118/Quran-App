@@ -1,11 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { t } from '../lib/strings';
+import { META_DESCRIPTIONS } from '../lib/landing-content';
 import Privacy from '../../../PRIVACY.md';
 
 const title = `${t('ar', 'footerPrivacy')} — ${t('ar', 'appName')}`;
 ---
-<BaseLayout title={title}>
+<BaseLayout title={title} description={META_DESCRIPTIONS.ar.privacy}>
   <article class="legal">
     <Privacy />
   </article>

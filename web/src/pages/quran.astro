@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import QuranPage from '../components/pages/QuranPage.astro';
+import { META_DESCRIPTIONS } from '../lib/landing-content';
 ---
-<BaseLayout title="المصحف — قرآن يَهدي">
+<BaseLayout title="المصحف — قرآن يَهدي" description={META_DESCRIPTIONS.ar.quran}>
   <QuranPage locale="ar" />
 </BaseLayout>

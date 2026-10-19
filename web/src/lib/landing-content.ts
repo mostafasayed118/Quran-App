@@ -142,8 +142,13 @@ export const LANDING: { ar: LandingCopy; en: LandingCopy } = {
   },
 };
 
-// Per-page meta descriptions (owner-review copy). EN pages must not inherit the AR default.
+// Per-page meta descriptions (owner-approved 2026-10-19). EN pages must not inherit the AR default.
 export const META_DESCRIPTIONS = {
+  ar: {
+    quran: 'تصفّح القرآن كاملًا — 114 سورة ببحث فوري بالاسم أو الرقم، قراءة آية-بآية وتلاوة صوتية. مجاني، بلا إعلانات ولا تتبع.',
+    reciters: 'استمع إلى القرآن بأصوات أكثر من 240 قارئًا — بث فوري أو تحميل للاستماع بلا إنترنت. مجاني، بلا إعلانات ولا تتبع.',
+    privacy: 'سياسة خصوصية قرآن يَهدي: بلا حسابات، بلا إعلانات، بلا تحليلات ولا تتبع — التطبيق يعمل بلا إنترنت ولا يجمع أي بيانات.',
+  },
   en: {
     quran:
       'Browse the full Quran — all 114 surahs with instant search by name or number, verse-by-verse reading, and audio recitation. Free, no ads, no tracking.',
@@ -156,4 +161,8 @@ export const META_DESCRIPTIONS = {
 
 export function enReaderDescription(n: number, nameEn: string): string {
   return `Surah ${n} — ${nameEn} · Quran Yahdi`;
+}
+
+export function arReaderDescription(n: number, nameAr: string): string {
+  return `سورة ${n} — ${nameAr} · قرآن يَهدي`;
 }

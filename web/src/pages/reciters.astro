@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import RecitersPage from '../components/pages/RecitersPage.astro';
+import { META_DESCRIPTIONS } from '../lib/landing-content';
 ---
-<BaseLayout title="التلاوات — قرآن يَهدي">
+<BaseLayout title="التلاوات — قرآن يَهدي" description={META_DESCRIPTIONS.ar.reciters}>
   <RecitersPage locale="ar" />
 </BaseLayout>

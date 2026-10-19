@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReaderPage from '../../components/pages/ReaderPage.astro';
 import surahs from '../../data/surahs.json';
+import { arReaderDescription } from '../../lib/landing-content';
 
 export function getStaticPaths() {
   return surahs.surahs.map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
@@ -9,6 +10,6 @@ export function getStaticPaths() {
 const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
 const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
 ---
-<BaseLayout title={title} preloadFont>
+<BaseLayout title={title} description={arReaderDescription(surah.id, surah.nameAr)} preloadFont>
   <ReaderPage locale="ar" surah={surah} />
 </BaseLayout>
