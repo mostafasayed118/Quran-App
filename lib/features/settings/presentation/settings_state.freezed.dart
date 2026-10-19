@@ -52,6 +52,7 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SettingsLoading value)? loading,
+    TResult Function(SettingsFailed value)? failed,
     TResult Function(SettingsReady value)? ready,
     required TResult orElse(),
   }) {
@@ -59,6 +60,8 @@ extension SettingsStatePatterns on SettingsState {
     switch (_that) {
       case SettingsLoading() when loading != null:
         return loading(_that);
+      case SettingsFailed() when failed != null:
+        return failed(_that);
       case SettingsReady() when ready != null:
         return ready(_that);
       case _:
@@ -82,12 +85,15 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SettingsLoading value) loading,
+    required TResult Function(SettingsFailed value) failed,
     required TResult Function(SettingsReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case SettingsLoading():
         return loading(_that);
+      case SettingsFailed():
+        return failed(_that);
       case SettingsReady():
         return ready(_that);
     }
@@ -108,12 +114,15 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SettingsLoading value)? loading,
+    TResult? Function(SettingsFailed value)? failed,
     TResult? Function(SettingsReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case SettingsLoading() when loading != null:
         return loading(_that);
+      case SettingsFailed() when failed != null:
+        return failed(_that);
       case SettingsReady() when ready != null:
         return ready(_that);
       case _:
@@ -136,6 +145,7 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(
             bool azkarEnabled, String azkarTimeHm, bool permissionDenied)?
         ready,
@@ -145,6 +155,8 @@ extension SettingsStatePatterns on SettingsState {
     switch (_that) {
       case SettingsLoading() when loading != null:
         return loading();
+      case SettingsFailed() when failed != null:
+        return failed();
       case SettingsReady() when ready != null:
         return ready(
             _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
@@ -169,6 +181,7 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(
             bool azkarEnabled, String azkarTimeHm, bool permissionDenied)
         ready,
@@ -177,6 +190,8 @@ extension SettingsStatePatterns on SettingsState {
     switch (_that) {
       case SettingsLoading():
         return loading();
+      case SettingsFailed():
+        return failed();
       case SettingsReady():
         return ready(
             _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
@@ -198,6 +213,7 @@ extension SettingsStatePatterns on SettingsState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(
             bool azkarEnabled, String azkarTimeHm, bool permissionDenied)?
         ready,
@@ -206,6 +222,8 @@ extension SettingsStatePatterns on SettingsState {
     switch (_that) {
       case SettingsLoading() when loading != null:
         return loading();
+      case SettingsFailed() when failed != null:
+        return failed();
       case SettingsReady() when ready != null:
         return ready(
             _that.azkarEnabled, _that.azkarTimeHm, _that.permissionDenied);
@@ -232,6 +250,26 @@ class SettingsLoading implements SettingsState {
   @override
   String toString() {
     return 'SettingsState.loading()';
+  }
+}
+
+/// @nodoc
+
+class SettingsFailed implements SettingsState {
+  const SettingsFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is SettingsFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'SettingsState.failed()';
   }
 }
 

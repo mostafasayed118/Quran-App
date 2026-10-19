@@ -8,6 +8,8 @@ part 'settings_state.freezed.dart';
 sealed class SettingsState with _$SettingsState {
   const factory SettingsState.loading() = SettingsLoading;
 
+  const factory SettingsState.failed() = SettingsFailed;
+
   const factory SettingsState.ready({
     @Default(false) bool azkarEnabled,
     @Default(defaultAzkarTimeHm) String azkarTimeHm,

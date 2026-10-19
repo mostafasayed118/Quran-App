@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/widgets/async_view.dart';
+import '../../../core/widgets/error_pane.dart';
 import '../../../l10n/app_localizations.dart';
 import 'settings_cubit.dart';
 import 'settings_state.dart';
@@ -19,6 +20,8 @@ class SettingsScreen extends StatelessWidget {
       body: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, state) => switch (state) {
           SettingsLoading() => const LoadingView(),
+          SettingsFailed() =>
+            errorPane(loc, 'settings load failed', 'settings'),
           SettingsReady(
             :final azkarEnabled,
             :final azkarTimeHm,
