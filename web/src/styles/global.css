@@ -25,7 +25,7 @@ body {
   padding: 14px 20px;
 }
 .site-header { justify-content: space-between; border-bottom: 1px solid var(--hairline); }
-.site-footer { border-top: 1px solid var(--hairline); }
+.site-footer { border-top: 1px solid var(--hairline); flex-wrap: wrap; }
 .brand { display: flex; align-items: center; gap: 9px; color: var(--accent); font-weight: 700; text-decoration: none; }
 .site-header nav { display: flex; gap: 16px; }
 .site-header nav a, .site-footer a { color: var(--muted-strong); text-decoration: none; }
@@ -35,6 +35,9 @@ body {
 }
 @media (pointer: coarse) {
   .brand, .site-header nav a { display: inline-flex; align-items: center; min-height: 44px; }
+}
+@media (pointer: coarse) {
+  .site-footer a, .reader-nav a { display: inline-flex; align-items: center; min-height: 44px; }
 }
 @media (max-width: 26.25em) {
   .site-header { padding: 10px 12px; gap: 6px; flex-wrap: wrap; }

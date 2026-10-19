@@ -17,7 +17,7 @@ test.describe('coarse-pointer targets are at least 44px at 360', () => {
 
   test('header, chrome and hero controls', async ({ page }) => {
     await page.goto('/');
-    for (const sel of ['header .brand', 'header nav a', 'header .lang-switch', 'header .theme-toggle', '.hero-cta']) {
+    for (const sel of ['header .brand', 'header nav a', 'header .lang-switch', 'header .theme-toggle', '.hero-cta', '.site-footer a']) {
       await expectMinHeight(page, sel);
     }
   });
@@ -25,7 +25,7 @@ test.describe('coarse-pointer targets are at least 44px at 360', () => {
   test('ayah actions, reader toolbar and reciter controls', async ({ page }) => {
     await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
     await page.goto('/surah/2/');
-    for (const sel of ['.reader-controls .rc-btn', '.ayah-actions button', '[data-qy="reader-play"]']) {
+    for (const sel of ['.reader-controls .rc-btn', '.ayah-actions button', '[data-qy="reader-play"]', '.reader-nav a']) {
       await expectMinHeight(page, sel);
     }
     await page.goto('/reciters/');
@@ -100,15 +100,20 @@ test.describe('no horizontal overflow at 360px', () => {
   }
 
   // Technique: a root font-size override approximates 200% text scaling for rem-derived
-  // sizes (px-derived sizes are intentionally unaffected). The header must still fit:
-  // the compact rules are viewport-based, so they stay active under the override.
-  // Scope note: assertion is header-only — the site footer (outside this wave's header
-  // scope) still overflows internally at 200% on a 360px viewport; disclosed in the report.
-  test('header fits at 200% root font size on a 360px viewport', async ({ page }) => {
+  // sizes (px-derived sizes are intentionally unaffected). Header, footer and the document
+  // must fit: the compact rules are viewport-based, so they stay active under the override.
+  test('header and footer fit at 200% root font size on a 360px viewport', async ({ page }) => {
     await page.goto('/');
     await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
     const header = page.locator('header.site-header');
-    const fit = await header.evaluate((el) => el.scrollWidth - el.clientWidth);
-    expect(fit).toBeLessThanOrEqual(0);
+    const headerFit = await header.evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(headerFit).toBeLessThanOrEqual(0);
+    const footer = page.locator('footer.site-footer');
+    const footerFit = await footer.evaluate((el) => el.scrollWidth - el.clientWidth);
+    expect(footerFit).toBeLessThanOrEqual(0);
+    const docOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth,
+    );
+    expect(docOverflow).toBeLessThanOrEqual(0);
   });
 });
