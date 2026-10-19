@@ -2,10 +2,12 @@ import { readSetting, writeSetting } from './settings';
 
 export type ReaderView = 'mushaf' | 'imlaei';
 export type FontStep = 0 | 1 | 2 | 3;
+export type ReaderLayout = 'verses' | 'pages';
 export interface ReaderSettings {
   fontStep: FontStep;
   view: ReaderView;
   reciterRow: string;
+  layout?: ReaderLayout;
 }
 
 export const READER_DEFAULTS: ReaderSettings = { fontStep: 0, view: 'mushaf', reciterRow: '' };
@@ -14,14 +16,16 @@ const FONT_STEPS: readonly FontStep[] = [0, 1, 2, 3];
 
 function coerce(raw: unknown): ReaderSettings {
   if (typeof raw !== 'object' || raw === null) return { ...READER_DEFAULTS };
-  const r = raw as { fontStep?: unknown; view?: unknown; reciterRow?: unknown };
-  return {
+  const r = raw as { fontStep?: unknown; view?: unknown; reciterRow?: unknown; layout?: unknown };
+  const out: ReaderSettings = {
     fontStep: FONT_STEPS.includes(r.fontStep as FontStep)
       ? (r.fontStep as FontStep)
       : READER_DEFAULTS.fontStep,
     view: r.view === 'mushaf' || r.view === 'imlaei' ? r.view : READER_DEFAULTS.view,
     reciterRow: typeof r.reciterRow === 'string' ? r.reciterRow : READER_DEFAULTS.reciterRow,
   };
+  if (r.layout === 'verses' || r.layout === 'pages') out.layout = r.layout;
+  return out;
 }
 
 export function readReaderSettings(): ReaderSettings {

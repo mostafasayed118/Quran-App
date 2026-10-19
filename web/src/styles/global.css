@@ -105,6 +105,25 @@ html[data-reading-view='imlaei'] .ayah-i {
   position: static; width: auto; height: auto; clip-path: none;
   font-family: 'Cairo', sans-serif; font-size: calc(var(--ayah-size) * 0.8); line-height: 2.1;
 }
+.mushaf-page { display: contents; }
+.mushaf-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; }
+.mushaf-nav[hidden] { display: none; }
+.mushaf-nav .mushaf-pos { color: var(--muted-strong); font-size: .9rem; }
+[data-reader-layout='pages'] .ayah { display: inline; padding: 0; border-bottom: 0; margin-inline-start: 6px; }
+[data-reader-layout='pages'] .ayah-text { display: inline; }
+[data-reader-layout='pages'] .ayah-actions { display: none; margin-top: 10px; justify-content: flex-end; }
+[data-reader-layout='pages'] .ayah.selected .ayah-actions { display: flex; }
+[data-reader-layout='pages'] .ayah.selected .ayah-u,
+[data-reader-layout='pages'] .ayah.selected .ayah-i {
+  background: color-mix(in srgb, var(--gold-line) 14%, transparent); border-radius: 6px;
+}
+[data-reader-layout='pages'] .mushaf-page {
+  display: block; margin: 14px 0; padding: 22px 20px 12px;
+  border: 1px solid var(--gold-line); border-radius: 16px; background: var(--surface);
+  box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--gold-line);
+}
+[data-reader-layout='pages'] .mushaf-page[hidden] { display: none; }
+[data-reader-layout='pages'] .mushaf-page-num { margin-top: 12px; text-align: center; color: var(--gold-ink); font-size: .85rem; }
 .reader-nav { display: flex; justify-content: space-between; margin-top: 22px; }
 .reader-nav a { color: var(--accent); text-decoration: none; font-weight: 700; }
 .content-panel {
