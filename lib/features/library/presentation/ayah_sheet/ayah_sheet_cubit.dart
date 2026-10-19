@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../data/pack_downloader.dart';
 import 'ayah_sheet_state.dart';
 
@@ -31,11 +30,12 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       final rows = await _downloader.installedPacks();
       final tafsirs = await Future.wait([
         for (final row in rows)
-          if (row.kind == 'tafsir') _tafsirEntry(row),
+          if (row.kind == 'tafsir') _tafsirEntry(row.packId, row.title),
       ]);
       final translations = await Future.wait([
         for (final row in rows)
-          if (row.kind == 'translation') _translationEntry(row),
+          if (row.kind == 'translation')
+            _translationEntry(row.packId, row.title),
       ]);
       if (isClosed) return;
       emit(AyahSheetState.ready(
@@ -55,13 +55,13 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
     }
   }
 
-  Future<AyahSheetEntry?> _tafsirEntry(InstalledPack row) async {
-    final text = await _downloader.tafsirFor(row.packId, _surah, _ayah);
-    return text == null ? null : (title: row.title, text: text);
+  Future<AyahSheetEntry?> _tafsirEntry(String packId, String title) async {
+    final text = await _downloader.tafsirFor(packId, _surah, _ayah);
+    return text == null ? null : (title: title, text: text);
   }
 
-  Future<AyahSheetEntry?> _translationEntry(InstalledPack row) async {
-    final text = await _downloader.translationFor(row.packId, _surah, _ayah);
-    return text == null ? null : (title: row.title, text: text);
+  Future<AyahSheetEntry?> _translationEntry(String packId, String title) async {
+    final text = await _downloader.translationFor(packId, _surah, _ayah);
+    return text == null ? null : (title: title, text: text);
   }
 }
