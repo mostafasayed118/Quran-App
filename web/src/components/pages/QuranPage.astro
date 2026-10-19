@@ -1,11 +1,34 @@
 ---
-import SurahIndexFilter from '../SurahIndexFilter.tsx';
 import { t, type Locale } from '../../lib/strings';
+import { surahDisplayName } from '../../lib/surah-name';
+import surahs from '../../data/surahs.json';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
+const base = locale === 'en' ? '/en' : '';
+const placeholder = t(locale, 'indexSearchPlaceholder');
+const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chipMedinan');
 ---
 <h1 class="page-title">{t(locale, 'surahIndexTitle')}</h1>
-<SurahIndexFilter client:idle locale={locale} />
+<div data-qy="surah-index" data-locale={locale}>
+  <input
+    type="search"
+    class="index-search"
+    placeholder={placeholder}
+    aria-label={placeholder}
+  />
+  <p class="empty" hidden>{t(locale, 'noResults')}</p>
+  <ol class="surah-list">
+    {surahs.surahs.map((s) => (
+      <li>
+        <a href={`${base}/surah/${s.id}/`}>
+          <span class="surah-num">{s.id}</span>
+          <span class="surah-name">{surahDisplayName(s, locale)}</span>
+          <span class="surah-meta">{chip(s.revelationType)} · {s.ayahCount}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</div>
 <style is:global>
   .ayah-search { width: min(760px, calc(100% - 40px)); margin: 26px auto 20px; }
   .ayah-search-title { font-size: 1.05rem; font-weight: 700; color: var(--gold-ink); margin: 0 0 10px; }
@@ -20,3 +43,194 @@ const { locale = 'ar' } = Astro.props;
     color: inherit; border-radius: 4px; padding: 0 3px;
   }
 </style>
+<script>
+  import { filterSurahs } from '../../lib/surah-filter';
+  import { loadSearchIndex, matchSpan, searchAyahs, type Hit } from '../../lib/search';
+  import { surahDisplayName } from '../../lib/surah-name';
+  import { t, type Locale } from '../../lib/strings';
+  import surahs from '../../data/surahs.json';
+
+  function init(): void {
+    const root = document.querySelector<HTMLElement>('[data-qy="surah-index"]');
+    if (!root || root.dataset.qyReady) return;
+    const locale: Locale = root.dataset.locale === 'en' ? 'en' : 'ar';
+    const base = locale === 'en' ? '/en' : '';
+    const input = root.querySelector<HTMLInputElement>('.index-search');
+    const empty = root.querySelector<HTMLParagraphElement>('p.empty');
+    const list = root.querySelector<HTMLOListElement>('.surah-list');
+    if (!input || !empty || !list) return;
+
+    let q = '';
+    let hits: Hit[] = [];
+    let section: HTMLElement | null = null;
+    let timer = 0;
+    let loading = false;
+    let failed = false;
+    let ready = false;
+
+    // Verse search is AR-only (EN chrome hides it and never loads the index) and is
+    // pointless for digit-only queries, which the surah-number filter already answers.
+    const active = (): boolean =>
+      q.trim().length >= 2 && locale !== 'en' && !/^[0-9٠-٩]+$/.test(q.trim());
+
+    const renderList = (results: typeof surahs.surahs): void => {
+      list.replaceChildren(
+        ...results.map((s) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `${base}/surah/${s.id}/`;
+          const num = document.createElement('span');
+          num.className = 'surah-num';
+          num.textContent = String(s.id);
+          const name = document.createElement('span');
+          name.className = 'surah-name';
+          name.textContent = surahDisplayName(s, locale);
+          const meta = document.createElement('span');
+          meta.className = 'surah-meta';
+          const chip = s.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan');
+          meta.textContent = `${chip} · ${s.ayahCount}`;
+          a.append(num, name, meta);
+          li.appendChild(a);
+          return li;
+        }),
+      );
+      empty.hidden = results.length !== 0;
+    };
+
+    const createSection = (): HTMLElement => {
+      const el = document.createElement('section');
+      el.className = 'ayah-search';
+      el.setAttribute('aria-labelledby', 'ayah-search-title');
+      root.appendChild(el);
+      section = el;
+      return el;
+    };
+
+    const hitAnchor = (h: Hit): HTMLAnchorElement => {
+      const a = document.createElement('a');
+      a.href = `${base}/surah/${h.s}/#ayah-${h.a}`;
+      const span = matchSpan(h.text, q);
+      if (!span) {
+        a.textContent = h.text;
+        return a;
+      }
+      const mark = document.createElement('mark');
+      mark.textContent = h.text.slice(span.start, span.end);
+      a.append(
+        document.createTextNode(h.text.slice(0, span.start)),
+        mark,
+        document.createTextNode(h.text.slice(span.end)),
+      );
+      return a;
+    };
+
+    const renderSection = (): void => {
+      if (!active()) {
+        section?.remove();
+        section = null;
+        return;
+      }
+      const el = section ?? createSection();
+      const children: Node[] = [];
+      const title = document.createElement('h2');
+      title.id = 'ayah-search-title';
+      title.className = 'ayah-search-title';
+      title.textContent = t(locale, 'searchAyahsTitle');
+      children.push(title);
+      if (loading) {
+        const p = document.createElement('p');
+        p.className = 'search-loading';
+        p.setAttribute('role', 'status');
+        p.textContent = t(locale, 'searchLoading');
+        children.push(p);
+      }
+      if (failed) {
+        const box = document.createElement('div');
+        box.className = 'panel-error';
+        const msg = document.createElement('span');
+        msg.textContent = t(locale, 'panelError');
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'rc-btn';
+        retry.textContent = t(locale, 'panelRetry');
+        retry.addEventListener('click', () => {
+          failed = false;
+          hits = [];
+          startLoad();
+        });
+        box.append(msg, retry);
+        children.push(box);
+      }
+      if (!loading && !failed && hits.length === 0) {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = t(locale, 'noResults');
+        children.push(p);
+      }
+      const ol = document.createElement('ol');
+      ol.className = 'ayah-hits';
+      for (const h of hits) {
+        const li = document.createElement('li');
+        li.appendChild(hitAnchor(h));
+        ol.appendChild(li);
+      }
+      children.push(ol);
+      el.replaceChildren(...children);
+    };
+
+    const scheduleHits = (): void => {
+      window.clearTimeout(timer);
+      // Hits only are debounced; the surah list above filters immediately.
+      timer = window.setTimeout(() => {
+        if (!root.isConnected) return; // a ClientRouter swap already moved on
+        hits = searchAyahs(q);
+        renderSection();
+      }, 150);
+    };
+
+    const startLoad = (): void => {
+      if (ready || failed || loading) return;
+      loading = true;
+      renderSection();
+      loadSearchIndex()
+        .then(() => {
+          if (!root.isConnected) return;
+          ready = true;
+          loading = false;
+          renderSection();
+          scheduleHits();
+        })
+        .catch(() => {
+          if (!root.isConnected) return;
+          loading = false;
+          failed = true;
+          renderSection();
+        });
+    };
+
+    const updateAyahSearch = (): void => {
+      if (!active()) {
+        window.clearTimeout(timer);
+        section?.remove();
+        section = null;
+        return;
+      }
+      if (!ready && !failed && !loading) startLoad();
+      if (ready) scheduleHits();
+      renderSection();
+    };
+
+    input.addEventListener('input', () => {
+      q = input.value;
+      renderList(filterSurahs(surahs.surahs, q));
+      updateAyahSearch();
+    });
+
+    // ClientRouter swap: never let a pending hit flush touch the next page.
+    document.addEventListener('astro:before-swap', () => window.clearTimeout(timer), { once: true });
+
+    root.dataset.qyReady = '1';
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>

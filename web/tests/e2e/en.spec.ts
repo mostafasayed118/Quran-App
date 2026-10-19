@@ -41,7 +41,7 @@ test('EN index search never fetches or shows the verse panel', async ({ page }) 
     if (req.url().includes('search-index')) indexRequests.push(req.url());
   });
   await page.goto('/en/quran');
-  await page.locator('astro-island:not([ssr])').waitFor({ state: 'attached', timeout: 30_000 });
+  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('Al-Fatihah');
     await expect(page.locator('.surah-list a')).toHaveCount(1);
