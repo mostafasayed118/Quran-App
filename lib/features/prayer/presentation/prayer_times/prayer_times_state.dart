@@ -21,6 +21,8 @@ class PrayerEntry {
 sealed class PrayerTimesState with _$PrayerTimesState {
   const factory PrayerTimesState.loading() = PrayerTimesLoading;
 
+  const factory PrayerTimesState.failed() = PrayerTimesFailed;
+
   const factory PrayerTimesState.ready({
     City? city,
     @Default(<PrayerEntry>[]) List<PrayerEntry> entries,

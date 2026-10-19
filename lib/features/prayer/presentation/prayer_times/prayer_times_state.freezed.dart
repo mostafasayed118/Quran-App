@@ -53,6 +53,7 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(PrayerTimesLoading value)? loading,
+    TResult Function(PrayerTimesFailed value)? failed,
     TResult Function(PrayerTimesReady value)? ready,
     required TResult orElse(),
   }) {
@@ -60,6 +61,8 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     switch (_that) {
       case PrayerTimesLoading() when loading != null:
         return loading(_that);
+      case PrayerTimesFailed() when failed != null:
+        return failed(_that);
       case PrayerTimesReady() when ready != null:
         return ready(_that);
       case _:
@@ -83,12 +86,15 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(PrayerTimesLoading value) loading,
+    required TResult Function(PrayerTimesFailed value) failed,
     required TResult Function(PrayerTimesReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case PrayerTimesLoading():
         return loading(_that);
+      case PrayerTimesFailed():
+        return failed(_that);
       case PrayerTimesReady():
         return ready(_that);
     }
@@ -109,12 +115,15 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(PrayerTimesLoading value)? loading,
+    TResult? Function(PrayerTimesFailed value)? failed,
     TResult? Function(PrayerTimesReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case PrayerTimesLoading() when loading != null:
         return loading(_that);
+      case PrayerTimesFailed() when failed != null:
+        return failed(_that);
       case PrayerTimesReady() when ready != null:
         return ready(_that);
       case _:
@@ -137,6 +146,7 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(
             City? city, List<PrayerEntry> entries, Duration? remaining)?
         ready,
@@ -146,6 +156,8 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     switch (_that) {
       case PrayerTimesLoading() when loading != null:
         return loading();
+      case PrayerTimesFailed() when failed != null:
+        return failed();
       case PrayerTimesReady() when ready != null:
         return ready(_that.city, _that.entries, _that.remaining);
       case _:
@@ -169,6 +181,7 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(
             City? city, List<PrayerEntry> entries, Duration? remaining)
         ready,
@@ -177,6 +190,8 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     switch (_that) {
       case PrayerTimesLoading():
         return loading();
+      case PrayerTimesFailed():
+        return failed();
       case PrayerTimesReady():
         return ready(_that.city, _that.entries, _that.remaining);
     }
@@ -197,6 +212,7 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(
             City? city, List<PrayerEntry> entries, Duration? remaining)?
         ready,
@@ -205,6 +221,8 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     switch (_that) {
       case PrayerTimesLoading() when loading != null:
         return loading();
+      case PrayerTimesFailed() when failed != null:
+        return failed();
       case PrayerTimesReady() when ready != null:
         return ready(_that.city, _that.entries, _that.remaining);
       case _:
@@ -230,6 +248,26 @@ class PrayerTimesLoading implements PrayerTimesState {
   @override
   String toString() {
     return 'PrayerTimesState.loading()';
+  }
+}
+
+/// @nodoc
+
+class PrayerTimesFailed implements PrayerTimesState {
+  const PrayerTimesFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is PrayerTimesFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'PrayerTimesState.failed()';
   }
 }
 

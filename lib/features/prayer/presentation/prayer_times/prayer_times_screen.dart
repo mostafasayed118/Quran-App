@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'prayer_times_cubit.dart';
 import 'prayer_times_state.dart';
@@ -43,6 +44,8 @@ class PrayerTimesScreen extends StatelessWidget {
       body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
         builder: (context, state) => switch (state) {
           PrayerTimesLoading() => const LoadingView(),
+          PrayerTimesFailed() =>
+            errorPane(loc, 'prayer times load failed', 'prayer_times'),
           PrayerTimesReady() when state.city == null => EmptyState(
               loc.noCity,
               actionLabel: loc.selectCity,
