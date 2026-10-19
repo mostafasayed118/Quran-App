@@ -45,9 +45,12 @@ String? featureOf(String libRel) =>
 
 void main() {
   final sources = <String, String>{};
-  for (final f in Directory('lib').listSync(recursive: true).whereType<File>()) {
+  for (final f
+      in Directory('lib').listSync(recursive: true).whereType<File>()) {
     if (!f.path.endsWith('.dart')) continue;
-    if (f.path.endsWith('.g.dart') || f.path.endsWith('.freezed.dart')) continue;
+    if (f.path.endsWith('.g.dart') || f.path.endsWith('.freezed.dart')) {
+      continue;
+    }
     final rel = p.posix.joinAll(p.split(f.path)); // lib/... with / separators
     sources[rel] = f.readAsStringSync();
   }
@@ -62,11 +65,12 @@ void main() {
             'package:quran_yahdi/core/db/app_database.dart'),
         'lib/core/db/app_database.dart');
     expect(
-        resolveTarget('lib/features/a/presentation/x.dart',
-            '../../../core/utils/a.dart'),
+        resolveTarget(
+            'lib/features/a/presentation/x.dart', '../../../core/utils/a.dart'),
         'lib/core/utils/a.dart');
     expect(resolveTarget('lib/features/a/x.dart', 'dart:async'), isNull);
-    expect(resolveTarget('lib/features/a/x.dart', 'package:flutter/material.dart'),
+    expect(
+        resolveTarget('lib/features/a/x.dart', 'package:flutter/material.dart'),
         isNull);
   });
 
@@ -82,7 +86,8 @@ void main() {
       }
     });
     expect(offenders, isEmpty,
-        reason: 'features must not depend on lib/app/ — move shared logic to core/');
+        reason:
+            'features must not depend on lib/app/ — move shared logic to core/');
   });
 
   test('cross-feature edges stay within the pinned allowlist', () {
