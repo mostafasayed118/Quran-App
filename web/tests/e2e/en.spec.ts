@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
+import surahsData from '../../src/data/surahs.json' with { type: 'json' };
 import { LANDING, META_DESCRIPTIONS, enReaderDescription } from '../../src/lib/landing-content';
 import { t } from '../../src/lib/strings';
 
@@ -130,6 +131,8 @@ test('EN home resume card links to the stored last-read ayah', async ({ page }) 
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute('href', '/en/surah/36/#ayah-5');
   await expect(card).toContainText(t('en', 'resumeTitle'));
+  const surah36 = (surahsData as { surahs: ReadonlyArray<{ id: number; nameEn?: string }> }).surahs.find((s) => s.id === 36);
+  await expect(card).toContainText(surah36?.nameEn ?? '');
 });
 
 test('EN pages carry localized meta descriptions', async ({ page }) => {

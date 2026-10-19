@@ -8,11 +8,12 @@ const { locale = 'ar' } = Astro.props;
   import { readResume, type ResumePoint } from '../lib/reader-resume';
   import { toArabicDigits } from '../lib/arabic-digits';
   import { t, type Locale } from '../lib/strings';
+  import { surahDisplayName, type SurahNameLike } from '../lib/surah-name';
   import surahsData from '../data/surahs.json';
 
-  const surahNames = new Map<number, string>(
-    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string }> }).surahs.map(
-      (s): [number, string] => [s.id, s.nameAr],
+  const surahNames = new Map<number, SurahNameLike>(
+    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string; nameEn?: string }> }).surahs.map(
+      (s): [number, SurahNameLike] => [s.id, { nameAr: s.nameAr, nameEn: s.nameEn }],
     ),
   );
 
@@ -29,8 +30,8 @@ const { locale = 'ar' } = Astro.props;
       point = null;
     }
     if (!point) return;
-    const surahName = surahNames.get(point.s);
-    if (!surahName) return;
+    const surahRecord = surahNames.get(point.s);
+    if (!surahRecord) return;
 
     const link = document.createElement('a');
     link.className = 'resume-link';
@@ -46,7 +47,7 @@ const { locale = 'ar' } = Astro.props;
 
     const surah = document.createElement('span');
     surah.className = 'resume-surah';
-    surah.textContent = surahName;
+    surah.textContent = surahDisplayName(surahRecord, locale);
 
     const ayah = document.createElement('span');
     ayah.className = 'resume-ayah';
