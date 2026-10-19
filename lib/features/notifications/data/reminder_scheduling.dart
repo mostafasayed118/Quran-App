@@ -31,9 +31,12 @@ Future<void> scheduleReminders({
         todayPrayers: prayer.today(selected.coordinates, nowLocal),
         azkarEnabled: await settings.azkarEnabled(),
         azkarTimeHm: await settings.azkarTimeHm(),
+        wirdEnabled: await settings.wirdEnabled(),
+        wirdTimeHm: await settings.wirdTimeHm(),
         texts: ReminderTexts(
           prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
           azkarTitle: loc.reminderAzkar,
+          wirdTitle: loc.reminderWird,
         ),
       ));
     }

@@ -944,6 +944,12 @@ abstract class AppLocalizations {
   /// **'تذكيرات الصلاة والأذكار'**
   String get reminderChannelDescription;
 
+  /// No description provided for @reminderWird.
+  ///
+  /// In ar, this message translates to:
+  /// **'حان وقت ورد الختمة'**
+  String get reminderWird;
+
   /// No description provided for @wirdTitle.
   ///
   /// In ar, this message translates to:

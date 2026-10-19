@@ -479,6 +479,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderChannelDescription => 'Prayer and azkar reminders';
 
   @override
+  String get reminderWird => 'Time for your khatma wird';
+
+  @override
   String get wirdTitle => 'Khatma wird';
 
   @override

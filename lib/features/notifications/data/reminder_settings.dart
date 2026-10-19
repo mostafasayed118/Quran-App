@@ -1,8 +1,11 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
 
-/// The only reminder settings keys (PM ruling: two keys, none beyond).
+/// The reminder settings keys (A1 supersedes the earlier two-key ruling:
+/// prayer + azkar + wird).
 const String azkarReminderEnabledKey = 'azkar_reminder_enabled';
 const String azkarReminderTimeKey = 'azkar_reminder_time';
+const String wirdReminderEnabledKey = 'wird_reminder_enabled';
+const String wirdReminderTimeKey = 'wird_reminder_time';
 
 /// Settings-table reads/writes for the reminder engine (W3 CityRepository
 /// pattern; bool stored as the 'true'/'false' string, time as 'HH:mm').
@@ -38,5 +41,19 @@ class ReminderSettings {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(key: azkarReminderTimeKey, value: hm),
         );
+  }
+
+  Future<bool> wirdEnabled() async {
+    final row = await (_db.select(_db.settingsTable)
+          ..where((s) => s.key.equals(wirdReminderEnabledKey)))
+        .getSingleOrNull();
+    return row?.value == 'true';
+  }
+
+  Future<String?> wirdTimeHm() async {
+    final row = await (_db.select(_db.settingsTable)
+          ..where((s) => s.key.equals(wirdReminderTimeKey)))
+        .getSingleOrNull();
+    return row?.value;
   }
 }

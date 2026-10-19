@@ -477,6 +477,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reminderChannelDescription => 'تذكيرات الصلاة والأذكار';
 
   @override
+  String get reminderWird => 'حان وقت ورد الختمة';
+
+  @override
   String get wirdTitle => 'ورد الختمة';
 
   @override

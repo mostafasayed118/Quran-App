@@ -12,7 +12,7 @@ import 'core/l10n/platform_localizations.dart';
 import 'core/utils/deep_links.dart';
 import 'features/notifications/data/notifications_binding.dart';
 import 'features/notifications/data/reminder_planner.dart'
-    show azkarReminderPayload, prayerReminderPayload;
+    show azkarReminderPayload, prayerReminderPayload, wirdReminderPayload;
 import 'features/notifications/data/reminder_settings.dart';
 import 'features/recitation/playback/background_init_guard.dart';
 
@@ -58,6 +58,7 @@ Future<void> main() async {
 String? reminderRouteFor(String? payload) => switch (payload) {
       prayerReminderPayload => '/prayer-times',
       azkarReminderPayload => '/azkar',
+      wirdReminderPayload => '/worship',
       _ => null,
     };
 
