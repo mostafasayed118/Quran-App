@@ -56,65 +56,18 @@ class QiblaScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              ListTile(
-                leading: const Icon(Icons.location_on_outlined),
-                title: Text(
-                  city.nameAr,
-                  style: const TextStyle(
-                    fontFamily: QuranFonts.meQuran,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
+              _CityTile(title: city.nameAr),
               const SizedBox(height: 8),
-              Center(
-                child: SizedBox(
-                  width: 260,
-                  height: 260,
-                  child: CustomPaint(
-                    painter:
-                        _DialPainter(colors: Theme.of(context).colorScheme),
-                    child: Center(
-                      child: AnimatedRotation(
-                        turns: dialAngleDeg(bearing, heading ?? 0) / 360.0,
-                        duration: const Duration(milliseconds: 180),
-                        child: Icon(
-                          Icons.navigation,
-                          size: 72,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _Dial(bearing: bearing, heading: heading),
               if (heading != null) ...[
                 const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    loc.compassLive,
-                    style: AppTheme.mutedFootnote(context),
-                  ),
-                ),
+                _CompassNote(text: loc.compassLive),
               ] else if (compassUnavailable) ...[
                 const SizedBox(height: 8),
-                Center(
-                  child: Text(
-                    loc.compassStatic,
-                    style: AppTheme.mutedFootnote(context),
-                  ),
-                ),
+                _CompassNote(text: loc.compassStatic),
               ],
               const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  loc.degreesFromNorth(bearing.round().toArabicIndic),
-                  style: const TextStyle(
-                    fontFamily: QuranFonts.meQuran,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
+              _DegreesLabel(bearing: bearing),
             ],
           );
         },
@@ -158,4 +111,88 @@ class _DialPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _DialPainter oldDelegate) =>
       oldDelegate.colors != colors;
+}
+
+class _CityTile extends StatelessWidget {
+  const _CityTile({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.location_on_outlined),
+      title: Text(
+        title,
+        style: const TextStyle(
+          fontFamily: QuranFonts.meQuran,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+}
+
+class _CompassNote extends StatelessWidget {
+  const _CompassNote({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(text, style: AppTheme.mutedFootnote(context)),
+    );
+  }
+}
+
+class _DegreesLabel extends StatelessWidget {
+  const _DegreesLabel({required this.bearing});
+
+  final double bearing;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Center(
+      child: Text(
+        loc.degreesFromNorth(bearing.round().toArabicIndic),
+        style: const TextStyle(
+          fontFamily: QuranFonts.meQuran,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+}
+
+class _Dial extends StatelessWidget {
+  const _Dial({required this.bearing, required this.heading});
+
+  final double bearing;
+  final double? heading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 260,
+        height: 260,
+        child: CustomPaint(
+          painter: _DialPainter(colors: Theme.of(context).colorScheme),
+          child: Center(
+            child: AnimatedRotation(
+              turns: dialAngleDeg(bearing, heading ?? 0) / 360.0,
+              duration: const Duration(milliseconds: 180),
+              child: Icon(
+                Icons.navigation,
+                size: 72,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

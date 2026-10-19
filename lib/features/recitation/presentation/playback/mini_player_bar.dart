@@ -92,72 +92,13 @@ class _PlaybackStrip extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      loc.nowPlaying(reciterName),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      loc.surahBadge(surahNumber.toArabicIndic),
-                      style: AppTheme.mutedFootnote(context),
-                    ),
-                    BlocBuilder<PlaybackCubit, PlaybackState>(
-                      builder: (context, state) {
-                        final (:position, :duration) = switch (state) {
-                          PlaybackPlaying(
-                            :final position,
-                            :final duration,
-                          ) =>
-                            (position: position, duration: duration),
-                          PlaybackPaused(
-                            :final position,
-                            :final duration,
-                          ) =>
-                            (position: position, duration: duration),
-                          _ => (
-                              position: Duration.zero,
-                              duration: Duration.zero,
-                            ),
-                        };
-                        final progress = duration.inMilliseconds > 0
-                            ? position.inMilliseconds / duration.inMilliseconds
-                            : null;
-                        return LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 3,
-                        );
-                      },
-                    ),
-                  ],
+                child: _TrackInfo(
+                  reciterName: reciterName,
+                  surahNumber: surahNumber,
                 ),
               ),
               const SizedBox(width: 4),
-              if (busy)
-                const SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: Center(
-                    child: SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                  ),
-                )
-              else
-                IconButton(
-                  tooltip: playing ? loc.pauseTooltip : loc.playTooltip,
-                  icon: Icon(playing ? Icons.pause : Icons.play_arrow),
-                  onPressed: () => context.read<PlaybackCubit>().toggle(),
-                ),
+              _PlayToggle(busy: busy, playing: playing),
               IconButton(
                 tooltip: loc.stopTooltip,
                 icon: const Icon(Icons.stop),
@@ -167,6 +108,94 @@ class _PlaybackStrip extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TrackInfo extends StatelessWidget {
+  const _TrackInfo({required this.reciterName, required this.surahNumber});
+
+  final String reciterName;
+  final int surahNumber;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          loc.nowPlaying(reciterName),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        ),
+        Text(
+          loc.surahBadge(surahNumber.toArabicIndic),
+          style: AppTheme.mutedFootnote(context),
+        ),
+        const _ProgressRow(),
+      ],
+    );
+  }
+}
+
+class _ProgressRow extends StatelessWidget {
+  const _ProgressRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PlaybackCubit, PlaybackState>(
+      builder: (context, state) {
+        final (:position, :duration) = switch (state) {
+          PlaybackPlaying(
+            :final position,
+            :final duration,
+          ) =>
+            (position: position, duration: duration),
+          PlaybackPaused(
+            :final position,
+            :final duration,
+          ) =>
+            (position: position, duration: duration),
+          _ => (position: Duration.zero, duration: Duration.zero),
+        };
+        final progress = duration.inMilliseconds > 0
+            ? position.inMilliseconds / duration.inMilliseconds
+            : null;
+        return LinearProgressIndicator(value: progress, minHeight: 3);
+      },
+    );
+  }
+}
+
+class _PlayToggle extends StatelessWidget {
+  const _PlayToggle({required this.busy, required this.playing});
+
+  final bool busy;
+  final bool playing;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (busy) {
+      return const SizedBox(
+        width: 44,
+        height: 44,
+        child: Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+      );
+    }
+    return IconButton(
+      tooltip: playing ? loc.pauseTooltip : loc.playTooltip,
+      icon: Icon(playing ? Icons.pause : Icons.play_arrow),
+      onPressed: () => context.read<PlaybackCubit>().toggle(),
     );
   }
 }

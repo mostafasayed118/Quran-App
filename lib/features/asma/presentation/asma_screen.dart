@@ -52,76 +52,9 @@ class AsmaScreen extends StatelessWidget {
             EmptyState(loc.noResults),
           AsmaReady(:final names, :final selected) => Stack(
               children: [
-                GridView.builder(
-                  padding: const EdgeInsets.all(12),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 0.92,
-                  ),
-                  itemCount: names.length,
-                  itemBuilder: (context, i) {
-                    final name = names[i];
-                    final colors = Theme.of(context).colorScheme;
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(14),
-                      onTap: () => context.read<AsmaCubit>().select(name),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: colors.surfaceContainerHighest
-                              .withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              name.n.toArabicIndic,
-                              style: _mutedAt(colors, 10),
-                            ),
-                            const SizedBox(height: 4),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                name.nameAr,
-                                textAlign: TextAlign.center,
-                                style: _gridNameArStyle,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 4),
-                              child: Text(
-                                name.nameEn,
-                                textAlign: TextAlign.center,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTheme.mutedFootnote(context),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                _NamesGrid(names: names),
                 if (selected != null) ...[
-                  Positioned.fill(
-                    child: ExcludeSemantics(
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => context.read<AsmaCubit>().select(null),
-                        child: ColoredBox(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .scrim
-                              .withValues(alpha: 0.32),
-                        ),
-                      ),
-                    ),
-                  ),
+                  const Positioned.fill(child: _Scrim()),
                   _NameSheet(name: selected),
                 ],
               ],
@@ -196,6 +129,94 @@ class _NameSheet extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NamesGrid extends StatelessWidget {
+  const _NamesGrid({required this.names});
+
+  final List<AsmaName> names;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.all(12),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+        childAspectRatio: 0.92,
+      ),
+      itemCount: names.length,
+      itemBuilder: (context, i) => _NameCell(name: names[i]),
+    );
+  }
+}
+
+class _NameCell extends StatelessWidget {
+  const _NameCell({required this.name});
+
+  final AsmaName name;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () => context.read<AsmaCubit>().select(name),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              name.n.toArabicIndic,
+              style: _mutedAt(colors, 10),
+            ),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                name.nameAr,
+                textAlign: TextAlign.center,
+                style: _gridNameArStyle,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                name.nameEn,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.mutedFootnote(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Scrim extends StatelessWidget {
+  const _Scrim();
+
+  @override
+  Widget build(BuildContext context) {
+    return ExcludeSemantics(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => context.read<AsmaCubit>().select(null),
+        child: ColoredBox(
+          color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.32),
         ),
       ),
     );
