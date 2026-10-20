@@ -9,7 +9,12 @@ import '../../data/download_status.dart';
 import '../../data/reciter_repository.dart';
 import 'downloads_state.dart';
 
+/// The downloads screen: the per-surah download queue and the done rows.
 class DownloadsCubit extends Cubit<DownloadsState> {
+  /// Creates the cubit with the downloader and the reciter catalog.
+  ///
+  /// No work starts here: the screen calls [refreshDone] to list the
+  /// already-downloaded rows and [enqueue] to queue new ones.
   DownloadsCubit({
     required AudioDownloader downloader,
     required ReciterRepository reciters,
@@ -26,6 +31,10 @@ class DownloadsCubit extends Cubit<DownloadsState> {
 
   String _key(String rowId, int surahNumber) => '$rowId-$surahNumber';
 
+  /// Re-reads the finished downloads and merges them into the state.
+  ///
+  /// A failure is soft: the screen keeps rendering, the done rows simply
+  /// stay missing until the next refresh.
   Future<void> refreshDone() async {
     try {
       final rows = await _downloader.listDone();
@@ -64,6 +73,9 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     }));
   }
 
+  /// Queues the download of one surah for one reciter.
+  ///
+  /// A row that is already downloading, done, or queued is ignored.
   Future<void> enqueue(String rowId, int surahNumber) async {
     final key = _key(rowId, surahNumber);
     final current = state.items[key];

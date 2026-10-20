@@ -39,6 +39,7 @@
   },
   "mushafMode": "وضع المصحف",
   "versesMode": "وضع الآيات",
+  "basmala": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
   "bookmarks": "العلامات المرجعية",
   "bookmarkSave": "احفظ الآية",
   "bookmarkRemove": "أزل الحفظ",
@@ -263,6 +264,14 @@
   "pageNotFound": "الصفحة غير موجودة",
   "pageNotFoundHint": "الرابط الذي فتحت غير موجود هنا",
   "genericError": "عذرًا، حدث خطأ — حاول مرة أخرى",
+  "readerNoAyahs": "لا توجد آيات قابلة للقراءة في السورة {number}",
+  "@readerNoAyahs": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "noResults": "لا نتائج مطابقة",
   "recitersRefreshFailed": "تعذّر تحديث قائمة القرّاء",
   "downloadProgressReceived": "{received} م.ب",

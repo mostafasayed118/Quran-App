@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../prayer/data/prayer_time_service.dart';
+import '../../../core/domain/prayer_name.dart';
 
 part 'home_state.freezed.dart';
 

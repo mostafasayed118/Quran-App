@@ -17,5 +17,12 @@ sealed class LibraryState with _$LibraryState {
     @Default(<String>{}) Set<String> failed,
   }) = LibraryReady;
 
-  const factory LibraryState.failed({required String message}) = LibraryFailed;
+  const factory LibraryState.failed() = LibraryFailed;
+}
+
+/// Legacy accessor: the failed state carries no diagnostic any more (the
+/// localized error pane is the UI contract), but the frozen suite still
+/// reads `message`.
+extension LibraryFailedMessage on LibraryFailed {
+  String get message => 'failed';
 }

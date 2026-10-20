@@ -7,6 +7,10 @@ import 'hadith_state.dart';
 
 /// Pages through an INSTALLED hadith pack with a fixed page size.
 class HadithCubit extends Cubit<HadithState> {
+  /// Creates the cubit for one installed pack and loads its first page.
+  ///
+  /// The first page load is fire-and-forget; the state moves from loading
+  /// to ready/failed on its own.
   HadithCubit({
     required PackDownloader downloader,
     required String packId,
@@ -16,6 +20,7 @@ class HadithCubit extends Cubit<HadithState> {
     _load(0);
   }
 
+  /// How many hadith rows one page holds.
   static const int pageSize = 10;
 
   final PackDownloader _downloader;
@@ -37,7 +42,7 @@ class HadithCubit extends Cubit<HadithState> {
       dev.log('hadith load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
       if (isClosed) return;
-      emit(HadithState.error(message: error.toString()));
+      emit(const HadithState.failed());
       return;
     }
     if (isClosed) return;
@@ -50,12 +55,14 @@ class HadithCubit extends Cubit<HadithState> {
     ));
   }
 
+  /// Loads the next page; a no-op when the last page was reached.
   Future<void> next() {
     final s = state;
     if (s is! HadithReady || !s.hasMore) return Future.value();
     return _load(s.offset + pageSize);
   }
 
+  /// Loads the previous page; a no-op on the first page.
   Future<void> prev() {
     final s = state;
     if (s is! HadithReady || s.offset <= 0) return Future.value();

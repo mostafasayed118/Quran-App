@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/heading_service.dart';
 import 'qibla_cubit.dart';
@@ -23,6 +25,8 @@ bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
         a.bearing != b.bearing ||
         a.compassUnavailable != b.compassUnavailable ||
         a.heading?.round() != b.heading?.round(),
+    (QiblaFailed(), QiblaFailed()) => false,
+    _ => true,
   };
 }
 
@@ -70,6 +74,7 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
       body: BlocBuilder<QiblaCubit, QiblaState>(
         buildWhen: qiblaBodyShouldRebuild,
         builder: (context, state) {
+          if (state is QiblaFailed) return errorPane(loc);
           final (:city, :bearing, :heading, :compassUnavailable) =
               switch (state) {
             QiblaReady() => (
@@ -77,6 +82,12 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
                 bearing: state.bearing,
                 heading: state.heading,
                 compassUnavailable: state.compassUnavailable,
+              ),
+            QiblaFailed() => (
+                city: null,
+                bearing: null,
+                heading: null,
+                compassUnavailable: false,
               ),
           };
           if (city == null || bearing == null) {
@@ -87,19 +98,19 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
             );
           }
           return ListView(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             children: [
               _CityTile(title: city.nameAr),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               _Dial(bearing: bearing, heading: heading),
               if (heading != null) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 _CompassNote(text: loc.compassLive),
               ] else if (compassUnavailable) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 _CompassNote(text: loc.compassStatic),
               ],
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               _DegreesLabel(bearing: bearing),
             ],
           );
@@ -117,7 +128,7 @@ class _DialPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.shortestSide / 2 - 8;
+    final radius = size.shortestSide / 2 - AppSpacing.sm;
     final circle = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2

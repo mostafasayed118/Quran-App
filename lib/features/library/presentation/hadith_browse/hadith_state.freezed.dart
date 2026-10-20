@@ -53,7 +53,7 @@ extension HadithStatePatterns on HadithState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(HadithLoading value)? loading,
     TResult Function(HadithReady value)? ready,
-    TResult Function(HadithError value)? error,
+    TResult Function(HadithFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -62,8 +62,8 @@ extension HadithStatePatterns on HadithState {
         return loading(_that);
       case HadithReady() when ready != null:
         return ready(_that);
-      case HadithError() when error != null:
-        return error(_that);
+      case HadithFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,7 +86,7 @@ extension HadithStatePatterns on HadithState {
   TResult map<TResult extends Object?>({
     required TResult Function(HadithLoading value) loading,
     required TResult Function(HadithReady value) ready,
-    required TResult Function(HadithError value) error,
+    required TResult Function(HadithFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -94,8 +94,8 @@ extension HadithStatePatterns on HadithState {
         return loading(_that);
       case HadithReady():
         return ready(_that);
-      case HadithError():
-        return error(_that);
+      case HadithFailed():
+        return failed(_that);
     }
   }
 
@@ -115,7 +115,7 @@ extension HadithStatePatterns on HadithState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(HadithLoading value)? loading,
     TResult? Function(HadithReady value)? ready,
-    TResult? Function(HadithError value)? error,
+    TResult? Function(HadithFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -123,8 +123,8 @@ extension HadithStatePatterns on HadithState {
         return loading(_that);
       case HadithReady() when ready != null:
         return ready(_that);
-      case HadithError() when error != null:
-        return error(_that);
+      case HadithFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -148,7 +148,7 @@ extension HadithStatePatterns on HadithState {
     TResult Function(String packTitle, String language, List<HadithItem> items,
             int offset, bool hasMore)?
         ready,
-    TResult Function(String message)? error,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -158,8 +158,8 @@ extension HadithStatePatterns on HadithState {
       case HadithReady() when ready != null:
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
             _that.hasMore);
-      case HadithError() when error != null:
-        return error(_that.message);
+      case HadithFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -184,7 +184,7 @@ extension HadithStatePatterns on HadithState {
     required TResult Function(String packTitle, String language,
             List<HadithItem> items, int offset, bool hasMore)
         ready,
-    required TResult Function(String message) error,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -193,8 +193,8 @@ extension HadithStatePatterns on HadithState {
       case HadithReady():
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
             _that.hasMore);
-      case HadithError():
-        return error(_that.message);
+      case HadithFailed():
+        return failed();
     }
   }
 
@@ -216,7 +216,7 @@ extension HadithStatePatterns on HadithState {
     TResult? Function(String packTitle, String language, List<HadithItem> items,
             int offset, bool hasMore)?
         ready,
-    TResult? Function(String message)? error,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -225,8 +225,8 @@ extension HadithStatePatterns on HadithState {
       case HadithReady() when ready != null:
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
             _that.hasMore);
-      case HadithError() when error != null:
-        return error(_that.message);
+      case HadithFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -368,66 +368,21 @@ class _$HadithReadyCopyWithImpl<$Res> implements $HadithReadyCopyWith<$Res> {
 
 /// @nodoc
 
-class HadithError implements HadithState {
-  const HadithError({required this.message});
-
-  final String message;
-
-  /// Create a copy of HadithState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $HadithErrorCopyWith<HadithError> get copyWith =>
-      _$HadithErrorCopyWithImpl<HadithError>(this, _$identity);
+class HadithFailed implements HadithState {
+  const HadithFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is HadithError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is HadithFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'HadithState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $HadithErrorCopyWith<$Res>
-    implements $HadithStateCopyWith<$Res> {
-  factory $HadithErrorCopyWith(
-          HadithError value, $Res Function(HadithError) _then) =
-      _$HadithErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$HadithErrorCopyWithImpl<$Res> implements $HadithErrorCopyWith<$Res> {
-  _$HadithErrorCopyWithImpl(this._self, this._then);
-
-  final HadithError _self;
-  final $Res Function(HadithError) _then;
-
-  /// Create a copy of HadithState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(HadithError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'HadithState.failed()';
   }
 }
 

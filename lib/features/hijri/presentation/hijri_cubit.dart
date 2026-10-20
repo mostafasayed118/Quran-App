@@ -6,7 +6,12 @@ import '../../../../core/utils/arabic_numbers.dart';
 import '../data/hijri_service.dart';
 import 'hijri_state.dart';
 
+/// The Hijri calendar screen: one month grid plus today's header.
 class HijriCubit extends Cubit<HijriState> {
+  /// Creates the cubit and shows the current Hijri month.
+  ///
+  /// The first render is fire-and-forget: the state moves from loading to
+  /// ready on its own.
   HijriCubit({required HijriService service})
       : _service = service,
         super(const HijriState.loading()) {
@@ -15,6 +20,10 @@ class HijriCubit extends Cubit<HijriState> {
 
   final HijriService _service;
 
+  /// Shows the given Hijri month and emits the ready state.
+  ///
+  /// The grid is Saturday-first: [offset] is the number of empty cells
+  /// before day 1 of the month.
   Future<void> show(int hijriYear, int hijriMonth) async {
     final length = _service.daysInMonth(hijriYear, hijriMonth);
     final firstGregorian = _service.toGregorian(hijriYear, hijriMonth, 1);
@@ -46,6 +55,7 @@ class HijriCubit extends Cubit<HijriState> {
 
   String _arabic(int n) => n.toArabicIndic;
 
+  /// Shows the next month (rolls the year over from month 12).
   Future<void> next() async {
     final state = this.state;
     if (state is! HijriReady) return;
@@ -54,6 +64,7 @@ class HijriCubit extends Cubit<HijriState> {
     await show(year, month);
   }
 
+  /// Shows the previous month (rolls the year back from month 1).
   Future<void> prev() async {
     final state = this.state;
     if (state is! HijriReady) return;
@@ -62,6 +73,7 @@ class HijriCubit extends Cubit<HijriState> {
     await show(year, month);
   }
 
+  /// Shows the month that contains today.
   Future<void> jumpToToday() async {
     final now = DateTime.now();
     final hijri = _service.fromGregorian(now);

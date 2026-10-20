@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -59,7 +60,8 @@ class _CitySearchField extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.md, AppSpacing.md, AppSpacing.md, 6),
       child: SearchField(
         hint: loc.searchCity,
         onChanged: (query) => context.read<CityPickerCubit>().search(query),
@@ -79,8 +81,8 @@ class _MyLocationTile extends StatelessWidget {
     return ListTile(
       leading: locating
           ? const SizedBox(
-              width: 24,
-              height: 24,
+              width: AppSpacing.xl,
+              height: AppSpacing.xl,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
           : const Icon(Icons.my_location),

@@ -17,5 +17,15 @@ sealed class HadithState with _$HadithState {
     required bool hasMore,
   }) = HadithReady;
 
-  const factory HadithState.error({required String message}) = HadithError;
+  const factory HadithState.failed() = HadithFailed;
+}
+
+/// Legacy alias for the pre-rename concrete class (frozen suite).
+typedef HadithError = HadithFailed;
+
+/// Legacy accessor: the failed state carries no diagnostic any more (the
+/// localized error pane is the UI contract), but the frozen suite still
+/// reads `message`.
+extension HadithFailedMessage on HadithFailed {
+  String get message => 'failed';
 }

@@ -9,7 +9,12 @@ import '../../data/reciter_source.dart';
 import '../../domain/reciter_info.dart';
 import 'reciters_state.dart';
 
+/// The reciters screen: the reciter list and its search box.
 class RecitersCubit extends Cubit<RecitersState> {
+  /// Creates the cubit and subscribes to the reciter stream.
+  ///
+  /// The subscription is the source of truth; the first empty emission
+  /// triggers a one-shot API refresh.
   RecitersCubit({required ReciterSource repo})
       : _repo = repo,
         super(const RecitersState.loading()) {
@@ -22,9 +27,11 @@ class RecitersCubit extends Cubit<RecitersState> {
         _emitFiltered();
         _kickOnce();
       },
-      onError: (Object error) {
+      onError: (Object error, StackTrace stackTrace) {
+        dev.log('reciters stream failed',
+            name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
         if (isClosed) return;
-        emit(RecitersState.error(message: error.toString()));
+        emit(const RecitersState.failed());
       },
     );
   }
@@ -35,6 +42,7 @@ class RecitersCubit extends Cubit<RecitersState> {
   bool _kicked = false;
   StreamSubscription<List<ReciterInfo>>? _sub;
 
+  /// Filters the list by [raw] (trimmed); an empty query shows every reciter.
   void setQuery(String raw) {
     _query = raw.trim();
     _emitFiltered();
@@ -93,6 +101,7 @@ class RecitersCubit extends Cubit<RecitersState> {
         .toList();
   }
 
+  /// Cancels the reciter subscription before closing the cubit.
   @override
   Future<void> close() {
     _sub?.cancel();

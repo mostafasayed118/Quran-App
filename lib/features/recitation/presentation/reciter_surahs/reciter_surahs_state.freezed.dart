@@ -54,7 +54,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ReciterSurahsLoading value)? loading,
     TResult Function(ReciterSurahsReady value)? ready,
-    TResult Function(ReciterSurahsError value)? error,
+    TResult Function(ReciterSurahsFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -63,8 +63,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
         return loading(_that);
       case ReciterSurahsReady() when ready != null:
         return ready(_that);
-      case ReciterSurahsError() when error != null:
-        return error(_that);
+      case ReciterSurahsFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -87,7 +87,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   TResult map<TResult extends Object?>({
     required TResult Function(ReciterSurahsLoading value) loading,
     required TResult Function(ReciterSurahsReady value) ready,
-    required TResult Function(ReciterSurahsError value) error,
+    required TResult Function(ReciterSurahsFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -95,8 +95,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
         return loading(_that);
       case ReciterSurahsReady():
         return ready(_that);
-      case ReciterSurahsError():
-        return error(_that);
+      case ReciterSurahsFailed():
+        return failed(_that);
     }
   }
 
@@ -116,7 +116,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ReciterSurahsLoading value)? loading,
     TResult? Function(ReciterSurahsReady value)? ready,
-    TResult? Function(ReciterSurahsError value)? error,
+    TResult? Function(ReciterSurahsFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -124,8 +124,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
         return loading(_that);
       case ReciterSurahsReady() when ready != null:
         return ready(_that);
-      case ReciterSurahsError() when error != null:
-        return error(_that);
+      case ReciterSurahsFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -149,7 +149,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
     TResult Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)?
         ready,
-    TResult Function(String message)? error,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -159,8 +159,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
       case ReciterSurahsReady() when ready != null:
         return ready(
             _that.row, _that.surahNumbers, _that.names, _that.previews);
-      case ReciterSurahsError() when error != null:
-        return error(_that.message);
+      case ReciterSurahsFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -185,7 +185,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
     required TResult Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)
         ready,
-    required TResult Function(String message) error,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -194,8 +194,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
       case ReciterSurahsReady():
         return ready(
             _that.row, _that.surahNumbers, _that.names, _that.previews);
-      case ReciterSurahsError():
-        return error(_that.message);
+      case ReciterSurahsFailed():
+        return failed();
     }
   }
 
@@ -217,7 +217,7 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
     TResult? Function(ReciterInfo row, List<int> surahNumbers,
             Map<int, String> names, Map<int, String> previews)?
         ready,
-    TResult? Function(String message)? error,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -226,8 +226,8 @@ extension ReciterSurahsStatePatterns on ReciterSurahsState {
       case ReciterSurahsReady() when ready != null:
         return ready(
             _that.row, _that.surahNumbers, _that.names, _that.previews);
-      case ReciterSurahsError() when error != null:
-        return error(_that.message);
+      case ReciterSurahsFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -380,67 +380,21 @@ class _$ReciterSurahsReadyCopyWithImpl<$Res>
 
 /// @nodoc
 
-class ReciterSurahsError implements ReciterSurahsState {
-  const ReciterSurahsError({required this.message});
-
-  final String message;
-
-  /// Create a copy of ReciterSurahsState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $ReciterSurahsErrorCopyWith<ReciterSurahsError> get copyWith =>
-      _$ReciterSurahsErrorCopyWithImpl<ReciterSurahsError>(this, _$identity);
+class ReciterSurahsFailed implements ReciterSurahsState {
+  const ReciterSurahsFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is ReciterSurahsError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is ReciterSurahsFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'ReciterSurahsState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $ReciterSurahsErrorCopyWith<$Res>
-    implements $ReciterSurahsStateCopyWith<$Res> {
-  factory $ReciterSurahsErrorCopyWith(
-          ReciterSurahsError value, $Res Function(ReciterSurahsError) _then) =
-      _$ReciterSurahsErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$ReciterSurahsErrorCopyWithImpl<$Res>
-    implements $ReciterSurahsErrorCopyWith<$Res> {
-  _$ReciterSurahsErrorCopyWithImpl(this._self, this._then);
-
-  final ReciterSurahsError _self;
-  final $Res Function(ReciterSurahsError) _then;
-
-  /// Create a copy of ReciterSurahsState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(ReciterSurahsError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'ReciterSurahsState.failed()';
   }
 }
 

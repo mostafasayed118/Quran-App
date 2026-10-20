@@ -5,27 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
-import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
-import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_cubit.dart';
 import 'package:quran_yahdi/features/qibla/presentation/qibla_screen.dart';
 
+import 'support/fakes.dart';
 import 'support/host.dart';
 import 'support/test_db.dart';
-
-const cairoCity = City(
-  id: 'cairo',
-  nameAr: 'القاهرة',
-  nameEn: 'Cairo',
-  lat: 30.0444,
-  lng: 31.2357,
-);
-
-class FakeQiblaService implements QiblaService {
-  @override
-  double bearingDeg(CityCoordinates c) => 137.2;
-}
 
 void main() {
   late AppDatabase db;

@@ -14,5 +14,15 @@ sealed class RecitersState with _$RecitersState {
     @Default(false) bool dataError,
   }) = RecitersReady;
 
-  const factory RecitersState.error({required String message}) = RecitersError;
+  const factory RecitersState.failed() = RecitersFailed;
+}
+
+/// Legacy alias for the pre-rename concrete class (frozen suite).
+typedef RecitersError = RecitersFailed;
+
+/// Legacy accessor: the failed state carries no diagnostic any more (the
+/// localized error pane is the UI contract), but the frozen suite still
+/// reads `message`.
+extension RecitersFailedMessage on RecitersFailed {
+  String get message => 'failed';
 }

@@ -7,14 +7,18 @@ class HijriService {
     HijriCalendar.setLocal('ar');
   }
 
+  /// Converts a Gregorian date to its Hijri calendar date.
   HijriCalendar fromGregorian(DateTime date) => HijriCalendar.fromDate(date);
 
+  /// Converts a Hijri year/month/day back to a Gregorian date.
   DateTime toGregorian(int hijriYear, int hijriMonth, int hijriDay) =>
       HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, hijriDay);
 
+  /// Number of days in the given Hijri month.
   int daysInMonth(int hijriYear, int hijriMonth) =>
       HijriCalendar().getDaysInMonth(hijriYear, hijriMonth);
 
+  /// Arabic name of the given Hijri month.
   String monthName(int hijriYear, int hijriMonth) {
     // Mid-month gregorian anchor is stable within the month.
     final anchor = toGregorian(hijriYear, hijriMonth, 15);

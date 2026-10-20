@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'وضع الآيات'**
   String get versesMode;
 
+  /// No description provided for @basmala.
+  ///
+  /// In ar, this message translates to:
+  /// **'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'**
+  String get basmala;
+
   /// No description provided for @bookmarks.
   ///
   /// In ar, this message translates to:
@@ -901,6 +907,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'عذرًا، حدث خطأ — حاول مرة أخرى'**
   String get genericError;
+
+  /// No description provided for @readerNoAyahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد آيات قابلة للقراءة في السورة {number}'**
+  String readerNoAyahs(String number);
 
   /// No description provided for @noResults.
   ///

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -42,13 +43,13 @@ class TrackerScreen extends StatelessWidget {
             :final khatma,
           ) =>
             ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 _TodayCard(today: today),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 for (final slot in PrayerSlot.values)
                   _SlotTile(slot: slot, today: today),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   loc.last7Days,
                   style: _mutedAt(Theme.of(context).colorScheme, 12),
@@ -57,7 +58,7 @@ class TrackerScreen extends StatelessWidget {
                 _Last7Row(last7: last7),
                 if (streakDays > 0) _StreakChip(streakDays: streakDays),
                 if (khatmaAvailable) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   _WirdCard(progress: khatma),
                 ],
               ],
@@ -78,7 +79,7 @@ class _TodayCard extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           children: [
             Text(
@@ -231,14 +232,14 @@ class _WirdCard extends StatelessWidget {
     final p = progress;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Icon(Icons.menu_book, size: 18, color: colors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(loc.wirdTitle, style: _todayTitleStyle),
               ],
             ),
@@ -261,7 +262,7 @@ class _WirdCard extends StatelessWidget {
             ] else ...[
               const SizedBox(height: 10),
               LinearProgressIndicator(value: p.fraction),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               Text(
                 loc.wirdProgress(
                   p.pagesDone.toArabicIndic,
@@ -269,7 +270,7 @@ class _WirdCard extends StatelessWidget {
                 ),
                 style: _mutedAt(colors, 13),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 loc.wirdTodayRange(
                   p.todayStartPage.toArabicIndic,
@@ -277,7 +278,7 @@ class _WirdCard extends StatelessWidget {
                 ),
                 style: _mutedAt(colors, 13),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 loc.wirdRemainingDays(p.remainingDays.toArabicIndic),
                 style: _mutedAt(colors, 13),
@@ -292,7 +293,7 @@ class _WirdCard extends StatelessWidget {
                       child: Text(loc.wirdFinishToday),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: FilledButton(
                       onPressed: () => context.push(wirdReaderRoute(p)),
@@ -328,7 +329,8 @@ class _WirdSetupSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 16, 12, 6),
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.lg, AppSpacing.md, 6),
             child: Text(loc.wirdPaceSheetTitle, style: _todayTitleStyle),
           ),
           for (final target in KhatmaProgress.targetChoices)

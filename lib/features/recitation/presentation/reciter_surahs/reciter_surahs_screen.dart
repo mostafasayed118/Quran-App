@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -53,7 +55,7 @@ class ReciterSurahsScreen extends StatelessWidget {
       body: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
         builder: (context, state) => switch (state) {
           ReciterSurahsLoading() => const LoadingView(),
-          ReciterSurahsError() => errorPane(loc),
+          ReciterSurahsFailed() => errorPane(loc),
           ReciterSurahsReady(
             :final row,
             :final surahNumbers,
@@ -265,7 +267,7 @@ class _DownloadProgress extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: AppTheme.mutedFootnote(context),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           LinearProgressIndicator(
             value: total > 0 ? (received / total).clamp(0.0, 1.0) : null,
             minHeight: 3,
@@ -281,10 +283,8 @@ class _DownloadProgress extends StatelessWidget {
 /// received amount renders alone.
 @visibleForTesting
 String downloadProgressLabel(AppLocalizations loc, int received, int total) {
-  final receivedLabel = _megabytes(received).toArabicIndicDigits;
+  final receivedLabel = formatMegabytes(received).toArabicIndicDigits;
   if (total <= 0) return loc.downloadProgressReceived(receivedLabel);
   return loc.downloadProgressOfTotal(
-      receivedLabel, _megabytes(total).toArabicIndicDigits);
+      receivedLabel, formatMegabytes(total).toArabicIndicDigits);
 }
-
-String _megabytes(int bytes) => (bytes / (1024 * 1024)).toStringAsFixed(1);

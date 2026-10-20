@@ -36,6 +36,7 @@ String _toWesternNumerals(String s) {
   return buffer.toString();
 }
 
+/// The assets and debts used to compute zakat.
 class ZakatInput {
   const ZakatInput({
     this.goldGrams = 0,
@@ -45,13 +46,23 @@ class ZakatInput {
     this.nisabBySilver = false,
   });
 
+  /// Held gold, in grams.
   final double goldGrams;
+
+  /// Held silver, in grams.
   final double silverGrams;
+
+  /// Cash and cash-like assets.
   final double cash;
+
+  /// Deductible debts.
   final double debts;
+
+  /// Use the silver nisab instead of the gold one.
   final bool nisabBySilver;
 }
 
+/// The computed zakat.
 class ZakatResult {
   const ZakatResult({
     required this.zakatable,
@@ -60,20 +71,33 @@ class ZakatResult {
     required this.amount,
   });
 
+  /// Wealth left after deducting debts.
   final double zakatable;
+
+  /// Value of the nisab threshold that applies.
   final double nisabValue;
+
+  /// True when the wealth reaches the nisab, so zakat is due.
   final bool due;
+
+  /// Zakat amount due; zero when [due] is false.
   final double amount;
 }
 
+/// Computes zakat from the entered assets.
 class ZakatCalculator {
   const ZakatCalculator();
 
   /// Locked v1 constants (PM decision, cited on the screen).
   static const double goldNisabGrams = 87.48;
+
+  /// Silver nisab threshold in grams (612.36 g).
   static const double silverNisabGrams = 612.36;
+
+  /// Zakat rate applied to the zakatable wealth (2.5%).
   static const double zakatRate = 0.025;
 
+  /// Computes the zakat for [input] using the given metal prices.
   ZakatResult compute(
     ZakatInput input, {
     required double goldPricePerGram,

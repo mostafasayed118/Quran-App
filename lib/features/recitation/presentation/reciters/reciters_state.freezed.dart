@@ -53,7 +53,7 @@ extension RecitersStatePatterns on RecitersState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(RecitersLoading value)? loading,
     TResult Function(RecitersReady value)? ready,
-    TResult Function(RecitersError value)? error,
+    TResult Function(RecitersFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -62,8 +62,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading(_that);
       case RecitersReady() when ready != null:
         return ready(_that);
-      case RecitersError() when error != null:
-        return error(_that);
+      case RecitersFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,7 +86,7 @@ extension RecitersStatePatterns on RecitersState {
   TResult map<TResult extends Object?>({
     required TResult Function(RecitersLoading value) loading,
     required TResult Function(RecitersReady value) ready,
-    required TResult Function(RecitersError value) error,
+    required TResult Function(RecitersFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -94,8 +94,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading(_that);
       case RecitersReady():
         return ready(_that);
-      case RecitersError():
-        return error(_that);
+      case RecitersFailed():
+        return failed(_that);
     }
   }
 
@@ -115,7 +115,7 @@ extension RecitersStatePatterns on RecitersState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(RecitersLoading value)? loading,
     TResult? Function(RecitersReady value)? ready,
-    TResult? Function(RecitersError value)? error,
+    TResult? Function(RecitersFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -123,8 +123,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading(_that);
       case RecitersReady() when ready != null:
         return ready(_that);
-      case RecitersError() when error != null:
-        return error(_that);
+      case RecitersFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -147,7 +147,7 @@ extension RecitersStatePatterns on RecitersState {
     TResult Function()? loading,
     TResult Function(List<ReciterInfo> reciters, String query, bool dataError)?
         ready,
-    TResult Function(String message)? error,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -156,8 +156,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading();
       case RecitersReady() when ready != null:
         return ready(_that.reciters, _that.query, _that.dataError);
-      case RecitersError() when error != null:
-        return error(_that.message);
+      case RecitersFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -182,7 +182,7 @@ extension RecitersStatePatterns on RecitersState {
     required TResult Function(
             List<ReciterInfo> reciters, String query, bool dataError)
         ready,
-    required TResult Function(String message) error,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -190,8 +190,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading();
       case RecitersReady():
         return ready(_that.reciters, _that.query, _that.dataError);
-      case RecitersError():
-        return error(_that.message);
+      case RecitersFailed():
+        return failed();
     }
   }
 
@@ -212,7 +212,7 @@ extension RecitersStatePatterns on RecitersState {
     TResult? Function()? loading,
     TResult? Function(List<ReciterInfo> reciters, String query, bool dataError)?
         ready,
-    TResult? Function(String message)? error,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -220,8 +220,8 @@ extension RecitersStatePatterns on RecitersState {
         return loading();
       case RecitersReady() when ready != null:
         return ready(_that.reciters, _that.query, _that.dataError);
-      case RecitersError() when error != null:
-        return error(_that.message);
+      case RecitersFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -345,67 +345,21 @@ class _$RecitersReadyCopyWithImpl<$Res>
 
 /// @nodoc
 
-class RecitersError implements RecitersState {
-  const RecitersError({required this.message});
-
-  final String message;
-
-  /// Create a copy of RecitersState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $RecitersErrorCopyWith<RecitersError> get copyWith =>
-      _$RecitersErrorCopyWithImpl<RecitersError>(this, _$identity);
+class RecitersFailed implements RecitersState {
+  const RecitersFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is RecitersError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is RecitersFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'RecitersState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $RecitersErrorCopyWith<$Res>
-    implements $RecitersStateCopyWith<$Res> {
-  factory $RecitersErrorCopyWith(
-          RecitersError value, $Res Function(RecitersError) _then) =
-      _$RecitersErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$RecitersErrorCopyWithImpl<$Res>
-    implements $RecitersErrorCopyWith<$Res> {
-  _$RecitersErrorCopyWithImpl(this._self, this._then);
-
-  final RecitersError _self;
-  final $Res Function(RecitersError) _then;
-
-  /// Create a copy of RecitersState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(RecitersError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'RecitersState.failed()';
   }
 }
 

@@ -1,5 +1,6 @@
 import '../../../core/utils/cached_loader.dart';
 
+/// One supplication with its category and repetition count.
 class DuaEntry {
   const DuaEntry({
     required this.id,
@@ -10,11 +11,22 @@ class DuaEntry {
     this.count = 1,
   });
 
+  /// Stable id of the dua.
   final String id;
+
+  /// Arabic category name the dua belongs to.
   final String categoryAr;
+
+  /// English category name the dua belongs to.
   final String categoryEn;
+
+  /// Arabic text of the dua.
   final String text;
+
+  /// Optional source reference for the dua.
   final String? reference;
+
+  /// How many times it should be recited.
   final int count;
 
   factory DuaEntry.fromJson(Map<String, dynamic> json) => DuaEntry(
@@ -27,6 +39,7 @@ class DuaEntry {
       );
 }
 
+/// Reads the bundled duas catalog.
 class DuaRepository {
   DuaRepository({
     required Future<List<Map<String, dynamic>>> Function() loader,
@@ -36,6 +49,7 @@ class DuaRepository {
 
   late final CachedLoader<List<DuaEntry>> _entries = CachedLoader(_load);
 
+  /// All duas; the catalog is loaded once and cached.
   Future<List<DuaEntry>> entries() {
     return _entries.load();
   }
@@ -45,6 +59,7 @@ class DuaRepository {
     return [for (final row in raw) DuaEntry.fromJson(row)];
   }
 
+  /// Duas of one category, matched on the Arabic category name.
   Future<List<DuaEntry>> byCategory(String categoryAr) async {
     final all = await entries();
     return [
@@ -53,6 +68,7 @@ class DuaRepository {
     ];
   }
 
+  /// Distinct Arabic category names, in catalog order.
   Future<List<String>> categories() async {
     final all = await entries();
     final seen = <String>{};

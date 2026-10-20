@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_spacing.dart';
 
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title});
@@ -9,7 +10,7 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 2),
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 10, AppSpacing.lg, 2),
       child: Align(
         alignment: AlignmentDirectional.centerEnd,
         child: Text(

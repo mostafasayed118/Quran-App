@@ -12,6 +12,10 @@ import 'ayah_sheet_state.dart';
 /// as absent by construction; rows with a missing file read as absent
 /// (PackDownloader null semantics), never throwing upward.
 class AyahSheetCubit extends Cubit<AyahSheetState> {
+  /// Creates the cubit for one ayah and starts resolving its packs.
+  ///
+  /// [surah] is the surah id and [ayah] the ayah number inside it; the
+  /// resolution is fire-and-forget and ends in ready or failed.
   AyahSheetCubit({
     required PackDownloader downloader,
     required int surah,
@@ -54,7 +58,7 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       dev.log('ayah sheet load failed',
           name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
       if (isClosed) return;
-      emit(AyahSheetState.error(message: error.toString()));
+      emit(const AyahSheetState.failed());
       return;
     }
   }

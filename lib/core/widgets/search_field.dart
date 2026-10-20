@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_spacing.dart';
 
 class SearchField extends StatelessWidget {
   const SearchField({
@@ -25,7 +26,7 @@ class SearchField extends StatelessWidget {
         fillColor:
             Theme.of(context).colorScheme.secondary.withValues(alpha: 0.08),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.md),
           borderSide: BorderSide.none,
         ),
       ),

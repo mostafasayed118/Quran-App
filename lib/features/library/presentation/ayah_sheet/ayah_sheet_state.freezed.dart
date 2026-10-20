@@ -53,7 +53,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AyahSheetLoading value)? loading,
     TResult Function(AyahSheetReady value)? ready,
-    TResult Function(AyahSheetError value)? error,
+    TResult Function(AyahSheetFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -62,8 +62,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading(_that);
       case AyahSheetReady() when ready != null:
         return ready(_that);
-      case AyahSheetError() when error != null:
-        return error(_that);
+      case AyahSheetFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,7 +86,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
   TResult map<TResult extends Object?>({
     required TResult Function(AyahSheetLoading value) loading,
     required TResult Function(AyahSheetReady value) ready,
-    required TResult Function(AyahSheetError value) error,
+    required TResult Function(AyahSheetFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -94,8 +94,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading(_that);
       case AyahSheetReady():
         return ready(_that);
-      case AyahSheetError():
-        return error(_that);
+      case AyahSheetFailed():
+        return failed(_that);
     }
   }
 
@@ -115,7 +115,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AyahSheetLoading value)? loading,
     TResult? Function(AyahSheetReady value)? ready,
-    TResult? Function(AyahSheetError value)? error,
+    TResult? Function(AyahSheetFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -123,8 +123,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading(_that);
       case AyahSheetReady() when ready != null:
         return ready(_that);
-      case AyahSheetError() when error != null:
-        return error(_that);
+      case AyahSheetFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -148,7 +148,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
     TResult Function(List<AyahSheetEntry> tafsirEntries,
             List<AyahSheetEntry> translationEntries)?
         ready,
-    TResult Function(String message)? error,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -157,8 +157,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading();
       case AyahSheetReady() when ready != null:
         return ready(_that.tafsirEntries, _that.translationEntries);
-      case AyahSheetError() when error != null:
-        return error(_that.message);
+      case AyahSheetFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -183,7 +183,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
     required TResult Function(List<AyahSheetEntry> tafsirEntries,
             List<AyahSheetEntry> translationEntries)
         ready,
-    required TResult Function(String message) error,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -191,8 +191,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading();
       case AyahSheetReady():
         return ready(_that.tafsirEntries, _that.translationEntries);
-      case AyahSheetError():
-        return error(_that.message);
+      case AyahSheetFailed():
+        return failed();
     }
   }
 
@@ -214,7 +214,7 @@ extension AyahSheetStatePatterns on AyahSheetState {
     TResult? Function(List<AyahSheetEntry> tafsirEntries,
             List<AyahSheetEntry> translationEntries)?
         ready,
-    TResult? Function(String message)? error,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -222,8 +222,8 @@ extension AyahSheetStatePatterns on AyahSheetState {
         return loading();
       case AyahSheetReady() when ready != null:
         return ready(_that.tafsirEntries, _that.translationEntries);
-      case AyahSheetError() when error != null:
-        return error(_that.message);
+      case AyahSheetFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -348,67 +348,21 @@ class _$AyahSheetReadyCopyWithImpl<$Res>
 
 /// @nodoc
 
-class AyahSheetError implements AyahSheetState {
-  const AyahSheetError({required this.message});
-
-  final String message;
-
-  /// Create a copy of AyahSheetState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $AyahSheetErrorCopyWith<AyahSheetError> get copyWith =>
-      _$AyahSheetErrorCopyWithImpl<AyahSheetError>(this, _$identity);
+class AyahSheetFailed implements AyahSheetState {
+  const AyahSheetFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is AyahSheetError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is AyahSheetFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'AyahSheetState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $AyahSheetErrorCopyWith<$Res>
-    implements $AyahSheetStateCopyWith<$Res> {
-  factory $AyahSheetErrorCopyWith(
-          AyahSheetError value, $Res Function(AyahSheetError) _then) =
-      _$AyahSheetErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$AyahSheetErrorCopyWithImpl<$Res>
-    implements $AyahSheetErrorCopyWith<$Res> {
-  _$AyahSheetErrorCopyWithImpl(this._self, this._then);
-
-  final AyahSheetError _self;
-  final $Res Function(AyahSheetError) _then;
-
-  /// Create a copy of AyahSheetState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(AyahSheetError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'AyahSheetState.failed()';
   }
 }
 

@@ -51,8 +51,7 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
-    TResult Function(PlaybackInitial value)? initial,
-    TResult Function(PlaybackLoading value)? loading,
+    TResult Function(PlaybackLoading value)? initial,
     TResult Function(PlaybackPlaying value)? playing,
     TResult Function(PlaybackPaused value)? paused,
     TResult Function(PlaybackFailed value)? failed,
@@ -60,10 +59,8 @@ extension PlaybackStatePatterns on PlaybackState {
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial() when initial != null:
+      case PlaybackLoading() when initial != null:
         return initial(_that);
-      case PlaybackLoading() when loading != null:
-        return loading(_that);
       case PlaybackPlaying() when playing != null:
         return playing(_that);
       case PlaybackPaused() when paused != null:
@@ -90,18 +87,15 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
-    required TResult Function(PlaybackInitial value) initial,
-    required TResult Function(PlaybackLoading value) loading,
+    required TResult Function(PlaybackLoading value) initial,
     required TResult Function(PlaybackPlaying value) playing,
     required TResult Function(PlaybackPaused value) paused,
     required TResult Function(PlaybackFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial():
-        return initial(_that);
       case PlaybackLoading():
-        return loading(_that);
+        return initial(_that);
       case PlaybackPlaying():
         return playing(_that);
       case PlaybackPaused():
@@ -125,18 +119,15 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(PlaybackInitial value)? initial,
-    TResult? Function(PlaybackLoading value)? loading,
+    TResult? Function(PlaybackLoading value)? initial,
     TResult? Function(PlaybackPlaying value)? playing,
     TResult? Function(PlaybackPaused value)? paused,
     TResult? Function(PlaybackFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial() when initial != null:
+      case PlaybackLoading() when initial != null:
         return initial(_that);
-      case PlaybackLoading() when loading != null:
-        return loading(_that);
       case PlaybackPlaying() when playing != null:
         return playing(_that);
       case PlaybackPaused() when paused != null:
@@ -162,8 +153,7 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? initial,
-    TResult Function(String reciterName, int surahNumber)? loading,
+    TResult Function(String? reciterName, int surahNumber)? initial,
     TResult Function(String reciterName, int surahNumber, Duration position,
             Duration duration)?
         playing,
@@ -175,10 +165,8 @@ extension PlaybackStatePatterns on PlaybackState {
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial() when initial != null:
-        return initial();
-      case PlaybackLoading() when loading != null:
-        return loading(_that.reciterName, _that.surahNumber);
+      case PlaybackLoading() when initial != null:
+        return initial(_that.reciterName, _that.surahNumber);
       case PlaybackPlaying() when playing != null:
         return playing(_that.reciterName, _that.surahNumber, _that.position,
             _that.duration);
@@ -207,8 +195,7 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function() initial,
-    required TResult Function(String reciterName, int surahNumber) loading,
+    required TResult Function(String? reciterName, int surahNumber) initial,
     required TResult Function(String reciterName, int surahNumber,
             Duration position, Duration duration)
         playing,
@@ -219,10 +206,8 @@ extension PlaybackStatePatterns on PlaybackState {
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial():
-        return initial();
       case PlaybackLoading():
-        return loading(_that.reciterName, _that.surahNumber);
+        return initial(_that.reciterName, _that.surahNumber);
       case PlaybackPlaying():
         return playing(_that.reciterName, _that.surahNumber, _that.position,
             _that.duration);
@@ -248,8 +233,7 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? initial,
-    TResult? Function(String reciterName, int surahNumber)? loading,
+    TResult? Function(String? reciterName, int surahNumber)? initial,
     TResult? Function(String reciterName, int surahNumber, Duration position,
             Duration duration)?
         playing,
@@ -260,10 +244,8 @@ extension PlaybackStatePatterns on PlaybackState {
   }) {
     final _that = this;
     switch (_that) {
-      case PlaybackInitial() when initial != null:
-        return initial();
-      case PlaybackLoading() when loading != null:
-        return loading(_that.reciterName, _that.surahNumber);
+      case PlaybackLoading() when initial != null:
+        return initial(_that.reciterName, _that.surahNumber);
       case PlaybackPlaying() when playing != null:
         return playing(_that.reciterName, _that.surahNumber, _that.position,
             _that.duration);
@@ -280,30 +262,11 @@ extension PlaybackStatePatterns on PlaybackState {
 
 /// @nodoc
 
-class PlaybackInitial implements PlaybackState {
-  const PlaybackInitial();
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is PlaybackInitial);
-  }
-
-  @override
-  int get hashCode => runtimeType.hashCode;
-
-  @override
-  String toString() {
-    return 'PlaybackState.initial()';
-  }
-}
-
-/// @nodoc
-
 class PlaybackLoading implements PlaybackState {
-  const PlaybackLoading({required this.reciterName, required this.surahNumber});
+  const PlaybackLoading({this.reciterName, this.surahNumber = 0});
 
-  final String reciterName;
+  final String? reciterName;
+  @JsonKey()
   final int surahNumber;
 
   /// Create a copy of PlaybackState
@@ -331,7 +294,7 @@ class PlaybackLoading implements PlaybackState {
 
   @override
   String toString() {
-    return 'PlaybackState.loading(reciterName: $reciterName, surahNumber: $surahNumber)';
+    return 'PlaybackState.initial(reciterName: $reciterName, surahNumber: $surahNumber)';
   }
 }
 
@@ -342,7 +305,7 @@ abstract mixin class $PlaybackLoadingCopyWith<$Res>
           PlaybackLoading value, $Res Function(PlaybackLoading) _then) =
       _$PlaybackLoadingCopyWithImpl;
   @useResult
-  $Res call({String reciterName, int surahNumber});
+  $Res call({String? reciterName, int surahNumber});
 }
 
 /// @nodoc
@@ -357,14 +320,14 @@ class _$PlaybackLoadingCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? reciterName = null,
+    Object? reciterName = freezed,
     Object? surahNumber = null,
   }) {
     return _then(PlaybackLoading(
-      reciterName: null == reciterName
+      reciterName: freezed == reciterName
           ? _self.reciterName
           : reciterName // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
       surahNumber: null == surahNumber
           ? _self.surahNumber
           : surahNumber // ignore: cast_nullable_to_non_nullable

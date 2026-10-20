@@ -6,7 +6,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/azkar_repository.dart';
 import 'azkar_state.dart';
 
+/// The azkar screen: the collection list, the search results and the
+/// reciting view (one counter per item).
 class AzkarCubit extends Cubit<AzkarState> {
+  /// Creates the cubit and starts the first load.
+  ///
+  /// The load is fire-and-forget: the state moves from loading to
+  /// browsing/failed on its own.
   AzkarCubit({required AzkarRepository repository})
       : _repository = repository,
         super(const AzkarState.loading()) {
@@ -18,6 +24,10 @@ class AzkarCubit extends Cubit<AzkarState> {
   List<AzkarCollection> _collections = const [];
   int _searchSeq = 0;
 
+  /// Loads the collections and emits the browsing state.
+  ///
+  /// A failure emits the failed state (the error is logged, never raised as
+  /// an unhandled async error).
   Future<void> load() async {
     try {
       final collections = await _repository.collections();
@@ -63,6 +73,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     }
   }
 
+  /// Opens a collection in the reciting view (every counter starts at full).
   void open(AzkarCollection collection) {
     if (isClosed) return;
     _searchSeq++;
@@ -74,6 +85,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     ));
   }
 
+  /// Counts one tap on the item at [index]; the counter stops at zero.
   void tapItem(int index) {
     if (isClosed) return;
     final state = this.state;
@@ -88,6 +100,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     ));
   }
 
+  /// Leaves the reciting view and returns to the collection list.
   void back() {
     if (isClosed) return;
     unawaited(load());

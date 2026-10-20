@@ -88,6 +88,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get versesMode => 'وضع الآيات';
 
   @override
+  String get basmala => 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+
+  @override
   String get bookmarks => 'العلامات المرجعية';
 
   @override
@@ -448,6 +451,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get genericError => 'عذرًا، حدث خطأ — حاول مرة أخرى';
+
+  @override
+  String readerNoAyahs(String number) {
+    return 'لا توجد آيات قابلة للقراءة في السورة $number';
+  }
 
   @override
   String get noResults => 'لا نتائج مطابقة';

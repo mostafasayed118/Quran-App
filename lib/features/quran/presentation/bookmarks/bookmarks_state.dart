@@ -11,6 +11,5 @@ sealed class BookmarksState with _$BookmarksState {
   const factory BookmarksState.ready({required List<Verse> entries}) =
       BookmarksReady;
 
-  const factory BookmarksState.error({required String message}) =
-      BookmarksError;
+  const factory BookmarksState.failed() = BookmarksFailed;
 }

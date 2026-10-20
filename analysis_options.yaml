@@ -5,12 +5,73 @@ analyzer:
     - build/**
     - android/**
     - ios/**
+    - coverage/**
+    - "**/*.g.dart"
   language:
     strict-casts: true
     strict-inference: true
 
 linter:
   rules:
+    # --- house rules ---
     prefer_const_constructors: true
     prefer_final_locals: true
     avoid_print: true
+
+    # --- type safety: no implicit dynamic, no inferred public signatures ---
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    type_annotate_public_apis: true
+
+    # --- async + resource safety ---
+    unawaited_futures: true
+    cancel_subscriptions: true
+    avoid_void_async: true
+    use_rethrow_when_possible: true
+    conditional_uri_does_not_exist: true
+
+    # --- public API hygiene ---
+    prefer_final_fields: true
+    prefer_initializing_formals: true
+    prefer_final_in_for_each: true
+    unnecessary_underscores: true
+    library_private_types_in_public_api: true
+    use_setters_to_change_properties: true
+
+    # --- redundancy the analyzer can prove ---
+    unnecessary_const: true
+    unnecessary_new: true
+    unnecessary_this: true
+    unnecessary_overrides: true
+    unnecessary_late: true
+    unnecessary_getters_setters: true
+    unnecessary_brace_in_string_interps: true
+    unnecessary_string_escapes: true
+    unnecessary_to_list_in_spreads: true
+    unnecessary_nullable_for_final_variable_declarations: true
+    unnecessary_null_aware_assignments: true
+
+    # --- correctness ---
+    hash_and_equals: true
+    null_closures: true
+    overridden_fields: true
+    empty_catches: true
+    throw_in_finally: true
+    valid_regexps: true
+    avoid_init_to_null: true
+    avoid_null_checks_in_equality_operators: true
+    no_leading_underscores_for_local_identifiers: true
+
+    # --- flutter/idiom ---
+    avoid_web_libraries_in_flutter: true
+    avoid_unnecessary_containers: true
+    use_key_in_widget_constructors: true
+    sort_child_properties_last: true
+    slash_for_doc_comments: true
+
+    # --- package hygiene ---
+    depend_on_referenced_packages: true
+    implementation_imports: true
+    file_names: true
+    library_names: true
+    package_names: true

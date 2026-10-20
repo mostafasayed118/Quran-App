@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../notifications/data/reminder_planner.dart';
+import '../../../core/domain/reminders.dart';
 
 part 'settings_state.freezed.dart';
 

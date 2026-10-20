@@ -39,6 +39,7 @@
   },
   "mushafMode": "Mushaf Mode",
   "versesMode": "Verses Mode",
+  "basmala": "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",
   "bookmarks": "Bookmarks",
   "bookmarkSave": "Bookmark this ayah",
   "bookmarkRemove": "Remove bookmark",
@@ -249,6 +250,14 @@
   "pageNotFound": "Page not found",
   "pageNotFoundHint": "The link you followed does not exist here",
   "genericError": "Sorry, something went wrong — try again",
+  "readerNoAyahs": "No readable ayahs in surah {number}",
+  "@readerNoAyahs": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "noResults": "No matching results",
   "recitersRefreshFailed": "Couldn't refresh the reciters list",
   "downloadProgressReceived": "{received} MB",

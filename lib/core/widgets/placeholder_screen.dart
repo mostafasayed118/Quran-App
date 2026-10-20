@@ -18,6 +18,8 @@ class PlaceholderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hintText = hint;
+    final actionLabelText = actionLabel;
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: Center(
@@ -29,19 +31,19 @@ class PlaceholderScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
               textAlign: TextAlign.center,
             ),
-            if (hint != null) ...[
+            if (hintText != null) ...[
               const SizedBox(height: 6),
               Text(
-                hint!,
+                hintText,
                 style: AppTheme.mutedFootnote(context),
                 textAlign: TextAlign.center,
               ),
             ],
-            if (actionLabel != null && onAction != null) ...[
+            if (actionLabelText != null && onAction != null) ...[
               const SizedBox(height: 20),
               FilledButton(
                 onPressed: onAction,
-                child: Text(actionLabel!),
+                child: Text(actionLabelText),
               ),
             ],
           ],

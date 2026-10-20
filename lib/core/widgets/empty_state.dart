@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_spacing.dart';
 
 class EmptyState extends StatelessWidget {
   const EmptyState(this.message, {super.key, this.actionLabel, this.onAction});
@@ -9,14 +10,15 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = actionLabel;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(message),
-          if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: 12),
-            FilledButton(onPressed: onAction, child: Text(actionLabel!)),
+          if (label != null && onAction != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            FilledButton(onPressed: onAction, child: Text(label)),
           ],
         ],
       ),

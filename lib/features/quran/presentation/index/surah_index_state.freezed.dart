@@ -53,18 +53,18 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(SurahIndexLoading value)? loading,
-    TResult Function(SurahIndexLoaded value)? loaded,
-    TResult Function(SurahIndexError value)? error,
+    TResult Function(SurahIndexReady value)? ready,
+    TResult Function(SurahIndexFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading() when loading != null:
         return loading(_that);
-      case SurahIndexLoaded() when loaded != null:
-        return loaded(_that);
-      case SurahIndexError() when error != null:
-        return error(_that);
+      case SurahIndexReady() when ready != null:
+        return ready(_that);
+      case SurahIndexFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,17 +86,17 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(SurahIndexLoading value) loading,
-    required TResult Function(SurahIndexLoaded value) loaded,
-    required TResult Function(SurahIndexError value) error,
+    required TResult Function(SurahIndexReady value) ready,
+    required TResult Function(SurahIndexFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading():
         return loading(_that);
-      case SurahIndexLoaded():
-        return loaded(_that);
-      case SurahIndexError():
-        return error(_that);
+      case SurahIndexReady():
+        return ready(_that);
+      case SurahIndexFailed():
+        return failed(_that);
     }
   }
 
@@ -115,17 +115,17 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(SurahIndexLoading value)? loading,
-    TResult? Function(SurahIndexLoaded value)? loaded,
-    TResult? Function(SurahIndexError value)? error,
+    TResult? Function(SurahIndexReady value)? ready,
+    TResult? Function(SurahIndexFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading() when loading != null:
         return loading(_that);
-      case SurahIndexLoaded() when loaded != null:
-        return loaded(_that);
-      case SurahIndexError() when error != null:
-        return error(_that);
+      case SurahIndexReady() when ready != null:
+        return ready(_that);
+      case SurahIndexFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -146,18 +146,18 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<SurahSummary> surahs, String query)? loaded,
-    TResult Function(String message)? error,
+    TResult Function(List<SurahSummary> surahs, String query)? ready,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading() when loading != null:
         return loading();
-      case SurahIndexLoaded() when loaded != null:
-        return loaded(_that.surahs, _that.query);
-      case SurahIndexError() when error != null:
-        return error(_that.message);
+      case SurahIndexReady() when ready != null:
+        return ready(_that.surahs, _that.query);
+      case SurahIndexFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -179,17 +179,17 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<SurahSummary> surahs, String query) loaded,
-    required TResult Function(String message) error,
+    required TResult Function(List<SurahSummary> surahs, String query) ready,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading():
         return loading();
-      case SurahIndexLoaded():
-        return loaded(_that.surahs, _that.query);
-      case SurahIndexError():
-        return error(_that.message);
+      case SurahIndexReady():
+        return ready(_that.surahs, _that.query);
+      case SurahIndexFailed():
+        return failed();
     }
   }
 
@@ -208,17 +208,17 @@ extension SurahIndexStatePatterns on SurahIndexState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(List<SurahSummary> surahs, String query)? loaded,
-    TResult? Function(String message)? error,
+    TResult? Function(List<SurahSummary> surahs, String query)? ready,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
       case SurahIndexLoading() when loading != null:
         return loading();
-      case SurahIndexLoaded() when loaded != null:
-        return loaded(_that.surahs, _that.query);
-      case SurahIndexError() when error != null:
-        return error(_that.message);
+      case SurahIndexReady() when ready != null:
+        return ready(_that.surahs, _that.query);
+      case SurahIndexFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -247,8 +247,8 @@ class SurahIndexLoading implements SurahIndexState {
 
 /// @nodoc
 
-class SurahIndexLoaded implements SurahIndexState {
-  const SurahIndexLoaded(
+class SurahIndexReady implements SurahIndexState {
+  const SurahIndexReady(
       {List<SurahSummary> surahs = const <SurahSummary>[], this.query = ''})
       : _surahs = surahs;
 
@@ -267,14 +267,14 @@ class SurahIndexLoaded implements SurahIndexState {
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $SurahIndexLoadedCopyWith<SurahIndexLoaded> get copyWith =>
-      _$SurahIndexLoadedCopyWithImpl<SurahIndexLoaded>(this, _$identity);
+  $SurahIndexReadyCopyWith<SurahIndexReady> get copyWith =>
+      _$SurahIndexReadyCopyWithImpl<SurahIndexReady>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is SurahIndexLoaded &&
+            other is SurahIndexReady &&
             const DeepCollectionEquality().equals(other.surahs, _surahs) &&
             (identical(other.query, query) || other.query == query));
   }
@@ -287,27 +287,27 @@ class SurahIndexLoaded implements SurahIndexState {
 
   @override
   String toString() {
-    return 'SurahIndexState.loaded(surahs: $surahs, query: $query)';
+    return 'SurahIndexState.ready(surahs: $surahs, query: $query)';
   }
 }
 
 /// @nodoc
-abstract mixin class $SurahIndexLoadedCopyWith<$Res>
+abstract mixin class $SurahIndexReadyCopyWith<$Res>
     implements $SurahIndexStateCopyWith<$Res> {
-  factory $SurahIndexLoadedCopyWith(
-          SurahIndexLoaded value, $Res Function(SurahIndexLoaded) _then) =
-      _$SurahIndexLoadedCopyWithImpl;
+  factory $SurahIndexReadyCopyWith(
+          SurahIndexReady value, $Res Function(SurahIndexReady) _then) =
+      _$SurahIndexReadyCopyWithImpl;
   @useResult
   $Res call({List<SurahSummary> surahs, String query});
 }
 
 /// @nodoc
-class _$SurahIndexLoadedCopyWithImpl<$Res>
-    implements $SurahIndexLoadedCopyWith<$Res> {
-  _$SurahIndexLoadedCopyWithImpl(this._self, this._then);
+class _$SurahIndexReadyCopyWithImpl<$Res>
+    implements $SurahIndexReadyCopyWith<$Res> {
+  _$SurahIndexReadyCopyWithImpl(this._self, this._then);
 
-  final SurahIndexLoaded _self;
-  final $Res Function(SurahIndexLoaded) _then;
+  final SurahIndexReady _self;
+  final $Res Function(SurahIndexReady) _then;
 
   /// Create a copy of SurahIndexState
   /// with the given fields replaced by the non-null parameter values.
@@ -316,7 +316,7 @@ class _$SurahIndexLoadedCopyWithImpl<$Res>
     Object? surahs = null,
     Object? query = null,
   }) {
-    return _then(SurahIndexLoaded(
+    return _then(SurahIndexReady(
       surahs: null == surahs
           ? _self._surahs
           : surahs // ignore: cast_nullable_to_non_nullable
@@ -331,67 +331,21 @@ class _$SurahIndexLoadedCopyWithImpl<$Res>
 
 /// @nodoc
 
-class SurahIndexError implements SurahIndexState {
-  const SurahIndexError({required this.message});
-
-  final String message;
-
-  /// Create a copy of SurahIndexState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $SurahIndexErrorCopyWith<SurahIndexError> get copyWith =>
-      _$SurahIndexErrorCopyWithImpl<SurahIndexError>(this, _$identity);
+class SurahIndexFailed implements SurahIndexState {
+  const SurahIndexFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is SurahIndexError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is SurahIndexFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'SurahIndexState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $SurahIndexErrorCopyWith<$Res>
-    implements $SurahIndexStateCopyWith<$Res> {
-  factory $SurahIndexErrorCopyWith(
-          SurahIndexError value, $Res Function(SurahIndexError) _then) =
-      _$SurahIndexErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$SurahIndexErrorCopyWithImpl<$Res>
-    implements $SurahIndexErrorCopyWith<$Res> {
-  _$SurahIndexErrorCopyWithImpl(this._self, this._then);
-
-  final SurahIndexError _self;
-  final $Res Function(SurahIndexError) _then;
-
-  /// Create a copy of SurahIndexState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(SurahIndexError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'SurahIndexState.failed()';
   }
 }
 

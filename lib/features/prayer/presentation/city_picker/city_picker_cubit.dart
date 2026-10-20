@@ -7,7 +7,12 @@ import '../../data/city_repository.dart';
 import '../../data/location_service.dart';
 import 'city_picker_state.dart';
 
+/// The city picker: the search results and the selected city.
 class CityPickerCubit extends Cubit<CityPickerState> {
+  /// Creates the cubit and runs the first (empty) search.
+  ///
+  /// [location] is optional — without it the "locate me" affordance is not
+  /// offered.
   CityPickerCubit({required CityRepository cityRepo, LocationService? location})
       : _cityRepo = cityRepo,
         _location = location,
@@ -21,6 +26,11 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   String? _selectedCityId;
   bool _selectedLoaded = false;
 
+  /// Searches the city catalog for [query] and emits the results.
+  ///
+  /// The first call also loads the persisted selection; a failure emits the
+  /// failed state (the error is logged, never raised as an unhandled async
+  /// error).
   Future<void> search(String query) async {
     try {
       final results = await _cityRepo.search(query);
@@ -44,6 +54,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
     }
   }
 
+  /// Stores [city] as the selected city.
   Future<void> persist(City city) async {
     await _cityRepo.select(city);
     _selectedCityId = city.id;

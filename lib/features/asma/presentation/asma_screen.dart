@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -77,10 +78,10 @@ class _NameSheet extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Card(
-        margin: const EdgeInsets.all(12),
+        margin: const EdgeInsets.all(AppSpacing.md),
         color: colors.surface,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -107,13 +108,13 @@ class _NameSheet extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: _sheetNameArStyle,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   name.nameEn,
                   textAlign: TextAlign.center,
                   style: _sheetNameEnStyle(colors),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.md),
                 Text(
                   name.meaningAr,
                   textAlign: TextAlign.center,
@@ -143,7 +144,7 @@ class _NamesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 8,
@@ -179,7 +180,7 @@ class _NameCell extends StatelessWidget {
               name.n.toArabicIndic,
               style: _mutedAt(colors, 10),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -188,9 +189,9 @@ class _NameCell extends StatelessWidget {
                 style: _gridNameArStyle,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Text(
                 name.nameEn,
                 textAlign: TextAlign.center,

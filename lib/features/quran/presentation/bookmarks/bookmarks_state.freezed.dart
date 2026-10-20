@@ -53,7 +53,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(BookmarksLoading value)? loading,
     TResult Function(BookmarksReady value)? ready,
-    TResult Function(BookmarksError value)? error,
+    TResult Function(BookmarksFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -62,8 +62,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading(_that);
       case BookmarksReady() when ready != null:
         return ready(_that);
-      case BookmarksError() when error != null:
-        return error(_that);
+      case BookmarksFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,7 +86,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult map<TResult extends Object?>({
     required TResult Function(BookmarksLoading value) loading,
     required TResult Function(BookmarksReady value) ready,
-    required TResult Function(BookmarksError value) error,
+    required TResult Function(BookmarksFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -94,8 +94,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading(_that);
       case BookmarksReady():
         return ready(_that);
-      case BookmarksError():
-        return error(_that);
+      case BookmarksFailed():
+        return failed(_that);
     }
   }
 
@@ -115,7 +115,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(BookmarksLoading value)? loading,
     TResult? Function(BookmarksReady value)? ready,
-    TResult? Function(BookmarksError value)? error,
+    TResult? Function(BookmarksFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -123,8 +123,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading(_that);
       case BookmarksReady() when ready != null:
         return ready(_that);
-      case BookmarksError() when error != null:
-        return error(_that);
+      case BookmarksFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -146,7 +146,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function(List<Verse> entries)? ready,
-    TResult Function(String message)? error,
+    TResult Function()? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -155,8 +155,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading();
       case BookmarksReady() when ready != null:
         return ready(_that.entries);
-      case BookmarksError() when error != null:
-        return error(_that.message);
+      case BookmarksFailed() when failed != null:
+        return failed();
       case _:
         return orElse();
     }
@@ -179,7 +179,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function(List<Verse> entries) ready,
-    required TResult Function(String message) error,
+    required TResult Function() failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -187,8 +187,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading();
       case BookmarksReady():
         return ready(_that.entries);
-      case BookmarksError():
-        return error(_that.message);
+      case BookmarksFailed():
+        return failed();
     }
   }
 
@@ -208,7 +208,7 @@ extension BookmarksStatePatterns on BookmarksState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function(List<Verse> entries)? ready,
-    TResult? Function(String message)? error,
+    TResult? Function()? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -216,8 +216,8 @@ extension BookmarksStatePatterns on BookmarksState {
         return loading();
       case BookmarksReady() when ready != null:
         return ready(_that.entries);
-      case BookmarksError() when error != null:
-        return error(_that.message);
+      case BookmarksFailed() when failed != null:
+        return failed();
       case _:
         return null;
     }
@@ -318,67 +318,21 @@ class _$BookmarksReadyCopyWithImpl<$Res>
 
 /// @nodoc
 
-class BookmarksError implements BookmarksState {
-  const BookmarksError({required this.message});
-
-  final String message;
-
-  /// Create a copy of BookmarksState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $BookmarksErrorCopyWith<BookmarksError> get copyWith =>
-      _$BookmarksErrorCopyWithImpl<BookmarksError>(this, _$identity);
+class BookmarksFailed implements BookmarksState {
+  const BookmarksFailed();
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is BookmarksError &&
-            (identical(other.message, message) || other.message == message));
+        (other.runtimeType == runtimeType && other is BookmarksFailed);
   }
 
   @override
-  int get hashCode {
-    return Object.hash(runtimeType, message);
-  }
+  int get hashCode => runtimeType.hashCode;
 
   @override
   String toString() {
-    return 'BookmarksState.error(message: $message)';
-  }
-}
-
-/// @nodoc
-abstract mixin class $BookmarksErrorCopyWith<$Res>
-    implements $BookmarksStateCopyWith<$Res> {
-  factory $BookmarksErrorCopyWith(
-          BookmarksError value, $Res Function(BookmarksError) _then) =
-      _$BookmarksErrorCopyWithImpl;
-  @useResult
-  $Res call({String message});
-}
-
-/// @nodoc
-class _$BookmarksErrorCopyWithImpl<$Res>
-    implements $BookmarksErrorCopyWith<$Res> {
-  _$BookmarksErrorCopyWithImpl(this._self, this._then);
-
-  final BookmarksError _self;
-  final $Res Function(BookmarksError) _then;
-
-  /// Create a copy of BookmarksState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? message = null,
-  }) {
-    return _then(BookmarksError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
-    ));
+    return 'BookmarksState.failed()';
   }
 }
 

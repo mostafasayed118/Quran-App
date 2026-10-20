@@ -6,6 +6,7 @@ class CatalogRepository {
 
   final CatalogSource _source;
 
+  /// All catalog packs, optionally filtered by kind.
   Future<List<LibraryPackInfo>> packs({LibraryPackKind? kind}) async {
     final all = await _source.all();
     if (kind == null) return all;
@@ -15,5 +16,6 @@ class CatalogRepository {
     ];
   }
 
+  /// The pack with the given id, or null when it is not in the catalog.
   Future<LibraryPackInfo?> byId(String id) => _source.byId(id);
 }

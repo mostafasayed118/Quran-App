@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -22,7 +23,8 @@ class DuasScreen extends StatelessWidget {
         builder: (context, state) => Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+              padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md, 10, AppSpacing.md, AppSpacing.xs),
               child: Row(
                 children: [
                   Expanded(
@@ -83,12 +85,12 @@ class _DuasView extends StatelessWidget {
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Row(
                 children: [
                   for (final category in view.categories)
                     Padding(
-                      padding: const EdgeInsets.only(left: 4),
+                      padding: const EdgeInsets.only(left: AppSpacing.xs),
                       child: ChoiceChip(
                         label: Text(category),
                         selected: view.selectedCategory == category,
@@ -105,7 +107,7 @@ class _DuasView extends StatelessWidget {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 itemCount: view.entries.length,
                 itemBuilder: (context, i) {
                   final entry = view.entries[i];
@@ -140,7 +142,7 @@ class _RuqyahView extends StatelessWidget {
           return EmptyState(loc.noResults);
         }
         return ListView.builder(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: view.entries.length,
           itemBuilder: (context, i) {
             final entry = view.entries[i];
@@ -188,7 +190,7 @@ class DuaCard extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -213,7 +215,7 @@ class DuaCard extends StatelessWidget {
             ),
             if (count != null && count! > 1)
               Padding(
-                padding: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: AppSpacing.xs),
                 child: Text(
                   loc.duaRepeat(count!.toArabicIndic),
                   textAlign: TextAlign.right,
@@ -225,7 +227,7 @@ class DuaCard extends StatelessWidget {
               ),
             if (reference != null)
               Padding(
-                padding: const EdgeInsets.only(top: 4),
+                padding: const EdgeInsets.only(top: AppSpacing.xs),
                 child: Text(
                   reference!,
                   textAlign: TextAlign.right,

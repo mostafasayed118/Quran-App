@@ -13,14 +13,11 @@ const List<String> _arabicIndicDigits = [
 
 extension ArabicIndicInt on int {
   /// Renders this int with Arabic-Indic digits (٠-٩).
-  String get toArabicIndic {
-    final buffer = StringBuffer();
-    for (final char in toString().split('')) {
-      final digit = int.tryParse(char);
-      buffer.write(digit == null ? char : _arabicIndicDigits[digit]);
-    }
-    return buffer.toString();
-  }
+  ///
+  /// Delegates to the [String] mapping, so both extensions agree on every
+  /// input — including negatives, where only the digits are converted and
+  /// the minus sign is kept as-is.
+  String get toArabicIndic => toString().toArabicIndicDigits;
 }
 
 extension ArabicIndicString on String {
@@ -36,10 +33,13 @@ extension ArabicIndicString on String {
 }
 
 /// H:mm clock label with Arabic-Indic digits (call-site transform, W3).
-String formatHm(DateTime time) {
+///
+/// [arabicIndic] false returns the plain 'HH:mm' form — the format the
+/// reminder planner parses, so a caller that PERSISTS a time must use it.
+String formatHm(DateTime time, {bool arabicIndic = true}) {
   final clock = '${time.hour.toString().padLeft(2, '0')}:'
       '${time.minute.toString().padLeft(2, '0')}';
-  return clock.toArabicIndicDigits;
+  return arabicIndic ? clock.toArabicIndicDigits : clock;
 }
 
 /// H:mm label for a Duration (call-site transform, W3).

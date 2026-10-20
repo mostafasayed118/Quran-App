@@ -53,7 +53,7 @@ extension ReaderStatePatterns on ReaderState {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(ReaderLoading value)? loading,
     TResult Function(ReaderReady value)? ready,
-    TResult Function(ReaderError value)? error,
+    TResult Function(ReaderFailed value)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -62,8 +62,8 @@ extension ReaderStatePatterns on ReaderState {
         return loading(_that);
       case ReaderReady() when ready != null:
         return ready(_that);
-      case ReaderError() when error != null:
-        return error(_that);
+      case ReaderFailed() when failed != null:
+        return failed(_that);
       case _:
         return orElse();
     }
@@ -86,7 +86,7 @@ extension ReaderStatePatterns on ReaderState {
   TResult map<TResult extends Object?>({
     required TResult Function(ReaderLoading value) loading,
     required TResult Function(ReaderReady value) ready,
-    required TResult Function(ReaderError value) error,
+    required TResult Function(ReaderFailed value) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -94,8 +94,8 @@ extension ReaderStatePatterns on ReaderState {
         return loading(_that);
       case ReaderReady():
         return ready(_that);
-      case ReaderError():
-        return error(_that);
+      case ReaderFailed():
+        return failed(_that);
     }
   }
 
@@ -115,7 +115,7 @@ extension ReaderStatePatterns on ReaderState {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(ReaderLoading value)? loading,
     TResult? Function(ReaderReady value)? ready,
-    TResult? Function(ReaderError value)? error,
+    TResult? Function(ReaderFailed value)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -123,8 +123,8 @@ extension ReaderStatePatterns on ReaderState {
         return loading(_that);
       case ReaderReady() when ready != null:
         return ready(_that);
-      case ReaderError() when error != null:
-        return error(_that);
+      case ReaderFailed() when failed != null:
+        return failed(_that);
       case _:
         return null;
     }
@@ -155,7 +155,7 @@ extension ReaderStatePatterns on ReaderState {
             Set<int> bookmarkedAyahIds,
             bool showBasmala)?
         ready,
-    TResult Function(String message)? error,
+    TResult Function(int? emptySurahId)? failed,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -172,8 +172,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala);
-      case ReaderError() when error != null:
-        return error(_that.message);
+      case ReaderFailed() when failed != null:
+        return failed(_that.emptySurahId);
       case _:
         return orElse();
     }
@@ -205,7 +205,7 @@ extension ReaderStatePatterns on ReaderState {
             Set<int> bookmarkedAyahIds,
             bool showBasmala)
         ready,
-    required TResult Function(String message) error,
+    required TResult Function(int? emptySurahId) failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -221,8 +221,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala);
-      case ReaderError():
-        return error(_that.message);
+      case ReaderFailed():
+        return failed(_that.emptySurahId);
     }
   }
 
@@ -251,7 +251,7 @@ extension ReaderStatePatterns on ReaderState {
             Set<int> bookmarkedAyahIds,
             bool showBasmala)?
         ready,
-    TResult? Function(String message)? error,
+    TResult? Function(int? emptySurahId)? failed,
   }) {
     final _that = this;
     switch (_that) {
@@ -267,8 +267,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala);
-      case ReaderError() when error != null:
-        return error(_that.message);
+      case ReaderFailed() when failed != null:
+        return failed(_that.emptySurahId);
       case _:
         return null;
     }
@@ -520,65 +520,67 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
 
 /// @nodoc
 
-class ReaderError implements ReaderState {
-  const ReaderError({required this.message});
+class ReaderFailed implements ReaderState {
+  const ReaderFailed({this.emptySurahId = null});
 
-  final String message;
+  @JsonKey()
+  final int? emptySurahId;
 
   /// Create a copy of ReaderState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
-  $ReaderErrorCopyWith<ReaderError> get copyWith =>
-      _$ReaderErrorCopyWithImpl<ReaderError>(this, _$identity);
+  $ReaderFailedCopyWith<ReaderFailed> get copyWith =>
+      _$ReaderFailedCopyWithImpl<ReaderFailed>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is ReaderError &&
-            (identical(other.message, message) || other.message == message));
+            other is ReaderFailed &&
+            (identical(other.emptySurahId, emptySurahId) ||
+                other.emptySurahId == emptySurahId));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, message);
+    return Object.hash(runtimeType, emptySurahId);
   }
 
   @override
   String toString() {
-    return 'ReaderState.error(message: $message)';
+    return 'ReaderState.failed(emptySurahId: $emptySurahId)';
   }
 }
 
 /// @nodoc
-abstract mixin class $ReaderErrorCopyWith<$Res>
+abstract mixin class $ReaderFailedCopyWith<$Res>
     implements $ReaderStateCopyWith<$Res> {
-  factory $ReaderErrorCopyWith(
-          ReaderError value, $Res Function(ReaderError) _then) =
-      _$ReaderErrorCopyWithImpl;
+  factory $ReaderFailedCopyWith(
+          ReaderFailed value, $Res Function(ReaderFailed) _then) =
+      _$ReaderFailedCopyWithImpl;
   @useResult
-  $Res call({String message});
+  $Res call({int? emptySurahId});
 }
 
 /// @nodoc
-class _$ReaderErrorCopyWithImpl<$Res> implements $ReaderErrorCopyWith<$Res> {
-  _$ReaderErrorCopyWithImpl(this._self, this._then);
+class _$ReaderFailedCopyWithImpl<$Res> implements $ReaderFailedCopyWith<$Res> {
+  _$ReaderFailedCopyWithImpl(this._self, this._then);
 
-  final ReaderError _self;
-  final $Res Function(ReaderError) _then;
+  final ReaderFailed _self;
+  final $Res Function(ReaderFailed) _then;
 
   /// Create a copy of ReaderState
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? message = null,
+    Object? emptySurahId = freezed,
   }) {
-    return _then(ReaderError(
-      message: null == message
-          ? _self.message
-          : message // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(ReaderFailed(
+      emptySurahId: freezed == emptySurahId
+          ? _self.emptySurahId
+          : emptySurahId // ignore: cast_nullable_to_non_nullable
+              as int?,
     ));
   }
 }

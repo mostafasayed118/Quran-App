@@ -9,7 +9,12 @@ import '../../data/reciter_source.dart';
 import '../downloads/downloads_cubit.dart';
 import 'reciter_surahs_state.dart';
 
+/// The surahs of one reciter: the available list, the names and the teasers.
 class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
+  /// Creates the cubit for one reciter row and starts the load.
+  ///
+  /// The load is fire-and-forget: the state moves from loading to
+  /// ready/failed on its own.
   ReciterSurahsCubit({
     required ReciterSource reciters,
     required DownloadsCubit downloads,
@@ -25,12 +30,19 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
   final DownloadsCubit _downloads;
   final String _rowId;
 
+  /// Loads the reciter's surah list, names and ayah teasers.
+  ///
+  /// An unknown reciter row fails the screen (the state is failed, never a
+  /// raw exception). The download state is refreshed before the emission so
+  /// the per-surah download badges are already correct.
   Future<void> load() async {
     try {
       final row = await _reciters.byId(_rowId);
       if (isClosed) return;
       if (row == null) {
-        emit(const ReciterSurahsState.error(message: 'reciter row not found'));
+        dev.log('reciter row not found',
+            name: 'quran_yahdi/reciter_surahs', error: _rowId);
+        emit(const ReciterSurahsState.failed());
         return;
       }
       final surahs = parseSurahList(row.surahList);
@@ -50,10 +62,11 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
           name: 'quran_yahdi/reciter_surahs',
           error: error,
           stackTrace: stackTrace);
-      if (!isClosed) emit(ReciterSurahsState.error(message: '$error'));
+      if (!isClosed) emit(const ReciterSurahsState.failed());
     }
   }
 
+  /// Makes this reciter the default one (the moshaf selection).
   Future<void> setAsDefault() async {
     await _reciters.selectMoshaf(_rowId);
   }

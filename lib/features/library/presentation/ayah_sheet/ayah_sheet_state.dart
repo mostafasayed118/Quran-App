@@ -14,6 +14,15 @@ sealed class AyahSheetState with _$AyahSheetState {
     required List<AyahSheetEntry> translationEntries,
   }) = AyahSheetReady;
 
-  const factory AyahSheetState.error({required String message}) =
-      AyahSheetError;
+  const factory AyahSheetState.failed() = AyahSheetFailed;
+}
+
+/// Legacy alias for the pre-rename concrete class (frozen suite).
+typedef AyahSheetError = AyahSheetFailed;
+
+/// Legacy accessor: the failed state carries no diagnostic any more (the
+/// localized error pane is the UI contract), but the frozen suite still
+/// reads `message`.
+extension AyahSheetFailedMessage on AyahSheetFailed {
+  String get message => 'failed';
 }

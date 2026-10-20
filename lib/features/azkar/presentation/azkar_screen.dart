@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -106,7 +107,8 @@ class _BrowsingView extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
           child: SearchField(
             hint: loc.azkarSearchPlaceholder,
             onChanged: context.read<AzkarCubit>().setSearchQuery,
@@ -117,7 +119,7 @@ class _BrowsingView extends StatelessWidget {
               ? (collections.isEmpty
                   ? EmptyState(loc.noResults)
                   : ListView.builder(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       itemCount: collections.length,
                       itemBuilder: (context, i) =>
                           _CollectionTile(collection: collections[i]),
@@ -146,7 +148,7 @@ class _SearchResultsList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 2, 14, 4),
+          padding: const EdgeInsets.fromLTRB(14, 2, 14, AppSpacing.xs),
           child: Text(
             loc.azkarSearchResultsFor(results.length.toArabicIndic),
             style: AppTheme.mutedFootnote(context),
@@ -154,12 +156,12 @@ class _SearchResultsList extends StatelessWidget {
         ),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             itemCount: results.length + (hasMore ? 1 : 0),
             itemBuilder: (context, i) {
               if (i == results.length) {
                 return Padding(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   child: Text(
                     loc.azkarSearchMore(
                         AzkarRepository.searchLimit.toArabicIndic),
@@ -249,7 +251,7 @@ class _RecitingList extends StatelessWidget {
       builder: (context, state) {
         final reciting = state as AzkarReciting;
         return ListView.builder(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(AppSpacing.md),
           itemCount: reciting.collection.items.length,
           itemBuilder: (context, i) {
             final item = reciting.collection.items[i];
@@ -282,7 +284,7 @@ class _RecitingCard extends StatelessWidget {
       child: Card(
         color: done ? colors.surfaceContainerHighest : null,
         child: InkWell(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.md),
           onTap: done
               ? null
               : () {
@@ -290,7 +292,7 @@ class _RecitingCard extends StatelessWidget {
                   context.read<AzkarCubit>().tapItem(index);
                 },
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -344,7 +346,7 @@ class _ZikrLine extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppSpacing.sm),
         Container(
           width: 40,
           height: 40,

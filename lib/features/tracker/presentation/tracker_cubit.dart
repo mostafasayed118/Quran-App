@@ -8,7 +8,12 @@ import '../data/khatma_repository.dart';
 import '../data/prayer_log_repository.dart';
 import 'tracker_state.dart';
 
+/// The tracker screen: today's prayer marks, the streak and the khatma card.
 class TrackerCubit extends Cubit<TrackerState> {
+  /// Creates the cubit and hydrates it.
+  ///
+  /// [khatma] is optional — without it the khatma card is hidden. The
+  /// hydration is fire-and-forget; await [loaded] to wait for it.
   TrackerCubit({required PrayerLogRepository repo, KhatmaRepository? khatma})
       : _repo = repo,
         _khatma = khatma,
@@ -19,6 +24,7 @@ class TrackerCubit extends Cubit<TrackerState> {
   /// Used by red-first tests to await the initial load deterministically.
   final Completer<void> _loaded = Completer<void>();
 
+  /// Completes when the first load has settled (success or failure).
   Future<void> get loaded => _loaded.future;
 
   final PrayerLogRepository _repo;
@@ -32,6 +38,11 @@ class TrackerCubit extends Cubit<TrackerState> {
     }
   }
 
+  /// Loads today's prayer marks, the streak, the last 7 days and the khatma
+  /// card, then emits the ready state.
+  ///
+  /// A failure emits the failed state (the error is logged, never raised as
+  /// an unhandled async error).
   Future<void> reload() async {
     try {
       final now = DateTime.now();
@@ -164,6 +175,7 @@ class TrackerCubit extends Cubit<TrackerState> {
 
   String _key(DateTime day) => '${day.year}-${day.month}-${day.day}';
 
+  /// Marks or unmarks one prayer slot for today and reloads the screen.
   Future<void> toggle(PrayerSlot slot) async {
     try {
       await _repo.togglePrayer(DateTime.now(), slot);

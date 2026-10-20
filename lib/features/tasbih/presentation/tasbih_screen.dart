@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'tasbih_cubit.dart';
@@ -24,17 +25,17 @@ class TasbihScreen extends StatelessWidget {
           final done = ready.count >= ready.target;
           return Column(
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               _TasbihDial(ready: ready),
               const SizedBox(height: 20),
               _TargetChips(ready: ready),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               OutlinedButton.icon(
                 onPressed: () => context.read<TasbihCubit>().reset(),
                 icon: const Icon(Icons.refresh),
                 label: Text(loc.tasbihReset),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.sm),
               if (done)
                 Text(
                   loc.azkarDone,
@@ -136,7 +137,7 @@ class _TargetChips extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: 8,
+      spacing: AppSpacing.sm,
       runSpacing: 8,
       children: [
         for (final target in TasbihCubit.targets)

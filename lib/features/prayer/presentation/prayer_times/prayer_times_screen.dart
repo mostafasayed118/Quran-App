@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -94,7 +95,7 @@ class _TimesListState extends State<_TimesList> {
     final colors = Theme.of(context).colorScheme;
     final state = widget.state;
     return ListView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.entries.length + 1,
       itemBuilder: (context, i) {

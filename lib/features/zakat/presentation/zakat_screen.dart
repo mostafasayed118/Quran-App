@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -45,7 +46,7 @@ class ZakatScreen extends StatelessWidget {
                   ? loc.zakatDue
                   : loc.zakatNotDue;
           return ListView(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               _NisabToggle(ready: ready),
               const SizedBox(height: 10),
@@ -135,7 +136,7 @@ class _SummaryCard extends StatelessWidget {
             _ZakatLine(
                 label: loc.zakatableLabel, value: ready.result.zakatable),
             _ZakatLine(label: loc.nisabLabel, value: ready.result.nisabValue),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               verdictText,
               textAlign: TextAlign.right,
@@ -151,7 +152,7 @@ class _SummaryCard extends StatelessWidget {
                 textAlign: TextAlign.right,
                 style: _amountStyle.copyWith(color: colors.primary),
               ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               loc.zakatFootnote,
               style: AppTheme.mutedFootnote(context),
@@ -204,7 +205,7 @@ class _Field extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: TextField(
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         decoration: InputDecoration(labelText: label),

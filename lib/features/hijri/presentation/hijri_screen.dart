@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -27,7 +28,7 @@ class HijriScreen extends StatelessWidget {
             :final todayHeader
           ) =>
             ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 _TodayCard(todayHeader: todayHeader),
                 _MonthNavBar(monthName: monthName, year: year),
@@ -120,7 +121,7 @@ class _MonthGrid extends StatelessWidget {
       mainAxisSpacing: 4,
       crossAxisSpacing: 4,
       childAspectRatio: 0.82,
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.only(top: AppSpacing.sm),
       children: [
         for (var i = 0; i < offset; i++) const SizedBox.shrink(),
         for (final cell in cells) _DayCell(cell: cell),

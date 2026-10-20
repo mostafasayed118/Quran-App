@@ -88,6 +88,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get versesMode => 'Verses Mode';
 
   @override
+  String get basmala => 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ';
+
+  @override
   String get bookmarks => 'Bookmarks';
 
   @override
@@ -450,6 +453,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get genericError => 'Sorry, something went wrong — try again';
+
+  @override
+  String readerNoAyahs(String number) {
+    return 'No readable ayahs in surah $number';
+  }
 
   @override
   String get noResults => 'No matching results';

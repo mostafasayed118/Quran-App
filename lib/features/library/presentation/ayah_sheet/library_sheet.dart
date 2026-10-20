@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/di/injector.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -17,8 +18,8 @@ import 'ayah_sheet_state.dart';
 /// empty states route to /library. [downloader] is a widget-test seam:
 /// production callers omit it and the registered singleton is resolved here,
 /// so the reader presentation never depends on the library data layer.
-class LibrarySheet extends StatelessWidget {
-  const LibrarySheet({
+class AyahSheet extends StatelessWidget {
+  const AyahSheet({
     super.key,
     required this.surahId,
     required this.surahName,
@@ -35,7 +36,10 @@ class LibrarySheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<AyahSheetCubit>(
       create: (_) => AyahSheetCubit(
-        downloader: downloader ?? getIt<PackDownloader>(),
+        // The container is resolved through get_it directly: a feature may
+        // not import the app layer (the composition root), and the
+        // compatibility shim exists for the frozen suite only.
+        downloader: downloader ?? GetIt.instance<PackDownloader>(),
         surah: surahId,
         ayah: ayah,
       ),
@@ -43,6 +47,11 @@ class LibrarySheet extends StatelessWidget {
     );
   }
 }
+
+/// The sheet's former name, kept ONLY as a compatibility alias for the
+/// frozen suite (the widget test imports this file by path and uses the old
+/// name). Production code calls [AyahSheet].
+typedef LibrarySheet = AyahSheet;
 
 class _AyahSheetView extends StatelessWidget {
   const _AyahSheetView({required this.surahName, required this.ayah});
@@ -59,7 +68,7 @@ class _AyahSheetView extends StatelessWidget {
       builder: (context, state) {
         final Widget content = switch (state) {
           AyahSheetLoading() => const LoadingView(),
-          AyahSheetError() => errorPane(loc),
+          AyahSheetFailed() => errorPane(loc),
           final AyahSheetReady ready => _SheetBody(
               surahName: surahName,
               ayah: ayah,
@@ -132,7 +141,8 @@ class _SheetHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg, 14, AppSpacing.lg, AppSpacing.xs),
       child: Row(
         textDirection: TextDirection.rtl,
         children: [
@@ -176,12 +186,13 @@ class _SheetPane extends StatelessWidget {
       );
     }
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
         return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+          padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             textDirection: TextDirection.rtl,
@@ -194,7 +205,7 @@ class _SheetPane extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textDirection: TextDirection.rtl,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 entry.text,
                 style: const TextStyle(fontSize: 16, height: 1.9),

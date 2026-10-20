@@ -24,6 +24,7 @@ class ErrorStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final label = actionLabel;
     return Material(
       color: colors.errorContainer,
       child: SafeArea(
@@ -40,8 +41,8 @@ class ErrorStrip extends StatelessWidget {
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (actionLabel != null && onRetry != null)
-                TextButton(onPressed: onRetry, child: Text(actionLabel!)),
+              if (label != null && onRetry != null)
+                TextButton(onPressed: onRetry, child: Text(label)),
               IconButton(
                 tooltip: dismissTooltip ??
                     MaterialLocalizations.of(context).closeButtonTooltip,

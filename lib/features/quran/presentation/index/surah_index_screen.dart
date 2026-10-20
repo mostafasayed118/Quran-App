@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
@@ -25,11 +26,12 @@ class SurahIndexScreen extends StatelessWidget {
       body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
         builder: (context, state) => switch (state) {
           SurahIndexLoading() => const LoadingView(),
-          SurahIndexError() => errorPane(loc),
-          SurahIndexLoaded(:final surahs) => Column(
+          SurahIndexFailed() => errorPane(loc),
+          SurahIndexReady(:final surahs) => Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.md,
+                      AppSpacing.md, AppSpacing.md, AppSpacing.xs),
                   child: SearchField(
                     hint: loc.searchSurahHint,
                     onChanged: context.read<SurahIndexCubit>().setQuery,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -20,7 +21,7 @@ class HadithScreen extends StatelessWidget {
         builder: (context, state) {
           final Widget content = switch (state) {
             HadithLoading() => const Center(child: CircularProgressIndicator()),
-            HadithError() => errorPane(loc),
+            HadithFailed() => errorPane(loc),
             final HadithReady ready => Column(
                 children: [
                   Expanded(child: _HadithVerses(ready: ready)),
@@ -52,7 +53,7 @@ class _HadithTitle extends StatelessWidget {
               child: Text(title, overflow: TextOverflow.ellipsis),
             ),
             if (s is HadithReady && s.language.isNotEmpty) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Text(
                 s.language.toUpperCase(),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -75,7 +76,7 @@ class _HadithVerses extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       itemCount: ready.items.length,
       itemBuilder: (context, index) {
         final (number, text) = ready.items[index];
@@ -103,7 +104,8 @@ class _HadithVerseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding:
+          const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
@@ -116,7 +118,7 @@ class _HadithVerseRow extends StatelessWidget {
               style: const TextStyle(fontSize: 12),
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
               text,
@@ -141,7 +143,8 @@ class _HadithPager extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

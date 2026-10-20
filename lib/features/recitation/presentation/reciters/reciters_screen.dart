@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
@@ -36,7 +37,7 @@ class RecitersScreen extends StatelessWidget {
       body: BlocBuilder<RecitersCubit, RecitersState>(
         builder: (context, state) => switch (state) {
           RecitersLoading() => const LoadingView(),
-          RecitersError() => errorPane(loc),
+          RecitersFailed() => errorPane(loc),
           RecitersReady(:final reciters, :final query, :final dataError) =>
             Column(
               children: [
@@ -48,7 +49,8 @@ class RecitersScreen extends StatelessWidget {
                         context.read<RecitersCubit>().clearDataError(),
                   ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.md,
+                      AppSpacing.md, AppSpacing.md, AppSpacing.xs),
                   child: SearchField(
                     hint: loc.searchReciters,
                     onChanged: context.read<RecitersCubit>().setQuery,

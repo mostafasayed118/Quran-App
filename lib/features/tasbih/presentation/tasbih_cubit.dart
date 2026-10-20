@@ -6,7 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/tasbih_repository.dart';
 import 'tasbih_state.dart';
 
+/// The tasbih screen: the counter, its target and the persisted snapshot.
 class TasbihCubit extends Cubit<TasbihState> {
+  /// Creates the cubit and hydrates it from the stored snapshot.
+  ///
+  /// The hydration is fire-and-forget; await [loaded] to wait for it.
   TasbihCubit({
     required TasbihRepository repo,
   })  : _repo = repo,
@@ -14,11 +18,13 @@ class TasbihCubit extends Cubit<TasbihState> {
     unawaited(_hydrate());
   }
 
+  /// The counter targets the user can pick (33, 99, 100 and 500).
   static const List<int> targets = <int>[33, 99, 100, 500];
 
   final TasbihRepository _repo;
   final Completer<void> _loaded = Completer<void>();
 
+  /// Completes when the stored snapshot has been applied (or failed).
   Future<void> get loaded => _loaded.future;
 
   Future<void> _hydrate() async {
@@ -41,6 +47,10 @@ class TasbihCubit extends Cubit<TasbihState> {
     }
   }
 
+  /// Counts one tap and persists the new count.
+  ///
+  /// [TasbihState.reachedTarget] flips exactly on the target count, not
+  /// beyond it.
   Future<void> increment() async {
     final state = this.state;
     if (state is! TasbihReady) return;
@@ -55,6 +65,7 @@ class TasbihCubit extends Cubit<TasbihState> {
     await _save(next, state.target);
   }
 
+  /// Resets the counter to zero (the target is kept) and persists it.
   Future<void> reset() async {
     final state = this.state;
     if (state is! TasbihReady) return;
@@ -63,6 +74,7 @@ class TasbihCubit extends Cubit<TasbihState> {
     await _save(0, state.target);
   }
 
+  /// Picks the counter target and resets the count to zero.
   Future<void> selectTarget(int target) async {
     if (isClosed) return;
     emit(TasbihState.ready(target: target));

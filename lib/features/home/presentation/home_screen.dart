@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -34,14 +35,14 @@ class HomeScreen extends StatelessWidget {
           HomeLoading() => const LoadingView(),
           HomeFailed() => errorPane(loc),
           HomeReady(:final lastRead, :final nextPrayer) => ListView(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 if (lastRead != null) _LastReadCard(lastRead: lastRead),
                 if (nextPrayer != null)
                   _NextPrayerCard(prayer: nextPrayer)
                 else
                   const _NoCityCard(),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.sm),
                 const _FeatureGrid(),
               ],
             ),
@@ -194,11 +195,11 @@ class _FeatureTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppSpacing.lg),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.lg),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -206,7 +207,7 @@ class _FeatureTile extends StatelessWidget {
             Icon(icon, color: colors.primary),
             const SizedBox(height: 6),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
               child: Text(
                 label,
                 textAlign: TextAlign.center,

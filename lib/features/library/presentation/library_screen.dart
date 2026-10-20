@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/utils/format_bytes.dart';
 import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
@@ -100,7 +102,7 @@ class _PackList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       itemCount: packs.length,
       itemBuilder: (context, index) =>
           _PackRow(pack: packs[index], ready: ready),
@@ -129,8 +131,8 @@ class _PackRow extends StatelessWidget {
       trailing = DownloadProgressLabel(
         received: received,
         total: total,
-        format: (r, t) =>
-            '${_mb(r).toArabicIndicDigits} / ${_mb(t).toArabicIndicDigits} MB',
+        format: (r, t) => '${formatMegabytes(r).toArabicIndicDigits} / '
+            '${formatMegabytes(t).toArabicIndicDigits} MB',
       );
     } else if (installed) {
       trailing = IconButton(
@@ -165,16 +167,11 @@ class _PackRow extends StatelessWidget {
               icon: const Icon(Icons.menu_book_outlined),
               onPressed: () => context.push('/library/hadith?pack=${pack.id}'),
             ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           trailing,
         ],
       ),
     );
-  }
-
-  static String _mb(int bytes) {
-    final v = bytes / (1024 * 1024);
-    return v >= 10 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
   }
 
   Future<void> _confirmDelete(

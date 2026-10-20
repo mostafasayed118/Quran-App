@@ -15,6 +15,5 @@ sealed class ReciterSurahsState with _$ReciterSurahsState {
     @Default(<int, String>{}) Map<int, String> previews,
   }) = ReciterSurahsReady;
 
-  const factory ReciterSurahsState.error({required String message}) =
-      ReciterSurahsError;
+  const factory ReciterSurahsState.failed() = ReciterSurahsFailed;
 }
