@@ -13,6 +13,8 @@ Public website + online reader for قرآن يَهدي. Astro 7 static site — 
 - **Per-ayah actions** — copy · share · bookmark (local-only) · listen (opens the surah player; per-ayah audio is a later phase).
 - **About & Privacy** — `/about` mission + offline-first story; `/privacy` renders the repo `PRIVACY.md` single source (EN mirror from `PRIVACY.en.md`).
 - **EN locale** — every route is mirrored at `/en/**` with LTR chrome (`lang="en"`), reader included; the header language switch round-trips.
+- **Prayer times** — `/prayer-times` city index (156 cities, instant filter) + per-city pages with a 24-month table, today highlighted, month switcher and an imsakiah (imsak/iftar) view; times are precomputed in each city's local time.
+- **Qibla** — `/qibla` client-side great-circle bearing to the Kaaba with an SVG compass; uses the device location (graceful denial → city picker).
 - **404** — localized not-found page with search and home links.
 - **SEO** — canonical + `hreflang` alternates + OG/Twitter meta per page; `sitemap.xml` (AR+EN with alternates) and `robots.txt`.
 
@@ -39,6 +41,17 @@ dart run tools/export_web_data.dart   # from repo root; reads assets/db/quran.sq
 ```
 
 Re-run it only when the app's DB changes; commit the regenerated JSON.
+
+Prayer times live in `public/data/prayer-times/` and are **generated, never hand-edited**:
+
+```
+dart run tools/export_web_prayer_times.dart   # from repo root; reads assets/data/cities.json
+```
+
+Per-city shape: `{ city: { id, nameAr, nameEn, lat, lng, tz }, months: [{ y, m, days: [[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak], ...] }] }` — minutes
+since local midnight in the city's own timezone (DST-aware), Egyptian method, `imsak = fajr - 10`.
+An isha that falls after local midnight (northern summers) is stored as `1440 + minutes`; render it
+with `% 1440`. `index.json` lists every city (slug = `id`); the pages read it at build time via `process.cwd()`.
 
 ## Deploy
 Cloudflare Pages project ← this repo; root directory `web`, output `dist`.
