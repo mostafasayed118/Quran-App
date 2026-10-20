@@ -4,6 +4,10 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://quranyahdi.pages.dev',
   output: 'static',
+  // Every component's <style> ships as one hashed stylesheet instead of being
+  // inlined into the page, so the CSP needs no 'unsafe-inline' for styles.
+  // (Astro's 'always' means "always inline"; 'never' is the external stylesheet.)
+  build: { inlineStylesheets: 'never' },
   i18n: {
     defaultLocale: 'ar',
     locales: ['ar', 'en'],

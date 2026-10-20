@@ -24,7 +24,13 @@ const blocks = parseBlocks(source);
 
 describe('_headers cache-control', () => {
   it('declares the root, hashed asset and font path blocks', () => {
-    expect([...blocks.keys()]).toEqual(['/*', '/_astro/*', '/fonts/*']);
+    expect([...blocks.keys()]).toEqual([
+      '/*',
+      '/_astro/*',
+      '/fonts/*',
+      '/data/*',
+      '/og/*',
+    ]);
   });
 
   it('marks content-hashed /_astro assets immutable for a year', () => {

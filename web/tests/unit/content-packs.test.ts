@@ -35,10 +35,10 @@ describe('PACKS catalog', () => {
 
   it('builds spa5k tafsir URLs verbatim', () => {
     expect(pack('ar-tafsir-muyassar').url(1)).toBe(
-      'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir/ar-tafsir-muyassar/1.json',
+      'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@eb82bb6294efe30ad5c135c03b1864afaa70e855/tafsir/ar-tafsir-muyassar/1.json',
     );
     expect(pack('ar-tafsir-al-jalalayn').url(114)).toBe(
-      'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir/ar-tafsir-al-jalalayn/114.json',
+      'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@eb82bb6294efe30ad5c135c03b1864afaa70e855/tafsir/ar-tafsir-al-jalalayn/114.json',
     );
   });
 

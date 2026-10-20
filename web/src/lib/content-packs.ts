@@ -37,10 +37,12 @@ function parseTranslationChapter(json: unknown): Map<number, string> {
   return map;
 }
 
-const SPA5K_BASE = 'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir';
-// Pinned to the app-parity commit SHA (quran-api carries no tags; the branch-head SHA is its only immutable ref). Never move it back to @1.
+// Pinned to the resolved COMMIT SHA of the v1.2.2 tag (a tag is a mutable ref; the commit SHA is not).
+// Parity with the app catalog, which pins the same SHA. Never move it back to a tag or to @1.
 // The pin is the integrity boundary; a SHA-256 manifest was evaluated and SKIPPED (owner-approved 2026-10-19) — it would be a
 // network-dependent CI check for marginal gain over an immutable URL. The un-pin guard lives in tests/unit/content-packs.test.ts.
+const SPA5K_BASE =
+  'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@eb82bb6294efe30ad5c135c03b1864afaa70e855/tafsir';
 const FAWAZ_BASE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions';
 
 function tafsirPack(id: string, titleAr: string): PackInfo {
