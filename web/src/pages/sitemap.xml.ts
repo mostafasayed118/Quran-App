@@ -15,6 +15,7 @@ export const GET: APIRoute = ({ site }) => {
   const extras = [
     '/prayer-times/',
     ...cityIndex.cities.map((c) => `/prayer-times/${c.id}/`),
+    '/qibla/',
   ];
   const xml = toSitemapXml(buildSitemapUrls(site!.href, ids, extras));
   return new Response(xml, { headers: { 'Content-Type': 'application/xml' } });

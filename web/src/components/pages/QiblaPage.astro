@@ -1,0 +1,198 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { t, type Locale } from '../../lib/strings';
+
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+const placeholder = t(locale, 'ptSearchPlaceholder');
+// Mirrors the prayer-times pages: resolve the data dir from the web/ cwd
+// (components are bundled at build time; npm run build/dev run there).
+const index = JSON.parse(
+  readFileSync(join(process.cwd(), 'public', 'data', 'prayer-times', 'index.json'), 'utf8'),
+) as { cities: { id: string; nameAr: string; nameEn: string }[] };
+const cardinal =
+  locale === 'en'
+    ? { n: 'N', e: 'E', s: 'S', w: 'W' }
+    : { n: 'شمال', e: 'شرق', s: 'جنوب', w: 'غرب' };
+---
+<h1 class="page-title">{t(locale, 'qbTitle')}</h1>
+<p class="page-lead">{t(locale, 'qbLead')}</p>
+<div class="qb" data-qy="qb" data-locale={locale}>
+  <div class="qb-actions">
+    <button type="button" class="rc-btn" data-qy="qb-geo">{t(locale, 'qbUseLocation')}</button>
+    <span class="qb-status" data-qy="qb-status" role="status"></span>
+  </div>
+  <div class="qb-result" data-qy="qb-result" hidden>
+    <svg viewBox="0 0 200 200" width="230" height="230" role="img" aria-label={t(locale, 'qbTitle')}>
+      <circle cx="100" cy="100" r="96" class="qb-ring"></circle>
+      <line x1="100" y1="6" x2="100" y2="18" class="qb-tick"></line>
+      <line x1="100" y1="182" x2="100" y2="194" class="qb-tick"></line>
+      <line x1="6" y1="100" x2="18" y2="100" class="qb-tick"></line>
+      <line x1="182" y1="100" x2="194" y2="100" class="qb-tick"></line>
+      <text x="100" y="34" class="qb-card" text-anchor="middle">{cardinal.n}</text>
+      <text x="100" y="176" class="qb-card" text-anchor="middle">{cardinal.s}</text>
+      <text x="174" y="105" class="qb-card" text-anchor="middle">{cardinal.e}</text>
+      <text x="26" y="105" class="qb-card" text-anchor="middle">{cardinal.w}</text>
+      <g class="qb-needle" data-qy="qb-needle" transform="rotate(0 100 100)">
+        <path d="M100 16 L109 106 L100 94 L91 106 Z" class="qb-arrow"></path>
+      </g>
+      <circle cx="100" cy="100" r="6" class="qb-hub"></circle>
+    </svg>
+    <p class="qb-readout">
+      <span class="qb-readout-label">{t(locale, 'qbDirection')}</span>
+      <span class="qb-deg"><span data-qy="qb-deg"></span>°</span>
+    </p>
+    <p class="qb-place" data-qy="qb-place"></p>
+  </div>
+  <div class="qb-picker" data-qy="qb-picker" hidden>
+    <p class="qb-picker-msg">{t(locale, 'qbDenied')}</p>
+    <input type="search" class="index-search" placeholder={placeholder} aria-label={placeholder} />
+    <p class="empty" hidden>{t(locale, 'noResults')}</p>
+    <ul class="qb-cities">
+      {index.cities.map((city) => (
+        <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
+          <button type="button" data-qy="qb-city" data-city-id={city.id}>
+            {locale === 'en' ? city.nameEn : city.nameAr}
+          </button>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <p class="qb-how">{t(locale, 'qbHow')}</p>
+</div>
+<style is:global>
+  .qb { width: min(760px, calc(100% - 40px)); margin: 0 auto 60px; }
+  .qb .qb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0; }
+  .qb .qb-status { color: var(--muted-strong); font-size: .9rem; }
+  .qb .qb-result { text-align: center; margin-top: 8px; }
+  .qb .qb-ring { fill: var(--surface); stroke: var(--hairline); stroke-width: 2; }
+  .qb .qb-tick { stroke: var(--gold-line); stroke-width: 2; }
+  .qb .qb-card { fill: var(--muted-strong); font-size: 13px; font-family: inherit; }
+  .qb .qb-arrow { fill: var(--accent); }
+  .qb .qb-hub { fill: var(--gold-ink); }
+  .qb .qb-needle { transition: transform .5s ease; }
+  .qb .qb-readout { margin: 10px 0 0; font-size: 1.05rem; }
+  .qb .qb-readout-label { color: var(--muted-strong); margin-inline-end: 8px; }
+  .qb .qb-deg { font-weight: 700; color: var(--accent); }
+  .qb .qb-place { margin: 2px 0 0; color: var(--muted-strong); font-size: .9rem; }
+  .qb .qb-picker { margin-top: 6px; }
+  .qb .qb-picker-msg { color: var(--muted-strong); }
+  .qb .qb-cities {
+    list-style: none; margin: 4px 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    column-gap: 18px;
+  }
+  .qb .qb-cities button {
+    display: block; width: 100%; text-align: start; padding: 10px 4px;
+    border: 0; border-bottom: 1px solid var(--hairline); background: transparent;
+    color: var(--ink); font: inherit; cursor: pointer;
+  }
+  .qb .qb-cities button:hover { color: var(--accent); }
+  @media (pointer: coarse) { .qb .qb-cities button { min-height: 44px; } }
+  .qb .qb-how { color: var(--muted-strong); font-size: .85rem; margin-top: 14px; }
+  @media (prefers-reduced-motion: reduce) { .qb .qb-needle { transition: none; } }
+</style>
+<script>
+  import { t, type Locale } from '../../lib/strings';
+  import { normalizeArabic } from '../../lib/arabic';
+  import { qiblaBearing } from '../../lib/qibla';
+  import { digitsFor } from '../../lib/arabic-digits';
+
+  function init(): void {
+    const root = document.querySelector<HTMLElement>('[data-qy="qb"]');
+    if (!root || root.dataset.qyReady) return;
+    const locale: Locale = root.dataset.locale === 'en' ? 'en' : 'ar';
+    const geo = root.querySelector<HTMLButtonElement>('[data-qy="qb-geo"]');
+    const status = root.querySelector<HTMLElement>('[data-qy="qb-status"]');
+    const result = root.querySelector<HTMLElement>('[data-qy="qb-result"]');
+    const picker = root.querySelector<HTMLElement>('[data-qy="qb-picker"]');
+    const needle = root.querySelector<SVGGElement>('[data-qy="qb-needle"]');
+    const deg = root.querySelector<HTMLElement>('[data-qy="qb-deg"]');
+    const place = root.querySelector<HTMLElement>('[data-qy="qb-place"]');
+    if (!geo || !status || !result || !picker || !needle || !deg || !place) return;
+
+    const showBearing = (lat: number, lng: number, label: string): void => {
+      const bearing = qiblaBearing(lat, lng);
+      needle.setAttribute('transform', `rotate(${bearing.toFixed(2)} 100 100)`);
+      deg.textContent = digitsFor(Math.round(bearing), locale);
+      place.textContent = label;
+      status.textContent = '';
+      result.hidden = false;
+      picker.hidden = true;
+    };
+
+    const showPicker = (): void => {
+      status.textContent = '';
+      picker.hidden = false;
+    };
+
+    geo.addEventListener('click', () => {
+      if (!('geolocation' in navigator)) {
+        showPicker();
+        return;
+      }
+      status.textContent = t(locale, 'qbLocating');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          if (root.isConnected) {
+            showBearing(pos.coords.latitude, pos.coords.longitude, t(locale, 'qbYourLocation'));
+          }
+        },
+        () => {
+          if (root.isConnected) showPicker();
+        },
+        { timeout: 10_000, maximumAge: 300_000 },
+      );
+    });
+
+    const search = picker.querySelector<HTMLInputElement>('input[type="search"]');
+    const empty = picker.querySelector<HTMLParagraphElement>('p.empty');
+    const items = picker.querySelectorAll<HTMLLIElement>('.qb-cities li');
+    if (search && empty && items.length > 0) {
+      search.addEventListener('input', () => {
+        const raw = search.value;
+        const q = normalizeArabic(raw);
+        const qEn = raw.trim().toLowerCase();
+        let visible = 0;
+        for (const li of items) {
+          const hit =
+            q === '' ||
+            normalizeArabic(li.dataset.nameAr ?? '').includes(q) ||
+            (li.dataset.nameEn ?? '').toLowerCase().includes(qEn);
+          li.hidden = !hit;
+          if (hit) visible += 1;
+        }
+        empty.hidden = visible !== 0;
+      });
+    }
+
+    for (const button of root.querySelectorAll<HTMLButtonElement>('[data-qy="qb-city"]')) {
+      button.addEventListener('click', () => {
+        const cityId = button.dataset.cityId ?? '';
+        if (cityId === '') return;
+        status.textContent = t(locale, 'recitersLoading');
+        fetch(`/data/prayer-times/${cityId}.json`, { credentials: 'omit' })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
+          .then((data: { city: { lat: number; lng: number; nameAr: string; nameEn: string } }) => {
+            if (!root.isConnected) return;
+            showBearing(
+              data.city.lat,
+              data.city.lng,
+              locale === 'en' ? data.city.nameEn : data.city.nameAr,
+            );
+          })
+          .catch(() => {
+            if (root.isConnected) status.textContent = t(locale, 'panelError');
+          });
+      });
+    }
+
+    root.dataset.qyReady = '1';
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>
