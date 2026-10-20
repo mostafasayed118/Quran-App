@@ -9,12 +9,19 @@ import 'app/bootstrap.dart';
 import 'app/router.dart';
 import 'core/di/injector.dart';
 import 'core/l10n/platform_localizations.dart';
+import 'core/utils/boot_fail_open.dart';
 import 'core/utils/deep_links.dart';
 import 'features/notifications/data/notifications_binding.dart';
 import 'features/notifications/data/reminder_planner.dart'
     show azkarReminderPayload, prayerReminderPayload, wirdReminderPayload;
 import 'features/notifications/data/reminder_settings.dart';
 import 'features/recitation/playback/background_init_guard.dart';
+
+/// F-D1 fail-open budgets: the two awaited boot inits may each take at most
+/// this long — a plugin that overruns is abandoned and boot proceeds (the
+/// helper logs the failure under `quran_yahdi/boot`).
+const _bootAudioInitTimeout = Duration(seconds: 8);
+const _bootNotificationsInitTimeout = Duration(seconds: 8);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,19 +37,27 @@ Future<void> main() async {
   );
   final loc = platformLocalizations();
   await Future.wait<void>([
-    BackgroundInitGuard.attempt(
-      () => JustAudioBackground.init(
-        androidNotificationChannelId:
-            'com.mostafasayed.quranyahdi.channel.audio',
-        androidNotificationChannelName:
-            '${loc.recitationsTitle} — ${loc.appName}',
-        androidNotificationOngoing: true,
+    failOpenBootInit(
+      'JustAudioBackground.init',
+      () => BackgroundInitGuard.attempt(
+        () => JustAudioBackground.init(
+          androidNotificationChannelId:
+              'com.mostafasayed.quranyahdi.channel.audio',
+          androidNotificationChannelName:
+              '${loc.recitationsTitle} — ${loc.appName}',
+          androidNotificationOngoing: true,
+        ),
       ),
+      timeout: _bootAudioInitTimeout,
     ),
-    getIt<NotificationsBinding>().init(
-      onTap: () => AppRouter.router.go('/home'),
-      onTapPayload: (payload) =>
-          AppRouter.router.go(reminderRouteFor(payload) ?? '/home'),
+    failOpenBootInit(
+      'NotificationsBinding.init',
+      () => getIt<NotificationsBinding>().init(
+        onTap: () => AppRouter.router.go('/home'),
+        onTapPayload: (payload) =>
+            AppRouter.router.go(reminderRouteFor(payload) ?? '/home'),
+      ),
+      timeout: _bootNotificationsInitTimeout,
     ),
   ]);
   unawaited(_requestBootNotificationGrace());
