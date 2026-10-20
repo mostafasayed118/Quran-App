@@ -26,12 +26,18 @@ Public website + online reader for قرآن يَهدي. Astro 7 static site — 
 
 | Script | Purpose |
 |---|---|
-| `npm run gates` | `check` + `test` + `build` + `budget` — required before every commit |
+| `npm run gates` | `check` + `test` + `build` + `budget` + `test:e2e` — required before every commit; CI runs exactly this |
 | `npm run check` | `astro check` (TypeScript strict) |
-| `npm run test` | Vitest unit tests |
-| `npm run test:e2e` | Playwright smoke (chromium; one-time setup: `npx playwright install chromium`) |
-| `npm run budget` | post-build gates: reader JS ≤ 30KB gzip, `dist/` < 2,000 files |
+| `npm run test` | Vitest unit tests (DOM-free) |
+| `npm run test:e2e` | Playwright specs (chromium; one-time setup: `npx playwright install chromium`) |
+| `npm run budget` | size + CSP gate: per-page JS (reader ≤ 30KB gzip, quran/home/prayer-times ≤ 25KB), the lazy search index (≤ 240KB gzip), other lazy chunks, CSS, fonts, the largest HTML page, `dist/` < 2,000 files, and the CSP script hashes |
 | `npm run build` | static build → `dist/` (`npm run preview` serves it) |
+
+## Security headers
+`public/_headers` ships the CSP, HSTS, `X-Content-Type-Options`, `X-Frame-Options`,
+`Referrer-Policy` and `Permissions-Policy`. `script-src` has **no** `'unsafe-inline'`: every inline
+script is allowed by an exact `sha256-`, and `npm run budget` fails if a hash drifts from the
+built HTML.
 
 ## Data
 Quran text lives in `src/data/` and is **generated, never hand-edited**:
@@ -51,7 +57,9 @@ dart run tools/export_web_prayer_times.dart   # from repo root; reads assets/dat
 Per-city shape: `{ city: { id, nameAr, nameEn, lat, lng, tz }, months: [{ y, m, days: [[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak], ...] }] }` — minutes
 since local midnight in the city's own timezone (DST-aware), Egyptian method, `imsak = fajr - 10`.
 An isha that falls after local midnight (northern summers) is stored as `1440 + minutes`; render it
-with `% 1440`. `index.json` lists every city (slug = `id`); the pages read it at build time via `process.cwd()`.
+with `% 1440`. `index.json` lists every city (slug = `id`); the pages read it through the typed
+loader in `src/lib/prayer-times.ts` (no `process.cwd()`), and the covered year window is derived
+from the shipped data — never hardcoded in a page.
 
 ## Deploy
 Cloudflare Pages project ← this repo; root directory `web`, output `dist`.

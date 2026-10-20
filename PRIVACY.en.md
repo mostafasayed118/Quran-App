@@ -17,7 +17,7 @@ Last updated: 2026-10-16 · Applies to version 1.0.0
 | Permission | Why it is needed | Where it is used |
 |---|---|---|
 | Location (fine/coarse) | To compute the **nearest city to you** automatically, for accurate prayer times and Qibla direction | Processed **on-device only**; your position is compared against a city list bundled inside the app to pick the nearest one. **The location is never sent, stored, or shared with any party — ever.** |
-| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to pinned, hardcoded CDN endpoints only. No device identifiers or personal data are attached to these requests. |
+| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to two fixed, pinned endpoints hardcoded in the app: `mp3quran.net` (audio) and `cdn.jsdelivr.net` (tafsir and translation packs, pinned to a specific commit). No device identifiers or personal data are attached to these requests. |
 | Notifications / exact alarms | To remind you of prayer times **that you enable yourself** in settings | Reminders are computed and scheduled locally on your device. |
 | Foreground service (audio) | To keep recitation playing when the app is minimized | Playback info (reciter & surah names) appears in the media bar and stays on your device. |
 
