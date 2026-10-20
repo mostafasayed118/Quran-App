@@ -63,7 +63,9 @@ describe('sampled city (eg-cairo) covers 24 months', () => {
 });
 
 describe('whole corpus invariants', () => {
-  it('every city/day is strictly ordered; minutes bounded; wrapped isha stored as 1440+min', () => {
+  // 2026-10-20: the 113,880-row sweep exceeded vitest's 5s default on the GitHub
+  // runner (175/176 passed; this one timed out) — bound it explicitly.
+  it('every city/day is strictly ordered; minutes bounded; wrapped isha stored as 1440+min', { timeout: 60_000 }, () => {
     let wrapped = 0;
     for (const ref of index.cities) {
       const data = loadCity(ref.id);
