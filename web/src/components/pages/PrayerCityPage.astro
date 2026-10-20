@@ -1,0 +1,256 @@
+---
+import { t, type Locale } from '../../lib/strings';
+import { digitsFor } from '../../lib/arabic-digits';
+
+interface CityData {
+  city: { id: string; nameAr: string; nameEn: string; lat: number; lng: number; tz: string };
+  months: { y: number; m: number; days: number[][] }[];
+}
+interface Props { locale?: Locale; data: CityData }
+const { locale = 'ar', data } = Astro.props;
+const city = data.city;
+
+const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const monthLabel = (y: number, m: number): string =>
+  locale === 'en' ? `${MONTHS_EN[m - 1]} ${y}` : `${MONTHS_AR[m - 1]} ${digitsFor(y, 'ar')}`;
+
+// SSR "today" is the build date: the page ships the current month pre-highlighted
+// and the client re-renders/highlights on month switches (see script below).
+const now = new Date();
+const todayY = now.getFullYear();
+const todayM = now.getMonth() + 1;
+const todayD = now.getDate();
+const inRange = todayY >= 2026 && todayY <= 2027;
+const currentIdx = inRange ? (todayY - 2026) * 12 + (todayM - 1) : 0;
+const month = data.months[currentIdx];
+const todayISO = `${todayY}-${todayM}-${todayD}`;
+
+const hm = (min: number): string => {
+  const m = ((min % 1440) + 1440) % 1440;
+  return digitsFor(
+    `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`,
+    locale,
+  );
+};
+const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? city.nameEn : city.nameAr);
+---
+<h1 class="page-title">{heading}</h1>
+<div
+  class="pt-city"
+  data-qy="pt-city"
+  data-city-id={city.id}
+  data-locale={locale}
+  data-today={inRange ? todayISO : ''}
+  data-current={`${month.y}-${month.m}`}
+>
+  <div class="pt-controls">
+    <label class="pt-month">
+      <span>{t(locale, 'ptMonth')}</span>
+      <select data-qy="pt-month">
+        {data.months.map((mo, i) => (
+          <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>{monthLabel(mo.y, mo.m)}</option>
+        ))}
+      </select>
+    </label>
+    <button type="button" class="rc-btn" data-qy="pt-view-toggle" aria-pressed="false">
+      {t(locale, 'ptViewImsakiah')}
+    </button>
+  </div>
+  <div class="pt-table-wrap" data-view="times">
+    <table data-qy="pt-table" aria-label={heading}>
+      <thead>
+        <tr>
+          <th data-col="day">{t(locale, 'ptDay')}</th>
+          <th data-col="imsak">{t(locale, 'ptImsak')}</th>
+          <th data-col="fajr">{t(locale, 'ptFajr')}</th>
+          <th data-col="sunrise">{t(locale, 'ptSunrise')}</th>
+          <th data-col="dhuhr">{t(locale, 'ptDhuhr')}</th>
+          <th data-col="asr">{t(locale, 'ptAsr')}</th>
+          <th data-col="maghrib">
+            <span class="lbl-times">{t(locale, 'ptMaghrib')}</span><span class="lbl-imsakiah">{t(locale, 'ptIftar')}</span>
+          </th>
+          <th data-col="isha">{t(locale, 'ptIsha')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {month.days.map((row, i) => (
+          <tr
+            data-day={i + 1}
+            data-today={inRange && i + 1 === todayD ? '1' : undefined}
+            class={inRange && i + 1 === todayD ? 'is-today' : undefined}
+          >
+            <td data-col="day">{digitsFor(i + 1, locale)}</td>
+            <td data-col="imsak">{hm(row[6])}</td>
+            <td data-col="fajr">{hm(row[0])}</td>
+            <td data-col="sunrise">{hm(row[1])}</td>
+            <td data-col="dhuhr">{hm(row[2])}</td>
+            <td data-col="asr">{hm(row[3])}</td>
+            <td data-col="maghrib">{hm(row[4])}</td>
+            <td data-col="isha">{hm(row[5])}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="pt-note">{t(locale, 'ptNote')}</p>
+</div>
+<style is:global>
+  .pt-city { width: min(920px, calc(100% - 40px)); margin: 0 auto 60px; }
+  .pt-city .pt-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0 10px; }
+  .pt-city .pt-month { display: flex; align-items: center; gap: 8px; color: var(--muted-strong); font-size: .9rem; }
+  .pt-city .pt-month select {
+    padding: 8px 12px; border-radius: 999px; border: 1px solid var(--hairline);
+    background: var(--surface); color: var(--ink); font: inherit;
+  }
+  @media (pointer: coarse) { .pt-city .pt-month select { min-height: 44px; } }
+  .pt-city .pt-table-wrap { overflow-x: auto; }
+  .pt-city table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .pt-city th, .pt-city td { padding: 8px 10px; border-bottom: 1px solid var(--hairline); text-align: center; white-space: nowrap; }
+  .pt-city th { color: var(--muted-strong); font-size: .82rem; font-weight: 700; }
+  .pt-city td { font-size: .95rem; }
+  .pt-city tr.is-today td { background: color-mix(in srgb, var(--gold-line) 14%, transparent); font-weight: 700; }
+  .pt-city .lbl-imsakiah { display: none; }
+  .pt-city [data-view='imsakiah'] .lbl-imsakiah { display: inline; }
+  .pt-city [data-view='imsakiah'] .lbl-times { display: none; }
+  .pt-city [data-view='imsakiah'] [data-col='sunrise'],
+  .pt-city [data-view='imsakiah'] [data-col='dhuhr'],
+  .pt-city [data-view='imsakiah'] [data-col='asr'],
+  .pt-city [data-view='imsakiah'] [data-col='isha'] { display: none; }
+  .pt-city .pt-note { color: var(--muted-strong); font-size: .85rem; margin-top: 10px; }
+  .pt-city .pt-error { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted-strong); }
+</style>
+<script>
+  import { t, type Locale } from '../../lib/strings';
+  import { digitsFor } from '../../lib/arabic-digits';
+
+  function init(): void {
+    const root = document.querySelector<HTMLElement>('[data-qy="pt-city"]');
+    if (!root || root.dataset.qyReady) return;
+    const locale: Locale = root.dataset.locale === 'en' ? 'en' : 'ar';
+    const cityId = root.dataset.cityId ?? '';
+    const today = root.dataset.today ?? '';
+    const select = root.querySelector<HTMLSelectElement>('[data-qy="pt-month"]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-qy="pt-view-toggle"]');
+    const wrap = root.querySelector<HTMLElement>('.pt-table-wrap');
+    const tbody = root.querySelector<HTMLTableSectionElement>('[data-qy="pt-table"] tbody');
+    if (!select || !toggle || !wrap || !tbody || cityId === '') return;
+
+    let months: { y: number; m: number; days: number[][] }[] | null = null;
+    let pending: Promise<void> | null = null;
+
+    const hm = (min: number): string => {
+      const m = ((min % 1440) + 1440) % 1440;
+      return digitsFor(
+        `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`,
+        locale,
+      );
+    };
+
+    const cell = (col: string, text: string): HTMLTableCellElement => {
+      const td = document.createElement('td');
+      td.dataset.col = col;
+      td.textContent = text;
+      return td;
+    };
+
+    const renderMonth = (): void => {
+      if (!months) return;
+      const [y, m] = select.value.split('-').map(Number);
+      const monthData = months[(y - 2026) * 12 + (m - 1)];
+      if (!monthData) return;
+      const todayParts = today === '' ? null : today.split('-').map(Number);
+      const todayDay =
+        todayParts && todayParts[0] === y && todayParts[1] === m ? todayParts[2] : 0;
+      const rows = monthData.days.map((row, i) => {
+        const day = i + 1;
+        const tr = document.createElement('tr');
+        tr.dataset.day = String(day);
+        if (day === todayDay) {
+          tr.dataset.today = '1';
+          tr.classList.add('is-today');
+        }
+        tr.append(
+          cell('day', digitsFor(day, locale)),
+          cell('imsak', hm(row[6])),
+          cell('fajr', hm(row[0])),
+          cell('sunrise', hm(row[1])),
+          cell('dhuhr', hm(row[2])),
+          cell('asr', hm(row[3])),
+          cell('maghrib', hm(row[4])),
+          cell('isha', hm(row[5])),
+        );
+        return tr;
+      });
+      tbody.replaceChildren(...rows);
+    };
+
+    const renderError = (): void => {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 8;
+      const box = document.createElement('div');
+      box.className = 'pt-error';
+      const msg = document.createElement('span');
+      msg.textContent = t(locale, 'panelError');
+      const retry = document.createElement('button');
+      retry.type = 'button';
+      retry.className = 'rc-btn';
+      retry.textContent = t(locale, 'panelRetry');
+      retry.addEventListener('click', () => {
+        void refresh();
+      });
+      box.append(msg, retry);
+      td.appendChild(box);
+      tr.appendChild(td);
+      tbody.replaceChildren(tr);
+    };
+
+    const load = (): Promise<void> => {
+      if (months) return Promise.resolve();
+      if (!pending) {
+        pending = fetch(`/data/prayer-times/${cityId}.json`, { credentials: 'omit' })
+          .then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json();
+          })
+          .then((data: { months: { y: number; m: number; days: number[][] }[] }) => {
+            months = data.months;
+          })
+          .catch((error: unknown) => {
+            pending = null;
+            throw error;
+          });
+      }
+      return pending;
+    };
+
+    const refresh = (): Promise<void> =>
+      load().then(
+        () => {
+          if (root.isConnected) renderMonth();
+        },
+        () => {
+          if (root.isConnected) renderError();
+        },
+      );
+
+    select.addEventListener('change', () => {
+      void refresh();
+    });
+
+    toggle.addEventListener('click', () => {
+      const next = wrap.dataset.view === 'imsakiah' ? 'times' : 'imsakiah';
+      wrap.dataset.view = next;
+      toggle.setAttribute('aria-pressed', String(next === 'imsakiah'));
+      toggle.textContent = t(locale, next === 'imsakiah' ? 'ptViewTimes' : 'ptViewImsakiah');
+    });
+
+    // Pre-warm the month data in the background: month switching is then instant
+    // and the imsakiah toggle (pure CSS) keeps working even if the fetch fails.
+    void load().catch(() => {});
+    root.dataset.qyReady = '1';
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>

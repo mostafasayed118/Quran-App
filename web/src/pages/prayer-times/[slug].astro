@@ -1,0 +1,28 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PrayerCityPage from '../../components/pages/PrayerCityPage.astro';
+import { t } from '../../lib/strings';
+
+export function getStaticPaths() {
+  // getStaticPaths is extracted into a prerender chunk at build time (and
+  // import.meta.url/hoisted consts do not survive that), so resolve the data
+  // dir from the web/ cwd — npm run build/dev always run there.
+  const dataDir = join(process.cwd(), 'public', 'data', 'prayer-times');
+  const index = JSON.parse(readFileSync(join(dataDir, 'index.json'), 'utf8')) as {
+    cities: { id: string; nameAr: string; nameEn: string }[];
+  };
+  return index.cities.map((city) => ({ params: { slug: city.id }, props: { city } }));
+}
+
+const { city } = Astro.props as { city: { id: string; nameAr: string; nameEn: string } };
+const data = JSON.parse(
+  readFileSync(join(process.cwd(), 'public', 'data', 'prayer-times', `${city.id}.json`), 'utf8'),
+);
+const title = `${t('ar', 'ptCityTitle').replace('{city}', city.nameAr)} — قرآن يَهدي`;
+const description = `مواقيت الصلاة اليوم في ${city.nameAr} — الفجر والظهر والعصر والمغرب والعشاء بتوقيت المدينة المحلي، مع الإمساكية.`;
+---
+<BaseLayout title={title} description={description}>
+  <PrayerCityPage locale="ar" data={data} />
+</BaseLayout>

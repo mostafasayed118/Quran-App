@@ -1,0 +1,80 @@
+---
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { t, type Locale } from '../../lib/strings';
+
+interface Props { locale?: Locale }
+const { locale = 'ar' } = Astro.props;
+const base = locale === 'en' ? '/en' : '';
+const placeholder = t(locale, 'ptSearchPlaceholder');
+// Mirrors the getStaticPaths note: components are bundled at build time, so
+// resolve the data dir from the web/ cwd (npm run build/dev run there).
+const index = JSON.parse(
+  readFileSync(join(process.cwd(), 'public', 'data', 'prayer-times', 'index.json'), 'utf8'),
+) as { cities: { id: string; nameAr: string; nameEn: string }[] };
+---
+<h1 class="page-title">{t(locale, 'ptTitle')}</h1>
+<p class="page-lead">{t(locale, 'ptLead')}</p>
+<div data-qy="pt-cities" data-locale={locale}>
+  <input
+    type="search"
+    class="index-search"
+    placeholder={placeholder}
+    aria-label={placeholder}
+  />
+  <p class="empty" hidden>{t(locale, 'noResults')}</p>
+  <ul class="city-list">
+    {index.cities.map((city) => (
+      <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
+        <a href={`${base}/prayer-times/${city.id}/`}>{locale === 'en' ? city.nameEn : city.nameAr}</a>
+      </li>
+    ))}
+  </ul>
+</div>
+<style>
+  .page-lead { width: min(760px, calc(100% - 40px)); margin: 0 auto 8px; color: var(--muted-strong); }
+  .city-list {
+    list-style: none; margin: 4px auto 60px; padding: 0; max-width: 760px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    column-gap: 18px;
+  }
+  .city-list a {
+    display: flex; padding: 10px 4px; border-bottom: 1px solid var(--hairline);
+    color: var(--ink); text-decoration: none;
+  }
+  .city-list a:hover { color: var(--accent); }
+  @media (pointer: coarse) { .city-list a { min-height: 44px; align-items: center; } }
+</style>
+<script>
+  import { normalizeArabic } from '../../lib/arabic';
+
+  function init(): void {
+    const root = document.querySelector<HTMLElement>('[data-qy="pt-cities"]');
+    if (!root || root.dataset.qyReady) return;
+    const input = root.querySelector<HTMLInputElement>('.index-search');
+    const empty = root.querySelector<HTMLParagraphElement>('p.empty');
+    const items = root.querySelectorAll<HTMLLIElement>('.city-list li');
+    if (!input || !empty || items.length === 0) return;
+
+    const filter = (): void => {
+      const raw = input.value;
+      const q = normalizeArabic(raw);
+      const qEn = raw.trim().toLowerCase();
+      let visible = 0;
+      for (const li of items) {
+        const hit =
+          q === '' ||
+          normalizeArabic(li.dataset.nameAr ?? '').includes(q) ||
+          (li.dataset.nameEn ?? '').toLowerCase().includes(qEn);
+        li.hidden = !hit;
+        if (hit) visible += 1;
+      }
+      empty.hidden = visible !== 0;
+    };
+
+    input.addEventListener('input', filter);
+    root.dataset.qyReady = '1';
+  }
+  init();
+  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+</script>

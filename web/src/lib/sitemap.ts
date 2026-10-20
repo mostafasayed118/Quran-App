@@ -6,9 +6,9 @@ function enPath(path: string): string {
   return path === '/' ? '/en/' : `/en${path}`;
 }
 
-export function buildSitemapUrls(site: string, surahIds: number[]): SitemapEntry[] {
+export function buildSitemapUrls(site: string, surahIds: number[], extras: string[] = []): SitemapEntry[] {
   const origin = site.replace(/\/+$/, '');
-  const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}/`)];
+  const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}/`), ...extras];
   return paths.map((path) => {
     const ar = `${origin}${path}`;
     return { loc: ar, alternates: { ar, en: `${origin}${enPath(path)}` } };
