@@ -1,3 +1,4 @@
+import '../../../core/utils/arabic_search.dart';
 import '../../../core/utils/cached_loader.dart';
 
 class AzkarItem {
@@ -47,17 +48,64 @@ class AzkarCollection {
       );
 }
 
+class AzkarSearchHit {
+  const AzkarSearchHit({required this.collection, required this.itemIndex});
+
+  final AzkarCollection collection;
+  final int itemIndex;
+
+  AzkarItem get item => collection.items[itemIndex];
+}
+
+class AzkarSearchResults {
+  const AzkarSearchResults({required this.hits, required this.hasMore});
+
+  final List<AzkarSearchHit> hits;
+  final bool hasMore;
+}
+
 class AzkarRepository {
   AzkarRepository({required Future<Map<String, dynamic>> Function() loader})
       : _loader = loader;
 
   final Future<Map<String, dynamic>> Function() _loader;
 
+  static const int searchLimit = 50;
+
   late final CachedLoader<List<AzkarCollection>> _collections =
       CachedLoader(_load);
 
   Future<List<AzkarCollection>> collections() {
     return _collections.load();
+  }
+
+  /// Local, normalization-aware search over every collection name and item
+  /// text. Bounded to [limit] hits with a [AzkarSearchResults.hasMore] flag;
+  /// an empty query yields no hits.
+  Future<AzkarSearchResults> search(String query,
+      {int limit = searchLimit}) async {
+    if (normalizeArabic(query).isEmpty) {
+      return const AzkarSearchResults(hits: [], hasMore: false);
+    }
+    final collections = await _collections.load();
+    final hits = <AzkarSearchHit>[];
+    var hasMore = false;
+    for (final collection in collections) {
+      for (var i = 0; i < collection.items.length; i++) {
+        final item = collection.items[i];
+        if (matchesQuery(item.text, query) ||
+            matchesQuery(collection.nameAr, query) ||
+            matchesQuery(collection.nameEn, query)) {
+          if (hits.length == limit) {
+            hasMore = true;
+            break;
+          }
+          hits.add(AzkarSearchHit(collection: collection, itemIndex: i));
+        }
+      }
+      if (hasMore) break;
+    }
+    return AzkarSearchResults(hits: hits, hasMore: hasMore);
   }
 
   Future<List<AzkarCollection>> _load() async {

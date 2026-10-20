@@ -1153,6 +1153,30 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} إعداد'**
   String backupPreviewSettings(String count);
+
+  /// No description provided for @azkarSearchPlaceholder.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في الأذكار…'**
+  String get azkarSearchPlaceholder;
+
+  /// No description provided for @azkarSearchResultsFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'نتائج البحث: {count}'**
+  String azkarSearchResultsFor(String count);
+
+  /// No description provided for @azkarSearchNoResults.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أذكار مطابقة لبحثك'**
+  String get azkarSearchNoResults;
+
+  /// No description provided for @azkarSearchMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُعرض أول {count} نتيجة — جرّب تضييق البحث'**
+  String azkarSearchMore(String count);
 }
 
 class _AppLocalizationsDelegate

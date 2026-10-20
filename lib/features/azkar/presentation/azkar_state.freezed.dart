@@ -155,7 +155,9 @@ extension AzkarStatePatterns on AzkarState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(List<AzkarCollection> collections)? browsing,
+    TResult Function(List<AzkarCollection> collections, String query,
+            List<AzkarSearchHit> searchResults, bool searchHasMore)?
+        browsing,
     TResult Function(AzkarCollection collection, List<int> remaining)? reciting,
     required TResult orElse(),
   }) {
@@ -166,7 +168,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed() when failed != null:
         return failed();
       case AzkarBrowsing() when browsing != null:
-        return browsing(_that.collections);
+        return browsing(_that.collections, _that.query, _that.searchResults,
+            _that.searchHasMore);
       case AzkarReciting() when reciting != null:
         return reciting(_that.collection, _that.remaining);
       case _:
@@ -191,7 +194,9 @@ extension AzkarStatePatterns on AzkarState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(List<AzkarCollection> collections) browsing,
+    required TResult Function(List<AzkarCollection> collections, String query,
+            List<AzkarSearchHit> searchResults, bool searchHasMore)
+        browsing,
     required TResult Function(AzkarCollection collection, List<int> remaining)
         reciting,
   }) {
@@ -202,7 +207,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed():
         return failed();
       case AzkarBrowsing():
-        return browsing(_that.collections);
+        return browsing(_that.collections, _that.query, _that.searchResults,
+            _that.searchHasMore);
       case AzkarReciting():
         return reciting(_that.collection, _that.remaining);
     }
@@ -224,7 +230,9 @@ extension AzkarStatePatterns on AzkarState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(List<AzkarCollection> collections)? browsing,
+    TResult? Function(List<AzkarCollection> collections, String query,
+            List<AzkarSearchHit> searchResults, bool searchHasMore)?
+        browsing,
     TResult? Function(AzkarCollection collection, List<int> remaining)?
         reciting,
   }) {
@@ -235,7 +243,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed() when failed != null:
         return failed();
       case AzkarBrowsing() when browsing != null:
-        return browsing(_that.collections);
+        return browsing(_that.collections, _that.query, _that.searchResults,
+            _that.searchHasMore);
       case AzkarReciting() when reciting != null:
         return reciting(_that.collection, _that.remaining);
       case _:
@@ -288,8 +297,12 @@ class AzkarFailed implements AzkarState {
 
 class AzkarBrowsing implements AzkarState {
   const AzkarBrowsing(
-      {List<AzkarCollection> collections = const <AzkarCollection>[]})
-      : _collections = collections;
+      {List<AzkarCollection> collections = const <AzkarCollection>[],
+      this.query = '',
+      List<AzkarSearchHit> searchResults = const <AzkarSearchHit>[],
+      this.searchHasMore = false})
+      : _collections = collections,
+        _searchResults = searchResults;
 
   final List<AzkarCollection> _collections;
   @JsonKey()
@@ -298,6 +311,19 @@ class AzkarBrowsing implements AzkarState {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_collections);
   }
+
+  @JsonKey()
+  final String query;
+  final List<AzkarSearchHit> _searchResults;
+  @JsonKey()
+  List<AzkarSearchHit> get searchResults {
+    if (_searchResults is EqualUnmodifiableListView) return _searchResults;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_searchResults);
+  }
+
+  @JsonKey()
+  final bool searchHasMore;
 
   /// Create a copy of AzkarState
   /// with the given fields replaced by the non-null parameter values.
@@ -312,18 +338,27 @@ class AzkarBrowsing implements AzkarState {
         (other.runtimeType == runtimeType &&
             other is AzkarBrowsing &&
             const DeepCollectionEquality()
-                .equals(other.collections, _collections));
+                .equals(other.collections, _collections) &&
+            (identical(other.query, query) || other.query == query) &&
+            const DeepCollectionEquality()
+                .equals(other.searchResults, _searchResults) &&
+            (identical(other.searchHasMore, searchHasMore) ||
+                other.searchHasMore == searchHasMore));
   }
 
   @override
   int get hashCode {
     return Object.hash(
-        runtimeType, const DeepCollectionEquality().hash(_collections));
+        runtimeType,
+        const DeepCollectionEquality().hash(_collections),
+        query,
+        const DeepCollectionEquality().hash(_searchResults),
+        searchHasMore);
   }
 
   @override
   String toString() {
-    return 'AzkarState.browsing(collections: $collections)';
+    return 'AzkarState.browsing(collections: $collections, query: $query, searchResults: $searchResults, searchHasMore: $searchHasMore)';
   }
 }
 
@@ -334,7 +369,11 @@ abstract mixin class $AzkarBrowsingCopyWith<$Res>
           AzkarBrowsing value, $Res Function(AzkarBrowsing) _then) =
       _$AzkarBrowsingCopyWithImpl;
   @useResult
-  $Res call({List<AzkarCollection> collections});
+  $Res call(
+      {List<AzkarCollection> collections,
+      String query,
+      List<AzkarSearchHit> searchResults,
+      bool searchHasMore});
 }
 
 /// @nodoc
@@ -350,12 +389,27 @@ class _$AzkarBrowsingCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? collections = null,
+    Object? query = null,
+    Object? searchResults = null,
+    Object? searchHasMore = null,
   }) {
     return _then(AzkarBrowsing(
       collections: null == collections
           ? _self._collections
           : collections // ignore: cast_nullable_to_non_nullable
               as List<AzkarCollection>,
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      searchResults: null == searchResults
+          ? _self._searchResults
+          : searchResults // ignore: cast_nullable_to_non_nullable
+              as List<AzkarSearchHit>,
+      searchHasMore: null == searchHasMore
+          ? _self.searchHasMore
+          : searchHasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

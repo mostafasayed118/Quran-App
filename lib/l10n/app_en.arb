@@ -362,5 +362,23 @@
         "type": "String"
       }
     }
+  },
+  "azkarSearchPlaceholder": "Search the azkar…",
+  "azkarSearchResultsFor": "Search results: {count}",
+  "@azkarSearchResultsFor": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "azkarSearchNoResults": "No azkar match your search",
+  "azkarSearchMore": "Showing the first {count} results — try narrowing your search",
+  "@azkarSearchMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -594,4 +594,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String backupPreviewSettings(String count) {
     return '$count إعداد';
   }
+
+  @override
+  String get azkarSearchPlaceholder => 'ابحث في الأذكار…';
+
+  @override
+  String azkarSearchResultsFor(String count) {
+    return 'نتائج البحث: $count';
+  }
+
+  @override
+  String get azkarSearchNoResults => 'لا توجد أذكار مطابقة لبحثك';
+
+  @override
+  String azkarSearchMore(String count) {
+    return 'تُعرض أول $count نتيجة — جرّب تضييق البحث';
+  }
 }

@@ -376,5 +376,23 @@
         "type": "String"
       }
     }
+  },
+  "azkarSearchPlaceholder": "ابحث في الأذكار…",
+  "azkarSearchResultsFor": "نتائج البحث: {count}",
+  "@azkarSearchResultsFor": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "azkarSearchNoResults": "لا توجد أذكار مطابقة لبحثك",
+  "azkarSearchMore": "تُعرض أول {count} نتيجة — جرّب تضييق البحث",
+  "@azkarSearchMore": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
   }
 }

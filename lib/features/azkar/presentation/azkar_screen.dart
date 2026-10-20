@@ -7,6 +7,7 @@ import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/azkar_repository.dart';
 import 'azkar_cubit.dart';
@@ -27,8 +28,18 @@ class AzkarScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           AzkarLoading() => const LoadingView(),
           AzkarFailed() => errorPane(loc),
-          AzkarBrowsing(:final collections) =>
-            _BrowsingView(collections: collections),
+          AzkarBrowsing(
+            :final collections,
+            :final query,
+            :final searchResults,
+            :final searchHasMore,
+          ) =>
+            _BrowsingView(
+              collections: collections,
+              query: query,
+              searchResults: searchResults,
+              searchHasMore: searchHasMore,
+            ),
           AzkarReciting() => const _RecitingList(),
         },
       ),
@@ -77,21 +88,124 @@ class _AzkarBackButton extends StatelessWidget {
 }
 
 class _BrowsingView extends StatelessWidget {
-  const _BrowsingView({required this.collections});
+  const _BrowsingView({
+    required this.collections,
+    required this.query,
+    required this.searchResults,
+    required this.searchHasMore,
+  });
 
   final List<AzkarCollection> collections;
+  final String query;
+  final List<AzkarSearchHit> searchResults;
+  final bool searchHasMore;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    return collections.isEmpty
-        ? EmptyState(loc.noResults)
-        : ListView.builder(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+          child: SearchField(
+            hint: loc.azkarSearchPlaceholder,
+            onChanged: context.read<AzkarCubit>().setSearchQuery,
+          ),
+        ),
+        Expanded(
+          child: query.isEmpty
+              ? (collections.isEmpty
+                  ? EmptyState(loc.noResults)
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(12),
+                      itemCount: collections.length,
+                      itemBuilder: (context, i) =>
+                          _CollectionTile(collection: collections[i]),
+                    ))
+              : _SearchResultsList(
+                  results: searchResults,
+                  hasMore: searchHasMore,
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SearchResultsList extends StatelessWidget {
+  const _SearchResultsList({required this.results, required this.hasMore});
+
+  final List<AzkarSearchHit> results;
+  final bool hasMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    if (results.isEmpty) return EmptyState(loc.azkarSearchNoResults);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 2, 14, 4),
+          child: Text(
+            loc.azkarSearchResultsFor(results.length.toArabicIndic),
+            style: AppTheme.mutedFootnote(context),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
             padding: const EdgeInsets.all(12),
-            itemCount: collections.length,
-            itemBuilder: (context, i) =>
-                _CollectionTile(collection: collections[i]),
-          );
+            itemCount: results.length + (hasMore ? 1 : 0),
+            itemBuilder: (context, i) {
+              if (i == results.length) {
+                return Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    loc.azkarSearchMore(
+                        AzkarRepository.searchLimit.toArabicIndic),
+                    textAlign: TextAlign.center,
+                    style: AppTheme.mutedFootnote(context),
+                  ),
+                );
+              }
+              return _SearchHitTile(hit: results[i]);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SearchHitTile extends StatelessWidget {
+  const _SearchHitTile({required this.hit});
+
+  final AzkarSearchHit hit;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      child: ListTile(
+        title: Text(
+          hit.item.text,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.right,
+          style: const TextStyle(
+            fontFamily: QuranFonts.meQuran,
+            fontSize: 16,
+            height: 1.8,
+          ),
+        ),
+        subtitle: Text(
+          hit.collection.nameAr,
+          textAlign: TextAlign.right,
+          style: TextStyle(color: colors.onSurfaceVariant),
+        ),
+        onTap: () => context.read<AzkarCubit>().open(hit.collection),
+      ),
+    );
   }
 }
 
