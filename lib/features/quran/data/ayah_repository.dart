@@ -5,11 +5,14 @@ import 'ayah_source.dart';
 
 /// One readable bookmark row: the bookmark joined with its ayah.
 class BookmarkEntry {
+  /// A bookmark together with the ayah it points at.
   const BookmarkEntry({required this.ayah});
 
+  /// The bookmarked ayah.
   final Ayah ayah;
 }
 
+/// Reads ayahs and bookmarks from the local database.
 class AyahRepository implements AyahSource {
   AyahRepository(this._db);
 

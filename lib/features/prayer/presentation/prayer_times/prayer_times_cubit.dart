@@ -2,38 +2,47 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
 
-import '../../../notifications/data/reminder_scheduler.dart';
-import '../../../notifications/data/reminder_scheduling.dart';
-import '../../../notifications/data/reminder_settings.dart';
-import '../../data/city_repository.dart';
-import '../../data/prayer_time_service.dart';
 import 'prayer_times_state.dart';
 
+/// The prayer times screen: today's prayers, the next one and the countdown.
 class PrayerTimesCubit extends Cubit<PrayerTimesState> {
+  /// Creates the cubit and starts the first load.
+  ///
+  /// [clock] is the time seam (defaults to [DateTime.now]); [settings] and
+  /// [scheduler] are optional — without them no reminder is (re)planned.
   PrayerTimesCubit({
-    required PrayerTimeService prayer,
-    required CityRepository city,
-    ReminderScheduler? scheduler,
-    ReminderSettings? reminderSettings,
+    required PrayerTimesPort prayer,
+    required CitySource city,
+    ReminderSettingsPort? settings,
+    ReminderSchedulerPort? scheduler,
     DateTime Function()? clock,
   })  : _prayer = prayer,
         _city = city,
+        _settings = settings,
         _scheduler = scheduler,
-        _reminderSettings = reminderSettings,
         _clock = clock ?? DateTime.now,
         super(const PrayerTimesState.loading()) {
     unawaited(reload());
   }
 
-  final PrayerTimeService _prayer;
-  final CityRepository _city;
-  final ReminderScheduler? _scheduler;
-  final ReminderSettings? _reminderSettings;
+  final PrayerTimesPort _prayer;
+  final CitySource _city;
+  final ReminderSettingsPort? _settings;
+  final ReminderSchedulerPort? _scheduler;
   final DateTime Function() _clock;
 
   DateTime? _loadedDay;
 
+  /// Loads the selected city, today's prayers and the countdown, then emits
+  /// the ready state.
+  ///
+  /// With no selected city the ready state carries no entries. A failure
+  /// emits the failed state (the error is logged, never raised as an
+  /// unhandled async error).
   Future<void> reload() async {
     try {
       final selected = await _city.selectedCity();
@@ -116,17 +125,17 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
   /// W7b: reminders are (re)computed after every successful load (startup +
   /// city/selection change). Fire-and-forget; the shared helper never throws.
   void _scheduleReminders() {
+    final settings = _settings;
     final scheduler = _scheduler;
-    final reminderSettings = _reminderSettings;
-    if (scheduler == null || reminderSettings == null) return;
-    unawaited(scheduleReminders(
+    if (settings == null || scheduler == null) return;
+    unawaited(settings.reschedule(
       city: _city,
       prayer: _prayer,
-      settings: reminderSettings,
       scheduler: scheduler,
     ));
   }
 
+  /// Stores [city] as the selected city and reloads the prayers.
   Future<void> select(City city) async {
     await _city.select(city);
     await reload();

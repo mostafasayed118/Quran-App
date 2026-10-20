@@ -2,7 +2,11 @@ import 'package:flutter/foundation.dart' show ValueKey;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/di/injector.dart';
+import '../core/domain/ayah_lookup.dart';
+import '../core/domain/city.dart';
+import '../core/domain/last_read.dart';
+import '../core/domain/prayer_times.dart';
+import '../core/domain/reminders.dart';
 import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
@@ -38,20 +42,17 @@ import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/last_read_repository.dart';
-import '../features/quran/data/surah_repository.dart';
+import '../features/quran/data/surah_source.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
-import '../features/notifications/data/reminder_scheduler.dart';
-import '../features/notifications/data/reminder_settings.dart';
 import '../features/settings/presentation/settings_cubit.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/prayer/data/city_repository.dart';
 import '../features/prayer/data/location_service.dart';
-import '../features/prayer/data/prayer_time_service.dart';
 import '../features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import '../features/prayer/presentation/city_picker/city_picker_screen.dart';
 import '../features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
@@ -68,6 +69,7 @@ import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
+import 'di/injector.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -86,10 +88,10 @@ abstract final class AppRouter {
         path: '/home',
         builder: (_, __) => BlocProvider<HomeCubit>(
           create: (_) => HomeCubit(
-            lastRead: getIt<LastReadRepository>(),
-            ayahs: getIt<AyahRepository>(),
-            prayer: getIt<PrayerTimeService>(),
-            city: getIt<CityRepository>(),
+            lastRead: getIt<LastReadMarker>(),
+            ayahs: getIt<AyahLookup>(),
+            prayer: getIt<PrayerTimesPort>(),
+            city: getIt<CitySource>(),
           ),
           child: const HomeScreen(),
         ),
@@ -97,7 +99,7 @@ abstract final class AppRouter {
       GoRoute(
         path: '/quran',
         builder: (_, __) => BlocProvider<SurahIndexCubit>(
-          create: (_) => SurahIndexCubit(getIt<SurahRepository>()),
+          create: (_) => SurahIndexCubit(getIt<SurahSource>()),
           child: const SurahIndexScreen(),
         ),
       ),
@@ -110,8 +112,8 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: '/library',
-        builder: (_, __) => BlocProvider<LibraryCubit>.value(
-          value: getIt<LibraryCubit>(),
+        builder: (_, __) => BlocProvider<LibraryCubit>(
+          create: (_) => getIt<LibraryCubit>(),
           child: const LibraryScreen(),
         ),
       ),
@@ -132,10 +134,10 @@ abstract final class AppRouter {
         path: '/prayer-times',
         builder: (_, __) => BlocProvider<PrayerTimesCubit>(
           create: (_) => PrayerTimesCubit(
-            prayer: getIt<PrayerTimeService>(),
-            city: getIt<CityRepository>(),
-            scheduler: getIt<ReminderScheduler>(),
-            reminderSettings: getIt<ReminderSettings>(),
+            prayer: getIt<PrayerTimesPort>(),
+            city: getIt<CitySource>(),
+            settings: getIt<ReminderSettingsPort>(),
+            scheduler: getIt<ReminderSchedulerPort>(),
           ),
           child: const PrayerTimesScreen(),
         ),
@@ -154,7 +156,7 @@ abstract final class AppRouter {
         path: '/qibla',
         builder: (_, __) => BlocProvider<QiblaCubit>(
           create: (_) => QiblaCubit(
-            city: getIt<CityRepository>(),
+            city: getIt<CitySource>(),
             qibla: getIt<QiblaService>(),
             heading: getIt<HeadingService>(),
           ),
@@ -183,7 +185,7 @@ abstract final class AppRouter {
           create: (_) => DuasCubit(
             duas: getIt<DuaRepository>(),
             ruqyah: getIt<RuqyahRepository>(),
-            ayahs: getIt<AyahRepository>(),
+            ayahs: getIt<AyahLookup>(),
           ),
           child: const DuasScreen(),
         ),
@@ -225,10 +227,10 @@ abstract final class AppRouter {
           providers: [
             BlocProvider<SettingsCubit>(
               create: (_) => SettingsCubit(
-                settings: getIt<ReminderSettings>(),
-                city: getIt<CityRepository>(),
-                prayer: getIt<PrayerTimeService>(),
-                scheduler: getIt<ReminderScheduler>(),
+                settings: getIt<ReminderSettingsPort>(),
+                city: getIt<CitySource>(),
+                prayer: getIt<PrayerTimesPort>(),
+                scheduler: getIt<ReminderSchedulerPort>(),
               ),
             ),
             BlocProvider<BackupCubit>(

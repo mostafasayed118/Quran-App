@@ -2,19 +2,24 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
+import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/last_read.dart';
+import 'package:quran_yahdi/core/domain/prayer_times.dart';
 
-import '../../prayer/data/city_repository.dart';
-import '../../prayer/data/prayer_time_service.dart';
-import '../../quran/data/ayah_source.dart';
-import '../../quran/data/last_read_source.dart';
 import 'home_state.dart';
 
+/// The home screen's two cards: the last-read ayah and the next prayer.
 class HomeCubit extends Cubit<HomeState> {
+  /// Creates the cubit and starts the first load.
+  ///
+  /// The load is fire-and-forget: the state moves from loading to
+  /// ready/failed on its own.
   HomeCubit({
-    required LastReadSource lastRead,
-    required AyahSource ayahs,
-    required PrayerTimeService prayer,
-    required CityRepository city,
+    required LastReadMarker lastRead,
+    required AyahLookup ayahs,
+    required PrayerTimesPort prayer,
+    required CitySource city,
   })  : _lastRead = lastRead,
         _ayahs = ayahs,
         _prayer = prayer,
@@ -23,11 +28,16 @@ class HomeCubit extends Cubit<HomeState> {
     unawaited(reload());
   }
 
-  final LastReadSource _lastRead;
-  final AyahSource _ayahs;
-  final PrayerTimeService _prayer;
-  final CityRepository _city;
+  final LastReadMarker _lastRead;
+  final AyahLookup _ayahs;
+  final PrayerTimesPort _prayer;
+  final CitySource _city;
 
+  /// Loads both cards and emits the ready state.
+  ///
+  /// The two reads are independent and run concurrently; the first failure
+  /// wins and emits [HomeState.failed] (the other chain is consumed, never
+  /// an unhandled async error).
   Future<void> reload() async {
     try {
       // The two cards are independent. The LIST form of Future.wait completes
@@ -55,9 +65,9 @@ class HomeCubit extends Cubit<HomeState> {
   Future<LastReadCard?> _loadLastReadCard() async {
     final ayahId = await _lastRead.loadAyahId();
     if (ayahId == null) return null;
-    final ayah = await _ayahs.ayahById(ayahId);
+    final ayah = await _ayahs.ayahRefById(ayahId);
     if (ayah == null) return null;
-    final surah = await _ayahs.surahById(ayah.surahId);
+    final surah = await _ayahs.surahRefById(ayah.surahId);
     if (surah == null) return null;
     return (
       surahId: ayah.surahId,

@@ -1,31 +1,41 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../data/surah_source.dart';
-import '../../data/verse_mapping.dart';
+import '../../domain/surah_summary.dart';
 import 'surah_index_state.dart';
 
+/// The surah index screen: the surah list and its search box.
 class SurahIndexCubit extends Cubit<SurahIndexState> {
+  /// Creates the cubit and subscribes to the surah stream.
+  ///
+  /// The subscription is the source of truth: every change re-emits the
+  /// ready state (re-filtered by the current query).
   SurahIndexCubit(this._repo) : super(const SurahIndexState.loading()) {
-    _sub = _repo.watchAll().listen(
+    _sub = _repo.watchSummaries().listen(
       (surahs) {
         _latest = surahs;
         _emitFiltered();
       },
-      onError: (Object error) {
+      onError: (Object error, StackTrace stackTrace) {
+        dev.log('surah index stream failed',
+            name: 'quran_yahdi/surah_index',
+            error: error,
+            stackTrace: stackTrace);
         if (isClosed) return;
-        emit(SurahIndexState.error(message: error.toString()));
+        emit(const SurahIndexState.failed());
       },
     );
   }
 
   final SurahSource _repo;
-  List<Surah> _latest = [];
+  List<SurahSummary> _latest = [];
   String _query = '';
-  StreamSubscription<List<Surah>>? _sub;
+  StreamSubscription<List<SurahSummary>>? _sub;
 
+  /// Filters the list by [raw] (trimmed); an empty query shows every surah.
   void setQuery(String raw) {
     _query = raw.trim();
     _emitFiltered();
@@ -33,13 +43,13 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 
   void _emitFiltered() {
     if (isClosed) return;
-    emit(SurahIndexState.loaded(
-      surahs: _filter(_latest).map((s) => s.toSummary()).toList(),
+    emit(SurahIndexState.ready(
+      surahs: _filter(_latest),
       query: _query,
     ));
   }
 
-  List<Surah> _filter(List<Surah> surahs) {
+  List<SurahSummary> _filter(List<SurahSummary> surahs) {
     if (_query.isEmpty) return surahs;
     final q = _query.toLowerCase();
     return surahs.where((s) {
@@ -50,6 +60,7 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
     }).toList();
   }
 
+  /// Cancels the surah subscription before closing the cubit.
   @override
   Future<void> close() {
     _sub?.cancel();

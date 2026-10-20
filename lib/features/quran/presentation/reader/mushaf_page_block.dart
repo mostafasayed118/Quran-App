@@ -1,6 +1,6 @@
-import '../../../../core/db/app_database.dart';
-import '../../data/verse_mapping.dart';
 import '../../domain/verse.dart';
+
+export 'mushaf_page_block_rows.dart';
 
 /// A single rendered page block in mushaf mode: the surah's ayahs that share
 /// one mushaf page. Pages the surah owns no ayahs on are omitted (surah-
@@ -12,12 +12,11 @@ class MushafPageBlock {
   final List<Verse> ayahs;
 }
 
-/// The parameter stays a list of drift rows: the frozen grouping test feeds
-/// `repo.surahAyahs(...)` straight in; rows are mapped to entities here.
-List<MushafPageBlock> groupAyahsByPage(List<Ayah> ayahs) {
-  final byPage = <int, List<Ayah>>{};
+/// Groups domain ayahs into sorted page blocks (one block per mushaf page).
+List<MushafPageBlock> groupVersesByPage(List<Verse> ayahs) {
+  final byPage = <int, List<Verse>>{};
   for (final ayah in ayahs) {
-    byPage.putIfAbsent(ayah.page, () => <Ayah>[]).add(ayah);
+    byPage.putIfAbsent(ayah.page, () => <Verse>[]).add(ayah);
   }
   final pages = byPage.keys.toList()..sort();
   return [
@@ -26,7 +25,6 @@ List<MushafPageBlock> groupAyahsByPage(List<Ayah> ayahs) {
         page: page,
         ayahs: (byPage[page]!
               ..sort((a, b) => a.numberInSurah.compareTo(b.numberInSurah)))
-            .map((a) => a.toVerse())
             .toList(),
       ),
   ];

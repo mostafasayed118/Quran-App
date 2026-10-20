@@ -4,12 +4,13 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-import '../core/di/injector.dart';
-import '../features/notifications/data/reminder_scheduler.dart';
-import '../features/notifications/data/reminder_scheduling.dart';
-import '../features/notifications/data/reminder_settings.dart';
-import '../features/prayer/data/city_repository.dart';
-import '../features/prayer/data/prayer_time_service.dart';
+import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/features/library/data/library_catalog.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_scheduling.dart';
+
+import 'di/injector.dart';
 
 const citiesAssetKey = 'assets/data/cities.json';
 const azkarAssetKey = 'assets/data/azkar.json';
@@ -55,16 +56,19 @@ Future<List<Map<String, dynamic>>> defaultAsmaLoader() async {
 
 Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
   final raw = await rootBundle.loadString(libraryCatalogAssetKey);
-  return ((jsonDecode(raw) as Map<String, dynamic>)['packs'] as List)
+  final packs = ((jsonDecode(raw) as Map<String, dynamic>)['packs'] as List)
       .cast<Map<String, dynamic>>();
+  // Store-bound content: every pack must declare its integrity hashes.
+  requirePinnedCatalogEntries(packs);
+  return packs;
 }
 
 /// W7b boot glue: recompute + reschedule reminders once per app start (PM
 /// ruling — no background isolate, no boot receiver in v1; missed-while-dead
 /// reminders are accepted). The shared helper is guarded and never throws.
 Future<void> runBootReminderSchedule() => scheduleReminders(
-      city: getIt<CityRepository>(),
-      prayer: getIt<PrayerTimeService>(),
-      settings: getIt<ReminderSettings>(),
-      scheduler: getIt<ReminderScheduler>(),
+      city: getIt<CitySource>(),
+      prayer: getIt<PrayerTimesPort>(),
+      settings: getIt<ReminderSettingsPort>(),
+      scheduler: getIt<ReminderSchedulerPort>(),
     );

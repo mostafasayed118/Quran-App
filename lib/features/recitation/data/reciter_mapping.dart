@@ -8,6 +8,7 @@ import 'reciter_repository.dart';
 /// the data layer keeps returning them; the presentation boundary maps rows
 /// to entities here instead.
 extension ReciterRowMapping on ReciterRow {
+  /// Maps this row to the presentation-facing [ReciterInfo] model.
   ReciterInfo toInfo() => ReciterInfo(
         id: id,
         reciterName: reciterName,

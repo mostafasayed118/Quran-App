@@ -1,27 +1,19 @@
 import 'package:adhan/adhan.dart';
 
-import '../../../core/domain/prayer_name.dart';
+import '../../../core/domain/city.dart';
+import '../../../core/domain/prayer_times.dart';
 
-// Compat: existing importers of this file keep resolving [PrayerName].
-export '../../../core/domain/prayer_name.dart' show PrayerName;
+// Compat: existing importers of this file keep resolving [PrayerChoice],
+// [PrayerName] and [CityCoordinates].
+export '../../../core/domain/city.dart' show CityCoordinates;
+export '../../../core/domain/prayer_times.dart' show PrayerChoice, PrayerName;
 
-class CityCoordinates {
-  const CityCoordinates(this.latitude, this.longitude);
-
-  final double latitude;
-  final double longitude;
-}
-
-class PrayerChoice {
-  const PrayerChoice(this.name, this.time);
-
-  final PrayerName name;
-  final DateTime time;
-}
-
-class PrayerTimeService {
+/// Computes prayer times with the Egyptian calculation method.
+class PrayerTimeService implements PrayerTimesPort {
+  /// Creates the service; it holds no state.
   const PrayerTimeService();
 
+  /// Label of the calculation method, 'egyptian'.
   static const String methodLabel = 'egyptian';
 
   PrayerTimes _timesFor(CityCoordinates c, DateTime dayLocal) {
@@ -32,6 +24,7 @@ class PrayerTimeService {
     );
   }
 
+  @override
   List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) {
     final t = _timesFor(c, dayLocal);
     return <PrayerChoice>[
@@ -44,6 +37,7 @@ class PrayerTimeService {
     ];
   }
 
+  @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) {
     final day = DateTime(whenLocal.year, whenLocal.month, whenLocal.day);
     final entries = today(c, day);

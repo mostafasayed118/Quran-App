@@ -2,18 +2,24 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
 import '../data/dua_repository.dart';
 import '../data/ruqyah_repository.dart';
-import '../../quran/data/ayah_repository.dart';
 import 'duas_state.dart';
 
+/// The duas/ruqyah screen: the dua list, the category filter and the ruqyah
+/// tab (its Quran entries resolve to ayah texts through the ayah port).
 class DuasCubit extends Cubit<DuasState> {
+  /// Creates the cubit and loads the dua list.
+  ///
+  /// The load is fire-and-forget: the state moves from loading to
+  /// duas/failed on its own.
   DuasCubit({
     required DuaRepository duas,
     required RuqyahRepository ruqyah,
-    required AyahRepository ayahs,
+    required AyahLookup ayahs,
   })  : _duas = duas,
         _ruqyah = ruqyah,
         _ayahs = ayahs,
@@ -23,11 +29,16 @@ class DuasCubit extends Cubit<DuasState> {
 
   final DuaRepository _duas;
   final RuqyahRepository _ruqyah;
-  final AyahRepository _ayahs;
+  final AyahLookup _ayahs;
 
   List<DuaEntry>? _allDuas;
   List<RuqyahResolved>? _resolvedRuqyah;
 
+  /// Loads the dua list and its categories and emits them.
+  ///
+  /// The two reads are independent and run concurrently; the first failure
+  /// wins and emits [DuasState.failed] (the other chain is consumed, never
+  /// an unhandled async error).
   Future<void> showDuas() async {
     try {
       // Independent reads: run them concurrently (list form keeps the first
@@ -49,6 +60,10 @@ class DuasCubit extends Cubit<DuasState> {
     }
   }
 
+  /// Switches to the ruqyah tab and resolves its entries.
+  ///
+  /// The resolutions are cached: a second visit re-emits the cached rows
+  /// instead of re-querying the ayah port.
   Future<void> showRuqyah() async {
     final cached = _resolvedRuqyah;
     if (cached != null) {
@@ -77,23 +92,22 @@ class DuasCubit extends Cubit<DuasState> {
   }
 
   Future<RuqyahResolved> _resolveEntry(RuqyahEntry entry) async {
+    final surahId = entry.surahId;
+    final fromAyah = entry.fromAyah;
+    final toAyah = entry.toAyah;
     if (entry.isQuran &&
-        entry.surahId != null &&
-        entry.fromAyah != null &&
-        entry.toAyah != null) {
-      final ayahs = await _ayahs.ayahsForRange(
-        entry.surahId!,
-        entry.fromAyah!,
-        entry.toAyah!,
-      );
-      final surah = await _ayahs.surahById(entry.surahId!);
+        surahId != null &&
+        fromAyah != null &&
+        toAyah != null) {
+      final ayahs = await _ayahs.ayahRefsForRange(surahId, fromAyah, toAyah);
+      final surah = await _ayahs.surahRefById(surahId);
       return RuqyahResolved(
         id: entry.id,
         isQuran: true,
         displayText:
             <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
         citation: '${surah?.nameAr ?? ''} '
-            '${entry.fromAyah!.toArabicIndic}–${entry.toAyah!.toArabicIndic}',
+            '${fromAyah.toArabicIndic}–${toAyah.toArabicIndic}',
         reference: entry.reference,
       );
     }
@@ -106,6 +120,7 @@ class DuasCubit extends Cubit<DuasState> {
     );
   }
 
+  /// Switches the visible tab; a no-op when the tab is already shown.
   Future<void> selectTab(DuasTab tab) async {
     final isAlreadyDuas = state is DuasInView && tab == DuasTab.duas;
     final isAlreadyRuqyah = state is RuqyahInView && tab == DuasTab.ruqyah;
@@ -117,6 +132,7 @@ class DuasCubit extends Cubit<DuasState> {
     }
   }
 
+  /// Filters the dua list by [category]; null clears the filter.
   void selectCategory(String? category) {
     final state = this.state;
     final all = _allDuas;

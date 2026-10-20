@@ -3,6 +3,7 @@ import 'last_read_source.dart';
 
 const lastReadAyahIdKey = 'last_read_ayah_id';
 
+/// Stores the last ayah the user read.
 class LastReadRepository implements LastReadSource {
   LastReadRepository(this._db);
 

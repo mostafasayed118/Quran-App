@@ -15,6 +15,7 @@ class LocationService {
 
   final PositionResolver _resolver;
 
+  /// The device position, or null when it is unavailable or denied.
   Future<CityCoordinates?> currentPosition() async {
     try {
       return await _resolver();
@@ -32,6 +33,7 @@ class LocationService {
     }
   }
 
+  /// One-shot device position read; returns null on any failure.
   static Future<CityCoordinates?> resolveFromDevice() async {
     if (!await Geolocator.isLocationServiceEnabled()) return null;
     var permission = await Geolocator.checkPermission();

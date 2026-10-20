@@ -27,6 +27,7 @@ class HeadingService {
 
   final HeadingStreamFactory _streamFactory;
 
+  /// Device heading in degrees; null when the device has no magnetometer.
   Stream<double>? headingStream() {
     try {
       return _streamFactory();

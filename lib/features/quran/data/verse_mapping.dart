@@ -8,6 +8,7 @@ import '../domain/verse.dart';
 /// the data layer keeps returning them; the presentation boundary maps rows
 /// to entities here instead.
 extension AyahRowMapping on Ayah {
+  /// Maps this row to the reader-facing [Verse] model.
   Verse toVerse() => Verse(
         id: id,
         surahId: surahId,
@@ -21,6 +22,7 @@ extension AyahRowMapping on Ayah {
 }
 
 extension SurahRowMapping on Surah {
+  /// Maps this row to the list-facing [SurahSummary] model.
   SurahSummary toSummary() => SurahSummary(
         id: id,
         nameAr: nameAr,
