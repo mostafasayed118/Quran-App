@@ -18,48 +18,104 @@ const int maxTotalBytes = 12 * 1024 * 1024;
 
 /// Per-prefix IANA default (cities.json id prefix = country code).
 const Map<String, String> tzByPrefix = {
-  'eg': 'Africa/Cairo', 'sa': 'Asia/Riyadh', 'ae': 'Asia/Dubai',
-  'qa': 'Asia/Qatar', 'kw': 'Asia/Kuwait', 'bh': 'Asia/Bahrain',
-  'om': 'Asia/Muscat', 'ye': 'Asia/Aden', 'iq': 'Asia/Baghdad',
-  'sy': 'Asia/Damascus', 'lb': 'Asia/Beirut', 'jo': 'Asia/Amman',
-  'ly': 'Africa/Tripoli', 'tn': 'Africa/Tunis', 'dz': 'Africa/Algiers',
-  'ma': 'Africa/Casablanca', 'mr': 'Africa/Nouakchott', 'sd': 'Africa/Khartoum',
-  'so': 'Africa/Mogadishu', 'dj': 'Africa/Djibouti', 'km': 'Indian/Comoro',
-  'gb': 'Europe/London', 'fr': 'Europe/Paris', 'de': 'Europe/Berlin',
-  'es': 'Europe/Madrid', 'it': 'Europe/Rome', 'pt': 'Europe/Lisbon',
-  'nl': 'Europe/Amsterdam', 'be': 'Europe/Brussels', 'at': 'Europe/Vienna',
-  'ch': 'Europe/Zurich', 'pl': 'Europe/Warsaw', 'cz': 'Europe/Prague',
-  'hu': 'Europe/Budapest', 'gr': 'Europe/Athens', 'ru': 'Europe/Moscow',
-  'ua': 'Europe/Kyiv', 'se': 'Europe/Stockholm', 'dk': 'Europe/Copenhagen',
-  'fi': 'Europe/Helsinki', 'ie': 'Europe/Dublin', 'ba': 'Europe/Sarajevo',
-  'rs': 'Europe/Belgrade', 'tr': 'Europe/Istanbul', 'mx': 'America/Mexico_City',
-  'cu': 'America/Havana', 'co': 'America/Bogota', 've': 'America/Caracas',
-  'pe': 'America/Lima', 'ar': 'America/Argentina/Buenos_Aires',
-  'cl': 'America/Santiago', 'uy': 'America/Montevideo', 'cn': 'Asia/Shanghai',
-  'jp': 'Asia/Tokyo', 'kr': 'Asia/Seoul', 'vn': 'Asia/Ho_Chi_Minh',
-  'th': 'Asia/Bangkok', 'my': 'Asia/Kuala_Lumpur', 'sg': 'Asia/Singapore',
-  'id': 'Asia/Jakarta', 'ph': 'Asia/Manila', 'bd': 'Asia/Dhaka',
-  'np': 'Asia/Kathmandu', 'in': 'Asia/Kolkata', 'pk': 'Asia/Karachi',
-  'af': 'Asia/Kabul', 'uz': 'Asia/Tashkent', 'kz': 'Asia/Almaty',
-  'az': 'Asia/Baku', 'ge': 'Asia/Tbilisi', 'am': 'Asia/Yerevan',
-  'ir': 'Asia/Tehran', 'et': 'Africa/Addis_Ababa', 'ke': 'Africa/Nairobi',
-  'ng': 'Africa/Lagos', 'sn': 'Africa/Dakar', 'za': 'Africa/Johannesburg',
-  'rw': 'Africa/Kigali', 'nz': 'Pacific/Auckland',
+  'eg': 'Africa/Cairo',
+  'sa': 'Asia/Riyadh',
+  'ae': 'Asia/Dubai',
+  'qa': 'Asia/Qatar',
+  'kw': 'Asia/Kuwait',
+  'bh': 'Asia/Bahrain',
+  'om': 'Asia/Muscat',
+  'ye': 'Asia/Aden',
+  'iq': 'Asia/Baghdad',
+  'sy': 'Asia/Damascus',
+  'lb': 'Asia/Beirut',
+  'jo': 'Asia/Amman',
+  'ly': 'Africa/Tripoli',
+  'tn': 'Africa/Tunis',
+  'dz': 'Africa/Algiers',
+  'ma': 'Africa/Casablanca',
+  'mr': 'Africa/Nouakchott',
+  'sd': 'Africa/Khartoum',
+  'so': 'Africa/Mogadishu',
+  'dj': 'Africa/Djibouti',
+  'km': 'Indian/Comoro',
+  'gb': 'Europe/London',
+  'fr': 'Europe/Paris',
+  'de': 'Europe/Berlin',
+  'es': 'Europe/Madrid',
+  'it': 'Europe/Rome',
+  'pt': 'Europe/Lisbon',
+  'nl': 'Europe/Amsterdam',
+  'be': 'Europe/Brussels',
+  'at': 'Europe/Vienna',
+  'ch': 'Europe/Zurich',
+  'pl': 'Europe/Warsaw',
+  'cz': 'Europe/Prague',
+  'hu': 'Europe/Budapest',
+  'gr': 'Europe/Athens',
+  'ru': 'Europe/Moscow',
+  'ua': 'Europe/Kyiv',
+  'se': 'Europe/Stockholm',
+  'dk': 'Europe/Copenhagen',
+  'fi': 'Europe/Helsinki',
+  'ie': 'Europe/Dublin',
+  'ba': 'Europe/Sarajevo',
+  'rs': 'Europe/Belgrade',
+  'tr': 'Europe/Istanbul',
+  'mx': 'America/Mexico_City',
+  'cu': 'America/Havana',
+  'co': 'America/Bogota',
+  've': 'America/Caracas',
+  'pe': 'America/Lima',
+  'ar': 'America/Argentina/Buenos_Aires',
+  'cl': 'America/Santiago',
+  'uy': 'America/Montevideo',
+  'cn': 'Asia/Shanghai',
+  'jp': 'Asia/Tokyo',
+  'kr': 'Asia/Seoul',
+  'vn': 'Asia/Ho_Chi_Minh',
+  'th': 'Asia/Bangkok',
+  'my': 'Asia/Kuala_Lumpur',
+  'sg': 'Asia/Singapore',
+  'id': 'Asia/Jakarta',
+  'ph': 'Asia/Manila',
+  'bd': 'Asia/Dhaka',
+  'np': 'Asia/Kathmandu',
+  'in': 'Asia/Kolkata',
+  'pk': 'Asia/Karachi',
+  'af': 'Asia/Kabul',
+  'uz': 'Asia/Tashkent',
+  'kz': 'Asia/Almaty',
+  'az': 'Asia/Baku',
+  'ge': 'Asia/Tbilisi',
+  'am': 'Asia/Yerevan',
+  'ir': 'Asia/Tehran',
+  'et': 'Africa/Addis_Ababa',
+  'ke': 'Africa/Nairobi',
+  'ng': 'Africa/Lagos',
+  'sn': 'Africa/Dakar',
+  'za': 'Africa/Johannesburg',
+  'rw': 'Africa/Kigali',
+  'nz': 'Pacific/Auckland',
 };
 
 /// Exact-city overrides (multi-timezone countries).
 const Map<String, String> tzByCity = {
-  'ps-jerusalem': 'Asia/Jerusalem', 'ps-gaza': 'Asia/Gaza',
+  'ps-jerusalem': 'Asia/Jerusalem',
+  'ps-gaza': 'Asia/Gaza',
   'ps-ramallah': 'Asia/Hebron',
-  'us-washington': 'America/New_York', 'us-new-york': 'America/New_York',
+  'us-washington': 'America/New_York',
+  'us-new-york': 'America/New_York',
   'us-chicago': 'America/Chicago',
-  'ca-toronto': 'America/Toronto', 'ca-ottawa': 'America/Toronto',
-  'br-brasilia': 'America/Sao_Paulo', 'br-sao-paulo': 'America/Sao_Paulo',
-  'au-canberra': 'Australia/Sydney', 'au-sydney': 'Australia/Sydney',
+  'ca-toronto': 'America/Toronto',
+  'ca-ottawa': 'America/Toronto',
+  'br-brasilia': 'America/Sao_Paulo',
+  'br-sao-paulo': 'America/Sao_Paulo',
+  'au-canberra': 'Australia/Sydney',
+  'au-sydney': 'Australia/Sydney',
 };
 
-String? ianaFor(String id) =>
-    tzByCity[id] ?? tzByPrefix[id.split('-').first];
+String? ianaFor(String id) => tzByCity[id] ?? tzByPrefix[id.split('-').first];
 
 Never fail(String message) {
   stderr.writeln('FAIL: $message');
@@ -96,7 +152,8 @@ void main() {
       fail('timezone "$iana" for city "$id" not found in the bundled database');
     }
     final lngImpliedHours = lng / 15.0;
-    final januaryOffset = tz.TZDateTime(loc, startYear, 1, 1, 12).timeZoneOffset;
+    final januaryOffset =
+        tz.TZDateTime(loc, startYear, 1, 1, 12).timeZoneOffset;
     if ((januaryOffset.inMinutes / 60.0 - lngImpliedHours).abs() > 3.5) {
       fail('"$id" -> $iana offset $januaryOffset strays >3.5h from longitude '
           '$lngImpliedHours — mapping likely wrong');
@@ -174,9 +231,11 @@ void main() {
   totalBytes += index.length;
 
   final sampleCairo = File('${outDir.path}/eg-cairo.json').readAsStringSync();
-  final firstDay =
-      ((((jsonDecode(sampleCairo) as Map)['months'] as List).first as Map)['days'] as List).first;
-  stdout.writeln('OK: ${cities.length} cities x 24 months ($totalDays day rows)');
+  final firstDay = ((((jsonDecode(sampleCairo) as Map)['months'] as List).first
+          as Map)['days'] as List)
+      .first;
+  stdout
+      .writeln('OK: ${cities.length} cities x 24 months ($totalDays day rows)');
   stdout.writeln('sample eg-cairo 2026-01-01 '
       '[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak]: $firstDay');
   stdout.writeln('total bytes: $totalBytes '
