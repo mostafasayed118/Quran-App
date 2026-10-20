@@ -73,9 +73,16 @@ body {
 .ayah { padding: 14px 2px; border-bottom: 1px solid var(--hairline); }
 .ayah-text {
   margin: 0;
-  font-family: 'HafsSmart', 'me_quran', serif;
+  --ayah-size: calc(19px + var(--reader-step, 0) * 3px);
+  font-family: 'HafsSmart', serif;
   font-size: var(--ayah-size); line-height: 2.15; color: var(--ink);
 }
+/* The reader font step travels as an attribute, not as an inline style: the CSP
+   allows no inline styles at all. */
+html[data-reader-step='0'] { --reader-step: 0; }
+html[data-reader-step='1'] { --reader-step: 1; }
+html[data-reader-step='2'] { --reader-step: 2; }
+html[data-reader-step='3'] { --reader-step: 3; }
 .medal {
   display: inline-flex; align-items: center; justify-content: center;
   width: 27px; height: 27px; border-radius: 50%;
@@ -248,3 +255,20 @@ body.has-player { padding-bottom: 72px; }
   .reciter-play, .surah-play { width: 44px; height: 44px; }
   .surah-download { display: inline-flex; align-items: center; min-height: 44px; }
 }
+
+/* Legal pages (privacy): the rendered PRIVACY.md / PRIVACY.en.md article. */
+.legal { width: min(760px, calc(100% - 40px)); margin: 0 auto 60px; }
+.legal h1 { margin: 28px 0 6px; font-size: 1.35rem; }
+.legal h2 { margin: 26px 0 8px; font-size: 1.05rem; }
+.legal p, .legal li { color: var(--muted-strong); line-height: 1.9; }
+.legal blockquote {
+  margin: 16px 0; padding: 12px 16px; border-radius: 8px;
+  border-inline-start: 3px solid var(--gold-line);
+  background: color-mix(in srgb, var(--gold-line) 12%, transparent);
+}
+.legal blockquote p { margin: 0; color: var(--ink); }
+.legal table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 14px 0; font-size: .9rem; }
+.legal th, .legal td { padding: 8px 10px; border: 1px solid var(--hairline); text-align: start; }
+.legal th { color: var(--ink); background: color-mix(in srgb, var(--gold-line) 10%, transparent); }
+.legal hr { border: 0; border-top: 1px solid var(--hairline); margin: 30px 0; }
+.legal a { color: var(--accent); }

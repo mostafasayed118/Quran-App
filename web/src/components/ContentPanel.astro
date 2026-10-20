@@ -20,6 +20,7 @@ const { surah, locale = 'ar' } = Astro.props;
   import { PACKS, fetchPackAyahs, type PackInfo } from '../lib/content-packs';
   import { readSetting, writeSetting } from '../lib/settings';
   import { t, type Locale } from '../lib/strings';
+  import { onPageReady } from '../lib/lifecycle';
 
   const KEY = 'content';
 
@@ -117,6 +118,5 @@ const { surah, locale = 'ar' } = Astro.props;
       if (current) void load(current);
     });
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

@@ -1,17 +1,12 @@
 ---
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { t, type Locale } from '../../lib/strings';
+import { getCities } from '../../lib/cities';
 
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const placeholder = t(locale, 'ptSearchPlaceholder');
-// Mirrors the getStaticPaths note: components are bundled at build time, so
-// resolve the data dir from the web/ cwd (npm run build/dev run there).
-const index = JSON.parse(
-  readFileSync(join(process.cwd(), 'public', 'data', 'prayer-times', 'index.json'), 'utf8'),
-) as { cities: { id: string; nameAr: string; nameEn: string }[] };
+const cities = getCities();
 ---
 <h1 class="page-title">{t(locale, 'ptTitle')}</h1>
 <p class="page-lead">{t(locale, 'ptLead')}</p>
@@ -26,7 +21,7 @@ const index = JSON.parse(
   />
   <p class="empty" hidden>{t(locale, 'noResults')}</p>
   <ul class="city-list">
-    {index.cities.map((city) => (
+    {cities.map((city) => (
       <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
         <a href={`${base}/prayer-times/${city.id}/`}>{locale === 'en' ? city.nameEn : city.nameAr}</a>
       </li>
@@ -49,6 +44,7 @@ const index = JSON.parse(
 </style>
 <script>
   import { normalizeArabic } from '../../lib/arabic';
+  import { onPageReady } from '../../lib/lifecycle';
 
   function init(): void {
     const root = document.querySelector<HTMLElement>('[data-qy="pt-cities"]');
@@ -77,6 +73,5 @@ const index = JSON.parse(
     input.addEventListener('input', filter);
     root.dataset.qyReady = '1';
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

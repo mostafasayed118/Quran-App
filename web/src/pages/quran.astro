@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import QuranPage from '../components/pages/QuranPage.astro';
+import { t } from '../lib/strings';
 import { META_DESCRIPTIONS } from '../lib/landing-content';
 ---
-<BaseLayout title="المصحف — قرآن يَهدي" description={META_DESCRIPTIONS.ar.quran}>
+<BaseLayout title={`${t('ar', 'surahIndexTitle')} — ${t('ar', 'appName')}`} description={META_DESCRIPTIONS.ar.quran}>
   <QuranPage locale="ar" />
 </BaseLayout>

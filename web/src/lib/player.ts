@@ -1,6 +1,17 @@
 import { surahAudioUrl, type MoshafRow } from './reciters';
 import { writeSetting } from './settings';
 
+/**
+ * The DOM event names the player listens on. The reader and the reciters page
+ * dispatch them on `document`; the mini player picks them up.
+ */
+export const PLAYER_EVENTS = {
+  /** Detail: { row: MoshafRow; surah: number } — start playing that surah. */
+  play: 'qy:play',
+  /** Detail: none — toggle play/pause. */
+  toggle: 'qy:toggle',
+} as const;
+
 export interface PlayerState {
   row: MoshafRow | null;
   surah: number | null;

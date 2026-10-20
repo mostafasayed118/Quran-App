@@ -1,7 +1,7 @@
 ---
 import { t, type Locale } from '../../lib/strings';
 import { surahDisplayName } from '../../lib/surah-name';
-import surahs from '../../data/surahs.json';
+import { getSurahs } from '../../lib/surahs';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
@@ -20,7 +20,7 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
   />
   <p class="empty" hidden>{t(locale, 'noResults')}</p>
   <ol class="surah-list">
-    {surahs.surahs.map((s) => (
+    {getSurahs().map((s) => (
       <li>
         <a href={`${base}/surah/${s.id}/`}>
           <span class="surah-num">{s.id}</span>
@@ -47,10 +47,11 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
 </style>
 <script>
   import { filterSurahs } from '../../lib/surah-filter';
-  import { loadSearchIndex, matchSpan, searchAyahs, type Hit } from '../../lib/search';
+  import { loadSearchIndex, matchSpan, searchAyahsAsync, type Hit } from '../../lib/search';
   import { surahDisplayName } from '../../lib/surah-name';
   import { t, type Locale } from '../../lib/strings';
-  import surahs from '../../data/surahs.json';
+  import { getSurahs, type Surah } from '../../lib/surahs';
+  import { onPageReady } from '../../lib/lifecycle';
 
   function init(): void {
     const root = document.querySelector<HTMLElement>('[data-qy="surah-index"]');
@@ -75,7 +76,7 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
     const active = (): boolean =>
       q.trim().length >= 2 && locale !== 'en' && !/^[0-9٠-٩]+$/.test(q.trim());
 
-    const renderList = (results: typeof surahs.surahs): void => {
+    const renderList = (results: Surah[]): void => {
       list.replaceChildren(
         ...results.map((s) => {
           const li = document.createElement('li');
@@ -185,8 +186,20 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
       // Hits only are debounced; the surah list above filters immediately.
       timer = window.setTimeout(() => {
         if (!root.isConnected) return; // a ClientRouter swap already moved on
-        hits = searchAyahs(q);
-        renderSection();
+        // The verse index lives in a worker: the ranking happens off this thread.
+        void searchAyahsAsync(q).then(
+          (next) => {
+            if (!root.isConnected) return;
+            hits = next;
+            renderSection();
+          },
+          () => {
+            if (!root.isConnected) return;
+            loading = false;
+            failed = true;
+            renderSection();
+          },
+        );
       }, 150);
     };
 
@@ -217,6 +230,11 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
         section = null;
         return;
       }
+      // The verse index is ~205 KB gzip and its normalize pass runs on the main
+      // thread, so it is fetched exactly when the query can actually match
+      // text — the first keystroke that passes the `active()` gate above.
+      // A bare focus never pulls it down, and a digit-only query (answered by
+      // the surah-number filter) never pulls it down either.
       if (!ready && !failed && !loading) startLoad();
       if (ready) scheduleHits();
       renderSection();
@@ -224,7 +242,7 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
 
     input.addEventListener('input', () => {
       q = input.value;
-      renderList(filterSurahs(surahs.surahs, q));
+      renderList(filterSurahs(getSurahs(), q));
       updateAyahSearch();
     });
 
@@ -233,6 +251,5 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
 
     root.dataset.qyReady = '1';
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

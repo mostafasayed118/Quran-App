@@ -1,38 +1,22 @@
 ---
 import { t, type Locale } from '../../lib/strings';
 import { digitsFor } from '../../lib/arabic-digits';
+import { type PrayerTimesData } from '../../lib/prayer-times';
+import { formatClock, monthLabel, resolveToday } from '../../lib/prayer-calendar';
 
-interface CityData {
-  city: { id: string; nameAr: string; nameEn: string; lat: number; lng: number; tz: string };
-  months: { y: number; m: number; days: number[][] }[];
-}
-interface Props { locale?: Locale; data: CityData }
+interface Props { locale?: Locale; data: PrayerTimesData }
 const { locale = 'ar', data } = Astro.props;
 const city = data.city;
 
-const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
-const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const monthLabel = (y: number, m: number): string =>
-  locale === 'en' ? `${MONTHS_EN[m - 1]} ${y}` : `${MONTHS_AR[m - 1]} ${digitsFor(y, 'ar')}`;
-
 // SSR "today" is the build date: the page ships the current month pre-highlighted
 // and the client re-renders/highlights on month switches (see script below).
-const now = new Date();
-const todayY = now.getFullYear();
-const todayM = now.getMonth() + 1;
-const todayD = now.getDate();
-const inRange = todayY >= 2026 && todayY <= 2027;
-const currentIdx = inRange ? (todayY - 2026) * 12 + (todayM - 1) : 0;
+const { y: todayY, m: todayM, d: todayD, inRange, monthIndex: currentIdx } = resolveToday(
+  data.months,
+  new Date(),
+);
 const month = data.months[currentIdx];
 const todayISO = `${todayY}-${todayM}-${todayD}`;
 
-const hm = (min: number): string => {
-  const m = ((min % 1440) + 1440) % 1440;
-  return digitsFor(
-    `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`,
-    locale,
-  );
-};
 const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? city.nameEn : city.nameAr);
 ---
 <h1 class="page-title">{heading}</h1>
@@ -49,7 +33,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
       <span>{t(locale, 'ptMonth')}</span>
       <select id="prayer-month-select" name="prayer-month-select" data-qy="pt-month">
         {data.months.map((mo, i) => (
-          <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>{monthLabel(mo.y, mo.m)}</option>
+          <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>{monthLabel(locale, mo.y, mo.m)}</option>
         ))}
       </select>
     </label>
@@ -81,13 +65,13 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
             class={inRange && i + 1 === todayD ? 'is-today' : undefined}
           >
             <td data-col="day">{digitsFor(i + 1, locale)}</td>
-            <td data-col="imsak">{hm(row[6])}</td>
-            <td data-col="fajr">{hm(row[0])}</td>
-            <td data-col="sunrise">{hm(row[1])}</td>
-            <td data-col="dhuhr">{hm(row[2])}</td>
-            <td data-col="asr">{hm(row[3])}</td>
-            <td data-col="maghrib">{hm(row[4])}</td>
-            <td data-col="isha">{hm(row[5])}</td>
+            <td data-col="imsak">{formatClock(row[6], locale)}</td>
+            <td data-col="fajr">{formatClock(row[0], locale)}</td>
+            <td data-col="sunrise">{formatClock(row[1], locale)}</td>
+            <td data-col="dhuhr">{formatClock(row[2], locale)}</td>
+            <td data-col="asr">{formatClock(row[3], locale)}</td>
+            <td data-col="maghrib">{formatClock(row[4], locale)}</td>
+            <td data-col="isha">{formatClock(row[5], locale)}</td>
           </tr>
         ))}
       </tbody>
@@ -123,6 +107,8 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
 <script>
   import { t, type Locale } from '../../lib/strings';
   import { digitsFor } from '../../lib/arabic-digits';
+  import { formatClock } from '../../lib/prayer-calendar';
+  import { onPageReady } from '../../lib/lifecycle';
 
   function init(): void {
     const root = document.querySelector<HTMLElement>('[data-qy="pt-city"]');
@@ -139,13 +125,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
     let months: { y: number; m: number; days: number[][] }[] | null = null;
     let pending: Promise<void> | null = null;
 
-    const hm = (min: number): string => {
-      const m = ((min % 1440) + 1440) % 1440;
-      return digitsFor(
-        `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`,
-        locale,
-      );
-    };
+    const hm = (min: number): string => formatClock(min, locale);
 
     const cell = (col: string, text: string): HTMLTableCellElement => {
       const td = document.createElement('td');
@@ -157,7 +137,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
     const renderMonth = (): void => {
       if (!months) return;
       const [y, m] = select.value.split('-').map(Number);
-      const monthData = months[(y - 2026) * 12 + (m - 1)];
+      const monthData = months.find((mo) => mo.y === y && mo.m === m);
       if (!monthData) return;
       const todayParts = today === '' ? null : today.split('-').map(Number);
       const todayDay =
@@ -251,6 +231,5 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
     void load().catch(() => {});
     root.dataset.qyReady = '1';
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

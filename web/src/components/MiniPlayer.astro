@@ -17,11 +17,12 @@ const { locale = 'ar' } = Astro.props;
   <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>✕</button>
 </div>
 <script>
-  import { getPlayer } from '../lib/player';
+  import { getPlayer, PLAYER_EVENTS } from '../lib/player';
   import { digitsFor } from '../lib/arabic-digits';
   import type { Locale } from '../lib/strings';
   import { dedupeLabel } from '../lib/labels';
   import type { MoshafRow } from '../lib/reciters';
+  import { onPageReady } from '../lib/lifecycle';
 
   let dismissed = false;
 
@@ -85,14 +86,13 @@ const { locale = 'ar' } = Astro.props;
         document.getElementById('main');
       target?.focus();
     });
-    document.addEventListener('qy:play', (e) => {
+    document.addEventListener(PLAYER_EVENTS.play, (e) => {
       const { row, surah } = (e as CustomEvent<{ row: MoshafRow; surah: number }>).detail;
       dismissed = false;
       player.play(row, surah);
     });
-    document.addEventListener('qy:toggle', () => player.toggle());
+    document.addEventListener(PLAYER_EVENTS.toggle, () => player.toggle());
     render();
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

@@ -11,20 +11,3 @@ const title = `${t('en', 'footerPrivacy')} — ${t('en', 'appName')}`;
     <PrivacyEn />
   </article>
 </BaseLayout>
-<style is:global>
-  .legal { width: min(760px, calc(100% - 40px)); margin: 0 auto 60px; }
-  .legal h1 { margin: 28px 0 6px; font-size: 1.35rem; }
-  .legal h2 { margin: 26px 0 8px; font-size: 1.05rem; }
-  .legal p, .legal li { color: var(--muted-strong); line-height: 1.9; }
-  .legal blockquote {
-    margin: 16px 0; padding: 12px 16px; border-radius: 8px;
-    border-inline-start: 3px solid var(--gold-line);
-    background: color-mix(in srgb, var(--gold-line) 12%, transparent);
-  }
-  .legal blockquote p { margin: 0; color: var(--ink); }
-  .legal table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 14px 0; font-size: .9rem; }
-  .legal th, .legal td { padding: 8px 10px; border: 1px solid var(--hairline); text-align: start; }
-  .legal th { color: var(--ink); background: color-mix(in srgb, var(--gold-line) 10%, transparent); }
-  .legal hr { border: 0; border-top: 1px solid var(--hairline); margin: 30px 0; }
-  .legal a { color: var(--accent); }
-</style>

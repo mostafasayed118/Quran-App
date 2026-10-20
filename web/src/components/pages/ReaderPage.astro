@@ -5,26 +5,36 @@ import { surahNeighbors } from '../../lib/surah-neighbors';
 import { t, type Locale } from '../../lib/strings';
 import { surahDisplayName } from '../../lib/surah-name';
 import { toArabicDigits } from '../../lib/arabic-digits';
-import surahs from '../../data/surahs.json';
-interface Props { surah: (typeof surahs.surahs)[number]; locale?: Locale }
+import { getAyahs } from '../../lib/ayahs';
+import {
+  READER_SETTINGS_KEY,
+  READER_FONT_STEPS,
+  READER_VIEWS,
+  READER_LAYOUTS,
+} from '../../lib/reader-settings';
+import type { Surah } from '../../lib/surahs';
+interface Props { surah: Surah; locale?: Locale }
 const { surah, locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const { prev, next } = surahNeighbors(surah.id);
-const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
-  surah: number;
-  ayahs: { n: number; juz: number; page: number; u: string; i: string; sajda: boolean }[];
-};
+const data = await getAyahs(surah.id);
 ---
-<script is:inline data-astro-rerun>
+<script
+  is:inline
+  data-astro-rerun
+  define:vars={{ READER_SETTINGS_KEY, READER_FONT_STEPS, READER_VIEWS, READER_LAYOUTS }}
+>
   (function () {
     try {
-      var s = JSON.parse(localStorage.getItem('qy:reader') || 'null') || {};
-      var step = s.fontStep === 1 || s.fontStep === 2 || s.fontStep === 3 ? s.fontStep : 0;
-      var view = s.view === 'imlaei' ? 'imlaei' : 'mushaf';
-      var layout = s.layout === 'pages' ? 'pages' : 'verses';
+      // The stored settings come from src/lib/reader-settings.ts: the key and the
+      // allowed values are injected above, so this block never re-defines them.
+      var s = JSON.parse(localStorage.getItem(READER_SETTINGS_KEY) || 'null') || {};
+      var step = READER_FONT_STEPS.indexOf(s.fontStep) >= 0 ? s.fontStep : 0;
+      var view = READER_VIEWS.indexOf(s.view) >= 0 ? s.view : 'mushaf';
+      var layout = READER_LAYOUTS.indexOf(s.layout) >= 0 ? s.layout : 'verses';
       document.documentElement.setAttribute('data-reading-view', view);
       document.documentElement.setAttribute('data-reader-layout', layout);
-      document.documentElement.style.setProperty('--reader-step', String(step));
+      document.documentElement.setAttribute('data-reader-step', String(step));
     } catch (e) { /* defaults */ }
   })();
 </script>
@@ -67,71 +77,39 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
     type FontStep,
     type ReaderSettings,
   } from '../../lib/reader-settings';
-  import { fetchReciters, fetchRecitersSnapshot, sortReciters, type MoshafRow } from '../../lib/reciters';
-  import { dedupeLabel } from '../../lib/labels';
-  import { listBookmarks, toggleBookmark } from '../../lib/bookmarks';
   import { readResume, writeResume } from '../../lib/reader-resume';
-  import { shareOrCopy } from '../../lib/share';
-  import { surahUrl } from '../../lib/urls';
-  import { t, type Locale } from '../../lib/strings';
-  import { toArabicDigits } from '../../lib/arabic-digits';
-
-  let L: Locale = 'ar';
+  import { onPageReady } from '../../lib/lifecycle';
+  import { initReciterPicker } from '../../lib/reader/reciter-picker';
+  import { initAyahActions } from '../../lib/reader/ayah-actions';
+  import { initPageCards } from '../../lib/reader/page-cards';
+  import { initKeyboardNav } from '../../lib/reader/keyboard-nav';
+  import { initResumeObserver } from '../../lib/reader/resume-observer';
+  import type { ReaderContext } from '../../lib/reader/context';
+  import type { Locale } from '../../lib/strings';
 
   function clampStep(n: number): FontStep {
     return (n < 0 ? 0 : n > 3 ? 3 : n) as FontStep;
   }
 
-  interface PageBlock {
-    page: number;
-    el: HTMLElement;
-    ayahs: HTMLElement[];
-  }
-
-  // One module-level keydown listener for pages navigation; the active reader sets keyNav
-  // and the before-swap cleanup clears it (same lifecycle as the resume observer).
-  let keyNav: { box: HTMLElement; go: (delta: number) => void } | null = null;
-  document.addEventListener('keydown', (e) => {
-    if (!keyNav || !keyNav.box.isConnected) return;
-    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
-    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-    const target = e.target as HTMLElement | null;
-    if (target?.closest('input, select, textarea, [contenteditable]')) return;
-    const forward =
-      document.documentElement.lang === 'en' ? e.key === 'ArrowRight' : e.key === 'ArrowLeft';
-    keyNav.go(forward ? 1 : -1);
-    e.preventDefault();
-  });
-
-  // Reciter rows are fetched once per page load and reused by the picker and listen actions.
-  let rowsPromise: Promise<MoshafRow[]> | null = null;
-  let resolvedRows: MoshafRow[] | null = null;
-  function loadRows(): Promise<MoshafRow[]> {
-    rowsPromise ??= fetchReciters()
-      .then((rows) => (resolvedRows = sortReciters(rows)))
-      .catch(() => (resolvedRows = [] as MoshafRow[]));
-    return rowsPromise;
-  }
-
   function init() {
     const box = document.querySelector<HTMLElement>('.reader-controls');
     if (!box || box.dataset.qyReady) return;
-    L = box.dataset.locale === 'en' ? 'en' : 'ar';
+    const locale: Locale = box.dataset.locale === 'en' ? 'en' : 'ar';
     box.dataset.qyReady = '1';
     let settings: ReaderSettings = readReaderSettings();
 
-    const pick = document.querySelector<HTMLSelectElement>('[data-qy="reciter-pick"]');
-    const playBtn = document.querySelector<HTMLButtonElement>('[data-qy="reader-play"]');
     const ayahs = document.querySelector<HTMLElement>('.ayahs');
     const reader = document.querySelector<HTMLElement>('.reader');
+    const playBtn = document.querySelector<HTMLButtonElement>('[data-qy="reader-play"]');
+    const surahId = Number(playBtn?.dataset.surah);
 
-    const render = () => {
+    const render = (): void => {
       document.documentElement.setAttribute('data-reading-view', settings.view);
       document.documentElement.setAttribute(
         'data-reader-layout',
         settings.layout === 'pages' ? 'pages' : 'verses',
       );
-      document.documentElement.style.setProperty('--reader-step', String(settings.fontStep));
+      document.documentElement.setAttribute('data-reader-step', String(settings.fontStep));
       box.querySelectorAll<HTMLButtonElement>('[data-qy-view]').forEach((b) => {
         b.setAttribute('aria-pressed', String(b.dataset.qyView === settings.view));
       });
@@ -141,42 +119,39 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
       });
     };
 
+    const saveSettings = (patch: Partial<ReaderSettings>): ReaderSettings => {
+      settings = writeReaderSettings(patch);
+      return settings;
+    };
+
+    const ctx: ReaderContext = {
+      locale,
+      box,
+      ayahs,
+      reader,
+      surahId,
+      settings: () => settings,
+      saveSettings,
+      render,
+    };
+
     // --- header picker + play (featured-first via sortReciters) ---
-    const selectedRow = async (): Promise<MoshafRow | undefined> => {
-      const wanted = pick?.value || settings.reciterRow;
-      if (wanted) {
-        const fromLive = resolvedRows?.find((r) => r.rowId === wanted);
-        if (fromLive) return fromLive;
-        const fromSnap = sortReciters(await fetchRecitersSnapshot()).find((r) => r.rowId === wanted);
-        if (fromSnap) return fromSnap;
+    const picker = initReciterPicker(ctx);
+    initAyahActions({ context: ctx, playSurah: (s) => { void picker.playSurah(s); } });
+    const keyboard = initKeyboardNav();
+    const pages = initPageCards(ctx, keyboard);
+    const observer = initResumeObserver(ctx);
+
+    const applyLayoutMode = (): void => {
+      if (!ctx.ayahs) return;
+      if (settings.layout === 'pages') {
+        observer.stop();
+        pages.enterPages(pages.topmostVisibleAyah(), { scroll: true });
+      } else {
+        pages.exitPages();
+        observer.start();
       }
-      const rows = await loadRows();
-      return rows.find((r) => r.rowId === wanted) ?? rows[0];
     };
-    const playSurah = async (s: number): Promise<void> => {
-      if (!Number.isFinite(s)) return;
-      const row = await selectedRow();
-      if (row) document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah: s } }));
-    };
-    if (pick) {
-      loadRows().then((rows) => {
-        pick.replaceChildren(
-          ...rows.map((r) => {
-            const opt = document.createElement('option');
-            opt.value = r.rowId;
-            opt.textContent = `${r.reciterName} — ${dedupeLabel(r.moshafName)}`;
-            return opt;
-          }),
-        );
-        const stored = settings.reciterRow;
-        if (stored && rows.some((r) => r.rowId === stored)) pick.value = stored;
-        pick.disabled = rows.length === 0;
-      });
-      pick.addEventListener('change', () => { settings = writeReaderSettings({ reciterRow: pick.value }); });
-    }
-    playBtn?.addEventListener('click', () => {
-      void playSurah(Number(playBtn.dataset.surah));
-    });
 
     box.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement | null)?.closest('button');
@@ -184,275 +159,23 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
       const view = btn.dataset.qyView;
       const layout = btn.dataset.qyLayout;
       if (view === 'mushaf' || view === 'imlaei') {
-        settings = writeReaderSettings({ view });
+        saveSettings({ view });
         render();
       } else if (layout === 'verses' || layout === 'pages') {
-        settings = writeReaderSettings({ layout });
+        saveSettings({ layout });
         render();
         applyLayoutMode();
       } else {
         const delta = Number(btn.dataset.qyStep);
         if (Number.isFinite(delta) && delta !== 0) {
-          settings = writeReaderSettings({ fontStep: clampStep(settings.fontStep + delta) });
+          saveSettings({ fontStep: clampStep(settings.fontStep + delta) });
         }
         render();
       }
     });
 
-    // --- per-ayah actions (delegated; copy/share always use the plain-Arabic `.ayah-i`) ---
-    const saved = new Set(listBookmarks().map((b) => `${b.s}:${b.a}`));
-    const setBookmarkState = (btn: HTMLButtonElement, pressed: boolean): void => {
-      const label = t(L, pressed ? 'ayahBookmarked' : 'ayahBookmark');
-      btn.setAttribute('aria-pressed', String(pressed));
-      btn.setAttribute('aria-label', label);
-      btn.textContent = label;
-    };
-    ayahs?.querySelectorAll<HTMLButtonElement>('[data-ayah-action="bookmark"]').forEach((btn) => {
-      setBookmarkState(btn, saved.has(`${btn.dataset.surah}:${btn.dataset.ayah}`));
-    });
-
-    const flashTimers = new WeakMap<HTMLElement, number>();
-    const flashCopied = (btn: HTMLElement): void => {
-      if (btn.dataset.origLabel === undefined) btn.dataset.origLabel = btn.textContent ?? '';
-      btn.textContent = t(L, 'ayahCopied');
-      window.clearTimeout(flashTimers.get(btn));
-      flashTimers.set(
-        btn,
-        window.setTimeout(() => {
-          btn.textContent = btn.dataset.origLabel ?? '';
-          delete btn.dataset.origLabel;
-        }, 1500),
-      );
-    };
-
-    ayahs?.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement | null)?.closest<HTMLButtonElement>('[data-ayah-action]');
-      if (!btn) return;
-      const s = Number(btn.dataset.surah);
-      const a = Number(btn.dataset.ayah);
-      const text = btn.closest('.ayah')?.querySelector('.ayah-i')?.textContent ?? '';
-      const action = btn.dataset.ayahAction;
-      if (action === 'copy') {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => flashCopied(btn))
-          .catch(() => { /* clipboard unavailable */ });
-      } else if (action === 'share') {
-        shareOrCopy(surahUrl(document.documentElement.lang === 'en' ? 'en' : 'ar', s, a), text)
-          .then((outcome) => {
-            if (outcome === 'copied') flashCopied(btn);
-          })
-          .catch(() => { /* clipboard unavailable */ });
-      } else if (action === 'bookmark') {
-        setBookmarkState(btn, toggleBookmark(s, a));
-      } else if (action === 'listen') {
-        void playSurah(s);
-      }
-    });
-
-    // --- pages layout: tap an ayah to reveal its actions (one at a time; tap again/outside clears) ---
-    ayahs?.addEventListener('click', (e) => {
-      if (settings.layout !== 'pages') return;
-      const target = e.target as HTMLElement | null;
-      if (!target || target.closest('[data-ayah-action]')) return;
-      const picked = target.closest<HTMLElement>('.ayah');
-      const current = ayahs?.querySelector<HTMLElement>('.ayah.selected') ?? null;
-      if (picked && picked !== current) {
-        current?.classList.remove('selected');
-        picked.classList.add('selected');
-      } else {
-        current?.classList.remove('selected');
-      }
-    });
-
-    // --- pages layout: cards built in place from the SSR ayah elements; one page shown at a time ---
-    let pages: PageBlock[] | null = null;
-    let currentIndex = 0;
-    let nav: HTMLElement | null = null;
-    let posEl: HTMLElement | null = null;
-    let prevPageBtn: HTMLButtonElement | null = null;
-    let nextPageBtn: HTMLButtonElement | null = null;
-
-    const pageOf = (page: number, total: number): string => {
-      const x = L === 'ar' ? toArabicDigits(page) : String(page);
-      const y = L === 'ar' ? toArabicDigits(total) : String(total);
-      return t(L, 'readerPageOf').replace('{x}', x).replace('{y}', y);
-    };
-
-    const buildPages = (container: HTMLElement): PageBlock[] => {
-      const byPage = new Map<number, HTMLElement[]>();
-      for (const el of Array.from(container.querySelectorAll<HTMLElement>('.ayah'))) {
-        const p = Number(el.dataset.page);
-        if (!Number.isInteger(p)) continue;
-        const list = byPage.get(p);
-        if (list) list.push(el);
-        else byPage.set(p, [el]);
-      }
-      const built: PageBlock[] = [];
-      for (const page of [...byPage.keys()].sort((x, y) => x - y)) {
-        const list = byPage.get(page)!;
-        list.sort((x, y) => Number(x.dataset.n) - Number(y.dataset.n));
-        const el = document.createElement('div');
-        el.className = 'mushaf-page';
-        el.setAttribute('data-page', String(page));
-        for (const ayah of list) el.appendChild(ayah);
-        const num = document.createElement('div');
-        num.className = 'mushaf-page-num';
-        num.setAttribute('aria-hidden', 'true');
-        num.textContent = toArabicDigits(page);
-        el.appendChild(num);
-        container.appendChild(el);
-        built.push({ page, el, ayahs: list });
-      }
-      return built;
-    };
-
-    const indexOfAyah = (n: number): number => {
-      if (!pages) return 0;
-      const i = pages.findIndex((block) => block.ayahs.some((el) => Number(el.dataset.n) === n));
-      return i === -1 ? 0 : i;
-    };
-
-    const clearSelection = (): void => {
-      ayahs?.querySelector<HTMLElement>('.ayah.selected')?.classList.remove('selected');
-    };
-
-    const showPage = (index: number, opts: { scroll?: boolean } = {}): void => {
-      if (!pages || pages.length === 0) return;
-      const i = Math.min(Math.max(index, 0), pages.length - 1);
-      currentIndex = i;
-      pages.forEach((block, j) => block.el.toggleAttribute('hidden', j !== i));
-      const total = pages.length;
-      if (posEl) posEl.textContent = pageOf(pages[i].page, total);
-      if (prevPageBtn) {
-        prevPageBtn.disabled = i === 0;
-        prevPageBtn.setAttribute('aria-label', pageOf(pages[Math.max(i - 1, 0)].page, total));
-      }
-      if (nextPageBtn) {
-        nextPageBtn.disabled = i === total - 1;
-        nextPageBtn.setAttribute(
-          'aria-label',
-          pageOf(pages[Math.min(i + 1, total - 1)].page, total),
-        );
-      }
-      if (nav) nav.hidden = false;
-      clearSelection();
-      const a = Number(pages[i].ayahs[0]?.dataset.n);
-      if (Number.isInteger(a) && Number.isInteger(surahId)) {
-        writeResume(localStorage, { s: surahId, a });
-      }
-      if (opts.scroll === true) reader?.scrollIntoView({ block: 'start' });
-    };
-
-    const stepPage = (delta: number): void => {
-      if (!pages) return;
-      const next = currentIndex + delta;
-      if (next < 0 || next >= pages.length) return;
-      showPage(next, { scroll: true });
-    };
-
-    const buildNav = (container: HTMLElement): void => {
-      if (nav) return;
-      nav = document.createElement('div');
-      nav.className = 'mushaf-nav';
-      nav.hidden = true;
-      const makeBtn = (dir: 'prev' | 'next'): HTMLButtonElement => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'rc-btn';
-        b.setAttribute('data-mushaf', dir);
-        b.textContent = dir === 'prev' ? (L === 'ar' ? '›' : '‹') : L === 'ar' ? '‹' : '›';
-        b.addEventListener('click', () => stepPage(dir === 'prev' ? -1 : 1));
-        return b;
-      };
-      prevPageBtn = makeBtn('prev');
-      nextPageBtn = makeBtn('next');
-      posEl = document.createElement('span');
-      posEl.className = 'mushaf-pos';
-      posEl.setAttribute('data-mushaf', 'pos');
-      posEl.setAttribute('aria-live', 'polite');
-      nav.append(prevPageBtn, posEl, nextPageBtn);
-      container.appendChild(nav);
-    };
-
-    const enterPages = (
-      target: number | null,
-      opts: { scroll?: boolean; anchor?: boolean } = {},
-    ): void => {
-      const container = ayahs;
-      if (!container) return;
-      if (!pages) pages = buildPages(container);
-      if (pages.length === 0) return;
-      buildNav(container);
-      showPage(target === null ? 0 : indexOfAyah(target), { scroll: opts.scroll === true });
-      keyNav = { box, go: stepPage };
-      if (opts.anchor === true && target !== null) {
-        document.getElementById(`ayah-${target}`)?.scrollIntoView({ block: 'start' });
-      }
-    };
-
-    const exitPages = (): void => {
-      if (pages) for (const block of pages) block.el.removeAttribute('hidden');
-      if (nav) nav.hidden = true;
-      clearSelection();
-      keyNav = null;
-    };
-
-    const topmostVisibleAyah = (container: HTMLElement): number | null => {
-      const els = Array.from(container.querySelectorAll<HTMLElement>('.ayah'));
-      const top = els.find((el) => el.getBoundingClientRect().bottom > 0);
-      const n = Number((top ?? els[0])?.dataset.n);
-      return Number.isInteger(n) ? n : null;
-    };
-
-    // --- resume point: qy:last-read keeps the topmost visible ayah (throttled ~1s; verses mode) ---
-    const surahId = Number(playBtn?.dataset.surah);
-    const blocks = Array.from(ayahs?.querySelectorAll<HTMLElement>('.ayah') ?? []);
-    const readerActive = Number.isInteger(surahId) && blocks.length > 0;
-
-    const visible = new Set<HTMLElement>();
-    let observer: IntersectionObserver | null = null;
-    let flushTimer = 0;
-    const stopObserver = (): void => {
-      window.clearTimeout(flushTimer);
-      flushTimer = 0;
-      observer?.disconnect();
-      observer = null;
-    };
-    const flush = (): void => {
-      flushTimer = 0;
-      if (!box.isConnected) return; // a ClientRouter swap already moved on
-      const top = blocks.find((el) => visible.has(el));
-      const a = Number(top?.dataset.n);
-      if (Number.isInteger(a)) writeResume(localStorage, { s: surahId, a });
-    };
-    const startObserver = (): void => {
-      if (!readerActive) return;
-      stopObserver();
-      const next = new IntersectionObserver((entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) visible.add(entry.target as HTMLElement);
-          else visible.delete(entry.target as HTMLElement);
-        }
-        if (flushTimer === 0) flushTimer = window.setTimeout(flush, 1000);
-      });
-      for (const el of blocks) next.observe(el);
-      observer = next;
-    };
-    const applyLayoutMode = (): void => {
-      const container = ayahs;
-      if (!container) return;
-      if (settings.layout === 'pages') {
-        stopObserver();
-        enterPages(topmostVisibleAyah(container), { scroll: true });
-      } else {
-        exitPages();
-        startObserver();
-      }
-    };
-
     try {
-      if (readerActive) {
+      if (observer.active) {
         if (settings.layout === 'pages') {
           const m = /^#ayah-(\d+)$/.exec(location.hash);
           const hashTarget = m ? Number(m[1]) : null;
@@ -461,17 +184,17 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
             const stored = readResume(localStorage);
             if (stored !== null && stored.s === surahId) target = stored.a;
           }
-          enterPages(target, { anchor: hashTarget !== null });
+          pages.enterPages(target, { anchor: hashTarget !== null });
         } else {
           writeResume(localStorage, { s: surahId, a: 1 });
-          startObserver();
+          observer.start();
         }
         // ClientRouter swap: never let this surah's flush, observer or key nav outlive the page
         document.addEventListener(
           'astro:before-swap',
           () => {
-            stopObserver();
-            keyNav = null;
+            observer.stop();
+            keyboard.set(null);
           },
           { once: true },
         );
@@ -482,6 +205,5 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
 
     render();
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

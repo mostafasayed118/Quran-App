@@ -9,12 +9,11 @@ const { locale = 'ar' } = Astro.props;
   import { toArabicDigits } from '../lib/arabic-digits';
   import { t, type Locale } from '../lib/strings';
   import { surahDisplayName, type SurahNameLike } from '../lib/surah-name';
-  import surahsData from '../data/surahs.json';
+  import { getSurahs } from '../lib/surahs';
+  import { onPageReady } from '../lib/lifecycle';
 
   const surahNames = new Map<number, SurahNameLike>(
-    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string; nameEn?: string }> }).surahs.map(
-      (s): [number, SurahNameLike] => [s.id, { nameAr: s.nameAr, nameEn: s.nameEn }],
-    ),
+    getSurahs().map((s): [number, SurahNameLike] => [s.id, { nameAr: s.nameAr, nameEn: s.nameEn }]),
   );
 
   function init() {
@@ -59,8 +58,7 @@ const { locale = 'ar' } = Astro.props;
     mount.hidden = false;
   }
 
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>
 <style is:global>
   .resume { width: min(760px, calc(100% - 40px)); margin: 20px auto 0; }

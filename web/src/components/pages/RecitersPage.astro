@@ -23,13 +23,16 @@ const { locale = 'ar' } = Astro.props;
   import { digitsFor } from '../../lib/arabic-digits';
   import { surahDisplayName } from '../../lib/surah-name';
   import { t, type Locale } from '../../lib/strings';
-  import surahsData from '../../data/surahs.json';
+  import { PLAYER_EVENTS } from '../../lib/player';
+  import { getSurahs } from '../../lib/surahs';
+  import { onPageReady } from '../../lib/lifecycle';
 
   let L: Locale = 'ar';
   const surahNames = new Map<number, { nameAr: string; nameEn: string }>(
-    (surahsData as { surahs: ReadonlyArray<{ id: number; nameAr: string; nameEn: string }> }).surahs.map(
-      (s): [number, { nameAr: string; nameEn: string }] => [s.id, { nameAr: s.nameAr, nameEn: s.nameEn }],
-    ),
+    getSurahs().map((s): [number, { nameAr: string; nameEn: string }] => [
+      s.id,
+      { nameAr: s.nameAr, nameEn: s.nameEn },
+    ]),
   );
 
   const rowsById = new Map<string, MoshafRow>();
@@ -148,7 +151,7 @@ const { locale = 'ar' } = Astro.props;
         const row = rowsById.get(playBtn.dataset.reciterPlay ?? '');
         if (!row) return;
         const surah = playBtn.dataset.surah ? Number(playBtn.dataset.surah) : surahsOf(row)[0];
-        document.dispatchEvent(new CustomEvent('qy:play', { detail: { row, surah } }));
+        document.dispatchEvent(new CustomEvent(PLAYER_EVENTS.play, { detail: { row, surah } }));
         return;
       }
 
@@ -180,6 +183,5 @@ const { locale = 'ar' } = Astro.props;
     });
   }
 
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>

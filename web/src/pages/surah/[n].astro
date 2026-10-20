@@ -1,15 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReaderPage from '../../components/pages/ReaderPage.astro';
-import surahs from '../../data/surahs.json';
+import { getSurahs, type Surah } from '../../lib/surahs';
+import { t } from '../../lib/strings';
 import { arReaderDescription } from '../../lib/landing-content';
 
 export function getStaticPaths() {
-  return surahs.surahs.map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
+  return getSurahs().map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
 }
-const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
-const title = `سورة ${surah.nameAr} — قرآن يَهدي`;
+const { surah } = Astro.props as { surah: Surah };
+const title = `${t('ar', 'surahTitle').replace('{name}', surah.nameAr)} — ${t('ar', 'appName')}`;
 ---
-<BaseLayout title={title} description={arReaderDescription(surah.id, surah.nameAr)} preloadFont ogImage={`/og/surah/${surah.id}.png`}>
+<BaseLayout title={title} description={arReaderDescription(surah.id, surah.nameAr)} preloadFont={['hafs']} ogImage={`/og/surah/${surah.id}.png`}>
   <ReaderPage locale="ar" surah={surah} />
 </BaseLayout>

@@ -2,17 +2,17 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ReaderPage from '../../../components/pages/ReaderPage.astro';
 import { t } from '../../../lib/strings';
+import { getSurahs, type Surah } from '../../../lib/surahs';
 import { surahDisplayName } from '../../../lib/surah-name';
 import { enReaderDescription } from '../../../lib/landing-content';
-import surahs from '../../../data/surahs.json';
 
 export function getStaticPaths() {
-  return surahs.surahs.map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
+  return getSurahs().map((s) => ({ params: { n: String(s.id) }, props: { surah: s } }));
 }
-const { surah } = Astro.props as { surah: (typeof surahs.surahs)[number] };
+const { surah } = Astro.props as { surah: Surah };
 const nameEn = surahDisplayName(surah, 'en');
 const title = `${nameEn} — ${t('en', 'appName')}`;
 ---
-<BaseLayout title={title} description={enReaderDescription(surah.id, nameEn)} locale="en" preloadFont ogImage={`/og/surah/${surah.id}.png`}>
+<BaseLayout title={title} description={enReaderDescription(surah.id, nameEn)} locale="en" preloadFont={['hafs']} ogImage={`/og/surah/${surah.id}.png`}>
   <ReaderPage locale="en" surah={surah} />
 </BaseLayout>

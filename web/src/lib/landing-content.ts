@@ -1,6 +1,9 @@
-import type { Locale } from './strings';
+import { t, type Locale } from './strings';
 
 const EN_PREFIX = '/en';
+
+/** The app version the landing page shows; not copy, so it has no translation. */
+export const APP_VERSION = '1.0.0';
 
 function homeFor(to: Locale): string {
   return to === 'en' ? '/en/' : '/';
@@ -39,130 +42,95 @@ export interface LandingCopy {
 // Store URL swap place: wire playLabel to the Google Play listing URL once published ([OWNER] publish step).
 export const GITHUB_RELEASES_URL = 'https://github.com/mostafasayed118/Quran-App/releases/latest';
 
+/** Replaces the `{name}` placeholders of a string-table entry. */
+function fill(text: string, vars: Record<string, string>): string {
+  let out = text;
+  for (const [key, value] of Object.entries(vars)) out = out.replace(`{${key}}`, value);
+  return out;
+}
+
+/**
+ * The landing copy of one locale, built from the site's single string table.
+ *
+ * Every user-visible string lives in `src/lib/strings.ts`; this module only
+ * shapes it. Feature titles that repeat a chrome string (the reading card, the
+ * recitations card, the Qibla card) reuse that string's key, so the wording
+ * exists exactly once.
+ */
+function landingCopy(locale: Locale): LandingCopy {
+  const app = t(locale, 'appName');
+  return {
+    hero: {
+      ayah: t(locale, 'landingHeroAyah'),
+      ayahRef: t(locale, 'landingHeroAyahRef'),
+      kicker: t(locale, 'landingHeroKicker'),
+      lead: t(locale, 'landingHeroLead'),
+      ctaPrimary: t(locale, 'landingHeroCtaPrimary'),
+      ctaSecondary: t(locale, 'landingHeroCtaSecondary'),
+    },
+    features: [
+      { title: t(locale, 'landingFeatureHome'), desc: t(locale, 'landingFeatureHomeDesc') },
+      { title: t(locale, 'landingFeatureIndex'), desc: t(locale, 'landingFeatureIndexDesc') },
+      { title: t(locale, 'landingFeatureReader'), desc: t(locale, 'landingFeatureReaderDesc') },
+      { title: t(locale, 'landingFeatureAyahSheet'), desc: t(locale, 'landingFeatureAyahSheetDesc') },
+      { title: t(locale, 'resumeTitle'), desc: t(locale, 'landingFeatureContinueDesc') },
+      { title: t(locale, 'navReciters'), desc: t(locale, 'landingFeatureRecitationsDesc') },
+      { title: t(locale, 'landingFeaturePlayer'), desc: t(locale, 'landingFeaturePlayerDesc') },
+      { title: t(locale, 'landingFeaturePrayerTimes'), desc: t(locale, 'landingFeaturePrayerTimesDesc') },
+      { title: t(locale, 'qbTitle'), desc: t(locale, 'landingFeatureQiblaDesc') },
+      { title: t(locale, 'landingFeatureAdhkar'), desc: t(locale, 'landingFeatureAdhkarDesc') },
+      { title: t(locale, 'landingFeatureTasbih'), desc: t(locale, 'landingFeatureTasbihDesc') },
+      { title: t(locale, 'landingFeatureDuas'), desc: t(locale, 'landingFeatureDuasDesc') },
+      { title: t(locale, 'landingFeatureTracker'), desc: t(locale, 'landingFeatureTrackerDesc') },
+      { title: t(locale, 'landingFeatureSettings'), desc: t(locale, 'landingFeatureSettingsDesc') },
+    ],
+    promise: [
+      t(locale, 'landingPromise1'),
+      t(locale, 'landingPromise2'),
+      t(locale, 'landingPromise3'),
+    ],
+    about: {
+      story: [fill(t(locale, 'landingStory1'), { app }), t(locale, 'landingStory2')],
+      bullets: [
+        t(locale, 'landingBullet1'),
+        t(locale, 'landingBullet2'),
+        t(locale, 'landingBullet3'),
+        t(locale, 'landingBullet4'),
+      ],
+    },
+    cta: {
+      title: fill(t(locale, 'landingCtaTitle'), { app }),
+      lead: fill(t(locale, 'landingCtaLead'), { v: APP_VERSION }),
+      githubLabel: t(locale, 'landingCtaGithub'),
+      playLabel: t(locale, 'landingCtaPlay'),
+      version: APP_VERSION,
+    },
+  };
+}
+
 export const LANDING: { ar: LandingCopy; en: LandingCopy } = {
-  ar: {
-    hero: {
-      ayah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
-      ayahRef: 'الإسراء ٩',
-      kicker: 'رفيق إسلامي متكامل يعمل بلا إنترنت أولًا',
-      lead: 'مصحف كامل (114 سورة، 6236 آية) مضمّن داخل التطبيق، مع تلاوات صوتية تُبث أو تُنزَّل، أذكار وأدعية، مواقيت الصلاة والقبلة — بلا حسابات ولا إعلانات ولا تتبع.',
-      ctaPrimary: 'افتح المصحف',
-      ctaSecondary: 'تعرّف على التطبيق',
-    },
-    features: [
-      { title: 'الرئيسية', desc: 'بطاقة الصلاة القادمة + متابعة القراءة + شبكة الميزات' },
-      { title: 'فهرس السور', desc: '114 سورة مع بحث فوري بالاسم أو الرقم' },
-      { title: 'قارئ القرآن', desc: 'قراءة آية-بآية أو وضع المصحف الصفحي التقليدي' },
-      { title: 'شاشة الآية', desc: 'التفسير والترجمات وعلامة الحفظ من مكان واحد' },
-      { title: 'متابعة القراءة', desc: 'حفظ آخر موضع وعلامات مرجعية متعددة' },
-      { title: 'التلاوات', desc: 'أكثر من 240 قارئًا (خدمة mp3quran) — بث فوري أو تحميل كامل للأوفلاين' },
-      { title: 'المشغّل والتنزيلات', desc: 'مشغّل مصغّر يلازمك + مدير تنزيلات بحالة كل ملف' },
-      { title: 'مواقيت الصلاة', desc: 'أوقات دقيقة لاختيار مدينتك (أو أقرب مدينة تحديدًا على جهازك) + تنبيه صلاة اختياري' },
-      { title: 'القبلة', desc: 'بوصلة بتوجيه حي من حساسات الهاتف' },
-      { title: 'الأذكار', desc: 'أذكار مصنّفة مع عدّاد لكل ذكر' },
-      { title: 'السبحة', desc: 'عدّاد إلكتروني دائري بأهداف قابلة للتبديل' },
-      { title: 'الأدعية والرقية', desc: 'مختارات مرتبة من المصنفات التقليدية مع نصوصها الأصلية' },
-      { title: 'متتبع العبادات', desc: 'الصلوات الخمس اليومية وخطط الختمة' },
-      { title: 'الإعدادات والإضافات', desc: 'وضع ليلي، أحجام خط وخط المصحف الأصلي، حساب الزكاة، التقويم الهجري، أسماء الله الحسنى' },
-    ],
-    promise: [
-      'بلا إنترنت أولًا: المصحف كامل — 114 سورة و6236 آية — مضمّن داخل التطبيق.',
-      'بلا حسابات، بلا إعلانات، بلا تتبع — ولا نجمع أي بيانات.',
-      'مجاني بالكامل، عربي أولًا، مع وضع ليلي مريح وخط مصحف أصيل.',
-    ],
-    about: {
-      story: [
-        'قرآن يَهدي رفيق إسلامي متكامل يعمل بلا إنترنت أولًا: مصحف كامل (114 سورة، 6236 آية) مضمّن داخل التطبيق، تلاوات صوتية تُبث أو تُنزَّل، أذكار وأدعية، مواقيت الصلاة والقبلة — بلا حسابات ولا إعلانات ولا تتبع.',
-        'بدأ المشروع كتطبيق أندرويد مكتمل الميزات (v1.0.0 قيد التحضير للمتجر)، وهذا الموقع هو واجهته الرسمية على الويب: تعريف بالتطبيق، وروابط التحميل، وسياسة خصوصية شفافة.',
-      ],
-      bullets: [
-        '114 سورة و6236 آية مضمّنة — يعمل بلا إنترنت إطلاقًا',
-        'أكثر من 240 قارئًا للتلاوة — بث فوري أو تحميل كامل',
-        'مواقيت صلاة دقيقة وقبلة حية — الحساب يتم على جهازك',
-        'بلا حسابات، بلا إعلانات، بلا تتبع، ولا جمع لأي بيانات',
-      ],
-    },
-    cta: {
-      title: 'حمّل قرآن يَهدي',
-      lead: 'الإصدار 1.0.0 لأندرويد — نسخة كاملة تعمل بلا إنترنت.',
-      githubLabel: 'حمّل من GitHub',
-      playLabel: 'قريبًا على Google Play',
-      version: '1.0.0',
-    },
-  },
-  en: {
-    hero: {
-      ayah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
-      ayahRef: 'Al-Isra 9',
-      kicker: 'Your complete offline-first Islamic companion',
-      lead: 'The full Mushaf — 114 surahs, 6,236 ayahs — bundled inside the app, with audio recitations you can stream or download, adhkar, duas, prayer times and a Qibla compass; no accounts, no ads, and no tracking.',
-      ctaPrimary: 'Open the Quran',
-      ctaSecondary: 'About the app',
-    },
-    features: [
-      { title: 'Home', desc: 'Next-prayer card, continue reading and the feature grid at a glance' },
-      { title: 'Surah index', desc: '114 surahs with instant search by name or number' },
-      { title: 'Quran reader', desc: 'Verse-by-verse reading or the traditional paginated Mushaf mode' },
-      { title: 'Ayah sheet', desc: 'Tafsir, translations and a bookmark in one place' },
-      { title: 'Continue reading', desc: 'Saves your last position and multiple bookmarks' },
-      { title: 'Recitations', desc: '240+ reciters (mp3quran) — stream instantly or download for offline' },
-      { title: 'Player & downloads', desc: 'A persistent mini player plus a download manager with per-file status' },
-      { title: 'Prayer times', desc: 'Accurate times for your chosen city (or the nearest city, computed on-device) plus an optional prayer reminder' },
-      { title: 'Qibla', desc: "A live compass driven by your phone's sensors" },
-      { title: 'Adhkar', desc: 'Categorized adhkar with a counter for each' },
-      { title: 'Tasbih', desc: 'A circular digital counter with switchable targets' },
-      { title: 'Duas & ruqyah', desc: 'Organized selections from traditional collections with the source texts' },
-      { title: 'Worship tracker', desc: 'The five daily prayers and khatma plans' },
-      { title: 'Settings & extras', desc: 'Dark mode, font sizes and the authentic mushaf font, zakat calculator, Hijri calendar, the 99 names of Allah' },
-    ],
-    promise: [
-      'Offline-first: the complete Mushaf — 114 surahs, 6,236 ayahs — bundled inside the app.',
-      'No accounts, no ads, no tracking — and no data collection.',
-      'Completely free, Arabic-first, with a comfortable dark mode and authentic mushaf typography.',
-    ],
-    about: {
-      story: [
-        'Quran Yahdi is a complete, offline-first Islamic companion: the full Mushaf (114 surahs, 6,236 ayahs) bundled inside the app, with audio recitations you can stream or download, adhkar, duas, prayer times and a Qibla compass — no accounts, no ads, no tracking.',
-        'The project began as a feature-complete Android app (v1.0.0, being prepared for the store), and this site is its official home on the web: an introduction to the app, download links, and a transparent privacy policy.',
-      ],
-      bullets: [
-        '114 surahs and 6,236 ayahs bundled — works fully offline',
-        '240+ reciters to stream instantly or download for offline listening',
-        'Accurate prayer times and a live Qibla compass — all computed on your device',
-        'No accounts, no ads, no tracking, and no data collection',
-      ],
-    },
-    cta: {
-      title: 'Get Quran Yahdi',
-      lead: 'Version 1.0.0 for Android — the complete offline app.',
-      githubLabel: 'Download from GitHub',
-      playLabel: 'Coming soon to Google Play',
-      version: '1.0.0',
-    },
-  },
+  ar: landingCopy('ar'),
+  en: landingCopy('en'),
 };
 
 // Per-page meta descriptions (owner-approved 2026-10-19). EN pages must not inherit the AR default.
 export const META_DESCRIPTIONS = {
   ar: {
-    quran: 'تصفّح القرآن كاملًا — 114 سورة ببحث فوري بالاسم أو الرقم، قراءة آية-بآية وتلاوة صوتية. مجاني، بلا إعلانات ولا تتبع.',
-    reciters: 'استمع إلى القرآن بأصوات أكثر من 240 قارئًا — بث فوري أو تحميل للاستماع بلا إنترنت. مجاني، بلا إعلانات ولا تتبع.',
-    privacy: 'سياسة خصوصية قرآن يَهدي: بلا حسابات، بلا إعلانات، بلا تحليلات ولا تتبع — التطبيق يعمل بلا إنترنت ولا يجمع أي بيانات.',
+    quran: t('ar', 'metaQuran'),
+    reciters: t('ar', 'metaReciters'),
+    privacy: fill(t('ar', 'metaPrivacy'), { app: t('ar', 'appName') }),
   },
   en: {
-    quran:
-      'Browse the full Quran — all 114 surahs with instant search by name or number, verse-by-verse reading, and audio recitation. Free, no ads, no tracking.',
-    reciters:
-      'Listen to the Quran recited by 240+ reciters — stream instantly or download for offline listening. Free, no ads, no tracking.',
-    privacy:
-      'Privacy policy for Quran Yahdi: no accounts, no ads, no analytics, no tracking — the app runs offline and collects nothing.',
+    quran: t('en', 'metaQuran'),
+    reciters: t('en', 'metaReciters'),
+    privacy: fill(t('en', 'metaPrivacy'), { app: t('en', 'appName') }),
   },
 } as const;
 
 export function enReaderDescription(n: number, nameEn: string): string {
-  return `Surah ${n} — ${nameEn} · Quran Yahdi`;
+  return `${fill(t('en', 'surahDescription'), { n: String(n), name: nameEn })} · ${t('en', 'appName')}`;
 }
 
 export function arReaderDescription(n: number, nameAr: string): string {
-  return `سورة ${n} — ${nameAr} · قرآن يَهدي`;
+  return `${fill(t('ar', 'surahDescription'), { n: String(n), name: nameAr })} · ${t('ar', 'appName')}`;
 }

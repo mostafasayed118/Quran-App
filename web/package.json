@@ -14,7 +14,7 @@
     "test:e2e": "playwright test",
     "budget": "node scripts/check-budgets.mjs",
     "og": "node scripts/generate-og.mjs",
-    "gates": "npm run check && npm run test && npm run build && npm run budget"
+    "gates": "npm run check && npm run test && npm run build && npm run budget && npm run test:e2e"
   },
   "dependencies": {
     "astro": "^7.4.0"

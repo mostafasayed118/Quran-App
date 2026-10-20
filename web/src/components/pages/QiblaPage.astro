@@ -1,20 +1,17 @@
 ---
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { t, type Locale } from '../../lib/strings';
+import { getCities } from '../../lib/cities';
 
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 const placeholder = t(locale, 'ptSearchPlaceholder');
-// Mirrors the prayer-times pages: resolve the data dir from the web/ cwd
-// (components are bundled at build time; npm run build/dev run there).
-const index = JSON.parse(
-  readFileSync(join(process.cwd(), 'public', 'data', 'prayer-times', 'index.json'), 'utf8'),
-) as { cities: { id: string; nameAr: string; nameEn: string }[] };
-const cardinal =
-  locale === 'en'
-    ? { n: 'N', e: 'E', s: 'S', w: 'W' }
-    : { n: 'شمال', e: 'شرق', s: 'جنوب', w: 'غرب' };
+const cities = getCities();
+const cardinal = {
+  n: t(locale, 'qbNorth'),
+  e: t(locale, 'qbEast'),
+  s: t(locale, 'qbSouth'),
+  w: t(locale, 'qbWest'),
+};
 ---
 <h1 class="page-title">{t(locale, 'qbTitle')}</h1>
 <p class="page-lead">{t(locale, 'qbLead')}</p>
@@ -50,7 +47,7 @@ const cardinal =
     <input type="search" class="index-search" id="qibla-city-search" name="qibla-city-search" placeholder={placeholder} aria-label={placeholder} />
     <p class="empty" hidden>{t(locale, 'noResults')}</p>
     <ul class="qb-cities">
-      {index.cities.map((city) => (
+      {cities.map((city) => (
         <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
           <button type="button" data-qy="qb-city" data-city-id={city.id}>
             {locale === 'en' ? city.nameEn : city.nameAr}
@@ -98,6 +95,7 @@ const cardinal =
   import { normalizeArabic } from '../../lib/arabic';
   import { qiblaBearing } from '../../lib/qibla';
   import { digitsFor } from '../../lib/arabic-digits';
+  import { onPageReady } from '../../lib/lifecycle';
 
   function init(): void {
     const root = document.querySelector<HTMLElement>('[data-qy="qb"]');
@@ -193,6 +191,5 @@ const cardinal =
 
     root.dataset.qyReady = '1';
   }
-  init();
-  document.addEventListener('astro:after-swap', init); // ClientRouter re-entry safety
+  onPageReady(init);
 </script>
