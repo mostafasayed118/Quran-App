@@ -60,9 +60,13 @@
                 <action android:name="android.media.browse.MediaBrowserService"/>
             </intent-filter>
         </service>
+        <!-- The media-button receiver is reachable by any installed app
+             without this permission: BIND_MEDIA_BUTTON is signature-level,
+             so only the system can deliver media-button intents here. -->
         <receiver
             android:name="com.ryanheise.audioservice.MediaButtonReceiver"
             android:exported="true"
+            android:permission="android.permission.BIND_MEDIA_BUTTON"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>

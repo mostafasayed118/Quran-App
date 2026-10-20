@@ -1,9 +1,13 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:drift/drift.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../core/db/app_database.dart';
+import '../domain/reciter_info.dart';
+import 'reciter_info_source.dart';
+import 'reciter_mapping.dart';
 import 'reciter_source.dart';
 
 /// Featured reciters pinned by PM from the verified 2026-10-15 mp3quran dump
@@ -20,20 +24,24 @@ const List<int> featuredReciterIds = <int>[
   5,
 ];
 
+/// File name the surah audio is stored under.
 String surahAudioFileName(int surahNumber) =>
     '${surahNumber.toString().padLeft(3, '0')}.mp3';
 
+/// Full download URL of a surah audio on [server].
 String surahAudioUrl(String server, int surahNumber) {
   final base = server.endsWith('/') ? server : '$server/';
   return '$base${surahAudioFileName(surahNumber)}';
 }
 
+/// Parses the comma-separated surah list of a moshaf.
 List<int> parseSurahList(String csv) => csv
     .split(',')
     .map((part) => int.tryParse(part.trim()))
     .whereType<int>()
     .toList();
 
+/// Sorts reciters by featured order, then by name.
 List<ReciterRow> sortReciters(List<ReciterRow> input) {
   var featuredRank = 0;
   final ranks = <int, int>{};
@@ -60,6 +68,7 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
   return sorted;
 }
 
+/// True when the row belongs to a featured reciter.
 bool isFeaturedReciterRow(ReciterRow row) {
   final leadingId = int.tryParse(row.id.split('-').first);
   return leadingId != null && featuredReciterIds.contains(leadingId);
@@ -79,7 +88,8 @@ bool isTrustedAudioServer(String server) {
 const recitersApiEndpoint = 'https://mp3quran.net/api/v3/reciters?language=ar';
 const selectedMoshafKey = 'selected_moshaf_row';
 
-class ReciterRepository implements ReciterSource {
+/// Keeps the reciter catalog in sync with the remote API and the local database.
+class ReciterRepository implements ReciterSource, ReciterInfoSource {
   ReciterRepository(
     this._db, {
     http.Client? client,
@@ -91,6 +101,24 @@ class ReciterRepository implements ReciterSource {
   final http.Client _client;
   final String _endpoint;
 
+  /// Parses the catalog payload on a worker isolate.
+  ///
+  /// It is STATIC on purpose: a closure created inside an instance method
+  /// captures the receiver - and this repository holds the http client,
+  /// which is not sendable to another isolate.
+  static Future<Object?> _decodePayloadOnWorker(String body) =>
+      Isolate.run<Object?>(() => jsonDecode(body));
+
+  /// Refreshes the reciter catalog from the mp3quran API.
+  ///
+  /// The payload is deliberately NOT hash-pinned: upstream mutates the
+  /// catalog (reciters and moshafs are added over time), so a full-payload
+  /// sha256 pin would break the app on every upstream edit. What protects
+  /// the app instead: (1) every `server` that survives parsing passes the
+  /// [isTrustedAudioServer] allowlist before a row is written, and (2) the
+  /// payload must clear the sanity floor below - a tampered or truncated
+  /// response is rejected (the caller surfaces the localized error) instead
+  /// of replacing the cached list with an empty one.
   @override
   Future<void> refreshFromApi() async {
     final res = await _client
@@ -99,7 +127,12 @@ class ReciterRepository implements ReciterSource {
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }
-    final data = jsonDecode(res.body);
+    final body = res.body;
+    // The payload holds hundreds of reciters: the JSON decode runs on a
+    // worker isolate so the UI isolate never parses it. Everything that
+    // follows - the host allowlist and the sanity floor - still runs here,
+    // on the PARSED rows.
+    final data = await _decodePayloadOnWorker(body);
     if (data is! Map<String, dynamic>) {
       throw StateError('mp3quran payload is not a JSON object');
     }
@@ -108,6 +141,7 @@ class ReciterRepository implements ReciterSource {
       throw StateError('mp3quran payload is missing the reciters list');
     }
     final rows = <RecitersCompanion>[];
+    var featuredPresent = false;
     for (final reciter in reciters) {
       if (reciter is! Map<String, dynamic>) continue;
       final reciterId = reciter['id'];
@@ -120,12 +154,16 @@ class ReciterRepository implements ReciterSource {
         final moshafId = moshaf['id'];
         if (moshafId is! num) continue;
         final server = moshaf['server'];
+        // The allowlist is the only gate a `server` passes: a foreign host
+        // is rejected here, so it is never stored and never streamed.
         if (server is! String || !isTrustedAudioServer(server)) continue;
         final moshafName = moshaf['name'];
         final surahList = moshaf['surah_list'];
         final surahTotal = moshaf['surah_total'];
+        final reciterIdInt = reciterId.toInt();
+        if (featuredReciterIds.contains(reciterIdInt)) featuredPresent = true;
         rows.add(RecitersCompanion.insert(
-          id: '${reciterId.toInt()}-${moshafId.toInt()}',
+          id: '$reciterIdInt-${moshafId.toInt()}',
           reciterName: reciterName is String ? reciterName : '',
           moshafName: moshafName is String ? moshafName : '',
           server: server,
@@ -133,6 +171,13 @@ class ReciterRepository implements ReciterSource {
           surahTotal: surahTotal is num ? surahTotal.toInt() : 0,
         ));
       }
+    }
+    // Sanity floor: the payload must yield at least one trusted row and
+    // keep a pinned featured reciter, otherwise a tampered or truncated
+    // response would leave the app with an empty reciter list.
+    if (rows.isEmpty || !featuredPresent) {
+      throw StateError(
+          'mp3quran payload failed the sanity floor: ${rows.length} trusted rows, featured=$featuredPresent');
     }
     await _db.transaction(() async {
       await _db.delete(_db.reciters).go();
@@ -142,6 +187,20 @@ class ReciterRepository implements ReciterSource {
 
   @override
   Stream<List<ReciterRow>> watchAll() => _db.select(_db.reciters).watch();
+
+  /// The selected reciter, or the first featured one when nothing is picked.
+  /// The repository is the mapping boundary: rows become entities here.
+  @override
+  Future<ReciterInfo?> defaultReciter() async {
+    final selectedId = await loadSelectedMoshaf();
+    if (selectedId != null) {
+      final selected = await byId(selectedId);
+      if (selected != null) return selected.toInfo();
+    }
+    final all = sortReciters(await watchAll().first);
+    if (all.isEmpty) return null;
+    return all.first.toInfo();
+  }
 
   @override
   Future<ReciterRow?> byId(String rowId) =>

@@ -6,6 +6,40 @@
 /// asserts literal == constant, so a rename in any owner file fails loudly.
 library;
 
+import 'dart:convert';
+
+/// The selected city as it may leave the app: the id and the names, NEVER the
+/// coordinates.
+///
+/// The privacy policy says the location is never stored or shared with any
+/// party, and a backup file is a file the user hands to somebody else - so
+/// the GPS point must not travel with it. The id survives, which is what an
+/// import needs to restore the selection (the prayer feature resolves the id
+/// against its own offline city catalog).
+///
+/// Returns null when the value is not a city object: an unreadable value is
+/// never exported, and a value that carries no id cannot be restored.
+String? redactedSelectedCity(String? value) {
+  if (value == null || value.isEmpty) return null;
+  Map<String, dynamic> city;
+  try {
+    final decoded = jsonDecode(value);
+    if (decoded is! Map<String, dynamic>) return null;
+    city = decoded;
+  } on Object {
+    return null;
+  }
+  final id = city['id'];
+  if (id is! String || id.isEmpty) return null;
+  final nameAr = city['nameAr'];
+  final nameEn = city['nameEn'];
+  return jsonEncode(<String, dynamic>{
+    'id': id,
+    if (nameAr is String) 'nameAr': nameAr,
+    if (nameEn is String) 'nameEn': nameEn,
+  });
+}
+
 /// `lib/features/notifications/data/reminder_settings.dart`.
 const String backupKeyAzkarReminderEnabled = 'azkar_reminder_enabled';
 const String backupKeyAzkarReminderTime = 'azkar_reminder_time';

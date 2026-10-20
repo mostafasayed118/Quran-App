@@ -7,27 +7,38 @@ const int kBackupMaxBytes = 2 * 1024 * 1024;
 
 /// One bookmarked ayah — `bookmarks` table.
 class BackupBookmark {
+  /// One exported bookmark.
   const BackupBookmark({required this.ayahId, required this.createdAt});
 
+  /// Global ayah number that was bookmarked.
   final int ayahId;
+
+  /// When the bookmark was created.
   final DateTime createdAt;
 }
 
 /// One khatma/wird plan row — `khatma_progress` (single row by invariant).
 class BackupKhatmaRow {
+  /// The exported khatma plan row.
   const BackupKhatmaRow({
     required this.ayahId,
     required this.targetPages,
     required this.updatedAt,
   });
 
+  /// Global ayah number the plan was anchored at.
   final int ayahId;
+
+  /// Page count the plan aimed to finish.
   final int targetPages;
+
+  /// When the plan last moved.
   final DateTime updatedAt;
 }
 
 /// One worship-tracker day — `prayer_log` (day PK + 5 bools).
 class BackupPrayerDay {
+  /// One exported day of the prayer log.
   const BackupPrayerDay({
     required this.day,
     required this.fajr,
@@ -37,11 +48,22 @@ class BackupPrayerDay {
     required this.isha,
   });
 
+  /// The calendar day this row describes.
   final DateTime day;
+
+  /// Fajr was marked on [day].
   final bool fajr;
+
+  /// Dhuhr was marked on [day].
   final bool dhuhr;
+
+  /// Asr was marked on [day].
   final bool asr;
+
+  /// Maghrib was marked on [day].
   final bool maghrib;
+
+  /// Isha was marked on [day].
   final bool isha;
 
   bool get anyMarked => fajr || dhuhr || asr || maghrib || isha;
@@ -49,14 +71,19 @@ class BackupPrayerDay {
 
 /// Tasbih state — settings key `tasbih_state` (`{count, target}`).
 class BackupTasbih {
+  /// The exported tasbih counter.
   const BackupTasbih({required this.count, required this.target});
 
+  /// Current number of tasbih repetitions.
   final int count;
+
+  /// Repetition goal for the tasbih counter.
   final int target;
 }
 
 /// The typed `data` payload of a backup document.
 class BackupData {
+  /// The payload of a backup: everything the app restores.
   const BackupData({
     required this.bookmarks,
     required this.lastReadAyahId,
@@ -66,24 +93,41 @@ class BackupData {
     required this.settings,
   });
 
+  /// Exported bookmarks.
   final List<BackupBookmark> bookmarks;
+
+  /// Last ayah the user read, if any.
   final int? lastReadAyahId;
+
+  /// Exported khatma plan rows.
   final List<BackupKhatmaRow> khatma;
+
+  /// Exported prayer-log days.
   final List<BackupPrayerDay> prayerLog;
+
+  /// Exported tasbih counter, when the user had one.
   final BackupTasbih? tasbih;
+
+  /// Exported settings, key to raw string value.
   final Map<String, String> settings;
 }
 
 /// A decoded, typed backup document (wrapper metadata + typed data).
 class BackupDocument {
+  /// A backup file: the payload plus its envelope.
   const BackupDocument({
     required this.exportedAt,
     required this.schemaVersion,
     required this.data,
   });
 
+  /// When the backup was produced.
   final DateTime exportedAt;
+
+  /// Schema version of the payload, used to migrate old backups.
   final int schemaVersion;
+
+  /// The payload itself.
   final BackupData data;
 }
 
@@ -96,19 +140,25 @@ sealed class BackupDecodeResult {
   const BackupDecodeResult();
 }
 
+/// The backup file could not be decoded.
 class BackupDecodeFailure extends BackupDecodeResult {
   const BackupDecodeFailure(this.reason);
 
+  /// Why decoding failed.
   final BackupDecodeFailureReason reason;
 }
 
+/// The backup file decoded cleanly.
 class BackupDecodeSuccess extends BackupDecodeResult {
   const BackupDecodeSuccess({
     required this.document,
     required this.skippedEntries,
   });
 
+  /// The decoded document.
   final BackupDocument document;
+
+  /// How many malformed entries were skipped while decoding.
   final int skippedEntries;
 }
 

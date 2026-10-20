@@ -7,13 +7,26 @@ plugins {
 
 // REL-1: optional external signing config. If the gitignored android/key.properties
 // exists, release builds are signed from it; otherwise builds fail soft with a loud
-// stdout notice and stay debug-signed (owner keystore intake = W7c).
+// stdout notice and stay debug-signed (owner keystore intake = W7c) - except when
+// publishing is requested, where a debug-signed store-bound artifact is refused
+// outright (see buildTypes below).
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file("key.properties")
 def hasReleaseKeystore = keystorePropertiesFile.exists()
 if (hasReleaseKeystore) {
     keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
 }
+
+// GitHub Actions exports CI=true; only an explicit truthy value counts
+// (Groovy treats every non-empty string as true, so "false" is normalized).
+def isCiBuild = (System.getenv("CI") ?: "").toLowerCase() in ["true", "1"]
+
+// A store-bound artifact must be signed, so publishing is refused without
+// the owner keystore. The trigger is explicit - PUBLISH_RELEASE=true or
+// -PpublishRelease=true - so a plain local or CI build is never blocked.
+def publishRelease = (System.getenv("PUBLISH_RELEASE") ?: "").toLowerCase() == "true" ||
+        (project.hasProperty("publishRelease") &&
+                project.property("publishRelease").toString().toLowerCase() == "true")
 
 android {
     namespace = "com.mostafasayed.quranyahdi"
@@ -58,8 +71,53 @@ android {
             if (hasReleaseKeystore) {
                 signingConfig = signingConfigs.release
             } else {
+                // A store-bound artifact must be signed: publishing is refused
+                // without the owner keystore. Otherwise the build stays
+                // debug-signed (loud notice) until the owner keystore intake
+                // (W7c), and CI is warned that the artifact must not be
+                // published.
+                if (publishRelease) {
+                    throw new GradleException(
+                        "PUBLISH_RELEASE build without a signing key: android/key.properties is missing. " +
+                        "The artifact is store-bound and must be signed with the owner keystore " +
+                        "(owner keystore intake: docs/superpowers/plans/2026-10-16-w7c-release.md).")
+                }
+                if (isCiBuild) {
+                    logger.warn("WARNING: CI build without android/key.properties - the release artifact is DEBUG-SIGNED and must NOT be published (a store-bound artifact needs the owner keystore, W7c).")
+                }
                 println "RELEASE NOT SIGNED (debug-signed artifact): android/key.properties not found - the owner keystore lands in W7c (docs/superpowers/plans/2026-10-16-w7c-release.md)"
                 signingConfig = signingConfigs.debug
+            }
+        }
+        // The store-bound build type. It REQUIRES the release signing config:
+        // a `publish` artifact can never be produced without the owner
+        // keystore, so a store-bound APK can no longer be produced by
+        // accident. The plain `release` build type is untouched - a local
+        // `flutter build apk --release` keeps its debug-signed fail-soft.
+        //
+        // Build it with: cd android && ./gradlew assemblePublish
+        //   (the artifact lands in android/app/build/outputs/apk/publish/)
+        publish {
+            initWith release
+            matchingFallbacks = ['release']
+            signingConfig = signingConfigs.release
+        }
+    }
+}
+
+// The store-bound variant must carry the owner keystore: fail loudly (and
+// only for THIS variant - the plain release build must keep working without
+// the keystore) instead of shipping an unsigned or debug-signed artifact.
+// The signing config alone already fails the build (it has no storeFile
+// without android/key.properties); this check makes the reason explicit.
+afterEvaluate {
+    project.tasks.matching { it.name == 'prePublishBuild' }.configureEach { task ->
+        task.doFirst {
+            if (!hasReleaseKeystore) {
+                throw new GradleException(
+                    "PUBLISH build without a signing key: android/key.properties is missing. " +
+                    "The store-bound artifact must be signed with the owner keystore " +
+                    "(owner keystore intake: docs/superpowers/plans/2026-10-16-w7c-release.md).")
             }
         }
     }

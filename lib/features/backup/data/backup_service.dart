@@ -10,9 +10,13 @@ import 'backup_merger.dart';
 /// Result of a completed [BackupService.apply] — the preview-identical
 /// summary plus whether the injected reschedule hook ran after the commit.
 class BackupOutcome {
+  /// What an applied backup did.
   const BackupOutcome({required this.summary, required this.rescheduled});
 
+  /// Counts of what changed.
   final BackupSummary summary;
+
+  /// True when reminders were rescheduled after the import.
   final bool rescheduled;
 }
 
@@ -101,10 +105,41 @@ class BackupService {
           ),
       ],
       tasbih: _decodeTasbihValue(tasbihRow?.value),
-      settings: {
-        for (final row in whitelistRows) row.key: row.value,
-      },
+      settings: _exportedSettings(whitelistRows),
     );
+  }
+
+  /// The whitelisted settings as they may leave the app.
+  ///
+  /// The selected city is redacted: a backup file is a file the user hands
+  /// to somebody else, so the GPS coordinates never travel with it (the
+  /// city id does, so an import can restore the selection).
+  static Map<String, String> _exportedSettings(List<SettingsTableData> rows) {
+    final exported = <String, String>{};
+    for (final row in rows) {
+      final value = row.key == backupKeySelectedCity
+          ? redactedSelectedCity(row.value)
+          : row.value;
+      if (value != null) exported[row.key] = value;
+    }
+    return exported;
+  }
+
+  /// The imported settings, with the selected city redacted.
+  ///
+  /// The redaction runs on the import too: a file that carries coordinates
+  /// must not be able to write them into the settings table.
+  static Map<String, String> _redactedSettings(Map<String, String> imported) {
+    final redacted = <String, String>{};
+    for (final entry in imported.entries) {
+      if (entry.key == backupKeySelectedCity) {
+        final value = redactedSelectedCity(entry.value);
+        if (value != null) redacted[entry.key] = value;
+        continue;
+      }
+      redacted[entry.key] = entry.value;
+    }
+    return redacted;
   }
 
   Future<SettingsTableData?> _readSetting(String key) =>
@@ -174,7 +209,7 @@ class BackupService {
       ),
       settings: mergeSettings(
         existing: {for (final row in whitelistRows) row.key: row.value},
-        imported: data.settings,
+        imported: _redactedSettings(data.settings),
       ),
       khatmaRowId: khatmaRow?.id,
     );

@@ -21,6 +21,7 @@ final RegExp _sha256Pattern = RegExp(r'^[0-9a-f]{64}$');
 
 bool _isHttps(String? url) => url == null || url.startsWith('https://');
 
+/// One downloadable library pack (tafsir, translation or hadith).
 class LibraryPackInfo {
   const LibraryPackInfo({
     required this.id,
@@ -37,12 +38,25 @@ class LibraryPackInfo {
     this.sha256PerSurah,
   });
 
+  /// Stable id of the pack.
   final String id;
+
+  /// What the pack contains.
   final LibraryPackKind kind;
+
+  /// Language of the pack content, e.g. `ar` or `en`.
   final String language;
+
+  /// Arabic title.
   final String titleAr;
+
+  /// English title.
   final String titleEn;
+
+  /// Catalog version of the pack.
   final String version;
+
+  /// Approximate download size in megabytes.
   final double approxSizeMb;
 
   /// Single-file kinds only (translation/hadith): one probed CDN URL.
@@ -150,6 +164,7 @@ class LibraryPackInfo {
   }
 }
 
+/// Maps a raw catalog kind to a [LibraryPackKind]; unknown kinds throw.
 LibraryPackKind kindFor(String raw) {
   for (final k in LibraryPackKind.values) {
     if (k.name == raw) return k;
@@ -157,10 +172,64 @@ LibraryPackKind kindFor(String raw) {
   throw FormatException('unknown library pack kind: "$raw"');
 }
 
+/// The integrity contract for a catalog pack, per kind.
+///
+/// Every pack the catalog serves must declare its integrity hashes: a pack
+/// served without them would silently degrade to shape-sniff-only at
+/// download time. The bundled manifest and a remote manifest go through the
+/// same gate - [requirePinnedCatalogEntries].
+///
+/// Returns null when the pack is fully pinned, or a diagnostic naming the
+/// missing hashes.
+String? catalogIntegrityGap(LibraryPackInfo pack) {
+  switch (pack.kind) {
+    case LibraryPackKind.tafsir:
+      final hashes = pack.sha256PerSurah;
+      if (hashes == null ||
+          (pack.fileCount != null && hashes.length != pack.fileCount)) {
+        return 'requires sha256PerSurah covering its ${pack.fileCount} files';
+      }
+      return null;
+    case LibraryPackKind.translation:
+    case LibraryPackKind.hadith:
+      return pack.sha256 == null ? 'requires a sha256 hash' : null;
+  }
+}
+
+/// Throws a [FormatException] when [pack] is not fully integrity-pinned.
+void _requirePinned(LibraryPackInfo pack) {
+  final gap = catalogIntegrityGap(pack);
+  if (gap != null) {
+    throw FormatException('catalog pack "${pack.id}" $gap');
+  }
+}
+
+/// Enforces the integrity contract on a raw catalog manifest.
+///
+/// This is the single gate both the bundled manifest and a remote manifest
+/// go through: every entry is parsed and checked against
+/// [catalogIntegrityGap], and a pack served without its hashes is rejected
+/// with a [FormatException] instead of degrading to shape-sniff-only at
+/// download time. Malformed entries are left alone here - the catalog
+/// source drops those, as it always has.
+void requirePinnedCatalogEntries(List<Map<String, dynamic>> entries) {
+  for (final entry in entries) {
+    final LibraryPackInfo pack;
+    try {
+      pack = LibraryPackInfo.fromJson(entry);
+    } on FormatException {
+      continue;
+    }
+    _requirePinned(pack);
+  }
+}
+
 /// The remote-manifest seam (see the library doc comment above).
 abstract class CatalogSource {
+  /// Every pack the source offers.
   Future<List<LibraryPackInfo>> all();
 
+  /// The pack with the given id, or null when the source has none.
   Future<LibraryPackInfo?> byId(String id) async {
     for (final pack in await all()) {
       if (pack.id == id) return pack;
@@ -169,9 +238,30 @@ abstract class CatalogSource {
   }
 }
 
+/// A catalog manifest fetched over the network.
+///
+/// The bundled manifest is curated and ships inside the signed APK; a
+/// remote manifest is not covered by that signature, so every pack it
+/// serves must declare its integrity hashes. Entries go through
+/// [parseEntry], which rejects a malformed entry - or one whose hashes are
+/// missing - instead of letting it reach the downloader unverified.
+abstract class RemoteCatalogSource extends CatalogSource {
+  /// Parses one remote entry, enforcing the integrity contract.
+  ///
+  /// Throws a [FormatException] when the entry is malformed or when its
+  /// integrity hashes are missing.
+  LibraryPackInfo parseEntry(Map<String, dynamic> json) {
+    final pack = LibraryPackInfo.fromJson(json);
+    _requirePinned(pack);
+    return pack;
+  }
+}
+
+/// A catalog source reading the JSON bundled with the app.
 class BundledCatalogSource extends CatalogSource {
   BundledCatalogSource({required this.loader});
 
+  /// Loads the raw catalog JSON; injected so tests can serve their own.
   final Future<List<Map<String, dynamic>>> Function() loader;
 
   late final CachedLoader<List<LibraryPackInfo>> _packs = CachedLoader(_load);

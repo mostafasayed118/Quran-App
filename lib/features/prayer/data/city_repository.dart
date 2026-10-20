@@ -2,46 +2,17 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import '../../../core/db/app_database.dart';
+import '../../../core/domain/city.dart';
+import '../../../core/utils/arabic_search.dart';
 import '../../../core/utils/cached_loader.dart';
-import 'prayer_time_service.dart';
+
+// Compat: existing importers of this file keep resolving [City].
+export '../../../core/domain/city.dart' show City;
 
 const selectedCityKey = 'selected_city';
 
-class City {
-  const City({
-    required this.id,
-    required this.nameAr,
-    required this.nameEn,
-    required this.lat,
-    required this.lng,
-  });
-
-  final String id;
-  final String nameAr;
-  final String nameEn;
-  final double lat;
-  final double lng;
-
-  CityCoordinates get coordinates => CityCoordinates(lat, lng);
-
-  factory City.fromJson(Map<String, dynamic> json) => City(
-        id: json['id'] as String,
-        nameAr: json['nameAr'] as String,
-        nameEn: json['nameEn'] as String,
-        lat: (json['lat'] as num).toDouble(),
-        lng: (json['lng'] as num).toDouble(),
-      );
-
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'nameAr': nameAr,
-        'nameEn': nameEn,
-        'lat': lat,
-        'lng': lng,
-      };
-}
-
-class CityRepository {
+/// Offline city catalog: search, nearest-city lookup and the selected city.
+class CityRepository implements CitySource {
   CityRepository({
     required AppDatabase db,
     required Future<List<Map<String, dynamic>>> Function() loader,
@@ -62,42 +33,21 @@ class CityRepository {
     return [for (final json in raw) City.fromJson(json)];
   }
 
+  /// Cities matching [query]; Arabic is matched diacritics-insensitively. An empty query returns every city.
   Future<List<City>> search(String query) async {
     final q = query.trim().toLowerCase();
     if (q.isEmpty) return _all();
     final all = await _all();
-    final normalizedQuery = _normalizeArabic(q);
+    final normalizedQuery = normalizeArabicLetters(q);
     return [
       for (final city in all)
         if (city.nameEn.toLowerCase().contains(q) ||
-            _normalizeArabic(city.nameAr).contains(normalizedQuery))
+            normalizeArabicLetters(city.nameAr).contains(normalizedQuery))
           city,
     ];
   }
 
-  /// Folds Arabic letter variants (hamza forms, alef maqsura, ta marbuta)
-  /// and strips diacritics/tatweel so plain-keyboard queries match curated
-  /// names (e.g. «الاسكندرية» finds «الإسكندرية»).
-  static String _normalizeArabic(String input) {
-    final buffer = StringBuffer();
-    for (final rune in input.runes) {
-      if (_isArabicDiacritic(rune)) continue;
-      buffer.writeCharCode(_foldArabicLetter(rune));
-    }
-    return buffer.toString();
-  }
-
-  static bool _isArabicDiacritic(int rune) =>
-      (rune >= 0x064B && rune <= 0x065F) || rune == 0x0670 || rune == 0x0640;
-
-  static int _foldArabicLetter(int rune) => switch (rune) {
-        0x0622 || 0x0623 || 0x0625 || 0x0671 => 0x0627, // آ أ إ ٱ -> ا
-        0x0624 => 0x0648, // ؤ -> و
-        0x0626 || 0x0649 => 0x064A, // ئ ى -> ي
-        0x0629 => 0x0647, // ة -> ه
-        _ => rune,
-      };
-
+  /// Closest catalog city to the given coordinates; throws when the catalog is empty.
   Future<City> nearestTo(double lat, double lng) async {
     final all = await _all();
     if (all.isEmpty) {
@@ -134,6 +84,7 @@ class CityRepository {
 
   static double _toRadians(double degrees) => degrees * math.pi / 180.0;
 
+  /// Raw JSON of the stored selected city, or null when none is stored.
   Future<String?> selectedCityJson() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(selectedCityKey)))
@@ -141,16 +92,34 @@ class CityRepository {
     return row?.value;
   }
 
+  @override
   Future<City?> selectedCity() async {
     final json = await selectedCityJson();
     if (json == null || json.isEmpty) return null;
+    Map<String, dynamic> city;
     try {
-      return City.fromJson(jsonDecode(json) as Map<String, dynamic>);
+      final decoded = jsonDecode(json);
+      if (decoded is! Map<String, dynamic>) return null;
+      city = decoded;
     } on Object {
+      return null;
+    }
+    try {
+      return City.fromJson(city);
+    } on Object {
+      // A backup import restores the city by id only - the coordinates are
+      // never exported (they are a location, and a backup file is a file the
+      // user shares). Resolve the id against the offline city catalog.
+      final id = city['id'];
+      if (id is! String || id.isEmpty) return null;
+      for (final catalogCity in await _all()) {
+        if (catalogCity.id == id) return catalogCity;
+      }
       return null;
     }
   }
 
+  @override
   Future<void> select(City city) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(

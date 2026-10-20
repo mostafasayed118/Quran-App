@@ -8,6 +8,13 @@ library;
 /// Final host (owner decision 2026-10-18), mirrored from web/src/lib/urls.ts.
 const String deepLinkHost = 'quranyahdi.pages.dev';
 
+/// The highest ayah number in the Quran (Al-Baqarah has 286).
+///
+/// The surah's own ayah count is not known at parse time, so this hard
+/// maximum is the clamp an incoming link is held to: a link can never
+/// point past the last ayah of the longest surah.
+const int maxDeepLinkAyah = 286;
+
 /// Maps an incoming content link to an in-app route; null for anything else
 /// (other host, http, unknown path) so the caller can ignore it silently.
 String? deepLinkRouteFor(Uri uri) {
@@ -32,12 +39,13 @@ String? deepLinkRouteFor(Uri uri) {
   return null;
 }
 
-/// `#ayah-{m}` with m >= 1; any other fragment (absent, `#ayah-0`, `#x`)
-/// yields a surah-only route. Ayah range is the reader route's contract.
+/// `#ayah-{m}` with 1 <= m <= [maxDeepLinkAyah]; any other fragment (absent,
+/// `#ayah-0`, `#x`, an out-of-range ayah) yields a surah-only route. Ayah
+/// range is the reader route's contract.
 int? _ayahFromFragment(String fragment) {
   if (!fragment.startsWith('ayah-')) return null;
   final m = int.tryParse(fragment.substring(5));
-  return (m != null && m >= 1) ? m : null;
+  return (m != null && m >= 1 && m <= maxDeepLinkAyah) ? m : null;
 }
 
 /// Shared-link builder — byte-format mirror of web/src/lib/urls.ts so that a

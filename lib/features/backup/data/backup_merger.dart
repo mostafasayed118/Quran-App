@@ -13,9 +13,11 @@ DateTime backupDateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 /// Stable day key for merge batching (same shape as the tracker's own keys).
 String backupDayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
 
+/// Result of merging imported bookmarks with the local ones.
 class BookmarkMerge {
   const BookmarkMerge(this.toInsert);
 
+  /// Bookmarks that are new and must be written.
   final List<BackupBookmark> toInsert;
 
   int get newCount => toInsert.length;
@@ -35,10 +37,14 @@ BookmarkMerge mergeBookmarks({
   return BookmarkMerge(List<BackupBookmark>.unmodifiable(toInsert));
 }
 
+/// Result of merging the imported last-read position.
 class LastReadMerge {
   const LastReadMerge({required this.toWrite, required this.changed});
 
+  /// Ayah id to store, or null when nothing changes.
   final int? toWrite;
+
+  /// True when the imported position differs from the stored one.
   final bool changed;
 }
 
@@ -50,10 +56,14 @@ LastReadMerge mergeLastRead({required int? existing, required int? imported}) {
   return LastReadMerge(toWrite: imported, changed: imported != existing);
 }
 
+/// Result of merging the imported khatma plan.
 class KhatmaMerge {
   const KhatmaMerge({required this.toWrite, required this.replaced});
 
+  /// The plan row to write, or null to keep the current plan.
   final BackupKhatmaRow? toWrite;
+
+  /// True when the imported plan replaced the existing one.
   final bool replaced;
 }
 
@@ -75,9 +85,11 @@ KhatmaMerge mergeKhatma({
   return const KhatmaMerge(toWrite: null, replaced: false);
 }
 
+/// Result of merging the imported prayer log.
 class PrayerLogMerge {
   const PrayerLogMerge(this.daysToWrite);
 
+  /// Merged days that still have to be written.
   final List<BackupPrayerDay> daysToWrite;
 
   int get mergedDays => daysToWrite.length;
@@ -123,12 +135,17 @@ bool _flipsMark(BackupPrayerDay current, BackupPrayerDay merged) =>
     (merged.maghrib && !current.maghrib) ||
     (merged.isha && !current.isha);
 
+/// Result of merging the imported tasbih counter.
 class TasbihMerge {
   const TasbihMerge({required this.toWrite, required this.countDelta});
 
+  /// The counter to write, or null when nothing changed.
   final BackupTasbih? toWrite;
+
+  /// How much the count grew against the stored value.
   final int countDelta;
 
+  /// True when the merged counter differs from the stored one.
   bool get changed => toWrite != null;
 }
 
@@ -154,9 +171,11 @@ TasbihMerge mergeTasbih({
   );
 }
 
+/// Result of merging imported settings.
 class SettingsMerge {
   const SettingsMerge(this.toWrite);
 
+  /// Settings that differ from the stored ones and must be written.
   final Map<String, String> toWrite;
 
   int get appliedCount => toWrite.length;
@@ -179,6 +198,7 @@ SettingsMerge mergeSettings({
 
 /// Per-entity summary of a plan (preview counts and apply outcome).
 class BackupSummary {
+  /// What a backup import changed, in numbers.
   const BackupSummary({
     required this.newBookmarks,
     required this.mergedPrayerDays,
@@ -210,6 +230,7 @@ class BackupSummary {
   /// Whitelisted settings keys that would be (re)written.
   final int settingsKeysApplied;
 
+  /// True when the import changed nothing at all.
   bool get isEmpty =>
       newBookmarks == 0 &&
       mergedPrayerDays == 0 &&
