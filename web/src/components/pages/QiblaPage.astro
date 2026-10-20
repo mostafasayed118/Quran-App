@@ -47,7 +47,7 @@ const cardinal =
   </div>
   <div class="qb-picker" data-qy="qb-picker" hidden>
     <p class="qb-picker-msg">{t(locale, 'qbDenied')}</p>
-    <input type="search" class="index-search" placeholder={placeholder} aria-label={placeholder} />
+    <input type="search" class="index-search" id="qibla-city-search" name="qibla-city-search" placeholder={placeholder} aria-label={placeholder} />
     <p class="empty" hidden>{t(locale, 'noResults')}</p>
     <ul class="qb-cities">
       {index.cities.map((city) => (

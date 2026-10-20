@@ -42,7 +42,7 @@ const data = (await import(`../../data/ayahs/${surah.id}.json`)).default as {
       <button type="button" class="rc-btn" data-qy="panel-toggle" aria-pressed="false" aria-controls="qy-content-panel">{t(locale, 'panelTitle')}</button>
     </div>
     <div class="reader-listen">
-      <select data-qy="reciter-pick" aria-label={t(locale, 'readerPickReciter')} disabled></select>
+      <select id="reader-reciter-select" name="reader-reciter-select" data-qy="reciter-pick" aria-label={t(locale, 'readerPickReciter')} disabled></select>
       <button type="button" class="rc-btn" data-qy="reader-play" data-surah={surah.id}>{t(locale, 'readerPlay')}</button>
     </div>
   </header>

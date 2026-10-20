@@ -47,7 +47,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
   <div class="pt-controls">
     <label class="pt-month">
       <span>{t(locale, 'ptMonth')}</span>
-      <select data-qy="pt-month">
+      <select id="prayer-month-select" name="prayer-month-select" data-qy="pt-month">
         {data.months.map((mo, i) => (
           <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>{monthLabel(mo.y, mo.m)}</option>
         ))}
