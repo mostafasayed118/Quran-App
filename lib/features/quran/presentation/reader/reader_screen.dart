@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/deep_links.dart';
@@ -23,26 +24,46 @@ class ReaderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReaderCubit, ReaderState>(
+      buildWhen: readerShellShouldRebuild,
       builder: (context, state) => switch (state) {
         ReaderLoading() => const Scaffold(body: LoadingView()),
-        ReaderError() => const _ReaderErrorView(),
+        ReaderFailed() => _ReaderErrorView(state: state),
         ReaderReady() => _ReadyView(state: state),
       },
     );
   }
 }
 
+/// The reader shell rebuilds on every state change EXCEPT a bookmark-only
+/// one: the bookmark UI carries its own subscription (one [BlocSelector] per
+/// verse), so toggling a bookmark no longer rebuilds the whole Scaffold.
+bool readerShellShouldRebuild(ReaderState previous, ReaderState current) {
+  if (previous is! ReaderReady || current is! ReaderReady) return true;
+  // Equal apart from the bookmarks means the shell has nothing new to show.
+  return previous.copyWith(bookmarkedAyahIds: current.bookmarkedAyahIds) !=
+      current;
+}
+
 class _ReaderErrorView extends StatelessWidget {
-  const _ReaderErrorView();
+  const _ReaderErrorView({required this.state});
+
+  final ReaderFailed state;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final emptySurahId = state.emptySurahId;
     return Scaffold(
       appBar: AppBar(title: Text(loc.quran)),
       body: Column(
         children: [
-          Expanded(child: errorPane(loc)),
+          Expanded(
+            child: emptySurahId == null
+                ? errorPane(loc)
+                // A surah without readable ayahs is its own failure: the
+                // generic pane would blame a transient error.
+                : ErrorView(loc.readerNoAyahs(emptySurahId.toArabicIndic)),
+          ),
           Padding(
             padding: const EdgeInsets.only(bottom: 32),
             child: FilledButton(
@@ -95,7 +116,7 @@ class _ReadyView extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: Text(
-                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                loc.basmala,
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 22,
@@ -130,23 +151,40 @@ class _VersesListState extends State<_VersesList> {
   /// controller mid-scroll, which re-applied initialScrollIndex.
   final ItemScrollController _controller = ItemScrollController();
 
+  /// The list's start index, computed once per surah: scanning the surah on
+  /// every build re-ran the scan on each rebuild.
+  late final int _initialIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = widget.state;
+    final index =
+        state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
+    _initialIndex = index > 0 ? index : 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final cubit = context.read<ReaderCubit>();
     final state = widget.state;
-    final initialIndex =
-        state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
     return ScrollablePositionedList.builder(
-      initialScrollIndex: initialIndex > 0 ? initialIndex : 0,
+      initialScrollIndex: _initialIndex,
       itemScrollController: _controller,
       itemCount: state.ayahs.length,
       itemBuilder: (context, index) {
         final ayah = state.ayahs[index];
-        return _AyahCard(
-          ayah: ayah,
-          surahName: state.surahName,
-          bookmarked: state.bookmarkedAyahIds.contains(ayah.id),
-          onToggle: () => cubit.toggleBookmark(ayah.id),
+        // The bookmark flag is its own subscription: a bookmark toggle
+        // rebuilds this card alone, not the verse list and not the Scaffold.
+        return BlocSelector<ReaderCubit, ReaderState, bool>(
+          selector: (s) =>
+              s is ReaderReady && s.bookmarkedAyahIds.contains(ayah.id),
+          builder: (context, bookmarked) => _AyahCard(
+            ayah: ayah,
+            surahName: state.surahName,
+            bookmarked: bookmarked,
+            onToggle: () => cubit.toggleBookmark(ayah.id),
+          ),
         );
       },
     );
@@ -170,8 +208,11 @@ class _AyahCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -240,7 +281,7 @@ class _AyahActions extends StatelessWidget {
             useSafeArea: true,
             isScrollControlled: true,
             showDragHandle: true,
-            builder: (_) => LibrarySheet(
+            builder: (_) => AyahSheet(
               surahId: ayah.surahId,
               surahName: surahName,
               ayah: ayah.numberInSurah,
@@ -332,7 +373,7 @@ class _MushafPagerState extends State<_MushafPager> {
                 '${a.textUthmani} ${loc.ornateBrackets(a.numberInSurah.toArabicIndic)}')
             .join(' ');
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
               Expanded(

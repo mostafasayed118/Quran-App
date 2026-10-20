@@ -11,14 +11,17 @@ import '../../../core/utils/progress_throttle.dart';
 import 'download_status.dart';
 import 'reciter_repository.dart';
 
+/// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
   DownloadFailure(this.message);
 
+  /// Human-readable reason of the failure.
   final String message;
   @override
   String toString() => 'DownloadFailure: $message';
 }
 
+/// Downloads surah audio files and tracks them in the database.
 class AudioDownloader {
   AudioDownloader(
     this._db, {
@@ -35,6 +38,7 @@ class AudioDownloader {
   final Dio _dio;
   final Future<Directory> Function()? _audioRoot;
 
+  /// Folder name under the app documents directory: 'audio'.
   static const audioFolderName = 'audio';
 
   /// Guard against a lying/compromised host streaming unbounded bytes:
@@ -45,6 +49,8 @@ class AudioDownloader {
   static const int maxAcceptedBytesCeiling = 64 << 20;
 
   @visibleForTesting
+
+  /// Byte cap accepted for a download, derived from the declared size.
   static int maxAcceptedBytes(int declaredTotal) =>
       guardedByteCap(declaredTotal, ceiling: maxAcceptedBytesCeiling);
 
@@ -88,6 +94,7 @@ class AudioDownloader {
     }
   }
 
+  /// Downloads one surah for [reciter]; reports progress and honours [cancelToken].
   Future<File> downloadSurah({
     required ReciterRow reciter,
     required int surahNumber,
@@ -139,6 +146,7 @@ class AudioDownloader {
     }
   }
 
+  /// True when the surah finished downloading for that reciter.
   Future<bool> isDownloaded(String rowId, int surahNumber) async {
     final row = await (_db.select(_db.downloads)
           ..where((d) =>
@@ -150,6 +158,7 @@ class AudioDownloader {
     return File(row.path).exists();
   }
 
+  /// Path of the downloaded file, or null when it is not downloaded.
   Future<String?> downloadedPath(String rowId, int surahNumber) async {
     final row = await (_db.select(_db.downloads)
           ..where((d) =>
@@ -161,6 +170,7 @@ class AudioDownloader {
     return await File(row.path).exists() ? row.path : null;
   }
 
+  /// Deletes the downloaded file and forgets the download row.
   Future<void> removeDownload(String rowId, int surahNumber) async {
     final row = await (_db.select(_db.downloads)
           ..where(

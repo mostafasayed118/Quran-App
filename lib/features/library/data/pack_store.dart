@@ -15,6 +15,8 @@ class PackStore {
   }) : _rootResolver = rootResolver;
 
   final Future<Directory> Function()? _rootResolver;
+
+  /// Folder under the app documents directory that holds the packs.
   final String folderName;
 
   Future<Directory> _root() async {
@@ -29,6 +31,7 @@ class PackStore {
   /// caller (or a tampered registry row) from steering a write/delete.
   static final RegExp _safePackId = RegExp(r'^[a-z0-9][a-z0-9-]{0,63}$');
 
+  /// Path of the installed pack file for [packId].
   Future<File> packFile(String packId) async {
     if (!_safePackId.hasMatch(packId)) {
       throw PackFailure('unsafe pack id "$packId"');
@@ -49,6 +52,7 @@ class PackStore {
   Future<File> promote(File partFile) => partFile.rename(
       partFile.path.substring(0, partFile.path.length - '.part'.length));
 
+  /// Deletes [file] when it exists; missing files are not an error.
   Future<void> deleteIfExists(File file) async {
     if (await file.exists()) {
       await file.delete();

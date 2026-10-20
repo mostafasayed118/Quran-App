@@ -31,6 +31,12 @@ import 'reminder_scheduler.dart';
 ///
 /// Failure semantics: init failure leaves reminders silently disabled
 /// (disclosed v1 behavior) and must never crash boot (device smoke enforces).
+///
+/// Init window: the plugin init runs BEHIND the first frame, so a reminder
+/// plan (or a permission request) that arrives before the plugin is ready is
+/// QUEUED, never dropped — [init] applies it as soon as the plugin is ready
+/// and discards it when the init fails. Nothing on this path waits for the
+/// plugin: a caller that awaited readiness would hang instead of queueing.
 class NotificationsBinding implements ReminderScheduler {
   NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
@@ -45,11 +51,47 @@ class NotificationsBinding implements ReminderScheduler {
   VoidCallback? _onTap;
   void Function(String payload)? _onTapPayload;
 
+  /// The plan that was requested while the plugin was not ready yet.
+  ///
+  /// The plugin init now runs BEHIND the first frame, so a reminder change
+  /// made in the first seconds of the app's life reaches the binding before
+  /// the plugin is ready. The plan is remembered here (last write wins) and
+  /// applied by [init] the moment the plugin reports ready — it is never
+  /// dropped, and the user never loses a change without a trace.
+  List<ScheduledReminder>? _pendingPlan;
+
+  /// Whether a permission request arrived before the plugin was ready.
+  ///
+  /// Remembered for the same reason as [_pendingPlan]; [init] performs it
+  /// once the plugin is ready.
+  bool _pendingPermission = false;
+
+  /// Whether the plugin init has already failed.
+  ///
+  /// After a failed init the reminders stay disabled (the disclosed v1
+  /// semantics), so a later request must not queue a plan that no init will
+  /// ever apply — it is dropped, exactly as it was before the queueing
+  /// change. Cleared when an init is attempted again.
+  bool _initFailed = false;
+
+  /// The fingerprint of the last plan this binding applied to the OS.
+  ///
+  /// A reload that produces the SAME plan (a city change that moves no
+  /// reminder, a settings save that changes nothing) must not cancel and
+  /// re-schedule every alarm — the platform round-trip is the expensive part
+  /// and the alarms it would write are identical.
+  String? _appliedPlan;
+
   /// One-time plugin init; safe to call repeatedly, never rethrows. A
   /// notification tap fires the injected `onTap` callback (payloadless taps)
   /// or `onTapPayload` when the tapped reminder carries a routing tag — the
   /// app layer wires both to the router, so this data class stays
   /// router-free.
+  ///
+  /// When the init succeeds, whatever arrived during the init window — a
+  /// queued plan, a queued permission request — is applied here. When the
+  /// init fails, the queue is discarded: reminders stay disabled (the
+  /// disclosed v1 semantics) and no stale plan survives the failure.
   Future<void> init({
     VoidCallback? onTap,
     void Function(String payload)? onTapPayload,
@@ -57,6 +99,7 @@ class NotificationsBinding implements ReminderScheduler {
     if (_ready) return;
     _onTap = onTap;
     _onTapPayload = onTapPayload;
+    _initFailed = false;
     try {
       final loc = lookupAppLocalizations(const Locale('ar'));
       await _plugin.initialize(
@@ -82,6 +125,33 @@ class NotificationsBinding implements ReminderScheduler {
       _ready = true;
     } on Object {
       _ready = false;
+      _initFailed = true;
+      // A failed init leaves the reminders disabled — drop the queued plan
+      // and the queued permission request so neither survives as a stale
+      // wish that will never be fulfilled.
+      _pendingPlan = null;
+      _pendingPermission = false;
+      return;
+    }
+    await _drainPending();
+  }
+
+  /// Applies what arrived while the plugin was not ready.
+  ///
+  /// The permission request goes first (an alarm registered before the OS
+  /// permission is granted never shows up), then the plan — through the very
+  /// same path a normal [scheduleAll] uses, so the plan-fingerprint dedupe
+  /// applies to it as well. Nothing here throws: the queued work is
+  /// best-effort, exactly like the direct calls.
+  Future<void> _drainPending() async {
+    if (_pendingPermission) {
+      _pendingPermission = false;
+      await ensurePermissions();
+    }
+    final plan = _pendingPlan;
+    _pendingPlan = null;
+    if (plan != null) {
+      await scheduleAll(plan);
     }
   }
 
@@ -132,9 +202,25 @@ class NotificationsBinding implements ReminderScheduler {
     }
   }
 
+  /// Requests the OS notification (+ exact-alarm) permissions.
+  ///
+  /// While the plugin is not ready yet, the request is remembered and
+  /// performed by [init] as soon as the plugin is ready. Such a request is
+  /// NOT a refusal: it is reported as granted, because nothing was refused —
+  /// claiming a denial that never happened would state something false about
+  /// the user's device (the same discipline the playback probe follows).
+  ///
+  /// Returns false only when the OS refused the request or the plugin is
+  /// unavailable. Never throws.
   @override
   Future<bool> ensurePermissions() async {
-    if (!_ready) return false;
+    if (!_ready) {
+      // The plugin failed for good: the reminders stay disabled and there is
+      // no init left that could apply a queued request.
+      if (_initFailed) return false;
+      _pendingPermission = true;
+      return true;
+    }
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -159,10 +245,34 @@ class NotificationsBinding implements ReminderScheduler {
     }
   }
 
+  /// Replace-all semantics: cancels the previously scheduled reminders, then
+  /// schedules the given plan.
+  ///
+  /// While the plugin is not ready yet, the plan is remembered (last write
+  /// wins) and applied by [init] once the plugin is ready — the plan is
+  /// never dropped, so a city change or an azkar/wird toggle made during
+  /// the init window still reaches the OS.
   @override
   Future<void> scheduleAll(List<ScheduledReminder> reminders) async {
+    if (!_ready || _details == null) {
+      // A failed init leaves the reminders disabled for good: drop the plan
+      // instead of keeping a queue that no init will ever apply.
+      if (_initFailed) return;
+      _pendingPlan = List<ScheduledReminder>.of(reminders);
+      return;
+    }
+    await _applyPlan(reminders);
+  }
+
+  /// Cancels the previously scheduled alarms and schedules [reminders].
+  ///
+  /// The plan fingerprint skips the platform round-trip when the new plan
+  /// schedules exactly the same alarms as the applied one.
+  Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
-    if (!_ready || details == null) return;
+    if (details == null) return;
+    final fingerprint = _planFingerprint(reminders);
+    if (fingerprint == _appliedPlan) return;
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
@@ -182,8 +292,35 @@ class NotificationsBinding implements ReminderScheduler {
           androidScheduleMode: mode,
         );
       }
+      _appliedPlan = fingerprint;
     } on Object {
       // Best-effort v1: a failed schedule surfaces only in the device smoke.
     }
+  }
+
+  /// A deterministic fingerprint of a reminder plan: the reminders sorted by
+  /// id, each with its fire instant and its visible copy.
+  ///
+  /// Two plans with the same fingerprint schedule exactly the same alarms, so
+  /// the second one can skip the platform round-trip. The copy is part of the
+  /// fingerprint on purpose: a renamed reciter changes what the shade shows
+  /// and must therefore re-register the alarm.
+  static String _planFingerprint(List<ScheduledReminder> reminders) {
+    final sorted = [...reminders]..sort((a, b) => a.id.compareTo(b.id));
+    // Length-prefixed fields: no separator can appear in the content, so the
+    // flat encoding is unambiguous.
+    final fields = <String>[];
+    for (final r in sorted) {
+      for (final value in <String>[
+        '${r.id}',
+        r.fireAt.toUtc().toIso8601String(),
+        r.title,
+        r.body ?? '',
+        r.payload ?? '',
+      ]) {
+        fields.add('${value.length}:$value');
+      }
+    }
+    return fields.join();
   }
 }

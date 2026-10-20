@@ -27,3 +27,14 @@ abstract interface class PlaybackService {
   Future<void> resume();
   Future<void> stop();
 }
+
+/// Optional capability: a playback service that owns platform resources (the
+/// ExoPlayer instance, the audio focus, the platform media session).
+///
+/// It is a SEPARATE interface on purpose: [PlaybackService] is implemented by
+/// the frozen test doubles, so adding a member to it would break them. The
+/// cubit disposes the service only when it implements this capability.
+abstract interface class DisposablePlaybackService {
+  /// Releases the platform resources. Safe to call once.
+  Future<void> dispose();
+}

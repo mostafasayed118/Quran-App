@@ -29,14 +29,6 @@ class PackReader {
   /// isolate-projection path below.
   final Future<dynamic> Function(String path)? _fileDecoder;
 
-  /// Decodes a pack file at [path] to its full JSON tree in a worker isolate.
-  ///
-  /// The install integrity sniff uses this as its default decoder. Read paths
-  /// do NOT use it: they call [_decodeProjectionInIsolate], which never sends
-  /// the tree back.
-  static Future<dynamic> decodeFileInIsolate(String path) =>
-      Isolate.run(() => jsonDecode(File(path).readAsStringSync()));
-
   /// Resolves an installed pack id to its file path, null when absent.
   final Future<String?> Function(String packId) _packPath;
 

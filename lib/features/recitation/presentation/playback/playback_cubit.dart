@@ -3,19 +3,27 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/db/app_database.dart';
 import '../../data/audio_downloader.dart';
-import '../../data/reciter_repository.dart';
-import '../../data/reciter_source.dart';
+import '../../data/reciter_info_source.dart';
+import '../../data/reciter_repository.dart' show surahAudioUrl;
 import '../../domain/reciter_info.dart';
 import '../../playback/background_init_guard.dart';
 import '../../playback/playback_service.dart';
 import 'playback_state.dart';
 
+// The row-typed entry point lives in its own file so this surface never
+// imports a drift row; it is re-exported for the frozen recitation doubles.
+export 'playback_row_entry.dart';
+
+/// The player: the current track, its position and the mini player's state.
 class PlaybackCubit extends Cubit<PlaybackState> {
+  /// Creates the cubit around the playback service.
+  ///
+  /// [backgroundActive] is the probe that decides how a load failure is
+  /// labelled; it defaults to the production probe.
   PlaybackCubit({
     required PlaybackService service,
-    required ReciterSource reciters,
+    required ReciterInfoSource reciters,
     required AudioDownloader downloader,
     bool Function()? backgroundActive,
   })  : _service = service,
@@ -25,15 +33,29 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         super(const PlaybackState.initial());
 
   final PlaybackService _service;
-  final ReciterSource _reciters;
+  final ReciterInfoSource _reciters;
   final AudioDownloader _downloader;
 
-  /// Whether the background-audio bootstrap succeeded. When it did not, a
-  /// failed load is labelled [PlaybackFailureKind.backgroundUnavailable]
-  /// instead of masquerading as a network failure.
+  /// Decides how a failed load is labelled: `true` (background audio is up)
+  /// → [PlaybackFailureKind.network], `false` (background audio is known to
+  /// be down) → [PlaybackFailureKind.backgroundUnavailable] instead of
+  /// masquerading as a network failure.
+  ///
+  /// The INJECTED probe keeps exactly that meaning. The PRODUCTION probe
+  /// ([_probeBackgroundInit]) answers the truthful question — "is background
+  /// audio known to be unavailable?" — so a load that fails while the
+  /// bootstrap is still PENDING is not reported as a missing background
+  /// service.
   final bool Function() _backgroundActive;
 
-  static bool _probeBackgroundInit() => BackgroundInitGuard.active;
+  /// The production probe: background audio counts as available until an
+  /// attempt has settled AND failed.
+  ///
+  /// The bootstrap runs behind the first frame, so during the first ~1.5 s
+  /// the outcome is simply unknown. A pending attempt is not a failure, and
+  /// claiming "background audio unavailable" on that basis would state
+  /// something false about the user's device.
+  static bool _probeBackgroundInit() => BackgroundInitGuard.available;
 
   String _reciterName = '';
 
@@ -45,12 +67,6 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   StreamSubscription<bool>? _playingSub;
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
-
-  /// Row-typed entry: the frozen recitation doubles call it with
-  /// `ReciterRow` literals, so the signature stays pinned; it funnels into
-  /// the same shared start path as [playReciter].
-  Future<void> playSurah(ReciterRow row, int surahNumber) =>
-      _start(row.id, row.reciterName, row.server, surahNumber);
 
   /// Entity entry for the re-typed screens (ready states carry
   /// [ReciterInfo], never drift rows).
@@ -99,25 +115,15 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     }
   }
 
+  /// Plays the default reciter's audio for [surahNumber].
+  ///
+  /// A missing default reciter fails with [PlaybackFailureKind.noReciters];
+  /// a lookup error fails with [PlaybackFailureKind.network].
   Future<void> playDefaultForSurah(int surahNumber) async {
     final episode = ++_episode;
-    final ReciterRow row;
+    final ReciterInfo? reciter;
     try {
-      final selectedId = await _reciters.loadSelectedMoshaf();
-      var candidate =
-          selectedId == null ? null : await _reciters.byId(selectedId);
-      if (candidate == null) {
-        final all = sortReciters(await _reciters.watchAll().first);
-        if (isClosed || episode != _episode) return;
-        if (all.isEmpty) {
-          emit(const PlaybackState.failed(
-            kind: PlaybackFailureKind.noReciters,
-          ));
-          return;
-        }
-        candidate = all.first;
-      }
-      row = candidate;
+      reciter = await _reciters.defaultReciter();
     } on Object catch (error, stackTrace) {
       dev.log('reciter lookup failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
@@ -126,9 +132,19 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       return;
     }
     if (isClosed || episode != _episode) return;
-    await playSurah(row, surahNumber);
+    if (reciter == null) {
+      emit(const PlaybackState.failed(
+        kind: PlaybackFailureKind.noReciters,
+      ));
+      return;
+    }
+    await playReciter(reciter, surahNumber);
   }
 
+  /// Pauses a playing track, resumes a paused one; a no-op otherwise.
+  ///
+  /// A failed pause/resume keeps the current state: the audio is still
+  /// audible (pause) or still paused (resume).
   Future<void> toggle() async {
     final state = this.state;
     if (state is PlaybackPlaying) {
@@ -166,6 +182,10 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     }
   }
 
+  /// Stops the playback and returns to the idle (not-ready) state.
+  ///
+  /// The play-attempt counter is bumped, so a late success of the stopped
+  /// attempt is discarded instead of resurrecting a track.
   Future<void> stopAndReset() async {
     _episode++;
     try {
@@ -205,9 +225,18 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _durationSub = null;
   }
 
+  /// Unbinds the player streams and disposes the service when it owns
+  /// platform resources.
   @override
   Future<void> close() async {
     await _unbindStreams();
+    // The service owns the platform resources (ExoPlayer, audio focus). It
+    // is disposed only when it exposes the capability - the frozen test
+    // doubles implement the plain seam and own nothing.
+    final Object service = _service;
+    if (service is DisposablePlaybackService) {
+      await service.dispose();
+    }
     return super.close();
   }
 

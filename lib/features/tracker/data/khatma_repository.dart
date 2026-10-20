@@ -5,6 +5,7 @@ import '../../../core/domain/wird_progress_sink.dart';
 
 /// One active wird/khatma plan row (single-row by invariant).
 class KhatmaPlan {
+  /// The stored reading plan.
   const KhatmaPlan({
     required this.ayahId,
     required this.targetPages,
@@ -14,7 +15,10 @@ class KhatmaPlan {
   /// Read-up-to pointer: the global ayah id (1..6236) the plan has reached.
   final int ayahId;
 
+  /// Page count the plan aims to finish.
   final int targetPages;
+
+  /// When the plan last moved.
   final DateTime updatedAt;
 }
 
@@ -24,6 +28,7 @@ class KhatmaRepository implements WirdProgressSink {
 
   final AppDatabase _db;
 
+  /// The stored plan, or null when no plan is active.
   Future<KhatmaPlan?> currentPlan() async {
     final row = await _row();
     if (row == null) return null;
@@ -73,6 +78,7 @@ class KhatmaRepository implements WirdProgressSink {
     await _db.delete(_db.khatmaProgress).go();
   }
 
+  /// Mushaf page of the given ayah, or null when it is unknown.
   Future<int?> pagesFromAyah(int ayahId) async =>
       (await anchorFor(ayahId))?.page;
 

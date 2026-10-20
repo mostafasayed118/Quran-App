@@ -7,7 +7,8 @@ import 'package:just_audio_background/just_audio_background.dart';
 import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
-class JustAudioPlaybackService implements PlaybackService {
+class JustAudioPlaybackService
+    implements PlaybackService, DisposablePlaybackService {
   JustAudioPlaybackService([AudioPlayer? player])
       : _player = player ?? AudioPlayer();
 
@@ -61,4 +62,10 @@ class JustAudioPlaybackService implements PlaybackService {
 
   @override
   Future<void> stop() => _player.stop();
+
+  /// Releases the ExoPlayer instance, the audio focus and the platform
+  /// media session. Without it the player is held for the whole process
+  /// lifetime.
+  @override
+  Future<void> dispose() => _player.dispose();
 }

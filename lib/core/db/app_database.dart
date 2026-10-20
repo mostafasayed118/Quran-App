@@ -40,11 +40,20 @@ class AppDatabase extends _$AppDatabase {
           // reader's per-surah query; the others are per-check lookups).
           await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_surah '
               'ON ayahs(surah_id, number_in_surah)');
+          // The khatma page query filters `ayahs.page`; without this index
+          // every call scans the whole 6236-row table.
+          await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_page '
+              'ON ayahs(page)');
           await customStatement('CREATE INDEX IF NOT EXISTS idx_bookmarks_ayah '
               'ON bookmarks(ayah_id)');
           await customStatement(
               'CREATE INDEX IF NOT EXISTS idx_downloads_lookup '
               'ON downloads(reciter_id, surah_id)');
+          // The downloads screen filters `status='done'`; without this index
+          // every open of that screen scans the whole downloads table.
+          await customStatement(
+              'CREATE INDEX IF NOT EXISTS idx_downloads_status '
+              'ON downloads(status)');
         },
       );
 

@@ -10,7 +10,13 @@ import '../../data/verse_mapping.dart';
 import 'mushaf_page_block.dart';
 import 'reader_state.dart';
 
+/// The reader screen: one surah, in verses or in mushaf pages.
 class ReaderCubit extends Cubit<ReaderState> {
+  /// Creates the cubit for one surah and starts the load.
+  ///
+  /// [surahId] and [initialAyah] are the route parameters; the first load
+  /// is fire-and-forget and ends in ready or failed. [wirdProgress] is
+  /// optional — without it the reader just does not report wird progress.
   ReaderCubit({
     required AyahSource ayahRepository,
     required LastReadSource lastReadRepository,
@@ -51,9 +57,9 @@ class ReaderCubit extends Cubit<ReaderState> {
       ).wait;
       if (ayahs.isEmpty) {
         if (isClosed) return;
-        emit(ReaderState.error(
-          message: 'surah $_surahId has no readable ayahs',
-        ));
+        dev.log('surah $_surahId has no readable ayahs',
+            name: 'quran_yahdi/reader');
+        emit(ReaderState.failed(emptySurahId: _surahId));
         return;
       }
       final startList =
@@ -62,12 +68,13 @@ class ReaderCubit extends Cubit<ReaderState> {
         startList.isNotEmpty ? startList.first.id : ayahs.first.id,
       ));
       if (isClosed) return;
+      final verses = ayahs.map((a) => a.toVerse()).toList();
       emit(ReaderState.ready(
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',
         initialAyah: _initialAyah,
-        ayahs: ayahs.map((a) => a.toVerse()).toList(),
-        mushafPages: groupAyahsByPage(ayahs),
+        ayahs: verses,
+        mushafPages: groupVersesByPage(verses),
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: _surahId != 1 && _surahId != 9,
       ));
@@ -75,7 +82,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       dev.log('reader load failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       if (isClosed) return;
-      emit(ReaderState.error(message: error.toString()));
+      emit(const ReaderState.failed());
     }
   }
 
@@ -96,6 +103,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     }
   }
 
+  /// Switches between the verses list and the mushaf pager.
   void toggleMode() {
     final current = state;
     if (current is! ReaderReady || isClosed) return;
@@ -106,10 +114,15 @@ class ReaderCubit extends Cubit<ReaderState> {
     ));
   }
 
+  /// Toggles the bookmark of [ayahId]; the stream re-emits the new set.
   Future<void> toggleBookmark(int ayahId) async {
     await _ayahRepository.toggleBookmark(ayahId);
   }
 
+  /// Records the mushaf page the user reached and advances the wird progress.
+  ///
+  /// [blockIndex] indexes the mushaf page blocks; an out-of-range index is
+  /// ignored. The wird sink is optional and never fails the page change.
   Future<void> onMushafPageChanged(int blockIndex) async {
     final current = state;
     if (current is! ReaderReady) return;
@@ -127,6 +140,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     }
   }
 
+  /// Cancels the bookmark subscription before closing the cubit.
   @override
   Future<void> close() {
     _bookmarksSub?.cancel();

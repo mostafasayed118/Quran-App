@@ -6,8 +6,8 @@ import 'package:just_audio_background/just_audio_background.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
+import 'app/di/injector.dart';
 import 'app/router.dart';
-import 'core/di/injector.dart';
 import 'core/l10n/platform_localizations.dart';
 import 'core/utils/boot_fail_open.dart';
 import 'core/utils/deep_links.dart';
@@ -17,11 +17,14 @@ import 'features/notifications/data/reminder_planner.dart'
 import 'features/notifications/data/reminder_settings.dart';
 import 'features/recitation/playback/background_init_guard.dart';
 
-/// F-D1 fail-open budgets: the two awaited boot inits may each take at most
-/// this long — a plugin that overruns is abandoned and boot proceeds (the
-/// helper logs the failure under `quran_yahdi/boot`).
-const _bootAudioInitTimeout = Duration(seconds: 8);
-const _bootNotificationsInitTimeout = Duration(seconds: 8);
+/// F-D1 fail-open budgets: the two plugin inits may each take at most this
+/// long — a plugin that overruns is abandoned and boot proceeds (the helper
+/// logs the failure under `quran_yahdi/boot`).
+///
+/// The inits run BEHIND the first frame, so these are a backstop on a stuck
+/// plugin, not the time the user spends on a blank splash.
+const _bootAudioInitTimeout = Duration(milliseconds: 1500);
+const _bootNotificationsInitTimeout = Duration(milliseconds: 1500);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +39,20 @@ Future<void> main() async {
     libraryRootResolver: defaultLibraryRootResolver,
   );
   final loc = platformLocalizations();
+  // The first frame never waits for a plugin: the audio and notifications
+  // plugins initialize behind the running app, and the app tolerates a
+  // not-yet-initialized notifications binding (every call is a no-op until
+  // the plugin reports ready).
+  runApp(const QuranYahdiApp());
+  unawaited(_initPlugins('${loc.recitationsTitle} — ${loc.appName}'));
+}
+
+/// The plugin bootstrap, off the first-frame path.
+///
+/// The order is the pre-refactor one: the plugins initialize first, then the
+/// boot-only side effects that need them (the POST_NOTIFICATIONS grace needs
+/// a ready binding, the reminder schedule needs the scheduler).
+Future<void> _initPlugins(String audioChannelName) async {
   await Future.wait<void>([
     failOpenBootInit(
       'JustAudioBackground.init',
@@ -43,8 +60,7 @@ Future<void> main() async {
         () => JustAudioBackground.init(
           androidNotificationChannelId:
               'com.mostafasayed.quranyahdi.channel.audio',
-          androidNotificationChannelName:
-              '${loc.recitationsTitle} — ${loc.appName}',
+          androidNotificationChannelName: audioChannelName,
           androidNotificationOngoing: true,
         ),
       ),
@@ -65,7 +81,6 @@ Future<void> main() async {
   unawaited(_openDeepLinkLaunchTarget());
   _listenForDeepLinks();
   unawaited(runBootReminderSchedule());
-  runApp(const QuranYahdiApp());
 }
 
 /// Tap-target route for a reminder payload; null for unknown/absent payloads

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/error_strip.dart';
@@ -37,15 +38,17 @@ class MiniPlayerBar extends StatelessWidget {
     return BlocBuilder<PlaybackCubit, PlaybackState>(
       buildWhen: miniPlayerShellShouldRebuild,
       builder: (context, state) => switch (state) {
-        PlaybackInitial() => const SizedBox.shrink(),
-        PlaybackFailed(:final kind) => _FailedStrip(kind: kind),
+        // No track known yet (idle) — the mini player shows nothing.
         PlaybackLoading(:final reciterName, :final surahNumber) =>
-          _PlaybackStrip(
-            reciterName: reciterName,
-            surahNumber: surahNumber,
-            busy: true,
-            playing: false,
-          ),
+          reciterName == null
+              ? const SizedBox.shrink()
+              : _PlaybackStrip(
+                  reciterName: reciterName,
+                  surahNumber: surahNumber,
+                  busy: true,
+                  playing: false,
+                ),
+        PlaybackFailed(:final kind) => _FailedStrip(kind: kind),
         PlaybackPlaying(:final reciterName, :final surahNumber) =>
           _PlaybackStrip(
             reciterName: reciterName,
@@ -88,7 +91,8 @@ class _PlaybackStrip extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+          padding: const EdgeInsets.fromLTRB(
+              14, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
           child: Row(
             children: [
               Expanded(
@@ -97,7 +101,7 @@ class _PlaybackStrip extends StatelessWidget {
                   surahNumber: surahNumber,
                 ),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               _PlayToggle(busy: busy, playing: playing),
               IconButton(
                 tooltip: loc.stopTooltip,

@@ -1,8 +1,12 @@
-import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
+import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart'
     show dateOnly;
 
 import 'reminder_scheduler.dart';
+
+// Compat: existing importers of this file keep resolving the fallback times.
+export 'package:quran_yahdi/core/domain/reminders.dart'
+    show defaultAzkarTimeHm, defaultWirdTimeHm;
 
 /// Fixed notification ids (also the dedupe key of the replace-all plan).
 const int prayerReminderId = 1;
@@ -15,12 +19,6 @@ const String prayerReminderPayload = 'prayer';
 const String azkarReminderPayload = 'azkar';
 const String wirdReminderPayload = 'wird';
 
-/// Fallback azkar time when `azkar_reminder_time` is unset or malformed.
-const String defaultAzkarTimeHm = '06:30';
-
-/// Fallback wird time when `wird_reminder_time` is unset or malformed.
-const String defaultWirdTimeHm = '20:00';
-
 const (int, int) _defaultAzkarTime = (6, 30);
 const (int, int) _defaultWirdTime = (20, 0);
 
@@ -28,6 +26,7 @@ const (int, int) _defaultWirdTime = (20, 0);
 /// (fire-time localization is impossible once the app is dead — disclosed v1
 /// limitation). Plain strings keep the planner pure and testable.
 class ReminderTexts {
+  /// Localizable texts used by the reminder notifications.
   const ReminderTexts({
     required this.prayerTitle,
     required this.azkarTitle,
@@ -36,7 +35,10 @@ class ReminderTexts {
     this.wirdBody,
   });
 
+  /// Title builder for a prayer reminder.
   final String Function(PrayerName prayer) prayerTitle;
+
+  /// Title of the azkar reminder.
   final String azkarTitle;
 
   /// Optional shade body for the azkar reminder; null keeps it title-only.

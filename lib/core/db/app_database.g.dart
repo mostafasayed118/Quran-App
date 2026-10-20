@@ -139,9 +139,15 @@ class Surah extends DataClass implements Insertable<Surah> {
   final int id;
   final String nameAr;
   final String nameEn;
+
+  /// Revelation type as stored in the catalog: 'makki' or 'madani'.
   final String revelationType;
   final int ayahCount;
+
+  /// First mushaf page of the surah (inclusive).
   final int pagesStart;
+
+  /// Last mushaf page of the surah (inclusive).
   final int pagesEnd;
   const Surah(
       {required this.id,
@@ -561,15 +567,28 @@ class $AyahsTable extends Ayahs with TableInfo<$AyahsTable, Ayah> {
 }
 
 class Ayah extends DataClass implements Insertable<Ayah> {
+  /// Global ayah number, 1..6236 across the whole Quran.
   final int id;
   final int surahId;
+
+  /// Ayah number within its own surah, 1-based.
   final int numberInSurah;
+
+  /// Juz' (30-part division) the ayah belongs to, 1-based.
   final int juz;
+
+  /// Mushaf page the ayah starts on, 1-based.
   final int page;
+
+  /// First line of the ayah on its page; null when the page has no line map.
   final int? lineStart;
+
+  /// Last line of the ayah on its page; null when the page has no line map.
   final int? lineEnd;
   final String textUthmani;
   final String textImlaei;
+
+  /// True when the ayah ends with a sajda (prostration) marker.
   final bool sajda;
   const Ayah(
       {required this.id,
@@ -956,7 +975,11 @@ class $BookmarksTable extends Bookmarks
 
 class Bookmark extends DataClass implements Insertable<Bookmark> {
   final int id;
+
+  /// Global ayah number that was bookmarked.
   final int ayahId;
+
+  /// When the bookmark was created (defaults to write time).
   final DateTime createdAt;
   const Bookmark(
       {required this.id, required this.ayahId, required this.createdAt});
@@ -1187,8 +1210,14 @@ class $KhatmaProgressTable extends KhatmaProgress
 class KhatmaProgressData extends DataClass
     implements Insertable<KhatmaProgressData> {
   final int id;
+
+  /// Global ayah number the plan is anchored at.
   final int ayahId;
+
+  /// Page count the user aimed to finish.
   final int targetPages;
+
+  /// When the plan last moved (defaults to write time).
   final DateTime updatedAt;
   const KhatmaProgressData(
       {required this.id,
@@ -1477,11 +1506,22 @@ class $PrayerLogTable extends PrayerLog
 }
 
 class PrayerLogData extends DataClass implements Insertable<PrayerLogData> {
+  /// The calendar day this row describes.
   final DateTime day;
+
+  /// Fajr marked on [day].
   final bool fajr;
+
+  /// Dhuhr marked on [day].
   final bool dhuhr;
+
+  /// Asr marked on [day].
   final bool asr;
+
+  /// Maghrib marked on [day].
   final bool maghrib;
+
+  /// Isha marked on [day].
   final bool isha;
   const PrayerLogData(
       {required this.day,
@@ -1832,12 +1872,23 @@ class $InstalledPacksTable extends InstalledPacks
 }
 
 class InstalledPack extends DataClass implements Insertable<InstalledPack> {
+  /// Catalog id of the installed pack.
   final String packId;
+
+  /// Pack kind as stored: 'tafsir', 'translation' or 'hadith'.
   final String kind;
   final String language;
+
+  /// Display title of the installed pack.
   final String title;
+
+  /// Installed size in megabytes.
   final double sizeMb;
+
+  /// Catalog version of the installed pack.
   final String version;
+
+  /// When the pack finished installing (defaults to write time).
   final DateTime installedAt;
   const InstalledPack(
       {required this.packId,
@@ -2202,10 +2253,20 @@ class $DownloadsTable extends Downloads
 
 class Download extends DataClass implements Insertable<Download> {
   final int id;
+
+  /// Reciter (moshaf) id owning the download.
   final String reciterId;
+
+  /// Surah number being downloaded.
   final int surahId;
+
+  /// Download state: 'queued', 'downloading', 'done' or 'failed'.
   final String status;
+
+  /// Bytes received so far.
   final int bytes;
+
+  /// Absolute path of the finished file; empty while downloading.
   final String path;
   const Download(
       {required this.id,
@@ -2478,7 +2539,10 @@ class $SettingsTableTable extends SettingsTable
 
 class SettingsTableData extends DataClass
     implements Insertable<SettingsTableData> {
+  /// Setting key.
   final String key;
+
+  /// Setting value, stored as text.
   final String value;
   const SettingsTableData({required this.key, required this.value});
   @override
@@ -2730,11 +2794,16 @@ class $RecitersTable extends Reciters
 }
 
 class ReciterRow extends DataClass implements Insertable<ReciterRow> {
+  /// Row id in `<reciterId>-<moshafId>` form.
   final String id;
   final String reciterName;
   final String moshafName;
   final String server;
+
+  /// Comma-separated surah numbers the moshaf offers, e.g. '1,2,3'.
   final String surahList;
+
+  /// Number of surahs the moshaf offers.
   final int surahTotal;
   const ReciterRow(
       {required this.id,

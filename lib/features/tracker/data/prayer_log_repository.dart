@@ -7,6 +7,7 @@ DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
 enum PrayerSlot { fajr, dhuhr, asr, maghrib, isha }
 
+/// The prayers marked on one calendar day.
 class TrackerDay {
   const TrackerDay({
     required this.day,
@@ -17,15 +18,28 @@ class TrackerDay {
     required this.isha,
   });
 
+  /// The calendar day this record describes.
   final DateTime day;
+
+  /// Fajr marked.
   final bool fajr;
+
+  /// Dhuhr marked.
   final bool dhuhr;
+
+  /// Asr marked.
   final bool asr;
+
+  /// Maghrib marked.
   final bool maghrib;
+
+  /// Isha marked.
   final bool isha;
 
+  /// True when at least one prayer is marked.
   bool get anyMarked => fajr || dhuhr || asr || maghrib || isha;
 
+  /// Whether the prayer of [slot] is marked.
   bool forSlot(PrayerSlot slot) => switch (slot) {
         PrayerSlot.fajr => fajr,
         PrayerSlot.dhuhr => dhuhr,
@@ -53,11 +67,13 @@ class TrackerDay {
       );
 }
 
+/// Reads and toggles the daily prayer log.
 class PrayerLogRepository {
   PrayerLogRepository(this._db);
 
   final AppDatabase _db;
 
+  /// The marked prayers of [day]; an unmarked day returns all-false.
   Future<TrackerDay> dayView(DateTime day) async {
     final key = dateOnly(day);
     final row = await (_db.select(_db.prayerLog)
@@ -66,8 +82,10 @@ class PrayerLogRepository {
     return row == null ? TrackerDay.empty(key) : TrackerDay.fromRow(row);
   }
 
+  /// True when at least one prayer is marked on [day].
   Future<bool> getForDay(DateTime day) async => (await dayView(day)).anyMarked;
 
+  /// Marks or unmarks the prayer of [slot] on [day].
   Future<void> togglePrayer(DateTime day, PrayerSlot slot) async {
     final key = dateOnly(day);
     final current = await dayView(key);
@@ -87,6 +105,7 @@ class PrayerLogRepository {
     await _db.into(_db.prayerLog).insertOnConflictUpdate(companion);
   }
 
+  /// Days with at least one marked prayer, from [fromInclusive] going [daysBack] days back.
   Future<List<DateTime>> markedDaysRange(
       DateTime fromInclusive, int daysBack) async {
     final from = dateOnly(fromInclusive);

@@ -1,4 +1,9 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
+
+import 'reminder_scheduling.dart';
 
 /// The reminder settings keys (A1 supersedes the earlier two-key ruling:
 /// prayer + azkar + wird).
@@ -9,11 +14,12 @@ const String wirdReminderTimeKey = 'wird_reminder_time';
 
 /// Settings-table reads/writes for the reminder engine (W3 CityRepository
 /// pattern; bool stored as the 'true'/'false' string, time as 'HH:mm').
-class ReminderSettings {
+class ReminderSettings implements ReminderSettingsPort {
   ReminderSettings(this._db);
 
   final AppDatabase _db;
 
+  @override
   Future<bool> azkarEnabled() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(azkarReminderEnabledKey)))
@@ -21,6 +27,7 @@ class ReminderSettings {
     return row?.value == 'true';
   }
 
+  @override
   Future<String?> azkarTimeHm() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(azkarReminderTimeKey)))
@@ -28,6 +35,7 @@ class ReminderSettings {
     return row?.value;
   }
 
+  @override
   Future<void> setAzkarEnabled(bool enabled) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
@@ -37,12 +45,14 @@ class ReminderSettings {
         );
   }
 
+  @override
   Future<void> setAzkarTime(String hm) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(key: azkarReminderTimeKey, value: hm),
         );
   }
 
+  @override
   Future<bool> wirdEnabled() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(wirdReminderEnabledKey)))
@@ -50,6 +60,7 @@ class ReminderSettings {
     return row?.value == 'true';
   }
 
+  @override
   Future<String?> wirdTimeHm() async {
     final row = await (_db.select(_db.settingsTable)
           ..where((s) => s.key.equals(wirdReminderTimeKey)))
@@ -57,6 +68,7 @@ class ReminderSettings {
     return row?.value;
   }
 
+  @override
   Future<void> setWirdEnabled(bool enabled) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
@@ -66,9 +78,26 @@ class ReminderSettings {
         );
   }
 
+  @override
   Future<void> setWirdTime(String hm) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(key: wirdReminderTimeKey, value: hm),
         );
   }
+
+  /// The shared (re)planning path (boot, prayer times, settings) — the
+  /// notifications engine composes the plan; this class only owns the
+  /// settings it reads.
+  @override
+  Future<void> reschedule({
+    required CitySource city,
+    required PrayerTimesPort prayer,
+    required ReminderSchedulerPort scheduler,
+  }) =>
+      scheduleReminders(
+        city: city,
+        prayer: prayer,
+        settings: this,
+        scheduler: scheduler,
+      );
 }
