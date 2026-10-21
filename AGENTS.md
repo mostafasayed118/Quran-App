@@ -28,6 +28,7 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 ## 2) Project truth — verified 2026-10-18 (do not invent alternatives)
 
 **Toolchain:** Flutter 3.47.5 stable / Dart 3.13.4 · Windows PowerShell 5.1 (no `&&`; use `;`).
+**CI runs the SAME version** (`.github/workflows/ci.yml` → `flutter-version: 3.47.5`, pinned on purpose): the `dart format` gate is formatter-version-sensitive, so a floating `stable` made CI red on a green tree. Bumping the toolchain is a deliberate commit that changes this line and the workflow together.
 
 **Stack (as actually shipped):**
 - State: `flutter_bloc ^9.1.1` Cubits + **freezed** immutable states (`Equatable` is NOT used)
