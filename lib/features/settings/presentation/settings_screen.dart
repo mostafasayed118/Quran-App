@@ -100,8 +100,8 @@ class _SettingsList extends StatelessWidget {
         ),
         if (permissionDenied)
           Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.lg,
-                AppSpacing.xs, AppSpacing.lg, AppSpacing.xs),
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg, AppSpacing.xs, AppSpacing.lg, AppSpacing.xs),
             child: Text(
               loc.notificationsEnabledHint,
               style: TextStyle(
