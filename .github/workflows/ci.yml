@@ -12,6 +12,12 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          # PINNED to the documented toolchain (AGENTS.md §2). The format gate
+          # is formatter-version-sensitive: a floating 'stable' picked up
+          # 3.47.7 / Dart 3.13.5 and failed the gate on constructs the local
+          # 3.47.5 / Dart 3.13.4 formatter accepts. CI must run the SAME
+          # formatter as the dev box, or the gate measures the SDK, not the code.
+          flutter-version: 3.47.5
       - run: flutter pub get
       - run: flutter gen-l10n
       - run: dart run build_runner build --delete-conflicting-outputs
@@ -30,6 +36,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.5
       - run: flutter pub get
       - run: flutter build apk --release
       - run: flutter build appbundle --release
