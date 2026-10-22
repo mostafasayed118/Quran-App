@@ -109,6 +109,7 @@ const dict = {
       'مواقيت الصلاة اليوم في {city} — الفجر والظهر والعصر والمغرب والعشاء بتوقيت المدينة المحلي، مع الإمساكية.',
     surahTitle: 'سورة {name}',
     surahDescription: 'سورة {n} — {name}',
+    ayahCount: '{n} آية',
     // --- landing page copy: the one string table of the site ---
     landingHeroAyah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
     landingHeroAyahRef: 'الإسراء ٩',
@@ -274,6 +275,7 @@ const dict = {
       "Prayer times today in {city} — Fajr, Dhuhr, Asr, Maghrib and Isha in the city's local time, with an imsakiah view.",
     surahTitle: 'Surah {name}',
     surahDescription: 'Surah {n} — {name}',
+    ayahCount: '{n} verses',
     // --- landing page copy: the one string table of the site ---
     landingHeroAyah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
     landingHeroAyahRef: 'Al-Isra 9',

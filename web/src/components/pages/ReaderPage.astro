@@ -40,8 +40,8 @@ const data = await getAyahs(surah.id);
 </script>
 <article class="reader">
   <header class="reader-head">
-    <h1>{locale === 'ar' ? `سورة ${surah.nameAr}` : surahDisplayName(surah, locale)}</h1>
-    <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {locale === 'en' ? surah.ayahCount : `${toArabicDigits(surah.ayahCount)} آية`}</p>
+    <h1>{locale === 'ar' ? t(locale, 'surahTitle').replace('{name}', surah.nameAr) : surahDisplayName(surah, locale)}</h1>
+    <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {t(locale, 'ayahCount').replace('{n}', locale === 'en' ? String(surah.ayahCount) : toArabicDigits(surah.ayahCount))}</p>
     <div class="reader-controls" data-locale={locale}>
       <button type="button" class="rc-btn" data-qy-view="mushaf" aria-pressed="true">{t(locale, 'readerViewMushaf')}</button>
       <button type="button" class="rc-btn" data-qy-view="imlaei" aria-pressed="false">{t(locale, 'readerViewImlaei')}</button>
