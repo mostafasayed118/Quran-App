@@ -51,6 +51,10 @@ jobs:
   # the exporters and fails if the committed bytes differ from the source.
   data-drift:
     runs-on: ubuntu-latest
+    # adhan rounds each prayer in the HOST timezone; a DST host can shift a
+    # prayer by an hour. Pin UTC so the committed data regenerates byte-exact.
+    env:
+      TZ: UTC
     steps:
       # Same SHA-pinned checkout as the gates job: a mutable tag can be moved.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -77,7 +81,7 @@ jobs:
             web/public/data/prayer-times
           )
           if ! git --no-pager diff --exit-code -- "${PATHS[@]}"; then
-            echo "::error::Generated web data drifted from its source. Re-run the two exporters and commit the result."
+            echo "::error::Generated web data drifted from its source. Re-run the two exporters with TZ=UTC and commit the result."
             git --no-pager diff --stat -- "${PATHS[@]}"
             exit 1
           fi

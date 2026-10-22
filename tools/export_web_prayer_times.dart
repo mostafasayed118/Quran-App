@@ -1,10 +1,14 @@
 // Generates web/public/data/prayer-times from assets/data/cities.json (WW1 C1).
-// Run from repo root:  dart run tools/export_web_prayer_times.dart
+// Run from repo root with TZ=UTC:
+//   TZ=UTC dart run tools/export_web_prayer_times.dart
 //
 // City-local wall-clock MINUTES (0-1439) for fajr..isha + imsak (fajr - 10),
 // Egyptian method — mirrors PrayerTimeService (lib/features/prayer/data/).
 // Times are computed with PrayerTimes.utcOffset so the wall clock is the
-// CITY's (DST-aware via the timezone package), not the build machine's.
+// CITY's (DST-aware via the timezone package). adhan still rounds each time in
+// the HOST timezone, so a host whose DST transition overlaps a prayer instant
+// can shift that prayer by an hour: the committed data and the CI data-drift
+// job both run with TZ=UTC.
 import 'dart:convert';
 import 'dart:io';
 
