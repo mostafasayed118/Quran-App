@@ -51,10 +51,14 @@
                 android:name="flutter_deeplinking_enabled"
                 android:value="false" />
         </activity>
+        <!-- The media tree and the session token are reachable only by holders
+             of the platform BIND_MEDIA_BROWSER_SERVICE permission: our own
+             bind is same-UID (always allowed), third-party apps are refused. -->
         <service
             android:name="com.ryanheise.audioservice.AudioService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true"
+            android:permission="android.permission.BIND_MEDIA_BROWSER_SERVICE"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService"/>
