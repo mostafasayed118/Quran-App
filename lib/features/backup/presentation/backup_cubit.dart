@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:isolate';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -152,14 +152,22 @@ class BackupCubit extends Cubit<BackupState> {
       return decode(utf8.decode(bytes, allowMalformed: true));
     }
     try {
-      return await Isolate.run(
-        () => decode(utf8.decode(bytes, allowMalformed: true)),
-      );
+      return await decodeInIsolate(bytes);
     } on Object {
       // The worker is unavailable: decode inline so the failure states stay
       // exactly the codec's.
       return decode(utf8.decode(bytes, allowMalformed: true));
     }
+  }
+
+  /// The real worker-isolate decode. Exposed so a unit test can prove the
+  /// non-test path completes; the widget suite runs under the fake clock,
+  /// where isolate completions never arrive.
+  @visibleForTesting
+  static Future<BackupDecodeResult> decodeInIsolate(Uint8List bytes) {
+    return Isolate.run(
+      () => decode(utf8.decode(bytes, allowMalformed: true)),
+    );
   }
 
   static Future<Uint8List?> _defaultPickBytes() async {
