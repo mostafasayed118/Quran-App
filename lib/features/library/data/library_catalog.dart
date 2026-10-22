@@ -78,75 +78,28 @@ class LibraryPackInfo {
   final List<String>? sha256PerSurah;
 
   factory LibraryPackInfo.fromJson(Map<String, dynamic> json) {
-    final id = json['id'] as String?;
-    final kindRaw = json['kind'] as String?;
-    final language = json['language'] as String?;
-    final titleAr = json['titleAr'] as String?;
-    final titleEn = json['titleEn'] as String?;
-    final approx = json['approxSizeMb'] as num?;
-    final version = json['version'] as String?;
-    if (id == null ||
-        id.isEmpty ||
-        !_packIdPattern.hasMatch(id) ||
-        kindRaw == null ||
-        kindRaw.isEmpty ||
-        language == null ||
-        language.isEmpty ||
-        titleAr == null ||
-        titleAr.isEmpty ||
-        titleEn == null ||
-        titleEn.isEmpty ||
-        approx == null ||
-        version == null ||
-        version.isEmpty) {
+    final id = _requireString(json, 'id');
+    if (!_packIdPattern.hasMatch(id)) {
       throw const FormatException('invalid library pack entry');
     }
-    final kind = kindFor(kindRaw);
+    final kind = kindFor(_requireString(json, 'kind'));
+    final language = _requireString(json, 'language');
+    final titleAr = _requireString(json, 'titleAr');
+    final titleEn = _requireString(json, 'titleEn');
+    final version = _requireString(json, 'version');
+    final approx = json['approxSizeMb'] as num?;
+    if (approx == null) {
+      throw const FormatException('invalid library pack entry');
+    }
     final sourceUrl = json['sourceUrl'] as String?;
     final urlTemplate = json['urlTemplate'] as String?;
     final fileCount = json['fileCount'] as int?;
-    if (!_isHttps(sourceUrl) || !_isHttps(urlTemplate)) {
-      throw const FormatException('pack urls must be https');
-    }
-    switch (kind) {
-      case LibraryPackKind.tafsir:
-        if (urlTemplate == null ||
-            urlTemplate.isEmpty ||
-            fileCount == null ||
-            fileCount <= 0) {
-          throw const FormatException(
-              'tafsir pack requires urlTemplate and fileCount');
-        }
-      case LibraryPackKind.translation:
-      case LibraryPackKind.hadith:
-        if (sourceUrl == null || sourceUrl.isEmpty) {
-          throw FormatException('$kind pack requires sourceUrl');
-        }
-    }
-    final sha256Raw = json['sha256'];
-    final String? sha256;
-    if (sha256Raw == null) {
-      sha256 = null;
-    } else if (sha256Raw is String && _sha256Pattern.hasMatch(sha256Raw)) {
-      sha256 = sha256Raw;
-    } else {
-      throw const FormatException('invalid sha256 hash');
-    }
-    final sha256PerSurahRaw = json['sha256PerSurah'];
-    final List<String>? sha256PerSurah;
-    if (sha256PerSurahRaw == null) {
-      sha256PerSurah = null;
-    } else if (sha256PerSurahRaw is List &&
-        sha256PerSurahRaw
-            .every((h) => h is String && _sha256Pattern.hasMatch(h))) {
-      if (fileCount != null && sha256PerSurahRaw.length != fileCount) {
-        throw const FormatException(
-            'sha256PerSurah length must equal fileCount');
-      }
-      sha256PerSurah = sha256PerSurahRaw.cast<String>();
-    } else {
-      throw const FormatException('invalid sha256PerSurah hashes');
-    }
+    _validatePackShape(
+      kind,
+      sourceUrl: sourceUrl,
+      urlTemplate: urlTemplate,
+      fileCount: fileCount,
+    );
     return LibraryPackInfo(
       id: id,
       kind: kind,
@@ -158,10 +111,62 @@ class LibraryPackInfo {
       sourceUrl: sourceUrl,
       urlTemplate: urlTemplate,
       fileCount: fileCount,
-      sha256: sha256,
-      sha256PerSurah: sha256PerSurah,
+      sha256: _parseSha256(json['sha256']),
+      sha256PerSurah: _parseSha256PerSurah(json['sha256PerSurah'], fileCount),
     );
   }
+}
+
+String _requireString(Map<String, dynamic> json, String key) {
+  final value = json[key] as String?;
+  if (value == null || value.isEmpty) {
+    throw const FormatException('invalid library pack entry');
+  }
+  return value;
+}
+
+void _validatePackShape(
+  LibraryPackKind kind, {
+  required String? sourceUrl,
+  required String? urlTemplate,
+  required int? fileCount,
+}) {
+  if (!_isHttps(sourceUrl) || !_isHttps(urlTemplate)) {
+    throw const FormatException('pack urls must be https');
+  }
+  switch (kind) {
+    case LibraryPackKind.tafsir:
+      if (urlTemplate == null ||
+          urlTemplate.isEmpty ||
+          fileCount == null ||
+          fileCount <= 0) {
+        throw const FormatException(
+            'tafsir pack requires urlTemplate and fileCount');
+      }
+    case LibraryPackKind.translation:
+    case LibraryPackKind.hadith:
+      if (sourceUrl == null || sourceUrl.isEmpty) {
+        throw FormatException('$kind pack requires sourceUrl');
+      }
+  }
+}
+
+String? _parseSha256(Object? raw) {
+  if (raw == null) return null;
+  if (raw is String && _sha256Pattern.hasMatch(raw)) return raw;
+  throw const FormatException('invalid sha256 hash');
+}
+
+List<String>? _parseSha256PerSurah(Object? raw, int? fileCount) {
+  if (raw == null) return null;
+  if (raw is! List ||
+      !raw.every((h) => h is String && _sha256Pattern.hasMatch(h))) {
+    throw const FormatException('invalid sha256PerSurah hashes');
+  }
+  if (fileCount != null && raw.length != fileCount) {
+    throw const FormatException('sha256PerSurah length must equal fileCount');
+  }
+  return raw.cast<String>();
 }
 
 /// Maps a raw catalog kind to a [LibraryPackKind]; unknown kinds throw.
