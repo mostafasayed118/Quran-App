@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -26,6 +27,7 @@ bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
         a.compassUnavailable != b.compassUnavailable ||
         a.heading?.round() != b.heading?.round(),
     (QiblaFailed(), QiblaFailed()) => false,
+    (QiblaLoading(), QiblaLoading()) => false,
     _ => true,
   };
 }
@@ -74,10 +76,17 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
       body: BlocBuilder<QiblaCubit, QiblaState>(
         buildWhen: qiblaBodyShouldRebuild,
         builder: (context, state) {
+          if (state is QiblaLoading) return const LoadingView();
           if (state is QiblaFailed) return errorPane(loc);
           final (:city, :bearing, :heading, :compassUnavailable) =
               switch (state) {
             QiblaReady() => (
+                city: state.city,
+                bearing: state.bearing,
+                heading: state.heading,
+                compassUnavailable: state.compassUnavailable,
+              ),
+            QiblaLoading() => (
                 city: state.city,
                 bearing: state.bearing,
                 heading: state.heading,

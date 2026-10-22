@@ -6,6 +6,15 @@ part 'qibla_state.freezed.dart';
 
 @freezed
 sealed class QiblaState with _$QiblaState {
+  /// The first city/bearing load is in flight. Carries the same fields as
+  /// [QiblaState.ready] so the union keeps one field surface.
+  const factory QiblaState.loading({
+    @Default(null) City? city,
+    @Default(null) double? bearing,
+    @Default(null) double? heading,
+    @Default(false) bool compassUnavailable,
+  }) = QiblaLoading;
+
   /// The compass is ready: the selected city, the bearing to it and — when
   /// the device has a magnetometer — the live heading.
   ///

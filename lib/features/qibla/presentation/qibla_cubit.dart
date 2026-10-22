@@ -21,7 +21,7 @@ class QiblaCubit extends Cubit<QiblaState> {
   })  : _city = city,
         _qibla = qibla,
         _headingService = heading,
-        super(const QiblaState.ready()) {
+        super(const QiblaState.loading()) {
     unawaited(reload());
     _bindHeading();
   }
@@ -31,6 +31,8 @@ class QiblaCubit extends Cubit<QiblaState> {
   final HeadingService? _headingService;
 
   StreamSubscription<double>? _headingSub;
+  double? _heading;
+  bool _compassUnavailable = false;
 
   /// Loads the selected city and its bearing and emits the ready state.
   ///
@@ -45,8 +47,8 @@ class QiblaCubit extends Cubit<QiblaState> {
       emit(QiblaState.ready(
         city: selected,
         bearing: bearing,
-        heading: state.heading,
-        compassUnavailable: state.compassUnavailable,
+        heading: _heading,
+        compassUnavailable: _compassUnavailable,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('qibla reload failed',
@@ -93,8 +95,11 @@ class QiblaCubit extends Cubit<QiblaState> {
   }
 
   void _markCompassUnavailable() {
+    _heading = null;
+    _compassUnavailable = true;
     if (isClosed) return;
     final state = this.state;
+    if (state is QiblaLoading) return;
     emit(QiblaState.ready(
       city: state.city,
       bearing: state.bearing,
@@ -104,8 +109,11 @@ class QiblaCubit extends Cubit<QiblaState> {
   }
 
   void _onHeading(double degrees) {
+    _heading = degrees;
+    _compassUnavailable = false;
     if (isClosed) return;
     final state = this.state;
+    if (state is QiblaLoading) return;
     emit(QiblaState.ready(
       city: state.city,
       bearing: state.bearing,
