@@ -1,6 +1,5 @@
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
-import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart'
-    show dateOnly;
+import 'package:quran_yahdi/core/utils/date_only.dart';
 
 import 'reminder_scheduler.dart';
 

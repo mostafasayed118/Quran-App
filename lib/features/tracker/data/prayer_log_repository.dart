@@ -1,9 +1,9 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/date_only.dart';
 
-/// Day-key normalization: midnight, local. Never compare raw DateTimes.
-DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+export '../../../core/utils/date_only.dart' show dateOnly;
 
 enum PrayerSlot { fajr, dhuhr, asr, maghrib, isha }
 
