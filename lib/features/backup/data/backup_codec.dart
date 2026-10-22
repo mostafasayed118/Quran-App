@@ -168,8 +168,8 @@ String encode(BackupDocument document) {
   final data = document.data;
   final lastRead = data.lastReadAyahId;
   final tasbih = data.tasbih;
-  final settings = Map<String, String>.of(data.settings);
-  final sortedKeys = settings.keys.toList()..sort();
+  final sortedSettings = data.settings.entries.toList()
+    ..sort((a, b) => a.key.compareTo(b.key));
   return jsonEncode(<String, Object?>{
     'app': kBackupAppId,
     'format': kBackupFormat,
@@ -208,7 +208,7 @@ String encode(BackupDocument document) {
           ? null
           : <String, Object?>{'count': tasbih.count, 'target': tasbih.target},
       'settings': <String, String>{
-        for (final key in sortedKeys) key: settings[key]!,
+        for (final entry in sortedSettings) entry.key: entry.value,
       },
     },
   });
