@@ -162,7 +162,10 @@ function measurePage(page) {
     assetFiles.push({ file, gzip: gzipSync(readFileSync(file)).length });
   };
   const addRef = (src) => {
-    if (!src.startsWith('/')) return;
+    if (!src.startsWith('/')) {
+      console.error(`budget: ${page.rel} has a non-absolute script src ${src}`);
+      process.exit(1);
+    }
     const file = resolveFromPage(src);
     if (!existsSync(file)) {
       console.error(`budget: ${page.rel} references missing asset ${src}`);
@@ -379,12 +382,20 @@ function measurePrayerTimesPayload() {
   let bytes = 0;
   let files = 0;
   let largest = 0;
-  for (const name of readdirSync(dir)) {
-    const size = statSync(join(dir, name)).size;
-    bytes += size;
-    files += 1;
-    if (size > largest) largest = size;
-  }
+  const walk = (current) => {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const path = join(current, entry.name);
+      if (entry.isDirectory()) {
+        walk(path);
+        continue;
+      }
+      const size = statSync(path).size;
+      bytes += size;
+      files += 1;
+      if (size > largest) largest = size;
+    }
+  };
+  walk(dir);
   return { bytes, files, largest };
 }
 
