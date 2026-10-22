@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/city.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -46,14 +47,14 @@ class PrayerTimesScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           PrayerTimesLoading() => const LoadingView(),
           PrayerTimesFailed() => errorPane(loc),
-          PrayerTimesReady() when state.city == null => EmptyState(
+          PrayerTimesReady(:final city?) => RefreshIndicator(
+              onRefresh: () => context.read<PrayerTimesCubit>().reload(),
+              child: _TimesList(state: state, city: city),
+            ),
+          PrayerTimesReady() => EmptyState(
               loc.noCity,
               actionLabel: loc.selectCity,
               onAction: () => _openCityPicker(context),
-            ),
-          PrayerTimesReady() => RefreshIndicator(
-              onRefresh: () => context.read<PrayerTimesCubit>().reload(),
-              child: _TimesList(state: state),
             ),
         },
       ),
@@ -62,9 +63,10 @@ class PrayerTimesScreen extends StatelessWidget {
 }
 
 class _TimesList extends StatefulWidget {
-  const _TimesList({required this.state});
+  const _TimesList({required this.state, required this.city});
 
   final PrayerTimesReady state;
+  final City city;
 
   @override
   State<_TimesList> createState() => _TimesListState();
@@ -94,6 +96,7 @@ class _TimesListState extends State<_TimesList> {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final state = widget.state;
+    final city = widget.city;
     return ListView.builder(
       padding: const EdgeInsets.all(AppSpacing.md),
       physics: const AlwaysScrollableScrollPhysics(),
@@ -104,7 +107,7 @@ class _TimesListState extends State<_TimesList> {
             child: ListTile(
               leading: const Icon(Icons.location_on_outlined),
               title: Text(
-                state.city!.nameAr,
+                city.nameAr,
                 style: const TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   fontSize: 18,
