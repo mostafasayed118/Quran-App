@@ -15,43 +15,8 @@ import 'library_catalog.dart';
 import 'pack_reader.dart';
 import 'pack_store.dart';
 
-class PackFailure implements Exception {
-  PackFailure(this.message);
-
-  final String message;
-  @override
-  String toString() => 'PackFailure: $message';
-}
-
-/// The projection of one tafsir surah body: the ayah index and the array
-/// interior the wrapper splices verbatim. [error] is the shape failure
-/// (null when the body is valid).
-typedef _SurahProjection = ({
-  String? error,
-  Map<int, String> index,
-  String interior
-});
-
-/// Why the install sniff rejected a downloaded pack.
-enum _SniffError { parse, notObject, quran, hadiths, packMismatch, noTafsirs }
-
-/// The sniff verdict: the shape failure (null when the pack is valid) and the
-/// projection the read path needs — the decoded tree itself never crosses an
-/// isolate port.
-typedef _SniffResult = ({_SniffError? error, Object? projection});
-
-/// The shared byte counter of one pack download.
-///
-/// The size cap covers the WHOLE pack, so every in-flight stream of the
-/// tafsir fetch window adds to this one counter.
-class _ByteCounter {
-  int value = 0;
-}
-
-/// How many tafsir surahs are fetched in parallel and decoded per worker
-/// isolate. A small window: enough to hide the per-request latency, small
-/// enough to bound the memory and the load on the origin.
-const int _tafsirBatchSize = 4;
+part 'pack_downloader_sniff.dart';
+part 'pack_downloader_types.dart';
 
 /// Downloads and registers offline library packs.
 ///
@@ -362,52 +327,6 @@ class PackDownloader {
     }
   }
 
-  /// Decodes a batch of tafsir surah bodies in ONE worker isolate and returns
-  /// ONLY what the install needs: the ayah index and the array interior the
-  /// wrapper splices verbatim. The JSON parse never runs on the UI isolate.
-  ///
-  /// The bodies are [Uint8List]s, so they cross the isolate port zero-copy.
-  static Future<List<_SurahProjection>> _decodeSurahs(List<Uint8List> bodies) =>
-      Isolate.run(() => [for (final bytes in bodies) _projectSurah(bytes)]);
-
-  /// The worker-side projection of one surah body.
-  ///
-  /// [error] is the shape failure (null when the body is valid); a body that
-  /// is not JSON at all throws inside the worker and the failure reaches the
-  /// caller unchanged.
-  static _SurahProjection _projectSurah(List<int> bytes) {
-    final body = utf8.decode(bytes);
-    final perSurah = jsonDecode(body);
-    if (perSurah is! List || perSurah.isEmpty) {
-      return const (
-        error: 'empty or not an array',
-        index: <int, String>{},
-        interior: '',
-      );
-    }
-    final trimmed = body.trim();
-    if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
-      return const (
-        error: 'not a JSON array',
-        index: <int, String>{},
-        interior: '',
-      );
-    }
-    final interior = trimmed.substring(1, trimmed.length - 1).trim();
-    if (interior.isEmpty) {
-      return const (
-        error: 'empty',
-        index: <int, String>{},
-        interior: '',
-      );
-    }
-    return (
-      error: null,
-      index: PackReader.buildAyahIndex(perSurah),
-      interior: interior,
-    );
-  }
-
   /// Validates the downloaded shape and returns the projection the read path
   /// needs (an ayah index, or the raw hadith list) so the caller can prime
   /// the read cache instead of decoding the file again.
@@ -434,65 +353,6 @@ class PackDownloader {
     }
     return result.projection;
   }
-
-  /// The production sniff: the decode, the shape check and the projection all
-  /// happen inside one worker isolate — only the verdict and the projection
-  /// cross the port.
-  static Future<_SniffResult> _sniffInIsolate(
-          String path, LibraryPackInfo pack) =>
-      Isolate.run(() {
-        dynamic decoded;
-        try {
-          decoded = jsonDecode(File(path).readAsStringSync());
-        } on Object {
-          return const (error: _SniffError.parse, projection: null);
-        }
-        return _sniffTree(decoded, pack);
-      });
-
-  /// The shape check and the projection of an already-decoded pack tree.
-  static _SniffResult _sniffTree(dynamic decoded, LibraryPackInfo pack) {
-    final map = decoded;
-    if (map is! Map<String, dynamic>) {
-      return const (error: _SniffError.notObject, projection: null);
-    }
-    switch (pack.kind) {
-      case LibraryPackKind.translation:
-        final list = map['quran'];
-        if (list is! List || list.isEmpty) {
-          return const (error: _SniffError.quran, projection: null);
-        }
-        return (error: null, projection: PackReader.buildAyahIndex(list));
-      case LibraryPackKind.hadith:
-        final list = map['hadiths'];
-        if (list is! List || list.isEmpty) {
-          return const (error: _SniffError.hadiths, projection: null);
-        }
-        return (error: null, projection: list);
-      case LibraryPackKind.tafsir:
-        if (map['pack'] != pack.id) {
-          return const (error: _SniffError.packMismatch, projection: null);
-        }
-        final list = map['tafsirs'];
-        if (list is! List || list.isEmpty) {
-          return const (error: _SniffError.noTafsirs, projection: null);
-        }
-        return (error: null, projection: PackReader.buildAyahIndex(list));
-    }
-  }
-
-  /// The failure message of a sniff verdict (verbatim, per pack kind).
-  static String _sniffFailureMessage(_SniffError error, String packId) =>
-      switch (error) {
-        _SniffError.parse => 'downloaded pack "$packId" did not parse as JSON',
-        _SniffError.notObject =>
-          'downloaded pack "$packId" is not a JSON object',
-        _SniffError.quran => 'pack "$packId" missing a non-empty quran list',
-        _SniffError.hadiths =>
-          'pack "$packId" missing a non-empty hadiths list',
-        _SniffError.packMismatch => 'wrapper pack mismatch for "$packId"',
-        _SniffError.noTafsirs => 'wrapper for "$packId" has no tafsirs',
-      };
 
   /// Primes the read cache from the install-time projections: the merged
   /// per-surah index (tafsir) or the sniffed projection (translation/hadith).
@@ -599,18 +459,4 @@ class PackDownloader {
   Future<(List<(int, String)>, bool)> hadithPage(
           String packId, int offset, int limit) =>
       _reader.hadithPage(packId, offset, limit);
-}
-
-/// Collects the single digest produced by [sha256.startChunkedConversion].
-///
-/// The streaming install path feeds the digest sink chunk by chunk, so the
-/// whole body is never retained a second time just to hash it.
-class _DigestSink implements Sink<Digest> {
-  Digest? value;
-
-  @override
-  void add(Digest data) => value = data;
-
-  @override
-  void close() {}
 }
