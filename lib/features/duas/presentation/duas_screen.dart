@@ -146,14 +146,13 @@ class _RuqyahView extends StatelessWidget {
           itemCount: view.entries.length,
           itemBuilder: (context, i) {
             final entry = view.entries[i];
+            final citation = entry.citation;
             return DuaCard(
               text: entry.displayText,
               fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
               fontSize: entry.isQuran ? 18 : 17,
               height: entry.isQuran ? 2.0 : 1.8,
-              citation: entry.citation == null
-                  ? null
-                  : loc.ornateBrackets(entry.citation!),
+              citation: citation == null ? null : loc.ornateBrackets(citation),
               count: entry.count,
               reference: entry.reference,
             );
@@ -188,15 +187,18 @@ class DuaCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    final citationText = citation;
+    final repeatCount = count;
+    final referenceText = reference;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (citation != null)
+            if (citationText != null)
               Text(
-                citation!,
+                citationText,
                 textAlign: TextAlign.right,
                 style: TextStyle(
                   fontSize: 13,
@@ -213,11 +215,11 @@ class DuaCard extends StatelessWidget {
                 height: height,
               ),
             ),
-            if (count != null && count! > 1)
+            if (repeatCount != null && repeatCount > 1)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.xs),
                 child: Text(
-                  loc.duaRepeat(count!.toArabicIndic),
+                  loc.duaRepeat(repeatCount.toArabicIndic),
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 12,
@@ -225,11 +227,11 @@ class DuaCard extends StatelessWidget {
                   ),
                 ),
               ),
-            if (reference != null)
+            if (referenceText != null)
               Padding(
                 padding: const EdgeInsets.only(top: AppSpacing.xs),
                 child: Text(
-                  reference!,
+                  referenceText,
                   textAlign: TextAlign.right,
                   style: AppTheme.mutedFootnote(context),
                 ),

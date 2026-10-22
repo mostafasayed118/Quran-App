@@ -28,13 +28,21 @@ class JustAudioPlaybackService
   Future<void> loadAndPlay(PlaybackSource source) async {
     switch (source.kind) {
       case PlaybackSourceKind.file:
-        final file = File(source.path!);
+        final path = source.path;
+        if (path == null) {
+          throw StateError('file playback source without a path');
+        }
+        final file = File(path);
         await _player.setFilePath(
           file.path,
           tag: _mediaItem(id: file.path, source: source),
         );
       case PlaybackSourceKind.url:
-        final id = source.uri!.toString();
+        final uri = source.uri;
+        if (uri == null) {
+          throw StateError('url playback source without a uri');
+        }
+        final id = uri.toString();
         await _player.setUrl(
           id,
           tag: _mediaItem(id: id, source: source),

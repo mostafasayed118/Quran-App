@@ -117,8 +117,10 @@ class AudioDownloader {
       var received = 0;
       final throttle = ProgressThrottle();
       final sink = target.openWrite();
+      final body = res.data;
+      if (body == null) throw DownloadFailure('empty audio response');
       try {
-        await for (final chunk in res.data!.stream) {
+        await for (final chunk in body.stream) {
           received += chunk.length;
           if (received > maxAcceptedBytes(total)) {
             throw DownloadFailure('audio stream exceeded its declared size');

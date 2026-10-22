@@ -203,18 +203,19 @@ class PackDownloader {
     ProgressThrottle throttle,
     void Function(int received, int total)? onProgress,
   ) async {
-    if (pack.urlTemplate == null || pack.fileCount == null) {
+    final urlTemplate = pack.urlTemplate;
+    final fileCount = pack.fileCount;
+    if (urlTemplate == null || fileCount == null) {
       throw PackFailure('tafsir pack missing urlTemplate/fileCount');
     }
     final perSurahHashes = pack.sha256PerSurah;
-    if (perSurahHashes != null && perSurahHashes.length != pack.fileCount) {
+    if (perSurahHashes != null && perSurahHashes.length != fileCount) {
       throw PackFailure('tafsir pack "${pack.id}" hash count mismatch');
     }
     final merged = <int, String>{};
     final received = _ByteCounter();
     var separator = '';
     sink.write(_wrapperPrefix(pack.id));
-    final fileCount = pack.fileCount!;
     for (var start = 1; start <= fileCount; start += _tafsirBatchSize) {
       final last = start + _tafsirBatchSize - 1;
       final end = last < fileCount ? last : fileCount;
@@ -223,7 +224,7 @@ class PackDownloader {
       final bodies = await Future.wait([
         for (final n in numbers)
           _downloadSurah(
-            pack.urlTemplate!.replaceFirst('{n}', '$n'),
+            urlTemplate.replaceFirst('{n}', '$n'),
             pack,
             expectedBytes,
             received,
@@ -284,8 +285,10 @@ class PackDownloader {
       url,
       options: Options(responseType: ResponseType.stream),
     );
+    final body = res.data;
+    if (body == null) throw PackFailure('empty response body');
     final bytes = BytesBuilder(copy: false);
-    await for (final chunk in res.data!.stream) {
+    await for (final chunk in body.stream) {
       received.value += chunk.length;
       if (received.value > _sizeCap(expectedBytes)) {
         throw PackFailure('pack "${pack.id}" exceeds its declared size');
@@ -305,11 +308,12 @@ class PackDownloader {
     ProgressThrottle throttle,
     void Function(int received, int total)? onProgress,
   ) async {
-    if (pack.sourceUrl == null) {
+    final sourceUrl = pack.sourceUrl;
+    if (sourceUrl == null) {
       throw PackFailure('single-file pack missing sourceUrl');
     }
     final res = await _dio.get<ResponseBody>(
-      pack.sourceUrl!,
+      sourceUrl,
       options: Options(responseType: ResponseType.stream),
     );
     final contentLength =
@@ -322,7 +326,9 @@ class PackDownloader {
     final hasher =
         digestSink == null ? null : sha256.startChunkedConversion(digestSink);
     var received = 0;
-    await for (final chunk in res.data!.stream) {
+    final body = res.data;
+    if (body == null) throw PackFailure('empty response body');
+    await for (final chunk in body.stream) {
       received += chunk.length;
       if (received > _sizeCap(expectedBytes)) {
         throw PackFailure('pack "${pack.id}" exceeds its declared size');
@@ -347,8 +353,11 @@ class PackDownloader {
     ByteConversionSink? hasher,
   ) {
     if (expectedSha == null) return;
-    hasher!.close();
-    if (digestSink!.value.toString() != expectedSha) {
+    if (hasher == null || digestSink == null) {
+      throw PackFailure('pack "${pack.id}" hash sink missing');
+    }
+    hasher.close();
+    if (digestSink.value.toString() != expectedSha) {
       throw PackFailure('pack "${pack.id}" failed sha256 verification');
     }
   }

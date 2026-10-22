@@ -18,12 +18,12 @@ List<MushafPageBlock> groupVersesByPage(List<Verse> ayahs) {
   for (final ayah in ayahs) {
     byPage.putIfAbsent(ayah.page, () => <Verse>[]).add(ayah);
   }
-  final pages = byPage.keys.toList()..sort();
+  final pages = byPage.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
   return [
-    for (final page in pages)
+    for (final entry in pages)
       MushafPageBlock(
-        page: page,
-        ayahs: (byPage[page]!
+        page: entry.key,
+        ayahs: (entry.value
               ..sort((a, b) => a.numberInSurah.compareTo(b.numberInSurah)))
             .toList(),
       ),

@@ -115,6 +115,7 @@ class _SurahDownloadRow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final cubit = context.read<DownloadsCubit>();
     final status = item?.status;
+    final teaserText = teaser;
     return ListTile(
       contentPadding: AppTheme.tileContentPadding,
       leading: _buildLeading(context, colors),
@@ -124,10 +125,10 @@ class _SurahDownloadRow extends StatelessWidget {
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),
-      subtitle: teaser == null || teaser!.isEmpty
+      subtitle: teaserText == null || teaserText.isEmpty
           ? null
           : Text(
-              teaser!,
+              teaserText,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -196,7 +197,8 @@ class _SurahDownloadRow extends StatelessWidget {
           ],
         );
       case DownloadStatus.downloading:
-        final item = this.item!;
+        final item = this.item;
+        if (item == null) return const SizedBox.shrink();
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [

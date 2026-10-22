@@ -58,8 +58,10 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
   // Ranks are computed once per row: the comparator runs O(n log n) times,
   // and splitting ids inside it is pure waste.
   final ranksById = {for (final row in input) row.id: rankOf(row)};
+  final fallbackRank = featuredReciterIds.length;
   final sorted = [...input]..sort((a, b) {
-      final byFeature = ranksById[a.id]!.compareTo(ranksById[b.id]!);
+      final byFeature = (ranksById[a.id] ?? fallbackRank)
+          .compareTo(ranksById[b.id] ?? fallbackRank);
       if (byFeature != 0) return byFeature;
       final byName = a.reciterName.compareTo(b.reciterName);
       if (byName != 0) return byName;

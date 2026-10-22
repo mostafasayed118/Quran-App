@@ -160,8 +160,9 @@ class NotificationsBinding implements ReminderScheduler {
   /// A payloaded tap with no payload callback falls back to the default too.
   void onNotificationTap(NotificationResponse response) {
     final payload = response.payload;
-    if (payload != null && payload.isNotEmpty && _onTapPayload != null) {
-      _onTapPayload!(payload);
+    final onTapPayload = _onTapPayload;
+    if (payload != null && payload.isNotEmpty && onTapPayload != null) {
+      onTapPayload(payload);
       return;
     }
     _onTap?.call();

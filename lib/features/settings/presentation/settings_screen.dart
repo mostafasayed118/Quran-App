@@ -109,7 +109,7 @@ class _SettingsList extends StatelessWidget {
               ),
             ),
           ),
-        if (backupSection != null) backupSection!,
+        if (backupSection case final section?) section,
         const Divider(),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),

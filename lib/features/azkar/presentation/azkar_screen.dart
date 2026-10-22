@@ -302,8 +302,8 @@ class _RecitingCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
                       [
-                        if (item.virtue != null) item.virtue!,
-                        if (item.reference != null) item.reference!,
+                        if (item.virtue case final virtue?) virtue,
+                        if (item.reference case final reference?) reference,
                       ].join(' · '),
                       textAlign: TextAlign.right,
                       style: AppTheme.mutedFootnote(context),

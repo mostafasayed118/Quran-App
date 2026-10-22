@@ -102,6 +102,7 @@ class _TimesListState extends State<_TimesList> {
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.entries.length + 1,
       itemBuilder: (context, i) {
+        final remaining = state.remaining;
         if (i == 0) {
           return Card(
             child: ListTile(
@@ -135,9 +136,9 @@ class _TimesListState extends State<_TimesList> {
                 fontWeight: entry.isNext ? FontWeight.bold : null,
               ),
             ),
-            subtitle: entry.isNext && state.remaining != null
+            subtitle: entry.isNext && remaining != null
                 ? Text(
-                    loc.remaining(formatDurationHm(state.remaining!)),
+                    loc.remaining(formatDurationHm(remaining)),
                     style: TextStyle(
                       fontSize: 11,
                       color: colors.onPrimaryContainer,
