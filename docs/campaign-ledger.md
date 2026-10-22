@@ -861,3 +861,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Push:** `git push origin 1221470:refs/heads/main` — `f79defd..1221470` (exit 0); **ls-remote proof: remote tip == `12214705eccec12f516e2554fe8200cbfa31ff1f` == local HEAD (MATCH)**; unpushed 0.
 - **CI on `1221470` — BOTH GREEN:** `ci` **39763585904 SUCCESS (6m31s)** (incl. the pinned format gate + **599/599**) · `web-gates` **39763585874 SUCCESS (1m26s)** — `gates` + `data-drift` both success.
 - **State:** main @ `1221470` = origin; **unpushed 0** before this entry — this ledger close-out is the only local commit.
+
+### Structural wave + push — deferred audit items — (1221470..bd214c2) — 2026-10-22 — CI GREEN
+- **Owner GO:** «موافق» on the deferred six, then «GO» for the push window.
+- **Range:** 5 commits: `d53a356` (the prior code-wave ledger close-out) + 4 structural: `2f2e929` force-unwrap sweep (12 files; zero `!` left outside the generated l10n) · `e8aa4a6` `LibraryPackInfo.fromJson` split into parsers · `f0a13ac` real worker-isolate backup decode test (suite 599→600) · `bd214c2` `pack_downloader.dart` split into part files (616→462 + types 53 + sniff 103; the class surface, including the query methods the frozen fakes override, is unchanged).
+- **Verified but NOT implemented (with evidence):** `AppSpacing` — zero on-scale literals (4/8/12/16/24) remain; the rest are 2/6/10/14/20/32, which `app_spacing.dart` says stay literal (mass conversion would change pixels) · `ayah_lookup` — the audit's own fix column says "keep"; the row-typed members are pinned by 4 frozen doubles and the clean path is `AyahLookupRefs` (decoupling needs a frozen-test grant) · `search-index` — the audit itself notes the scan still needs all records; per-surah splitting multiplies requests without reducing the lazy-loaded bytes (207 KB gzip, budget PASS).
+- **Gates at the pushed tip `bd214c2`:** `flutter analyze` **0** (72.1 s) · `flutter test` **600/600** (1:52). No `web/**` paths → web suites unchanged; `web-gates` is correctly not triggered by design.
+- **Push:** `git push origin bd214c2:refs/heads/main` — `1221470..bd214c2` (exit 0); **ls-remote proof: remote tip == `bd214c2a3fc981e4ad2ae284f47f5505df83ba78` == local HEAD (MATCH)**; unpushed 0.
+- **CI on `bd214c2`:** `ci` **39770525593 SUCCESS (6m22s)** — the pinned format gate and **600/600** both green; `web-gates` did not run (path filter, zero web paths).
+- **State:** main @ `bd214c2` = origin; **unpushed 0** before this entry — this ledger close-out is the only local commit.
