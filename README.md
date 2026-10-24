@@ -55,10 +55,11 @@ flutter gen-l10n
 dart run build_runner build --delete-conflicting-outputs
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 426 اختبارات
+flutter test           # البوابة الكاملة: 618 اختبار
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
 flutter build appbundle --release  # مخرجات المتجر
+flutter build apk --split-per-abi  # APK مباشر أصغر حجمًا لكل معمارية (الافتراضي يبقى AAB أعلاه)
 tools/device_smoke.ps1             # بوابة دخان الجهاز: تثبيت + إقلاع بلا أخطاء قاتلة
 ```
 
