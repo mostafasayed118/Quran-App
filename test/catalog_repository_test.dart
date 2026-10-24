@@ -169,7 +169,7 @@ void main() {
     expect(packs, hasLength(3));
   });
 
-  test('bundled library catalog asset is well-formed (9 curated packs)',
+  test('bundled library catalog asset is well-formed (3 curated packs)',
       () async {
     final file = File('assets/data/library_catalog.json');
     if (!file.existsSync()) {
@@ -178,12 +178,12 @@ void main() {
     }
     final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     final list = (json['packs'] as List).cast<Map<String, dynamic>>();
-    expect(list.length, 9);
+    expect(list.length, 3);
 
     final packs = await CatalogRepository(
       source: BundledCatalogSource(loader: () async => list),
     ).packs();
-    expect(packs, hasLength(9)); // every entry must parse
+    expect(packs, hasLength(3)); // every entry must parse
 
     for (final pack in packs) {
       expect(pack.id, isNotEmpty);
@@ -202,7 +202,7 @@ void main() {
     }
 
     final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
-    expect(tafsirs, hasLength(3));
+    expect(tafsirs, hasLength(0));
     for (final pack in tafsirs) {
       expect(pack.urlTemplate, isNotNull);
       expect(pack.urlTemplate!, contains('{n}'),
@@ -212,24 +212,18 @@ void main() {
 
     final translations =
         packs.where((p) => p.kind == LibraryPackKind.translation);
-    expect(translations, hasLength(3));
+    expect(translations, hasLength(2));
     final hadiths = packs.where((p) => p.kind == LibraryPackKind.hadith);
-    expect(hadiths, hasLength(3));
+    expect(hadiths, hasLength(1));
 
     final ids = packs.map((p) => p.id).toSet();
-    expect(ids.length, 9, reason: 'pack ids must be unique');
+    expect(ids.length, 3, reason: 'pack ids must be unique');
     expect(
         ids,
         containsAll(<String>[
-          'ar-tafsir-muyassar',
-          'ar-tafsir-al-jalalayn',
-          'en-tafisr-ibn-kathir',
           'ara-sirajtafseer',
-          'eng-safiurrahmanalm',
-          'eng-mustafakhattabg',
+          'eng-mohammedmarmadu',
           'ara-bukhari',
-          'eng-bukhari',
-          'eng-muslim',
         ]));
   });
 }

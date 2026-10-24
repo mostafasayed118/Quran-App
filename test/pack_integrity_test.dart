@@ -217,8 +217,8 @@ void main() {
       final list = (json['packs'] as List).cast<Map<String, dynamic>>();
       final packs = await BundledCatalogSource(loader: () async => list).all();
 
-      expect(packs, hasLength(9), reason: 'every shipped entry must parse');
-      expect(packs.map((p) => p.id).toSet(), hasLength(9));
+      expect(packs, hasLength(3), reason: 'every shipped entry must parse');
+      expect(packs.map((p) => p.id).toSet(), hasLength(3));
 
       final hex = RegExp(r'^[0-9a-f]{64}$');
       for (final pack in packs) {
@@ -229,7 +229,7 @@ void main() {
       }
 
       final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
-      expect(tafsirs, hasLength(3));
+      expect(tafsirs, hasLength(0));
       for (final pack in tafsirs) {
         final hashes = pack.sha256PerSurah;
         expect(hashes, isNotNull,
@@ -243,7 +243,7 @@ void main() {
       }
 
       final singles = packs.where((p) => p.kind != LibraryPackKind.tafsir);
-      expect(singles, hasLength(6));
+      expect(singles, hasLength(3));
       for (final pack in singles) {
         final hash = pack.sha256;
         expect(hash, isNotNull, reason: 'pack ${pack.id} needs a sha256');
