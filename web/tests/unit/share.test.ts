@@ -34,7 +34,9 @@ describe('shareOrCopy', () => {
 
   it('propagates clipboard failures instead of pretending success', async () => {
     const writeText = vi.fn().mockRejectedValue(new Error('clipboard denied'));
-    await expect(shareOrCopy(URL_, TEXT, { share: undefined, writeText })).rejects.toThrow('clipboard denied');
+    await expect(shareOrCopy(URL_, TEXT, { share: undefined, writeText })).rejects.toThrow(
+      'clipboard denied',
+    );
   });
 
   it('defaults to the browser navigator: stubbed clipboard is used when share is absent', async () => {

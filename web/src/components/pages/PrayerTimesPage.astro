@@ -2,12 +2,15 @@
 import { t, type Locale } from '../../lib/strings';
 import { cityLabel, getCities } from '../../lib/cities';
 
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const placeholder = t(locale, 'ptSearchPlaceholder');
 const cities = getCities();
 ---
+
 <h1 class="page-title">{t(locale, 'ptTitle')}</h1>
 <p class="page-lead">{t(locale, 'ptLead')}</p>
 <div data-qy="pt-cities" data-locale={locale}>
@@ -19,7 +22,9 @@ const cities = getCities();
     placeholder={placeholder}
     aria-label={placeholder}
   />
-  <p class="empty" hidden>{t(locale, 'noResults')}</p>
+  <p class="empty" hidden>
+    {t(locale, 'noResults')}
+  </p>
   <ul class="city-list">
     {cities.map((city) => (
       <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
@@ -29,18 +34,36 @@ const cities = getCities();
   </ul>
 </div>
 <style>
-  .page-lead { width: min(760px, calc(100% - 40px)); margin: 0 auto 8px; color: var(--muted-strong); }
+  .page-lead {
+    width: min(760px, calc(100% - 40px));
+    margin: 0 auto 8px;
+    color: var(--muted-strong);
+  }
   .city-list {
-    list-style: none; margin: 4px auto 60px; padding: 0; max-width: 760px;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    list-style: none;
+    margin: 4px auto 60px;
+    padding: 0;
+    max-width: 760px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     column-gap: 18px;
   }
   .city-list a {
-    display: flex; padding: 10px 4px; border-bottom: 1px solid var(--hairline);
-    color: var(--ink); text-decoration: none;
+    display: flex;
+    padding: 10px 4px;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--ink);
+    text-decoration: none;
   }
-  .city-list a:hover { color: var(--accent); }
-  @media (pointer: coarse) { .city-list a { min-height: 44px; align-items: center; } }
+  .city-list a:hover {
+    color: var(--accent);
+  }
+  @media (pointer: coarse) {
+    .city-list a {
+      min-height: 44px;
+      align-items: center;
+    }
+  }
 </style>
 <script>
   import { normalizeArabic } from '../../lib/arabic';

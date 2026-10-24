@@ -5,7 +5,11 @@ import { fileURLToPath } from 'node:url';
 const dataDir = fileURLToPath(new URL('../../public/data/prayer-times/', import.meta.url));
 const read = (file: string): unknown => JSON.parse(readFileSync(dataDir + file, 'utf8'));
 
-interface CityRef { id: string; nameAr: string; nameEn: string }
+interface CityRef {
+  id: string;
+  nameAr: string;
+  nameEn: string;
+}
 interface CityData {
   city: CityRef & { lat: number; lng: number; tz: string };
   months: { y: number; m: number; days: number[][] }[];
@@ -65,32 +69,36 @@ describe('sampled city (eg-cairo) covers 24 months', () => {
 describe('whole corpus invariants', () => {
   // 2026-10-20: the 113,880-row sweep exceeded vitest's 5s default on the GitHub
   // runner (175/176 passed; this one timed out) — bound it explicitly.
-  it('every city/day is strictly ordered; minutes bounded; wrapped isha stored as 1440+min', { timeout: 60_000 }, () => {
-    let wrapped = 0;
-    for (const ref of index.cities) {
-      const data = loadCity(ref.id);
-      expect(data.city.id, ref.id).toBe(ref.id);
-      expect(data.city.tz.trim().length, ref.id).toBeGreaterThan(0);
-      expect(data.months, ref.id).toHaveLength(24);
-      for (const month of data.months) {
-        for (const row of month.days) {
-          const [fajr, sunrise, dhuhr, asr, maghrib, isha, imsak] = row;
-          const label = `${ref.id} ${month.y}-${month.m}`;
-          expect(fajr, label).toBeLessThan(sunrise);
-          expect(sunrise, label).toBeLessThan(dhuhr);
-          expect(dhuhr, label).toBeLessThan(asr);
-          expect(asr, label).toBeLessThan(maghrib);
-          expect(maghrib, label).toBeLessThan(isha);
-          expect(fajr, label).toBeGreaterThanOrEqual(10);
-          expect(maghrib, label).toBeLessThan(1440);
-          expect(isha, label).toBeLessThan(1440 + 360);
-          expect(imsak, label).toBe(fajr - 10);
-          if (isha >= 1440) wrapped += 1;
+  it(
+    'every city/day is strictly ordered; minutes bounded; wrapped isha stored as 1440+min',
+    { timeout: 60_000 },
+    () => {
+      let wrapped = 0;
+      for (const ref of index.cities) {
+        const data = loadCity(ref.id);
+        expect(data.city.id, ref.id).toBe(ref.id);
+        expect(data.city.tz.trim().length, ref.id).toBeGreaterThan(0);
+        expect(data.months, ref.id).toHaveLength(24);
+        for (const month of data.months) {
+          for (const row of month.days) {
+            const [fajr, sunrise, dhuhr, asr, maghrib, isha, imsak] = row;
+            const label = `${ref.id} ${month.y}-${month.m}`;
+            expect(fajr, label).toBeLessThan(sunrise);
+            expect(sunrise, label).toBeLessThan(dhuhr);
+            expect(dhuhr, label).toBeLessThan(asr);
+            expect(asr, label).toBeLessThan(maghrib);
+            expect(maghrib, label).toBeLessThan(isha);
+            expect(fajr, label).toBeGreaterThanOrEqual(10);
+            expect(maghrib, label).toBeLessThan(1440);
+            expect(isha, label).toBeLessThan(1440 + 360);
+            expect(imsak, label).toBe(fajr - 10);
+            if (isha >= 1440) wrapped += 1;
+          }
         }
       }
-    }
-    expect(wrapped).toBe(2308);
-  });
+      expect(wrapped).toBe(2308);
+    },
+  );
 });
 
 describe('known-value pins (DST-aware city-local wall clock)', () => {
@@ -106,6 +114,8 @@ describe('known-value pins (DST-aware city-local wall clock)', () => {
   });
 
   it('Mexico City keeps UTC-6 (no DST since 2022)', () => {
-    expect(day(loadCity('mx-mexico-city'), 2026, 6, 1)).toEqual([268, 358, 755, 953, 1151, 1231, 258]);
+    expect(day(loadCity('mx-mexico-city'), 2026, 6, 1)).toEqual([
+      268, 358, 755, 953, 1151, 1231, 258,
+    ]);
   });
 });

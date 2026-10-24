@@ -13,7 +13,8 @@ function parseTafsirArray(json: unknown): Map<number, string> {
   if (!Array.isArray(json)) throw new Error('invalid tafsir payload');
   const map = new Map<number, string>();
   json.forEach((entry, i) => {
-    const text = typeof entry === 'object' && entry !== null ? (entry as { text?: unknown }).text : undefined;
+    const text =
+      typeof entry === 'object' && entry !== null ? (entry as { text?: unknown }).text : undefined;
     if (typeof text !== 'string') throw new Error(`invalid tafsir entry ${i + 1}`);
     map.set(i + 1, text);
   });
@@ -23,11 +24,15 @@ function parseTafsirArray(json: unknown): Map<number, string> {
 
 // fawazahmed0/quran-api per-surah payload: { chapter: [{ verse, text }, ...] }.
 function parseTranslationChapter(json: unknown): Map<number, string> {
-  const chapter = typeof json === 'object' && json !== null ? (json as { chapter?: unknown }).chapter : undefined;
+  const chapter =
+    typeof json === 'object' && json !== null ? (json as { chapter?: unknown }).chapter : undefined;
   if (!Array.isArray(chapter)) throw new Error('invalid translation payload');
   const map = new Map<number, string>();
   for (const entry of chapter) {
-    const item = typeof entry === 'object' && entry !== null ? (entry as { verse?: unknown; text?: unknown }) : null;
+    const item =
+      typeof entry === 'object' && entry !== null
+        ? (entry as { verse?: unknown; text?: unknown })
+        : null;
     if (!item || typeof item.verse !== 'number' || typeof item.text !== 'string') {
       throw new Error('invalid translation entry');
     }
@@ -43,10 +48,17 @@ function parseTranslationChapter(json: unknown): Map<number, string> {
 // network-dependent CI check for marginal gain over an immutable URL. The un-pin guard lives in tests/unit/content-packs.test.ts.
 const SPA5K_BASE =
   'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@eb82bb6294efe30ad5c135c03b1864afaa70e855/tafsir';
-const FAWAZ_BASE = 'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions';
+const FAWAZ_BASE =
+  'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions';
 
 function tafsirPack(id: string, titleAr: string): PackInfo {
-  return { kind: 'tafsir', id, titleAr, url: (surah) => `${SPA5K_BASE}/${id}/${surah}.json`, parse: parseTafsirArray };
+  return {
+    kind: 'tafsir',
+    id,
+    titleAr,
+    url: (surah) => `${SPA5K_BASE}/${id}/${surah}.json`,
+    parse: parseTafsirArray,
+  };
 }
 
 function translationPack(id: string, titleAr: string): PackInfo {

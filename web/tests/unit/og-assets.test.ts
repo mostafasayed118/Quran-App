@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 
 const DIR = new URL('../../public/og/surah/', import.meta.url);
-const PNG_SIGNATURE = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 const expected = Array.from({ length: 114 }, (_, i) => `${i + 1}.png`);
 
 describe('per-surah OG assets exist', () => {

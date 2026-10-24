@@ -1,19 +1,36 @@
 ---
 import { PACKS } from '../lib/content-packs';
 import { t, type Locale } from '../lib/strings';
-interface Props { surah: number; locale?: Locale }
+interface Props {
+  surah: number;
+  locale?: Locale;
+}
 const { surah, locale = 'ar' } = Astro.props;
 ---
-<section id="qy-content-panel" class="content-panel" data-surah={surah} data-locale={locale} hidden aria-label={t(locale, 'panelTitle')}>
-  <label class="sr-only" for="qy-content-pick">{t(locale, 'panelTitle')}</label>
+
+<section
+  id="qy-content-panel"
+  class="content-panel"
+  data-surah={surah}
+  data-locale={locale}
+  hidden
+  aria-label={t(locale, 'panelTitle')}
+>
+  <label class="sr-only" for="qy-content-pick">
+    {t(locale, 'panelTitle')}
+  </label>
   <select id="qy-content-pick" data-qy="content-pick">
     <option value="">{t(locale, 'panelHide')}</option>
-    {PACKS.map((p) => <option value={`${p.kind}:${p.id}`}>{p.titleAr}</option>)}
+    {PACKS.map((p) => (
+      <option value={`${p.kind}:${p.id}`}>{p.titleAr}</option>
+    ))}
   </select>
   <p class="panel-source" data-qy="panel-source" hidden></p>
   <div class="panel-error" data-qy="panel-error" hidden>
     <span>{t(locale, 'panelError')}</span>
-    <button type="button" class="rc-btn" data-qy="panel-retry">{t(locale, 'panelRetry')}</button>
+    <button type="button" class="rc-btn" data-qy="panel-retry">
+      {t(locale, 'panelRetry')}
+    </button>
   </div>
 </section>
 <script>
@@ -27,7 +44,8 @@ const { surah, locale = 'ar' } = Astro.props;
   let L: Locale = 'ar';
 
   const valueOf = (pack: PackInfo): string => `${pack.kind}:${pack.id}`;
-  const packOf = (value: string): PackInfo | null => PACKS.find((p) => valueOf(p) === value) ?? null;
+  const packOf = (value: string): PackInfo | null =>
+    PACKS.find((p) => valueOf(p) === value) ?? null;
 
   function readSelection(): PackInfo | null {
     const raw = readSetting<unknown>(KEY, null);

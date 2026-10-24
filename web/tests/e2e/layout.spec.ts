@@ -17,7 +17,14 @@ test.describe('coarse-pointer targets are at least 44px at 360', () => {
 
   test('header, chrome and hero controls', async ({ page }) => {
     await page.goto('/');
-    for (const sel of ['header .brand', 'header nav a', 'header .lang-switch', 'header .theme-toggle', '.hero-cta', '.site-footer a']) {
+    for (const sel of [
+      'header .brand',
+      'header nav a',
+      'header .lang-switch',
+      'header .theme-toggle',
+      '.hero-cta',
+      '.site-footer a',
+    ]) {
       await expectMinHeight(page, sel);
     }
   });
@@ -25,7 +32,12 @@ test.describe('coarse-pointer targets are at least 44px at 360', () => {
   test('ayah actions, reader toolbar and reciter controls', async ({ page }) => {
     await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
     await page.goto('/surah/2/');
-    for (const sel of ['.reader-controls .rc-btn', '.ayah-actions button', '[data-qy="reader-play"]', '.reader-nav a']) {
+    for (const sel of [
+      '.reader-controls .rc-btn',
+      '.ayah-actions button',
+      '[data-qy="reader-play"]',
+      '.reader-nav a',
+    ]) {
       await expectMinHeight(page, sel);
     }
     await page.goto('/reciters/');
@@ -49,9 +61,15 @@ test.describe('chrome a11y', () => {
 
   test('active nav link carries aria-current in both locales', async ({ page }) => {
     await page.goto('/quran/');
-    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute('href', '/quran/');
+    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute(
+      'href',
+      '/quran/',
+    );
     await page.goto('/en/reciters/');
-    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute('href', '/en/reciters/');
+    await expect(page.locator('header nav a[aria-current="page"]')).toHaveAttribute(
+      'href',
+      '/en/reciters/',
+    );
     await page.goto('/en/');
     await expect(page.locator('header nav a[aria-current="page"]')).toHaveCount(0);
   });

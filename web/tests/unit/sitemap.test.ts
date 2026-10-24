@@ -28,7 +28,9 @@ describe('sitemap urls', () => {
       expect(entry.alternates.en).toBe(`${SITE}${expected}`);
     }
     expect(entries.find((e) => e.alternates.ar === `${SITE}/`)?.alternates.en).toBe(`${SITE}/en/`);
-    expect(entries.find((e) => e.alternates.ar === `${SITE}/surah/114/`)?.alternates.en).toBe(`${SITE}/en/surah/114/`);
+    expect(entries.find((e) => e.alternates.ar === `${SITE}/surah/114/`)?.alternates.en).toBe(
+      `${SITE}/en/surah/114/`,
+    );
   });
 
   it('has no duplicate locs', () => {
@@ -44,15 +46,22 @@ describe('sitemap urls', () => {
 describe('sitemap xml', () => {
   it('emits one <url> per entry with ar/en/x-default alternates pointing at the right urls', () => {
     const xml = toSitemapXml([
-      { loc: `${SITE}/surah/114`, alternates: { ar: `${SITE}/surah/114`, en: `${SITE}/en/surah/114` } },
+      {
+        loc: `${SITE}/surah/114`,
+        alternates: { ar: `${SITE}/surah/114`, en: `${SITE}/en/surah/114` },
+      },
     ]);
     expect(xml).toContain(
-      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
     );
     expect(xml).toContain(`<loc>${SITE}/surah/114</loc>`);
     expect(xml).toContain(`<xhtml:link rel="alternate" hreflang="ar" href="${SITE}/surah/114" />`);
-    expect(xml).toContain(`<xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/surah/114" />`);
-    expect(xml).toContain(`<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/surah/114" />`);
+    expect(xml).toContain(
+      `<xhtml:link rel="alternate" hreflang="en" href="${SITE}/en/surah/114" />`,
+    );
+    expect(xml).toContain(
+      `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/surah/114" />`,
+    );
     expect(xml.match(/<url>/g)).toHaveLength(1);
   });
 

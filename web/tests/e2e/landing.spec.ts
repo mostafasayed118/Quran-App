@@ -5,13 +5,17 @@ test('landing renders the hero ayah and both CTAs', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('قرآن يَهدي');
   await expect(page.locator('.hero-ayah')).toBeVisible();
-  await expect(page.locator('.hero-ayah')).toContainText('إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ');
+  await expect(page.locator('.hero-ayah')).toContainText(
+    'إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ',
+  );
   await expect(page.locator('.hero-ref')).toContainText('الإسراء ٩');
   await expect(page.locator('.hero a[href="/quran/"]')).toBeVisible();
   await expect(page.locator('.hero a[href="/about/"]')).toBeVisible();
 });
 
-test('landing shows the features heading, exactly 14 feature rows and the promise', async ({ page }) => {
+test('landing shows the features heading, exactly 14 feature rows and the promise', async ({
+  page,
+}) => {
   await page.goto('/');
   await expect(page.locator('.features h2')).toBeVisible();
   await expect(page.locator('.feat-item')).toHaveCount(14);
@@ -73,11 +77,16 @@ test('landing resume card survives a ClientRouter round-trip', async ({ page }) 
   await expect(page.locator('[data-qy="resume"]')).toHaveCount(1);
 });
 
-test('landing CTA section links GitHub Releases live and shows the Play badge as coming-soon', async ({ page }) => {
+test('landing CTA section links GitHub Releases live and shows the Play badge as coming-soon', async ({
+  page,
+}) => {
   await page.goto('/');
   const github = page.locator('.cta a.cta-github');
   await expect(github).toBeVisible();
-  await expect(github).toHaveAttribute('href', 'https://github.com/mostafasayed118/Quran-App/releases/latest');
+  await expect(github).toHaveAttribute(
+    'href',
+    'https://github.com/mostafasayed118/Quran-App/releases/latest',
+  );
   const play = page.locator('.cta span.cta-play');
   await expect(play).toHaveCount(1);
   await expect(play).toHaveAttribute('aria-disabled', 'true');

@@ -107,10 +107,7 @@ export function initPageCards(ctx: ReaderContext, keyboard: KeyboardNav): PageCa
     }
     if (nextPageBtn) {
       nextPageBtn.disabled = i === total - 1;
-      nextPageBtn.setAttribute(
-        'aria-label',
-        pageOf(pages[Math.min(i + 1, total - 1)].page, total),
-      );
+      nextPageBtn.setAttribute('aria-label', pageOf(pages[Math.min(i + 1, total - 1)].page, total));
     }
     if (nav) nav.hidden = false;
     clearSelection();

@@ -76,7 +76,10 @@ export function resolveToday(months: readonly PrayerMonth[], now: Date): TodayRe
   const { minYear, maxYear } = getPrayerTimesYearRange(months);
   const inRange = y >= minYear && y <= maxYear;
   const monthIndex = inRange
-    ? Math.max(0, months.findIndex((mo) => mo.y === y && mo.m === m))
+    ? Math.max(
+        0,
+        months.findIndex((mo) => mo.y === y && mo.m === m),
+      )
     : 0;
   return { y, m, d, inRange, monthIndex };
 }

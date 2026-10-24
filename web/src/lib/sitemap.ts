@@ -1,4 +1,8 @@
-export type SitemapEntry = { loc: string; alternates: { ar: string; en: string } };
+export type SitemapEntry = {
+  loc: string;
+  alternates: { ar: string; en: string };
+  lastmod?: string;
+};
 
 const STATIC_PATHS = ['/', '/quran/', '/reciters/', '/about/', '/privacy/'];
 
@@ -6,7 +10,11 @@ function enPath(path: string): string {
   return path === '/' ? '/en/' : `/en${path}`;
 }
 
-export function buildSitemapUrls(site: string, surahIds: number[], extras: string[] = []): SitemapEntry[] {
+export function buildSitemapUrls(
+  site: string,
+  surahIds: number[],
+  extras: string[] = [],
+): SitemapEntry[] {
   const origin = site.replace(/\/+$/, '');
   const paths = [...STATIC_PATHS, ...surahIds.map((n) => `/surah/${n}/`), ...extras];
   return paths.map((path) => {
@@ -23,9 +31,7 @@ export function buildSitemapUrls(site: string, surahIds: number[], extras: strin
  */
 export function dualLocaleEntries(entries: SitemapEntry[]): SitemapEntry[] {
   return entries.flatMap((entry) =>
-    entry.loc === entry.alternates.en
-      ? [entry]
-      : [entry, { loc: entry.alternates.en, alternates: entry.alternates }]
+    entry.loc === entry.alternates.en ? [entry] : [entry, { ...entry, loc: entry.alternates.en }],
   );
 }
 
@@ -45,11 +51,13 @@ export function toSitemapXml(entries: SitemapEntry[]): string {
   const urls = entries
     .map(
       (entry) => `  <url>
-    <loc>${xmlEscape(entry.loc)}</loc>
+    <loc>${xmlEscape(entry.loc)}</loc>${
+      entry.lastmod === undefined ? '' : `\n    <lastmod>${xmlEscape(entry.lastmod)}</lastmod>`
+    }
     <xhtml:link rel="alternate" hreflang="ar" href="${xmlEscape(entry.alternates.ar)}" />
     <xhtml:link rel="alternate" hreflang="en" href="${xmlEscape(entry.alternates.en)}" />
     <xhtml:link rel="alternate" hreflang="x-default" href="${xmlEscape(entry.alternates.ar)}" />
-  </url>`
+  </url>`,
     )
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>

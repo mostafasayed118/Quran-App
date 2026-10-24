@@ -10,7 +10,10 @@ function pack(id: string): PackInfo {
 }
 
 const okJson = (body: unknown) =>
-  new Response(JSON.stringify(body), { status: 200, headers: { 'content-type': 'application/json' } });
+  new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { 'content-type': 'application/json' },
+  });
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -121,7 +124,10 @@ describe('fetchPackAyahs', () => {
   });
 
   it('throws when the payload does not match the pack shape', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => okJson({ nope: true })));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => okJson({ nope: true })),
+    );
     await expect(fetchPackAyahs(pack('ar-tafsir-al-jalalayn'), 4)).rejects.toThrow();
   });
 });

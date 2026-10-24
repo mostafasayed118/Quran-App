@@ -4,6 +4,11 @@ import QuranPage from '../../components/pages/QuranPage.astro';
 import { t } from '../../lib/strings';
 import { META_DESCRIPTIONS } from '../../lib/landing-content';
 ---
-<BaseLayout title={`${t('en', 'surahIndexTitle')} — ${t('en', 'appName')}`} description={META_DESCRIPTIONS.en.quran} locale="en">
+
+<BaseLayout
+  title={`${t('en', 'surahIndexTitle')} — ${t('en', 'appName')}`}
+  description={META_DESCRIPTIONS.en.quran}
+  locale="en"
+>
   <QuranPage locale="en" />
 </BaseLayout>

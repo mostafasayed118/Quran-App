@@ -34,7 +34,13 @@ describe('rankAyahs', () => {
     expect(rankAyahs(fixture, norms, ' \u064B\u0652 ')).toEqual([]);
   });
   it('ranks whole-text exact before word-prefix before contains, stable by (s,a)', () => {
-    expect(ids(rankAyahs(fixture, norms, 'الله'))).toEqual(['5:3', '1:1', '2:255', '24:35', '112:1']);
+    expect(ids(rankAyahs(fixture, norms, 'الله'))).toEqual([
+      '5:3',
+      '1:1',
+      '2:255',
+      '24:35',
+      '112:1',
+    ]);
     expect(ids(rankAyahs(fixture, norms, 'الرحمن'))).toEqual(['55:1', '1:1']);
     expect(ids(rankAyahs(fixture, norms, 'حيم'))).toEqual(['1:1']);
   });

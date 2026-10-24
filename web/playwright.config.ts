@@ -8,6 +8,9 @@ export default defineConfig({
   retries: 0,
   use: {
     baseURL: 'http://localhost:4321',
+    // Keep the service worker out of the normal specs so app-level network-failure
+    // tests still exercise the real fetch path; the offline spec opts in explicitly.
+    serviceWorkers: 'block',
     // Keep the failure evidence without changing the no-retry policy: there is
     // no first retry to hook, so retain the trace and screenshot of the failure.
     trace: 'retain-on-failure',

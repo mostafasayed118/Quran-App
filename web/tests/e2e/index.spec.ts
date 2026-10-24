@@ -5,7 +5,9 @@ test.describe.configure({ timeout: 60_000 });
 
 test('index lists 114 surahs and filters', async ({ page }) => {
   await page.goto('/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(page.locator('.surah-list a')).toHaveCount(114);
   await expect(async () => {
     await page.getByRole('searchbox').fill('الكهف');
@@ -14,13 +16,17 @@ test('index lists 114 surahs and filters', async ({ page }) => {
   await expect(page.locator('.surah-list a')).toHaveAttribute('href', '/surah/18/');
 });
 
-test('digit-only query filters surahs without the verse area or an index fetch', async ({ page }) => {
+test('digit-only query filters surahs without the verse area or an index fetch', async ({
+  page,
+}) => {
   const indexRequests: string[] = [];
   page.on('request', (req) => {
     if (req.url().includes('search-index')) indexRequests.push(req.url());
   });
   await page.goto('/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('112');
     await expect(page.locator('.surah-list a')).toHaveCount(1);
@@ -32,7 +38,9 @@ test('digit-only query filters surahs without the verse area or an index fetch',
 
 test('ayah search finds the Light verse and caps results at 50', async ({ page }) => {
   await page.goto('/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('الله نور السماوات');
     await expect(page.locator('.ayah-hits a[href="/surah/24/#ayah-35"]')).toBeVisible();
@@ -43,7 +51,9 @@ test('ayah search finds the Light verse and caps results at 50', async ({ page }
 test('ayah search load failure shows a retry that recovers', async ({ page }) => {
   await page.route('**/search-index*', (r) => r.abort());
   await page.goto('/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('الله نور السماوات');
     await expect(page.getByText('تعذر تحميل المحتوى')).toBeVisible();
@@ -58,7 +68,9 @@ test('ayah search load failure shows a retry that recovers', async ({ page }) =>
 test('ayah hit deep-link scrolls to the target anchor under SPA navigation', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
   await page.goto('/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('الله نور السماوات');
     await expect(page.locator('.ayah-hits a[href="/surah/24/#ayah-35"]')).toBeVisible();

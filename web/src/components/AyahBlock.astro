@@ -1,24 +1,83 @@
 ---
 import { toArabicDigits } from '../lib/arabic-digits';
 import { t, type Locale } from '../lib/strings';
-interface Props { surah: number; n: number; page: number; textUthmani: string; textImlaei: string; sajda: boolean; locale?: Locale }
-const { surah, n, page, textUthmani, textImlaei, sajda, locale = 'ar' } = Astro.props;
+interface Props {
+  surah: number;
+  n: number;
+  page: number;
+  textUthmani: string;
+  textImlaei: string;
+  sajda: boolean;
+  locale?: Locale;
+  translation?: string;
+}
+const { surah, n, page, textUthmani, textImlaei, sajda, locale = 'ar', translation } = Astro.props;
 const copyLabel = t(locale, 'ayahCopy');
 const shareLabel = t(locale, 'ayahShare');
 const bookmarkLabel = t(locale, 'ayahBookmark');
 const listenLabel = t(locale, 'ayahListen');
 ---
+
 <div class="ayah" id={`ayah-${n}`} data-n={n} data-page={page} tabindex="0">
   <p class="ayah-text" lang="ar">
-    <span class="sr-only" lang={locale}>{t(locale, 'ayahNumber').replace('{n}', locale === 'en' ? String(n) : toArabicDigits(n))}</span>
-    <span class="ayah-u" aria-hidden="true">{textUthmani}{sajda && <span class="sajda" aria-hidden="true">۩</span>}</span>
+    <span class="sr-only" lang={locale}>
+      {t(locale, 'ayahNumber').replace('{n}', locale === 'en' ? String(n) : toArabicDigits(n))}
+    </span>
+    <span class="ayah-u" aria-hidden="true">
+      {textUthmani}
+      {sajda && (
+        <span class="sajda" aria-hidden="true">
+          ۩
+        </span>
+      )}
+    </span>
     <span class="ayah-i sr-only">{textImlaei}</span>
-    <span class="medal" aria-hidden="true">{toArabicDigits(n)}</span>
+    <span class="medal" aria-hidden="true">
+      {toArabicDigits(n)}
+    </span>
   </p>
+  {translation && (
+    <p class="ayah-tr" lang="en" dir="ltr">
+      {translation}
+    </p>
+  )}
   <div class="ayah-actions">
-    <button type="button" data-ayah-action="copy" data-surah={surah} data-ayah={n} aria-label={copyLabel}>{copyLabel}</button>
-    <button type="button" data-ayah-action="share" data-surah={surah} data-ayah={n} aria-label={shareLabel}>{shareLabel}</button>
-    <button type="button" data-ayah-action="bookmark" data-surah={surah} data-ayah={n} aria-label={bookmarkLabel} aria-pressed="false">{bookmarkLabel}</button>
-    <button type="button" data-ayah-action="listen" data-surah={surah} data-ayah={n} aria-label={listenLabel}>▶ {listenLabel}</button>
+    <button
+      type="button"
+      data-ayah-action="copy"
+      data-surah={surah}
+      data-ayah={n}
+      aria-label={copyLabel}
+    >
+      {copyLabel}
+    </button>
+    <button
+      type="button"
+      data-ayah-action="share"
+      data-surah={surah}
+      data-ayah={n}
+      aria-label={shareLabel}
+    >
+      {shareLabel}
+    </button>
+    <button
+      type="button"
+      data-ayah-action="bookmark"
+      data-surah={surah}
+      data-ayah={n}
+      aria-label={bookmarkLabel}
+      aria-pressed="false"
+    >
+      {bookmarkLabel}
+    </button>
+    <button
+      type="button"
+      data-ayah-action="listen"
+      data-surah={surah}
+      data-ayah={n}
+      aria-label={listenLabel}
+    >
+      ▶ {listenLabel}
+    </button>
   </div>
 </div>

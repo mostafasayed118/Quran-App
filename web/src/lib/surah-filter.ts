@@ -4,7 +4,11 @@ export function normalizeQuery(q: string): string {
   return normalizeArabic(q);
 }
 
-export interface SurahLike { id: number; nameAr: string; nameEn: string }
+export interface SurahLike {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+}
 
 export function filterSurahs<T extends SurahLike>(list: T[], q: string): T[] {
   const n = normalizeQuery(q);

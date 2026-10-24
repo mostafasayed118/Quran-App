@@ -32,7 +32,7 @@ describe('dual locale sitemap entries', () => {
     const entries = dualLocaleEntries(base);
     expect(entries).toHaveLength(base.length * 2);
     expect(entries.map((e) => e.loc)).toEqual(
-      base.flatMap((e) => [e.alternates.ar, e.alternates.en])
+      base.flatMap((e) => [e.alternates.ar, e.alternates.en]),
     );
   });
 });

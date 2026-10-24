@@ -1,20 +1,56 @@
 ---
 import { t, type Locale } from '../lib/strings';
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 ---
-<div class="mini-player" data-qy="bar" data-locale={locale} data-error-label={t(locale, 'playerError')} hidden>
+
+<div
+  class="mini-player"
+  data-qy="bar"
+  data-locale={locale}
+  data-error-label={t(locale, 'playerError')}
+  hidden
+>
   <audio id="qy-audio" preload="none"></audio>
-  <button type="button" class="mp-btn" data-qy="prev" aria-label={t(locale, 'playerPrev')}>⏮</button>
-  <button type="button" class="mp-btn mp-main" data-qy="toggle" data-play-label={t(locale, 'playerPlay')} data-pause-label={t(locale, 'playerPause')} aria-label={t(locale, 'playerPlay')}>▶</button>
-  <button type="button" class="mp-btn" data-qy="next" aria-label={t(locale, 'playerNext')}>⏭</button>
+  <button type="button" class="mp-btn" data-qy="prev" aria-label={t(locale, 'playerPrev')}>
+    ⏮
+  </button>
+  <button
+    type="button"
+    class="mp-btn mp-main"
+    data-qy="toggle"
+    data-play-label={t(locale, 'playerPlay')}
+    data-pause-label={t(locale, 'playerPause')}
+    aria-label={t(locale, 'playerPlay')}
+  >
+    ▶
+  </button>
+  <button type="button" class="mp-btn" data-qy="next" aria-label={t(locale, 'playerNext')}>
+    ⏭
+  </button>
   <div class="mp-meta">
     <span class="mp-title" data-qy="title"></span>
     <span class="mp-reciter" data-qy="reciter"></span>
   </div>
-  <div class="mp-track"><div class="mp-bar" data-qy="seek" role="slider" tabindex="0" aria-label={t(locale, 'playerSeek')} aria-valuemin="0" aria-valuemax="100"><i></i></div></div>
+  <div class="mp-track">
+    <div
+      class="mp-bar"
+      data-qy="seek"
+      role="slider"
+      tabindex="0"
+      aria-label={t(locale, 'playerSeek')}
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <i></i>
+    </div>
+  </div>
   <span class="mp-time" data-qy="time"></span>
-  <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>✕</button>
+  <button type="button" class="mp-btn" data-qy="close" aria-label={t(locale, 'playerClose')}>
+    ✕
+  </button>
 </div>
 <script>
   import { getPlayer, PLAYER_EVENTS } from '../lib/player';
@@ -37,7 +73,12 @@ const { locale = 'ar' } = Astro.props;
     const player = getPlayer();
     const locale: Locale = bar.dataset.locale === 'en' ? 'en' : 'ar';
     const $ = (sel: string) => bar.querySelector(`[data-qy="${sel}"]`) as HTMLElement;
-    const fmt = (s: number) => (Number.isFinite(s) ? digitsFor(Math.floor(s / 60), locale) + ':' + digitsFor(String(Math.floor(s % 60)).padStart(2, '0'), locale) : '');
+    const fmt = (s: number) =>
+      Number.isFinite(s)
+        ? digitsFor(Math.floor(s / 60), locale) +
+          ':' +
+          digitsFor(String(Math.floor(s % 60)).padStart(2, '0'), locale)
+        : '';
     const setVisible = (visible: boolean) => {
       bar.hidden = !visible;
       document.body.classList.toggle('has-player', visible);
@@ -45,16 +86,25 @@ const { locale = 'ar' } = Astro.props;
 
     const render = () => {
       const st = player.state();
-      if (dismissed || !st.row || st.surah === null) { setVisible(false); return; }
+      if (dismissed || !st.row || st.surah === null) {
+        setVisible(false);
+        return;
+      }
       setVisible(true);
       $('title').textContent = st.row.reciterName;
       $('reciter').textContent = dedupeLabel(st.row.moshafName);
-      $('time').textContent = st.status === 'error'
-        ? (bar.dataset.errorLabel ?? '')
-        : st.duration ? `${fmt(st.currentTime)} / ${fmt(st.duration)}` : '';
+      $('time').textContent =
+        st.status === 'error'
+          ? (bar.dataset.errorLabel ?? '')
+          : st.duration
+            ? `${fmt(st.currentTime)} / ${fmt(st.duration)}`
+            : '';
       const playing = st.status === 'playing';
       $('toggle').textContent = playing ? '⏸' : '▶';
-      $('toggle').setAttribute('aria-label', (playing ? $('toggle').dataset.pauseLabel : $('toggle').dataset.playLabel) ?? '');
+      $('toggle').setAttribute(
+        'aria-label',
+        (playing ? $('toggle').dataset.pauseLabel : $('toggle').dataset.playLabel) ?? '',
+      );
       const pct = st.duration ? Math.min(100, (st.currentTime / st.duration) * 100) : 0;
       const i = bar.querySelector('[data-qy="seek"] i') as HTMLElement;
       i.style.width = `${pct}%`;

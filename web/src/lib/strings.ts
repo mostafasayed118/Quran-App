@@ -62,10 +62,14 @@ const dict = {
     notFoundLead: 'تعذر العثور على الصفحة التي تبحث عنها.',
     notFoundSearchCta: 'ابحث في المصحف',
     notFoundHomeCta: 'الصفحة الرئيسية',
+    offlineTitle: 'أنت غير متصل',
+    offlineLead: 'تعذّر تحميل الصفحة من الشبكة. الصفحات التي زرتها سابقاً قد تعمل دون اتصال.',
+    offlineHome: 'العودة للرئيسية',
     skipToContent: 'تخطَّ إلى المحتوى',
     navPrayerTimes: 'المواقيت',
     ptTitle: 'مواقيت الصلاة',
-    ptLead: 'مواقيت الصلاة لأكثر من ١٥٠ مدينة — محسوبة فلكيًا على الطريقة المصرية وبتوقيت كل مدينة المحلي.',
+    ptLead:
+      'مواقيت الصلاة لأكثر من ١٥٠ مدينة — محسوبة فلكيًا على الطريقة المصرية وبتوقيت كل مدينة المحلي.',
     ptSearchPlaceholder: 'ابحث عن مدينة…',
     ptCityTitle: 'مواقيت الصلاة في {city}',
     ptDay: 'اليوم',
@@ -230,10 +234,15 @@ const dict = {
     notFoundLead: "Couldn't find the page you're looking for.",
     notFoundSearchCta: 'Search the Quran',
     notFoundHomeCta: 'Home',
+    offlineTitle: 'You are offline',
+    offlineLead:
+      'This page could not be loaded from the network. Pages you visited earlier may still work offline.',
+    offlineHome: 'Back home',
     skipToContent: 'Skip to content',
     navPrayerTimes: 'Prayer Times',
     ptTitle: 'Prayer Times',
-    ptLead: "Prayer times for 150+ cities — astronomically computed with the Egyptian method, shown in each city's local time.",
+    ptLead:
+      "Prayer times for 150+ cities — astronomically computed with the Egyptian method, shown in each city's local time.",
     ptSearchPlaceholder: 'Search for a city…',
     ptCityTitle: 'Prayer times in {city}',
     ptDay: 'Day',
@@ -251,13 +260,15 @@ const dict = {
     ptMonth: 'Month',
     ptNote: "Times are shown in each city's local time, including daylight-saving changes.",
     qbTitle: 'Qibla',
-    qbLead: 'The qibla direction from your location — computed astronomically on your device, nothing is sent.',
+    qbLead:
+      'The qibla direction from your location — computed astronomically on your device, nothing is sent.',
     qbUseLocation: 'Use my location',
     qbLocating: 'Locating…',
     qbDenied: "Couldn't access your location — pick your city:",
     qbYourLocation: 'Your location',
     qbDirection: 'Qibla direction',
-    qbHow: 'The arrow points to the qibla. Use your phone compass to find that direction on the ground, relative to north.',
+    qbHow:
+      'The arrow points to the qibla. Use your phone compass to find that direction on the ground, relative to north.',
     monthJan: 'January',
     monthFeb: 'February',
     monthMar: 'March',
@@ -300,7 +311,8 @@ const dict = {
     landingFeatureRecitationsDesc:
       '240+ reciters (mp3quran) — stream instantly or download for offline',
     landingFeaturePlayer: 'Player & downloads',
-    landingFeaturePlayerDesc: 'A persistent mini player plus a download manager with per-file status',
+    landingFeaturePlayerDesc:
+      'A persistent mini player plus a download manager with per-file status',
     landingFeaturePrayerTimes: 'Prayer times',
     landingFeaturePrayerTimesDesc:
       'Accurate times for your chosen city (or the nearest city, computed on-device) plus an optional prayer reminder',
@@ -310,13 +322,15 @@ const dict = {
     landingFeatureTasbih: 'Tasbih',
     landingFeatureTasbihDesc: 'A circular digital counter with switchable targets',
     landingFeatureDuas: 'Duas & ruqyah',
-    landingFeatureDuasDesc: 'Organized selections from traditional collections with the source texts',
+    landingFeatureDuasDesc:
+      'Organized selections from traditional collections with the source texts',
     landingFeatureTracker: 'Worship tracker',
     landingFeatureTrackerDesc: 'The five daily prayers and khatma plans',
     landingFeatureSettings: 'Settings & extras',
     landingFeatureSettingsDesc:
       'Dark mode, font sizes and the authentic mushaf font, zakat calculator, Hijri calendar, the 99 names of Allah',
-    landingPromise1: 'Offline-first: the complete Mushaf — 114 surahs, 6,236 ayahs — bundled inside the app.',
+    landingPromise1:
+      'Offline-first: the complete Mushaf — 114 surahs, 6,236 ayahs — bundled inside the app.',
     landingPromise2: 'No accounts, no ads, no tracking — and no data collection.',
     landingPromise3:
       'Completely free, Arabic-first, with a comfortable dark mode and authentic mushaf typography.',

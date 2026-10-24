@@ -3,6 +3,11 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PrayerTimesPage from '../../../components/pages/PrayerTimesPage.astro';
 import { t } from '../../../lib/strings';
 ---
-<BaseLayout title={`${t('en', 'ptTitle')} — ${t('en', 'appName')}`} description={t('en', 'ptLead')} locale="en">
+
+<BaseLayout
+  title={`${t('en', 'ptTitle')} — ${t('en', 'appName')}`}
+  description={t('en', 'ptLead')}
+  locale="en"
+>
   <PrayerTimesPage locale="en" />
 </BaseLayout>

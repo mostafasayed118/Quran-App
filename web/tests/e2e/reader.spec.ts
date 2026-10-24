@@ -52,11 +52,15 @@ test('reader boot script re-applies seeded settings right after SPA entry', asyn
   await page.locator('.surah-list a[href="/surah/1/"]').click();
   await page.waitForURL('**/surah/1**');
   await expect(page.locator('html')).toHaveAttribute('data-reading-view', 'imlaei');
-  const step = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--reader-step').trim());
+  const step = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue('--reader-step').trim(),
+  );
   expect(step).toBe('2');
 });
 
-test('reader records the topmost visible ayah as the qy:last-read resume point', async ({ page }) => {
+test('reader records the topmost visible ayah as the qy:last-read resume point', async ({
+  page,
+}) => {
   await page.goto('/surah/2/');
   await page.waitForFunction(() => {
     try {
@@ -66,7 +70,9 @@ test('reader records the topmost visible ayah as the qy:last-read resume point',
       return false;
     }
   });
-  const initial = await page.evaluate(() => (JSON.parse(localStorage.getItem('qy:last-read')!) as { a: number }).a);
+  const initial = await page.evaluate(
+    () => (JSON.parse(localStorage.getItem('qy:last-read')!) as { a: number }).a,
+  );
   await page.locator('#ayah-50').scrollIntoViewIfNeeded();
   await page.waitForFunction((prev) => {
     try {
@@ -76,12 +82,16 @@ test('reader records the topmost visible ayah as the qy:last-read resume point',
       return false;
     }
   }, initial);
-  const resumed = await page.evaluate(() => JSON.parse(localStorage.getItem('qy:last-read')!) as { s: number; a: number });
+  const resumed = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('qy:last-read')!) as { s: number; a: number },
+  );
   expect(resumed.s).toBe(2);
   expect(resumed.a).toBeGreaterThan(initial);
 });
 
-test('a pending resume flush cannot overwrite the next surah after a ClientRouter swap', async ({ page }) => {
+test('a pending resume flush cannot overwrite the next surah after a ClientRouter swap', async ({
+  page,
+}) => {
   await page.goto('/surah/2/');
   await page.evaluate(() => {
     const w = window as Window & { __qySamples?: (string | null)[] };
@@ -128,9 +138,10 @@ test('mushaf pages layout renders page cards and navigates', async ({ page }) =>
   const shown = page.locator('.mushaf-page:not([hidden])');
   await expect(shown).toHaveCount(1);
   await expect(shown).toHaveAttribute('data-page', String(surah2.pagesStart));
-  await expect(
-    page.getByRole('button', { name: t('ar', 'readerLayoutPages') }),
-  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: t('ar', 'readerLayoutPages') })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
   await expect(page.locator('[data-mushaf="prev"]')).toBeDisabled();
   await expect(page.locator('[data-mushaf="pos"]')).toHaveText(
     t('ar', 'readerPageOf')
@@ -143,9 +154,7 @@ test('mushaf pages layout renders page cards and navigates', async ({ page }) =>
   await expect(page.locator('[data-mushaf="prev"]')).toBeEnabled();
   await expect
     .poll(() =>
-      page.evaluate(
-        () => JSON.parse(localStorage.getItem('qy:last-read') ?? 'null') as unknown,
-      ),
+      page.evaluate(() => JSON.parse(localStorage.getItem('qy:last-read') ?? 'null') as unknown),
     )
     .toEqual({ s: 2, a: firstOfPage(surah2.pagesStart + 1) });
 });

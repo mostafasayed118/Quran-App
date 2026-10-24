@@ -15,6 +15,7 @@ const label = cityLabel(city, 'en');
 const title = `${t('en', 'ptCityTitle').replace('{city}', label)} — ${t('en', 'appName')}`;
 const description = t('en', 'ptCityDescription').replace('{city}', label);
 ---
+
 <BaseLayout title={title} description={description} locale="en">
   <PrayerCityPage locale="en" data={data} />
 </BaseLayout>

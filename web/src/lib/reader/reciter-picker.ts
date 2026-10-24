@@ -40,7 +40,8 @@ export function initReciterPicker(ctx: ReaderContext): ReciterPicker {
   const playSurah = async (s: number): Promise<void> => {
     if (!Number.isFinite(s)) return;
     const row = await selectedRow();
-    if (row) document.dispatchEvent(new CustomEvent(PLAYER_EVENTS.play, { detail: { row, surah: s } }));
+    if (row)
+      document.dispatchEvent(new CustomEvent(PLAYER_EVENTS.play, { detail: { row, surah: s } }));
   };
 
   if (pick) {

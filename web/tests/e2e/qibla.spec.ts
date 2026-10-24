@@ -4,7 +4,9 @@ test.describe.configure({ timeout: 60_000 });
 
 const CAIRO = { latitude: 30.0444, longitude: 31.2357 };
 
-test('geo denial falls back to the city picker; a picked city renders the bearing', async ({ page }) => {
+test('geo denial falls back to the city picker; a picked city renders the bearing', async ({
+  page,
+}) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'geolocation', {
       configurable: true,
@@ -15,7 +17,9 @@ test('geo denial falls back to the city picker; a picked city renders the bearin
     });
   });
   await page.goto('/qibla/');
-  await page.locator('[data-qy="qb"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="qb"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(page.locator('[data-qy="qb-picker"]')).toBeHidden();
   await page.locator('[data-qy="qb-geo"]').click();
   await expect(page.locator('[data-qy="qb-picker"]')).toBeVisible();
@@ -26,7 +30,10 @@ test('geo denial falls back to the city picker; a picked city renders the bearin
   await expect(page.locator('[data-qy="qb-result"]')).toBeVisible();
   await expect(page.locator('[data-qy="qb-deg"]')).toHaveText('١٣٦');
   await expect(page.locator('[data-qy="qb-place"]')).toHaveText('القاهرة');
-  await expect(page.locator('[data-qy="qb-needle"]')).toHaveAttribute('transform', /^rotate\(136\./);
+  await expect(page.locator('[data-qy="qb-needle"]')).toHaveAttribute(
+    'transform',
+    /^rotate\(136\./,
+  );
 });
 
 test('geolocation success renders the dial from the device position', async ({ page }) => {
@@ -40,12 +47,17 @@ test('geolocation success renders the dial from the device position', async ({ p
     });
   }, CAIRO);
   await page.goto('/qibla/');
-  await page.locator('[data-qy="qb"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="qb"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await page.locator('[data-qy="qb-geo"]').click();
   await expect(page.locator('[data-qy="qb-result"]')).toBeVisible();
   await expect(page.locator('[data-qy="qb-deg"]')).toHaveText('١٣٦');
   await expect(page.locator('[data-qy="qb-place"]')).toHaveText('موقعك الحالي');
-  await expect(page.locator('[data-qy="qb-needle"]')).toHaveAttribute('transform', /^rotate\(136\./);
+  await expect(page.locator('[data-qy="qb-needle"]')).toHaveAttribute(
+    'transform',
+    /^rotate\(136\./,
+  );
 });
 
 test('EN qibla page renders with EN labels', async ({ page }) => {

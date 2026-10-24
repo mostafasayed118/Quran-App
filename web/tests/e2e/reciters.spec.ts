@@ -1,20 +1,30 @@
 import { test, expect } from '@playwright/test';
 import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
 
-test('reciters browser: featured-first, surah play + download, snapshot fallback on API failure', async ({ page }) => {
+test('reciters browser: featured-first, surah play + download, snapshot fallback on API failure', async ({
+  page,
+}) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/reciters/');
 
   // Featured section first, in PM order (51 outranks 118 whose name sorts earlier).
   const featured = page.locator('#reciters-featured');
   await expect(featured).toBeVisible();
-  await expect(page.locator('[data-reciter-row]').first()).toHaveAttribute('data-reciter-row', '51-5');
+  await expect(page.locator('[data-reciter-row]').first()).toHaveAttribute(
+    'data-reciter-row',
+    '51-5',
+  );
   await expect(featured.locator('[data-reciter-row]')).toHaveCount(2);
   const first = featured.locator('[data-reciter-row="51-5"]');
   await expect(first.locator('.reciter-name')).toHaveText('مشاري العفاسي');
   await expect(first.locator('.reciter-moshaf')).toHaveText('حفص عن عاصم - مرتل');
-  await expect(featured.locator('[data-reciter-row]').nth(1)).toHaveAttribute('data-reciter-row', '118-1');
+  await expect(featured.locator('[data-reciter-row]').nth(1)).toHaveAttribute(
+    'data-reciter-row',
+    '118-1',
+  );
 
   // ClientRouter re-entry: leave and return in-session; the swapped-in shell must re-render and stay wired.
   await page.locator('header a[href="/quran/"]').click();

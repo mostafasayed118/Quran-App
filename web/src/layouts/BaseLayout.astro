@@ -48,6 +48,7 @@ const ogImageUrl = new URL(ogImage ?? '/og-base.png', Astro.site);
 const origin = (Astro.site ?? new URL('https://quranyahdi.pages.dev')).origin;
 const jsonLd = `{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"${origin}/#website","url":"${origin}/","name":"قرآن يَهدي","alternateName":"Quran Yahdi","inLanguage":["ar","en"],"publisher":{"@id":"${origin}/#organization"}},{"@type":"Organization","@id":"${origin}/#organization","name":"Quran Yahdi","url":"${origin}/","logo":"${origin}/logo-64.png"}]}`;
 ---
+
 <!doctype html>
 <html lang={locale} dir={dir} data-theme="day">
   <head>
@@ -78,27 +79,55 @@ const jsonLd = `{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@
     <meta name="theme-color" content="#F2ECDD" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#012A27" media="(prefers-color-scheme: dark)" />
     <script type="application/ld+json" is:inline set:html={jsonLd}></script>
-    {fonts.has('cairo') && <link rel="preload" href="/fonts/Cairo-Regular.woff2" as="font" type="font/woff2" crossorigin />}
-    {fonts.has('cairo') && <link rel="preload" href="/fonts/Cairo-Bold.woff2" as="font" type="font/woff2" crossorigin />}
-    {fonts.has('hafs') && <link rel="preload" href="/fonts/HafsSmart_08.woff2" as="font" type="font/woff2" crossorigin />}
+    {fonts.has('cairo') && (
+      <link
+        rel="preload"
+        href="/fonts/Cairo-Regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin
+      />
+    )}
+    {fonts.has('cairo') && (
+      <link rel="preload" href="/fonts/Cairo-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    )}
+    {fonts.has('hafs') && (
+      <link
+        rel="preload"
+        href="/fonts/HafsSmart_08.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin
+      />
+    )}
     <script is:inline data-astro-rerun define:vars={{ THEME_KEY }}>
       (function () {
         try {
           var saved = localStorage.getItem(THEME_KEY);
           var sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day';
           document.documentElement.setAttribute('data-theme', saved || sys);
-        } catch (e) { /* keep day */ }
+        } catch (e) {
+          /* keep day */
+        }
       })();
     </script>
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main">{t(locale, 'skipToContent')}</a>
+    <a class="skip-link" href="#main">
+      {t(locale, 'skipToContent')}
+    </a>
     <Header locale={locale} altLocaleHref={altLocaleHref} />
-    <main id="main" tabindex="-1"><slot /></main>
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
     <div id="qy-player-region" transition:persist="qy-player">
       <MiniPlayer locale={locale} />
     </div>
     <Footer locale={locale} />
+    <script>
+      import { registerServiceWorker } from '../lib/sw-register';
+      registerServiceWorker();
+    </script>
   </body>
 </html>

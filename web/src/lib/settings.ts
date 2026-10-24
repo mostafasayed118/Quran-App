@@ -12,8 +12,14 @@ export function readSetting<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(settingsKey(key));
     return raw === null ? fallback : (JSON.parse(raw) as T);
-  } catch { return fallback; }
+  } catch {
+    return fallback;
+  }
 }
 export function writeSetting(key: string, value: unknown): void {
-  try { localStorage.setItem(settingsKey(key), JSON.stringify(value)); } catch { /* private mode */ }
+  try {
+    localStorage.setItem(settingsKey(key), JSON.stringify(value));
+  } catch {
+    /* private mode */
+  }
 }

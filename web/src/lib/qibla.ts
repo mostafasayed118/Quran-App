@@ -10,7 +10,6 @@ export function qiblaBearing(lat: number, lng: number): number {
   const phi2 = toRad(KAABA.lat);
   const dLng = toRad(KAABA.lng - lng);
   const y = Math.sin(dLng) * Math.cos(phi2);
-  const x =
-    Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLng);
+  const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLng);
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
 }

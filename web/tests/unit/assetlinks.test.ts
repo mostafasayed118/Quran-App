@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const source = readFileSync(new URL('../../public/.well-known/assetlinks.json', import.meta.url), 'utf8');
+const source = readFileSync(
+  new URL('../../public/.well-known/assetlinks.json', import.meta.url),
+  'utf8',
+);
 
 type Statement = {
   relation: string[];

@@ -4,6 +4,10 @@ import RecitersPage from '../components/pages/RecitersPage.astro';
 import { t } from '../lib/strings';
 import { META_DESCRIPTIONS } from '../lib/landing-content';
 ---
-<BaseLayout title={`${t('ar', 'navReciters')} — ${t('ar', 'appName')}`} description={META_DESCRIPTIONS.ar.reciters}>
+
+<BaseLayout
+  title={`${t('ar', 'navReciters')} — ${t('ar', 'appName')}`}
+  description={META_DESCRIPTIONS.ar.reciters}
+>
   <RecitersPage locale="ar" />
 </BaseLayout>

@@ -6,7 +6,9 @@ export interface ShareEnv {
 }
 
 function browserEnv(): ShareEnv {
-  const nav = navigator as Navigator & { share?: (data: { text: string; url: string }) => Promise<void> };
+  const nav = navigator as Navigator & {
+    share?: (data: { text: string; url: string }) => Promise<void>;
+  };
   return {
     share: typeof nav.share === 'function' ? nav.share.bind(nav) : undefined,
     writeText: (text) => navigator.clipboard.writeText(text),

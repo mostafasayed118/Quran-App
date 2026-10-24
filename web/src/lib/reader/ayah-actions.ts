@@ -57,13 +57,17 @@ export function initAyahActions({ context: ctx, playSurah }: AyahActionsOptions)
       navigator.clipboard
         .writeText(text)
         .then(() => flashCopied(btn))
-        .catch(() => { /* clipboard unavailable */ });
+        .catch(() => {
+          /* clipboard unavailable */
+        });
     } else if (action === 'share') {
       shareOrCopy(surahUrl(document.documentElement.lang === 'en' ? 'en' : 'ar', s, a), text)
         .then((outcome) => {
           if (outcome === 'copied') flashCopied(btn);
         })
-        .catch(() => { /* clipboard unavailable */ });
+        .catch(() => {
+          /* clipboard unavailable */
+        });
     } else if (action === 'bookmark') {
       setBookmarkState(btn, toggleBookmark(s, a));
     } else if (action === 'listen') {

@@ -79,7 +79,10 @@ const html = (surah) => `<!doctype html>
 mkdirSync(OUT_DIR, { recursive: true });
 
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
+const context = await browser.newContext({
+  viewport: { width: 1200, height: 630 },
+  deviceScaleFactor: 1,
+});
 const page = await context.newPage();
 
 const sizes = [];

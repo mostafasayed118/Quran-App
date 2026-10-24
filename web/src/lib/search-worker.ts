@@ -1,21 +1,24 @@
 /**
  * The verse search, off the UI thread.
  *
- * The committed index is 837 KB of JSON; parsing it and normalizing its 6,236
- * records used to run on the main thread the moment the user typed, and every
- * query rescanned all 6,236 records. This worker owns the whole job: it fetches
- * the index, builds the normalized and alef-free forms once, and answers
- * ranking queries.
+ * The committed indexes are ~854 KB (AR) and ~979 KB (EN) of JSON; parsing them
+ * and normalizing their 6,236 records used to run on the main thread the moment
+ * the user typed, and every query rescanned all 6,236 records. This worker owns
+ * the whole job: it fetches the requested locale's index, builds the normalized
+ * and alef-free forms once, and answers ranking queries.
  */
 import { normalizeArabic } from './arabic';
 import { foldForm, rankAyahsFolded, type SearchRecord } from './search-core';
-// The index ships as a hashed asset, so the worker downloads it as a file and
-// parses it here instead of the main thread parsing a bundled module.
-import indexUrl from '../data/search-index.json?url';
+// The indexes ship as hashed assets, so the worker downloads them as files and
+// parses them here instead of the main thread parsing a bundled module.
+import indexArUrl from '../data/search-index.json?url';
+import indexEnUrl from '../data/search-index-en.json?url';
+
+type SearchLocale = 'ar' | 'en';
 
 type SearchRequest =
-  | { type: 'load' }
-  | { type: 'query'; id: number; query: string; limit: number };
+  | { type: 'load'; locale: SearchLocale }
+  | { type: 'query'; id: number; query: string; limit: number; locale: SearchLocale };
 
 /** The worker's own scope; the DOM lib types `self` as a Window. */
 interface WorkerScope {
@@ -25,40 +28,56 @@ interface WorkerScope {
 
 const scope = self as unknown as WorkerScope;
 
-let records: SearchRecord[] = [];
-let normalized: string[] = [];
-let folded: string[] = [];
-let loading: Promise<void> | null = null;
+interface LocaleIndex {
+  url: string;
+  records: SearchRecord[];
+  normalized: string[];
+  folded: string[];
+  loading: Promise<void> | null;
+}
 
-function load(): Promise<void> {
-  loading ??= fetch(indexUrl, { credentials: 'omit' })
+const indexes: Record<SearchLocale, LocaleIndex> = {
+  ar: { url: indexArUrl, records: [], normalized: [], folded: [], loading: null },
+  en: { url: indexEnUrl, records: [], normalized: [], folded: [], loading: null },
+};
+
+function load(locale: SearchLocale): Promise<void> {
+  const index = indexes[locale];
+  index.loading ??= fetch(index.url, { credentials: 'omit' })
     .then((res) => {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return res.json() as Promise<{ ayahs: SearchRecord[] }>;
     })
     .then((data) => {
-      records = data.ayahs;
-      normalized = records.map((r) => normalizeArabic(r.t));
-      folded = normalized.map(foldForm);
+      index.records = data.ayahs;
+      index.normalized = index.records.map((r) => normalizeArabic(r.t));
+      index.folded = index.normalized.map(foldForm);
     });
-  return loading;
+  return index.loading;
 }
 
 scope.addEventListener('message', (event: MessageEvent<SearchRequest>) => {
   const msg = event.data;
   if (msg.type === 'load') {
-    load().then(
-      () => scope.postMessage({ type: 'loaded', records }),
-      (error: unknown) => scope.postMessage({ type: 'load-error', message: String(error) }),
+    load(msg.locale).then(
+      () =>
+        scope.postMessage({
+          type: 'loaded',
+          locale: msg.locale,
+          records: indexes[msg.locale].records,
+        }),
+      (error: unknown) =>
+        scope.postMessage({ type: 'load-error', locale: msg.locale, message: String(error) }),
     );
     return;
   }
-  load().then(
+  const index = indexes[msg.locale];
+  load(msg.locale).then(
     () =>
       scope.postMessage({
         type: 'hits',
         id: msg.id,
-        hits: rankAyahsFolded(records, normalized, folded, msg.query, msg.limit),
+        hits: rankAyahsFolded(index.records, index.normalized, index.folded, msg.query, msg.limit),
       }),
     (error: unknown) => scope.postMessage({ type: 'error', id: msg.id, message: String(error) }),
   );

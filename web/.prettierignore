@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.astro/
+test-results/
+playwright-report/
+blob-report/
+coverage/
+package-lock.json
+
+# Generated data and generated assets: never reformat these by hand or by tool.
+src/data/
+public/data/
+public/og/
+public/fonts/
+public/google*.html
+public/_headers
+public/robots.txt
+public/manifest.webmanifest
+public/.well-known/
+public/*.png
+public/*.ico
+public/*.svg
+tests/fixtures/

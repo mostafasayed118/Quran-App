@@ -10,7 +10,9 @@ test('AR home carries locale head and the language switch', async ({ page }) => 
   await page.goto('/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
   await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
-  expect(await page.locator('head link[rel="alternate"][hreflang]').count()).toBeGreaterThanOrEqual(1);
+  expect(await page.locator('head link[rel="alternate"][hreflang]').count()).toBeGreaterThanOrEqual(
+    1,
+  );
   const switchLink = page.locator('header .lang-switch');
   await expect(switchLink).toHaveText('English');
   await expect(switchLink).toHaveAttribute('href', '/en/');
@@ -35,20 +37,19 @@ test('EN quran index shows the EN heading over 114 surah cards', async ({ page }
   expect(await page.locator('.surah-list a[href^="/en/surah/"]').count()).toBeGreaterThan(0);
 });
 
-test('EN index search never fetches or shows the verse panel', async ({ page }) => {
-  const indexRequests: string[] = [];
-  page.on('request', (req) => {
-    if (req.url().includes('search-index')) indexRequests.push(req.url());
-  });
+test('EN index search enables the verse panel and keeps the surah filter', async ({ page }) => {
   await page.goto('/en/quran');
-  await page.locator('[data-qy="surah-index"][data-qy-ready="1"]').waitFor({ state: 'attached', timeout: 30_000 });
+  await page
+    .locator('[data-qy="surah-index"][data-qy-ready="1"]')
+    .waitFor({ state: 'attached', timeout: 30_000 });
   await expect(async () => {
     await page.getByRole('searchbox').fill('Al-Fatihah');
     await expect(page.locator('.surah-list a')).toHaveCount(1);
   }).toPass({ timeout: 10_000 });
   await expect(page.locator('.surah-list a').first()).toContainText('Al-Fatihah');
-  await expect(page.locator('.ayah-search')).toHaveCount(0);
-  expect(indexRequests).toHaveLength(0);
+  // The verse panel is now enabled on EN too; the surah name itself has no verse hit.
+  await expect(page.locator('.ayah-search')).toHaveCount(1);
+  await expect(page.locator('.ayah-hits li')).toHaveCount(0);
 });
 
 test('EN reciters page resolves the loading state into EN content', async ({ page }) => {
@@ -61,7 +62,9 @@ test('EN reciters page resolves the loading state into EN content', async ({ pag
   const first = featured.locator('[data-reciter-row]').first();
   await expect(first.locator('.reciter-name')).toBeVisible();
   await first.locator('[data-reciter-toggle]').click();
-  await expect(first.locator('[data-surah-row] [data-surah-download]').first()).toHaveText(t('en', 'recitersDownload'));
+  await expect(first.locator('[data-surah-row] [data-surah-download]').first()).toHaveText(
+    t('en', 'recitersDownload'),
+  );
 });
 
 test('EN about page renders the EN mission copy', async ({ page }) => {
@@ -70,7 +73,9 @@ test('EN about page renders the EN mission copy', async ({ page }) => {
   await expect(page.locator('.about-story p').first()).toHaveText(LANDING.en.about.story[0]);
 });
 
-test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text', async ({ page }) => {
+test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text', async ({
+  page,
+}) => {
   await page.goto('/en/surah/2');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
@@ -78,17 +83,25 @@ test('EN surah reader mirrors the AR reader with LTR chrome over RTL ayah text',
   // EN chrome uses the English surah name (owner ruling 2026-10-19).
   await expect(page.locator('.reader-head h1')).toContainText('Al-Baqarah');
   await expect(page.locator('[data-qy="reader-play"]')).toHaveText(t('en', 'readerPlay'));
-  await expect(page.locator('[data-qy="reciter-pick"]')).toHaveAttribute('aria-label', t('en', 'readerPickReciter'));
+  await expect(page.locator('[data-qy="reciter-pick"]')).toHaveAttribute(
+    'aria-label',
+    t('en', 'readerPickReciter'),
+  );
   // Per-ayah action chrome is EN too (AyahBlock locale plumbing).
   await expect(page.locator('[data-ayah-action="copy"]').first()).toHaveText('Copy');
   // The ayah line keeps its RTL base direction even though the page chrome is LTR.
-  const textDir = await page.locator('.ayah-text').first().evaluate((el) => getComputedStyle(el).direction);
+  const textDir = await page
+    .locator('.ayah-text')
+    .first()
+    .evaluate((el) => getComputedStyle(el).direction);
   expect(textDir).toBe('rtl');
 });
 
 test('EN surah reader: mini-player plays and survives an in-app navigation', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/en/surah/1');
   await expect(page.locator('.reader')).toBeVisible();
   const bar = page.locator('[data-qy="bar"]');
@@ -136,7 +149,9 @@ test('EN home resume card links to the stored last-read ayah', async ({ page }) 
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute('href', '/en/surah/36/#ayah-5');
   await expect(card).toContainText(t('en', 'resumeTitle'));
-  const surah36 = (surahsData as { surahs: ReadonlyArray<{ id: number; nameEn?: string }> }).surahs.find((s) => s.id === 36);
+  const surah36 = (
+    surahsData as { surahs: ReadonlyArray<{ id: number; nameEn?: string }> }
+  ).surahs.find((s) => s.id === 36);
   await expect(card).toContainText(surah36?.nameEn ?? '');
 });
 
@@ -148,7 +163,10 @@ test('EN pages carry localized meta descriptions', async ({ page }) => {
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.reciters);
   await page.goto('/en/surah/2');
   await expect(meta).toHaveAttribute('content', enReaderDescription(2, 'Al-Baqarah'));
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/og\/surah\/2\.png$/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    /\/og\/surah\/2\.png$/,
+  );
   await page.goto('/en/privacy');
   await expect(meta).toHaveAttribute('content', META_DESCRIPTIONS.en.privacy);
 });

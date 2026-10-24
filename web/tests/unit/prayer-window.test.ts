@@ -5,8 +5,13 @@ import { fileURLToPath } from 'node:url';
 const dataDir = fileURLToPath(new URL('../../public/data/prayer-times/', import.meta.url));
 const read = (file: string): unknown => JSON.parse(readFileSync(dataDir + file, 'utf8'));
 
-interface CityRef { id: string }
-interface MonthRef { y: number; m: number }
+interface CityRef {
+  id: string;
+}
+interface MonthRef {
+  y: number;
+  m: number;
+}
 
 const index = read('index.json') as { cities: CityRef[] };
 const cairo = read('eg-cairo.json') as { months: MonthRef[] };

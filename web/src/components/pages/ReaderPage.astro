@@ -13,12 +13,17 @@ import {
   READER_LAYOUTS,
 } from '../../lib/reader-settings';
 import type { Surah } from '../../lib/surahs';
-interface Props { surah: Surah; locale?: Locale }
-const { surah, locale = 'ar' } = Astro.props;
+interface Props {
+  surah: Surah;
+  locale?: Locale;
+  translations?: ReadonlyMap<number, string>;
+}
+const { surah, locale = 'ar', translations } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const { prev, next } = surahNeighbors(surah.id);
 const data = await getAyahs(surah.id);
 ---
+
 <script
   is:inline
   data-astro-rerun
@@ -35,40 +40,111 @@ const data = await getAyahs(surah.id);
       document.documentElement.setAttribute('data-reading-view', view);
       document.documentElement.setAttribute('data-reader-layout', layout);
       document.documentElement.setAttribute('data-reader-step', String(step));
-    } catch (e) { /* defaults */ }
+    } catch (e) {
+      /* defaults */
+    }
   })();
 </script>
 <article class="reader">
   <header class="reader-head">
-    <h1>{locale === 'ar' ? t(locale, 'surahTitle').replace('{name}', surah.nameAr) : surahDisplayName(surah, locale)}</h1>
-    <p class="meta">{surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} · {t(locale, 'ayahCount').replace('{n}', locale === 'en' ? String(surah.ayahCount) : toArabicDigits(surah.ayahCount))}</p>
+    <h1>
+      {locale === 'ar'
+        ? t(locale, 'surahTitle').replace('{name}', surah.nameAr)
+        : surahDisplayName(surah, locale)}
+    </h1>
+    <p class="meta">
+      {surah.revelationType === 'makkah' ? t(locale, 'chipMeccan') : t(locale, 'chipMedinan')} ·{' '}
+      {t(locale, 'ayahCount').replace(
+        '{n}',
+        locale === 'en' ? String(surah.ayahCount) : toArabicDigits(surah.ayahCount),
+      )}
+    </p>
     <div class="reader-controls" data-locale={locale}>
-      <button type="button" class="rc-btn" data-qy-view="mushaf" aria-pressed="true">{t(locale, 'readerViewMushaf')}</button>
-      <button type="button" class="rc-btn" data-qy-view="imlaei" aria-pressed="false">{t(locale, 'readerViewImlaei')}</button>
-      <button type="button" class="rc-btn" data-qy-layout="verses" aria-pressed="true">{t(locale, 'readerLayoutVerses')}</button>
-      <button type="button" class="rc-btn" data-qy-layout="pages" aria-pressed="false">{t(locale, 'readerLayoutPages')}</button>
-      <button type="button" class="rc-btn" data-qy-step="-1" aria-label={t(locale, 'readerFontSmaller')}>−</button>
-      <button type="button" class="rc-btn" data-qy-step="1" aria-label={t(locale, 'readerFontBigger')}>＋</button>
-      <button type="button" class="rc-btn" data-qy="panel-toggle" aria-pressed="false" aria-controls="qy-content-panel">{t(locale, 'panelTitle')}</button>
+      <button type="button" class="rc-btn" data-qy-view="mushaf" aria-pressed="true">
+        {t(locale, 'readerViewMushaf')}
+      </button>
+      <button type="button" class="rc-btn" data-qy-view="imlaei" aria-pressed="false">
+        {t(locale, 'readerViewImlaei')}
+      </button>
+      <button type="button" class="rc-btn" data-qy-layout="verses" aria-pressed="true">
+        {t(locale, 'readerLayoutVerses')}
+      </button>
+      <button type="button" class="rc-btn" data-qy-layout="pages" aria-pressed="false">
+        {t(locale, 'readerLayoutPages')}
+      </button>
+      <button
+        type="button"
+        class="rc-btn"
+        data-qy-step="-1"
+        aria-label={t(locale, 'readerFontSmaller')}
+      >
+        −
+      </button>
+      <button
+        type="button"
+        class="rc-btn"
+        data-qy-step="1"
+        aria-label={t(locale, 'readerFontBigger')}
+      >
+        ＋
+      </button>
+      <button
+        type="button"
+        class="rc-btn"
+        data-qy="panel-toggle"
+        aria-pressed="false"
+        aria-controls="qy-content-panel"
+      >
+        {t(locale, 'panelTitle')}
+      </button>
     </div>
     <div class="reader-listen">
-      <select id="reader-reciter-select" name="reader-reciter-select" data-qy="reciter-pick" aria-label={t(locale, 'readerPickReciter')} disabled></select>
-      <button type="button" class="rc-btn" data-qy="reader-play" data-surah={surah.id}>{t(locale, 'readerPlay')}</button>
+      <select
+        id="reader-reciter-select"
+        name="reader-reciter-select"
+        data-qy="reciter-pick"
+        aria-label={t(locale, 'readerPickReciter')}
+        disabled
+      ></select>
+      <button type="button" class="rc-btn" data-qy="reader-play" data-surah={surah.id}>
+        {t(locale, 'readerPlay')}
+      </button>
     </div>
   </header>
   <ContentPanel surah={surah.id} locale={locale} />
   <div class="ayahs">
-    {data.ayahs.map((a) => <AyahBlock surah={surah.id} n={a.n} page={a.page} textUthmani={a.u} textImlaei={a.i} sajda={a.sajda} locale={locale} />)}
+    {data.ayahs.map((a) => (
+      <AyahBlock
+        surah={surah.id}
+        n={a.n}
+        page={a.page}
+        textUthmani={a.u}
+        textImlaei={a.i}
+        sajda={a.sajda}
+        locale={locale}
+        translation={translations?.get(a.n)}
+      />
+    ))}
   </div>
   <nav class="reader-nav">
-    {prev !== null ? <a href={`${base}/surah/${prev}/`}>{t(locale, 'readerPrev')}</a> : <a href={`${base}/quran/`}>{t(locale, 'backToIndex')}</a>}
+    {prev !== null ? (
+      <a href={`${base}/surah/${prev}/`}>{t(locale, 'readerPrev')}</a>
+    ) : (
+      <a href={`${base}/quran/`}>{t(locale, 'backToIndex')}</a>
+    )}
     {next !== null && <a href={`${base}/surah/${next}/`}>{t(locale, 'readerNext')}</a>}
   </nav>
 </article>
 <style is:global>
-  html[dir='ltr'] .reader .ayah-text { direction: rtl; }
-  [data-reader-layout='pages'] .ayah.selected .ayah-actions { opacity: 1; }
-  .reader-controls { flex-wrap: wrap; }
+  html[dir='ltr'] .reader .ayah-text {
+    direction: rtl;
+  }
+  [data-reader-layout='pages'] .ayah.selected .ayah-actions {
+    opacity: 1;
+  }
+  .reader-controls {
+    flex-wrap: wrap;
+  }
 </style>
 <script>
   import {
@@ -137,7 +213,12 @@ const data = await getAyahs(surah.id);
 
     // --- header picker + play (featured-first via sortReciters) ---
     const picker = initReciterPicker(ctx);
-    initAyahActions({ context: ctx, playSurah: (s) => { void picker.playSurah(s); } });
+    initAyahActions({
+      context: ctx,
+      playSurah: (s) => {
+        void picker.playSurah(s);
+      },
+    });
     const keyboard = initKeyboardNav();
     const pages = initPageCards(ctx, keyboard);
     const observer = initResumeObserver(ctx);

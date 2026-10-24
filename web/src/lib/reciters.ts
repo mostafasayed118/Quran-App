@@ -14,13 +14,22 @@ export interface MoshafRow {
 
 export function isTrustedAudioServer(server: string): boolean {
   let uri: URL;
-  try { uri = new URL(server); } catch { return false; }
-  return uri.protocol === 'https:' &&
-    (uri.hostname === 'mp3quran.net' || uri.hostname.endsWith('.mp3quran.net'));
+  try {
+    uri = new URL(server);
+  } catch {
+    return false;
+  }
+  return (
+    uri.protocol === 'https:' &&
+    (uri.hostname === 'mp3quran.net' || uri.hostname.endsWith('.mp3quran.net'))
+  );
 }
 
 export function parseSurahList(csv: string): number[] {
-  return csv.split(',').map((p) => Number.parseInt(p.trim(), 10)).filter((n) => Number.isFinite(n));
+  return csv
+    .split(',')
+    .map((p) => Number.parseInt(p.trim(), 10))
+    .filter((n) => Number.isFinite(n));
 }
 
 export function parseReciters(payload: unknown): MoshafRow[] {
@@ -84,7 +93,9 @@ export async function fetchRecitersSnapshot(): Promise<MoshafRow[]> {
 /** Live API with committed-snapshot fallback (spec §3.4). */
 export async function fetchReciters(): Promise<MoshafRow[]> {
   try {
-    const res = await fetch('https://mp3quran.net/api/v3/reciters?language=ar', { signal: AbortSignal.timeout(15000) });
+    const res = await fetch('https://mp3quran.net/api/v3/reciters?language=ar', {
+      signal: AbortSignal.timeout(15000),
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const rows = parseReciters(await res.json());
     if (rows.length === 0) throw new Error('empty reciter payload');

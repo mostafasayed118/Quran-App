@@ -1,10 +1,13 @@
 ---
 import { t, type Locale } from '../lib/strings';
 import { CONTACT_EMAIL } from '../lib/landing-content';
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 ---
+
 <footer class="site-footer">
   <span>{t(locale, 'appName')}</span>
   <span aria-hidden="true">·</span>

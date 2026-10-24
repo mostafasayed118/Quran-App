@@ -1,8 +1,11 @@
 ---
 import type { Locale } from '../lib/strings';
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 ---
+
 <div class="resume" data-qy="resume-mount" data-locale={locale} hidden></div>
 <script>
   import { readResume, type ResumePoint } from '../lib/reader-resume';
@@ -61,16 +64,45 @@ const { locale = 'ar' } = Astro.props;
   onPageReady(init);
 </script>
 <style is:global>
-  .resume { width: min(760px, calc(100% - 40px)); margin: 20px auto 0; }
-  .resume[hidden] { display: none; }
-  .resume-link {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 18px; border: 1px solid var(--gold-line); border-radius: 14px;
-    background: var(--surface); color: var(--ink); text-decoration: none;
+  .resume {
+    width: min(760px, calc(100% - 40px));
+    margin: 20px auto 0;
   }
-  .resume-label { color: var(--gold-ink); font-size: .85rem; font-weight: 700; }
-  .resume-target { display: inline-flex; align-items: center; gap: 8px; margin-inline-start: auto; }
-  .resume-surah { font-weight: 700; }
-  .resume-ayah { color: var(--gold-ink); font-weight: 700; }
-  @media (pointer: coarse) { .resume-link { min-height: 44px; } }
+  .resume[hidden] {
+    display: none;
+  }
+  .resume-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border: 1px solid var(--gold-line);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .resume-label {
+    color: var(--gold-ink);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .resume-target {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-inline-start: auto;
+  }
+  .resume-surah {
+    font-weight: 700;
+  }
+  .resume-ayah {
+    color: var(--gold-ink);
+    font-weight: 700;
+  }
+  @media (pointer: coarse) {
+    .resume-link {
+      min-height: 44px;
+    }
+  }
 </style>

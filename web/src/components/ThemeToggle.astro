@@ -1,17 +1,17 @@
 ---
 import { t, type Locale } from '../lib/strings';
 import { THEME_KEY } from '../lib/theme';
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 const toNight = t(locale, 'themeToNight');
 const toDay = t(locale, 'themeToDay');
 ---
-<button
-  class="theme-toggle"
-  aria-label={toNight}
-  data-label-day={toNight}
-  data-label-night={toDay}
->{toNight}</button>
+
+<button class="theme-toggle" aria-label={toNight} data-label-day={toNight} data-label-night={toDay}>
+  {toNight}
+</button>
 <script is:inline data-astro-rerun define:vars={{ THEME_KEY }}>
   (function () {
     var btn = document.currentScript.previousElementSibling;
@@ -20,9 +20,10 @@ const toDay = t(locale, 'themeToDay');
     }
     if (!btn) return;
     function apply() {
-      var label = document.documentElement.getAttribute('data-theme') === 'night'
-        ? btn.dataset.labelNight
-        : btn.dataset.labelDay;
+      var label =
+        document.documentElement.getAttribute('data-theme') === 'night'
+          ? btn.dataset.labelNight
+          : btn.dataset.labelDay;
       btn.textContent = label;
       btn.setAttribute('aria-label', label);
     }
@@ -30,7 +31,11 @@ const toDay = t(locale, 'themeToDay');
     btn.addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'night' ? 'day' : 'night';
       document.documentElement.setAttribute('data-theme', next);
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* private mode */ }
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch (e) {
+        /* private mode */
+      }
       apply();
     });
   })();

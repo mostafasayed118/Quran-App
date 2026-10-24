@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import { statSync, readFileSync } from 'node:fs';
 
-const files = ['logo-64.png', 'favicon-32.png', 'favicon-16.png', 'apple-touch-icon-180.png', 'og-base.png'];
-const PNG_SIGNATURE = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+const files = [
+  'logo-64.png',
+  'favicon-32.png',
+  'favicon-16.png',
+  'apple-touch-icon-180.png',
+  'og-base.png',
+];
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
 describe('brand assets exist', () => {
   it.each(files)('public/%s', (f) => {
     const url = new URL(`../../public/${f}`, import.meta.url);

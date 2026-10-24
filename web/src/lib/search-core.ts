@@ -85,12 +85,7 @@ export function rankAyahsFolded(
   return rankCore(records, normalized, foldedForms, query, limit);
 }
 
-function rawRange(
-  rawText: string,
-  foldLayer: boolean,
-  start: number,
-  length: number,
-): Span | null {
+function rawRange(rawText: string, foldLayer: boolean, start: number, length: number): Span | null {
   const endNorm = start + length;
   const last = rawText.length;
   // A sentinel keeps normalizeArabic's trim() from eating trailing spaces of a prefix.

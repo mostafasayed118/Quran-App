@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { altLocalePath, GITHUB_RELEASES_URL, LANDING } from '../../src/lib/landing-content';
 
-interface TextEntry { path: string; value: string }
+interface TextEntry {
+  path: string;
+  value: string;
+}
 function stringsOf(value: unknown, path = ''): TextEntry[] {
   if (typeof value === 'string') return [{ path, value }];
   if (Array.isArray(value)) return value.flatMap((v, i) => stringsOf(v, `${path}[${i}]`));
@@ -47,11 +50,20 @@ describe('LANDING copy (both locales)', () => {
     for (const copy of [LANDING.ar, LANDING.en]) {
       expect(Object.keys(copy).sort()).toEqual(['about', 'cta', 'features', 'hero', 'promise']);
       expect(Object.keys(copy.hero).sort()).toEqual([
-        'ayah', 'ayahRef', 'ctaPrimary', 'ctaSecondary', 'kicker', 'lead',
+        'ayah',
+        'ayahRef',
+        'ctaPrimary',
+        'ctaSecondary',
+        'kicker',
+        'lead',
       ]);
       expect(Object.keys(copy.about).sort()).toEqual(['bullets', 'story']);
       expect(Object.keys(copy.cta).sort()).toEqual([
-        'githubLabel', 'lead', 'playLabel', 'title', 'version',
+        'githubLabel',
+        'lead',
+        'playLabel',
+        'title',
+        'version',
       ]);
     }
   });
@@ -82,6 +94,8 @@ describe('LANDING copy (both locales)', () => {
   });
 
   it('exposes the GitHub Releases URL', () => {
-    expect(GITHUB_RELEASES_URL).toBe('https://github.com/mostafasayed118/Quran-App/releases/latest');
+    expect(GITHUB_RELEASES_URL).toBe(
+      'https://github.com/mostafasayed118/Quran-App/releases/latest',
+    );
   });
 });

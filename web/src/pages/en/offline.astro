@@ -1,0 +1,46 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/strings';
+---
+
+<BaseLayout
+  title={t('en', 'offlineTitle')}
+  description={t('en', 'offlineLead')}
+  locale="en"
+  noindex
+>
+  <section class="offline">
+    <h1>{t('en', 'offlineTitle')}</h1>
+    <p>{t('en', 'offlineLead')}</p>
+    <a href="/en/">{t('en', 'offlineHome')}</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .offline {
+    width: min(560px, calc(100% - 40px));
+    margin-inline: auto;
+    padding: 96px 0 120px;
+    text-align: center;
+  }
+  .offline h1 {
+    margin: 0 0 12px;
+    font-size: 1.6rem;
+  }
+  .offline p {
+    margin: 0 0 28px;
+    color: var(--muted-strong);
+    line-height: 1.9;
+  }
+  .offline a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 999px;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-weight: 700;
+    text-decoration: none;
+  }
+</style>

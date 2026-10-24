@@ -7,9 +7,13 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
 });
 
-test('content panel: curated packs render notes, switch, and persist across reload', async ({ page }) => {
+test('content panel: curated packs render notes, switch, and persist across reload', async ({
+  page,
+}) => {
   await page.route('**/cdn.jsdelivr.net/gh/spa5k/**', (r) => r.fulfill({ json: tafsirFixture }));
-  await page.route('**/cdn.jsdelivr.net/gh/fawazahmed0/**', (r) => r.fulfill({ json: translationFixture }));
+  await page.route('**/cdn.jsdelivr.net/gh/fawazahmed0/**', (r) =>
+    r.fulfill({ json: translationFixture }),
+  );
   await page.goto('/surah/1/');
 
   const panel = page.locator('#qy-content-panel');
@@ -24,7 +28,9 @@ test('content panel: curated packs render notes, switch, and persist across relo
   await expect(notes).toHaveCount(7);
   const texts = await notes.allTextContents();
   for (const text of texts) expect(text.trim().length).toBeGreaterThan(0);
-  await expect(page.locator('.ayah[data-n="1"] .ayah-note[data-ayah="1"]')).toHaveText(tafsirFixture[0].text);
+  await expect(page.locator('.ayah[data-n="1"] .ayah-note[data-ayah="1"]')).toHaveText(
+    tafsirFixture[0].text,
+  );
   await expect(page.locator('.panel-source')).toContainText('التفسير الميسر');
 
   await pick.selectOption({ label: 'صحيح إنترناشيونال' });
@@ -43,7 +49,9 @@ test('content panel: curated packs render notes, switch, and persist across relo
   await expect(notes).toHaveCount(7);
 });
 
-test('content panel: pack failure shows error banner; retry after recovery reaches notes', async ({ page }) => {
+test('content panel: pack failure shows error banner; retry after recovery reaches notes', async ({
+  page,
+}) => {
   await page.route('**/cdn.jsdelivr.net/**', (r) => r.fulfill({ status: 500 }));
   await page.goto('/surah/1/');
 

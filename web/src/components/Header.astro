@@ -2,7 +2,10 @@
 import ThemeToggle from './ThemeToggle.astro';
 import { t, type Locale } from '../lib/strings';
 import { altLocalePath } from '../lib/landing-content';
-interface Props { locale?: Locale; altLocaleHref?: string }
+interface Props {
+  locale?: Locale;
+  altLocaleHref?: string;
+}
 const { locale = 'ar', altLocaleHref } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const other: Locale = locale === 'en' ? 'ar' : 'en';
@@ -12,21 +15,48 @@ const prayerTimesHref = `${base}/prayer-times/`;
 const qiblaHref = `${base}/qibla/`;
 const current = Astro.url.pathname;
 ---
+
 <header class="site-header">
   <a class="brand" href={`${base}/`}>
     <img src="/logo-64.png" alt={t(locale, 'appName')} width="27" height="27" />
     <span>{t(locale, 'appName')}</span>
   </a>
   <nav>
-    <a href={quranHref} aria-current={current === quranHref ? 'page' : undefined}>{t(locale, 'navQuran')}</a>
-    <a href={recitersHref} aria-current={current === recitersHref ? 'page' : undefined}>{t(locale, 'navReciters')}</a>
-    <a href={prayerTimesHref} aria-current={current.startsWith(prayerTimesHref) ? 'page' : undefined}>{t(locale, 'navPrayerTimes')}</a>
-    <a href={qiblaHref} aria-current={current.startsWith(qiblaHref) ? 'page' : undefined}>{t(locale, 'qbTitle')}</a>
+    <a href={quranHref} aria-current={current === quranHref ? 'page' : undefined}>
+      {t(locale, 'navQuran')}
+    </a>
+    <a href={recitersHref} aria-current={current === recitersHref ? 'page' : undefined}>
+      {t(locale, 'navReciters')}
+    </a>
+    <a
+      href={prayerTimesHref}
+      aria-current={current.startsWith(prayerTimesHref) ? 'page' : undefined}
+    >
+      {t(locale, 'navPrayerTimes')}
+    </a>
+    <a href={qiblaHref} aria-current={current.startsWith(qiblaHref) ? 'page' : undefined}>
+      {t(locale, 'qbTitle')}
+    </a>
   </nav>
-  <a class="lang-switch" href={altLocaleHref ?? altLocalePath(Astro.url.pathname, other)} rel="alternate">{t(locale, 'langSwitchTo')}</a>
+  <a
+    class="lang-switch"
+    href={altLocaleHref ?? altLocalePath(Astro.url.pathname, other)}
+    rel="alternate"
+  >
+    {t(locale, 'langSwitchTo')}
+  </a>
   <ThemeToggle locale={locale} />
 </header>
 <style>
-  .lang-switch { color: var(--muted-strong); text-decoration: none; }
-  @media (pointer: coarse) { .lang-switch { display: inline-flex; align-items: center; min-height: 44px; } }
+  .lang-switch {
+    color: var(--muted-strong);
+    text-decoration: none;
+  }
+  @media (pointer: coarse) {
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>

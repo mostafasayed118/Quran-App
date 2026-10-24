@@ -5,21 +5,28 @@ import { digitsFor } from '../../lib/arabic-digits';
 import { type PrayerTimesData } from '../../lib/prayer-times';
 import { formatClock, monthLabel, resolveToday } from '../../lib/prayer-calendar';
 
-interface Props { locale?: Locale; data: PrayerTimesData }
+interface Props {
+  locale?: Locale;
+  data: PrayerTimesData;
+}
 const { locale = 'ar', data } = Astro.props;
 const city = data.city;
 
 // SSR "today" is the build date: the page ships the current month pre-highlighted
 // and the client re-renders/highlights on month switches (see script below).
-const { y: todayY, m: todayM, d: todayD, inRange, monthIndex: currentIdx } = resolveToday(
-  data.months,
-  new Date(),
-);
+const {
+  y: todayY,
+  m: todayM,
+  d: todayD,
+  inRange,
+  monthIndex: currentIdx,
+} = resolveToday(data.months, new Date());
 const month = data.months[currentIdx];
 const todayISO = `${todayY}-${todayM}-${todayD}`;
 
 const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, locale));
 ---
+
 <h1 class="page-title">{heading}</h1>
 <div
   class="pt-city"
@@ -34,7 +41,9 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
       <span>{t(locale, 'ptMonth')}</span>
       <select id="prayer-month-select" name="prayer-month-select" data-qy="pt-month">
         {data.months.map((mo, i) => (
-          <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>{monthLabel(locale, mo.y, mo.m)}</option>
+          <option value={`${mo.y}-${mo.m}`} selected={i === currentIdx}>
+            {monthLabel(locale, mo.y, mo.m)}
+          </option>
         ))}
       </select>
     </label>
@@ -53,7 +62,8 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
           <th data-col="dhuhr">{t(locale, 'ptDhuhr')}</th>
           <th data-col="asr">{t(locale, 'ptAsr')}</th>
           <th data-col="maghrib">
-            <span class="lbl-times">{t(locale, 'ptMaghrib')}</span><span class="lbl-imsakiah">{t(locale, 'ptIftar')}</span>
+            <span class="lbl-times">{t(locale, 'ptMaghrib')}</span>
+            <span class="lbl-imsakiah">{t(locale, 'ptIftar')}</span>
           </th>
           <th data-col="isha">{t(locale, 'ptIsha')}</th>
         </tr>
@@ -81,29 +91,91 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
   <p class="pt-note">{t(locale, 'ptNote')}</p>
 </div>
 <style is:global>
-  .pt-city { width: min(920px, calc(100% - 40px)); margin: 0 auto 60px; }
-  .pt-city .pt-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0 10px; }
-  .pt-city .pt-month { display: flex; align-items: center; gap: 8px; color: var(--muted-strong); font-size: .9rem; }
-  .pt-city .pt-month select {
-    padding: 8px 12px; border-radius: 999px; border: 1px solid var(--hairline);
-    background: var(--surface); color: var(--ink); font: inherit;
+  .pt-city {
+    width: min(920px, calc(100% - 40px));
+    margin: 0 auto 60px;
   }
-  @media (pointer: coarse) { .pt-city .pt-month select { min-height: 44px; } }
-  .pt-city .pt-table-wrap { overflow-x: auto; }
-  .pt-city table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  .pt-city th, .pt-city td { padding: 8px 10px; border-bottom: 1px solid var(--hairline); text-align: center; white-space: nowrap; }
-  .pt-city th { color: var(--muted-strong); font-size: .82rem; font-weight: 700; }
-  .pt-city td { font-size: .95rem; }
-  .pt-city tr.is-today td { background: color-mix(in srgb, var(--gold-line) 14%, transparent); font-weight: 700; }
-  .pt-city .lbl-imsakiah { display: none; }
-  .pt-city [data-view='imsakiah'] .lbl-imsakiah { display: inline; }
-  .pt-city [data-view='imsakiah'] .lbl-times { display: none; }
+  .pt-city .pt-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0 10px;
+  }
+  .pt-city .pt-month {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted-strong);
+    font-size: 0.9rem;
+  }
+  .pt-city .pt-month select {
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+  }
+  @media (pointer: coarse) {
+    .pt-city .pt-month select {
+      min-height: 44px;
+    }
+  }
+  .pt-city .pt-table-wrap {
+    overflow-x: auto;
+  }
+  .pt-city table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+  .pt-city th,
+  .pt-city td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--hairline);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .pt-city th {
+    color: var(--muted-strong);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .pt-city td {
+    font-size: 0.95rem;
+  }
+  .pt-city tr.is-today td {
+    background: color-mix(in srgb, var(--gold-line) 14%, transparent);
+    font-weight: 700;
+  }
+  .pt-city .lbl-imsakiah {
+    display: none;
+  }
+  .pt-city [data-view='imsakiah'] .lbl-imsakiah {
+    display: inline;
+  }
+  .pt-city [data-view='imsakiah'] .lbl-times {
+    display: none;
+  }
   .pt-city [data-view='imsakiah'] [data-col='sunrise'],
   .pt-city [data-view='imsakiah'] [data-col='dhuhr'],
   .pt-city [data-view='imsakiah'] [data-col='asr'],
-  .pt-city [data-view='imsakiah'] [data-col='isha'] { display: none; }
-  .pt-city .pt-note { color: var(--muted-strong); font-size: .85rem; margin-top: 10px; }
-  .pt-city .pt-error { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted-strong); }
+  .pt-city [data-view='imsakiah'] [data-col='isha'] {
+    display: none;
+  }
+  .pt-city .pt-note {
+    color: var(--muted-strong);
+    font-size: 0.85rem;
+    margin-top: 10px;
+  }
+  .pt-city .pt-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: var(--muted-strong);
+  }
 </style>
 <script>
   import { t, type Locale } from '../../lib/strings';
@@ -154,8 +226,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
       const monthData = months.find((mo) => mo.y === y && mo.m === m);
       if (!monthData) return;
       const todayParts = today === '' ? null : today.split('-').map(Number);
-      const todayDay =
-        todayParts && todayParts[0] === y && todayParts[1] === m ? todayParts[2] : 0;
+      const todayDay = todayParts && todayParts[0] === y && todayParts[1] === m ? todayParts[2] : 0;
       const rows = monthData.days.map((row, i) => {
         const day = i + 1;
         const tr = document.createElement('tr');

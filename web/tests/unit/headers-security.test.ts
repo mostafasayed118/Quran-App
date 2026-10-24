@@ -48,8 +48,8 @@ describe('_headers security policy', () => {
     expect(scriptSrc).toContain("'self'");
     expect(scriptSrc).not.toContain("'unsafe-inline'");
     expect(scriptSrc).not.toContain("'unsafe-eval'");
-    // The five inline scripts (four executable + the static JSON-LD) are allowed by their exact bytes.
-    expect(scriptSrc.match(/'sha256-[^']+'/g)).toHaveLength(5);
+    // The six inline scripts (five executable + the static JSON-LD) are allowed by their exact bytes.
+    expect(scriptSrc.match(/'sha256-[^']+'/g)).toHaveLength(6);
   });
 
   it('allows styles from the site only (the CSS ships as a hashed file)', () => {

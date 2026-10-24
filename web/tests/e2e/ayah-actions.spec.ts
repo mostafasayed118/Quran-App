@@ -10,7 +10,10 @@ async function stubNoShare(page: Page): Promise<void> {
   });
 }
 
-test('copy writes plain Arabic (not glyphs), share falls back to clipboard, bookmark persists', async ({ context, page }) => {
+test('copy writes plain Arabic (not glyphs), share falls back to clipboard, bookmark persists', async ({
+  context,
+  page,
+}) => {
   await stubNoShare(page);
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters2 }));
@@ -18,22 +21,33 @@ test('copy writes plain Arabic (not glyphs), share falls back to clipboard, book
   await expect(page.locator('[data-ayah-action="copy"]').first()).toHaveText('نسخ');
   await page.locator('[data-ayah-action="copy"]').first().click();
   await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()), { message: 'clipboard receives the copy payload' })
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()), {
+      message: 'clipboard receives the copy payload',
+    })
     .toContain('بسم'); // plain Arabic — proves not PUA
   const clip = await page.evaluate(() => navigator.clipboard.readText());
   expect(/[\uE000-\uF8FF]/.test(clip)).toBe(false);
   await page.locator('[data-ayah-action="share"]').first().click();
   await expect
-    .poll(() => page.evaluate(() => navigator.clipboard.readText()), { message: 'share falls back to the clipboard' })
+    .poll(() => page.evaluate(() => navigator.clipboard.readText()), {
+      message: 'share falls back to the clipboard',
+    })
     .toContain('/surah/1#ayah-1');
   await page.locator('[data-ayah-action="bookmark"]').nth(2).click();
   await page.reload();
-  await expect(page.locator('[data-ayah-action="bookmark"]').nth(2)).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-ayah-action="bookmark"]').nth(2)).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
 });
 
-test('bookmark persists, listen dispatches the chosen reciter into the player', async ({ page }) => {
+test('bookmark persists, listen dispatches the chosen reciter into the player', async ({
+  page,
+}) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters2 }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/surah/1/');
   await page.locator('[data-qy="reciter-pick"]').selectOption({ index: 0 });
   await page.locator('[data-ayah-action="listen"]').first().click();

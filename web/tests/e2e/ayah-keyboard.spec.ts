@@ -5,7 +5,9 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
 });
 
-test('verses layout: one tab stop per ayah, Enter opens actions, Escape returns', async ({ page }) => {
+test('verses layout: one tab stop per ayah, Enter opens actions, Escape returns', async ({
+  page,
+}) => {
   await page.goto('/surah/1/');
   const ayahs = page.locator('.ayah');
   const first = ayahs.first();

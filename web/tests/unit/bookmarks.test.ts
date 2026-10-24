@@ -94,10 +94,19 @@ describe('bookmark store (injected storage)', () => {
     expect(store.isBookmarked(1, 2)).toBe(false);
     storage.setItem(BOOKMARKS_KEY, JSON.stringify({ s: 1, a: 2 }));
     expect(store.listBookmarks()).toEqual([]);
-    storage.setItem(BOOKMARKS_KEY, JSON.stringify([{ s: 'x', a: 1 }, { s: 2, a: 3 }]));
+    storage.setItem(
+      BOOKMARKS_KEY,
+      JSON.stringify([
+        { s: 'x', a: 1 },
+        { s: 2, a: 3 },
+      ]),
+    );
     expect(store.listBookmarks()).toEqual([{ s: 2, a: 3 }]);
     expect(store.toggleBookmark(1, 2)).toBe(true);
-    expect(JSON.parse(storage.getItem(BOOKMARKS_KEY)!)).toEqual([{ s: 2, a: 3 }, { s: 1, a: 2 }]);
+    expect(JSON.parse(storage.getItem(BOOKMARKS_KEY)!)).toEqual([
+      { s: 2, a: 3 },
+      { s: 1, a: 2 },
+    ]);
   });
 
   it('reports not-saved when an add cannot be persisted', () => {

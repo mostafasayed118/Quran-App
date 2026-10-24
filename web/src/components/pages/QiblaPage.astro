@@ -2,7 +2,9 @@
 import { t, type Locale } from '../../lib/strings';
 import { cityLabel, getCities } from '../../lib/cities';
 
-interface Props { locale?: Locale }
+interface Props {
+  locale?: Locale;
+}
 const { locale = 'ar' } = Astro.props;
 const placeholder = t(locale, 'ptSearchPlaceholder');
 const cities = getCities();
@@ -13,24 +15,41 @@ const cardinal = {
   w: t(locale, 'qbWest'),
 };
 ---
+
 <h1 class="page-title">{t(locale, 'qbTitle')}</h1>
 <p class="page-lead">{t(locale, 'qbLead')}</p>
 <div class="qb" data-qy="qb" data-locale={locale}>
   <div class="qb-actions">
-    <button type="button" class="rc-btn" data-qy="qb-geo">{t(locale, 'qbUseLocation')}</button>
+    <button type="button" class="rc-btn" data-qy="qb-geo">
+      {t(locale, 'qbUseLocation')}
+    </button>
     <span class="qb-status" data-qy="qb-status" role="status"></span>
   </div>
   <div class="qb-result" data-qy="qb-result" hidden>
-    <svg viewBox="0 0 200 200" width="230" height="230" role="img" aria-label={t(locale, 'qbTitle')}>
+    <svg
+      viewBox="0 0 200 200"
+      width="230"
+      height="230"
+      role="img"
+      aria-label={t(locale, 'qbTitle')}
+    >
       <circle cx="100" cy="100" r="96" class="qb-ring"></circle>
       <line x1="100" y1="6" x2="100" y2="18" class="qb-tick"></line>
       <line x1="100" y1="182" x2="100" y2="194" class="qb-tick"></line>
       <line x1="6" y1="100" x2="18" y2="100" class="qb-tick"></line>
       <line x1="182" y1="100" x2="194" y2="100" class="qb-tick"></line>
-      <text x="100" y="34" class="qb-card" text-anchor="middle">{cardinal.n}</text>
-      <text x="100" y="176" class="qb-card" text-anchor="middle">{cardinal.s}</text>
-      <text x="174" y="105" class="qb-card" text-anchor="middle">{cardinal.e}</text>
-      <text x="26" y="105" class="qb-card" text-anchor="middle">{cardinal.w}</text>
+      <text x="100" y="34" class="qb-card" text-anchor="middle">
+        {cardinal.n}
+      </text>
+      <text x="100" y="176" class="qb-card" text-anchor="middle">
+        {cardinal.s}
+      </text>
+      <text x="174" y="105" class="qb-card" text-anchor="middle">
+        {cardinal.e}
+      </text>
+      <text x="26" y="105" class="qb-card" text-anchor="middle">
+        {cardinal.w}
+      </text>
       <g class="qb-needle" data-qy="qb-needle" transform="rotate(0 100 100)">
         <path d="M100 16 L109 106 L100 94 L91 106 Z" class="qb-arrow"></path>
       </g>
@@ -38,14 +57,25 @@ const cardinal = {
     </svg>
     <p class="qb-readout">
       <span class="qb-readout-label">{t(locale, 'qbDirection')}</span>
-      <span class="qb-deg"><span data-qy="qb-deg"></span>°</span>
+      <span class="qb-deg">
+        <span data-qy="qb-deg"></span>°
+      </span>
     </p>
     <p class="qb-place" data-qy="qb-place"></p>
   </div>
   <div class="qb-picker" data-qy="qb-picker" hidden>
     <p class="qb-picker-msg">{t(locale, 'qbDenied')}</p>
-    <input type="search" class="index-search" id="qibla-city-search" name="qibla-city-search" placeholder={placeholder} aria-label={placeholder} />
-    <p class="empty" hidden>{t(locale, 'noResults')}</p>
+    <input
+      type="search"
+      class="index-search"
+      id="qibla-city-search"
+      name="qibla-city-search"
+      placeholder={placeholder}
+      aria-label={placeholder}
+    />
+    <p class="empty" hidden>
+      {t(locale, 'noResults')}
+    </p>
     <ul class="qb-cities">
       {cities.map((city) => (
         <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
@@ -59,36 +89,109 @@ const cardinal = {
   <p class="qb-how">{t(locale, 'qbHow')}</p>
 </div>
 <style is:global>
-  .qb { width: min(760px, calc(100% - 40px)); margin: 0 auto 60px; }
-  .qb .qb-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 14px 0; }
-  .qb .qb-status { color: var(--muted-strong); font-size: .9rem; }
-  .qb .qb-result { text-align: center; margin-top: 8px; }
-  .qb .qb-ring { fill: var(--surface); stroke: var(--hairline); stroke-width: 2; }
-  .qb .qb-tick { stroke: var(--gold-line); stroke-width: 2; }
-  .qb .qb-card { fill: var(--muted-strong); font-size: 13px; font-family: inherit; }
-  .qb .qb-arrow { fill: var(--accent); }
-  .qb .qb-hub { fill: var(--gold-ink); }
-  .qb .qb-needle { transition: transform .5s ease; }
-  .qb .qb-readout { margin: 10px 0 0; font-size: 1.05rem; }
-  .qb .qb-readout-label { color: var(--muted-strong); margin-inline-end: 8px; }
-  .qb .qb-deg { font-weight: 700; color: var(--accent); }
-  .qb .qb-place { margin: 2px 0 0; color: var(--muted-strong); font-size: .9rem; }
-  .qb .qb-picker { margin-top: 6px; }
-  .qb .qb-picker-msg { color: var(--muted-strong); }
+  .qb {
+    width: min(760px, calc(100% - 40px));
+    margin: 0 auto 60px;
+  }
+  .qb .qb-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .qb .qb-status {
+    color: var(--muted-strong);
+    font-size: 0.9rem;
+  }
+  .qb .qb-result {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .qb .qb-ring {
+    fill: var(--surface);
+    stroke: var(--hairline);
+    stroke-width: 2;
+  }
+  .qb .qb-tick {
+    stroke: var(--gold-line);
+    stroke-width: 2;
+  }
+  .qb .qb-card {
+    fill: var(--muted-strong);
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .qb .qb-arrow {
+    fill: var(--accent);
+  }
+  .qb .qb-hub {
+    fill: var(--gold-ink);
+  }
+  .qb .qb-needle {
+    transition: transform 0.5s ease;
+  }
+  .qb .qb-readout {
+    margin: 10px 0 0;
+    font-size: 1.05rem;
+  }
+  .qb .qb-readout-label {
+    color: var(--muted-strong);
+    margin-inline-end: 8px;
+  }
+  .qb .qb-deg {
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .qb .qb-place {
+    margin: 2px 0 0;
+    color: var(--muted-strong);
+    font-size: 0.9rem;
+  }
+  .qb .qb-picker {
+    margin-top: 6px;
+  }
+  .qb .qb-picker-msg {
+    color: var(--muted-strong);
+  }
   .qb .qb-cities {
-    list-style: none; margin: 4px 0 0; padding: 0;
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     column-gap: 18px;
   }
   .qb .qb-cities button {
-    display: block; width: 100%; text-align: start; padding: 10px 4px;
-    border: 0; border-bottom: 1px solid var(--hairline); background: transparent;
-    color: var(--ink); font: inherit; cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: start;
+    padding: 10px 4px;
+    border: 0;
+    border-bottom: 1px solid var(--hairline);
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
   }
-  .qb .qb-cities button:hover { color: var(--accent); }
-  @media (pointer: coarse) { .qb .qb-cities button { min-height: 44px; } }
-  .qb .qb-how { color: var(--muted-strong); font-size: .85rem; margin-top: 14px; }
-  @media (prefers-reduced-motion: reduce) { .qb .qb-needle { transition: none; } }
+  .qb .qb-cities button:hover {
+    color: var(--accent);
+  }
+  @media (pointer: coarse) {
+    .qb .qb-cities button {
+      min-height: 44px;
+    }
+  }
+  .qb .qb-how {
+    color: var(--muted-strong);
+    font-size: 0.85rem;
+    margin-top: 14px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .qb .qb-needle {
+      transition: none;
+    }
+  }
 </style>
 <script>
   import { t, type Locale } from '../../lib/strings';

@@ -31,6 +31,9 @@ const FILE_BUDGET = 2000;
 // chunk: it must not be charged against a page's pre-interaction budget, but it
 // must still be bounded.
 const SEARCH_INDEX_GZIP_BUDGET_BYTES = 240 * 1024;
+// The EN index is a separate, larger asset (6,236 records, ~304.56 KB gzip): its
+// own ceiling keeps the AR index bounded independently.
+const EN_SEARCH_INDEX_GZIP_BUDGET_BYTES = 360 * 1024;
 // Every other lazily imported chunk (today: the reciters snapshot) shares this ceiling.
 const LAZY_CHUNK_GZIP_BUDGET_BYTES = 64 * 1024;
 // Per-page CSS the browser must parse before the first paint.
@@ -43,7 +46,9 @@ const PRAYER_TIMES_PAYLOAD_BUDGET_BYTES = 4 * 1024 * 1024;
 const PRAYER_TIMES_FILE_BUDGET_BYTES = 64 * 1024;
 // The heaviest built HTML page. The ayah pages carry the full surah text, so they sit
 // in the hundreds of KB: the ceiling guards against a runaway page, not page weight.
-const HTML_PAGE_BUDGET_BYTES = 480 * 1024;
+// The EN surah pages now inline the full English translation (surah 2 is ~536 KB;
+// the AR surah page stays ~451 KB).
+const HTML_PAGE_BUDGET_BYTES = 640 * 1024;
 
 const PAGES = [
   {
@@ -60,6 +65,15 @@ const PAGES = [
     note: 'surah index (island-free)',
     showFileCount: false,
     expectsSearchIndex: true,
+  },
+  {
+    rel: 'en/quran/index.html',
+    budget: QURAN_JS_BUDGET_BYTES,
+    label: 'en-quran',
+    note: 'english surah index (island-free)',
+    showFileCount: false,
+    expectsSearchIndex: true,
+    searchIndexLocale: 'en',
   },
   {
     rel: 'index.html',
@@ -108,7 +122,9 @@ const INLINE_STYLE = /<style(?![^>]*\ssrc=)[^>]*>([\s\S]*?)<\/style>/g;
 // Vite names a chunk after its source: src/data/search-index.json -> search-index.<hash>.js
 const SEARCH_INDEX_CHUNK = /^search-index\.[\w-]+\.js$/;
 // The search worker fetches the index as a hashed JSON asset instead of bundling it.
-const SEARCH_INDEX_ASSET = /^search-index[-.][\w-]+\.json$/;
+// The EN asset is a distinct file: it must never satisfy the AR page's expectation.
+const SEARCH_INDEX_ASSET = /^search-index(?!-en)[-.][\w-]+\.json$/;
+const EN_SEARCH_INDEX_ASSET = /^search-index-en[-.][\w-]+\.json$/;
 // A worker is its own chunk; the page points at it with `new Worker(new URL(...))`.
 const WORKER_SPECIFIER = /new Worker\(\s*new URL\(\s*['"`]([^'"`]+)['"`]/g;
 // A chunk can fetch a hashed asset by its absolute URL (the worker fetches the index).
@@ -137,6 +153,7 @@ walk(DIST);
 
 let searchIndex = null;
 let searchIndexAsset = null;
+let enSearchIndexAsset = null;
 const lazyChunks = [];
 
 function measurePage(page) {
@@ -274,17 +291,28 @@ function measurePage(page) {
   const pageSearchIndexAsset = assetFiles.find((entry) =>
     SEARCH_INDEX_ASSET.test(basename(entry.file)),
   );
+  const pageEnSearchIndexAsset = assetFiles.find((entry) =>
+    EN_SEARCH_INDEX_ASSET.test(basename(entry.file)),
+  );
   const otherLazy = lazy.filter((entry) => entry !== pageSearchIndex);
   if (pageSearchIndex && !searchIndex) searchIndex = pageSearchIndex;
   if (pageSearchIndexAsset && !searchIndexAsset) searchIndexAsset = pageSearchIndexAsset;
+  if (pageEnSearchIndexAsset && !enSearchIndexAsset) enSearchIndexAsset = pageEnSearchIndexAsset;
   for (const entry of otherLazy) {
     if (!lazyChunks.some((known) => known.file === entry.file)) lazyChunks.push(entry);
   }
 
-  if (page.expectsSearchIndex && !pageSearchIndex && !pageSearchIndexAsset) {
+  // A page is bound to its own locale's asset. The worker chunk carries both URLs,
+  // so both assets show up in every page's file list - the binding must be explicit.
+  const indexLocale = page.searchIndexLocale === 'en' ? 'en' : 'ar';
+  const boundSearchIndexAsset =
+    indexLocale === 'en' ? pageEnSearchIndexAsset : pageSearchIndexAsset;
+
+  if (page.expectsSearchIndex && !pageSearchIndex && !boundSearchIndexAsset) {
     console.error(
-      `budget: ${page.rel} no longer reaches the search index - the ` +
-        `SEARCH_INDEX_GZIP_BUDGET_BYTES ceiling would be blind`,
+      `budget: ${page.rel} no longer reaches the ${indexLocale.toUpperCase()} search index - the ` +
+        `${indexLocale === 'en' ? 'EN_SEARCH_INDEX_GZIP_BUDGET_BYTES' : 'SEARCH_INDEX_GZIP_BUDGET_BYTES'} ` +
+        `ceiling would be blind`,
     );
     process.exit(1);
   }
@@ -297,7 +325,8 @@ function measurePage(page) {
     lazy,
     otherLazy,
     pageSearchIndex,
-    pageSearchIndexAsset,
+    pageSearchIndexAsset: boundSearchIndexAsset,
+    pageEnSearchIndexAsset,
     assetFiles,
     directGzip,
     staticGzip,
@@ -343,7 +372,12 @@ function printSection(result) {
   ];
   if (page.showFileCount) {
     const filesOk = fileCount < FILE_BUDGET;
-    rows.push(['dist file count', String(fileCount), String(FILE_BUDGET), filesOk ? 'PASS' : 'FAIL']);
+    rows.push([
+      'dist file count',
+      String(fileCount),
+      String(FILE_BUDGET),
+      filesOk ? 'PASS' : 'FAIL',
+    ]);
   }
 
   const widths = rows[0].map((_, col) => Math.max(...rows.map((row) => row[col].length)));
@@ -452,6 +486,8 @@ const fontsOk = fontPayload.bytes <= FONT_PAYLOAD_BUDGET_BYTES;
 const htmlOk = largestHtml.bytes <= HTML_PAGE_BUDGET_BYTES;
 const indexBytes = Math.max(searchIndex?.gzip ?? 0, searchIndexAsset?.gzip ?? 0);
 const searchIndexOk = indexBytes > 0 && indexBytes <= SEARCH_INDEX_GZIP_BUDGET_BYTES;
+const enIndexBytes = enSearchIndexAsset?.gzip ?? 0;
+const enSearchIndexOk = enIndexBytes > 0 && enIndexBytes <= EN_SEARCH_INDEX_GZIP_BUDGET_BYTES;
 const lazyOk = lazyChunks.every((entry) => entry.gzip <= LAZY_CHUNK_GZIP_BUDGET_BYTES);
 const cspOk = !cspCheck.unsafeInline && cspCheck.uncovered.length === 0 && cspCheck.seen.size > 0;
 const prayerTimesOk =
@@ -496,6 +532,14 @@ const globalRows = [
     searchIndexOk ? 'PASS' : 'FAIL',
   ],
   [
+    'search index EN (asset)',
+    enSearchIndexAsset
+      ? `${kb(enSearchIndexAsset.gzip)} (${basename(enSearchIndexAsset.file)})`
+      : 'not found',
+    kb(EN_SEARCH_INDEX_GZIP_BUDGET_BYTES),
+    enSearchIndexOk ? 'PASS' : 'FAIL',
+  ],
+  [
     'other lazy chunks (max)',
     lazyChunks.length ? kb(Math.max(...lazyChunks.map((e) => e.gzip))) : '-',
     kb(LAZY_CHUNK_GZIP_BUDGET_BYTES),
@@ -517,7 +561,9 @@ for (const row of globalRows) {
 if (cspCheck.seen.size > 0) {
   console.log('inline scripts in dist (sha256 of the exact bytes, one line per distinct script):');
   for (const [hash, entry] of cspCheck.seen) {
-    console.log(`  ${cspCheck.allowed.has(hash) ? '[hashed]' : '[MISSING]'} sha256-${hash} (${entry.count} page(s))`);
+    console.log(
+      `  ${cspCheck.allowed.has(hash) ? '[hashed]' : '[MISSING]'} sha256-${hash} (${entry.count} page(s))`,
+    );
   }
 }
 
@@ -554,6 +600,12 @@ if (!searchIndexOk) {
       `${kb(SEARCH_INDEX_GZIP_BUDGET_BYTES)}`,
   );
 }
+if (!enSearchIndexOk) {
+  console.error(
+    `BUDGET BREACH: english search index ${kb(enIndexBytes)} exceeds ` +
+      `${kb(EN_SEARCH_INDEX_GZIP_BUDGET_BYTES)}`,
+  );
+}
 if (!prayerTimesOk) {
   console.error(
     `BUDGET BREACH: prayer-times JSON ${kb(prayerTimesPayload.bytes)} (largest city ` +
@@ -580,6 +632,7 @@ const ok =
   fontsOk &&
   htmlOk &&
   searchIndexOk &&
+  enSearchIndexOk &&
   lazyOk &&
   prayerTimesOk &&
   cspOk;

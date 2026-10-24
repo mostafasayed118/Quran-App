@@ -4,7 +4,9 @@ import reciters from '../fixtures/reciters-2.json' with { type: 'json' };
 
 test('player: play from reciters page persists across SPA navigation', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/reciters/');
   await page.locator('[data-reciter-play]').first().click();
   const bar = page.locator('[data-qy="bar"]');
@@ -26,7 +28,9 @@ test('player: play from reciters page persists across SPA navigation', async ({ 
 
 test('player: close sticks while a track plays until a fresh play', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/surah/1/');
   const bar = page.locator('[data-qy="bar"]');
   await page.locator('[data-qy="reader-play"]').click();
@@ -42,7 +46,9 @@ test('player: close sticks while a track plays until a fresh play', async ({ pag
 
 test('player: audio error shows the localized message and toggle retries', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/surah/1/');
   const bar = page.locator('[data-qy="bar"]');
   const toggle = bar.locator('[data-qy="toggle"]');
@@ -68,7 +74,9 @@ test('player: audio error shows the localized message and toggle retries', async
 
 test('player: keyboard-close returns focus to the reader play control', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/surah/1/');
   await page.locator('[data-qy="reader-play"]').click();
   const bar = page.locator('[data-qy="bar"]');
@@ -82,7 +90,9 @@ test('player: keyboard-close returns focus to the reader play control', async ({
 
 test('player: close falls back to #main when there is no reader play control', async ({ page }) => {
   await page.route('**/mp3quran.net/api/v3/reciters**', (r) => r.fulfill({ json: reciters }));
-  await page.route('**/cdn.mp3quran.net/**', (r) => r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }));
+  await page.route('**/cdn.mp3quran.net/**', (r) =>
+    r.fulfill({ path: 'tests/fixtures/silent.wav', contentType: 'audio/wav' }),
+  );
   await page.goto('/reciters/');
   await page.locator('[data-reciter-play]').first().click();
   const bar = page.locator('[data-qy="bar"]');
@@ -106,9 +116,26 @@ test('player: seek slider is keyboard operable', async ({ page }) => {
       const m = /bytes=(\d+)-(\d*)/.exec(range);
       const start = m ? Number(m[1]) : 0;
       const end = m && m[2] ? Number(m[2]) : wav.length - 1;
-      await route.fulfill({ status: 206, headers: { 'Content-Type': 'audio/wav', 'Accept-Ranges': 'bytes', 'Content-Range': `bytes ${start}-${end}/${wav.length}`, 'Content-Length': String(end - start + 1) }, body: wav.subarray(start, end + 1) });
+      await route.fulfill({
+        status: 206,
+        headers: {
+          'Content-Type': 'audio/wav',
+          'Accept-Ranges': 'bytes',
+          'Content-Range': `bytes ${start}-${end}/${wav.length}`,
+          'Content-Length': String(end - start + 1),
+        },
+        body: wav.subarray(start, end + 1),
+      });
     } else {
-      await route.fulfill({ status: 200, headers: { 'Content-Type': 'audio/wav', 'Accept-Ranges': 'bytes', 'Content-Length': String(wav.length) }, body: wav });
+      await route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'audio/wav',
+          'Accept-Ranges': 'bytes',
+          'Content-Length': String(wav.length),
+        },
+        body: wav,
+      });
     }
   });
   await page.goto('/surah/1/');
@@ -116,10 +143,17 @@ test('player: seek slider is keyboard operable', async ({ page }) => {
   const seek = bar.locator('[data-qy="seek"]');
   await page.locator('[data-qy="reader-play"]').click();
   await expect(bar).toBeVisible();
-  await expect.poll(() => page.evaluate(() => (document.getElementById('qy-audio') as HTMLAudioElement).duration)).toBeGreaterThan(0);
+  await expect
+    .poll(() =>
+      page.evaluate(() => (document.getElementById('qy-audio') as HTMLAudioElement).duration),
+    )
+    .toBeGreaterThan(0);
   // Freeze playback first: with the 1s fixture, natural time drift would move
   // aria-valuenow on its own and fake a pass for the keypress assertion.
-  await page.evaluate(() => { const el = document.getElementById('qy-audio') as HTMLAudioElement | null; if (el) el.pause(); });
+  await page.evaluate(() => {
+    const el = document.getElementById('qy-audio') as HTMLAudioElement | null;
+    if (el) el.pause();
+  });
   // Park the position at ~30% through the real click-to-seek path.
   const box = await seek.boundingBox();
   if (!box) throw new Error('seek slider has no box');
