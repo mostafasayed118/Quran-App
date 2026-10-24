@@ -39,7 +39,6 @@ extension AyahLookupRefs on AyahLookup {
     final row = await ayahById(ayahId);
     if (row == null) return null;
     return AyahRef(
-      id: row.id,
       surahId: row.surahId,
       numberInSurah: row.numberInSurah,
       textUthmani: row.textUthmani,
@@ -50,7 +49,7 @@ extension AyahLookupRefs on AyahLookup {
   Future<SurahRef?> surahRefById(int surahId) async {
     final row = await surahById(surahId);
     if (row == null) return null;
-    return SurahRef(id: row.id, nameAr: row.nameAr);
+    return SurahRef(nameAr: row.nameAr);
   }
 
   /// The ayahs of [surahId] between [fromAyah] and [toAyah] inclusive, in
@@ -64,7 +63,6 @@ extension AyahLookupRefs on AyahLookup {
     return [
       for (final row in rows)
         AyahRef(
-          id: row.id,
           surahId: row.surahId,
           numberInSurah: row.numberInSurah,
           textUthmani: row.textUthmani,

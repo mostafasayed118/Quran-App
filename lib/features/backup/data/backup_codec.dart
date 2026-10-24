@@ -65,8 +65,6 @@ class BackupPrayerDay {
 
   /// Isha was marked on [day].
   final bool isha;
-
-  bool get anyMarked => fajr || dhuhr || asr || maghrib || isha;
 }
 
 /// Tasbih state — settings key `tasbih_state` (`{count, target}`).

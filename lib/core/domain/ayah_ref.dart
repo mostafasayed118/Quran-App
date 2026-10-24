@@ -7,14 +7,10 @@
 class AyahRef {
   /// Creates one ayah reference.
   const AyahRef({
-    required this.id,
     required this.surahId,
     required this.numberInSurah,
     required this.textUthmani,
   });
-
-  /// The ayah id (the global ayah number).
-  final int id;
 
   /// The id of the surah the ayah belongs to.
   final int surahId;
@@ -30,10 +26,7 @@ class AyahRef {
 /// feature needs in order to name a surah.
 class SurahRef {
   /// Creates one surah reference.
-  const SurahRef({required this.id, required this.nameAr});
-
-  /// The surah id (1-based).
-  final int id;
+  const SurahRef({required this.nameAr});
 
   /// The Arabic name of the surah.
   final String nameAr;

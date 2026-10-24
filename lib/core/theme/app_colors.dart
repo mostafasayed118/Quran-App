@@ -11,8 +11,6 @@ abstract final class AppColors {
   static const goldLight = Color(0xFFF7EAD2);
   static const pageBackground = Color(0xFFEFE9DA);
   static const ink = Color(0xFF232D28);
-  static const muted = Color(0xFF6E7B74);
   static const hairline = Color(0xFFD9D2BF);
   static const cardBackground = Color(0xFFFFFDF7);
-  static const danger = Color(0xFFB3452F);
 }

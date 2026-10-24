@@ -29,14 +29,11 @@ import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
-import 'package:quran_yahdi/features/quran/data/ayah_source.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
-import 'package:quran_yahdi/features/quran/data/last_read_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/surah_source.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
-import 'package:quran_yahdi/features/recitation/data/reciter_source.dart';
 import 'package:quran_yahdi/features/recitation/playback/just_audio_playback_service.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
@@ -92,15 +89,11 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<SurahRepository>(() => SurahRepository(db));
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
-  getIt.registerLazySingleton<AyahSource>(() => getIt<AyahRepository>());
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt
-      .registerLazySingleton<LastReadSource>(() => getIt<LastReadRepository>());
-  getIt
       .registerLazySingleton<LastReadMarker>(() => getIt<LastReadRepository>());
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
-  getIt.registerLazySingleton<ReciterSource>(() => getIt<ReciterRepository>());
   getIt.registerLazySingleton<PrayerTimeService>(
       () => const PrayerTimeService());
   getIt
