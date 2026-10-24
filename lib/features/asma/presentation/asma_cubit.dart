@@ -37,6 +37,8 @@ class AsmaCubit extends Cubit<AsmaState> {
   /// Selects a name (null clears the selection) and keeps the loaded list.
   void select(AsmaName? name) {
     if (isClosed) return;
-    emit(AsmaState.ready(names: (state as AsmaReady).names, selected: name));
+    if (state case AsmaReady(:final names)) {
+      emit(AsmaState.ready(names: names, selected: name));
+    }
   }
 }

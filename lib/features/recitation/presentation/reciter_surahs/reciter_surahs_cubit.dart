@@ -46,8 +46,10 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
         return;
       }
       final surahs = parseSurahList(row.surahList);
-      final names = await _reciters.surahNamesFor(surahs);
-      final previews = await _reciters.ayahTeasersFor(surahs);
+      final (names, previews) = await (
+        _reciters.surahNamesFor(surahs),
+        _reciters.ayahTeasersFor(surahs),
+      ).wait;
       if (isClosed) return;
       await _downloads.refreshDone();
       if (isClosed) return;
@@ -67,7 +69,17 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
   }
 
   /// Makes this reciter the default one (the moshaf selection).
+  ///
+  /// A storage failure is logged, never surfaced: the screen discards the
+  /// returned future, so the failure must not become an unhandled error.
   Future<void> setAsDefault() async {
-    await _reciters.selectMoshaf(_rowId);
+    try {
+      await _reciters.selectMoshaf(_rowId);
+    } on Object catch (error, stackTrace) {
+      dev.log('select moshaf failed',
+          name: 'quran_yahdi/reciter_surahs',
+          error: error,
+          stackTrace: stackTrace);
+    }
   }
 }

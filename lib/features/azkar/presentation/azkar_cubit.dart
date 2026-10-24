@@ -69,7 +69,7 @@ class AzkarCubit extends Cubit<AzkarState> {
       dev.log('azkar search failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _searchSeq) return;
-      emit(AzkarState.browsing(collections: _collections));
+      emit(AzkarState.browsing(collections: _collections, query: query));
     }
   }
 

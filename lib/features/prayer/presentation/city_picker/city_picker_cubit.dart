@@ -25,6 +25,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
 
   String? _selectedCityId;
   bool _selectedLoaded = false;
+  int _searchSeq = 0;
 
   /// Searches the city catalog for [query] and emits the results.
   ///
@@ -32,13 +33,14 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   /// failed state (the error is logged, never raised as an unhandled async
   /// error).
   Future<void> search(String query) async {
+    final seq = ++_searchSeq;
     try {
       final results = await _cityRepo.search(query);
       if (!_selectedLoaded) {
         _selectedCityId = (await _cityRepo.selectedCity())?.id;
         _selectedLoaded = true;
       }
-      if (isClosed) return;
+      if (isClosed || seq != _searchSeq) return;
       emit(CityPickerState.ready(
         query: query,
         results: results,
@@ -49,16 +51,28 @@ class CityPickerCubit extends Cubit<CityPickerState> {
           name: 'quran_yahdi/city_picker',
           error: error,
           stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || seq != _searchSeq) return;
       emit(const CityPickerState.failed());
     }
   }
 
   /// Stores [city] as the selected city.
-  Future<void> persist(City city) async {
-    await _cityRepo.select(city);
+  ///
+  /// Returns false when the write fails (logged, never raised); the caller
+  /// keeps the picker open and shows localized feedback.
+  Future<bool> persist(City city) async {
+    try {
+      await _cityRepo.select(city);
+    } on Object catch (error, stackTrace) {
+      dev.log('city persist failed',
+          name: 'quran_yahdi/city_picker',
+          error: error,
+          stackTrace: stackTrace);
+      return false;
+    }
     _selectedCityId = city.id;
     _selectedLoaded = true;
+    return true;
   }
 
   /// Resolves the device position to the nearest bundled city, persists it and

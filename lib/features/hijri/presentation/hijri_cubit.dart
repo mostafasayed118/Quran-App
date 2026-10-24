@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,32 +26,39 @@ class HijriCubit extends Cubit<HijriState> {
   /// The grid is Saturday-first: [offset] is the number of empty cells
   /// before day 1 of the month.
   Future<void> show(int hijriYear, int hijriMonth) async {
-    final length = _service.daysInMonth(hijriYear, hijriMonth);
-    final firstGregorian = _service.toGregorian(hijriYear, hijriMonth, 1);
-    // Saturday-first grid: Dart weekday Mon=1..Sun=7.
-    final offset = (firstGregorian.weekday + 1) % 7;
-    final todayHijri = _service.fromGregorian(DateTime.now());
-    final cells = <HijriCell>[
-      for (var day = 1; day <= length; day++)
-        HijriCell(
-          hDay: day,
-          gDay: _service.toGregorian(hijriYear, hijriMonth, day).day,
-          isToday: todayHijri.hYear == hijriYear &&
-              todayHijri.hMonth == hijriMonth &&
-              todayHijri.hDay == day,
-        ),
-    ];
-    final todayHeader =
-        '${_arabic(todayHijri.hDay)} ${_service.monthName(todayHijri.hYear, todayHijri.hMonth)} ${_arabic(todayHijri.hYear)}';
-    if (isClosed) return;
-    emit(HijriState.ready(
-      month: hijriMonth,
-      year: hijriYear,
-      monthName: _service.monthName(hijriYear, hijriMonth),
-      offset: offset,
-      cells: cells,
-      todayHeader: todayHeader,
-    ));
+    try {
+      final length = _service.daysInMonth(hijriYear, hijriMonth);
+      final firstGregorian = _service.toGregorian(hijriYear, hijriMonth, 1);
+      // Saturday-first grid: Dart weekday Mon=1..Sun=7.
+      final offset = (firstGregorian.weekday + 1) % 7;
+      final todayHijri = _service.fromGregorian(DateTime.now());
+      final cells = <HijriCell>[
+        for (var day = 1; day <= length; day++)
+          HijriCell(
+            hDay: day,
+            gDay: _service.toGregorian(hijriYear, hijriMonth, day).day,
+            isToday: todayHijri.hYear == hijriYear &&
+                todayHijri.hMonth == hijriMonth &&
+                todayHijri.hDay == day,
+          ),
+      ];
+      final todayHeader =
+          '${_arabic(todayHijri.hDay)} ${_service.monthName(todayHijri.hYear, todayHijri.hMonth)} ${_arabic(todayHijri.hYear)}';
+      if (isClosed) return;
+      emit(HijriState.ready(
+        month: hijriMonth,
+        year: hijriYear,
+        monthName: _service.monthName(hijriYear, hijriMonth),
+        offset: offset,
+        cells: cells,
+        todayHeader: todayHeader,
+      ));
+    } on Object catch (error, stackTrace) {
+      dev.log('hijri load failed',
+          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const HijriState.failed());
+    }
   }
 
   String _arabic(int n) => n.toArabicIndic;
@@ -75,8 +83,15 @@ class HijriCubit extends Cubit<HijriState> {
 
   /// Shows the month that contains today.
   Future<void> jumpToToday() async {
-    final now = DateTime.now();
-    final hijri = _service.fromGregorian(now);
-    await show(hijri.hYear, hijri.hMonth);
+    try {
+      final now = DateTime.now();
+      final hijri = _service.fromGregorian(now);
+      await show(hijri.hYear, hijri.hMonth);
+    } on Object catch (error, stackTrace) {
+      dev.log('hijri today failed',
+          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const HijriState.failed());
+    }
   }
 }

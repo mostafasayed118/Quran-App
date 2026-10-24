@@ -67,6 +67,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   StreamSubscription<bool>? _playingSub;
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
+  StreamSubscription<void>? _completionSub;
 
   /// Entity entry for the re-typed screens (ready states carry
   /// [ReciterInfo], never drift rows).
@@ -82,7 +83,16 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       reciterName: reciterName,
       surahNumber: surahNumber,
     ));
-    final downloaded = await _downloader.downloadedPath(rowId, surahNumber);
+    String? downloaded;
+    try {
+      downloaded = await _downloader.downloadedPath(rowId, surahNumber);
+    } on Object catch (error, stackTrace) {
+      // A registry read failure is not a playback failure: fall back to the
+      // remote URL instead of leaving the state stuck in loading.
+      dev.log('download lookup failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      downloaded = null;
+    }
     if (isClosed || episode != _episode) return;
     final source = downloaded != null
         ? PlaybackSource.file(
@@ -147,6 +157,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// audible (pause) or still paused (resume).
   Future<void> toggle() async {
     final state = this.state;
+    final episode = _episode;
     if (state is PlaybackPlaying) {
       try {
         await _service.pause();
@@ -156,7 +167,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
         return;
       }
-      if (isClosed) return;
+      if (isClosed || episode != _episode) return;
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
@@ -172,7 +183,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
         return;
       }
-      if (isClosed) return;
+      if (isClosed || episode != _episode) return;
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
@@ -187,13 +198,15 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// The play-attempt counter is bumped, so a late success of the stopped
   /// attempt is discarded instead of resurrecting a track.
   Future<void> stopAndReset() async {
-    _episode++;
+    final episode = ++_episode;
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
       dev.log('stop failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
     }
+    // A newer play (or stop) superseded this one: its streams must stay bound.
+    if (isClosed || episode != _episode) return;
     await _unbindStreams();
     if (isClosed) return;
     emit(const PlaybackState.initial());
@@ -209,6 +222,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _durationSub ??= _service
         .durationStream()
         .listen(_onDurationChanged, onError: _onStreamError);
+    if (_service case final CompletingPlaybackService completing) {
+      _completionSub ??= completing.completionStream().listen(
+            (_) => unawaited(stopAndReset()),
+            onError: _onStreamError,
+          );
+    }
   }
 
   void _onStreamError(Object error, StackTrace stackTrace) {
@@ -220,24 +239,29 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     await _playingSub?.cancel();
     await _positionSub?.cancel();
     await _durationSub?.cancel();
+    await _completionSub?.cancel();
     _playingSub = null;
     _positionSub = null;
     _durationSub = null;
+    _completionSub = null;
   }
 
   /// Unbinds the player streams and disposes the service when it owns
   /// platform resources.
   @override
   Future<void> close() async {
-    await _unbindStreams();
-    // The service owns the platform resources (ExoPlayer, audio focus). It
-    // is disposed only when it exposes the capability - the frozen test
-    // doubles implement the plain seam and own nothing.
-    final Object service = _service;
-    if (service is DisposablePlaybackService) {
-      await service.dispose();
+    try {
+      await _unbindStreams();
+      // The service owns the platform resources (ExoPlayer, audio focus). It
+      // is disposed only when it exposes the capability - the frozen test
+      // doubles implement the plain seam and own nothing.
+      final Object service = _service;
+      if (service is DisposablePlaybackService) {
+        await service.dispose();
+      }
+    } finally {
+      await super.close();
     }
-    return super.close();
   }
 
   void _onPlayingChanged(bool playing) {

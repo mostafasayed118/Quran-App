@@ -52,6 +52,7 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(HijriLoading value)? loading,
+    TResult Function(HijriFailed value)? failed,
     TResult Function(HijriReady value)? ready,
     required TResult orElse(),
   }) {
@@ -59,6 +60,8 @@ extension HijriStatePatterns on HijriState {
     switch (_that) {
       case HijriLoading() when loading != null:
         return loading(_that);
+      case HijriFailed() when failed != null:
+        return failed(_that);
       case HijriReady() when ready != null:
         return ready(_that);
       case _:
@@ -82,12 +85,15 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(HijriLoading value) loading,
+    required TResult Function(HijriFailed value) failed,
     required TResult Function(HijriReady value) ready,
   }) {
     final _that = this;
     switch (_that) {
       case HijriLoading():
         return loading(_that);
+      case HijriFailed():
+        return failed(_that);
       case HijriReady():
         return ready(_that);
     }
@@ -108,12 +114,15 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(HijriLoading value)? loading,
+    TResult? Function(HijriFailed value)? failed,
     TResult? Function(HijriReady value)? ready,
   }) {
     final _that = this;
     switch (_that) {
       case HijriLoading() when loading != null:
         return loading(_that);
+      case HijriFailed() when failed != null:
+        return failed(_that);
       case HijriReady() when ready != null:
         return ready(_that);
       case _:
@@ -136,6 +145,7 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
+    TResult Function()? failed,
     TResult Function(int month, int year, String monthName, int offset,
             List<HijriCell> cells, String todayHeader)?
         ready,
@@ -145,6 +155,8 @@ extension HijriStatePatterns on HijriState {
     switch (_that) {
       case HijriLoading() when loading != null:
         return loading();
+      case HijriFailed() when failed != null:
+        return failed();
       case HijriReady() when ready != null:
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
             _that.cells, _that.todayHeader);
@@ -169,6 +181,7 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
+    required TResult Function() failed,
     required TResult Function(int month, int year, String monthName, int offset,
             List<HijriCell> cells, String todayHeader)
         ready,
@@ -177,6 +190,8 @@ extension HijriStatePatterns on HijriState {
     switch (_that) {
       case HijriLoading():
         return loading();
+      case HijriFailed():
+        return failed();
       case HijriReady():
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
             _that.cells, _that.todayHeader);
@@ -198,6 +213,7 @@ extension HijriStatePatterns on HijriState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
+    TResult? Function()? failed,
     TResult? Function(int month, int year, String monthName, int offset,
             List<HijriCell> cells, String todayHeader)?
         ready,
@@ -206,6 +222,8 @@ extension HijriStatePatterns on HijriState {
     switch (_that) {
       case HijriLoading() when loading != null:
         return loading();
+      case HijriFailed() when failed != null:
+        return failed();
       case HijriReady() when ready != null:
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
             _that.cells, _that.todayHeader);
@@ -232,6 +250,26 @@ class HijriLoading implements HijriState {
   @override
   String toString() {
     return 'HijriState.loading()';
+  }
+}
+
+/// @nodoc
+
+class HijriFailed implements HijriState {
+  const HijriFailed();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is HijriFailed);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'HijriState.failed()';
   }
 }
 

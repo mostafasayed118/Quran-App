@@ -91,6 +91,10 @@ class QiblaCubit extends Cubit<QiblaState> {
         );
         _markCompassUnavailable();
       },
+      onDone: () {
+        _headingSub = null;
+        _markCompassUnavailable();
+      },
     );
   }
 
@@ -99,7 +103,7 @@ class QiblaCubit extends Cubit<QiblaState> {
     _compassUnavailable = true;
     if (isClosed) return;
     final state = this.state;
-    if (state is QiblaLoading) return;
+    if (state is! QiblaReady) return;
     emit(QiblaState.ready(
       city: state.city,
       bearing: state.bearing,
@@ -113,7 +117,7 @@ class QiblaCubit extends Cubit<QiblaState> {
     _compassUnavailable = false;
     if (isClosed) return;
     final state = this.state;
-    if (state is QiblaLoading) return;
+    if (state is! QiblaReady) return;
     emit(QiblaState.ready(
       city: state.city,
       bearing: state.bearing,

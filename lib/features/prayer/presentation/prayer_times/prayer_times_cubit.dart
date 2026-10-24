@@ -36,6 +36,8 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
   final DateTime Function() _clock;
 
   DateTime? _loadedDay;
+  bool _reloading = false;
+  Completer<void>? _reloadDone;
 
   /// Loads the selected city, today's prayers and the countdown, then emits
   /// the ready state.
@@ -44,6 +46,13 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
   /// emits the failed state (the error is logged, never raised as an
   /// unhandled async error).
   Future<void> reload() async {
+    if (_reloading) {
+      final done = _reloadDone;
+      if (done != null) await done.future;
+      return;
+    }
+    _reloading = true;
+    final done = _reloadDone = Completer<void>();
     try {
       final selected = await _city.selectedCity();
       if (isClosed) return;
@@ -84,6 +93,10 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
           stackTrace: stackTrace);
       if (isClosed) return;
       emit(const PrayerTimesState.failed());
+    } finally {
+      _reloading = false;
+      _reloadDone = null;
+      if (!done.isCompleted) done.complete();
     }
   }
 
@@ -133,11 +146,5 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       prayer: _prayer,
       scheduler: scheduler,
     ));
-  }
-
-  /// Stores [city] as the selected city and reloads the prayers.
-  Future<void> select(City city) async {
-    await _city.select(city);
-    await reload();
   }
 }

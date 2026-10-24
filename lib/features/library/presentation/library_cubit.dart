@@ -57,14 +57,13 @@ class LibraryCubit extends Cubit<LibraryState> {
   /// (the failed set) instead of failing the whole screen.
   Future<void> install(LibraryPackInfo pack) async {
     if (isClosed || _inFlight(pack.id)) return;
+    final current = state;
+    if (current is! LibraryReady) return;
     final expected = (pack.approxSizeMb * 1024 * 1024).round();
-    if (state is LibraryReady) {
-      final ready = state as LibraryReady;
-      emit(ready.copyWith(
-        failed: {...ready.failed}..remove(pack.id),
-        progress: {...ready.progress, pack.id: (0, expected)},
-      ));
-    }
+    emit(current.copyWith(
+      failed: {...current.failed}..remove(pack.id),
+      progress: {...current.progress, pack.id: (0, expected)},
+    ));
     try {
       await _downloader.install(pack, onProgress: (received, total) {
         if (isClosed) return;
@@ -122,6 +121,7 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   /// Clears the failure recorded for [packId] (the user dismissed it).
   void dismissFailure(String packId) {
+    if (isClosed) return;
     final ready = state;
     if (ready is! LibraryReady) return;
     emit(ready.copyWith(failed: {...ready.failed}..remove(packId)));
@@ -129,9 +129,14 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   /// Re-runs the install for [packId]; a no-op when the pack is unknown.
   Future<void> retry(String packId) async {
-    final pack = await _catalog.byId(packId);
-    if (pack == null) return;
-    await install(pack);
+    try {
+      final pack = await _catalog.byId(packId);
+      if (pack == null) return;
+      await install(pack);
+    } on Object catch (error, stackTrace) {
+      dev.log('library retry failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+    }
   }
 
   bool _inFlight(String packId) {

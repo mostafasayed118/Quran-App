@@ -94,6 +94,28 @@ void main() {
       expect(cubit.state.heading, isNull);
       await cubit.close();
     });
+
+    test('a closed heading stream returns to the unavailable compass',
+        () async {
+      final controller = StreamController<double>();
+      addTearDown(controller.close);
+      final cubit = QiblaCubit(
+        city: repo,
+        qibla: FakeQiblaService(),
+        heading: HeadingService(streamFactory: () => controller.stream),
+      );
+      await cubit.reload();
+      controller.add(90.0);
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state.heading, 90.0);
+      expect(cubit.state.compassUnavailable, isFalse);
+
+      unawaited(controller.close());
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state.heading, isNull);
+      expect(cubit.state.compassUnavailable, isTrue);
+      await cubit.close();
+    });
   });
 
   group('QiblaScreen static-mode hint', () {
@@ -124,10 +146,15 @@ void main() {
     });
 
     testWidgets('a live heading shows only the live footnote', (tester) async {
+      final controller = StreamController<double>();
+      addTearDown(controller.close);
       await pumpHost(
         tester,
-        heading: HeadingService(streamFactory: () => Stream.value(90.0)),
+        heading: HeadingService(streamFactory: () => controller.stream),
       );
+      controller.add(90.0);
+      await tester.pump();
+      await tester.pump();
       expect(find.text('المقياس حي'), findsOneWidget);
       expect(find.textContaining('المقياس ثابت'), findsNothing);
     });

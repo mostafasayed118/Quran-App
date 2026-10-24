@@ -25,34 +25,41 @@ class HadithCubit extends Cubit<HadithState> {
 
   final PackDownloader _downloader;
   final String _packId;
+  bool _paging = false;
 
   Future<void> _load(int offset) async {
-    List<(int, String)> items;
-    var hasMore = false;
-    String packTitle;
-    String language;
+    if (_paging) return;
+    _paging = true;
     try {
-      final rows = await _downloader.installedPacks();
-      final row = rows.where((r) => r.packId == _packId).firstOrNull;
-      packTitle = row?.title ?? _packId;
-      language = row?.language ?? '';
-      (items, hasMore) =
-          await _downloader.hadithPage(_packId, offset, pageSize);
-    } on Object catch (error, stackTrace) {
-      dev.log('hadith load failed',
-          name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+      List<(int, String)> items;
+      var hasMore = false;
+      String packTitle;
+      String language;
+      try {
+        final rows = await _downloader.installedPacks();
+        final row = rows.where((r) => r.packId == _packId).firstOrNull;
+        packTitle = row?.title ?? _packId;
+        language = row?.language ?? '';
+        (items, hasMore) =
+            await _downloader.hadithPage(_packId, offset, pageSize);
+      } on Object catch (error, stackTrace) {
+        dev.log('hadith load failed',
+            name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+        if (isClosed) return;
+        emit(const HadithState.failed());
+        return;
+      }
       if (isClosed) return;
-      emit(const HadithState.failed());
-      return;
+      emit(HadithState.ready(
+        packTitle: packTitle,
+        language: language,
+        items: items,
+        offset: offset,
+        hasMore: hasMore,
+      ));
+    } finally {
+      _paging = false;
     }
-    if (isClosed) return;
-    emit(HadithState.ready(
-      packTitle: packTitle,
-      language: language,
-      items: items,
-      offset: offset,
-      hasMore: hasMore,
-    ));
   }
 
   /// Loads the next page; a no-op when the last page was reached.

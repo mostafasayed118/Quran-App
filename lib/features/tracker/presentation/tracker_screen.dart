@@ -29,39 +29,52 @@ class TrackerScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.worshipTracker)),
-      body: BlocBuilder<TrackerCubit, TrackerState>(
-        builder: (context, state) => switch (state) {
-          TrackerLoading() => const LoadingView(),
-          TrackerFailed() => errorPane(loc),
-          TrackerReady(
-            :final today,
-            :final streakDays,
-            :final last7,
-            :final khatmaAvailable,
-            :final khatma,
-          ) =>
-            ListView(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              children: [
-                _TodayCard(today: today),
-                const SizedBox(height: AppSpacing.sm),
-                for (final slot in PrayerSlot.values)
-                  _SlotTile(slot: slot, today: today),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  loc.last7Days,
-                  style: AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
-                ),
-                const SizedBox(height: 6),
-                _Last7Row(last7: last7),
-                if (streakDays > 0) _StreakChip(streakDays: streakDays),
-                if (khatmaAvailable) ...[
-                  const SizedBox(height: AppSpacing.md),
-                  _WirdCard(progress: khatma),
-                ],
-              ],
-            ),
+      body: BlocListener<TrackerCubit, TrackerState>(
+        listenWhen: (previous, current) =>
+            previous is TrackerReady &&
+            !previous.actionFailed &&
+            current is TrackerReady &&
+            current.actionFailed,
+        listener: (context, state) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(loc.genericError)),
+          );
+          context.read<TrackerCubit>().acknowledgeActionFailure();
         },
+        child: BlocBuilder<TrackerCubit, TrackerState>(
+          builder: (context, state) => switch (state) {
+            TrackerLoading() => const LoadingView(),
+            TrackerFailed() => errorPane(loc),
+            TrackerReady(
+              :final today,
+              :final streakDays,
+              :final last7,
+              :final khatmaAvailable,
+              :final khatma,
+            ) =>
+              ListView(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                children: [
+                  _TodayCard(today: today),
+                  const SizedBox(height: AppSpacing.sm),
+                  for (final slot in PrayerSlot.values)
+                    _SlotTile(slot: slot, today: today),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    loc.last7Days,
+                    style: AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
+                  ),
+                  const SizedBox(height: 6),
+                  _Last7Row(last7: last7),
+                  if (streakDays > 0) _StreakChip(streakDays: streakDays),
+                  if (khatmaAvailable) ...[
+                    const SizedBox(height: AppSpacing.md),
+                    _WirdCard(progress: khatma),
+                  ],
+                ],
+              ),
+          },
+        ),
       ),
     );
   }

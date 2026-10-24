@@ -14,9 +14,13 @@ class TrackerCubit extends Cubit<TrackerState> {
   ///
   /// [khatma] is optional — without it the khatma card is hidden. The
   /// hydration is fire-and-forget; await [loaded] to wait for it.
-  TrackerCubit({required PrayerLogRepository repo, KhatmaRepository? khatma})
-      : _repo = repo,
+  TrackerCubit({
+    required PrayerLogRepository repo,
+    KhatmaRepository? khatma,
+    DateTime Function()? clock,
+  })  : _repo = repo,
         _khatma = khatma,
+        _clock = clock ?? DateTime.now,
         super(const TrackerState.loading()) {
     unawaited(_hydrate());
   }
@@ -29,6 +33,10 @@ class TrackerCubit extends Cubit<TrackerState> {
 
   final PrayerLogRepository _repo;
   final KhatmaRepository? _khatma;
+  final DateTime Function() _clock;
+
+  int _reloadSeq = 0;
+  final Set<PrayerSlot> _pendingToggles = <PrayerSlot>{};
 
   Future<void> _hydrate() async {
     try {
@@ -44,17 +52,18 @@ class TrackerCubit extends Cubit<TrackerState> {
   /// A failure emits the failed state (the error is logged, never raised as
   /// an unhandled async error).
   Future<void> reload() async {
+    final seq = ++_reloadSeq;
     try {
-      final now = DateTime.now();
+      final now = _clock();
       final today = await _repo.dayView(now);
       final marked = await _repo.markedDaysRange(now, 400);
       final last7 = <bool>[
         for (var i = 0; i < 7; i++)
-          marked.any((d) => _sameDay(d, now.subtract(Duration(days: i)))),
+          marked.any((d) => _sameDay(d, _daysBefore(now, i))),
       ];
       final streak = _computeStreak(marked, now);
       final khatma = await _loadKhatma();
-      if (isClosed) return;
+      if (isClosed || seq != _reloadSeq) return;
       emit(TrackerState.ready(
         today: today,
         streakDays: streak,
@@ -65,7 +74,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     } on Object catch (error, stackTrace) {
       dev.log('tracker load failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || seq != _reloadSeq) return;
       emit(const TrackerState.failed());
     }
   }
@@ -106,6 +115,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     } on Object catch (error, stackTrace) {
       dev.log('khatma start failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      _markActionFailed();
       return;
     }
     await reload();
@@ -133,6 +143,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     } on Object catch (error, stackTrace) {
       dev.log('khatma advance failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      _markActionFailed();
       return;
     }
     await reload();
@@ -147,13 +158,35 @@ class TrackerCubit extends Cubit<TrackerState> {
     } on Object catch (error, stackTrace) {
       dev.log('khatma reset failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      _markActionFailed();
       return;
     }
     await reload();
   }
 
+  /// Flags a failed user action so the screen can show localized feedback.
+  void _markActionFailed() {
+    if (isClosed) return;
+    final current = state;
+    if (current is TrackerReady) {
+      emit(current.copyWith(actionFailed: true));
+    }
+  }
+
+  /// Clears the failure flag after the screen has shown its feedback.
+  void acknowledgeActionFailure() {
+    if (isClosed) return;
+    final current = state;
+    if (current is TrackerReady && current.actionFailed) {
+      emit(current.copyWith(actionFailed: false));
+    }
+  }
+
   bool _sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
+
+  DateTime _daysBefore(DateTime day, int n) =>
+      DateTime(day.year, day.month, day.day - n);
 
   /// Consecutive marked days ending today — or yesterday, when today is
   /// still unmarked (so the streak survives the morning). PM ruling, W5.
@@ -163,12 +196,12 @@ class TrackerCubit extends Cubit<TrackerState> {
     };
     var cursor = DateTime(now.year, now.month, now.day);
     if (!keys.contains(_key(cursor))) {
-      cursor = cursor.subtract(const Duration(days: 1));
+      cursor = _daysBefore(cursor, 1);
     }
     var streak = 0;
     while (keys.contains(_key(cursor))) {
       streak += 1;
-      cursor = cursor.subtract(const Duration(days: 1));
+      cursor = _daysBefore(cursor, 1);
     }
     return streak;
   }
@@ -176,13 +209,20 @@ class TrackerCubit extends Cubit<TrackerState> {
   String _key(DateTime day) => '${day.year}-${day.month}-${day.day}';
 
   /// Marks or unmarks one prayer slot for today and reloads the screen.
+  ///
+  /// A second tap on the same slot while its write is in flight is ignored;
+  /// taps on different slots still proceed independently.
   Future<void> toggle(PrayerSlot slot) async {
+    if (isClosed || !_pendingToggles.add(slot)) return;
     try {
-      await _repo.togglePrayer(DateTime.now(), slot);
+      await _repo.togglePrayer(_clock(), slot);
     } on Object catch (error, stackTrace) {
       dev.log('tracker toggle failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      _markActionFailed();
       return;
+    } finally {
+      _pendingToggles.remove(slot);
     }
     await reload();
   }

@@ -38,3 +38,14 @@ abstract interface class DisposablePlaybackService {
   /// Releases the platform resources. Safe to call once.
   Future<void> dispose();
 }
+
+/// Optional capability: a playback service that reports when the loaded
+/// track reaches its end.
+///
+/// Kept separate from [PlaybackService] for the same reason as
+/// [DisposablePlaybackService]: the frozen test doubles implement the plain
+/// seam, and adding a member there would break them.
+abstract interface class CompletingPlaybackService {
+  /// Emits one event each time the current track completes.
+  Stream<void> completionStream();
+}

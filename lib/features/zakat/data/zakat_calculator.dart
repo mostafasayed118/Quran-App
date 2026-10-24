@@ -15,7 +15,9 @@ double parseDecimal(String raw) {
   } else if (hasComma) {
     normalized = s.replaceAll(',', '.');
   }
-  return double.tryParse(normalized) ?? 0;
+  final parsed = double.tryParse(normalized);
+  if (parsed == null || !parsed.isFinite || parsed < 0) return 0;
+  return parsed;
 }
 
 /// Maps Arabic-Indic digits (٠-٩) and the Arabic decimal/thousands

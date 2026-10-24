@@ -8,7 +8,10 @@ import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
 class JustAudioPlaybackService
-    implements PlaybackService, DisposablePlaybackService {
+    implements
+        PlaybackService,
+        DisposablePlaybackService,
+        CompletingPlaybackService {
   JustAudioPlaybackService([AudioPlayer? player])
       : _player = player ?? AudioPlayer();
 
@@ -23,6 +26,11 @@ class JustAudioPlaybackService
 
   @override
   Stream<Duration?> durationStream() => _player.durationStream;
+
+  @override
+  Stream<void> completionStream() => _player.processingStateStream
+      .where((s) => s == ProcessingState.completed)
+      .map((_) {});
 
   @override
   Future<void> loadAndPlay(PlaybackSource source) async {

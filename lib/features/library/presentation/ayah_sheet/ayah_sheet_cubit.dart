@@ -64,12 +64,24 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
   }
 
   Future<AyahSheetEntry?> _tafsirEntry(String packId, String title) async {
-    final text = await _downloader.tafsirFor(packId, _surah, _ayah);
-    return text == null ? null : (title: title, text: text);
+    try {
+      final text = await _downloader.tafsirFor(packId, _surah, _ayah);
+      return text == null ? null : (title: title, text: text);
+    } on Object catch (error, stackTrace) {
+      dev.log('ayah sheet tafsir read failed',
+          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
+      return null;
+    }
   }
 
   Future<AyahSheetEntry?> _translationEntry(String packId, String title) async {
-    final text = await _downloader.translationFor(packId, _surah, _ayah);
-    return text == null ? null : (title: title, text: text);
+    try {
+      final text = await _downloader.translationFor(packId, _surah, _ayah);
+      return text == null ? null : (title: title, text: text);
+    } on Object catch (error, stackTrace) {
+      dev.log('ayah sheet translation read failed',
+          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
+      return null;
+    }
   }
 }

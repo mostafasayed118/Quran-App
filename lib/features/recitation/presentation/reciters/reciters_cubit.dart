@@ -23,6 +23,7 @@ class RecitersCubit extends Cubit<RecitersState> {
         .map((rows) => [for (final row in sortReciters(rows)) row.toInfo()])
         .listen(
       (reciters) {
+        if (isClosed) return;
         _latest = reciters;
         _emitFiltered();
         _kickOnce();
@@ -103,8 +104,11 @@ class RecitersCubit extends Cubit<RecitersState> {
 
   /// Cancels the reciter subscription before closing the cubit.
   @override
-  Future<void> close() {
-    _sub?.cancel();
-    return super.close();
+  Future<void> close() async {
+    try {
+      await _sub?.cancel();
+    } finally {
+      await super.close();
+    }
   }
 }

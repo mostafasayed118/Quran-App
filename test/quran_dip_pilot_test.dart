@@ -46,6 +46,9 @@ class _InMemoryAyahSource implements AyahSource {
   Future<void> toggleBookmark(int ayahId) async {}
 
   @override
+  Future<void> deleteBookmark(int ayahId) async {}
+
+  @override
   Stream<Set<int>> watchBookmarkedIds() => Stream.value(const <int>{});
 
   @override

@@ -62,12 +62,12 @@ class ReaderCubit extends Cubit<ReaderState> {
         emit(ReaderState.failed(emptySurahId: _surahId));
         return;
       }
+      if (isClosed) return;
       final startList =
           ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      unawaited(_lastReadRepository.saveAyahId(
+      unawaited(_saveLastRead(
         startList.isNotEmpty ? startList.first.id : ayahs.first.id,
       ));
-      if (isClosed) return;
       final verses = ayahs.map((a) => a.toVerse()).toList();
       emit(ReaderState.ready(
         surahId: _surahId,
@@ -83,6 +83,17 @@ class ReaderCubit extends Cubit<ReaderState> {
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const ReaderState.failed());
+    }
+  }
+
+  /// Persists the last-read marker; a storage failure is logged, never
+  /// surfaced as an unhandled async error or a reader failure.
+  Future<void> _saveLastRead(int ayahId) async {
+    try {
+      await _lastReadRepository.saveAyahId(ayahId);
+    } on Object catch (error, stackTrace) {
+      dev.log('last-read save failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
 
@@ -116,7 +127,12 @@ class ReaderCubit extends Cubit<ReaderState> {
 
   /// Toggles the bookmark of [ayahId]; the stream re-emits the new set.
   Future<void> toggleBookmark(int ayahId) async {
-    await _ayahRepository.toggleBookmark(ayahId);
+    try {
+      await _ayahRepository.toggleBookmark(ayahId);
+    } on Object catch (error, stackTrace) {
+      dev.log('toggle bookmark failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+    }
   }
 
   /// Records the mushaf page the user reached and advances the wird progress.
@@ -129,7 +145,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     if (blockIndex < 0 || blockIndex >= current.mushafPages.length) return;
     final pageAyahs = current.mushafPages[blockIndex].ayahs;
     if (pageAyahs.isEmpty) return;
-    await _lastReadRepository.saveAyahId(pageAyahs.first.id);
+    await _saveLastRead(pageAyahs.first.id);
     final sink = _wirdProgress;
     if (sink == null) return;
     try {

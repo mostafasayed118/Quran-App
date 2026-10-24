@@ -58,33 +58,43 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   /// [AudioDownloader.removeDownload] (file + DB row) and drops its entry
   /// from the state so rows re-render — the delete affordance's refresh path
   /// (UX-FIX 2; mirrors LibraryCubit.uninstall, no new state machinery).
-  Future<void> removeDone(String rowId, int surahNumber) async {
+  ///
+  /// Returns `true` when the file and row were removed and the entry was
+  /// dropped, `false` when the removal failed and the entry therefore stays.
+  Future<bool> removeDone(String rowId, int surahNumber) async {
     try {
       await _downloader.removeDownload(rowId, surahNumber);
     } on Object catch (error, stackTrace) {
       dev.log('download remove failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
-      return;
+      return false;
     }
-    if (isClosed) return;
+    if (isClosed) return false;
     emit(state.copyWith(items: {
       for (final entry in state.items.entries)
         if (entry.key != '$rowId-$surahNumber') entry.key: entry.value,
     }));
+    return true;
   }
 
   /// Queues the download of one surah for one reciter.
   ///
-  /// A row that is already downloading, done, or queued is ignored.
+  /// A row that is already queued, downloading, done, or currently active is
+  /// ignored.
   Future<void> enqueue(String rowId, int surahNumber) async {
     final key = _key(rowId, surahNumber);
     final current = state.items[key];
     if (current != null &&
-        (current.status == DownloadStatus.downloading ||
+        (current.status == DownloadStatus.queued ||
+            current.status == DownloadStatus.downloading ||
             current.status == DownloadStatus.done)) {
       return;
     }
     if (_queue.any((task) => task.$1 == rowId && task.$2 == surahNumber)) {
+      return;
+    }
+    final active = _active;
+    if (active != null && active.$1 == rowId && active.$2 == surahNumber) {
       return;
     }
     _queue.add((rowId, surahNumber));
@@ -162,19 +172,15 @@ class DownloadsCubit extends Cubit<DownloadsState> {
         status != DownloadStatus.downloading) {
       return;
     }
-    final queuedIndex =
-        _queue.indexWhere((task) => task.$1 == rowId && task.$2 == surahNumber);
-    if (queuedIndex >= 0) {
-      _queue.removeAt(queuedIndex);
-      _removeEntry(key);
-      return;
-    }
+    // Drop every queued duplicate first: a cancelled surah must never restart
+    // from a stale queue entry for the same key.
+    _queue.removeWhere((task) => task.$1 == rowId && task.$2 == surahNumber);
     final active = _active;
     if (active != null && active.$1 == rowId && active.$2 == surahNumber) {
       _activeToken?.cancel('cancelled by user');
       return; // the in-flight catch drops the entry and cleans up.
     }
-    _removeEntry(key); // untracked entry (defensive): drop it from the map.
+    _removeEntry(key); // queued or untracked entry: drop it from the map.
   }
 
   Future<void> _dropCancelled(String rowId, int surahNumber, String key) async {
@@ -195,8 +201,17 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   }
 
   Future<void> _setFailed(String key) async {
+    if (isClosed) return;
     // The failed status in the DB is owned by the downloader; mirror in state.
     emit(_bump(key, status: DownloadStatus.failed));
+  }
+
+  /// Cancels the in-flight download and drops the pending queue.
+  @override
+  Future<void> close() async {
+    _activeToken?.cancel('cubit closed');
+    _queue.clear();
+    await super.close();
   }
 
   DownloadsState _bump(String key,

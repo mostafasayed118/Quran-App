@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -51,7 +52,7 @@ class BackupCubit extends Cubit<BackupState> {
   /// Encodes every backed-up entity and hands the JSON to the share sheet.
   /// Never throws: a failure emits the `failed(duringExport: true)` state.
   Future<void> export() async {
-    if (!_isIdle) return;
+    if (!_canStart) return;
     emit(const BackupState.idle(busy: true));
     try {
       final json = await _service.exportJson();
@@ -72,7 +73,7 @@ class BackupCubit extends Cubit<BackupState> {
   /// read-only merge preview. Nothing is written here — the write happens in
   /// [confirmImport] after the user confirms.
   Future<void> importFromFile() async {
-    if (!_isIdle) return;
+    if (!_canStart) return;
     emit(const BackupState.idle(busy: true));
     try {
       final bytes = await _pickBytes();
@@ -138,9 +139,14 @@ class BackupCubit extends Cubit<BackupState> {
     if (state is! BackupIdle) emit(const BackupState.idle());
   }
 
-  bool get _isIdle {
+  /// A new export/import may start from rest or from a terminal failure —
+  /// both entry points emit `idle(busy: true)` first, so a retry after a
+  /// failure is not silently ignored while the section keeps the buttons
+  /// enabled.
+  bool get _canStart {
     final current = state;
-    return current is BackupIdle && !current.busy;
+    if (current is BackupIdle) return !current.busy;
+    return current is BackupFailed || current is BackupInvalidFile;
   }
 
   /// Decodes the picked backup document.
@@ -181,18 +187,30 @@ class BackupCubit extends Cubit<BackupState> {
     );
     if (file == null) return null;
     // Size gate BEFORE the read: reading a multi-GB file first would OOM.
-    if (await _pickedLength(file) > kBackupMaxBytes) {
+    final length = await _pickedLength(file);
+    if (length != null && length > kBackupMaxBytes) {
       throw const _BackupTooLarge();
+    }
+    if (length == null) {
+      return _readBounded(file);
     }
     return file.readAsBytes();
   }
 
-  /// The picked file's length in bytes, without reading its bytes.
-  ///
-  /// The on-disk length is the source of truth; the size the picker
-  /// reported is the fallback (an unknown size reads the file, and the
-  /// post-read cap check still applies).
-  static Future<int> _pickedLength(PlatformFile file) async {
+  static Future<Uint8List> _readBounded(PlatformFile file) async {
+    final builder = BytesBuilder(copy: false);
+    await for (final chunk in file.readAsByteStream()) {
+      builder.add(chunk);
+      if (builder.length > kBackupMaxBytes) {
+        throw const _BackupTooLarge();
+      }
+    }
+    return builder.takeBytes();
+  }
+
+  /// The picked file's length in bytes, without reading its bytes, or null
+  /// when the picker cannot report it cheaply.
+  static Future<int?> _pickedLength(PlatformFile file) async {
     final path = file.path;
     if (path != null) {
       try {
@@ -201,7 +219,7 @@ class BackupCubit extends Cubit<BackupState> {
         // No readable path: fall back to the picker's reported size.
       }
     }
-    return file.lengthSync() ?? 0;
+    return file.lengthSync();
   }
 
   static Future<void> _defaultShareJson(String json) async {

@@ -34,12 +34,16 @@ class DuasCubit extends Cubit<DuasState> {
   List<DuaEntry>? _allDuas;
   List<RuqyahResolved>? _resolvedRuqyah;
 
+  /// Monotonic visible-view token: only the latest tab intent may emit.
+  int _viewSeq = 0;
+
   /// Loads the dua list and its categories and emits them.
   ///
   /// The two reads are independent and run concurrently; the first failure
   /// wins and emits [DuasState.failed] (the other chain is consumed, never
   /// an unhandled async error).
   Future<void> showDuas() async {
+    final seq = ++_viewSeq;
     try {
       // Independent reads: run them concurrently (list form keeps the first
       // error and consumes the other, so nothing leaks as unhandled).
@@ -49,13 +53,13 @@ class DuasCubit extends Cubit<DuasState> {
       ]);
       final entries = results[0] as List<DuaEntry>;
       final categories = results[1] as List<String>;
+      if (isClosed || seq != _viewSeq) return;
       _allDuas = entries;
-      if (isClosed) return;
       emit(DuasState.duas(categories: categories, entries: entries));
     } on Object catch (error, stackTrace) {
       dev.log('duas load failed',
           name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed());
     }
   }
@@ -65,13 +69,14 @@ class DuasCubit extends Cubit<DuasState> {
   /// The resolutions are cached: a second visit re-emits the cached rows
   /// instead of re-querying the ayah port.
   Future<void> showRuqyah() async {
+    final seq = ++_viewSeq;
     final cached = _resolvedRuqyah;
     if (cached != null) {
-      if (isClosed) return;
+      if (isClosed || seq != _viewSeq) return;
       emit(DuasState.ruqyah(entries: cached));
       return;
     }
-    if (isClosed) return;
+    if (isClosed || seq != _viewSeq) return;
     emit(const DuasState.loading(tab: DuasTab.ruqyah));
     try {
       final entries = await _ruqyah.entries();
@@ -80,13 +85,13 @@ class DuasCubit extends Cubit<DuasState> {
       final resolved = await Future.wait([
         for (final entry in entries) _resolveEntry(entry),
       ]);
-      if (isClosed) return;
+      if (isClosed || seq != _viewSeq) return;
       _resolvedRuqyah = resolved;
       emit(DuasState.ruqyah(entries: resolved));
     } on Object catch (error, stackTrace) {
       dev.log('ruqyah load failed',
           name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed(tab: DuasTab.ruqyah));
     }
   }

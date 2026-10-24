@@ -23,6 +23,9 @@ abstract class AyahSource implements AyahLookup {
   /// Adds the ayah to the bookmarks when absent, removes it when present.
   Future<void> toggleBookmark(int ayahId);
 
+  /// Removes the bookmark of the ayah when present; never re-adds it.
+  Future<void> deleteBookmark(int ayahId);
+
   /// Live set of bookmarked ayah ids; the caller holds the stream.
   Stream<Set<int>> watchBookmarkedIds();
 

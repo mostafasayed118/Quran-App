@@ -17,5 +17,6 @@ sealed class TrackerState with _$TrackerState {
     @Default(<bool>[]) List<bool> last7,
     @Default(false) bool khatmaAvailable,
     @Default(null) KhatmaProgress? khatma,
+    @Default(false) bool actionFailed,
   }) = TrackerReady;
 }

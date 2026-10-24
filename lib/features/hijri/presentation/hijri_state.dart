@@ -18,6 +18,10 @@ class HijriCell {
 sealed class HijriState with _$HijriState {
   const factory HijriState.loading() = HijriLoading;
 
+  /// Load failed (a service read threw): the screen shows the localized
+  /// error pane instead of hanging on [HijriState.loading] forever.
+  const factory HijriState.failed() = HijriFailed;
+
   const factory HijriState.ready({
     required int month,
     required int year,

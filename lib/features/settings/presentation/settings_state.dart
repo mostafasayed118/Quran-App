@@ -15,6 +15,11 @@ sealed class SettingsState with _$SettingsState {
     @Default(defaultAzkarTimeHm) String azkarTimeHm,
     @Default(false) bool wirdEnabled,
     @Default(defaultWirdTimeHm) String wirdTimeHm,
-    @Default(false) bool permissionDenied,
+    @Default(false) bool azkarPermissionDenied,
+    @Default(false) bool wirdPermissionDenied,
   }) = SettingsReady;
+}
+
+extension SettingsReadyPermission on SettingsReady {
+  bool get permissionDenied => azkarPermissionDenied || wirdPermissionDenied;
 }

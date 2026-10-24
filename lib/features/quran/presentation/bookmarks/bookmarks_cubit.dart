@@ -36,8 +36,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   final AyahSource _repo;
   StreamSubscription<List<BookmarkEntry>>? _sub;
 
-  /// Removes the bookmark of [ayahId] (toggles it off).
-  Future<void> remove(int ayahId) => _repo.toggleBookmark(ayahId);
+  /// Removes the bookmark of [ayahId]; a row that is already unbookmarked
+  /// stays removed (the reader star keeps the toggle).
+  Future<void> remove(int ayahId) => _repo.deleteBookmark(ayahId);
 
   /// Cancels the bookmark subscription before closing the cubit.
   @override

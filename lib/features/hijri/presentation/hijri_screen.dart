@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hijri_cubit.dart';
 import 'hijri_state.dart';
@@ -20,6 +21,7 @@ class HijriScreen extends StatelessWidget {
       body: BlocBuilder<HijriCubit, HijriState>(
         builder: (context, state) => switch (state) {
           HijriLoading() => const LoadingView(),
+          HijriFailed() => errorPane(loc),
           HijriReady(
             :final monthName,
             :final year,

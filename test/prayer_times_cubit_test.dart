@@ -89,18 +89,4 @@ void main() {
 
     await cubit.close();
   });
-
-  test('select reloads with the newly selected city', () async {
-    await repo.select(cairoCity);
-    final cubit = PrayerTimesCubit(prayer: fake, city: repo);
-    await cubit.reload();
-    expect((cubit.state as PrayerTimesReady).city!.id, 'cairo');
-
-    await cubit.select(dubaiCity);
-    final ready = cubit.state as PrayerTimesReady;
-    expect(ready.city!.id, 'dubai');
-    expect(ready.entries, isNotEmpty);
-
-    await cubit.close();
-  });
 }

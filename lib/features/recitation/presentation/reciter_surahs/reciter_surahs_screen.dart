@@ -152,7 +152,12 @@ class _SurahDownloadRow extends StatelessWidget {
       body: name,
     );
     if (confirmed) {
-      await cubit.removeDone(reciter.id, surahNumber);
+      final removed = await cubit.removeDone(reciter.id, surahNumber);
+      if (!removed && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.genericError)),
+        );
+      }
     }
   }
 

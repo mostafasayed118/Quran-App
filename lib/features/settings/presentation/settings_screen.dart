@@ -32,14 +32,15 @@ class SettingsScreen extends StatelessWidget {
             :final azkarTimeHm,
             :final wirdEnabled,
             :final wirdTimeHm,
-            :final permissionDenied,
+            :final azkarPermissionDenied,
+            :final wirdPermissionDenied,
           ) =>
             _SettingsList(
               azkarEnabled: azkarEnabled,
               azkarTimeHm: azkarTimeHm,
               wirdEnabled: wirdEnabled,
               wirdTimeHm: wirdTimeHm,
-              permissionDenied: permissionDenied,
+              permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
               backupSection: backupSection,
             ),
         },

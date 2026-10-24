@@ -65,6 +65,12 @@ class AyahRepository implements AyahSource {
   }
 
   @override
+  Future<void> deleteBookmark(int ayahId) async {
+    await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
+        .go();
+  }
+
+  @override
   Stream<Set<int>> watchBookmarkedIds() {
     return _db.select(_db.bookmarks).watch().map(
           (rows) => rows.map((b) => b.ayahId).toSet(),

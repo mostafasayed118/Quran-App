@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,12 +57,17 @@ void main() {
 
   testWidgets('textScale 2.0: the live dial survives the layout',
       (tester) async {
+    final controller = StreamController<double>();
+    addTearDown(controller.close);
     await pumpHost(
       tester,
       seeded: true,
       textScaler: const TextScaler.linear(2.0),
-      heading: HeadingService(streamFactory: () => Stream.value(90.0)),
+      heading: HeadingService(streamFactory: () => controller.stream),
     );
+    controller.add(90.0);
+    await tester.pump();
+    await tester.pump();
 
     expect(tester.takeException(), isNull);
     expect(find.text('المقياس حي'), findsOneWidget);

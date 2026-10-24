@@ -154,10 +154,15 @@ class _ResultTile extends StatelessWidget {
             )
           : null,
       onTap: () async {
-        await context.read<CityPickerCubit>().persist(city);
-        if (context.mounted) {
+        final persisted = await context.read<CityPickerCubit>().persist(city);
+        if (!context.mounted) return;
+        if (persisted) {
           Navigator.of(context).pop(true);
+          return;
         }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(loc.genericError)),
+        );
       },
     );
   }

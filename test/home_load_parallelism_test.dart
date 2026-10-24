@@ -78,6 +78,9 @@ class _UnusedAyahs implements AyahSource {
   Future<void> toggleBookmark(int ayahId) => throw UnimplementedError();
 
   @override
+  Future<void> deleteBookmark(int ayahId) async {}
+
+  @override
   Stream<List<BookmarkEntry>> watchBookmarkEntries() =>
       throw UnimplementedError();
 

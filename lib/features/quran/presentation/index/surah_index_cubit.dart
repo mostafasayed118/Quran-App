@@ -63,8 +63,11 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 
   /// Cancels the surah subscription before closing the cubit.
   @override
-  Future<void> close() {
-    _sub?.cancel();
-    return super.close();
+  Future<void> close() async {
+    try {
+      await _sub?.cancel();
+    } finally {
+      await super.close();
+    }
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -74,11 +76,16 @@ void main() {
 
   testWidgets('live heading rotates the dial by bearing minus heading',
       (tester) async {
+    final controller = StreamController<double>();
+    addTearDown(controller.close);
     await pumpHost(
       tester,
       seeded: true,
-      heading: HeadingService(streamFactory: () => Stream.value(90.0)),
+      heading: HeadingService(streamFactory: () => controller.stream),
     );
+    controller.add(90.0);
+    await tester.pump();
+    await tester.pump();
 
     final rotation =
         tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));

@@ -229,7 +229,8 @@ class _StaticDownloadsCubit extends DownloadsCubit {
   }
 
   @override
-  Future<void> removeDone(String rowId, int surahNumber) async {
+  Future<bool> removeDone(String rowId, int surahNumber) async {
     removedKeys.add('$rowId-$surahNumber');
+    return true;
   }
 }

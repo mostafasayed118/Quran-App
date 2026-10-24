@@ -24,6 +24,9 @@ class TasbihCubit extends Cubit<TasbihState> {
   final TasbihRepository _repo;
   final Completer<void> _loaded = Completer<void>();
 
+  /// True once the user changed the counter; hydration must not overwrite it.
+  bool _userMutated = false;
+
   /// Completes when the stored snapshot has been applied (or failed).
   Future<void> get loaded => _loaded.future;
 
@@ -31,7 +34,7 @@ class TasbihCubit extends Cubit<TasbihState> {
     try {
       final snapshot = await _repo.load();
       if (isClosed) return;
-      if (snapshot != null) {
+      if (snapshot != null && !_userMutated) {
         emit(TasbihState.ready(
           count: snapshot.count,
           target: snapshot.target,
@@ -52,6 +55,7 @@ class TasbihCubit extends Cubit<TasbihState> {
   /// [TasbihState.reachedTarget] flips exactly on the target count, not
   /// beyond it.
   Future<void> increment() async {
+    _userMutated = true;
     final state = this.state;
     if (state is! TasbihReady) return;
     final next = state.count + 1;
@@ -67,6 +71,7 @@ class TasbihCubit extends Cubit<TasbihState> {
 
   /// Resets the counter to zero (the target is kept) and persists it.
   Future<void> reset() async {
+    _userMutated = true;
     final state = this.state;
     if (state is! TasbihReady) return;
     if (isClosed) return;
@@ -76,6 +81,7 @@ class TasbihCubit extends Cubit<TasbihState> {
 
   /// Picks the counter target and resets the count to zero.
   Future<void> selectTarget(int target) async {
+    _userMutated = true;
     if (isClosed) return;
     emit(TasbihState.ready(target: target));
     await _save(0, target);

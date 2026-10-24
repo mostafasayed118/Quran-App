@@ -110,7 +110,8 @@ class PrayerLogRepository {
       DateTime fromInclusive, int daysBack) async {
     final from = dateOnly(fromInclusive);
     final days = <DateTime>[
-      for (var i = 0; i < daysBack; i++) from.subtract(Duration(days: i)),
+      for (var i = 0; i < daysBack; i++)
+        DateTime(from.year, from.month, from.day - i),
     ];
     final rows =
         await (_db.select(_db.prayerLog)..where((p) => p.day.isIn(days))).get();
