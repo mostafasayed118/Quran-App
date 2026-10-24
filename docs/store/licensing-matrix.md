@@ -45,8 +45,10 @@ Last updated: 2026-10-17 (verification-freshness date)
 > (`eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`,
 > `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir`); the two fonts have embedded terms that
 > must ship with the app. **Decision executed for the app catalog:** the six packs were
-> withdrawn on 2026-10-24 (catalog v1.2 ships 3 packs). The web `content-packs.ts` still
-> lists them — pending.
+> withdrawn on 2026-10-24 (catalog v1.2 ships 3 packs). The web catalog
+> (`web/src/lib/content-packs.ts`) ships only the two licensed translations; the six are
+> withdrawn there too. The font EULA/terms and the content sources are shipped in-app
+> (Settings → Licenses & sources).
 
 1. **HafsSmart + me_quran font licenses** — bundle a written license/redistribution
    statement for both TTFs before store submission (PRIVACY.md l.91 already promises this

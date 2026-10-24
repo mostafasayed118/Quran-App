@@ -119,6 +119,7 @@ clause, so the free/no-ads + attribution condition still applies.
 The two frozen catalog tests were updated to pin the new shape (9→3 packs, tafsirs 3→0,
 translations 3→2, hadiths 3→1) — same assertions, new expected catalog.
 
-**Still open:** the web app ships its own list in `web/src/lib/content-packs.ts`, which
-still includes the six withdrawn packs; removing them there is a separate web change
-(requires the web gates). Font EULA/attribution is also still to be shipped in-app.
+**Web:** `web/src/lib/content-packs.ts` now ships only the two licensed translations
+(`ara-sirajtafseer`, `eng-mohammedmarmadu`); the six were withdrawn there too (W-D wave
+`a8b2a9a`, web-gates green). The HafsSmart EULA and the me_quran/Cairo terms ship in-app via
+Settings → Licenses & sources (`assets/licenses/`, `lib/features/settings/presentation/licenses_screen.dart`).

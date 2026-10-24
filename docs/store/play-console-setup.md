@@ -106,7 +106,7 @@ All licensing items are `OPEN-FOR-OWNER` — recorded in `docs/store/licensing-m
 
 | # | Blocker (source: `licensing-matrix.md` → OPEN-FOR-OWNER) | Verified status (2026-10-24) |
 |---|---|---|
-| 1 | `HafsSmart_08.ttf` + `me_quran.ttf` mushaf font licenses | **AMBER** — HafsSmart EULA permits use/copy/distribute (ship it + attribution); `me_quran` is non-commercial only |
+| 1 | `HafsSmart_08.ttf` + `me_quran.ttf` mushaf font licenses | **AMBER** — HafsSmart EULA permits use/copy/distribute (shipped in-app + attribution); `me_quran` is non-commercial only |
 | 2 | quranenc.com text terms for `ara-sirajtafseer` | **AMBER** — republish allowed with attribution, version, no modification; prove the edition |
 | 3 | Saheeh International `eng-safiurrahmanalm` publisher terms | **AMBER** — Tanzil: non-commercial only; replaced in the app catalog by Pickthall (`eng-mohammedmarmadu`) on 2026-10-24, same Tanzil clause |
 | 4 | The Clear Quran `eng-mustafakhattabg` | **RED** — publisher requires prior written consent for any reproduction |
@@ -119,8 +119,9 @@ Full quotes and the per-pack verdict: `docs/store/licensing-verification-2026-10
 
 **App catalog:** the six RED packs were withdrawn on 2026-10-24 (catalog v1.2 ships 3
 packs: `ara-sirajtafseer`, `eng-mohammedmarmadu` (Pickthall), `ara-bukhari`). **Web:**
-`web/src/lib/content-packs.ts` still lists them — pending a web change. The `HafsSmart`
-EULA + attribution screen is still required in-app.
+`web/src/lib/content-packs.ts` ships only the two licensed translations; the six were
+withdrawn there too. The `HafsSmart` EULA + attribution are shipped in-app (Settings →
+Licenses & sources).
 
 Play-Console-only items (cannot be completed from the repo):
 
