@@ -3,6 +3,8 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/arabic_search.dart';
 import '../../data/surah_source.dart';
 import '../../domain/surah_summary.dart';
 import 'surah_index_state.dart';
@@ -51,12 +53,11 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 
   List<SurahSummary> _filter(List<SurahSummary> surahs) {
     if (_query.isEmpty) return surahs;
-    final q = _query.toLowerCase();
+    final westernQuery = _query.toWesternDigits;
     return surahs.where((s) {
-      return s.nameAr.contains(_query) ||
-          s.nameAr.toLowerCase().contains(q) ||
-          s.nameEn.toLowerCase().contains(q) ||
-          s.id.toString() == _query;
+      return matchesQuery(s.nameAr, _query) ||
+          matchesQuery(s.nameEn, _query) ||
+          s.id.toString() == westernQuery;
     }).toList();
   }
 

@@ -32,6 +32,19 @@ extension ArabicIndicString on String {
   }
 }
 
+extension WesternDigitsString on String {
+  /// Maps every Arabic-Indic digit (٠-٩) inside this string to its western
+  /// form; all other characters are kept as-is.
+  String get toWesternDigits {
+    final buffer = StringBuffer();
+    for (final char in split('')) {
+      final digit = _arabicIndicDigits.indexOf(char);
+      buffer.write(digit == -1 ? char : digit);
+    }
+    return buffer.toString();
+  }
+}
+
 /// H:mm clock label with Arabic-Indic digits (call-site transform, W3).
 ///
 /// [arabicIndic] false returns the plain 'HH:mm' form — the format the
