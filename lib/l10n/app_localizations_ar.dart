@@ -584,6 +584,69 @@ class AppLocalizationsAr extends AppLocalizations {
       'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.';
 
   @override
+  String get licensesTitle => 'التراخيص والمصادر';
+
+  @override
+  String get licensesContentSection => 'المحتوى';
+
+  @override
+  String get licensesQuranText =>
+      'نص القرآن الكريم (رواية حفص) — مضمّن في التطبيق';
+
+  @override
+  String get licensesSiraj =>
+      'المختصر في التفسير (سِراج) — QuranEnc.com، بدون تعديل';
+
+  @override
+  String get licensesPickthall => 'ترجمة بيكثال (1930) — ملك عام';
+
+  @override
+  String get licensesBukhari => 'صحيح البخاري — النص العربي';
+
+  @override
+  String get licensesAzkar =>
+      'الأذكار والأدعية والرقية — من المصنفات التقليدية';
+
+  @override
+  String get licensesAudio => 'التلاوات الصوتية — mp3quran.net';
+
+  @override
+  String get licensesFontsSection => 'الخطوط';
+
+  @override
+  String get licensesHafsSmart =>
+      'خط KFGQPC Hafs Smart — مملوك لـ KFGQPC، يُستخدم دون تعديل';
+
+  @override
+  String get licensesMeQuran =>
+      'خط me_quran — © Meor Ridzuan، للاستخدام غير التجاري';
+
+  @override
+  String get licensesCairo => 'خط Cairo — SIL Open Font License';
+
+  @override
+  String get licensesHafsEula => 'عرض اتفاقية ترخيص خط Hafs Smart';
+
+  @override
+  String get licensesMeQuranTerms => 'عرض شروط خط me_quran';
+
+  @override
+  String get licensesCairoOfl => 'عرض رخصة Cairo (OFL)';
+
+  @override
+  String get licensesOpenSource => 'تراخيص الحزم مفتوحة المصدر';
+
+  @override
+  String get licensesWithdrawn =>
+      'حِزم التفسير والترجمة غير المرخّصة أُزيلت من التطبيق في 2026-10-24.';
+
+  @override
+  String get licensesClose => 'إغلاق';
+
+  @override
+  String get licensesUnavailable => 'تعذّر تحميل النص';
+
+  @override
   String backupPreviewBookmarks(String count) {
     return '$count علامة جديدة';
   }

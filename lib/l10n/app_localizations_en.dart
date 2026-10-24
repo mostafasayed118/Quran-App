@@ -586,6 +586,69 @@ class AppLocalizationsEn extends AppLocalizations {
       'The exported file isn\'t encrypted — anyone who gets it can read your bookmarks, worship log and settings. Keep it somewhere safe.';
 
   @override
+  String get licensesTitle => 'Licenses & sources';
+
+  @override
+  String get licensesContentSection => 'Content';
+
+  @override
+  String get licensesQuranText => 'Quran text (Hafs) — bundled in the app';
+
+  @override
+  String get licensesSiraj =>
+      'At-Tafsir Al-Mukhtasar (Siraj) — QuranEnc.com, unmodified';
+
+  @override
+  String get licensesPickthall =>
+      'Pickthall translation (1930) — public domain';
+
+  @override
+  String get licensesBukhari => 'Sahih al-Bukhari — Arabic text';
+
+  @override
+  String get licensesAzkar =>
+      'Adhkar, duas and ruqyah — traditional compilations';
+
+  @override
+  String get licensesAudio => 'Recitation audio — mp3quran.net';
+
+  @override
+  String get licensesFontsSection => 'Fonts';
+
+  @override
+  String get licensesHafsSmart =>
+      'KFGQPC Hafs Smart font — owned by KFGQPC, used unmodified';
+
+  @override
+  String get licensesMeQuran =>
+      'me_quran font — © Meor Ridzuan, non-commercial use';
+
+  @override
+  String get licensesCairo => 'Cairo font — SIL Open Font License';
+
+  @override
+  String get licensesHafsEula => 'View the Hafs Smart font EULA';
+
+  @override
+  String get licensesMeQuranTerms => 'View the me_quran terms';
+
+  @override
+  String get licensesCairoOfl => 'View the Cairo OFL';
+
+  @override
+  String get licensesOpenSource => 'Open-source package licenses';
+
+  @override
+  String get licensesWithdrawn =>
+      'Unlicensed tafsir/translation packs were removed from the app on 2026-10-24.';
+
+  @override
+  String get licensesClose => 'Close';
+
+  @override
+  String get licensesUnavailable => 'Couldn\'t load the text';
+
+  @override
   String backupPreviewBookmarks(String count) {
     return '$count new bookmarks';
   }

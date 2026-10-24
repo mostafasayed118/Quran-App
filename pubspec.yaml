@@ -71,6 +71,7 @@ flutter:
     - assets/icons/
     - assets/db/
     - assets/data/
+    - assets/licenses/
     - assets/fonts/Cairo-OFL.txt
 
   fonts:

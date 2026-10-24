@@ -9,6 +9,7 @@ import '../../../core/widgets/error_pane.dart';
 import '../../../l10n/app_localizations.dart';
 import 'settings_cubit.dart';
 import 'settings_state.dart';
+import 'licenses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, this.backupSection});
@@ -110,6 +111,13 @@ class _SettingsList extends StatelessWidget {
             ),
           ),
         if (backupSection case final section?) section,
+        ListTile(
+          leading: const Icon(Icons.description_outlined),
+          title: Text(loc.licensesTitle),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => const LicensesScreen()),
+          ),
+        ),
         const Divider(),
         Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),

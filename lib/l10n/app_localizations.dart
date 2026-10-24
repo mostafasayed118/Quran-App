@@ -1136,6 +1136,120 @@ abstract class AppLocalizations {
   /// **'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.'**
   String get backupUnencryptedWarning;
 
+  /// No description provided for @licensesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التراخيص والمصادر'**
+  String get licensesTitle;
+
+  /// No description provided for @licensesContentSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'المحتوى'**
+  String get licensesContentSection;
+
+  /// No description provided for @licensesQuranText.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص القرآن الكريم (رواية حفص) — مضمّن في التطبيق'**
+  String get licensesQuranText;
+
+  /// No description provided for @licensesSiraj.
+  ///
+  /// In ar, this message translates to:
+  /// **'المختصر في التفسير (سِراج) — QuranEnc.com، بدون تعديل'**
+  String get licensesSiraj;
+
+  /// No description provided for @licensesPickthall.
+  ///
+  /// In ar, this message translates to:
+  /// **'ترجمة بيكثال (1930) — ملك عام'**
+  String get licensesPickthall;
+
+  /// No description provided for @licensesBukhari.
+  ///
+  /// In ar, this message translates to:
+  /// **'صحيح البخاري — النص العربي'**
+  String get licensesBukhari;
+
+  /// No description provided for @licensesAzkar.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأذكار والأدعية والرقية — من المصنفات التقليدية'**
+  String get licensesAzkar;
+
+  /// No description provided for @licensesAudio.
+  ///
+  /// In ar, this message translates to:
+  /// **'التلاوات الصوتية — mp3quran.net'**
+  String get licensesAudio;
+
+  /// No description provided for @licensesFontsSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'الخطوط'**
+  String get licensesFontsSection;
+
+  /// No description provided for @licensesHafsSmart.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط KFGQPC Hafs Smart — مملوك لـ KFGQPC، يُستخدم دون تعديل'**
+  String get licensesHafsSmart;
+
+  /// No description provided for @licensesMeQuran.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط me_quran — © Meor Ridzuan، للاستخدام غير التجاري'**
+  String get licensesMeQuran;
+
+  /// No description provided for @licensesCairo.
+  ///
+  /// In ar, this message translates to:
+  /// **'خط Cairo — SIL Open Font License'**
+  String get licensesCairo;
+
+  /// No description provided for @licensesHafsEula.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض اتفاقية ترخيص خط Hafs Smart'**
+  String get licensesHafsEula;
+
+  /// No description provided for @licensesMeQuranTerms.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض شروط خط me_quran'**
+  String get licensesMeQuranTerms;
+
+  /// No description provided for @licensesCairoOfl.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض رخصة Cairo (OFL)'**
+  String get licensesCairoOfl;
+
+  /// No description provided for @licensesOpenSource.
+  ///
+  /// In ar, this message translates to:
+  /// **'تراخيص الحزم مفتوحة المصدر'**
+  String get licensesOpenSource;
+
+  /// No description provided for @licensesWithdrawn.
+  ///
+  /// In ar, this message translates to:
+  /// **'حِزم التفسير والترجمة غير المرخّصة أُزيلت من التطبيق في 2026-10-24.'**
+  String get licensesWithdrawn;
+
+  /// No description provided for @licensesClose.
+  ///
+  /// In ar, this message translates to:
+  /// **'إغلاق'**
+  String get licensesClose;
+
+  /// No description provided for @licensesUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر تحميل النص'**
+  String get licensesUnavailable;
+
   /// No description provided for @backupPreviewBookmarks.
   ///
   /// In ar, this message translates to:
