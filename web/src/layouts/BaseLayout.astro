@@ -23,12 +23,18 @@ interface Props {
    * face and belongs on the pages that render ayah text.
    */
   preloadFont?: readonly PreloadFont[];
+  /** Omit canonical + hreflang and emit robots noindex (e.g. the 404 page). */
+  noindex?: boolean;
+  /** Override the header language-switch target (e.g. 404 → /en/). */
+  altLocaleHref?: string;
 }
 const {
   title,
   description = 'قرآن يَهدي — اقرأ واستمع وتدبّر، مجاناً وبلا حسابات.',
   locale = 'ar',
   ogImage,
+  noindex = false,
+  altLocaleHref,
 } = Astro.props;
 const requestedFont: readonly PreloadFont[] = Astro.props.preloadFont ?? [];
 const fonts = new Set<PreloadFont>(['cairo']);
@@ -39,6 +45,8 @@ const canonical = new URL(pathname, Astro.site);
 const alternateAr = new URL(altLocalePath(pathname, 'ar'), Astro.site);
 const alternateEn = new URL(altLocalePath(pathname, 'en'), Astro.site);
 const ogImageUrl = new URL(ogImage ?? '/og-base.png', Astro.site);
+const origin = (Astro.site ?? new URL('https://quranyahdi.pages.dev')).origin;
+const jsonLd = `{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"${origin}/#website","url":"${origin}/","name":"قرآن يَهدي","alternateName":"Quran Yahdi","inLanguage":["ar","en"],"publisher":{"@id":"${origin}/#organization"}},{"@type":"Organization","@id":"${origin}/#organization","name":"Quran Yahdi","url":"${origin}/","logo":"${origin}/logo-64.png"}]}`;
 ---
 <!doctype html>
 <html lang={locale} dir={dir} data-theme="day">
@@ -48,18 +56,28 @@ const ogImageUrl = new URL(ogImage ?? '/og-base.png', Astro.site);
     <meta name="google-site-verification" content="mdajZHhvXdfyv_j0FYVlBHMNKMGQ0hpwzTsKspr7XYk" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="ar" href={alternateAr} />
-    <link rel="alternate" hreflang="en" href={alternateEn} />
-    <link rel="alternate" hreflang="x-default" href={alternateAr} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && <link rel="alternate" hreflang="ar" href={alternateAr} />}
+    {!noindex && <link rel="alternate" hreflang="en" href={alternateEn} />}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={alternateAr} />}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:image" content={ogImageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-16.png" sizes="16x16" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+    <meta name="theme-color" content="#F2ECDD" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#012A27" media="(prefers-color-scheme: dark)" />
+    <script type="application/ld+json" is:inline set:html={jsonLd}></script>
     {fonts.has('cairo') && <link rel="preload" href="/fonts/Cairo-Regular.woff2" as="font" type="font/woff2" crossorigin />}
     {fonts.has('cairo') && <link rel="preload" href="/fonts/Cairo-Bold.woff2" as="font" type="font/woff2" crossorigin />}
     {fonts.has('hafs') && <link rel="preload" href="/fonts/HafsSmart_08.woff2" as="font" type="font/woff2" crossorigin />}
@@ -76,7 +94,7 @@ const ogImageUrl = new URL(ogImage ?? '/og-base.png', Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">{t(locale, 'skipToContent')}</a>
-    <Header locale={locale} />
+    <Header locale={locale} altLocaleHref={altLocaleHref} />
     <main id="main" tabindex="-1"><slot /></main>
     <div id="qy-player-region" transition:persist="qy-player">
       <MiniPlayer locale={locale} />

@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { t } from '../lib/strings';
 ---
-<BaseLayout title={t('ar', 'notFoundTitle')} description={t('ar', 'notFoundLead')}>
+<BaseLayout title={t('ar', 'notFoundTitle')} description={t('ar', 'notFoundLead')} noindex altLocaleHref="/en/">
   <section class="nf">
     <div data-qy="not-found">
       <h1 class="page-title nf-title">{t('ar', 'notFoundTitle')}</h1>
@@ -32,6 +32,8 @@ import { t } from '../lib/strings';
     var en = document.querySelector('[data-qy="not-found-en"]');
     if (ar) ar.hidden = true;
     if (en) en.hidden = false;
+    var swap = document.querySelector('.lang-switch');
+    if (swap) swap.setAttribute('href', '/');
   })();
 </script>
 <style is:global>

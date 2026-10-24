@@ -2,8 +2,8 @@
 import ThemeToggle from './ThemeToggle.astro';
 import { t, type Locale } from '../lib/strings';
 import { altLocalePath } from '../lib/landing-content';
-interface Props { locale?: Locale }
-const { locale = 'ar' } = Astro.props;
+interface Props { locale?: Locale; altLocaleHref?: string }
+const { locale = 'ar', altLocaleHref } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const other: Locale = locale === 'en' ? 'ar' : 'en';
 const quranHref = `${base}/quran/`;
@@ -23,7 +23,7 @@ const current = Astro.url.pathname;
     <a href={prayerTimesHref} aria-current={current.startsWith(prayerTimesHref) ? 'page' : undefined}>{t(locale, 'navPrayerTimes')}</a>
     <a href={qiblaHref} aria-current={current.startsWith(qiblaHref) ? 'page' : undefined}>{t(locale, 'qbTitle')}</a>
   </nav>
-  <a class="lang-switch" href={altLocalePath(Astro.url.pathname, other)} rel="alternate">{t(locale, 'langSwitchTo')}</a>
+  <a class="lang-switch" href={altLocaleHref ?? altLocalePath(Astro.url.pathname, other)} rel="alternate">{t(locale, 'langSwitchTo')}</a>
   <ThemeToggle locale={locale} />
 </header>
 <style>

@@ -1,0 +1,26 @@
+{
+  "name": "قرآن يَهدي — Quran Yahdi",
+  "short_name": "قرآن يَهدي",
+  "description": "اقرأ القرآن واستمع للتلاوات ومواقيت الصلاة في مكان واحد.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F2ECDD",
+  "theme_color": "#3E6B58",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
