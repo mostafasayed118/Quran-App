@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quran Yahdi — Code Quality Audit · 22 October 2026</title>
+<meta name="description" content="Independent read-only code quality audit of the Quran Yahdi Flutter application: maintainability, architecture, code quality, security, and performance.">
+<style>
+  :root{
+    --ink:#0b1220;
+    --body:#1f2937;
+    --muted:#5b6472;
+    --soft:#7b8494;
+    --line:#e3e7ee;
+    --line-strong:#cfd6e0;
+    --paper:#ffffff;
+    --bg:#f4f6f9;
+    --accent:#0f766e;
+    --accent-ink:#0b4f4a;
+    --accent-soft:#e7f4f1;
+    --high:#b91c1c;
+    --high-bg:#fee2e2;
+    --high-line:#fecaca;
+    --med:#92400e;
+    --med-bg:#fef3c7;
+    --med-line:#fde68a;
+    --low:#334155;
+    --low-bg:#eef2f7;
+    --low-line:#dbe2ea;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(11,18,32,.04), 0 12px 32px rgba(11,18,32,.05);
+    --mono:"Cascadia Code","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,"Helvetica Neue",Arial,sans-serif;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--body);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  a{color:var(--accent-ink);text-decoration:none}
+  a:hover{text-decoration:underline;text-underline-offset:3px}
+  code{
+    font-family:var(--mono);
+    font-size:.86em;
+    background:#f1f4f8;
+    border:1px solid #e6eaf0;
+    border-radius:5px;
+    padding:1px 5px;
+    color:#243247;
+    overflow-wrap:anywhere;
+  }
+  .skip{
+    position:absolute;left:-9999px;top:0;z-index:100;
+    background:var(--ink);color:#fff;padding:10px 16px;border-radius:0 0 8px 0;
+  }
+  .skip:focus{left:0}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+
+  /* Top bar */
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:saturate(160%) blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-in{
+    max-width:1280px;margin:0 auto;padding:12px 24px;
+    display:flex;align-items:center;gap:16px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand-mark{
+    width:30px;height:30px;border-radius:9px;flex:0 0 auto;
+    background:linear-gradient(145deg,var(--accent),#115e59);
+    color:#fff;display:grid;place-items:center;
+    font-family:var(--serif);font-size:16px;font-weight:700;
+  }
+  .brand-title{font-weight:700;color:var(--ink);letter-spacing:-.01em;white-space:nowrap}
+  .brand-sub{color:var(--soft);font-size:12px;white-space:nowrap}
+  .topbar .spacer{flex:1}
+  .topbar .stamp{color:var(--soft);font-size:12px;white-space:nowrap}
+  .print-btn{
+    appearance:none;border:1px solid var(--line-strong);background:var(--paper);
+    color:var(--ink);font:600 12px/1 var(--sans);letter-spacing:.02em;
+    padding:9px 14px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:7px;
+    transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+  }
+  .print-btn:hover{border-color:var(--accent);box-shadow:0 4px 14px rgba(15,118,110,.12)}
+  .print-btn:active{transform:translateY(1px)}
+  .print-btn svg{width:14px;height:14px}
+
+  /* Layout */
+  .layout{
+    max-width:1280px;margin:0 auto;
+    padding:32px 24px 90px;
+    display:grid;grid-template-columns:228px minmax(0,1fr);gap:44px;
+  }
+  .rail{position:sticky;top:76px;align-self:start;font-size:13px}
+  .rail-label{
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--soft);font-weight:700;margin:0 0 10px 12px;
+  }
+  .rail nav{display:grid;gap:2px}
+  .rail a{
+    display:flex;align-items:center;gap:10px;
+    padding:7px 12px;border-radius:8px;color:var(--muted);
+    border-left:2px solid transparent;
+  }
+  .rail a:hover{background:#eef1f5;text-decoration:none;color:var(--ink)}
+  .rail a.active{background:var(--accent-soft);color:var(--accent-ink);border-left-color:var(--accent);font-weight:600}
+  .rail .num{font-family:var(--mono);font-size:10px;color:var(--soft);width:18px}
+  .rail a.active .num{color:var(--accent)}
+  .rail-meta{
+    margin-top:28px;padding:14px 12px;border-top:1px solid var(--line);
+    color:var(--soft);font-size:11.5px;line-height:1.7;
+  }
+  .rail-meta b{display:block;color:var(--muted);font-weight:600}
+  main{min-width:0}
+
+  /* Hero */
+  .hero{
+    position:relative;overflow:hidden;
+    border:1px solid var(--line);border-radius:22px;
+    padding:42px 40px 36px;
+    background:
+      radial-gradient(900px 320px at 96% -20%, rgba(15,118,110,.13), transparent 62%),
+      radial-gradient(560px 280px at -10% 110%, rgba(15,118,110,.06), transparent 70%),
+      linear-gradient(180deg,#fcfdfd,#f4f8f7);
+    box-shadow:var(--shadow);
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background-image:linear-gradient(rgba(11,18,32,.025) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(11,18,32,.025) 1px, transparent 1px);
+    background-size:34px 34px;
+    mask-image:linear-gradient(180deg, transparent, #000 45%, transparent);
+  }
+  .hero > *{position:relative;z-index:1}
+  .eyebrow{
+    margin:0 0 14px;font-size:11px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent-ink);
+  }
+  h1{
+    margin:0;font-family:var(--serif);font-weight:600;
+    font-size:clamp(38px,5vw,54px);line-height:1.05;letter-spacing:-.02em;color:var(--ink);
+  }
+  .lede{
+    margin:16px 0 0;max-width:640px;font-size:16.5px;line-height:1.6;color:var(--muted);
+  }
+  .hero-grid{
+    display:flex;align-items:center;justify-content:space-between;gap:36px;
+    margin-top:34px;flex-wrap:wrap;
+  }
+  .meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px;min-width:0;flex:1 1 420px}
+  .meta-item{min-width:0}
+  .meta-item .k{
+    display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--soft);font-weight:700;margin-bottom:3px;
+  }
+  .meta-item .v{font-size:13.5px;color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+  .meta-item .v code{font-size:12.5px;background:rgba(255,255,255,.72)}
+
+  .score-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;flex:0 0 auto}
+  .score-ring{
+    --p:81;
+    width:164px;height:164px;border-radius:50%;
+    background:conic-gradient(var(--accent) calc(var(--p) * 1%), #dfe6ec 0);
+    display:grid;place-items:center;position:relative;
+    box-shadow:0 12px 30px rgba(15,118,110,.14);
+  }
+  .score-ring::before{
+    content:"";position:absolute;inset:11px;border-radius:50%;
+    background:#fbfdfc;border:1px solid rgba(255,255,255,.9);
+  }
+  .ring-inner{position:relative;text-align:center;line-height:1}
+  .ring-inner .big{
+    display:block;font-family:var(--serif);font-size:52px;font-weight:600;
+    color:var(--ink);letter-spacing:-.03em;
+  }
+  .ring-inner .den{display:block;font-size:12px;color:var(--soft);margin-top:3px;font-weight:600}
+  .ring-inner .cap{
+    display:block;font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:700;margin-top:8px;
+  }
+  .score-note{
+    font-size:11px;color:var(--soft);text-align:center;max-width:200px;line-height:1.45;
+  }
+
+  .verdict{
+    margin:26px 0 0;padding:16px 18px;border-radius:12px;
+    background:rgba(255,255,255,.74);border:1px solid rgba(15,118,110,.18);
+    border-left:3px solid var(--accent);
+    font-size:14px;color:var(--body);
+  }
+  .verdict b{color:var(--ink)}
+
+  /* Gates */
+  .gates{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:20px;
+  }
+  .gate{
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;box-shadow:0 1px 2px rgba(11,18,32,.03);
+  }
+  .gate .g-k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:700}
+  .gate .g-v{font-size:21px;font-weight:700;color:var(--ink);letter-spacing:-.02em;margin-top:3px;font-variant-numeric:tabular-nums}
+  .gate .g-v em{font-style:normal;font-size:12px;color:var(--soft);font-weight:600;margin-left:3px}
+  .gate .g-s{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .gate .g-v .ok{color:var(--accent)}
+
+  /* Sections */
+  section{margin-top:58px;scroll-margin-top:88px}
+  .section-head{
+    display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px;
+  }
+  .section-index{
+    font-family:var(--mono);font-size:11px;color:var(--accent);
+    background:var(--accent-soft);border:1px solid #d2e9e4;
+    padding:3px 7px;border-radius:6px;letter-spacing:.04em;
+  }
+  h2{
+    margin:0;font-family:var(--serif);font-weight:600;
+    font-size:clamp(24px,3vw,30px);line-height:1.15;letter-spacing:-.015em;color:var(--ink);
+  }
+  .section-sub{margin:0;color:var(--soft);font-size:12.5px;margin-left:auto}
+  h3{margin:0 0 6px;font-size:16px;color:var(--ink);letter-spacing:-.01em}
+  p{margin:0 0 12px}
+  .muted{color:var(--muted)}
+  .small{font-size:12.5px}
+
+  /* Summary cards */
+  .summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .sum-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 20px 18px;box-shadow:0 1px 2px rgba(11,18,32,.03);
+  }
+  .sum-card h3{display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.02em}
+  .sum-card h3 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .sum-card ul{margin:8px 0 0;padding-left:17px;font-size:12.8px;line-height:1.6;color:var(--muted)}
+  .sum-card li{margin:5px 0}
+  .sum-card li b{color:var(--ink);font-weight:600}
+  .dot.good{background:var(--accent)}
+  .dot.warn{background:#d97706}
+  .dot.next{background:#1d4ed8}
+
+  /* Tables */
+  .table-wrap{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 1px 2px rgba(11,18,32,.03);overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse}
+  .score-table{font-size:13.5px}
+  .score-table th{
+    text-align:left;font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--soft);font-weight:700;padding:12px 16px;border-bottom:1px solid var(--line);
+    background:#fafbfc;
+  }
+  .score-table td{padding:13px 16px;border-bottom:1px solid #edf0f4;vertical-align:middle}
+  .score-table tr:last-child td{border-bottom:0}
+  .score-table .dim{font-weight:600;color:var(--ink)}
+  .score-table .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .bar{
+    display:inline-block;vertical-align:middle;width:78px;height:6px;border-radius:999px;
+    background:#eaeef3;overflow:hidden;margin-right:9px;
+  }
+  .score-table td[data-label="Score"]{white-space:nowrap}
+  .bar span{display:block;height:100%;border-radius:999px;background:var(--accent)}
+  .bar span.warn{background:#c47a12}
+  .score-val{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+  .total-row td{
+    background:#f7faf9;border-top:1px solid var(--line-strong);
+    font-weight:700;color:var(--ink);
+  }
+  .total-row .num{color:var(--accent-ink)}
+  .math{
+    margin-top:12px;font-family:var(--mono);font-size:12px;color:var(--muted);
+    background:#f7f9fb;border:1px dashed var(--line-strong);border-radius:10px;
+    padding:10px 14px;overflow-wrap:anywhere;
+  }
+  .math b{color:var(--ink)}
+
+  /* Priority cards */
+  .priority{display:grid;gap:14px}
+  .p-card{
+    display:grid;grid-template-columns:58px minmax(0,1fr);gap:16px;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;box-shadow:0 1px 2px rgba(11,18,32,.03);
+    border-left-width:4px;border-left-style:solid;
+  }
+  .p-card[data-sev="high"]{border-left-color:var(--high)}
+  .p-card[data-sev="med"]{border-left-color:#d97706}
+  .p-card[data-sev="low"]{border-left-color:#94a3b8}
+  .p-rank{
+    width:44px;height:44px;border-radius:50%;display:grid;place-items:center;
+    font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);
+    background:#f1f4f8;border:1px solid var(--line);font-variant-numeric:tabular-nums;
+  }
+  .p-body{min-width:0}
+  .p-top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}
+  .p-top h3{margin:0;font-size:15.5px}
+  .p-meta{font-size:11px;color:var(--soft);letter-spacing:.03em}
+  .p-body p{font-size:13.2px;color:var(--muted);margin:6px 0}
+  .p-evidence{
+    font-size:12px;background:#f7f9fb;border:1px solid #e9edf2;border-radius:8px;
+    padding:8px 11px;margin:8px 0;overflow-wrap:anywhere;
+  }
+  .p-fix{font-size:12.6px;margin:6px 0 0}
+  .p-fix b{color:var(--ink)}
+
+  /* Severity */
+  .sev{
+    display:inline-block;font-size:10px;font-weight:700;letter-spacing:.09em;
+    text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid;
+    white-space:nowrap;
+  }
+  .sev.high{color:var(--high);background:var(--high-bg);border-color:var(--high-line)}
+  .sev.med{color:var(--med);background:var(--med-bg);border-color:var(--med-line)}
+  .sev.low{color:var(--low);background:var(--low-bg);border-color:var(--low-line)}
+
+  /* Register */
+  .toolbar{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;
+    padding:10px;margin-bottom:12px;
+  }
+  .search{position:relative;flex:1 1 240px;min-width:0}
+  .search svg{
+    position:absolute;left:11px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;color:var(--soft);pointer-events:none;
+  }
+  .search input{
+    width:100%;appearance:none;border:1px solid var(--line-strong);border-radius:9px;
+    background:#fbfcfd;padding:9px 12px 9px 34px;font:400 13px/1.3 var(--sans);color:var(--ink);
+  }
+  .search input::placeholder{color:#98a1b0}
+  .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.12)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{
+    appearance:none;border:1px solid var(--line-strong);background:var(--paper);
+    color:var(--muted);font:600 11.5px/1 var(--sans);padding:7px 10px;border-radius:999px;
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+    transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip .n{
+    font-variant-numeric:tabular-nums;background:rgba(11,18,32,.07);
+    border-radius:999px;padding:1px 6px;font-size:10.5px;
+  }
+  .chip[aria-pressed="true"] .n{background:rgba(255,255,255,.16)}
+  .result-count{margin-left:auto;font-size:11.5px;color:var(--soft);white-space:nowrap}
+  .register{font-size:12.6px;table-layout:fixed}
+  .register col.c-id{width:52px}
+  .register col.c-sev{width:88px}
+  .register col.c-find{width:34%}
+  .register col.c-evi{width:25%}
+  .register thead th{
+    text-align:left;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--soft);font-weight:700;padding:10px 12px;border-bottom:1px solid var(--line);
+    background:#fafbfc;
+  }
+  .register td{padding:12px;border-bottom:1px solid #edf0f4;vertical-align:top}
+  .register tr.finding:last-child td{border-bottom:1px solid var(--line)}
+  .register tbody:last-child tr.finding:last-child td{border-bottom:0}
+  .register td strong{color:var(--ink);font-weight:600}
+  .register td code{font-size:11.2px;padding:1px 4px}
+  .register .id{font-family:var(--mono);font-size:10.5px;color:var(--soft)}
+  .group-head th{
+    text-align:left;background:#f2f6f5;border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);padding:11px 12px;
+    font-size:12.5px;font-weight:700;color:var(--ink);letter-spacing:-.01em;
+  }
+  .group-head .dim-index{
+    font-family:var(--mono);font-size:10px;color:var(--accent);
+    margin-right:8px;letter-spacing:.04em;
+  }
+  .group-head .dim-score{
+    float:right;font-family:var(--mono);font-size:11.5px;color:var(--accent-ink);
+    background:#fff;border:1px solid #d2e9e4;border-radius:6px;padding:1px 7px;
+  }
+  .group-head .dim-count{float:right;color:var(--soft);font-weight:500;font-size:11px;margin-right:8px;margin-top:2px}
+
+  /* Dimension cards */
+  .dims{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .dim-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;box-shadow:0 1px 2px rgba(11,18,32,.03);display:flex;flex-direction:column;gap:10px;
+  }
+  .dim-card:last-child{grid-column:1 / -1}
+  .dim-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .dim-top h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}
+  .dim-top h3 .dim-index{font-family:var(--mono);font-size:10px;color:var(--soft)}
+  .dim-score-big{
+    font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);
+    font-variant-numeric:tabular-nums;line-height:1;
+  }
+  .dim-score-big small{font-family:var(--sans);font-size:10px;color:var(--soft);font-weight:600}
+  .dim-card p{font-size:12.8px;color:var(--muted);margin:0}
+  .dim-list{margin:0;padding-left:17px;font-size:12.2px;color:var(--muted);line-height:1.55}
+  .dim-list li{margin:3px 0}
+  .dim-list b{color:var(--ink);font-weight:600}
+  .dim-foot{
+    margin-top:auto;padding-top:10px;border-top:1px solid #eef1f5;
+    font-size:11px;color:var(--soft);display:flex;gap:6px;align-items:center;
+  }
+  .dim-foot b{color:var(--accent-ink);font-weight:700}
+
+  /* Verification */
+  .verify-table{font-size:12.8px}
+  .verify-table th{
+    text-align:left;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--soft);font-weight:700;padding:10px 14px;border-bottom:1px solid var(--line);background:#fafbfc;
+  }
+  .verify-table td{padding:12px 14px;border-bottom:1px solid #edf0f4;vertical-align:top}
+  .verify-table tr:last-child td{border-bottom:0}
+  .verify-table td:first-child{color:var(--ink);font-weight:600;width:31%}
+  .verdict-chip{
+    display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;padding:2px 7px;border-radius:5px;white-space:nowrap;
+    background:var(--accent-soft);border:1px solid #cfe7e2;color:var(--accent-ink);
+  }
+  .verdict-chip.down{background:#eef2f7;border-color:var(--low-line);color:var(--low)}
+  .verdict-chip.known{background:var(--med-bg);border-color:var(--med-line);color:var(--med)}
+
+  /* Controls */
+  .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .control{
+    display:flex;gap:12px;align-items:flex-start;
+    background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  }
+  .control .pass{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent-ink);
+    display:grid;place-items:center;font-size:11px;font-weight:800;
+    border:1px solid #cfe7e2;margin-top:1px;
+  }
+  .control h3{font-size:12.5px;margin:0 0 2px}
+  .control p{font-size:11.8px;color:var(--muted);margin:0;line-height:1.5}
+
+  /* Method */
+  .method{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .method-card{
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;
+  }
+  .method-card h3{font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .method-card .step{
+    width:22px;height:22px;border-radius:6px;background:var(--accent-soft);
+    color:var(--accent-ink);display:grid;place-items:center;font-family:var(--mono);font-size:10.5px;
+    border:1px solid #cfe7e2;
+  }
+  .method-card ul{margin:0;padding-left:17px;font-size:12.4px;color:var(--muted);line-height:1.6}
+  .method-card li{margin:4px 0}
+  .method-card li b{color:var(--ink);font-weight:600}
+  .readonly{
+    margin-top:16px;border:1px solid #cfe7e2;background:var(--accent-soft);
+    border-radius:12px;padding:14px 16px;font-size:12.5px;color:var(--accent-ink);
+  }
+  .readonly b{font-weight:700}
+
+  footer{
+    max-width:1280px;margin:0 auto;padding:0 24px 56px;
+    color:var(--soft);font-size:11.5px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    border-top:1px solid var(--line);padding-top:18px;
+  }
+  footer code{font-size:10.5px}
+
+  /* Responsive */
+  @media (max-width:1080px){
+    .layout{grid-template-columns:minmax(0,1fr);gap:0;padding-top:24px}
+    .rail{display:none}
+    .summary-grid{grid-template-columns:1fr}
+    .dims{grid-template-columns:1fr}
+    .dim-card:last-child{grid-column:auto}
+  }
+  @media (max-width:820px){
+    .topbar .stamp{display:none}
+    .topbar-in{padding:10px 16px;gap:10px}
+    .hero{padding:30px 22px 28px;border-radius:18px}
+    .hero-grid{align-items:center;gap:24px}
+    .meta{grid-template-columns:1fr;gap:12px;flex-basis:100%}
+    .score-wrap{width:100%;flex-direction:row;justify-content:flex-start;gap:18px}
+    .score-ring{width:118px;height:118px}
+    .ring-inner .big{font-size:38px}
+    .gates{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .controls,.method{grid-template-columns:1fr}
+    .p-card{grid-template-columns:44px minmax(0,1fr);padding:16px;gap:12px}
+    .p-rank{width:38px;height:38px;font-size:17px}
+    .section-sub{margin-left:0;flex-basis:100%}
+  }
+  @media (max-width:600px){
+    .brand-sub{display:none}
+    .print-label{display:none}
+    .print-btn{padding:9px 11px}
+  }
+  @media screen and (max-width:760px){
+    .register colgroup{display:none}
+    .register,.register tbody,.register tr,.register td{display:block;width:100%}
+    .register thead{display:none}
+    .register tr.finding{
+      border:1px solid var(--line);border-radius:12px;margin:0 0 12px;
+      padding:12px 14px;background:var(--paper);
+    }
+    .register tr.finding:last-child{margin-bottom:0}
+    .register tbody{padding:0 12px}
+    .register tbody:first-child{padding-top:12px}
+    .register td{border:0;padding:5px 0;min-width:0}
+    .register td::before{
+      content:attr(data-label);display:block;font-size:9px;letter-spacing:.12em;
+      text-transform:uppercase;color:var(--soft);font-weight:700;margin-bottom:2px;
+    }
+    .register td[data-label="Ref"],.register td[data-label="Severity"]{
+      display:inline-block;width:auto;margin-right:10px;padding:0 0 6px;
+    }
+    .register td[data-label="Ref"]::before,.register td[data-label="Severity"]::before{display:none}
+    .register td[data-label="Severity"]{margin-bottom:4px}
+    .group-head th{display:block;padding:12px 14px;border-radius:10px;margin:8px 0 10px}
+    .group-head .dim-score,.group-head .dim-count{float:none;display:inline-block;margin-left:8px}
+    .toolbar{padding:9px}
+    .result-count{width:100%;margin-left:0;text-align:right}
+    .table-wrap{background:transparent;border:0;box-shadow:none;overflow:visible}
+    .score-table{background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:block}
+    .score-table thead,.score-table tbody,.score-table tr,.score-table td{display:block;width:100%}
+    .score-table thead{display:none}
+    .score-table td{border-bottom:1px solid #edf0f4;padding:10px 14px;text-align:left}
+    .score-table td.num{text-align:left}
+    .score-table td::before{
+      content:attr(data-label);display:inline-block;min-width:86px;
+      font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:700;
+    }
+    .score-table .bar{width:64px}
+    .verify-table,.verify-table tbody,.verify-table tr,.verify-table td{display:block;width:100%}
+    .verify-table thead{display:none}
+    .verify-table td{padding:10px 14px;border-bottom:1px solid #edf0f4}
+    .verify-table td:first-child{width:auto;background:#fafbfc;border-bottom:0;padding-bottom:4px}
+    .verify-table td::before{
+      content:attr(data-label);display:block;font-size:9px;letter-spacing:.12em;
+      text-transform:uppercase;color:var(--soft);font-weight:700;margin-bottom:2px;
+    }
+    .verify-table td:first-child::before{display:none}
+    .verify-table tr{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:var(--paper)}
+  }
+
+  /* Print */
+  @media print{
+    @page{margin:13mm 12mm}
+    html{scroll-behavior:auto}
+    body{background:#fff;font-size:10.5pt;line-height:1.5}
+    .topbar,.rail,.toolbar,.print-btn,.skip,footer .noprint{display:none !important}
+    .layout{display:block;max-width:none;padding:0;margin:0}
+    .hero{padding:22px 24px;border-radius:12px;box-shadow:none;break-inside:avoid;background:#f7faf9}
+    .hero::after{display:none}
+    h1{font-size:32pt}
+    .lede{font-size:11pt}
+    .score-ring{width:118px;height:118px;box-shadow:none}
+    .ring-inner .big{font-size:36px}
+    section{margin-top:28px;break-inside:auto}
+    .section-head{break-after:avoid}
+    .sum-card,.gate,.p-card,.dim-card,.control,.method-card,.table-wrap{box-shadow:none}
+    .sum-card,.gate,.p-card,.dim-card,.control,.method-card{break-inside:avoid}
+    .register tr.finding[hidden]{display:table-row !important}
+    .register tr.group-head[hidden]{display:table-row !important}
+    .register tr.finding,.verify-table tr,.score-table tr{break-inside:avoid}
+    .register tr.group-head{break-after:avoid}
+    .register{font-size:8.2pt;table-layout:fixed}
+    .register td,.register th{padding:6px 7px}
+    .register td code{font-size:7.4pt}
+    .score-table th,.verify-table th{background:#f4f6f8}
+    a{color:inherit;text-decoration:none}
+    footer{border-top:1px solid #ccc;margin-top:24px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none !important}
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">Q</span>
+      <span class="brand-title">Quran Yahdi</span>
+      <span class="brand-sub">Code Quality Audit</span>
+    </div>
+    <span class="spacer"></span>
+    <span class="stamp">22 October 2026 · commit 1a71532</span>
+    <button class="print-btn" id="print" type="button" aria-label="Print or save as PDF">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+        <path d="M6 9V3h12v6M6 18H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-2"/>
+        <rect x="6" y="14" width="12" height="7" rx="1"/>
+      </svg>
+      <span class="print-label">Print / Save as PDF</span>
+    </button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="rail" aria-label="Report sections">
+    <p class="rail-label">Contents</p>
+    <nav>
+      <a href="#summary"><span class="num">01</span> Executive summary</a>
+      <a href="#scorecard"><span class="num">02</span> Scorecard</a>
+      <a href="#priority"><span class="num">03</span> Top 5 issues</a>
+      <a href="#register"><span class="num">04</span> Findings register</a>
+      <a href="#dimensions"><span class="num">05</span> Dimension notes</a>
+      <a href="#verification"><span class="num">06</span> Verification</a>
+      <a href="#controls"><span class="num">07</span> Security controls</a>
+      <a href="#method"><span class="num">08</span> Method &amp; limits</a>
+    </nav>
+    <div class="rail-meta">
+      <b>Scope</b>
+      167 hand-written Dart files<br>
+      18,221 lines · 16 features<br>
+      600 automated tests<br><br>
+      <b>Mode</b>
+      Read-only. No files were modified.
+    </div>
+  </aside>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="report-title">
+      <p class="eyebrow">Independent Code Quality Audit</p>
+      <h1 id="report-title">Quran Yahdi</h1>
+      <p class="lede">A production Flutter application for Quran reading, prayer times, and daily worship — reviewed across maintainability, clean architecture, code quality, security, and performance.</p>
+
+      <div class="hero-grid">
+        <div class="meta">
+          <div class="meta-item">
+            <span class="k">Commit</span>
+            <span class="v"><code>1a71532</code> · main</span>
+          </div>
+          <div class="meta-item">
+            <span class="k">Toolchain</span>
+            <span class="v">Flutter 3.47.5 · Dart 3.13.4</span>
+          </div>
+          <div class="meta-item">
+            <span class="k">Codebase</span>
+            <span class="v">167 files · 18,221 lines · 16 features</span>
+          </div>
+          <div class="meta-item">
+            <span class="k">Test suite</span>
+            <span class="v">600 / 600 passing</span>
+          </div>
+        </div>
+
+        <div class="score-wrap">
+          <div class="score-ring" style="--p:81" role="img" aria-label="Overall weighted score: 8.1 out of 10">
+            <div class="ring-inner">
+              <span class="big">8.1</span>
+              <span class="den">out of 10</span>
+            </div>
+          </div>
+          <span class="score-note">Overall weighted score · security 25%</span>
+        </div>
+      </div>
+
+      <p class="verdict"><b>Verdict:</b> production-grade engineering with unusually strong security and consistency for a solo Flutter codebase. The material risks are concentrated in the offline library pipeline — memory retention and main-isolate work — plus a small number of reliability seams. No critical vulnerability was found.</p>
+    </section>
+
+    <div class="gates" aria-label="Automated gate results">
+      <div class="gate">
+        <div class="g-k">Analyzer</div>
+        <div class="g-v"><span class="ok">0</span> <em>issues</em></div>
+        <div class="g-s">flutter analyze · 98.2s</div>
+      </div>
+      <div class="gate">
+        <div class="g-k">Tests</div>
+        <div class="g-v">600 <em>/ 600</em></div>
+        <div class="g-s">flutter test · all passed</div>
+      </div>
+      <div class="gate">
+        <div class="g-k">Formatting</div>
+        <div class="g-v"><span class="ok">0</span> <em>changed</em></div>
+        <div class="g-s">355 files checked</div>
+      </div>
+      <div class="gate">
+        <div class="g-k">Boundaries</div>
+        <div class="g-v"><span class="ok">0</span> <em>violations</em></div>
+        <div class="g-s">core → feature · feature → feature</div>
+      </div>
+    </div>
+
+    <section id="summary" aria-labelledby="summary-title">
+      <div class="section-head">
+        <span class="section-index">01</span>
+        <h2 id="summary-title">Executive summary</h2>
+        <p class="section-sub">35 verified findings · 1 high · 17 medium · 17 low</p>
+      </div>
+      <div class="summary-grid">
+        <div class="sum-card">
+          <h3><span class="dot good" aria-hidden="true"></span> What stands out</h3>
+          <ul>
+            <li><b>Clean gates:</b> analyzer, formatter, and the full 600-test suite are green.</li>
+            <li><b>Enforced boundaries:</b> zero cross-feature imports, zero core-to-feature imports.</li>
+            <li><b>Consistent failure contract:</b> localized copy only; diagnostics go to <code>dev.log</code>.</li>
+            <li><b>Security depth:</b> pinned remote content, parameterized SQL, no tracked secrets, hardened CSP.</li>
+          </ul>
+        </div>
+        <div class="sum-card">
+          <h3><span class="dot warn" aria-hidden="true"></span> What needs attention</h3>
+          <ul>
+            <li><b>Pack memory:</b> the reader cache is bounded by entry count, not bytes; large tafsir packs can stay resident.</li>
+            <li><b>Main-isolate work:</b> install-time hashing and backup encoding can cause dropped frames.</li>
+            <li><b>Silent failure paths:</b> settings mutations and some boot hooks can fail without feedback or logs.</li>
+            <li><b>Seam erosion:</b> the router acts as a second composition root; backup writes other features' tables directly.</li>
+          </ul>
+        </div>
+        <div class="sum-card">
+          <h3><span class="dot next" aria-hidden="true"></span> First actions</h3>
+          <ul>
+            <li><b>Byte-budget the pack cache</b> and project hadith to compact records.</li>
+            <li><b>Move install hashing and backup encoding</b> into worker isolates.</li>
+            <li><b>Batch backup writes</b> inside the existing transaction.</li>
+            <li><b>Guard settings mutations</b> with logging and an explicit failure state.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="scorecard" aria-labelledby="scorecard-title">
+      <div class="section-head">
+        <span class="section-index">02</span>
+        <h2 id="scorecard-title">Scorecard</h2>
+        <p class="section-sub">Weights: 20 / 20 / 20 / 25 / 15</p>
+      </div>
+      <div class="table-wrap">
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th scope="col">Dimension</th>
+              <th scope="col" class="num">Weight</th>
+              <th scope="col">Score</th>
+              <th scope="col" class="num">Weighted</th>
+              <th scope="col">Primary driver</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="dim" data-label="Dimension">Maintainability</td>
+              <td class="num" data-label="Weight">20%</td>
+              <td data-label="Score"><span class="bar"><span style="width:80%"></span></span><span class="score-val">8.0</span></td>
+              <td class="num" data-label="Weighted">1.60</td>
+              <td data-label="Driver">Deep documentation and decomposition; duplicated test doubles and a multi-role downloader.</td>
+            </tr>
+            <tr>
+              <td class="dim" data-label="Dimension">Clean Architecture</td>
+              <td class="num" data-label="Weight">20%</td>
+              <td data-label="Score"><span class="bar"><span class="warn" style="width:75%"></span></span><span class="score-val">7.5</span></td>
+              <td class="num" data-label="Weighted">1.50</td>
+              <td data-label="Driver">Zero dependency violations, but the router duplicates the composition root and backup bypasses owning repositories.</td>
+            </tr>
+            <tr>
+              <td class="dim" data-label="Dimension">Code Quality</td>
+              <td class="num" data-label="Weight">20%</td>
+              <td data-label="Score"><span class="bar"><span style="width:85%"></span></span><span class="score-val">8.5</span></td>
+              <td class="num" data-label="Weighted">1.70</td>
+              <td data-label="Driver">Strict lints, no dead code or debug prints, uniform state handling; residual casts and weak guards.</td>
+            </tr>
+            <tr>
+              <td class="dim" data-label="Dimension">Security</td>
+              <td class="num" data-label="Weight">25%</td>
+              <td data-label="Score"><span class="bar"><span style="width:85%"></span></span><span class="score-val">8.5</span></td>
+              <td class="num" data-label="Weighted">2.125</td>
+              <td data-label="Driver">No secrets, no injection surface, pinned content, hardened web headers; residual supply-chain and input-validation gaps.</td>
+            </tr>
+            <tr>
+              <td class="dim" data-label="Dimension">Performance</td>
+              <td class="num" data-label="Weight">15%</td>
+              <td data-label="Score"><span class="bar"><span class="warn" style="width:75%"></span></span><span class="score-val">7.5</span></td>
+              <td class="num" data-label="Weighted">1.125</td>
+              <td data-label="Driver">Off-isolate database and decode work; pack memory retention and main-isolate hashing.</td>
+            </tr>
+            <tr class="total-row">
+              <td data-label="Dimension">Overall weighted score</td>
+              <td class="num" data-label="Weight">100%</td>
+              <td data-label="Score">8.05 → <span class="score-val">8.1</span></td>
+              <td class="num" data-label="Weighted">8.05</td>
+              <td data-label="Driver">Stable at 8.0 under equal weights.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="math"><b>Arithmetic:</b> (8.0 × 0.20) + (7.5 × 0.20) + (8.5 × 0.20) + (8.5 × 0.25) + (7.5 × 0.15) = 1.60 + 1.50 + 1.70 + 2.125 + 1.125 = <b>8.05 → 8.1 / 10</b></p>
+    </section>
+
+    <section id="priority" aria-labelledby="priority-title">
+      <div class="section-head">
+        <span class="section-index">03</span>
+        <h2 id="priority-title">Top 5 priority issues</h2>
+        <p class="section-sub">Ranked by risk to users and release quality</p>
+      </div>
+      <div class="priority">
+        <article class="p-card" data-sev="high">
+          <div class="p-rank" aria-hidden="true">1</div>
+          <div class="p-body">
+            <div class="p-top">
+              <span class="sev high">High</span>
+              <h3>Pack cache retains full text projections</h3>
+              <span class="p-meta">Performance</span>
+            </div>
+            <p>The projection cache is bounded by entry count (2), not bytes. Hadith packs are stored as the raw decoded list and tafsir packs as a full ayah-to-text map, so a large installed pack can remain resident indefinitely.</p>
+            <div class="p-evidence"><code>lib/<wbr>features/<wbr>library/<wbr>data/<wbr>pack_reader.dart:<wbr>39&#8209;41,<wbr>99,<wbr>127&#8209;128</code> · catalog: Bukhari 9.4 MB, Ibn Kathir tafsir 82 MB (<code>assets/<wbr>data/<wbr>library_catalog.json</code>)</div>
+            <p class="p-fix"><b>Fix:</b> enforce an approximate byte budget, project hadith to <code>List&lt;(<wbr>int,<wbr> String)&gt;</code>, and evict the tafsir projection when the ayah sheet closes.</p>
+          </div>
+        </article>
+
+        <article class="p-card" data-sev="med">
+          <div class="p-rank" aria-hidden="true">2</div>
+          <div class="p-body">
+            <div class="p-top">
+              <span class="sev med">Medium</span>
+              <h3>Install pipeline does heavy work on the UI isolate</h3>
+              <span class="p-meta">Performance</span>
+            </div>
+            <p>Each tafsir batch buffers four complete surah bodies, verifies SHA-256 on the UI isolate, then builds the merged index on the same isolate. Large packs can drop frames during install.</p>
+            <div class="p-evidence"><code>pack_downloader.dart:<wbr>184&#8209;207,<wbr>202,<wbr>255&#8209;263,<wbr>367</code> · <code>pack_downloader_types.dart:<wbr>39</code> (<code>_tafsirBatchSize = 4</code>)</div>
+            <p class="p-fix"><b>Fix:</b> stream each body into the hashing sink inside the worker isolate, reduce the batch to 2, and return a compact projection.</p>
+          </div>
+        </article>
+
+        <article class="p-card" data-sev="med">
+          <div class="p-rank" aria-hidden="true">3</div>
+          <div class="p-body">
+            <div class="p-top">
+              <span class="sev med">Medium</span>
+              <h3>Backup restore writes row-by-row; export encodes on the UI isolate</h3>
+              <span class="p-meta">Performance</span>
+            </div>
+            <p>Import performs one awaited statement per row inside a transaction, so thousands of bookmarks or prayer days become thousands of isolate round-trips. Export runs <code>jsonEncode</code> on the UI isolate even though import decoding is already isolated.</p>
+            <div class="p-evidence"><code>lib/<wbr>features/<wbr>backup/<wbr>data/<wbr>backup_service.dart:<wbr>42&#8209;49,<wbr>220&#8209;266</code></div>
+            <p class="p-fix"><b>Fix:</b> write through <code>_db.batch(<wbr>(<wbr>b) =&gt; b.insertAll(<wbr>...))</code> and move export encoding into <code>Isolate.run</code>.</p>
+          </div>
+        </article>
+
+        <article class="p-card" data-sev="med">
+          <div class="p-rank" aria-hidden="true">4</div>
+          <div class="p-body">
+            <div class="p-top">
+              <span class="sev med">Medium</span>
+              <h3>Settings mutations can fail silently</h3>
+              <span class="p-meta">Reliability</span>
+            </div>
+            <p><code>setAzkarEnabled</code>, <code>setTime</code>, <code>toggleWird</code>, and <code>changeWirdTime</code> have no error handling, while the screen calls them fire-and-forget. A failed SQLite write becomes an unhandled async error with no user feedback and no diagnostic.</p>
+            <div class="p-evidence"><code>settings_cubit.dart:<wbr>67&#8209;126</code> · callers at <code>settings_screen.dart:<wbr>79,<wbr>86,<wbr>92,<wbr>99</code></div>
+            <p class="p-fix"><b>Fix:</b> wrap each mutation, log through <code>dev.log</code>, and expose an explicit failure or <code>permissionDenied</code> field. Apply the same discipline to <code>cached_loader.dart:<wbr>14&#8209;17</code>, which currently loses the original stack trace.</p>
+          </div>
+        </article>
+
+        <article class="p-card" data-sev="med">
+          <div class="p-rank" aria-hidden="true">5</div>
+          <div class="p-body">
+            <div class="p-top">
+              <span class="sev med">Medium</span>
+              <h3>CI publishes debug-signed “release” artifacts</h3>
+              <span class="p-meta">Security · supply chain</span>
+            </div>
+            <p>CI builds <code>&#8209;&#8209;release</code> without a keystore, silently falls back to the debug signing config, and uploads the result as <code>app&#8209;release&#8209;apk</code> / <code>app&#8209;release&#8209;aab</code>. The artifact cannot be updated by a future store build and is not attributable to the owner key.</p>
+            <div class="p-evidence"><code>.github/<wbr>workflows/<wbr>ci.yml:<wbr>41&#8209;52</code> · <code>android/<wbr>app/<wbr>build.gradle:<wbr>89</code> — known and documented as W7c-pending.</div>
+            <p class="p-fix"><b>Fix:</b> upload only when the keystore exists and <code>PUBLISH_RELEASE=true</code>; otherwise skip the upload or name the artifact <code>debug&#8209;signed&#8209;do&#8209;not&#8209;distribute</code>.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="register" aria-labelledby="register-title">
+      <div class="section-head">
+        <span class="section-index">04</span>
+        <h2 id="register-title">Findings register</h2>
+        <p class="section-sub">Every verified finding, grouped by dimension</p>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+          </svg>
+          <label for="search" class="skip">Search findings</label>
+          <input id="search" type="search" placeholder="Search findings, files, or fixes…" autocomplete="off">
+        </div>
+        <div class="chips" role="group" aria-label="Filter by severity">
+          <button class="chip" type="button" data-sev="all" aria-pressed="true">All <span class="n"></span></button>
+          <button class="chip" type="button" data-sev="high" aria-pressed="false">High <span class="n"></span></button>
+          <button class="chip" type="button" data-sev="med" aria-pressed="false">Medium <span class="n"></span></button>
+          <button class="chip" type="button" data-sev="low" aria-pressed="false">Low <span class="n"></span></button>
+        </div>
+        <span class="result-count" id="resultCount" aria-live="polite"></span>
+      </div>
+
+      <div class="table-wrap">
+        <table class="register">
+          <colgroup>
+            <col class="c-id"><col class="c-sev"><col class="c-find"><col class="c-evi"><col>
+          </colgroup>
+          <thead>
+            <tr>
+              <th scope="col">Ref</th>
+              <th scope="col">Severity</th>
+              <th scope="col">Finding</th>
+              <th scope="col">Evidence</th>
+              <th scope="col">Recommended fix</th>
+            </tr>
+          </thead>
+
+          <tbody class="group">
+            <tr class="group-head"><th colspan="5"><span class="dim-index">01</span> Maintainability <span class="dim-score">8.0</span><span class="dim-count">7 findings</span></th></tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">M1</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Test doubles are redeclared across files.</strong> <code>_FakePlaybackService</code> appears 9 times, <code>_TeardownSafeAyahRepository</code> 7 times, and <code>_StaticReciterRepository</code> 5 times, so one copy can drift silently.</td>
+              <td data-label="Evidence"><code>test/<wbr>support/<wbr>fakes.dart:<wbr>1</code> (covers only qibla); duplicates in reader/ayah/reciter tests.</td>
+              <td data-label="Fix">Move shared doubles into <code>test/<wbr>support</code> with constructor parameters. Test-only wave; frozen-suite grant required.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">M2</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Flat test tree.</strong> 161 test files sit at the root with no feature mirror, so ownership and discovery are filename-grep only.</td>
+              <td data-label="Evidence"><code>test/<wbr></code> root; <code>test/<wbr>support</code> and <code>fixtures</code> exist.</td>
+              <td data-label="Fix">Relocate to <code>test/<wbr>features/<wbr>&lt;feature&gt;/<wbr></code> as pure moves.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">M3</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Playback handlers duplicate state construction.</strong> Three listeners rebuild the same four-field state in ~60 duplicated lines; a new field can be forgotten in one handler.</td>
+              <td data-label="Evidence"><code>playback_cubit.dart:<wbr>243</code> (<code>_onPlayingChanged</code>, <code>_onPositionChanged</code>, <code>_onDurationChanged</code>).</td>
+              <td data-label="Fix">Add one <code>_emitProgress(<wbr>{position,<wbr> duration})</code> built on <code>copyWith</code>.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">M4</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>The downloader also owns registry CRUD and the read facade.</strong> Install, registry persistence, and reads share one class; the same row query is repeated five times.</td>
+              <td data-label="Evidence"><code>pack_downloader.dart:<wbr>382,<wbr>408,<wbr>423,<wbr>430,<wbr>441,<wbr>449&#8209;461</code> · <code>pack_reader.dart</code> is composed inside.</td>
+              <td data-label="Fix">Extract a <code>PackRegistry</code> for rows and <code>packPath</code>; keep the downloader install-only.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">M5</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>A boolean encodes the failing operation.</strong> <code>BackupState.failed(<wbr>{duringExport})</code> forces every consumer to branch.</td>
+              <td data-label="Evidence"><code>backup_state.dart:<wbr>27</code></td>
+              <td data-label="Fix">Split into <code>failedExport</code> / <code>failedImport</code> variants for exhaustive switches.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">M6</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Route paths are string literals inside features.</strong> Renaming a route fails only at runtime.</td>
+              <td data-label="Evidence"><code>reader_screen.dart:<wbr>109</code>, <code>home_screen.dart:<wbr>99</code>, <code>qibla_screen.dart:<wbr>106</code>, <code>surah_index_screen.dart:<wbr>69</code> vs <code>router.dart:<wbr>100&#8209;297</code>.</td>
+              <td data-label="Fix">Add shared route-name constants used by both the router and the screens.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">M7</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>README test count is stale.</strong> It advertises 426 tests while the suite runs 600.</td>
+              <td data-label="Evidence"><code>README.md:<wbr>58</code> vs 600 passing tests.</td>
+              <td data-label="Fix">State “600+” or drop the number and point at CI.</td>
+            </tr>
+          </tbody>
+
+          <tbody class="group">
+            <tr class="group-head"><th colspan="5"><span class="dim-index">02</span> Clean Architecture <span class="dim-score">7.5</span><span class="dim-count">8 findings</span></th></tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">A1</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>The router is a second composition root.</strong> It imports 16 features and constructs every route cubit inline, duplicating the injector’s wiring.</td>
+              <td data-label="Evidence"><code>lib/<wbr>app/<wbr>router.dart:<wbr>89&#8209;302</code> vs <code>lib/<wbr>app/<wbr>di/<wbr>injector.dart:<wbr>62</code>.</td>
+              <td data-label="Fix">Move route-scope construction into per-feature route factories or a typed scope helper.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">A2</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Backup reads and writes other features’ tables directly.</strong> A schema change silently breaks backup, and the import guard cannot detect it.</td>
+              <td data-label="Evidence"><code>backup_service.dart:<wbr>72&#8209;80,<wbr>220&#8209;266</code> (bookmarks, khatma, prayer log, settings).</td>
+              <td data-label="Fix">Introduce <code>BackupContributor</code> ports in <code>core/<wbr>domain</code> with per-feature implementations composed in the injector.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">A3</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>A drift row type leaks into presentation.</strong> The reciter seam exposes <code>ReciterRow</code>, so the cubit imports <code>core/<wbr>db</code> through a mapping extension.</td>
+              <td data-label="Evidence"><code>reciter_repository.dart:<wbr>191</code>, <code>reciter_source.dart:<wbr>13</code>, <code>reciters_cubit.dart:<wbr>6,<wbr>23</code>.</td>
+              <td data-label="Fix">Return a domain <code>ReciterInfo</code> from the seam; keep row-typed members only as a deprecated alias for frozen doubles.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">A4</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>State-variant naming diverges from the governance rule.</strong> The documented <code>loading/<wbr>ready/<wbr>failed</code> contract is not followed by several machines.</td>
+              <td data-label="Evidence"><code>backup_state.dart:<wbr>11</code>, <code>playback_state.dart:<wbr>14</code>, <code>duas_state.dart:<wbr>29</code>, <code>hijri_state.dart:<wbr>19</code>.</td>
+              <td data-label="Fix">Add deprecated aliases or amend the governance rule to permit explicit per-feature machines.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">A5</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Persistence and orchestration are conflated.</strong> The reminder settings port also implements <code>ReminderRescheduler</code>, while <code>ReminderScheduler</code> duplicates the port with no added members.</td>
+              <td data-label="Evidence"><code>core/<wbr>domain/<wbr>reminders.dart:<wbr>76</code>, <code>reminder_scheduler.dart:<wbr>8</code>; called from <code>settings_cubit.dart:<wbr>133</code> and <code>prayer_times_cubit.dart:<wbr>131</code>.</td>
+              <td data-label="Fix">Split store, rescheduler, and scheduler responsibilities; keep the old type as a deprecated test alias.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">A6</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>City picker depends on a concrete repository</strong> because the port exposes only <code>selectedCity</code> and <code>select</code>.</td>
+              <td data-label="Evidence"><code>city_picker_cubit.dart:<wbr>21</code>; <code>core/<wbr>domain/<wbr>city.dart:<wbr>71&#8209;77</code>.</td>
+              <td data-label="Fix">Widen the port with <code>search</code> / <code>nearestTo</code> and inject the interface.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">A7</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>The architecture guard never asserts core → feature.</strong> That invariant currently holds but is unenforced.</td>
+              <td data-label="Evidence"><code>test/<wbr>architecture_guard_test.dart:<wbr>80</code> returns early for non-feature paths.</td>
+              <td data-label="Fix">Add a core-to-feature offender scan to the guard.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">A8</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>The optional-loader DI contract is not honored by route builders.</strong> Registering without a loader skips a dependency, but the route resolves it unconditionally.</td>
+              <td data-label="Evidence"><code>injector.dart:<wbr>139&#8209;186</code> vs <code>router.dart:<wbr>115,<wbr>170,<wbr>186,<wbr>220,<wbr>265,<wbr>279</code>. Not reachable in production: <code>main.dart:<wbr>31&#8209;39</code> always passes all loaders.</td>
+              <td data-label="Fix">Always register null-object repositories, or gate builders on <code>getIt.isRegistered</code>.</td>
+            </tr>
+          </tbody>
+
+          <tbody class="group">
+            <tr class="group-head"><th colspan="5"><span class="dim-index">03</span> Code Quality <span class="dim-score">8.5</span><span class="dim-count">6 findings</span></th></tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">C1</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Loader failures lose the original stack trace.</strong> Rethrowing the error object starts a new trace, so every load failure points at the cache helper.</td>
+              <td data-label="Evidence"><code>lib/<wbr>core/<wbr>utils/<wbr>cached_loader.dart:<wbr>14&#8209;17</code>.</td>
+              <td data-label="Fix">Use <code>Error.throwWithStackTrace(<wbr>error,<wbr> stackTrace)</code>.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">C2</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Settings mutations have no error handling.</strong> Callers are fire-and-forget, so a SQLite write failure becomes an unhandled async error.</td>
+              <td data-label="Evidence"><code>settings_cubit.dart:<wbr>67&#8209;126</code>; <code>settings_screen.dart:<wbr>79,<wbr>86,<wbr>92,<wbr>99</code>.</td>
+              <td data-label="Fix">Wrap each mutation, log, and emit an explicit failure or permission field.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">C3</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Positional casts on <code>Future.wait&lt;Object&gt;</code>.</strong> Any reorder or signature change becomes a runtime <code>TypeError</code> inside the loading path.</td>
+              <td data-label="Evidence"><code>duas_cubit.dart:<wbr>46&#8209;51</code>.</td>
+              <td data-label="Fix">Use a record future: <code>final (<wbr>entries,<wbr> categories) = await (<wbr>_duas.entries(<wbr>),<wbr> _duas.categories(<wbr>)).wait;</code></td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">C4</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Boot hooks swallow failures without diagnostics.</strong> The code labels this “Disclosed v1”, so it is documented rather than accidental.</td>
+              <td data-label="Evidence"><code>main.dart:<wbr>105&#8209;107,<wbr>118&#8209;120,<wbr>134&#8209;136</code>.</td>
+              <td data-label="Fix">When the v1 disclosure is lifted, log with <code>dev.log</code> and keep the fail-open behavior.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">C5</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Deep-link stream has no <code>onError</code>.</strong> A plugin stream error becomes an unhandled zone error and can silently stop warm deep links.</td>
+              <td data-label="Evidence"><code>main.dart:<wbr>145</code>.</td>
+              <td data-label="Fix">Add an <code>onError</code> that logs; keep the subscription if it must stay disposable.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">C6</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Invalid zakat input is coerced to zero.</strong> The field has a numeric keyboard type but no formatter or validation, so pasted text yields a wrong zakat result.</td>
+              <td data-label="Evidence"><code>zakat_calculator.dart:<wbr>18</code>; <code>zakat_screen.dart:<wbr>209</code>.</td>
+              <td data-label="Fix">Add a numeric formatter and surface invalid input instead of coercing to zero.</td>
+            </tr>
+          </tbody>
+
+          <tbody class="group">
+            <tr class="group-head"><th colspan="5"><span class="dim-index">04</span> Security <span class="dim-score">8.5</span><span class="dim-count">6 findings</span></th></tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">S1</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>CI publishes debug-signed artifacts named as release builds.</strong> The fallback is silent, so the artifact looks official but cannot be updated by a future store build.</td>
+              <td data-label="Evidence"><code>.github/<wbr>workflows/<wbr>ci.yml:<wbr>41&#8209;52</code>; <code>android/<wbr>app/<wbr>build.gradle:<wbr>89</code>; documented W7c-pending in <code>AGENTS.md</code> §4.</td>
+              <td data-label="Fix">Gate the upload on a keystore plus <code>PUBLISH_RELEASE=true</code>; otherwise skip or rename it.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">S2</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Backup restore does not range-check integers.</strong> A crafted 2 MB backup can write out-of-range ayah ids or absurd page targets.</td>
+              <td data-label="Evidence"><code>backup_codec.dart:<wbr>308&#8209;313,<wbr>331&#8209;338</code>; inserts at <code>backup_merger.dart:<wbr>35</code>, <code>backup_service.dart:<wbr>222</code>.</td>
+              <td data-label="Fix">Enforce <code>1..6236</code> for ayah ids, <code>1..604</code> for pages, and bound tasbih values and list lengths.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">S3</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Redirects are not re-validated.</strong> Dio follows up to five redirects without re-applying the HTTPS and host allowlist; audio bodies have no SHA-256 pin.</td>
+              <td data-label="Evidence"><code>audio_downloader.dart:<wbr>109&#8209;113</code>; <code>pack_downloader.dart:<wbr>249&#8209;252</code>.</td>
+              <td data-label="Fix">Use <code>followRedirects:<wbr> false</code> for streamed downloads or validate each redirect target.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">S4</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>The remote catalog accepts any HTTPS host.</strong> The check is a string prefix, so the future remote manifest seam could point anywhere.</td>
+              <td data-label="Evidence"><code>library_catalog.dart:<wbr>22</code>; exported seam at <code>:<wbr>253</code>.</td>
+              <td data-label="Fix">Parse with <code>Uri</code> and allowlist the CDN and owner hosts, mirroring the reciter repository.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">S5</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>The exported backup file is never deleted.</strong> A plaintext copy of bookmarks and worship history stays in the cache directory after sharing.</td>
+              <td data-label="Evidence"><code>backup_cubit.dart:<wbr>206&#8209;208</code>.</td>
+              <td data-label="Fix">Delete the temporary file in a <code>finally</code> block after the share completes.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">S6</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Android 12+ device-to-device transfer is not explicitly excluded.</strong> <code>allowBackup=false</code> disables cloud backup but not necessarily direct transfer.</td>
+              <td data-label="Evidence"><code>AndroidManifest.xml:<wbr>14</code>; no <code>dataExtractionRules</code> or <code>fullBackupContent</code>.</td>
+              <td data-label="Fix">Add <code>res/<wbr>xml/<wbr>data_extraction_rules.xml</code> excluding cloud backup and device transfer.</td>
+            </tr>
+          </tbody>
+
+          <tbody class="group">
+            <tr class="group-head"><th colspan="5"><span class="dim-index">05</span> Performance <span class="dim-score">7.5</span><span class="dim-count">8 findings</span></th></tr>
+            <tr class="finding" data-sev="high">
+              <td class="id" data-label="Ref">P1</td>
+              <td data-label="Severity"><span class="sev high">High</span></td>
+              <td data-label="Finding"><strong>The pack cache is bounded by entry count, not bytes.</strong> Hadith packs retain the raw decoded list; tafsir packs retain a full text map. A 9.4 MB Bukhari pack or an 82 MB Ibn Kathir pack can stay resident.</td>
+              <td data-label="Evidence"><code>pack_reader.dart:<wbr>39&#8209;41,<wbr>99,<wbr>127&#8209;128</code>; <code>assets/<wbr>data/<wbr>library_catalog.json</code> (Bukhari 9.4 MB, Ibn Kathir 82 MB).</td>
+              <td data-label="Fix">Enforce an approximate byte budget, project hadith to <code>List&lt;(<wbr>int,<wbr> String)&gt;</code>, and evict the tafsir projection after the sheet closes.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">P2</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>The install pipeline does heavy work on the UI isolate.</strong> A batch holds four complete surah bodies; SHA-256 runs on the UI isolate per surah; the merged index is built there too.</td>
+              <td data-label="Evidence"><code>pack_downloader.dart:<wbr>184&#8209;207,<wbr>202,<wbr>255&#8209;263,<wbr>367</code>; <code>pack_downloader_types.dart:<wbr>39</code>.</td>
+              <td data-label="Fix">Stream each body into the hashing sink inside the worker isolate and reduce the batch to 2.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">P3</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Backup import writes one awaited statement per row.</strong> Thousands of rows become thousands of isolate round-trips inside one transaction.</td>
+              <td data-label="Evidence"><code>backup_service.dart:<wbr>221&#8209;226,<wbr>255&#8209;266</code>.</td>
+              <td data-label="Fix">Use <code>_db.batch(<wbr>(<wbr>b) =&gt; b.insertAll(<wbr>...))</code> for bookmarks and prayer days.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">P4</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Backup export encodes on the UI isolate.</strong> Import decoding is isolated, but export JSON encoding and the size check are not.</td>
+              <td data-label="Evidence"><code>backup_service.dart:<wbr>42&#8209;49</code>; <code>backup_codec.dart:<wbr>167&#8209;215,<wbr>222</code>.</td>
+              <td data-label="Fix">Move encoding into <code>Isolate.run</code>; avoid re-encoding just to measure UTF-8 length.</td>
+            </tr>
+            <tr class="finding" data-sev="med">
+              <td class="id" data-label="Ref">P5</td>
+              <td data-label="Severity"><span class="sev med">Medium</span></td>
+              <td data-label="Finding"><strong>Every tasbih tap awaits a database write.</strong> Rapid tapping queues unbounded upserts and JSON encoding work.</td>
+              <td data-label="Evidence"><code>tasbih_cubit.dart:<wbr>54&#8209;66</code>; <code>_save</code> at <code>:<wbr>84&#8209;91</code>.</td>
+              <td data-label="Fix">Trailing-debounce persistence (~500 ms) or persist on pause/close.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">P6</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Search re-normalizes the corpus on every keystroke.</strong> No debounce is applied; datasets are small today but the pattern scales poorly.</td>
+              <td data-label="Evidence"><code>azkar_repository.dart:<wbr>114&#8209;126</code>; <code>core/<wbr>utils/<wbr>arabic_search.dart:<wbr>27&#8209;31</code>; <code>city_repository.dart:<wbr>41&#8209;45</code>.</td>
+              <td data-label="Fix">Normalize once at load and debounce input (~150 ms).</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">P7</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>Index DDL runs on every database open.</strong> Five <code>CREATE INDEX IF NOT EXISTS</code> statements each take a schema lock round-trip.</td>
+              <td data-label="Evidence"><code>app_database.dart:<wbr>41&#8209;56</code>.</td>
+              <td data-label="Fix">Gate on a one-time settings flag or a schema-version migration.</td>
+            </tr>
+            <tr class="finding" data-sev="low">
+              <td class="id" data-label="Ref">P8</td>
+              <td data-label="Severity"><span class="sev low">Low</span></td>
+              <td data-label="Finding"><strong>The Home next-prayer card can go stale.</strong> It is computed once from <code>DateTime.now(<wbr>)</code> at cubit creation, with no ticker or lifecycle refresh.</td>
+              <td data-label="Evidence"><code>home_cubit.dart:<wbr>82</code>; the prayer-times screen already has a 1 s ticker at <code>prayer_times_screen.dart:<wbr>82</code>.</td>
+              <td data-label="Fix">Refresh on a minute ticker or on <code>AppLifecycleState.resumed</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="dimensions" aria-labelledby="dimensions-title">
+      <div class="section-head">
+        <span class="section-index">05</span>
+        <h2 id="dimensions-title">Dimension notes</h2>
+        <p class="section-sub">What works — and what to watch</p>
+      </div>
+      <div class="dims">
+        <article class="dim-card">
+          <div class="dim-top">
+            <h3><span class="dim-index">01</span> Maintainability</h3>
+            <div class="dim-score-big">8.0 <small>/10</small></div>
+          </div>
+          <p>One enforced feature shape across 16 modules, with 2,564 lines of doc comments that explain invariants rather than restating code. The main drags are test organization and two multi-role classes.</p>
+          <ul class="dim-list">
+            <li><b>Works:</b> small private widgets, zero <code>print</code>/TODO/force-unwraps, documented rationale.</li>
+            <li><b>Watch:</b> duplicated test doubles, flat test tree, downloader/registry coupling.</li>
+          </ul>
+          <div class="dim-foot"><b>7 findings</b> · 4 medium · 3 low</div>
+        </article>
+
+        <article class="dim-card">
+          <div class="dim-top">
+            <h3><span class="dim-index">02</span> Clean Architecture</h3>
+            <div class="dim-score-big">7.5 <small>/10</small></div>
+          </div>
+          <p>A genuine feature-first architecture with ports at every cross-feature seam, a single documented composition root, and an allowlist-pinned guard test. The pressure points are duplicated wiring and a few leaks.</p>
+          <ul class="dim-list">
+            <li><b>Works:</b> zero cross-feature imports, route-scoped cubits registered as factories, ports for prayer times and reminders.</li>
+            <li><b>Watch:</b> router-as-composition-root, backup bypassing owning repositories, drift row leaking into presentation.</li>
+          </ul>
+          <div class="dim-foot"><b>8 findings</b> · 5 medium · 3 low</div>
+        </article>
+
+        <article class="dim-card">
+          <div class="dim-top">
+            <h3><span class="dim-index">03</span> Code Quality</h3>
+            <div class="dim-score-big">8.5 <small>/10</small></div>
+          </div>
+          <p>Strict analyzer settings, no dead code or debug output, and a uniform Loading / Ready / Failed contract with localized copy only. Residual debt is robustness and diagnostics, not structure.</p>
+          <ul class="dim-list">
+            <li><b>Works:</b> <code>strict&#8209;casts</code>, <code>unawaited_futures</code>, <code>cancel_subscriptions</code>; shared empty/loading/error widgets.</li>
+            <li><b>Watch:</b> lost stack traces, unguarded settings writes, positional casts.</li>
+          </ul>
+          <div class="dim-foot"><b>6 findings</b> · 3 medium · 3 low</div>
+        </article>
+
+        <article class="dim-card">
+          <div class="dim-top">
+            <h3><span class="dim-index">04</span> Security</h3>
+            <div class="dim-score-big">8.5 <small>/10</small></div>
+          </div>
+          <p>No critical or high vulnerability. Untrusted-input paths are genuinely hardened: size caps, hash pins, host allowlists, fail-closed parsing, and parameterized SQL. Residual risk is release signing and small validation gaps.</p>
+          <ul class="dim-list">
+            <li><b>Works:</b> no tracked secrets or keystores, no WebView, no cleartext, CSP without <code>unsafe&#8209;inline</code>.</li>
+            <li><b>Watch:</b> debug-signed CI artifacts, backup integer ranges, redirect validation.</li>
+          </ul>
+          <div class="dim-foot"><b>6 findings</b> · 1 medium · 5 low · 6 verified controls</div>
+        </article>
+
+        <article class="dim-card">
+          <div class="dim-top">
+            <h3><span class="dim-index">05</span> Performance</h3>
+            <div class="dim-score-big">7.5 <small>/10</small></div>
+          </div>
+          <p>SQLite runs on drift’s background isolate, pack JSON decodes in workers, and rebuild scoping is deliberate. The real risks are memory retention in the library cache and main-isolate work in two write-heavy flows.</p>
+          <ul class="dim-list">
+            <li><b>Works:</b> WAL, background database, worker decode, per-verse selectors, no leaked subscriptions.</li>
+            <li><b>Watch:</b> byte-unbounded pack cache, install-time hashing, per-row backup writes, per-tap tasbih writes.</li>
+          </ul>
+          <div class="dim-foot"><b>8 findings</b> · 1 high · 4 medium · 3 low</div>
+        </article>
+      </div>
+    </section>
+
+    <section id="verification" aria-labelledby="verification-title">
+      <div class="section-head">
+        <span class="section-index">06</span>
+        <h2 id="verification-title">Verification &amp; corrections</h2>
+        <p class="section-sub">Every load-bearing claim was re-read at source</p>
+      </div>
+      <div class="table-wrap">
+        <table class="verify-table">
+          <thead>
+            <tr>
+              <th scope="col">Reported claim</th>
+              <th scope="col">Verdict</th>
+              <th scope="col">Source evidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Reported claim">“Six routes crash on degraded boot”</td>
+              <td data-label="Verdict"><span class="verdict-chip down">Downgraded to low</span></td>
+              <td data-label="Evidence"><code>main.dart:<wbr>31&#8209;39</code> always passes all eight loaders; registration is unconditional and asset failures surface lazily. The contract mismatch remains for omitted-loader callers and tests.</td>
+            </tr>
+            <tr>
+              <td data-label="Reported claim">“Peak installer memory equals the pack size cap”</td>
+              <td data-label="Verdict"><span class="verdict-chip down">Corrected</span></td>
+              <td data-label="Evidence">A batch holds at most four surah bodies (<code>pack_downloader_types.dart:<wbr>39</code>). Cap-wide retention comes from the reader cache, not the download buffer.</td>
+            </tr>
+            <tr>
+              <td data-label="Reported claim">“Silent boot catches are a new medium issue”</td>
+              <td data-label="Verdict"><span class="verdict-chip down">Downgraded / documented</span></td>
+              <td data-label="Evidence"><code>main.dart:<wbr>105&#8209;136</code> explicitly labels each catch “Disclosed v1”, so it is a documented v1 trade-off rather than accidental debt.</td>
+            </tr>
+            <tr>
+              <td data-label="Reported claim">“CI ships a debug-signed release artifact”</td>
+              <td data-label="Verdict"><span class="verdict-chip known">Confirmed · known</span></td>
+              <td data-label="Evidence"><code>ci.yml:<wbr>41&#8209;52</code> and <code>build.gradle:<wbr>89</code>; <code>AGENTS.md</code> §4 records W7c as pending, so this is accepted-risk hygiene, not a new finding.</td>
+            </tr>
+            <tr>
+              <td data-label="Reported claim">“README test count is stale”</td>
+              <td data-label="Verdict"><span class="verdict-chip">Confirmed</span></td>
+              <td data-label="Evidence"><code>README.md:<wbr>58</code> says 426; the full suite runs 600 and passes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="controls" aria-labelledby="controls-title">
+      <div class="section-head">
+        <span class="section-index">07</span>
+        <h2 id="controls-title">Security controls verified</h2>
+        <p class="section-sub">Checked directly, not inferred</p>
+      </div>
+      <div class="controls">
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Secrets &amp; signing material</h3>
+            <p>No tracked keystores, <code>key.properties</code>, <code>.env</code>, or <code>local.properties</code>; zero API-key, token, or private-key matches in the repository.</p>
+          </div>
+        </div>
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Backup &amp; deep links</h3>
+            <p><code>allowBackup=false</code>; deep links are restricted to the official host and path prefixes and re-validated in code; exported media components are signature-permission guarded.</p>
+          </div>
+        </div>
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Injection surface</h3>
+            <p>All drift raw SQL is parameter-bound; no WebView, JS bridge, or <code>eval</code>; pack paths are regex-gated twice with no archive extraction (no zip-slip).</p>
+          </div>
+        </div>
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Remote content integrity</h3>
+            <p>Packs are SHA-256 pinned (per surah for tafsir), size-capped, host-allowlisted, and written-then-promoted. Backup imports are capped at 2 MB with format guards and a settings whitelist.</p>
+          </div>
+        </div>
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Web hardening</h3>
+            <p>CSP uses <code>script&#8209;src 'self'</code> with exactly four hashes and no <code>unsafe&#8209;inline</code>; HSTS, nosniff, DENY, and frame-ancestors are present, pinned by a unit test.</p>
+          </div>
+        </div>
+        <div class="control">
+          <span class="pass" aria-hidden="true">✓</span>
+          <div>
+            <h3>Network</h3>
+            <p>No cleartext URLs in <code>lib/<wbr></code>, no TLS-verification overrides, and no certificate bypass code paths.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" aria-labelledby="method-title">
+      <div class="section-head">
+        <span class="section-index">08</span>
+        <h2 id="method-title">Method &amp; limitations</h2>
+        <p class="section-sub">How the result was produced</p>
+      </div>
+      <div class="method">
+        <div class="method-card">
+          <h3><span class="step">1</span> Baseline &amp; gates</h3>
+          <ul>
+            <li>Recorded HEAD, working-tree state, and toolchain versions.</li>
+            <li>Ran <code>flutter analyze</code>, the full <code>flutter test</code> suite, and <code>dart format &#8209;&#8209;set&#8209;exit&#8209;if&#8209;changed</code>.</li>
+            <li>Scripted scans counted files, lines, largest files, and every import edge.</li>
+          </ul>
+        </div>
+        <div class="method-card">
+          <h3><span class="step">2</span> Parallel dimension review</h3>
+          <ul>
+            <li>Five read-only reviewers, one per dimension, each capped to a focused file sample.</li>
+            <li>Each reviewer required to cite <code>file:<wbr>line</code> and a concrete fix.</li>
+            <li>Claims were treated as hypotheses, not conclusions.</li>
+          </ul>
+        </div>
+        <div class="method-card">
+          <h3><span class="step">3</span> Source verification</h3>
+          <ul>
+            <li>Every high-impact claim was reopened at the cited line and quoted.</li>
+            <li>Five claims were corrected or downgraded; the corrections are published above.</li>
+            <li>Security checks were run directly: tracked-file scan, manifest review, SQL and secret greps.</li>
+          </ul>
+        </div>
+        <div class="method-card">
+          <h3><span class="step">4</span> Scoring</h3>
+          <ul>
+            <li>Each dimension scored 0–10 against the repository’s own governance rules.</li>
+            <li>Weights: 20% maintainability, 20% architecture, 20% code quality, 25% security, 15% performance.</li>
+            <li>The arithmetic is shown so the total can be recomputed.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="readonly"><b>Limitations.</b> No profiler or physical device was available: memory and jank figures are estimates derived from catalog sizes and code paths. No CVE/OSV database scan was run; <code>pub outdated</code> shows only patch-level drift in direct dependencies. Generated files (<code>*.g.dart</code>, <code>*.freezed.dart</code>, localization output) were excluded from style and debt judgments. The web and native shells were reviewed for security posture, not feature behavior.</div>
+      <div class="readonly" style="background:#fff;border-color:var(--line)"><b>Read-only statement.</b> This audit did not modify, create, or delete any file in the repository. No commits, branches, or pushes were made.</div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span>Quran Yahdi · Code quality audit · 22 October 2026 · commit <code>1a71532</code></span>
+  <span>Read-only review · Flutter 3.47.5 / Dart 3.13.4</span>
+</footer>
+
+<script>
+(function () {
+  var rows = Array.prototype.slice.call(document.querySelectorAll('tr.finding'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip[data-sev]'));
+  var search = document.getElementById('search');
+  var resultCount = document.getElementById('resultCount');
+  var severity = 'all';
+
+  function apply() {
+    var q = (search.value || '').trim().toLowerCase();
+    var shown = 0;
+
+    rows.forEach(function (row) {
+      var sevOk = severity === 'all' || row.getAttribute('data-sev') === severity;
+      var textOk = !q || row.textContent.toLowerCase().indexOf(q) !== -1;
+      row.hidden = !(sevOk && textOk);
+      if (!row.hidden) shown += 1;
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('tbody.group'), function (body) {
+      var any = Array.prototype.some.call(body.querySelectorAll('tr.finding'), function (r) { return !r.hidden; });
+      var head = body.querySelector('tr.group-head');
+      if (head) head.hidden = !any;
+    });
+
+    chips.forEach(function (chip) {
+      var key = chip.getAttribute('data-sev');
+      var n = key === 'all' ? rows.length : rows.filter(function (r) { return r.getAttribute('data-sev') === key; }).length;
+      var badge = chip.querySelector('.n');
+      if (badge) badge.textContent = n;
+      chip.setAttribute('aria-pressed', String(key === severity));
+    });
+
+    resultCount.textContent = 'Showing ' + shown + ' of ' + rows.length + ' findings';
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      severity = chip.getAttribute('data-sev');
+      apply();
+    });
+  });
+
+  search.addEventListener('input', apply);
+
+  var print = document.getElementById('print');
+  if (print) print.addEventListener('click', function () { window.print(); });
+
+  apply();
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a'));
+  var sections = links.map(function (link) {
+    return document.querySelector(link.getAttribute('href'));
+  }).filter(Boolean);
+
+  if ('IntersectionObserver' in window && sections.length) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (link) {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      });
+    }, { rootMargin: '-18% 0px -72% 0px' });
+    sections.forEach(function (section) { observer.observe(section); });
+  }
+})();
+</script>
+</body>
+</html>
