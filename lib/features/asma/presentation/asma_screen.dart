@@ -28,9 +28,6 @@ const TextStyle _sheetMeaningArStyle = TextStyle(
   height: 1.7,
 );
 
-TextStyle _mutedAt(ColorScheme colors, double fontSize) =>
-    TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
-
 TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.bold,
@@ -93,7 +90,7 @@ class _NameSheet extends StatelessWidget {
                     Expanded(
                       child: Text(
                         loc.namePosition(name.n.toArabicIndic),
-                        style: _mutedAt(colors, 12),
+                        style: AppTheme.mutedAt(colors, 12),
                       ),
                     ),
                     IconButton(
@@ -125,7 +122,7 @@ class _NameSheet extends StatelessWidget {
                 Text(
                   name.meaningEn,
                   textAlign: TextAlign.center,
-                  style: _mutedAt(colors, 13),
+                  style: AppTheme.mutedAt(colors, 13),
                 ),
               ],
             ),
@@ -178,7 +175,7 @@ class _NameCell extends StatelessWidget {
           children: [
             Text(
               name.n.toArabicIndic,
-              style: _mutedAt(colors, 10),
+              style: AppTheme.mutedAt(colors, 10),
             ),
             const SizedBox(height: AppSpacing.xs),
             FittedBox(

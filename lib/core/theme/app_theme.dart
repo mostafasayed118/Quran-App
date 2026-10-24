@@ -36,6 +36,11 @@ abstract final class AppTheme {
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       );
 
+  /// Muted secondary text at [fontSize]
+  /// ([mutedFootnote]'s treatment with a call-site size).
+  static TextStyle mutedAt(ColorScheme colors, double fontSize) =>
+      TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
+
   static ThemeData get light => _theme(Brightness.light);
   static ThemeData get dark => _theme(Brightness.dark);
 

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -19,9 +20,6 @@ const TextStyle _todayTitleStyle = TextStyle(
 );
 
 const TextStyle _streakLabelStyle = TextStyle(fontSize: 12);
-
-TextStyle _mutedAt(ColorScheme colors, double fontSize) =>
-    TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
 
 class TrackerScreen extends StatelessWidget {
   const TrackerScreen({super.key});
@@ -52,7 +50,7 @@ class TrackerScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   loc.last7Days,
-                  style: _mutedAt(Theme.of(context).colorScheme, 12),
+                  style: AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
                 ),
                 const SizedBox(height: 6),
                 _Last7Row(last7: last7),
@@ -85,7 +83,7 @@ class _TodayCard extends StatelessWidget {
             Text(
               '${today.day.year}/${today.day.month}/${today.day.day}'
                   .toArabicIndicDigits,
-              style: _mutedAt(Theme.of(context).colorScheme, 13),
+              style: AppTheme.mutedAt(Theme.of(context).colorScheme, 13),
             ),
             Text(
               loc.trackerToday,
@@ -245,7 +243,7 @@ class _WirdCard extends StatelessWidget {
             ),
             if (p == null) ...[
               const SizedBox(height: 6),
-              Text(loc.wirdSetupHint, style: _mutedAt(colors, 13)),
+              Text(loc.wirdSetupHint, style: AppTheme.mutedAt(colors, 13)),
               const SizedBox(height: 10),
               FilledButton(
                 onPressed: () => _openSetupSheet(context),
@@ -253,7 +251,7 @@ class _WirdCard extends StatelessWidget {
               ),
             ] else if (p.completed) ...[
               const SizedBox(height: 6),
-              Text(loc.wirdCompleted, style: _mutedAt(colors, 13)),
+              Text(loc.wirdCompleted, style: AppTheme.mutedAt(colors, 13)),
               const SizedBox(height: 10),
               TextButton(
                 onPressed: () => context.read<TrackerCubit>().resetKhatma(),
@@ -268,7 +266,7 @@ class _WirdCard extends StatelessWidget {
                   p.pagesDone.toArabicIndic,
                   KhatmaProgress.totalPages.toArabicIndic,
                 ),
-                style: _mutedAt(colors, 13),
+                style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
@@ -276,12 +274,12 @@ class _WirdCard extends StatelessWidget {
                   p.todayStartPage.toArabicIndic,
                   p.todayEndPage.toArabicIndic,
                 ),
-                style: _mutedAt(colors, 13),
+                style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 loc.wirdRemainingDays(p.remainingDays.toArabicIndic),
-                style: _mutedAt(colors, 13),
+                style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: 10),
               Row(
