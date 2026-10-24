@@ -943,3 +943,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Gates at the code tip `480af87`:** `format:check` + `check` 0 errors · unit **220/220** (36 files) · build **557 pages** · budget **all PASS** (CSP **6/6**; EN index 294.57/360 KB; largest HTML 525.91/640 KB; dist 882/2000) · e2e **91/91**.
 - **Disclosures:** the translation is a network snapshot not covered by `data-drift`; the upstream license must be verified before commercial/store use (`SOURCE.md` records the edition/SHA; the store licensing doc flags six other packs, not this edition). The SW precaches the four HTML documents only; an unvisited offline page can render unstyled until its hashed CSS has been cached. `headers-security.test.ts` count 5→6 (SW register) and the hashes changed after the Prettier pass (assertions stay exact). Dev audit: 1 moderate (pre-existing, dev-only; prod 0).
 - **State:** no push; the W-D commits are local and unpushed.
+
+### Push window — W-D (English reader/search/offline/lastmod/format) + parallel W-C ledger — (5871e7e..a8b2a9a) — 2026-10-24 — CI GREEN
+- **Owner GO:** «أفتح push window للـ3 كوميتات ... وأراقب CI».
+- **Range:** 3 commits — `b062df8` (the parallel W-C push close-out ledger), `480af87` (W-D code/data/tests/format), `a8b2a9a` (W-D docs/ledger). 234 files, +3770/−877.
+- **Pre-flight:** scope clean (owner debris only); HEAD `a8b2a9a`; remote truth `5871e7e`; FF_OK; 3 unpushed; secret scan 0; no key/env paths.
+- **Gates at the tip `a8b2a9a`:** `format:check` + `check` 0 errors · unit **220/220** (36 files) · build **557 pages** · budget **all PASS** (CSP **6/6**; EN index 294.57/360 KB; largest HTML 525.91/640 KB; dist 882/2000) · e2e **91/91**.
+- **Push:** `git push origin a8b2a9a:refs/heads/main` — `5871e7e..a8b2a9a` (exit 0); **ls-remote proof: remote tip == `a8b2a9adcf3baecd3d838ccac791789ea214c07d` == local HEAD (MATCH)**; unpushed 0 at push time.
+- **CI on `a8b2a9a`:** `web-gates` **40101050960 SUCCESS** — `gates` and `data-drift` both success; `ci` **40101050953 SUCCESS** (the app workflow triggered on the push). Four Dependabot update runs were also queued/in progress; not blocking.
+- **Live probes (production):** `/en/surah/1/` carries 7 `.ayah-tr` (translation), `/en/surah/2/` 286, `/surah/1/` 0; `/sw.js`, `/offline/`, `/en/offline/` all 200; `/sitemap.xml` 554 `<loc>` + 554 `<lastmod>`; CSP 6 hashes; the Qibla nav link is present. The assetlinks fingerprint remains `DB:7F…` (W-A).
+- **State:** main @ `a8b2a9a` = origin; this close-out is the only local commit (rides the next window).
