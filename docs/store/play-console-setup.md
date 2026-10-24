@@ -103,18 +103,24 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 
 All licensing items are `OPEN-FOR-OWNER` — recorded in `docs/store/licensing-matrix.md`, **not resolved here**.
 
-| # | Blocker (source: `licensing-matrix.md` → OPEN-FOR-OWNER) | Status |
+| # | Blocker (source: `licensing-matrix.md` → OPEN-FOR-OWNER) | Verified status (2026-10-24) |
 |---|---|---|
-| 1 | `HafsSmart_08.ttf` + `me_quran.ttf` mushaf font licenses (no license file in-repo) | OPEN-FOR-OWNER |
-| 2 | quranenc.com text terms for `ara-sirajtafseer` (download pack) | OPEN-FOR-OWNER |
-| 3 | Saheeh International `eng-safiurrahmanalm` publisher terms | OPEN-FOR-OWNER |
-| 4 | The Clear Quran `eng-mustafakhattabg` — empty `source` field; possible NC/ND terms (highest risk) | OPEN-FOR-OWNER |
-| 5 | Bukhari EN translator license for `eng-bukhari` | OPEN-FOR-OWNER |
-| 6 | Tafsir data provenance for the `spa5k/tafsir_api` packs (MIT covers the repo, not the data) | OPEN-FOR-OWNER |
-| 7 | mp3quran.net terms for streaming/downloading recitation audio in a store-listed app | OPEN-FOR-OWNER |
+| 1 | `HafsSmart_08.ttf` + `me_quran.ttf` mushaf font licenses | **AMBER** — HafsSmart EULA permits use/copy/distribute (ship it + attribution); `me_quran` is non-commercial only |
+| 2 | quranenc.com text terms for `ara-sirajtafseer` | **AMBER** — republish allowed with attribution, version, no modification; prove the edition |
+| 3 | Saheeh International `eng-safiurrahmanalm` publisher terms | **AMBER** — Tanzil: non-commercial only; keep free/no-ads + credit |
+| 4 | The Clear Quran `eng-mustafakhattabg` | **RED** — publisher requires prior written consent for any reproduction |
+| 5 | Bukhari EN translator license for `eng-bukhari` | **RED** — no license grant (Muhsin Khan; upstream `source` empty) |
+| 6 | Tafsir data provenance for the `spa5k/tafsir_api` packs | **RED** — QF terms require a commercial license for content packages |
+| 7 | mp3quran.net terms for streaming/downloading | **AMBER/GREEN** — use/copy allowed with attribution; reciter rights remain |
+| 8 | `eng-muslim` (Abdul Hamid Siddiqui) | **RED/UNVERIFIED** — no license grant |
+
+Full quotes and the per-pack verdict: `docs/store/licensing-verification-2026-10-24.md`.
+
+**The current catalog is NOT upload-safe** until the six RED packs are held/removed or
+written permissions are obtained.
 
 Play-Console-only items (cannot be completed from the repo):
 
 - Data safety form submission, content rating questionnaire, target-audience selection, and the ads declaration must be entered in the console (`PLAY-CONSOLE-ONLY`).
 - Closed-testing policy (testers/days) must be re-read in the console at submission time (`PLAY-CONSOLE-ONLY`).
-- The feature graphic is still pending production (see §5).
+- The feature graphic is present (`docs/store/feature-graphic-1024x500.png`, 1024×500).

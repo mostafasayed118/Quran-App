@@ -40,6 +40,12 @@ Last updated: 2026-10-17 (verification-freshness date)
 
 ## OPEN-FOR-OWNER
 
+> **Verified 2026-10-24:** primary-source quotes and a per-pack verdict are in
+> `docs/store/licensing-verification-2026-10-24.md`. Six shipped packs are RED/UNVERIFIED
+> (`eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`,
+> `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir`); the two fonts have embedded terms that
+> must ship with the app. The decision remains OPEN-FOR-OWNER.
+
 1. **HafsSmart + me_quran font licenses** — bundle a written license/redistribution
    statement for both TTFs before store submission (PRIVACY.md l.91 already promises this
    documentation). Nothing else in-repo can stand in for it.
@@ -59,3 +65,5 @@ Last updated: 2026-10-17 (verification-freshness date)
    publisher policies (e.g. King Fahd Complex for al-Muyassar) for runtime redistribution.
 7. **mp3quran audio** — confirm mp3quran.net's terms for streaming/downloading recitation
    audio inside a store-listed app; recitation rights remain the reciters'.
+8. **`eng-muslim` translation (Abdul Hamid Siddiqui)** — shipped but absent from the
+   original list; upstream metadata has no license/source. Verify or hold.
