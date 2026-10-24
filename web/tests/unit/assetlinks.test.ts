@@ -9,10 +9,11 @@ type Statement = {
 };
 const statements = JSON.parse(source) as Statement[];
 
-// Owner-provided release cert (keytool, 2026-10-18). Verified at build time:
-// apksigner verify --print-certs on the signed release APK must print this digest.
+// Owner-provided release cert, rotated on 2026-10-22 (W7c; the 2026-10-18 keystore was
+// archived). Verified at build time: apksigner verify --print-certs on the signed release
+// APK must print this digest.
 const RELEASE_FP =
-  'D2:1E:83:DC:9F:B5:9F:6D:61:5A:A3:FF:A7:70:22:13:61:64:6A:8F:2B:70:50:FF:BE:24:DA:CC:1D:98:CB:DA';
+  'DB:7F:FE:F4:35:E1:79:43:47:88:73:41:96:79:C9:77:2D:AF:70:24:69:6D:E9:1A:02:52:CD:BF:99:9C:46:85';
 
 describe('assetlinks.json (Android App Links)', () => {
   it('declares handle_all_urls for the app package', () => {
