@@ -2,6 +2,20 @@
 
 # Google Play Store Listing — English
 
+## Store setup facts (v1.0.0)
+
+| Item | Value |
+|---|---|
+| Support email | `mustafasayed20002@gmail.com` |
+| Privacy policy (AR) | https://quranyahdi.pages.dev/privacy/ |
+| Privacy policy (EN) | https://quranyahdi.pages.dev/en/privacy/ |
+| Category | Books & Reference (alternative: Education) |
+| Tags | Quran, recitations, prayer times, qibla, adhkar, duas, offline, Islamic |
+| App access | All features available without login |
+| Ads | No ads |
+| Content rating | Everyone / PEGI 3 — religious reference content |
+| Target audience | General audience; not child-directed |
+
 ## Title (≤30 chars)
 
 Quran Yahdi: Quran Companion
@@ -56,21 +70,21 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 
 ---
 
-## Screenshot checklist — candidates
+## Screenshot checklist — captured candidates
 
-> REL-1 status: no captures are committed in-repo yet (verified by a full image scan). Target files live under `docs/store/screenshots/`; the owner captures them from a real device (build an installable APK via `flutter build apk --debug`, then `tools/device_smoke.ps1` to install and boot-verify).
+> REL-1 status (updated 2026-10-24): all 11 captures **are committed** at `docs/store/screenshots/` at **1080×2160** — this checklist is captured, not missing. Re-capture only if the UI changes (build an installable APK, then `tools/device_smoke.ps1` to install and boot-verify).
 
-- [ ] `01-home.png` — Home: next-prayer hero + continue reading + feature grid (most important — first slot)
-- [ ] `02-index.png` — Surah index with search field
-- [ ] `03-reader.png` — Verse-by-verse reader in the gold text tone
-- [ ] `04-mushaf.png` — Paginated Mushaf mode with the page indicator
-- [ ] `05-ayah-sheet.png` — Ayah sheet: tafsir, translation, bookmark
-- [ ] `06-recitation.png` — Reciters catalog with the featured section on top
-- [ ] `07-prayer-times.png` — Prayer times for a chosen city
-- [ ] `08-qibla.png` — Live Qibla compass
-- [ ] `09-azkar.png` — Azkar screen with counters
-- [ ] `10-tracker.png` — Worship tracker
-- [ ] `11-settings.png` — Settings (dark mode on in a second capture, if possible)
+- [x] `01-home.png` — Home: next-prayer hero + continue reading + feature grid (most important — first slot)
+- [x] `02-index.png` — Surah index with search field
+- [x] `03-reader.png` — Verse-by-verse reader in the gold text tone
+- [x] `04-mushaf.png` — Paginated Mushaf mode with the page indicator
+- [x] `05-ayah-sheet.png` — Ayah sheet: tafsir, translation, bookmark
+- [x] `06-recitation.png` — Reciters catalog with the featured section on top
+- [x] `07-prayer-times.png` — Prayer times for a chosen city
+- [x] `08-qibla.png` — Live Qibla compass
+- [x] `09-azkar.png` — Azkar screen with counters
+- [x] `10-tracker.png` — Worship tracker
+- [x] `11-settings.png` — Settings (dark mode on in a second capture, if possible)
 
 Specs: phone (portrait) 16:9 or 9:16, no real personal data in frame, light theme preferred.
 

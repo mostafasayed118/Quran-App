@@ -1,6 +1,6 @@
 # Privacy Policy — Quran Yahdi
 
-Last updated: 2026-10-16 · Applies to version 1.0.0
+Last updated: 2026-10-24 · Applies to version 1.0.0
 
 > **Honest TL;DR:** This app is **fully offline at its core**. **We collect no data about you. At all.** No accounts, no sign-in, no analytics, no ads, no tracking, and no server of ours ever receives anything from your device.
 
@@ -31,7 +31,7 @@ Everything the app stores stays **on your device only**, inside the app's privat
 - Your bookmarks and last-read position.
 - The audio files and text packs you downloaded.
 - Your worship-tracker and tasbih logs.
-- You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process.
+- You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process. That backup file is an unencrypted JSON file, so store and share it with care.
 
 Uninstalling the app permanently deletes all of it. We keep no copy.
 
@@ -44,4 +44,4 @@ Uninstalling the app permanently deletes all of it. We keep no copy.
 
 ## Questions
 
-For any question about this policy, contact the app owner through the project's GitHub repository.
+For any question about this policy, email the app owner at **mustafasayed20002@gmail.com**. (Optional alternative channel: the project's GitHub repository.)
