@@ -120,6 +120,6 @@ The two frozen catalog tests were updated to pin the new shape (9→3 packs, taf
 translations 3→2, hadiths 3→1) — same assertions, new expected catalog.
 
 **Web:** `web/src/lib/content-packs.ts` now ships only the two licensed translations
-(`ara-sirajtafseer`, `eng-mohammedmarmadu`); the six were withdrawn there too (W-D wave
-`a8b2a9a`, web-gates green). The HafsSmart EULA and the me_quran/Cairo terms ship in-app via
+(`ara-sirajtafseer`, `eng-mohammedmarmadu`); the six were withdrawn there too (W-E wave
+`2df27aa`, web-gates green). The HafsSmart EULA and the me_quran/Cairo terms ship in-app via
 Settings → Licenses & sources (`assets/licenses/`, `lib/features/settings/presentation/licenses_screen.dart`).

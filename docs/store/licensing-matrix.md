@@ -7,7 +7,7 @@
 > **DOWNLOAD-PACKS** are fetched on demand from pinned CDNs at runtime (not in the APK).
 > Owner decision needed wherever the table says `FLAG → OPEN-FOR-OWNER <n>`.
 
-Last updated: 2026-10-17 (verification-freshness date)
+Last updated: 2026-10-24 (the shipped catalog is the 3-pack shape; the web mirrors it)
 
 ## The matrix
 
