@@ -35,13 +35,34 @@ Everything the app stores stays **on your device only**, inside the app's privat
 
 Uninstalling the app permanently deletes all of it. We keep no copy.
 
+## The website (quranyahdi.pages.dev)
+
+The Quran Yahdi website creates no accounts, requires no sign-in, and uses no cookies of ours, no analytics, no ads, and no tracking. Your preferences are stored in your browser's local storage (localStorage) on your device only, under these keys:
+
+- `qy:theme` — light/dark mode.
+- `qy:reader` — reader settings (font size, view, selected reciter, layout).
+- `qy:bookmarks` — bookmarks.
+- `qy:last-read` — last-read position.
+- `qy:player:row` and `qy:player:surah` — player state (the last reciter and surah played).
+
+Clearing site data in your browser permanently removes these keys.
+
+On the Qibla page (/qibla), the browser asks for location permission when you choose to use your location; the Qibla bearing is computed in the browser on your device, and your position is never sent to us or stored.
+
+The site is served by Cloudflare Pages, which processes standard request metadata (such as IP address) to deliver and protect the site under Cloudflare's own privacy policy.
+
+External requests are limited to the same two fixed endpoints the app uses: `mp3quran.net` (audio and the reciter API) and `cdn.jsdelivr.net` (tafsir and translation packs); no device identifiers or personal data are attached to these requests.
+
+For any question about this policy, email us at [mustafasayed20002@gmail.com](mailto:mustafasayed20002@gmail.com).
+
 ## Content and open-source attributions
 
 - **Quran text (Hafs):** the Uthmani and Imlaei text (114 surahs, 6,236 ayahs) is bundled inside the app's local database — fully offline.
 - **Adhkar, duas, and ruqyah:** compilations gathered from classical public collections, bundled offline.
 - **Recitations:** streamed/downloaded from the free mp3quran.net service; recitation rights belong to the reciters and their owners.
+- **Tafsir and translations:** fetched from the open-source projects `spa5k/tafsir_api` (pinned commit `eb82bb6294efe30ad5c135c03b1864afaa70e855`) and `fawazahmed0/quran-api` (pinned commit `47ca096b0976443ba2eab2e45cdf0fb4096a2610`) via jsDelivr; the upstream projects' own terms apply.
 - **Fonts:** the Cairo font is licensed under the SIL Open Font License (its text file is bundled inside the app); the HafsSmart and me_quran mushaf typefaces are used under free-redistribution terms from Quran typography publishers — license documentation is to be completed before final store submission.
 
 ## Questions
 
-For any question about this policy, email the app owner at **mustafasayed20002@gmail.com**. (Optional alternative channel: the project's GitHub repository.)
+For any question about this policy, email the app owner at [mustafasayed20002@gmail.com](mailto:mustafasayed20002@gmail.com). (Optional alternative channel: the project's GitHub repository.)
