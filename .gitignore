@@ -46,3 +46,9 @@ app.*.map.json
 # Coverage output (regenerable; never committed)
 /coverage/
 
+# Secrets and signing material (never committed)
+.env
+.env.*
+*.jks
+*.keystore
+
