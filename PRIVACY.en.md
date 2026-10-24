@@ -60,8 +60,9 @@ For any question about this policy, email us at [mustafasayed20002@gmail.com](ma
 - **Quran text (Hafs):** the Uthmani and Imlaei text (114 surahs, 6,236 ayahs) is bundled inside the app's local database — fully offline.
 - **Adhkar, duas, and ruqyah:** compilations gathered from classical public collections, bundled offline.
 - **Recitations:** streamed/downloaded from the free mp3quran.net service; recitation rights belong to the reciters and their owners.
-- **Tafsir and translations:** fetched from the open-source projects `spa5k/tafsir_api` (pinned commit `eb82bb6294efe30ad5c135c03b1864afaa70e855`) and `fawazahmed0/quran-api` (pinned commit `47ca096b0976443ba2eab2e45cdf0fb4096a2610`) via jsDelivr; the upstream projects' own terms apply. The English reader's inline translation is the Saheeh International edition (`eng-safiurrahmanalm`) from the same pinned `fawazahmed0/quran-api` commit.
-- **Fonts:** the Cairo font is licensed under the SIL Open Font License (its text file is bundled inside the app); the HafsSmart and me_quran mushaf typefaces are used under free-redistribution terms from Quran typography publishers — license documentation is to be completed before final store submission.
+- **Hadith:** Sahih al-Bukhari (Arabic) is the classical public-domain text; the bundled digital edition's provenance is under review.
+- **Translations and tafsir:** the Arabic *At-Tafsir Al-Mukhtasar* (Siraj) is republished unmodified from **QuranEnc.com** (pinned version `47ca096b0976443ba2eab2e45cdf0fb4096a2610`). The English reader uses **Marmaduke Pickthall, The Meaning of the Glorious Koran (1930)**; the translation text is public domain (the translator died in 1936), and the digitized edition is used under its source's non-commercial terms — this site is free and ad-free and attributes the source. The Quran Foundation tafsir packs and The Clear Quran are not shipped.
+- **Fonts:** Cairo is licensed under the SIL Open Font License. HafsSmart (KFGQPC Hafs Smart) is free to use, copy and distribute under its bundled EULA, but may not be sold or modified; © King Fahd Glorious Quran Printing Complex. me_quran is © 2005 Meor Ridzuan and free for non-commercial use.
 
 ## Questions
 

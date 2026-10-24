@@ -1,25 +1,13 @@
-export type PackKind = 'tafsir' | 'translation';
+export type PackKind = 'translation';
 
 export interface PackInfo {
   kind: PackKind;
   id: string;
   titleAr: string;
+  /** The required attribution + pinned version shown in the panel source line. */
+  attribution: string;
   url(surah: number): string;
   parse(json: unknown): Map<number, string>;
-}
-
-// spa5k/tafsir_api per-surah payload: [{ text }, ...] indexed by ayah-1.
-function parseTafsirArray(json: unknown): Map<number, string> {
-  if (!Array.isArray(json)) throw new Error('invalid tafsir payload');
-  const map = new Map<number, string>();
-  json.forEach((entry, i) => {
-    const text =
-      typeof entry === 'object' && entry !== null ? (entry as { text?: unknown }).text : undefined;
-    if (typeof text !== 'string') throw new Error(`invalid tafsir entry ${i + 1}`);
-    map.set(i + 1, text);
-  });
-  if (map.size === 0) throw new Error('empty tafsir payload');
-  return map;
 }
 
 // fawazahmed0/quran-api per-surah payload: { chapter: [{ verse, text }, ...] }.
@@ -42,42 +30,45 @@ function parseTranslationChapter(json: unknown): Map<number, string> {
   return map;
 }
 
-// Pinned to the resolved COMMIT SHA of the v1.2.2 tag (a tag is a mutable ref; the commit SHA is not).
-// Parity with the app catalog, which pins the same SHA. Never move it back to a tag or to @1.
-// The pin is the integrity boundary; a SHA-256 manifest was evaluated and SKIPPED (owner-approved 2026-10-19) — it would be a
-// network-dependent CI check for marginal gain over an immutable URL. The un-pin guard lives in tests/unit/content-packs.test.ts.
-const SPA5K_BASE =
-  'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@eb82bb6294efe30ad5c135c03b1864afaa70e855/tafsir';
-const FAWAZ_BASE =
-  'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@47ca096b0976443ba2eab2e45cdf0fb4096a2610/editions';
+// Pinned to the resolved COMMIT SHA of the edition (a tag is a mutable ref; the commit SHA is
+// not). Parity with the app catalog, which pins the same SHA. The un-pin guard lives in
+// tests/unit/content-packs.test.ts.
+const FAWAZ_COMMIT = '47ca096b0976443ba2eab2e45cdf0fb4096a2610';
+const FAWAZ_BASE = `https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@${FAWAZ_COMMIT}/editions`;
 
-function tafsirPack(id: string, titleAr: string): PackInfo {
-  return {
-    kind: 'tafsir',
-    id,
-    titleAr,
-    url: (surah) => `${SPA5K_BASE}/${id}/${surah}.json`,
-    parse: parseTafsirArray,
-  };
-}
-
-function translationPack(id: string, titleAr: string): PackInfo {
+function translationPack(id: string, titleAr: string, attribution: string): PackInfo {
   return {
     kind: 'translation',
     id,
     titleAr,
+    attribution,
     url: (surah) => `${FAWAZ_BASE}/${id}/${surah}.json`,
     parse: parseTranslationChapter,
   };
 }
 
-/** PM-curated packs (URLs verified live 2026-10-18). Never extend without a grant. */
+/**
+ * Only the packs whose upstream terms allow redistribution on this free, ad-free site:
+ *
+ * - QuranEnc's At-Tafsir Al-Mukhtasar (Siraj): republished unmodified, attributed to
+ *   QuranEnc.com with the pinned version.
+ * - Pickthall's The Meaning of the Glorious Koran (1930): public domain (the translator died
+ *   in 1936).
+ *
+ * The Quran Foundation tafsir packs and The Clear Quran were withdrawn on 2026-10-24 for
+ * licensing reasons — do not re-add them without written permission.
+ */
 export const PACKS: readonly PackInfo[] = [
-  tafsirPack('ar-tafsir-muyassar', 'التفسير الميسر'),
-  tafsirPack('ar-tafsir-al-jalalayn', 'تفسير الجلالين'),
-  translationPack('ara-sirajtafseer', 'المختصر في التفسير - سِراج'),
-  translationPack('eng-safiurrahmanalm', 'صحيح إنترناشيونال'),
-  translationPack('eng-mustafakhattabg', 'The Clear Quran'),
+  translationPack(
+    'ara-sirajtafseer',
+    'المختصر في التفسير - سِراج',
+    `QuranEnc.com · version ${FAWAZ_COMMIT}`,
+  ),
+  translationPack(
+    'eng-mohammedmarmadu',
+    'ترجمة بيكثال الإنجليزية',
+    `fawazahmed0/quran-api · public domain · ${FAWAZ_COMMIT}`,
+  ),
 ];
 
 const cache = new Map<string, Map<number, string>>();

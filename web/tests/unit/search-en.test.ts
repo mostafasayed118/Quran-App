@@ -3,7 +3,7 @@ import { loadSearchIndex, matchSpan, searchAyahs } from '../../src/lib/search';
 
 const ids = (hits: { s: number; a: number }[]) => hits.map((h) => `${h.s}:${h.a}`);
 
-const BASMALA_EN = 'In the Name of Allah, the Most Gracious, the Most Merciful';
+const BASMALA_EN = 'In the name of Allah, the Beneficent, the Merciful';
 
 describe('english search index', () => {
   it('loads 6,236 english records once per locale', async () => {
@@ -12,15 +12,15 @@ describe('english search index', () => {
     expect(await loadSearchIndex('en')).toBe(records); // module-level cache
   });
 
-  it('finds 1:1 for "Most Merciful" with the english verse text', () => {
-    const hits = searchAyahs('Most Merciful', 5, 'en');
+  it('finds 1:1 for "Beneficent" with the english verse text', () => {
+    const hits = searchAyahs('Beneficent', 5, 'en');
     expect(ids(hits)).toContain('1:1');
     expect(hits[0]).toEqual({ s: 1, a: 1, text: BASMALA_EN });
     expect(hits.length).toBeLessThanOrEqual(5);
   });
 
   it('matches case-insensitively and maps the mark span back to the raw text', () => {
-    expect(searchAyahs('most merciful', 5, 'en')).toEqual(searchAyahs('Most Merciful', 5, 'en'));
+    expect(searchAyahs('beneficent', 5, 'en')).toEqual(searchAyahs('Beneficent', 5, 'en'));
     const span = matchSpan(BASMALA_EN, 'Merciful');
     expect(span).not.toBeNull();
     expect(BASMALA_EN.slice(span!.start, span!.end)).toBe('Merciful');
@@ -38,7 +38,7 @@ describe('english search index', () => {
     expect(ids(searchAyahs('الله', 50, 'ar'))).toContain('1:1');
 
     // An english query never leaks into the arabic index, nor the reverse.
-    expect(searchAyahs('Most Merciful', 5, 'ar')).toEqual([]);
+    expect(searchAyahs('Beneficent', 5, 'ar')).toEqual([]);
     expect(searchAyahs('الله', 5, 'en')).toEqual([]);
   });
 });

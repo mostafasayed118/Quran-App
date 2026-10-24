@@ -95,7 +95,7 @@ const { surah, locale = 'ar' } = Astro.props;
         const map = await fetchPackAyahs(pack, surah);
         if (current !== pack) return; // selection changed while loading
         renderNotes(map);
-        source.textContent = `${t(L, 'panelSource')}: ${pack.titleAr} — jsDelivr`;
+        source.textContent = `${t(L, 'panelSource')}: ${pack.titleAr} — ${pack.attribution}`;
         source.hidden = false;
       } catch {
         if (current !== pack) return;

@@ -31,9 +31,9 @@ describe('generated english translation', () => {
     }
     expect(total).toBe(6236);
   });
-  it('starts Fatiha with the Saheeh International opening', async () => {
+  it('starts Fatiha with the Pickthall opening', async () => {
     const fatiha = await load(1);
-    expect(fatiha.ayahs[0].t).toContain('In the Name of Allah');
+    expect(fatiha.ayahs[0].t).toContain('In the name of Allah');
   });
 });
 

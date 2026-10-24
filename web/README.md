@@ -10,11 +10,11 @@ Public website + online reader for قرآن يَهدي. Astro 7 static site — 
 - **Reader** (`/surah/{n}`) — all 114 surahs with mushaf or imlaei view, font size and day/night themes; a `sr-only` plain-Arabic layer exposes every ayah to screen readers.
 - **Audio** — per-surah recitations (mp3quran; trust-filtered list + committed snapshot fallback) with a persistent mini-player across navigation; `/reciters` browser with downloads.
 - **Search** — bilingual full-text ayah search on `/quran` (Arabic index) and `/en/quran` (English index); client-side normalization, an alef-fold tier for rasm spellings, ranked in a worker.
-- **Tafsir & translations** — curated app packs in a per-surah panel; fetched on demand, cached, off by default.
+- **Translations & tafsir** — two licensing-cleared packs in a per-surah panel: QuranEnc's _At-Tafsir Al-Mukhtasar_ (Siraj) with attribution/version, and Pickthall's _The Meaning of the Glorious Koran_ (public-domain text, free non-commercial edition); fetched on demand, cached, off by default. The Quran Foundation tafsir packs and The Clear Quran were withdrawn.
 - **Per-ayah actions** — copy · share · bookmark (local-only) · listen (opens the surah player; per-ayah audio is a later phase).
 - **About & Privacy** — `/about` mission + offline-first story; `/privacy` renders the repo `PRIVACY.md` single source (EN mirror from `PRIVACY.en.md`), now including the website's localStorage, geolocation and hosting flows; the footer links a contact address.
 - **EN locale** — every route is mirrored at `/en/**` with LTR chrome (`lang="en"`), reader included; the header language switch round-trips.
-- **English translation** — every `/en/surah/{n}` page pre-renders the Saheeh International translation under each ayah (SSR, indexable); the mushaf pages layout hides it.
+- **English translation** — every `/en/surah/{n}` page pre-renders Pickthall's _The Meaning of the Glorious Koran_ (public-domain text; free non-commercial edition) under each ayah (SSR, indexable); the mushaf pages layout hides it.
 - **Offline** — a versioned service worker caches visited pages/assets and serves `/offline/` (EN mirror `/en/offline/`) when the network is gone; the manifest handles installability.
 - **Prayer times** — `/prayer-times` city index (156 cities, instant filter) + per-city pages with a 24-month table, today highlighted, month switcher and an imsakiah (imsak/iftar) view; times are precomputed in each city's local time.
 - **Qibla** — `/qibla` client-side great-circle bearing to the Kaaba with an SVG compass; uses the device location (graceful denial → city picker).
@@ -57,18 +57,20 @@ dart run tools/export_web_data.dart   # from repo root; reads assets/db/quran.sq
 Re-run it only when the app's DB changes; commit the regenerated JSON.
 
 The English reader's translation lives in `src/data/translation-en/` and is a **network snapshot**
-(never hand-edited): the Saheeh International edition (`eng-safiurrahmanalm`) from
-`fawazahmed0/quran-api`, pinned to commit `47ca096b0976443ba2eab2e45cdf0fb4096a2610`. Regenerate the
-114 surah files and `src/data/search-index-en.json` together from the repo root:
+(never hand-edited): Pickthall's _The Meaning of the Glorious Koran_ (`eng-mohammedmarmadu`), split
+from the pinned `fawazahmed0/quran-api` aggregate at commit
+`47ca096b0976443ba2eab2e45cdf0fb4096a2610`. Regenerate the 114 surah files and
+`src/data/search-index-en.json` together from the repo root:
 
 ```
 node web/scripts/fetch-translation.mjs
 ```
 
 The script validates 114 surahs / 6,236 contiguous ayahs. This snapshot is **not** checked by the
-CI `data-drift` job (the fetch needs the network); the upstream project's own terms apply — verify
-the translation license before commercial/store use. `src/data/translation-en/SOURCE.md` records the
-exact source.
+CI `data-drift` job (the fetch needs the network). Pickthall's text is public domain (the translator
+died in 1936; the work was published in 1930); the digitized edition is used under its source's
+non-commercial terms, and the site is free and ad-free. `src/data/translation-en/SOURCE.md` records
+the exact source.
 
 Prayer times live in `public/data/prayer-times/` and are **generated, never hand-edited**:
 

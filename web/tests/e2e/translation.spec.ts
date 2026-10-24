@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 
-test('EN surah pages pre-render the Saheeh International translation', async ({ page }) => {
+test('EN surah pages pre-render the Pickthall translation', async ({ page }) => {
   await page.goto('/en/surah/1/');
-  await expect(page.locator('.ayah-tr').first()).toContainText('In the Name of Allah');
+  await expect(page.locator('.ayah-tr').first()).toContainText('In the name of Allah');
 });
 
 test('AR surah pages carry no translation', async ({ page }) => {
