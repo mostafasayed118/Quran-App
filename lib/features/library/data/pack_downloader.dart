@@ -159,8 +159,9 @@ class PackDownloader {
   /// The surahs are fetched with BOUNDED concurrency (a window of
   /// [_tafsirBatchSize] requests in flight) and decoded in batches - one
   /// worker isolate per batch, not one per surah. The wrapper is still
-  /// written in surah order, and every body is hash-verified before it is
-  /// decoded or spliced, so the sha256 gate stays exactly as strict.
+  /// written in surah order, and every body is hash-verified inside the
+  /// worker before it is decoded or spliced, so the sha256 gate stays exactly
+  /// as strict.
   Future<Map<int, String>> _writeTafsir(
     LibraryPackInfo pack,
     IOSink sink,
@@ -195,20 +196,20 @@ class PackDownloader {
             received,
           ),
       ]);
-      // (b) verify EVERY hash of the window before any body is decoded.
-      for (var i = 0; i < numbers.length; i++) {
-        final n = numbers[i];
-        if (perSurahHashes != null &&
-            sha256.convert(bodies[i]).toString() != perSurahHashes[n - 1]) {
-          throw PackFailure('tafsir surah $n failed sha256 verification');
-        }
-      }
-      // (c) decode the whole window in ONE worker isolate.
-      final projections = await _decodeSurahs(bodies);
-      // (d) splice the window in surah order.
+      // (b) decode the whole window in ONE worker isolate; every body is
+      // hash-verified there, before it is decoded.
+      final projections = await _decodeSurahs(bodies, numbers, [
+        for (final n in numbers)
+          perSurahHashes == null ? null : perSurahHashes[n - 1],
+      ]);
+      // (c) splice the window in surah order.
       for (var i = 0; i < numbers.length; i++) {
         final projection = projections[i];
         final error = projection.error;
+        if (error == _shaMismatchError) {
+          throw PackFailure(
+              'tafsir surah ${numbers[i]} failed sha256 verification');
+        }
         if (error != null) {
           throw PackFailure('tafsir surah ${numbers[i]} is $error');
         }

@@ -17,6 +17,10 @@ typedef _SurahProjection = ({
   String interior
 });
 
+/// The [error] sentinel a worker projection carries when the body failed its
+/// pinned sha256; the install loop maps it to the verbatim failure message.
+const String _shaMismatchError = 'sha256 mismatch';
+
 /// Why the install sniff rejected a downloaded pack.
 enum _SniffError { parse, notObject, quran, hadiths, packMismatch, noTafsirs }
 

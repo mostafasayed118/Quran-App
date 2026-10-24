@@ -2,18 +2,35 @@ part of 'pack_downloader.dart';
 
 /// Decodes a batch of tafsir surah bodies in ONE worker isolate and returns
 /// ONLY what the install needs: the ayah index and the array interior the
-/// wrapper splices verbatim. The JSON parse never runs on the UI isolate.
+/// wrapper splices verbatim. The per-surah sha256 check and the JSON parse
+/// never run on the UI isolate.
 ///
 /// The bodies are [Uint8List]s, so they cross the isolate port zero-copy.
-Future<List<_SurahProjection>> _decodeSurahs(List<Uint8List> bodies) =>
-    Isolate.run(() => [for (final bytes in bodies) _projectSurah(bytes)]);
+Future<List<_SurahProjection>> _decodeSurahs(
+  List<Uint8List> bodies,
+  List<int> numbers,
+  List<String?> expectedHashes,
+) =>
+    Isolate.run(() => [
+          for (var i = 0; i < numbers.length; i++)
+            _projectSurah(bodies[i], expectedHashes[i]),
+        ]);
 
 /// The worker-side projection of one surah body.
 ///
-/// [error] is the shape failure (null when the body is valid); a body that
-/// is not JSON at all throws inside the worker and the failure reaches the
-/// caller unchanged.
-_SurahProjection _projectSurah(List<int> bytes) {
+/// The pinned hash is checked BEFORE the body is decoded; a mismatch returns
+/// the [_shaMismatchError] sentinel with an empty projection. [error] is
+/// otherwise the shape failure (null when the body is valid); a body that is
+/// not JSON at all throws inside the worker and the failure reaches the caller
+/// unchanged.
+_SurahProjection _projectSurah(List<int> bytes, String? expectedSha) {
+  if (expectedSha != null && sha256.convert(bytes).toString() != expectedSha) {
+    return const (
+      error: _shaMismatchError,
+      index: <int, String>{},
+      interior: '',
+    );
+  }
   final body = utf8.decode(bytes);
   final perSurah = jsonDecode(body);
   if (perSurah is! List || perSurah.isEmpty) {
@@ -78,7 +95,7 @@ _SniffResult _sniffTree(dynamic decoded, LibraryPackInfo pack) {
       if (list is! List || list.isEmpty) {
         return const (error: _SniffError.hadiths, projection: null);
       }
-      return (error: null, projection: list);
+      return (error: null, projection: PackReader.buildHadithList(list));
     case LibraryPackKind.tafsir:
       if (map['pack'] != pack.id) {
         return const (error: _SniffError.packMismatch, projection: null);
