@@ -15,6 +15,20 @@ export function buildSitemapUrls(site: string, surahIds: number[], extras: strin
   });
 }
 
+/**
+ * Expands AR-first entries so both locales get their own <loc>: each entry is
+ * followed by a copy whose `loc` is its `alternates.en` (same alternates object).
+ * Precondition: `loc` is the AR URL, as produced by `buildSitemapUrls`. An entry
+ * that is already its own EN alternate (loc === alternates.en) is kept once.
+ */
+export function dualLocaleEntries(entries: SitemapEntry[]): SitemapEntry[] {
+  return entries.flatMap((entry) =>
+    entry.loc === entry.alternates.en
+      ? [entry]
+      : [entry, { loc: entry.alternates.en, alternates: entry.alternates }]
+  );
+}
+
 const XML_ENTITIES: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
