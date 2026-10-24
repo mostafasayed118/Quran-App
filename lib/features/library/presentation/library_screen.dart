@@ -24,16 +24,19 @@ class LibraryScreen extends StatelessWidget {
     return BlocBuilder<LibraryCubit, LibraryState>(
       builder: (context, state) {
         final loc = AppLocalizations.of(context);
+        final kinds = switch (state) {
+          LibraryReady(:final packs) => visibleLibraryKinds(packs),
+          _ => _libraryKinds,
+        };
         return DefaultTabController(
-          length: 3,
+          length: kinds.length,
           child: Scaffold(
             appBar: AppBar(
               title: Text(loc.library),
               bottom: TabBar(
                 tabs: [
-                  Tab(text: loc.tafsirTab),
-                  Tab(text: loc.translationsTab),
-                  Tab(text: loc.hadithTab),
+                  for (final kind in kinds)
+                    Tab(text: _libraryTabLabel(loc, kind)),
                 ],
               ),
             ),
@@ -47,19 +50,11 @@ class LibraryScreen extends StatelessWidget {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          _PackList(
-                            packs: ready.packsWhere(LibraryPackKind.tafsir),
-                            ready: ready,
-                          ),
-                          _PackList(
-                            packs:
-                                ready.packsWhere(LibraryPackKind.translation),
-                            ready: ready,
-                          ),
-                          _PackList(
-                            packs: ready.packsWhere(LibraryPackKind.hadith),
-                            ready: ready,
-                          ),
+                          for (final kind in kinds)
+                            _PackList(
+                              packs: ready.packsWhere(kind),
+                              ready: ready,
+                            ),
                         ],
                       ),
                     ),
@@ -92,6 +87,35 @@ extension on LibraryReady {
           if (pack.kind == kind) pack
       ];
 }
+
+/// Fixed display order for the library tabs.
+const List<LibraryPackKind> _libraryKinds = [
+  LibraryPackKind.tafsir,
+  LibraryPackKind.translation,
+  LibraryPackKind.hadith,
+];
+
+/// The tabs that actually have packs, in display order.
+///
+/// A kind with no catalog entry is hidden instead of rendering a blank tab
+/// (the unlicensed tafsir packs are withdrawn, so a fresh install has none).
+/// An empty catalog falls back to the three tabs so the controller is never
+/// zero-length.
+List<LibraryPackKind> visibleLibraryKinds(Iterable<LibraryPackInfo> packs) {
+  final present = {for (final pack in packs) pack.kind};
+  final visible = [
+    for (final kind in _libraryKinds)
+      if (present.contains(kind)) kind,
+  ];
+  return visible.isEmpty ? _libraryKinds : visible;
+}
+
+String _libraryTabLabel(AppLocalizations loc, LibraryPackKind kind) =>
+    switch (kind) {
+      LibraryPackKind.tafsir => loc.tafsirTab,
+      LibraryPackKind.translation => loc.translationsTab,
+      LibraryPackKind.hadith => loc.hadithTab,
+    };
 
 class _PackList extends StatelessWidget {
   const _PackList({required this.packs, required this.ready});
