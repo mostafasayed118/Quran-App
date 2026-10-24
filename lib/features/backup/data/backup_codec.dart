@@ -164,13 +164,18 @@ class BackupDecodeSuccess extends BackupDecodeResult {
 
 /// Encodes [document] to the versioned UTF-8 JSON string (spec §3);
 /// settings keys are sorted so identical state encodes identically.
-String encode(BackupDocument document) {
+String encode(BackupDocument document) => jsonEncode(encodeMap(document));
+
+/// The versioned JSON payload of [document] as sendable primitives — the
+/// exact map [encode] serializes, so the JSON can be built on a worker
+/// isolate. Settings keys are sorted so identical state encodes identically.
+Map<String, Object?> encodeMap(BackupDocument document) {
   final data = document.data;
   final lastRead = data.lastReadAyahId;
   final tasbih = data.tasbih;
   final sortedSettings = data.settings.entries.toList()
     ..sort((a, b) => a.key.compareTo(b.key));
-  return jsonEncode(<String, Object?>{
+  return <String, Object?>{
     'app': kBackupAppId,
     'format': kBackupFormat,
     'exportedAt': document.exportedAt.toIso8601String(),
@@ -211,7 +216,7 @@ String encode(BackupDocument document) {
         for (final entry in sortedSettings) entry.key: entry.value,
       },
     },
-  });
+  };
 }
 
 /// Decodes [raw] with fail-closed wrapper guards (size cap before parsing;

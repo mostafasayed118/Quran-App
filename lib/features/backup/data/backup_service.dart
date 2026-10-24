@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:isolate';
 
 import 'package:drift/drift.dart';
 
@@ -37,15 +39,24 @@ class BackupService {
   final AppDatabase _db;
   final Future<void> Function() _reschedule;
 
+  /// Small imports keep the per-row path (it preserves statement order and
+  /// keeps the rollback probe observable); a real import batches the writes
+  /// into one round-trip.
+  static const int _batchThreshold = 64;
+
   /// Gathers every backed-up entity in one read transaction and encodes the
   /// versioned document (settings filtered to the whitelist).
   Future<String> exportJson() async {
     final data = await _db.transaction(_gather);
-    return encode(BackupDocument(
+    final payload = encodeMap(BackupDocument(
       exportedAt: DateTime.now(),
       schemaVersion: _db.schemaVersion,
       data: data,
     ));
+    if (Platform.environment['FLUTTER_TEST'] == 'true') {
+      return jsonEncode(payload);
+    }
+    return Isolate.run(() => jsonEncode(payload));
   }
 
   /// Computes the per-entity merge counts WITHOUT writing anything.
@@ -218,64 +229,125 @@ class BackupService {
   /// All writes for one plan — called inside the apply transaction only.
   /// Inserts/upserts only; nothing is ever deleted.
   Future<void> _writePlan(_ApplyPlan plan) async {
-    for (final bookmark in plan.bookmarks.toInsert) {
-      await _db.into(_db.bookmarks).insert(BookmarksCompanion.insert(
-            ayahId: bookmark.ayahId,
-            createdAt: Value(bookmark.createdAt),
-          ));
-    }
+    final bookmarks = <BookmarksCompanion>[
+      for (final bookmark in plan.bookmarks.toInsert)
+        BookmarksCompanion.insert(
+          ayahId: bookmark.ayahId,
+          createdAt: Value(bookmark.createdAt),
+        ),
+    ];
 
+    final prayerDays = <PrayerLogCompanion>[
+      for (final day in plan.prayerLog.daysToWrite)
+        PrayerLogCompanion.insert(
+          day: day.day,
+          fajr: Value(day.fajr),
+          dhuhr: Value(day.dhuhr),
+          asr: Value(day.asr),
+          maghrib: Value(day.maghrib),
+          isha: Value(day.isha),
+        ),
+    ];
+
+    final settings = <SettingsTableCompanion>[];
     final lastRead = plan.lastRead.toWrite;
     if (lastRead != null) {
-      await _writeSetting(backupKeyLastReadAyahId, lastRead.toString());
+      settings.add(SettingsTableCompanion.insert(
+        key: backupKeyLastReadAyahId,
+        value: lastRead.toString(),
+      ));
+    }
+    final tasbih = plan.tasbih.toWrite;
+    if (tasbih != null) {
+      settings.add(SettingsTableCompanion.insert(
+        key: backupKeyTasbihState,
+        value: jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
+      ));
+    }
+    for (final entry in plan.settings.toWrite.entries) {
+      settings.add(SettingsTableCompanion.insert(
+        key: entry.key,
+        value: entry.value,
+      ));
     }
 
     final khatma = plan.khatma.toWrite;
-    if (khatma != null) {
-      final existingRowId = plan.khatmaRowId;
-      if (existingRowId != null) {
-        await (_db.update(_db.khatmaProgress)
-              ..where((t) => t.id.equals(existingRowId)))
-            .write(KhatmaProgressCompanion(
-          ayahId: Value(khatma.ayahId),
-          targetPages: Value(khatma.targetPages),
-          updatedAt: Value(khatma.updatedAt),
-        ));
-      } else {
-        await _db.into(_db.khatmaProgress).insert(
-              KhatmaProgressCompanion.insert(
-                ayahId: khatma.ayahId,
-                targetPages: khatma.targetPages,
-                updatedAt: Value(khatma.updatedAt),
-              ),
-            );
+    final khatmaRowId = plan.khatmaRowId;
+    final settingsEntries = plan.settings.toWrite.entries.toList();
+    final totalWrites = bookmarks.length +
+        prayerDays.length +
+        settingsEntries.length +
+        (lastRead == null ? 0 : 1) +
+        (tasbih == null ? 0 : 1) +
+        (khatma == null ? 0 : 1);
+    if (totalWrites < _batchThreshold) {
+      for (final bookmark in bookmarks) {
+        await _db.into(_db.bookmarks).insert(bookmark);
       }
+      if (lastRead != null) {
+        await _writeSetting(backupKeyLastReadAyahId, lastRead.toString());
+      }
+      if (khatma != null) {
+        if (khatmaRowId != null) {
+          await (_db.update(_db.khatmaProgress)
+                ..where((t) => t.id.equals(khatmaRowId)))
+              .write(KhatmaProgressCompanion(
+            ayahId: Value(khatma.ayahId),
+            targetPages: Value(khatma.targetPages),
+            updatedAt: Value(khatma.updatedAt),
+          ));
+        } else {
+          await _db.into(_db.khatmaProgress).insert(
+                KhatmaProgressCompanion.insert(
+                  ayahId: khatma.ayahId,
+                  targetPages: khatma.targetPages,
+                  updatedAt: Value(khatma.updatedAt),
+                ),
+              );
+        }
+      }
+      for (final day in prayerDays) {
+        await _db.into(_db.prayerLog).insertOnConflictUpdate(day);
+      }
+      if (tasbih != null) {
+        await _writeSetting(
+          backupKeyTasbihState,
+          jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
+        );
+      }
+      for (final entry in settingsEntries) {
+        await _writeSetting(entry.key, entry.value);
+      }
+      return;
     }
 
-    for (final day in plan.prayerLog.daysToWrite) {
-      await _db.into(_db.prayerLog).insertOnConflictUpdate(
-            PrayerLogCompanion.insert(
-              day: day.day,
-              fajr: Value(day.fajr),
-              dhuhr: Value(day.dhuhr),
-              asr: Value(day.asr),
-              maghrib: Value(day.maghrib),
-              isha: Value(day.isha),
+    await _db.batch((batch) {
+      batch.insertAll(_db.bookmarks, bookmarks);
+      if (khatma != null) {
+        if (khatmaRowId != null) {
+          batch.update(
+            _db.khatmaProgress,
+            KhatmaProgressCompanion(
+              ayahId: Value(khatma.ayahId),
+              targetPages: Value(khatma.targetPages),
+              updatedAt: Value(khatma.updatedAt),
+            ),
+            where: (t) => t.id.equals(khatmaRowId),
+          );
+        } else {
+          batch.insert(
+            _db.khatmaProgress,
+            KhatmaProgressCompanion.insert(
+              ayahId: khatma.ayahId,
+              targetPages: khatma.targetPages,
+              updatedAt: Value(khatma.updatedAt),
             ),
           );
-    }
-
-    final tasbih = plan.tasbih.toWrite;
-    if (tasbih != null) {
-      await _writeSetting(
-        backupKeyTasbihState,
-        jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
-      );
-    }
-
-    for (final entry in plan.settings.toWrite.entries) {
-      await _writeSetting(entry.key, entry.value);
-    }
+        }
+      }
+      batch.insertAllOnConflictUpdate(_db.prayerLog, prayerDays);
+      batch.insertAllOnConflictUpdate(_db.settingsTable, settings);
+    });
   }
 
   Future<void> _writeSetting(String key, String value) =>
