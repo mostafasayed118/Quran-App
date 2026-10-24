@@ -110,6 +110,7 @@ const dict = {
     surahTitle: 'سورة {name}',
     surahDescription: 'سورة {n} — {name}',
     ayahCount: '{n} آية',
+    ayahNumber: 'الآية {n}',
     // --- landing page copy: the one string table of the site ---
     landingHeroAyah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
     landingHeroAyahRef: 'الإسراء ٩',
@@ -276,6 +277,7 @@ const dict = {
     surahTitle: 'Surah {name}',
     surahDescription: 'Surah {n} — {name}',
     ayahCount: '{n} verses',
+    ayahNumber: 'Verse {n}',
     // --- landing page copy: the one string table of the site ---
     landingHeroAyah: '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾',
     landingHeroAyahRef: 'Al-Isra 9',

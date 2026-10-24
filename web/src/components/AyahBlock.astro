@@ -8,8 +8,9 @@ const shareLabel = t(locale, 'ayahShare');
 const bookmarkLabel = t(locale, 'ayahBookmark');
 const listenLabel = t(locale, 'ayahListen');
 ---
-<div class="ayah" id={`ayah-${n}`} data-n={n} data-page={page}>
-  <p class="ayah-text">
+<div class="ayah" id={`ayah-${n}`} data-n={n} data-page={page} tabindex="0">
+  <p class="ayah-text" lang="ar">
+    <span class="sr-only" lang={locale}>{t(locale, 'ayahNumber').replace('{n}', locale === 'en' ? String(n) : toArabicDigits(n))}</span>
     <span class="ayah-u" aria-hidden="true">{textUthmani}{sajda && <span class="sajda" aria-hidden="true">۩</span>}</span>
     <span class="ayah-i sr-only">{textImlaei}</span>
     <span class="medal" aria-hidden="true">{toArabicDigits(n)}</span>

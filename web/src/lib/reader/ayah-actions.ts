@@ -14,6 +14,12 @@ export function initAyahActions({ context: ctx, playSurah }: AyahActionsOptions)
   const L = ctx.locale;
   const ayahs = ctx.ayahs;
 
+  // The buttons start outside the tab order; the SSR bytes stay lean and the
+  // first Tab lands on the ayah, not on 4 hidden controls.
+  ayahs?.querySelectorAll<HTMLButtonElement>('[data-ayah-action]').forEach((btn) => {
+    btn.tabIndex = -1;
+  });
+
   // --- per-ayah actions (delegated; copy/share always use the plain-Arabic `.ayah-i`) ---
   const saved = new Set(listBookmarks().map((b) => `${b.s}:${b.a}`));
   const setBookmarkState = (btn: HTMLButtonElement, pressed: boolean): void => {
@@ -78,5 +84,68 @@ export function initAyahActions({ context: ctx, playSurah }: AyahActionsOptions)
     } else {
       current?.classList.remove('selected');
     }
+  });
+
+  // --- keyboard + focus: one tab stop per ayah; Enter/Space reveals that ayah's actions ---
+  let activeAyah: HTMLElement | null = null;
+  // A pointer press must not pre-select: the pages-layout click handler owns that toggle.
+  let pointerFocus = false;
+  const setActionTabStops = (ayah: HTMLElement, reachable: boolean): void => {
+    ayah.querySelectorAll<HTMLButtonElement>('[data-ayah-action]').forEach((btn) => {
+      btn.tabIndex = reachable ? 0 : -1;
+    });
+  };
+
+  ayahs?.addEventListener(
+    'pointerdown',
+    () => {
+      pointerFocus = true;
+    },
+    true,
+  );
+
+  ayahs?.addEventListener('click', () => {
+    pointerFocus = false;
+  });
+
+  ayahs?.addEventListener('focusin', (e) => {
+    const ayah = (e.target as HTMLElement | null)?.closest<HTMLElement>('.ayah') ?? null;
+    if (!ayah) return;
+    if (activeAyah && activeAyah !== ayah) {
+      setActionTabStops(activeAyah, false);
+      activeAyah.classList.remove('selected');
+    }
+    if (!pointerFocus) ayah.classList.add('selected');
+    activeAyah = ayah;
+  });
+
+  ayahs?.addEventListener('focusout', (e) => {
+    const ayah = (e.target as HTMLElement | null)?.closest<HTMLElement>('.ayah') ?? null;
+    if (!ayah) return;
+    const next = e.relatedTarget;
+    if (next instanceof Node && ayah.contains(next)) return;
+    setActionTabStops(ayah, false);
+  });
+
+  ayahs?.addEventListener('keydown', (e) => {
+    pointerFocus = false;
+    const target = e.target as HTMLElement | null;
+    if (e.key === 'Escape') {
+      const btn = target?.closest<HTMLElement>('[data-ayah-action]') ?? null;
+      const ayah = btn?.closest<HTMLElement>('.ayah') ?? null;
+      if (!btn || !ayah) return;
+      e.preventDefault();
+      setActionTabStops(ayah, false);
+      ayah.focus();
+      return;
+    }
+    if (!target || target.closest('button, a, input, select, textarea, [contenteditable]')) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const ayah = target.closest<HTMLElement>('.ayah');
+    if (!ayah) return;
+    e.preventDefault();
+    ayah.classList.add('selected');
+    setActionTabStops(ayah, true);
+    ayah.querySelector<HTMLElement>('[data-ayah-action]')?.focus();
   });
 }
