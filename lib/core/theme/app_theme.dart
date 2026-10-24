@@ -12,6 +12,10 @@ abstract final class AppTheme {
   static const TextStyle meQuranHead =
       TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20);
 
+  /// City and degree headings rendered in the meQuran face.
+  static const TextStyle meQuranTitle =
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 18);
+
   static const TextStyle hafsAyah =
       TextStyle(fontFamily: QuranFonts.quran, fontSize: 24, height: 2);
 
@@ -53,20 +57,20 @@ abstract final class AppTheme {
       onPrimary: isLight ? Colors.white : AppColors.ink,
       secondary: AppColors.gold,
       onSecondary: Colors.white,
-      surface: isLight ? AppColors.cardBackground : const Color(0xFF16201B),
-      onSurface: isLight ? AppColors.ink : const Color(0xFFE8E2D2),
+      surface: isLight ? AppColors.cardBackground : AppColors.darkSurface,
+      onSurface: isLight ? AppColors.ink : AppColors.darkOnSurface,
     );
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor:
-          isLight ? AppColors.pageBackground : const Color(0xFF101410),
+          isLight ? AppColors.pageBackground : AppColors.darkBackground,
       fontFamily: QuranFonts.ui,
       appBarTheme: AppBarTheme(
         backgroundColor:
-            isLight ? AppColors.primaryBeige : const Color(0xFF16201B),
+            isLight ? AppColors.primaryBeige : AppColors.darkSurface,
         foregroundColor:
-            isLight ? AppColors.emeraldDark : const Color(0xFFE8E2D2),
+            isLight ? AppColors.emeraldDark : AppColors.darkOnSurface,
         centerTitle: true,
       ),
       cardTheme: CardThemeData(
@@ -75,7 +79,7 @@ abstract final class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: isLight ? AppColors.hairline : const Color(0xFF2A362F),
+            color: isLight ? AppColors.hairline : AppColors.darkHairline,
           ),
         ),
       ),

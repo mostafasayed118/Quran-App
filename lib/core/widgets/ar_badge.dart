@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 class ArabicBadge extends StatelessWidget {
   const ArabicBadge(
     this.label, {
@@ -22,7 +24,7 @@ class ArabicBadge extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: colors.primary.withValues(alpha: 0.12),
+        color: colors.primary.withValues(alpha: AppColors.badgeTintAlpha),
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Text(

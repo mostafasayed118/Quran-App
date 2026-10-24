@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -13,11 +14,6 @@ import '../data/khatma_progress.dart';
 import '../data/prayer_log_repository.dart';
 import 'tracker_cubit.dart';
 import 'tracker_state.dart';
-
-const TextStyle _todayTitleStyle = TextStyle(
-  fontSize: 16,
-  fontWeight: FontWeight.bold,
-);
 
 const TextStyle _streakLabelStyle = TextStyle(fontSize: 12);
 
@@ -94,13 +90,16 @@ class _TodayCard extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              '${today.day.year}/${today.day.month}/${today.day.day}'
-                  .toArabicIndicDigits,
+              loc.trackerGregorianDate(
+                today.day.day.toArabicIndic,
+                today.day.month.toArabicIndic,
+                today.day.year.toArabicIndic,
+              ),
               style: AppTheme.mutedAt(Theme.of(context).colorScheme, 13),
             ),
             Text(
               loc.trackerToday,
-              style: _todayTitleStyle,
+              style: AppTheme.rowTitle,
             ),
           ],
         ),
@@ -163,7 +162,10 @@ class _Last7Row extends StatelessWidget {
       2 => loc.trackerDotTwoDaysAgo,
       _ => loc.trackerDotDaysAgo(index.toArabicIndic),
     };
-    return '$day: ${last7[index] ? loc.trackerDotMarked : loc.trackerDotUnmarked}';
+    return loc.trackerDotSemantics(
+      day,
+      last7[index] ? loc.trackerDotMarked : loc.trackerDotUnmarked,
+    );
   }
 
   @override
@@ -218,8 +220,10 @@ class _StreakChip extends StatelessWidget {
 }
 
 /// Reader route opening the wird at the plan's read-up-to pointer.
-String wirdReaderRoute(KhatmaProgress progress) =>
-    '/quran/reader?surah=${progress.readerSurahId}&ayah=${progress.readerAyahNumber}';
+String wirdReaderRoute(KhatmaProgress progress) => quranReaderPath(
+      surah: progress.readerSurahId,
+      ayah: progress.readerAyahNumber,
+    );
 
 class _WirdCard extends StatelessWidget {
   const _WirdCard({required this.progress});
@@ -251,7 +255,7 @@ class _WirdCard extends StatelessWidget {
               children: [
                 Icon(Icons.menu_book, size: 18, color: colors.primary),
                 const SizedBox(width: AppSpacing.sm),
-                Text(loc.wirdTitle, style: _todayTitleStyle),
+                Text(loc.wirdTitle, style: AppTheme.rowTitle),
               ],
             ),
             if (p == null) ...[
@@ -326,9 +330,9 @@ class _WirdSetupSheet extends StatelessWidget {
 
   String _paceLabel(AppLocalizations loc, int targetPages) =>
       switch (targetPages) {
-        604 => loc.wirdPaceMonthly,
-        302 => loc.wirdPaceTwoMonths,
-        201 => loc.wirdPaceThreeMonths,
+        KhatmaProgress.pagesPerMonth => loc.wirdPaceMonthly,
+        KhatmaProgress.pagesPerTwoMonths => loc.wirdPaceTwoMonths,
+        KhatmaProgress.pagesPerThreeMonths => loc.wirdPaceThreeMonths,
         _ => loc.wirdPaceFourMonths,
       };
 
@@ -342,7 +346,7 @@ class _WirdSetupSheet extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(
                 AppSpacing.md, AppSpacing.lg, AppSpacing.md, 6),
-            child: Text(loc.wirdPaceSheetTitle, style: _todayTitleStyle),
+            child: Text(loc.wirdPaceSheetTitle, style: AppTheme.rowTitle),
           ),
           for (final target in KhatmaProgress.targetChoices)
             ListTile(

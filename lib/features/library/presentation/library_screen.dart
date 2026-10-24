@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/format_bytes.dart';
 import '../../../core/widgets/async_view.dart';
@@ -73,7 +74,9 @@ class LibraryScreen extends StatelessWidget {
     final packId = ready.failed.first;
     final pack = ready.packs.where((p) => p.id == packId).firstOrNull;
     return ErrorStrip(
-      '${loc.libraryFailed}${pack != null ? ' — ${pack.titleAr}' : ''}',
+      pack == null
+          ? loc.libraryFailed
+          : loc.libraryFailedForPack(loc.libraryFailed, pack.titleAr),
       actionLabel: loc.libraryRetry,
       onRetry: () => cubit.retry(packId),
       onDismiss: () => cubit.dismissFailure(packId),
@@ -146,8 +149,10 @@ class _PackRow extends StatelessWidget {
     final cubit = context.read<LibraryCubit>();
     final progress = ready.progress[pack.id];
     final installed = ready.installed.contains(pack.id);
-    final subtitle =
-        '${pack.approxSizeMb.toString().toArabicIndicDigits} MB · ${pack.version}';
+    final subtitle = loc.libraryPackMeta(
+      pack.approxSizeMb.toString().toArabicIndicDigits,
+      pack.version,
+    );
 
     final Widget trailing;
     if (progress != null) {
@@ -155,8 +160,10 @@ class _PackRow extends StatelessWidget {
       trailing = DownloadProgressLabel(
         received: received,
         total: total,
-        format: (r, t) => '${formatMegabytes(r).toArabicIndicDigits} / '
-            '${formatMegabytes(t).toArabicIndicDigits} MB',
+        format: (r, t) => loc.downloadProgressOfTotal(
+          formatMegabytes(r).toArabicIndicDigits,
+          formatMegabytes(t).toArabicIndicDigits,
+        ),
       );
     } else if (installed) {
       trailing = IconButton(
@@ -176,7 +183,7 @@ class _PackRow extends StatelessWidget {
         pack.titleAr,
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
-      subtitle: Text('$subtitle · ${pack.titleEn}'),
+      subtitle: Text(loc.libraryPackSubtitle(subtitle, pack.titleEn)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -189,7 +196,7 @@ class _PackRow extends StatelessWidget {
             IconButton(
               tooltip: loc.hadithRead,
               icon: const Icon(Icons.menu_book_outlined),
-              onPressed: () => context.push('/library/hadith?pack=${pack.id}'),
+              onPressed: () => context.push(hadithBrowsePath(pack.id)),
             ),
           const SizedBox(width: AppSpacing.sm),
           trailing,

@@ -8,10 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import 'zakat_cubit.dart';
 import 'zakat_state.dart';
 
-const TextStyle _verdictStyle = TextStyle(
-  fontWeight: FontWeight.bold,
-  fontSize: 16,
-);
+const int _amountDecimals = 2;
 
 const TextStyle _amountStyle = TextStyle(
   fontSize: 28,
@@ -140,7 +137,7 @@ class _SummaryCard extends StatelessWidget {
             Text(
               verdictText,
               textAlign: TextAlign.right,
-              style: _verdictStyle.copyWith(
+              style: AppTheme.rowTitle.copyWith(
                 color: ready.result.due
                     ? colors.secondary
                     : colors.onSurfaceVariant,
@@ -148,7 +145,9 @@ class _SummaryCard extends StatelessWidget {
             ),
             if (!needsNisabPrice && ready.result.due)
               Text(
-                ready.result.amount.toStringAsFixed(2).toArabicIndicDigits,
+                ready.result.amount
+                    .toStringAsFixed(_amountDecimals)
+                    .toArabicIndicDigits,
                 textAlign: TextAlign.right,
                 style: _amountStyle.copyWith(color: colors.primary),
               ),
@@ -184,7 +183,7 @@ class _ZakatLine extends StatelessWidget {
             ),
           ),
           Text(
-            value.toStringAsFixed(2).toArabicIndicDigits,
+            value.toStringAsFixed(_amountDecimals).toArabicIndicDigits,
             style: _lineValueStyle,
           ),
         ],

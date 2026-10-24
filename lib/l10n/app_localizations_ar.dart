@@ -685,4 +685,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String azkarSearchMore(String count) {
     return 'تُعرض أول $count نتيجة — جرّب تضييق البحث';
   }
+
+  @override
+  String libraryPackMeta(String size, String version) {
+    return '$size م.ب · $version';
+  }
+
+  @override
+  String libraryPackSubtitle(String meta, String titleEn) {
+    return '$meta · $titleEn';
+  }
+
+  @override
+  String libraryFailedForPack(String failed, String pack) {
+    return '$failed — $pack';
+  }
+
+  @override
+  String trackerGregorianDate(String day, String month, String year) {
+    return '$day/$month/$year';
+  }
+
+  @override
+  String trackerDotSemantics(String day, String state) {
+    return '$day: $state';
+  }
+
+  @override
+  String shareAyahText(String text, String url) {
+    return '$text\n\n$url';
+  }
 }

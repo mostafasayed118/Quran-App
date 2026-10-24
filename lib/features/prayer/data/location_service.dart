@@ -4,6 +4,9 @@ import 'prayer_time_service.dart';
 
 typedef PositionResolver = Future<CityCoordinates?> Function();
 
+/// A location fix that takes longer than this falls back to manual choice.
+const Duration _locationTimeout = Duration(seconds: 20);
+
 /// Thin injectable wrapper around the device location stack.
 ///
 /// [currentPosition] never throws upward: denial, disabled services, timeouts
@@ -47,7 +50,7 @@ class LocationService {
     final position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.medium,
-        timeLimit: Duration(seconds: 20),
+        timeLimit: _locationTimeout,
       ),
     );
     return CityCoordinates(position.latitude, position.longitude);

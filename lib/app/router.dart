@@ -6,7 +6,9 @@ import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
 import '../core/domain/prayer_times.dart';
+import '../core/domain/quran_limits.dart';
 import '../core/domain/reminders.dart';
+import '../core/utils/app_routes.dart';
 import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
@@ -73,19 +75,19 @@ import 'di/injector.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: '/home',
+    initialLocation: AppRoutes.home,
     errorBuilder: (context, state) {
       final loc = AppLocalizations.of(context);
       return PlaceholderScreen(
         title: loc.pageNotFound,
         hint: loc.pageNotFoundHint,
         actionLabel: loc.home,
-        onAction: () => context.go('/home'),
+        onAction: () => context.go(AppRoutes.home),
       );
     },
     routes: [
       GoRoute(
-        path: '/home',
+        path: AppRoutes.home,
         builder: (_, __) => BlocProvider<HomeCubit>(
           create: (_) => HomeCubit(
             lastRead: getIt<LastReadMarker>(),
@@ -97,30 +99,30 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/quran',
+        path: AppRoutes.quran,
         builder: (_, __) => BlocProvider<SurahIndexCubit>(
           create: (_) => SurahIndexCubit(getIt<SurahSource>()),
           child: const SurahIndexScreen(),
         ),
       ),
       GoRoute(
-        path: '/recitation',
+        path: AppRoutes.recitation,
         builder: (_, __) => BlocProvider<RecitersCubit>(
           create: (_) => RecitersCubit(repo: getIt<ReciterRepository>()),
           child: const RecitersScreen(),
         ),
       ),
       GoRoute(
-        path: '/library',
+        path: AppRoutes.library,
         builder: (_, __) => BlocProvider<LibraryCubit>(
           create: (_) => getIt<LibraryCubit>(),
           child: const LibraryScreen(),
         ),
       ),
       GoRoute(
-        path: '/library/hadith',
+        path: AppRoutes.hadith,
         builder: (context, state) {
-          final pack = state.uri.queryParameters['pack'] ?? '';
+          final pack = state.uri.queryParameters[AppRouteQuery.pack] ?? '';
           return BlocProvider<HadithCubit>(
             create: (_) => HadithCubit(
               downloader: getIt<PackDownloader>(),
@@ -131,7 +133,7 @@ abstract final class AppRouter {
         },
       ),
       GoRoute(
-        path: '/prayer-times',
+        path: AppRoutes.prayerTimes,
         builder: (_, __) => BlocProvider<PrayerTimesCubit>(
           create: (_) => PrayerTimesCubit(
             prayer: getIt<PrayerTimesPort>(),
@@ -143,7 +145,7 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/prayer-times/city',
+        path: AppRoutes.cityPicker,
         builder: (_, __) => BlocProvider<CityPickerCubit>(
           create: (_) => CityPickerCubit(
             cityRepo: getIt<CityRepository>(),
@@ -153,7 +155,7 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/qibla',
+        path: AppRoutes.qibla,
         builder: (_, __) => BlocProvider<QiblaCubit>(
           create: (_) => QiblaCubit(
             city: getIt<CitySource>(),
@@ -164,7 +166,7 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/azkar',
+        path: AppRoutes.azkar,
         builder: (_, __) => BlocProvider<AzkarCubit>(
           create: (_) => AzkarCubit(
             repository: getIt<AzkarRepository>(),
@@ -173,14 +175,14 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/tasbih',
+        path: AppRoutes.tasbih,
         builder: (_, __) => BlocProvider<TasbihCubit>(
           create: (_) => TasbihCubit(repo: getIt<TasbihRepository>()),
           child: const TasbihScreen(),
         ),
       ),
       GoRoute(
-        path: '/duas',
+        path: AppRoutes.duas,
         builder: (_, __) => BlocProvider<DuasCubit>(
           create: (_) => DuasCubit(
             duas: getIt<DuaRepository>(),
@@ -191,7 +193,7 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/worship',
+        path: AppRoutes.worship,
         builder: (_, __) => BlocProvider<TrackerCubit>(
           create: (_) => TrackerCubit(
             repo: getIt<PrayerLogRepository>(),
@@ -201,28 +203,28 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/zakat',
+        path: AppRoutes.zakat,
         builder: (_, __) => BlocProvider<ZakatCubit>(
           create: (_) => ZakatCubit(),
           child: const ZakatScreen(),
         ),
       ),
       GoRoute(
-        path: '/hijri',
+        path: AppRoutes.hijri,
         builder: (_, __) => BlocProvider<HijriCubit>(
           create: (_) => HijriCubit(service: getIt<HijriService>()),
           child: const HijriScreen(),
         ),
       ),
       GoRoute(
-        path: '/asma',
+        path: AppRoutes.asma,
         builder: (_, __) => BlocProvider<AsmaCubit>(
           create: (_) => AsmaCubit(repository: getIt<AsmaRepository>()),
           child: const AsmaScreen(),
         ),
       ),
       GoRoute(
-        path: '/settings',
+        path: AppRoutes.settings,
         builder: (_, __) => MultiBlocProvider(
           providers: [
             BlocProvider<SettingsCubit>(
@@ -241,13 +243,15 @@ abstract final class AppRouter {
         ),
       ),
       GoRoute(
-        path: '/quran/reader',
+        path: AppRoutes.reader,
         builder: (context, state) {
-          final surah =
-              (int.tryParse(state.uri.queryParameters['surah'] ?? '') ?? 1)
-                  .clamp(1, 114);
-          final ayahParam =
-              int.tryParse(state.uri.queryParameters['ayah'] ?? '') ?? 0;
+          final surah = (int.tryParse(
+                      state.uri.queryParameters[AppRouteQuery.surah] ?? '') ??
+                  kFirstSurahId)
+              .clamp(kFirstSurahId, kSurahCount);
+          final ayahParam = int.tryParse(
+                  state.uri.queryParameters[AppRouteQuery.ayah] ?? '') ??
+              0;
           final ayah = ayahParam < 0 ? 0 : ayahParam;
           return MultiBlocProvider(
             providers: [
@@ -270,9 +274,9 @@ abstract final class AppRouter {
         },
       ),
       GoRoute(
-        path: '/recitation/reciter',
+        path: AppRoutes.reciter,
         builder: (context, state) {
-          final row = state.uri.queryParameters['row'] ?? '';
+          final row = state.uri.queryParameters[AppRouteQuery.row] ?? '';
           return MultiBlocProvider(
             providers: [
               BlocProvider<PlaybackCubit>.value(
@@ -294,7 +298,7 @@ abstract final class AppRouter {
         },
       ),
       GoRoute(
-        path: '/bookmarks',
+        path: AppRoutes.bookmarks,
         builder: (_, __) => BlocProvider<BookmarksCubit>(
           create: (_) => BookmarksCubit(getIt<AyahRepository>()),
           child: const BookmarksScreen(),

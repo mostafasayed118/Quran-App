@@ -11,6 +11,10 @@ import '../../../core/utils/progress_throttle.dart';
 import 'download_status.dart';
 import 'reciter_repository.dart';
 
+/// Download transport budgets: a slow server must not hang a queued surah.
+const Duration _connectTimeout = Duration(seconds: 15);
+const Duration _receiveTimeout = Duration(minutes: 2);
+
 /// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
   DownloadFailure(this.message);
@@ -29,8 +33,8 @@ class AudioDownloader {
     Future<Directory> Function()? audioRootResolver,
   })  : _dio = dio ??
             Dio(BaseOptions(
-              connectTimeout: const Duration(seconds: 15),
-              receiveTimeout: const Duration(minutes: 2),
+              connectTimeout: _connectTimeout,
+              receiveTimeout: _receiveTimeout,
             )),
         _audioRoot = audioRootResolver;
 

@@ -1309,6 +1309,42 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تُعرض أول {count} نتيجة — جرّب تضييق البحث'**
   String azkarSearchMore(String count);
+
+  /// No description provided for @libraryPackMeta.
+  ///
+  /// In ar, this message translates to:
+  /// **'{size} م.ب · {version}'**
+  String libraryPackMeta(String size, String version);
+
+  /// No description provided for @libraryPackSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'{meta} · {titleEn}'**
+  String libraryPackSubtitle(String meta, String titleEn);
+
+  /// No description provided for @libraryFailedForPack.
+  ///
+  /// In ar, this message translates to:
+  /// **'{failed} — {pack}'**
+  String libraryFailedForPack(String failed, String pack);
+
+  /// No description provided for @trackerGregorianDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'{day}/{month}/{year}'**
+  String trackerGregorianDate(String day, String month, String year);
+
+  /// No description provided for @trackerDotSemantics.
+  ///
+  /// In ar, this message translates to:
+  /// **'{day}: {state}'**
+  String trackerDotSemantics(String day, String state);
+
+  /// No description provided for @shareAyahText.
+  ///
+  /// In ar, this message translates to:
+  /// **'{text}\n\n{url}'**
+  String shareAyahText(String text, String url);
 }
 
 class _AppLocalizationsDelegate

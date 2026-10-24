@@ -63,7 +63,7 @@ class LicensesScreen extends StatelessWidget {
             title: Text(loc.licensesOpenSource),
             onTap: () => showLicensePage(
               context: context,
-              applicationName: 'Quran Yahdi',
+              applicationName: loc.appName,
             ),
           ),
           Padding(

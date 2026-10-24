@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
@@ -167,7 +168,8 @@ class _NameCell extends StatelessWidget {
       onTap: () => context.read<AsmaCubit>().select(name),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+          color: colors.surfaceContainerHighest
+              .withValues(alpha: AppColors.mutedSurfaceAlpha),
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
@@ -214,7 +216,10 @@ class _Scrim extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: () => context.read<AsmaCubit>().select(null),
         child: ColoredBox(
-          color: Theme.of(context).colorScheme.scrim.withValues(alpha: 0.32),
+          color: Theme.of(context)
+              .colorScheme
+              .scrim
+              .withValues(alpha: AppColors.scrimAlpha),
         ),
       ),
     );

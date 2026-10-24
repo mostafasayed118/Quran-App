@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -65,8 +66,8 @@ class _SurahRow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final isMakkah = surah.revelationType == 'makkah';
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-      onTap: () => context.push('/quran/reader?surah=${surah.id}&ayah=0'),
+      contentPadding: AppTheme.tileContentPadding,
+      onTap: () => context.push(quranReaderPath(surah: surah.id, ayah: 0)),
       leading: ArabicBadge(surah.id.toArabicIndic),
       title: Text(
         surah.nameAr,

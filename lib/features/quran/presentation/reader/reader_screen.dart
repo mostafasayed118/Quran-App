@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -106,7 +107,7 @@ class _ReadyView extends StatelessWidget {
           IconButton(
             tooltip: loc.bookmarks,
             icon: const Icon(Icons.bookmarks_outlined),
-            onPressed: () => context.push('/bookmarks'),
+            onPressed: () => context.push(AppRoutes.bookmarks),
           ),
         ],
       ),
@@ -314,8 +315,10 @@ class _ShareAyahButton extends StatelessWidget {
       tooltip: loc.shareAyah,
       icon: const Icon(Icons.share_outlined),
       onPressed: () => SharePlus.instance.share(ShareParams(
-        text:
-            '${ayah.textImlaei}\n\n${webSurahUrl(ayah.surahId, ayah.numberInSurah)}',
+        text: loc.shareAyahText(
+          ayah.textImlaei,
+          webSurahUrl(ayah.surahId, ayah.numberInSurah),
+        ),
       )),
     );
   }

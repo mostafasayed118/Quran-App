@@ -10,6 +10,7 @@ import 'app/bootstrap.dart';
 import 'app/di/injector.dart';
 import 'app/router.dart';
 import 'core/l10n/platform_localizations.dart';
+import 'core/utils/app_routes.dart';
 import 'core/utils/boot_fail_open.dart';
 import 'core/utils/deep_links.dart';
 import 'features/notifications/data/notifications_binding.dart';
@@ -70,9 +71,9 @@ Future<void> _initPlugins(String audioChannelName) async {
     failOpenBootInit(
       'NotificationsBinding.init',
       () => getIt<NotificationsBinding>().init(
-        onTap: () => AppRouter.router.go('/home'),
+        onTap: () => AppRouter.router.go(AppRoutes.home),
         onTapPayload: (payload) =>
-            AppRouter.router.go(reminderRouteFor(payload) ?? '/home'),
+            AppRouter.router.go(reminderRouteFor(payload) ?? AppRoutes.home),
       ),
       timeout: _bootNotificationsInitTimeout,
     ),
@@ -87,9 +88,9 @@ Future<void> _initPlugins(String audioChannelName) async {
 /// Tap-target route for a reminder payload; null for unknown/absent payloads
 /// (the caller falls back to `/home`). Warm taps and cold launches share it.
 String? reminderRouteFor(String? payload) => switch (payload) {
-      prayerReminderPayload => '/prayer-times',
-      azkarReminderPayload => '/azkar',
-      wirdReminderPayload => '/worship',
+      prayerReminderPayload => AppRoutes.prayerTimes,
+      azkarReminderPayload => AppRoutes.azkar,
+      wirdReminderPayload => AppRoutes.worship,
       _ => null,
     };
 

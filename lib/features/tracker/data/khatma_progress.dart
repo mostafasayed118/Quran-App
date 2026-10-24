@@ -14,14 +14,37 @@ class KhatmaProgress {
   /// Full mushaf page count (Madani layout, pages 1..604).
   static const int totalPages = 604;
 
-  /// The four offered paces, stored as the monthly mushaf portion in pages:
-  /// 604 = a khatma every month, 302 = every 2 months, 201 = every 3,
-  /// 151 = every 4.
-  static const List<int> targetChoices = [604, 302, 201, 151];
+  /// Monthly mushaf portion: one khatma per month.
+  static const int pagesPerMonth = 604;
 
-  /// Pages to read per day for a plan of [targetPages] (30-day plans).
+  /// Monthly mushaf portion: one khatma every two months.
+  static const int pagesPerTwoMonths = 302;
+
+  /// Monthly mushaf portion: one khatma every three months.
+  static const int pagesPerThreeMonths = 201;
+
+  /// Monthly mushaf portion: one khatma every four months.
+  static const int pagesPerFourMonths = 151;
+
+  /// Days a khatma plan is spread over.
+  static const int daysPerKhatmaMonth = 30;
+
+  /// First page of the mushaf.
+  static const int firstMushafPage = 1;
+
+  /// The four offered paces, stored as the monthly mushaf portion in pages.
+  static const List<int> targetChoices = [
+    pagesPerMonth,
+    pagesPerTwoMonths,
+    pagesPerThreeMonths,
+    pagesPerFourMonths,
+  ];
+
+  /// Pages to read per day for a plan of [targetPages].
   static int dailyPagesFor(int targetPages) =>
-      (targetPages / 30).round().clamp(1, totalPages);
+      (targetPages / daysPerKhatmaMonth)
+          .round()
+          .clamp(firstMushafPage, totalPages);
 
   /// Read-up-to pointer: global ayah id (1..6236).
   final int pointerAyahId;
@@ -45,16 +68,17 @@ class KhatmaProgress {
   bool get completed => pointerPage >= totalPages;
 
   /// Pages finished so far.
-  int get pagesDone => (pointerPage - 1).clamp(0, totalPages);
+  int get pagesDone => (pointerPage - firstMushafPage).clamp(0, totalPages);
 
   /// Progress of the plan as a 0..1 fraction.
   double get fraction => pagesDone / totalPages;
 
   /// First page of today’s reading chunk.
-  int get todayStartPage => pointerPage.clamp(1, totalPages);
+  int get todayStartPage => pointerPage.clamp(firstMushafPage, totalPages);
 
   /// Last page of today’s reading chunk.
-  int get todayEndPage => (pointerPage + dailyPages - 1).clamp(1, totalPages);
+  int get todayEndPage =>
+      (pointerPage + dailyPages - 1).clamp(firstMushafPage, totalPages);
 
   /// Pages left to finish the plan.
   int get remainingPages => totalPages - pagesDone;

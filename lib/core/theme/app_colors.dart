@@ -13,4 +13,14 @@ abstract final class AppColors {
   static const ink = Color(0xFF232D28);
   static const hairline = Color(0xFFD9D2BF);
   static const cardBackground = Color(0xFFFFFDF7);
+
+  static const darkSurface = Color(0xFF16201B);
+  static const darkOnSurface = Color(0xFFE8E2D2);
+  static const darkBackground = Color(0xFF101410);
+  static const darkHairline = Color(0xFF2A362F);
+
+  static const double badgeTintAlpha = 0.12;
+  static const double fieldTintAlpha = 0.08;
+  static const double mutedSurfaceAlpha = 0.5;
+  static const double scrimAlpha = 0.32;
 }

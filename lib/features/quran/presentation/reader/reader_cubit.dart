@@ -10,6 +10,9 @@ import '../../data/verse_mapping.dart';
 import 'mushaf_page_block.dart';
 import 'reader_state.dart';
 
+/// Al-Fatiha carries the basmala as its first ayah; At-Tawbah has none.
+const Set<int> _basmalaExemptSurahIds = {1, 9};
+
 /// The reader screen: one surah, in verses or in mushaf pages.
 class ReaderCubit extends Cubit<ReaderState> {
   /// Creates the cubit for one surah and starts the load.
@@ -76,7 +79,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         ayahs: verses,
         mushafPages: groupVersesByPage(verses),
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
-        showBasmala: _surahId != 1 && _surahId != 9,
+        showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
       ));
     } on Object catch (error, stackTrace) {
       dev.log('reader load failed',

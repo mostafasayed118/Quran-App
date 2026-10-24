@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/db/app_database.dart';
 import '../domain/reciter_info.dart';
+import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
 import 'reciter_mapping.dart';
 import 'reciter_source.dart';
@@ -23,6 +24,9 @@ const List<int> featuredReciterIds = <int>[
   4,
   5,
 ];
+
+/// Catalog refresh budget; a hung API must not block the reciter list.
+const Duration _catalogTimeout = Duration(seconds: 20);
 
 /// File name the surah audio is stored under.
 String surahAudioFileName(int surahNumber) =>
@@ -50,7 +54,7 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
     featuredRank += 1;
   }
   int rankOf(ReciterRow row) {
-    final leadingId = int.tryParse(row.id.split('-').first);
+    final leadingId = int.tryParse(row.id.split(reciterRowSeparator).first);
     final featured = leadingId == null ? null : ranks[leadingId];
     return featured ?? featuredReciterIds.length;
   }
@@ -72,7 +76,7 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
 
 /// True when the row belongs to a featured reciter.
 bool isFeaturedReciterRow(ReciterRow row) {
-  final leadingId = int.tryParse(row.id.split('-').first);
+  final leadingId = int.tryParse(row.id.split(reciterRowSeparator).first);
   return leadingId != null && featuredReciterIds.contains(leadingId);
 }
 
@@ -123,9 +127,8 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   /// of replacing the cached list with an empty one.
   @override
   Future<void> refreshFromApi() async {
-    final res = await _client
-        .get(Uri.parse(_endpoint))
-        .timeout(const Duration(seconds: 20));
+    final res =
+        await _client.get(Uri.parse(_endpoint)).timeout(_catalogTimeout);
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }
@@ -165,7 +168,7 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
         final reciterIdInt = reciterId.toInt();
         if (featuredReciterIds.contains(reciterIdInt)) featuredPresent = true;
         rows.add(RecitersCompanion.insert(
-          id: '$reciterIdInt-${moshafId.toInt()}',
+          id: '$reciterIdInt$reciterRowSeparator${moshafId.toInt()}',
           reciterName: reciterName is String ? reciterName : '',
           moshafName: moshafName is String ? moshafName : '',
           server: server,

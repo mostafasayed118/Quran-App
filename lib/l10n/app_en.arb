@@ -409,5 +409,74 @@
         "type": "String"
       }
     }
+  },
+  "libraryPackMeta": "{size} MB · {version}",
+  "@libraryPackMeta": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryPackSubtitle": "{meta} · {titleEn}",
+  "@libraryPackSubtitle": {
+    "placeholders": {
+      "meta": {
+        "type": "String"
+      },
+      "titleEn": {
+        "type": "String"
+      }
+    }
+  },
+  "libraryFailedForPack": "{failed} — {pack}",
+  "@libraryFailedForPack": {
+    "placeholders": {
+      "failed": {
+        "type": "String"
+      },
+      "pack": {
+        "type": "String"
+      }
+    }
+  },
+  "trackerGregorianDate": "{month}/{day}/{year}",
+  "@trackerGregorianDate": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "trackerDotSemantics": "{day}: {state}",
+  "@trackerDotSemantics": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "shareAyahText": "{text}\n\n{url}",
+  "@shareAyahText": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      },
+      "url": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -687,4 +687,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String azkarSearchMore(String count) {
     return 'Showing the first $count results — try narrowing your search';
   }
+
+  @override
+  String libraryPackMeta(String size, String version) {
+    return '$size MB · $version';
+  }
+
+  @override
+  String libraryPackSubtitle(String meta, String titleEn) {
+    return '$meta · $titleEn';
+  }
+
+  @override
+  String libraryFailedForPack(String failed, String pack) {
+    return '$failed — $pack';
+  }
+
+  @override
+  String trackerGregorianDate(String day, String month, String year) {
+    return '$month/$day/$year';
+  }
+
+  @override
+  String trackerDotSemantics(String day, String state) {
+    return '$day: $state';
+  }
+
+  @override
+  String shareAyahText(String text, String url) {
+    return '$text\n\n$url';
+  }
 }

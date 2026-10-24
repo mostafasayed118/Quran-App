@@ -1,17 +1,17 @@
+import '../../../core/utils/date_only.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
 
 /// Highest global ayah id (1..6236) accepted for the last-read pointer.
 const int kBackupMaxAyahId = 6236;
 
-/// Day-key normalization mirroring `prayer_log_repository.dart`'s convention:
-/// local midnight; a day's identity is its local calendar date. The rule is
-/// replicated (not imported) because backup production code is forbidden from
-/// importing other features.
-DateTime backupDateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+/// Day-key normalization: local midnight; a day's identity is its local
+/// calendar date. Shared through `core/utils/date_only.dart` so backup and the
+/// tracker cannot drift apart (backup still imports no other feature).
+DateTime backupDateOnly(DateTime d) => dateOnly(d);
 
 /// Stable day key for merge batching (same shape as the tracker's own keys).
-String backupDayKey(DateTime d) => '${d.year}-${d.month}-${d.day}';
+String backupDayKey(DateTime d) => dayKey(d);
 
 /// Result of merging imported bookmarks with the local ones.
 class BookmarkMerge {

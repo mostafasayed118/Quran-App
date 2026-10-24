@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -30,7 +31,7 @@ class BookmarksScreen extends StatelessWidget {
                 ? EmptyState(
                     AppLocalizations.of(context).noBookmarks,
                     actionLabel: AppLocalizations.of(context).quran,
-                    onAction: () => context.push('/quran'),
+                    onAction: () => context.push(AppRoutes.quran),
                   )
                 : ListView.builder(
                     itemCount: entries.length,
@@ -53,8 +54,10 @@ class BookmarksScreen extends StatelessWidget {
                           onPressed: () =>
                               context.read<BookmarksCubit>().remove(ayah.id),
                         ),
-                        onTap: () => context.push(
-                            '/quran/reader?surah=${ayah.surahId}&ayah=${ayah.numberInSurah}'),
+                        onTap: () => context.push(quranReaderPath(
+                          surah: ayah.surahId,
+                          ayah: ayah.numberInSurah,
+                        )),
                       );
                     },
                   ),

@@ -8,6 +8,7 @@ import '../../../../core/domain/city.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -23,7 +24,7 @@ class PrayerTimesScreen extends StatelessWidget {
   /// the picker pops `true` on a successful persist; zero state change.
   static Future<void> _openCityPicker(BuildContext context) async {
     final cubit = context.read<PrayerTimesCubit>();
-    final reloaded = await context.push<bool>('/prayer-times/city');
+    final reloaded = await context.push<bool>(AppRoutes.cityPicker);
     if (reloaded == true && context.mounted) {
       await cubit.reload();
     }
@@ -109,10 +110,7 @@ class _TimesListState extends State<_TimesList> {
               leading: const Icon(Icons.location_on_outlined),
               title: Text(
                 city.nameAr,
-                style: const TextStyle(
-                  fontFamily: QuranFonts.meQuran,
-                  fontSize: 18,
-                ),
+                style: AppTheme.meQuranTitle,
               ),
               trailing: IconButton(
                 tooltip: loc.selectCity,

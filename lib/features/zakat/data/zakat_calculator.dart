@@ -2,6 +2,12 @@
 /// decimal or the thousands separator (last separator wins). Arabic-Indic
 /// digits and separators (٠-٩، ٫، ٬) are normalized first so an Arabic
 /// keyboard entry parses instead of silently collapsing to 0.
+const int _arabicIndicZero = 0x0660;
+const int _arabicIndicNine = 0x0669;
+const int _arabicDecimalSeparator = 0x066B;
+const int _arabicThousandsSeparator = 0x066C;
+const int _asciiZero = 0x30;
+
 double parseDecimal(String raw) {
   final s = _toWesternNumerals(raw.trim()).replaceAll(' ', '');
   if (s.isEmpty) return 0;
@@ -25,11 +31,11 @@ double parseDecimal(String raw) {
 String _toWesternNumerals(String s) {
   final buffer = StringBuffer();
   for (final rune in s.runes) {
-    if (rune >= 0x0660 && rune <= 0x0669) {
-      buffer.writeCharCode(rune - 0x0660 + 0x30);
-    } else if (rune == 0x066B) {
+    if (rune >= _arabicIndicZero && rune <= _arabicIndicNine) {
+      buffer.writeCharCode(rune - _arabicIndicZero + _asciiZero);
+    } else if (rune == _arabicDecimalSeparator) {
       buffer.write('.');
-    } else if (rune == 0x066C) {
+    } else if (rune == _arabicThousandsSeparator) {
       buffer.write(',');
     } else {
       buffer.writeCharCode(rune);

@@ -5,6 +5,9 @@
 /// `app/` boot code and features can depend on it without inverting layering.
 library;
 
+import '../domain/quran_limits.dart';
+import 'app_routes.dart';
+
 /// Final host (owner decision 2026-10-18), mirrored from web/src/lib/urls.ts.
 const String deepLinkHost = 'quranyahdi.pages.dev';
 
@@ -26,15 +29,15 @@ String? deepLinkRouteFor(Uri uri) {
   }
   if (segments.length == 2 && segments.first == 'surah') {
     final surah = int.tryParse(segments[1]);
-    if (surah == null || surah < 1 || surah > 114) return null;
+    if (surah == null || surah < kFirstSurahId || surah > kSurahCount) {
+      return null;
+    }
     final ayah = _ayahFromFragment(uri.fragment);
-    return ayah == null
-        ? '/quran/reader?surah=$surah'
-        : '/quran/reader?surah=$surah&ayah=$ayah';
+    return quranReaderPath(surah: surah, ayah: ayah);
   }
   if (segments.length == 1) {
-    if (segments.first == 'quran') return '/quran';
-    if (segments.first == 'reciters') return '/recitation';
+    if (segments.first == 'quran') return AppRoutes.quran;
+    if (segments.first == 'reciters') return AppRoutes.recitation;
   }
   return null;
 }

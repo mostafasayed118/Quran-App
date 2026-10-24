@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/utils/date_only.dart';
 import '../data/khatma_progress.dart';
 import '../data/khatma_repository.dart';
 import '../data/prayer_log_repository.dart';
@@ -10,6 +11,10 @@ import 'tracker_state.dart';
 
 /// The tracker screen: today's prayer marks, the streak and the khatma card.
 class TrackerCubit extends Cubit<TrackerState> {
+  static const int _streakLookbackDays = 400;
+  static const int _last7DayCount = 7;
+  static const int _streakGraceDays = 1;
+
   /// Creates the cubit and hydrates it.
   ///
   /// [khatma] is optional — without it the khatma card is hidden. The
@@ -56,9 +61,9 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       final now = _clock();
       final today = await _repo.dayView(now);
-      final marked = await _repo.markedDaysRange(now, 400);
+      final marked = await _repo.markedDaysRange(now, _streakLookbackDays);
       final last7 = <bool>[
-        for (var i = 0; i < 7; i++)
+        for (var i = 0; i < _last7DayCount; i++)
           marked.any((d) => _sameDay(d, _daysBefore(now, i))),
       ];
       final streak = _computeStreak(marked, now);
@@ -196,7 +201,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     };
     var cursor = DateTime(now.year, now.month, now.day);
     if (!keys.contains(_key(cursor))) {
-      cursor = _daysBefore(cursor, 1);
+      cursor = _daysBefore(cursor, _streakGraceDays);
     }
     var streak = 0;
     while (keys.contains(_key(cursor))) {
@@ -206,7 +211,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     return streak;
   }
 
-  String _key(DateTime day) => '${day.year}-${day.month}-${day.day}';
+  String _key(DateTime day) => dayKey(day);
 
   /// Marks or unmarks one prayer slot for today and reloads the screen.
   ///

@@ -117,12 +117,11 @@ class PrayerLogRepository {
         await (_db.select(_db.prayerLog)..where((p) => p.day.isIn(days))).get();
     final marked = <String>{
       for (final row in rows)
-        if (TrackerDay.fromRow(row).anyMarked)
-          '${row.day.year}-${row.day.month}-${row.day.day}',
+        if (TrackerDay.fromRow(row).anyMarked) dayKey(row.day),
     };
     return [
       for (final day in days)
-        if (marked.contains('${day.year}-${day.month}-${day.day}')) day,
+        if (marked.contains(dayKey(day))) day,
     ];
   }
 }

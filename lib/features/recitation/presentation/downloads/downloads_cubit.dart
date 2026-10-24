@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/audio_downloader.dart';
 import '../../data/download_status.dart';
+import '../../data/recitation_keys.dart';
 import '../../data/reciter_repository.dart';
 import 'downloads_state.dart';
 
@@ -29,7 +30,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   (String, int)? _active;
   CancelToken? _activeToken;
 
-  String _key(String rowId, int surahNumber) => '$rowId-$surahNumber';
+  String _key(String rowId, int surahNumber) => downloadKey(rowId, surahNumber);
 
   /// Re-reads the finished downloads and merges them into the state.
   ///
@@ -41,7 +42,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
       final items = {
         ...state.items,
         for (final row in rows)
-          '${row.reciterId}-${row.surahId}':
+          downloadKey(row.reciterId, row.surahId):
               const DownloadItem(status: DownloadStatus.done),
       };
       if (isClosed) return;
@@ -72,7 +73,8 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     if (isClosed) return false;
     emit(state.copyWith(items: {
       for (final entry in state.items.entries)
-        if (entry.key != '$rowId-$surahNumber') entry.key: entry.value,
+        if (entry.key != downloadKey(rowId, surahNumber))
+          entry.key: entry.value,
     }));
     return true;
   }

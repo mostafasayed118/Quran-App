@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
@@ -124,8 +125,7 @@ class _ReciterRow extends StatelessWidget {
         : String.fromCharCode(trimmed.runes.first);
     return ListTile(
       contentPadding: AppTheme.tileContentPadding,
-      onTap: () => context
-          .push('/recitation/reciter?row=${Uri.encodeComponent(reciter.id)}'),
+      onTap: () => context.push(reciterSurahsPath(reciter.id)),
       leading: ArabicBadge(
         initial,
         textStyle: const TextStyle(fontSize: 16),

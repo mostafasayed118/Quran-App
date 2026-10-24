@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -181,7 +182,7 @@ class _SheetPane extends StatelessWidget {
         actionLabel: loc.library,
         onAction: () {
           Navigator.of(context).pop();
-          context.push('/library');
+          context.push(AppRoutes.library);
         },
       );
     }

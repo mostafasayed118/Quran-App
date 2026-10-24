@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -19,7 +21,7 @@ class HomeScreen extends StatelessWidget {
   /// successful persist, and Home reloads so the next-prayer card appears.
   static Future<void> _openCityPicker(BuildContext context) async {
     final cubit = context.read<HomeCubit>();
-    final reloaded = await context.push<bool>('/prayer-times/city');
+    final reloaded = await context.push<bool>(AppRoutes.cityPicker);
     if (reloaded == true && context.mounted) {
       await cubit.reload();
     }
@@ -71,8 +73,10 @@ class _LastReadCard extends StatelessWidget {
         subtitle: Text(
           loc.continueReadingAyah(lastRead.ayahNumber.toArabicIndic),
         ),
-        onTap: () => context.push(
-            '/quran/reader?surah=${lastRead.surahId}&ayah=${lastRead.ayahNumber}'),
+        onTap: () => context.push(quranReaderPath(
+          surah: lastRead.surahId,
+          ayah: lastRead.ayahNumber,
+        )),
       ),
     );
   }
@@ -94,9 +98,9 @@ class _NextPrayerCard extends StatelessWidget {
         subtitle: Text(loc.nextPrayer),
         trailing: Text(
           formatHm(prayer.time),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: AppTheme.rowTitle,
         ),
-        onTap: () => context.push('/prayer-times'),
+        onTap: () => context.push(AppRoutes.prayerTimes),
       ),
     );
   }
@@ -150,19 +154,19 @@ class _FeatureGrid extends StatelessWidget {
 typedef _Feature = (IconData, String Function(AppLocalizations), String);
 
 const List<_Feature> _features = [
-  (Icons.menu_book, _locQuran, '/quran'),
-  (Icons.schedule, _locPrayerTimes, '/prayer-times'),
-  (Icons.explore, _locQibla, '/qibla'),
-  (Icons.graphic_eq, _locRecitations, '/recitation'),
-  (Icons.library_books, _locLibrary, '/library'),
-  (Icons.spa, _locAzkar, '/azkar'),
-  (Icons.radio_button_checked, _locTasbih, '/tasbih'),
-  (Icons.volunteer_activism, _locDuas, '/duas'),
-  (Icons.mosque, _locWorship, '/worship'),
-  (Icons.payments_outlined, _locZakat, '/zakat'),
-  (Icons.calendar_month, _locHijri, '/hijri'),
-  (Icons.auto_awesome, _locAsma, '/asma'),
-  (Icons.settings, _locSettings, '/settings'),
+  (Icons.menu_book, _locQuran, AppRoutes.quran),
+  (Icons.schedule, _locPrayerTimes, AppRoutes.prayerTimes),
+  (Icons.explore, _locQibla, AppRoutes.qibla),
+  (Icons.graphic_eq, _locRecitations, AppRoutes.recitation),
+  (Icons.library_books, _locLibrary, AppRoutes.library),
+  (Icons.spa, _locAzkar, AppRoutes.azkar),
+  (Icons.radio_button_checked, _locTasbih, AppRoutes.tasbih),
+  (Icons.volunteer_activism, _locDuas, AppRoutes.duas),
+  (Icons.mosque, _locWorship, AppRoutes.worship),
+  (Icons.payments_outlined, _locZakat, AppRoutes.zakat),
+  (Icons.calendar_month, _locHijri, AppRoutes.hijri),
+  (Icons.auto_awesome, _locAsma, AppRoutes.asma),
+  (Icons.settings, _locSettings, AppRoutes.settings),
 ];
 
 String _locQuran(AppLocalizations loc) => loc.quran;
@@ -198,7 +202,8 @@ class _FeatureTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppSpacing.lg),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
+          color: colors.surfaceContainerHighest
+              .withValues(alpha: AppColors.mutedSurfaceAlpha),
           borderRadius: BorderRadius.circular(AppSpacing.lg),
         ),
         child: Column(

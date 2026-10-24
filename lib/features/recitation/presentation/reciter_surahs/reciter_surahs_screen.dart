@@ -10,6 +10,7 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/download_status.dart';
+import '../../data/recitation_keys.dart';
 import '../../domain/reciter_info.dart';
 import '../downloads/downloads_cubit.dart';
 import '../downloads/downloads_state.dart';
@@ -72,7 +73,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                     surahNumber: n,
                     name: names[n] ?? loc.surahFallbackName(n.toArabicIndic),
                     teaser: previews[n],
-                    item: dl.items['${row.id}-$n'],
+                    item: dl.items[downloadKey(row.id, n)],
                   );
                 },
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/domain/reminders.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
@@ -84,7 +85,7 @@ class _SettingsList extends StatelessWidget {
           enabled: azkarEnabled,
           title: loc.reminderTime,
           hm: azkarTimeHm,
-          fallback: const TimeOfDay(hour: 6, minute: 30),
+          fallback: _parseHm(defaultAzkarTimeHm)!,
           onPicked: cubit.setTime,
         ),
         SwitchListTile(
@@ -97,7 +98,7 @@ class _SettingsList extends StatelessWidget {
           enabled: wirdEnabled,
           title: loc.settingsWirdReminderTime,
           hm: wirdTimeHm,
-          fallback: const TimeOfDay(hour: 20, minute: 0),
+          fallback: _parseHm(defaultWirdTimeHm)!,
           onPicked: cubit.changeWirdTime,
         ),
         if (permissionDenied)
@@ -161,10 +162,7 @@ class _ReminderTimeTile extends StatelessWidget {
       title: Text(title),
       trailing: Text(
         formatHm(_asDateTime(_parseHm(hm) ?? fallback)),
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+        style: AppTheme.rowTitle,
       ),
       onTap: enabled ? () => _pick(context) : null,
     );
