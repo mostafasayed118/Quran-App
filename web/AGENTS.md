@@ -17,8 +17,10 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
 | `src/components/*.astro` | Shared components (header, footer, mini player, panels). |
 | `src/lib/*.ts` | **All** domain logic and data access: pure functions, typed loaders, the i18n dictionary, the reader modules. |
 | `src/data/**`, `public/data/**` | **Generated.** Never hand-edited (see *Data* below). |
+| `public/manifest.webmanifest`, `public/icon-*.png` | Static install assets; the brand script regenerates the icons from `src/assets/brand/logo-master.png`. |
+| `public/.well-known/security.txt` | Security contact (RFC 9116). |
 | `src/styles/**` | Global tokens + the global stylesheet. |
-| `scripts/*.mjs` | The budget gate and the OG image generator. |
+| `scripts/*.mjs` | The budget gate, the OG image generator, and the reciter snapshot fetch; `scripts/prepare_brand_assets.py` writes the brand/PWA icons. |
 | `tests/unit/**` | Vitest (DOM-free — `vitest.config.ts` has no jsdom). |
 | `tests/e2e/**` | Playwright (the behavioural contract for the reader, player, layout and locales). |
 
@@ -30,6 +32,8 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
   imports a component, and there are no cycles.
 - **Every user-visible string** goes through `src/lib/strings.ts` (`StringKey` + `t(locale, key)`);
   the AR and EN maps stay symmetric.
+- **Every page carries canonical + `ar`/`en`/`x-default` alternates, OG/Twitter meta and one static
+  `WebSite`/`Organization` JSON-LD block.** The 404 is deliberately `noindex` and omits canonical.
 - **TypeScript strict:** no `any`, no `@ts-ignore`, no `as any`. `npm run check` is the gate.
 - **The client JS budget is a gate, not a wish.** `npm run budget` measures the REAL closure
   (static *and* dynamic imports) of seven pages — reader, quran index, home, prayer-times index,
@@ -50,7 +54,9 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
   at an immutable commit SHA, never at a tag. The un-pin guard is a unit test.
 - **Accessibility is a requirement:** skip link, `main tabindex="-1"`, the `sr-only` plain-Arabic
   layer, `:focus-visible`, reduced-motion support.
-- **Generated data is committed**; the Dart export tools are its only writers.
+- **Generated data is committed.** The Dart export tools write `src/data/**` (Quran text/search
+  index) and `public/data/prayer-times/**`; `scripts/fetch-reciters.mjs` writes the reciter snapshot;
+  `scripts/generate-og.mjs` writes `public/og/**`.
 
 ## Gates — all must pass before a commit
 

@@ -11,12 +11,13 @@ Public website + online reader for قرآن يَهدي. Astro 7 static site — 
 - **Search** — full-text ayah search on `/quran` (generated index; client-side Arabic normalization + alef-fold tier for rasm spellings).
 - **Tafsir & translations** — curated app packs in a per-surah panel; fetched on demand, cached, off by default.
 - **Per-ayah actions** — copy · share · bookmark (local-only) · listen (opens the surah player; per-ayah audio is a later phase).
-- **About & Privacy** — `/about` mission + offline-first story; `/privacy` renders the repo `PRIVACY.md` single source (EN mirror from `PRIVACY.en.md`).
+- **About & Privacy** — `/about` mission + offline-first story; `/privacy` renders the repo `PRIVACY.md` single source (EN mirror from `PRIVACY.en.md`), now including the website's localStorage, geolocation and hosting flows; the footer links a contact address.
 - **EN locale** — every route is mirrored at `/en/**` with LTR chrome (`lang="en"`), reader included; the header language switch round-trips.
+- **Installable** — `manifest.webmanifest` with 192/512 icons and light/dark `theme-color`; the site opens standalone when installed.
 - **Prayer times** — `/prayer-times` city index (156 cities, instant filter) + per-city pages with a 24-month table, today highlighted, month switcher and an imsakiah (imsak/iftar) view; times are precomputed in each city's local time.
 - **Qibla** — `/qibla` client-side great-circle bearing to the Kaaba with an SVG compass; uses the device location (graceful denial → city picker).
-- **404** — localized not-found page with search and home links.
-- **SEO** — canonical + `hreflang` alternates + OG/Twitter meta per page; `sitemap.xml` (AR+EN with alternates) and `robots.txt`.
+- **404** — localized not-found page with search and home links; `noindex`, no canonical and no broken EN alternate.
+- **SEO** — canonical + `hreflang` alternates + OG/Twitter meta per page; `sitemap.xml` lists both locales as `<loc>` (each with alternates) and `robots.txt`; one static `WebSite` + `Organization` JSON-LD block per page.
 
 ## Dev
 - `npm ci`
