@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
@@ -102,8 +103,11 @@ Future<void> _openReminderLaunchTarget() async {
     if (route == null) return;
     WidgetsBinding.instance
         .addPostFrameCallback((_) => AppRouter.router.go(route));
-  } on Object {
-    // Disclosed v1: silent cold-launch routing failure.
+  } on Object catch (error, stackTrace) {
+    dev.log('reminder launch routing failed',
+        name: 'quran_yahdi/boot',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
   }
 }
 
@@ -115,8 +119,11 @@ Future<void> _requestBootNotificationGrace() async {
     final azkarEnabled = await getIt<ReminderSettings>().azkarEnabled();
     await getIt<NotificationsBinding>()
         .requestBootPermission(azkarEnabled: azkarEnabled);
-  } on Object {
-    // Disclosed v1: silent boot-grace failure.
+  } on Object catch (error, stackTrace) {
+    dev.log('boot notification grace failed',
+        name: 'quran_yahdi/boot',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
   }
 }
 
@@ -131,8 +138,11 @@ Future<void> _openDeepLinkLaunchTarget() async {
     if (route == null) return;
     WidgetsBinding.instance
         .addPostFrameCallback((_) => AppRouter.router.go(route));
-  } on Object {
-    // Disclosed v1: silent cold-launch deep-link failure.
+  } on Object catch (error, stackTrace) {
+    dev.log('deep link launch routing failed',
+        name: 'quran_yahdi/boot',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
   }
 }
 
