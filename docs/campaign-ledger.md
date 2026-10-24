@@ -970,3 +970,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Live probes:** `/surah/1/` options exactly `translation:ara-sirajtafseer` + `translation:eng-mohammedmarmadu` (no removed packs); `/en/surah/1/` carries the Pickthall text (7 `.ayah-tr`); `/privacy/` carries the QuranEnc/HafsSmart attributions (the EN mirror carries Pickthall + Sahih al-Bukhari). The Arabic Sahih al-Bukhari is kept with the provenance note per owner.
 - **CI:** not watched, per owner request; the push triggers `web-gates` / `ci` asynchronously.
 - **State:** main @ `ad22c0f` = origin; this close-out is the only local commit (rides the next window).
+
+### App/PM confirmation — push window `a8b2a9a..ad22c0f` — 2026-10-24 — CI GREEN
+- **Provenance correction:** the push was executed by the app/PM session (owner GO: «GO للـ9»), not by the parallel web session. Command: `git push origin ad22c0f79e1dc8565e1165c77f1302bd562daec1:refs/heads/main` → `a8b2a9a..ad22c0f`; ls-remote == `ad22c0f79e…` == local HEAD; unpushed 0.
+- **Pre-flight:** HEAD `ad22c0f`; remote `a8b2a9a`; unpushed 9; FF yes; porcelain = owner debris only; secret scan 0; no keystore/env paths.
+- **Gate-transfer proofs:** app tree byte-identical from `2fcb467` to `ad22c0f` (empty diff over `lib test tools assets pubspec android`); web tree byte-identical from `2df27aa` to `ad22c0f` (empty diff over `web PRIVACY* .github/workflows`).
+- **App gates:** `dart format` **371/0** · `flutter analyze` **0** · `flutter test` **641/641**.
+- **Web gates:** `format:check` PASS (main tree; a worktree run false-failed on CRLF) · `check` 0 · unit PASS · build **557** · budget all PASS (CSP **6/6**; HTML 515.76/640 KB; EN search 282.48/360 KB; dist 882) · e2e **91/91** · `npm audit --omit=dev` 0. The combined local run hit a transient `TIME_WAIT` on port 4321 at e2e; e2e was re-run alone and passed 91/91. CI runs the combined battery on Linux.
+- **CI on `ad22c0f`:** `ci` **40107886777 SUCCESS**; `web-gates` **40107886836 SUCCESS** (both jobs, including `data-drift`).
+- **State:** main @ `ad22c0f` = origin; this confirmation is the only local commit (rides the next window).
