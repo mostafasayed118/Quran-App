@@ -110,17 +110,30 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
   import { formatClock } from '../../lib/prayer-calendar';
   import { onPageReady } from '../../lib/lifecycle';
 
+  // Viewer-local calendar day, in the same unpadded shape as the SSR attrs
+  // (YYYY-M-D), so the select value and the highlight compare cleanly.
+  const localToday = (): string => {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  };
+
   function init(): void {
     const root = document.querySelector<HTMLElement>('[data-qy="pt-city"]');
     if (!root || root.dataset.qyReady) return;
     const locale: Locale = root.dataset.locale === 'en' ? 'en' : 'ar';
     const cityId = root.dataset.cityId ?? '';
-    const today = root.dataset.today ?? '';
+    let today = localToday() || (root.dataset.today ?? '');
     const select = root.querySelector<HTMLSelectElement>('[data-qy="pt-month"]');
     const toggle = root.querySelector<HTMLButtonElement>('[data-qy="pt-view-toggle"]');
     const wrap = root.querySelector<HTMLElement>('.pt-table-wrap');
     const tbody = root.querySelector<HTMLTableSectionElement>('[data-qy="pt-table"] tbody');
     if (!select || !toggle || !wrap || !tbody || cityId === '') return;
+    // The SSR default is the build month; open the viewer's month instead
+    // (the option list is the shipped window, so an out-of-range date keeps it).
+    const viewerMonth = today.split('-').slice(0, 2).join('-');
+    if (Array.from(select.options).some((o) => o.value === viewerMonth)) {
+      select.value = viewerMonth;
+    }
 
     let months: { y: number; m: number; days: number[][] }[] | null = null;
     let pending: Promise<void> | null = null;
@@ -226,9 +239,18 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? cit
       toggle.textContent = t(locale, next === 'imsakiah' ? 'ptViewTimes' : 'ptViewImsakiah');
     });
 
-    // Pre-warm the month data in the background: month switching is then instant
-    // and the imsakiah toggle (pure CSS) keeps working even if the fetch fails.
-    void load().catch(() => {});
+    // Pre-warm the month data, then re-render with the viewer's local date: the
+    // SSR table was built on the deploy date, so its highlight can be stale.
+    // Month switching is then instant and the imsakiah toggle (pure CSS) keeps
+    // working even if the fetch fails.
+    void load()
+      .then(() => {
+        if (root.isConnected) {
+          today = localToday();
+          renderMonth();
+        }
+      })
+      .catch(() => {});
     root.dataset.qyReady = '1';
   }
   onPageReady(init);

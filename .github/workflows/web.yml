@@ -24,6 +24,12 @@ on:
       - 'PRIVACY.md'
       - 'PRIVACY.en.md'
       - '.github/workflows/web.yml'
+  # The prayer-times freshness guard (web/tests/unit/prayer-window.test.ts)
+  # ages out ~3 months before the shipped window ends; the monthly run trips it
+  # even when nothing is pushed. Path filters do not apply to these triggers.
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 1 * *'
 jobs:
   gates:
     runs-on: ubuntu-latest

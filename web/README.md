@@ -51,8 +51,11 @@ Re-run it only when the app's DB changes; commit the regenerated JSON.
 Prayer times live in `public/data/prayer-times/` and are **generated, never hand-edited**:
 
 ```
-dart run tools/export_web_prayer_times.dart   # from repo root; reads assets/data/cities.json
+TZ=UTC dart run tools/export_web_prayer_times.dart   # from repo root; reads assets/data/cities.json
 ```
+
+Windows does not honor `TZ` for this exporter, so adhan rounds in the host timezone; regenerate on
+Linux/WSL or let CI do it, and never commit a Windows-generated shift.
 
 Per-city shape: `{ city: { id, nameAr, nameEn, lat, lng, tz }, months: [{ y, m, days: [[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak], ...] }] }` — minutes
 since local midnight in the city's own timezone (DST-aware), Egyptian method, `imsak = fajr - 10`.
@@ -60,6 +63,9 @@ An isha that falls after local midnight (northern summers) is stored as `1440 + 
 with `% 1440`. `index.json` lists every city (slug = `id`); the pages read it through the typed
 loader in `src/lib/prayer-times.ts` (no `process.cwd()`), and the covered year window is derived
 from the shipped data — never hardcoded in a page.
+`tests/unit/prayer-window.test.ts` fails about three months before the committed window ends; the
+monthly `web-gates` schedule runs it even without pushes, and the fix is to bump `startYear`/`endYear`
+in `tools/export_web_prayer_times.dart`, regenerate with `TZ=UTC`, and commit the result.
 
 ## Deploy
 Cloudflare Pages project ← this repo; root directory `web`, output `dist`.

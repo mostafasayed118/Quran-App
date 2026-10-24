@@ -16,8 +16,13 @@ import 'package:adhan/adhan.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+// Committed window: 2026-01 .. 2027-12 (24 months). The freshness guard
+// `web/tests/unit/prayer-window.test.ts` fails ~3 months before that window
+// ends. To extend: bump BOTH constants below, regenerate with
+// `TZ=UTC dart run tools/export_web_prayer_times.dart`, and commit the JSON.
 const int startYear = 2026;
-const int endYear = 2027; // inclusive -> 24 months
+const int endYear = 2027; // inclusive
+const int totalMonths = (endYear - startYear + 1) * 12;
 const int maxTotalBytes = 12 * 1024 * 1024;
 
 /// Per-prefix IANA default (cities.json id prefix = country code).
@@ -164,7 +169,7 @@ void main() {
     }
 
     final months = <Map<String, Object>>[];
-    for (var month = 0; month < 24; month++) {
+    for (var month = 0; month < totalMonths; month++) {
       final y = startYear + month ~/ 12;
       final m = month % 12 + 1;
       final daysInMonth = DateTime(y, m + 1, 0).day;
@@ -227,8 +232,15 @@ void main() {
     });
   }
 
-  if (totalDays != cities.length * 730) {
-    fail('expected ${cities.length * 730} day rows, got $totalDays');
+  var expectedDaysPerCity = 0;
+  for (var month = 0; month < totalMonths; month++) {
+    final y = startYear + month ~/ 12;
+    final m = month % 12 + 1;
+    expectedDaysPerCity += DateTime.utc(y, m + 1, 0).day;
+  }
+  if (totalDays != cities.length * expectedDaysPerCity) {
+    fail(
+        'expected ${cities.length * expectedDaysPerCity} day rows, got $totalDays');
   }
   final index = jsonEncode({'cities': indexRows});
   File('${outDir.path}/index.json').writeAsStringSync(index);
