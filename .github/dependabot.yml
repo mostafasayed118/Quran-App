@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # The site's npm tree (one production dependency + the test/gate toolchain).
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  # The SHA-pinned workflow actions: Dependabot proposes the next pinned SHA.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+  # The app's Dart packages (the web exporters import them).
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5

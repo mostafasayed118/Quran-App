@@ -104,6 +104,23 @@ Cloudflare Pages project ← this repo; root directory `web`, output `dist`.
 Preview per branch; production from `main`.
 After a production deploy, submit `https://quranyahdi.pages.dev/sitemap.xml` to Google Search Console (owner step).
 
+### Deploy runbook
+
+- **Rollback:** Cloudflare dashboard → Pages → the project → Deployments → the last known-good
+  deployment → **Rollback**. No code change is needed; this is an owner step.
+- **Post-deploy checks:** `/` returns 200 with a `Content-Security-Policy` whose hash list matches
+  `npm run budget`; `/sitemap.xml` returns 200 with 554 `<loc>` (AR + EN); an unknown path returns
+  404 with `robots noindex`; `/.well-known/assetlinks.json` carries the current release fingerprint.
+- **Deploy config:** the build command, output dir (`dist`), Node version, env vars, branch
+  mapping and custom-domain settings are dashboard-only. Keep them in sync with `package.json`
+  (`engines`) and this file; changing them is an owner step.
+- **Domain migration:** the origin is hardcoded in `astro.config.mjs`, `src/lib/urls.ts`,
+  `public/robots.txt` and `scripts/generate-og.mjs`. Change all four, regenerate the 114 OG cards
+  (`npm run og`), and re-run the gates.
+- **Open:** no `wrangler.toml`/`_redirects` in the repo; no service worker (offline reading is a
+  P5 item; the manifest is installability only); no analytics (tracker-free by design); no
+  ESLint/Prettier gate (adding one is a dependency decision).
+
 ## Docs
 
 - Full design: `docs/superpowers/specs/2026-10-17-quran-yahdi-web-design.md`

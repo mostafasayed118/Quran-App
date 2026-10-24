@@ -13,6 +13,9 @@ on:
       - 'assets/db/quran.sqlite'
       - 'PRIVACY.md'
       - 'PRIVACY.en.md'
+      - 'lib/core/db/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
       - '.github/workflows/web.yml'
   pull_request:
     paths:
@@ -23,6 +26,9 @@ on:
       - 'assets/db/quran.sqlite'
       - 'PRIVACY.md'
       - 'PRIVACY.en.md'
+      - 'lib/core/db/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
       - '.github/workflows/web.yml'
   # The prayer-times freshness guard (web/tests/unit/prayer-window.test.ts)
   # ages out ~3 months before the shipped window ends; the monthly run trips it
@@ -30,9 +36,16 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '17 3 1 * *'
+permissions:
+  contents: read
+
+concurrency:
+  group: web-gates-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   gates:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     defaults: { run: { working-directory: web } }
     steps:
       # Pinned to the commit of the v4 tag: a mutable tag can be moved to a
@@ -46,6 +59,14 @@ jobs:
       # One gate battery, defined once in web/package.json (check, test, build,
       # budget, e2e) so CI can never drift from `npm run gates`.
       - run: npm run gates
+      - name: Upload Playwright artifacts (failure only)
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: web-test-results
+          path: web/test-results
+          if-no-files-found: ignore
+          retention-days: 7
       # Dependency advisories on the shipped tree (astro + its runtime deps only).
       # Deliberately not forced green: a reported advisory must fail this gate.
       - run: npm audit --omit=dev
@@ -57,6 +78,7 @@ jobs:
   # the exporters and fails if the committed bytes differ from the source.
   data-drift:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     # adhan rounds each prayer in the HOST timezone; a DST host can shift a
     # prayer by an hour. Pin UTC so the committed data regenerates byte-exact.
     env:
@@ -67,7 +89,7 @@ jobs:
       # Same toolchain pin as the app CI (.github/workflows/ci.yml): the
       # exporters import the app's own packages, so they must read the same DB
       # with the same Dart the data was generated with.
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           flutter-version: 3.47.5
