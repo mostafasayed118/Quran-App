@@ -63,71 +63,108 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// Enables or disables the azkar reminder and re-plans the schedule.
   ///
   /// Enabling asks for the OS notification permission; a refusal is reported
-  /// through [SettingsState.permissionDenied], not as an error state.
+  /// through [SettingsState.permissionDenied], not as an error state. A failed
+  /// write is logged and the last confirmed state is kept.
   Future<void> setAzkarEnabled(bool enabled) async {
-    await _settings.setAzkarEnabled(enabled);
-    var denied = false;
-    if (enabled) {
-      denied = !(await _scheduler.ensurePermissions());
+    try {
+      await _settings.setAzkarEnabled(enabled);
+      var denied = false;
+      if (enabled) {
+        denied = !(await _scheduler.ensurePermissions());
+      }
+      await _reschedule();
+      if (isClosed) return;
+      emit(SettingsState.ready(
+        azkarEnabled: enabled,
+        azkarTimeHm: _timeOf(state),
+        wirdEnabled: _wirdEnabledOf(state),
+        wirdTimeHm: _wirdTimeOf(state),
+        permissionDenied: denied,
+      ));
+    } on Object catch (error, stackTrace) {
+      _logMutationFailure('setAzkarEnabled', error, stackTrace);
     }
-    await _reschedule();
-    if (isClosed) return;
-    emit(SettingsState.ready(
-      azkarEnabled: enabled,
-      azkarTimeHm: _timeOf(state),
-      wirdEnabled: _wirdEnabledOf(state),
-      wirdTimeHm: _wirdTimeOf(state),
-      permissionDenied: denied,
-    ));
   }
 
   /// Stores the azkar reminder time [hm] ('HH:mm') and re-plans.
+  ///
+  /// A failed write is logged and the last confirmed state is kept.
   Future<void> setTime(String hm) async {
-    await _settings.setAzkarTime(hm);
-    await _reschedule();
-    if (isClosed) return;
-    emit(SettingsState.ready(
-      azkarEnabled: _enabledOf(state),
-      azkarTimeHm: hm,
-      wirdEnabled: _wirdEnabledOf(state),
-      wirdTimeHm: _wirdTimeOf(state),
-      permissionDenied: _deniedOf(state),
-    ));
+    try {
+      await _settings.setAzkarTime(hm);
+      await _reschedule();
+      if (isClosed) return;
+      emit(SettingsState.ready(
+        azkarEnabled: _enabledOf(state),
+        azkarTimeHm: hm,
+        wirdEnabled: _wirdEnabledOf(state),
+        wirdTimeHm: _wirdTimeOf(state),
+        permissionDenied: _deniedOf(state),
+      ));
+    } on Object catch (error, stackTrace) {
+      _logMutationFailure('setTime', error, stackTrace);
+    }
   }
 
   /// Enables or disables the wird reminder and re-plans the schedule.
   ///
   /// Enabling asks for the OS notification permission; a refusal is reported
-  /// through [SettingsState.permissionDenied], not as an error state.
+  /// through [SettingsState.permissionDenied], not as an error state. A failed
+  /// write is logged and the last confirmed state is kept.
   Future<void> toggleWird(bool enabled) async {
-    await _settings.setWirdEnabled(enabled);
-    var denied = false;
-    if (enabled) {
-      denied = !(await _scheduler.ensurePermissions());
+    try {
+      await _settings.setWirdEnabled(enabled);
+      var denied = false;
+      if (enabled) {
+        denied = !(await _scheduler.ensurePermissions());
+      }
+      await _reschedule();
+      if (isClosed) return;
+      emit(SettingsState.ready(
+        azkarEnabled: _enabledOf(state),
+        azkarTimeHm: _timeOf(state),
+        wirdEnabled: enabled,
+        wirdTimeHm: _wirdTimeOf(state),
+        permissionDenied: denied,
+      ));
+    } on Object catch (error, stackTrace) {
+      _logMutationFailure('toggleWird', error, stackTrace);
     }
-    await _reschedule();
-    if (isClosed) return;
-    emit(SettingsState.ready(
-      azkarEnabled: _enabledOf(state),
-      azkarTimeHm: _timeOf(state),
-      wirdEnabled: enabled,
-      wirdTimeHm: _wirdTimeOf(state),
-      permissionDenied: denied,
-    ));
   }
 
   /// Stores the wird reminder time [hm] ('HH:mm') and re-plans.
+  ///
+  /// A failed write is logged and the last confirmed state is kept.
   Future<void> changeWirdTime(String hm) async {
-    await _settings.setWirdTime(hm);
-    await _reschedule();
-    if (isClosed) return;
-    emit(SettingsState.ready(
-      azkarEnabled: _enabledOf(state),
-      azkarTimeHm: _timeOf(state),
-      wirdEnabled: _wirdEnabledOf(state),
-      wirdTimeHm: hm,
-      permissionDenied: _deniedOf(state),
-    ));
+    try {
+      await _settings.setWirdTime(hm);
+      await _reschedule();
+      if (isClosed) return;
+      emit(SettingsState.ready(
+        azkarEnabled: _enabledOf(state),
+        azkarTimeHm: _timeOf(state),
+        wirdEnabled: _wirdEnabledOf(state),
+        wirdTimeHm: hm,
+        permissionDenied: _deniedOf(state),
+      ));
+    } on Object catch (error, stackTrace) {
+      _logMutationFailure('changeWirdTime', error, stackTrace);
+    }
+  }
+
+  /// Logs a failed mutation; the UI keeps the last confirmed state
+  /// (user-facing failure feedback is a separate owner decision).
+  void _logMutationFailure(
+    String operation,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    dev.log(
+      'settings $operation failed',
+      name: 'quran_yahdi/settings',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 
   Future<void> _reschedule() => _settings.reschedule(
