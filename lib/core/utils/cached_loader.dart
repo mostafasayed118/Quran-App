@@ -11,9 +11,12 @@ class CachedLoader<T> {
   Future<T>? _cache;
 
   Future<T> load() {
-    return _cache ??= _load().catchError((Object error, StackTrace stackTrace) {
-      _cache = null;
-      throw error;
-    });
+    return _cache ??= _load().then<T>(
+      (value) => value,
+      onError: (Object error, StackTrace stackTrace) {
+        _cache = null;
+        Error.throwWithStackTrace(error, stackTrace);
+      },
+    );
   }
 }
