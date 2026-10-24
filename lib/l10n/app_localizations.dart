@@ -1130,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'الملف المختار ليس نسخة احتياطية صالحة'**
   String get backupInvalidFile;
 
+  /// No description provided for @backupUnencryptedWarning.
+  ///
+  /// In ar, this message translates to:
+  /// **'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.'**
+  String get backupUnencryptedWarning;
+
   /// No description provided for @backupPreviewBookmarks.
   ///
   /// In ar, this message translates to:

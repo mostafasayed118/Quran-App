@@ -582,6 +582,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupInvalidFile => 'The selected file isn\'t a valid backup';
 
   @override
+  String get backupUnencryptedWarning =>
+      'The exported file isn\'t encrypted — anyone who gets it can read your bookmarks, worship log and settings. Keep it somewhere safe.';
+
+  @override
   String backupPreviewBookmarks(String count) {
     return '$count new bookmarks';
   }

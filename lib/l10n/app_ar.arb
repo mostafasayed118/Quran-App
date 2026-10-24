@@ -359,6 +359,7 @@
   "backupExportFailure": "تعذّر تصدير البيانات",
   "backupImportFailure": "تعذّر استيراد البيانات",
   "backupInvalidFile": "الملف المختار ليس نسخة احتياطية صالحة",
+  "backupUnencryptedWarning": "الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.",
   "backupPreviewBookmarks": "{count} علامة جديدة",
   "@backupPreviewBookmarks": {
     "placeholders": {

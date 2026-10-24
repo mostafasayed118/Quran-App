@@ -580,6 +580,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get backupInvalidFile => 'الملف المختار ليس نسخة احتياطية صالحة';
 
   @override
+  String get backupUnencryptedWarning =>
+      'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.';
+
+  @override
   String backupPreviewBookmarks(String count) {
     return '$count علامة جديدة';
   }

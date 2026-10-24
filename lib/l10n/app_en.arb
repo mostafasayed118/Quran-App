@@ -345,6 +345,7 @@
   "backupExportFailure": "Couldn't export the data",
   "backupImportFailure": "Couldn't import the data",
   "backupInvalidFile": "The selected file isn't a valid backup",
+  "backupUnencryptedWarning": "The exported file isn't encrypted — anyone who gets it can read your bookmarks, worship log and settings. Keep it somewhere safe.",
   "backupPreviewBookmarks": "{count} new bookmarks",
   "@backupPreviewBookmarks": {
     "placeholders": {
