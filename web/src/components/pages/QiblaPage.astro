@@ -1,6 +1,6 @@
 ---
 import { t, type Locale } from '../../lib/strings';
-import { getCities } from '../../lib/cities';
+import { cityLabel, getCities } from '../../lib/cities';
 
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
@@ -50,7 +50,7 @@ const cardinal = {
       {cities.map((city) => (
         <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
           <button type="button" data-qy="qb-city" data-city-id={city.id}>
-            {locale === 'en' ? city.nameEn : city.nameAr}
+            {cityLabel(city, locale)}
           </button>
         </li>
       ))}
@@ -92,6 +92,7 @@ const cardinal = {
 </style>
 <script>
   import { t, type Locale } from '../../lib/strings';
+  import { cityLabel } from '../../lib/city-label';
   import { normalizeArabic } from '../../lib/arabic';
   import { qiblaBearing } from '../../lib/qibla';
   import { digitsFor } from '../../lib/arabic-digits';
@@ -175,14 +176,19 @@ const cardinal = {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
           })
-          .then((data: { city: { lat: number; lng: number; nameAr: string; nameEn: string } }) => {
-            if (!root.isConnected) return;
-            showBearing(
-              data.city.lat,
-              data.city.lng,
-              locale === 'en' ? data.city.nameEn : data.city.nameAr,
-            );
-          })
+          .then(
+            (data: {
+              city: { id: string; lat: number; lng: number; nameAr: string; nameEn: string };
+            }) => {
+              if (!root.isConnected) return;
+              const { nameAr, nameEn } = data.city;
+              showBearing(
+                data.city.lat,
+                data.city.lng,
+                cityLabel({ id: data.city.id, nameAr, nameEn }, locale),
+              );
+            },
+          )
           .catch(() => {
             if (root.isConnected) status.textContent = t(locale, 'panelError');
           });

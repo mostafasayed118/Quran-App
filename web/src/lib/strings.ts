@@ -27,6 +27,7 @@ const dict = {
     chipMedinan: 'مدنية',
     footerPrivacy: 'سياسة الخصوصية',
     footerAbout: 'عن التطبيق',
+    footerContact: 'تواصل',
     backToIndex: 'كل السور',
     playerPlay: 'تشغيل',
     playerPause: 'إيقاف مؤقت',
@@ -108,7 +109,7 @@ const dict = {
     ptCityDescription:
       'مواقيت الصلاة اليوم في {city} — الفجر والظهر والعصر والمغرب والعشاء بتوقيت المدينة المحلي، مع الإمساكية.',
     surahTitle: 'سورة {name}',
-    surahDescription: 'سورة {n} — {name}',
+    surahDescription: '{name} — سورة {n}: اقرأها واستمع إليها مع التفسير والتلاوة.',
     ayahCount: '{n} آية',
     ayahNumber: 'الآية {n}',
     // --- landing page copy: the one string table of the site ---
@@ -194,6 +195,7 @@ const dict = {
     chipMedinan: 'Medinan',
     footerPrivacy: 'Privacy',
     footerAbout: 'About',
+    footerContact: 'Contact',
     backToIndex: 'All surahs',
     playerPlay: 'Play',
     playerPause: 'Pause',
@@ -275,7 +277,7 @@ const dict = {
     ptCityDescription:
       "Prayer times today in {city} — Fajr, Dhuhr, Asr, Maghrib and Isha in the city's local time, with an imsakiah view.",
     surahTitle: 'Surah {name}',
-    surahDescription: 'Surah {n} — {name}',
+    surahDescription: 'Surah {n} — {name}: read and listen online with tafsir and recitation.',
     ayahCount: '{n} verses',
     ayahNumber: 'Verse {n}',
     // --- landing page copy: the one string table of the site ---

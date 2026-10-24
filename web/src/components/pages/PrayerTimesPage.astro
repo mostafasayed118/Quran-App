@@ -1,6 +1,6 @@
 ---
 import { t, type Locale } from '../../lib/strings';
-import { getCities } from '../../lib/cities';
+import { cityLabel, getCities } from '../../lib/cities';
 
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
@@ -23,7 +23,7 @@ const cities = getCities();
   <ul class="city-list">
     {cities.map((city) => (
       <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
-        <a href={`${base}/prayer-times/${city.id}/`}>{locale === 'en' ? city.nameEn : city.nameAr}</a>
+        <a href={`${base}/prayer-times/${city.id}/`}>{cityLabel(city, locale)}</a>
       </li>
     ))}
   </ul>

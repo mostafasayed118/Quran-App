@@ -5,6 +5,9 @@ const EN_PREFIX = '/en';
 /** The app version the landing page shows; not copy, so it has no translation. */
 export const APP_VERSION = '1.0.0';
 
+/** The public contact address shown in the footer. */
+export const CONTACT_EMAIL = 'mustafasayed20002@gmail.com';
+
 function homeFor(to: Locale): string {
   return to === 'en' ? '/en/' : '/';
 }

@@ -1,5 +1,6 @@
 ---
 import { t, type Locale } from '../lib/strings';
+import { CONTACT_EMAIL } from '../lib/landing-content';
 interface Props { locale?: Locale }
 const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
@@ -10,4 +11,6 @@ const base = locale === 'en' ? '/en' : '';
   <a href={`${base}/about/`}>{t(locale, 'navAbout')}</a>
   <span aria-hidden="true">·</span>
   <a href={`${base}/privacy/`}>{t(locale, 'footerPrivacy')}</a>
+  <span aria-hidden="true">·</span>
+  <a href={`mailto:${CONTACT_EMAIL}`}>{t(locale, 'footerContact')}</a>
 </footer>

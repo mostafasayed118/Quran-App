@@ -4,12 +4,16 @@
  * The list is generated into web/public/data/prayer-times/index.json; Vite resolves
  * it at build time through import.meta.glob, so nothing here depends on
  * process.cwd() (which changes with the runner that happens to start the build).
+ * `cityLabel` lives in `city-label.ts` so the Qibla client script can use it
+ * without pulling the whole index into its bundle.
  */
 export interface City {
   id: string;
   nameAr: string;
   nameEn: string;
 }
+
+export { cityLabel } from './city-label';
 
 const INDEX_FILES = import.meta.glob('../../public/data/prayer-times/index.json', {
   eager: true,

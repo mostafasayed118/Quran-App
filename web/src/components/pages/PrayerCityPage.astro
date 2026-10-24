@@ -1,5 +1,6 @@
 ---
 import { t, type Locale } from '../../lib/strings';
+import { cityLabel } from '../../lib/cities';
 import { digitsFor } from '../../lib/arabic-digits';
 import { type PrayerTimesData } from '../../lib/prayer-times';
 import { formatClock, monthLabel, resolveToday } from '../../lib/prayer-calendar';
@@ -17,7 +18,7 @@ const { y: todayY, m: todayM, d: todayD, inRange, monthIndex: currentIdx } = res
 const month = data.months[currentIdx];
 const todayISO = `${todayY}-${todayM}-${todayD}`;
 
-const heading = t(locale, 'ptCityTitle').replace('{city}', locale === 'en' ? city.nameEn : city.nameAr);
+const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, locale));
 ---
 <h1 class="page-title">{heading}</h1>
 <div
