@@ -10,19 +10,22 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
 
 ## Layout
 
-| Path | Owns |
-|---|---|
-| `src/pages/**` | Routes only. AR at the root, EN mirrored under `/en/**`. A route wires a layout + a page component; it holds no logic. |
-| `src/components/pages/*.astro` | The page views (one per feature). |
-| `src/components/*.astro` | Shared components (header, footer, mini player, panels). |
-| `src/lib/*.ts` | **All** domain logic and data access: pure functions, typed loaders, the i18n dictionary, the reader modules. |
-| `src/data/**`, `public/data/**` | **Generated.** Never hand-edited (see *Data* below). |
-| `public/manifest.webmanifest`, `public/icon-*.png` | Static install assets; the brand script regenerates the icons from `src/assets/brand/logo-master.png`. |
-| `public/.well-known/security.txt` | Security contact (RFC 9116). |
-| `src/styles/**` | Global tokens + the global stylesheet. |
-| `scripts/*.mjs` | The budget gate, the OG image generator, and the reciter snapshot fetch; `scripts/prepare_brand_assets.py` writes the brand/PWA icons. |
-| `tests/unit/**` | Vitest (DOM-free — `vitest.config.ts` has no jsdom). |
-| `tests/e2e/**` | Playwright (the behavioural contract for the reader, player, layout and locales). |
+| Path                                                          | Owns                                                                                                                                                                  |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/pages/**`                                                | Routes only. AR at the root, EN mirrored under `/en/**`. A route wires a layout + a page component; it holds no logic.                                                |
+| `src/components/pages/*.astro`                                | The page views (one per feature).                                                                                                                                     |
+| `src/components/*.astro`                                      | Shared components (header, footer, mini player, panels).                                                                                                              |
+| `src/lib/*.ts`                                                | **All** domain logic and data access: pure functions, typed loaders, the i18n dictionary, the reader modules.                                                         |
+| `src/data/**`, `public/data/**`                               | **Generated.** Never hand-edited (see _Data_ below).                                                                                                                  |
+| `src/data/translation-en/**`, `src/data/search-index-en.json` | **Network snapshot** (Saheeh International, pinned); `scripts/fetch-translation.mjs` is its only writer.                                                              |
+| `public/sw.js`                                                | The offline service worker; cache version `qy-v1`, bump on change.                                                                                                    |
+| `src/pages/offline.astro`, `src/pages/en/offline.astro`       | The offline fallback pages (`noindex`).                                                                                                                               |
+| `public/manifest.webmanifest`, `public/icon-*.png`            | Static install assets; the brand script regenerates the icons from `src/assets/brand/logo-master.png`.                                                                |
+| `public/.well-known/security.txt`                             | Security contact (RFC 9116).                                                                                                                                          |
+| `src/styles/**`                                               | Global tokens + the global stylesheet.                                                                                                                                |
+| `scripts/*.mjs`                                               | The budget gate, the OG image generator, the reciter snapshot fetch and the translation snapshot fetch; `scripts/prepare_brand_assets.py` writes the brand/PWA icons. |
+| `tests/unit/**`                                               | Vitest (DOM-free — `vitest.config.ts` has no jsdom).                                                                                                                  |
+| `tests/e2e/**`                                                | Playwright (the behavioural contract for the reader, player, layout and locales).                                                                                     |
 
 ## Rules
 
@@ -36,13 +39,14 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
   `WebSite`/`Organization` JSON-LD block.** The 404 is deliberately `noindex` and omits canonical.
 - **TypeScript strict:** no `any`, no `@ts-ignore`, no `as any`. `npm run check` is the gate.
 - **The client JS budget is a gate, not a wish.** `npm run budget` measures the REAL closure
-  (static *and* dynamic imports) of seven pages — reader, quran index, home, prayer-times index,
-  one prayer-times city, reciters and the English home — and enforces: per-page JS (reader
-  ≤ 30 KB gzip, quran/home/prayer-times/reciters/en-home ≤ 25 KB), the lazy search index
-  (≤ 240 KB gzip), other lazy chunks (the verse-search worker included), the CSS bundle
-  (linked stylesheets *and* inline `<style>`), the font payload, the runtime-fetched
-  prayer-times JSON, the largest built HTML page, the `dist/` file count, and the CSP script
-  hashes.
+  (static _and_ dynamic imports) of eight pages — reader, Arabic quran index, English quran index,
+  home, prayer-times index, one prayer-times city, reciters and the English home — and enforces:
+  per-page JS (reader ≤ 30 KB gzip, quran/EN quran/home/prayer-times/reciters/en-home ≤ 25 KB),
+  the lazy Arabic search index (≤ 240 KB gzip) and the English search index (≤ 360 KB gzip), other
+  lazy chunks (the verse-search worker included), the CSS bundle (linked stylesheets _and_ inline
+  `<style>`), the font payload, the runtime-fetched prayer-times JSON, the largest built HTML page
+  (≤ 640 KB; the EN surah pages carry the full translation), the `dist/` file count, and the CSP
+  script hashes.
 - **CSP:** `script-src 'self'` — no `'unsafe-inline'`. Every inline script is covered by an exact
   `sha256-` in `public/_headers`. Adding or editing an inline script means re-running
   `npm run budget` and pasting the hashes it prints into `public/_headers`; the gate fails on drift.
@@ -52,6 +56,16 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
   `DOMParser`, so the directive would break every SPA navigation.
 - **Pinned upstream sources:** the tafsir and translation packs are fetched from `cdn.jsdelivr.net`
   at an immutable commit SHA, never at a tag. The un-pin guard is a unit test.
+- **English translation snapshot:** `src/data/translation-en/**` and `search-index-en.json` are
+  generated by `scripts/fetch-translation.mjs` from the pinned `fawazahmed0/quran-api`
+  `eng-safiurrahmanalm` edition. Never hand-edit them; the network snapshot is not covered by the
+  CI data-drift job. Verify the upstream license before commercial use.
+- **Service worker:** `public/sw.js` (cache `qy-v1`) is the only worker; registration lives in
+  `src/lib/sw-register.ts` and is the only place that touches `navigator.serviceWorker`. Bump the
+  cache name when the worker changes. Playwright blocks service workers by default; the offline
+  spec opts in.
+- **Format gate:** `npm run format:check` (Prettier + `prettier-plugin-astro`) runs first in
+  `npm run gates`. Generated data/assets are in `.prettierignore`; never format them.
 - **Accessibility is a requirement:** skip link, `main tabindex="-1"`, the `sr-only` plain-Arabic
   layer, `:focus-visible`, reduced-motion support.
 - **Generated data is committed.** The Dart export tools write `src/data/**` (Quran text/search
@@ -60,16 +74,17 @@ The Flutter app in `lib/` is a separate owner-supervised campaign — do not cou
 
 ## Gates — all must pass before a commit
 
-`npm run gates` = `check` → `test` → `build` → `budget` → `test:e2e`.
+`npm run gates` = `format:check` → `check` → `test` → `build` → `budget` → `test:e2e`.
 CI (`.github/workflows/web.yml`) runs exactly this battery, plus `npm audit --omit=dev`.
 
-| Script | Purpose |
-|---|---|
-| `npm run check` | `astro check` — TypeScript strict, 0 errors |
-| `npm run test` | Vitest unit tests (DOM-free) |
-| `npm run build` | static build → `dist/` (≈550 pages: 114 surahs × 2 locales + the rest) |
-| `npm run budget` | the size/CSP gate described above |
-| `npm run test:e2e` | Playwright specs (chromium: `npx playwright install chromium`) |
+| Script                 | Purpose                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| `npm run format:check` | Prettier check (`prettier-plugin-astro`); generated data is ignored              |
+| `npm run check`        | `astro check` — TypeScript strict, 0 errors                                      |
+| `npm run test`         | Vitest unit tests (DOM-free)                                                     |
+| `npm run build`        | static build → `dist/` (≈557 pages: 114 surahs × 2 locales + offline + the rest) |
+| `npm run budget`       | the size/CSP gate described above                                                |
+| `npm run test:e2e`     | Playwright specs (chromium: `npx playwright install chromium`)                   |
 
 ## Data
 
@@ -78,6 +93,17 @@ Quran text lives in `src/data/` and is **generated, never hand-edited**:
 ```
 dart run tools/export_web_data.dart   # from repo root; reads assets/db/quran.sqlite
 ```
+
+The English reader's translation is a **network snapshot** (never hand-edited):
+
+```
+node web/scripts/fetch-translation.mjs   # from repo root; pinned fawazahmed0/quran-api edition
+```
+
+It writes the 114 surah files under `src/data/translation-en/` and `src/data/search-index-en.json`,
+validating 114 surahs / 6,236 contiguous ayahs. `src/data/translation-en/SOURCE.md` records the
+edition and pinned commit; the upstream project's own terms apply (verify the license before
+commercial/store use). CI's `data-drift` job does not cover this network-dependent snapshot.
 
 Prayer times live in `public/data/prayer-times/` and are **generated, never hand-edited**:
 
@@ -117,9 +143,10 @@ After a production deploy, submit `https://quranyahdi.pages.dev/sitemap.xml` to 
 - **Domain migration:** the origin is hardcoded in `astro.config.mjs`, `src/lib/urls.ts`,
   `public/robots.txt` and `scripts/generate-og.mjs`. Change all four, regenerate the 114 OG cards
   (`npm run og`), and re-run the gates.
-- **Open:** no `wrangler.toml`/`_redirects` in the repo; no service worker (offline reading is a
-  P5 item; the manifest is installability only); no analytics (tracker-free by design); no
-  ESLint/Prettier gate (adding one is a dependency decision).
+- **Open:** no `wrangler.toml`/`_redirects` in the repo; no custom domain yet (the `pages.dev`
+  origin remains); no analytics (tracker-free by design; use Cloudflare's dashboard for traffic);
+  the service worker covers visited pages and the offline pages, not unvisited offline reading;
+  Prettier is the format gate (no ESLint).
 
 ## Docs
 
