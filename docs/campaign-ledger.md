@@ -919,3 +919,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Window contents (app):** pack-cache byte budget + tafsir slices; backup batch restore + isolated export; settings mutation logging; CachedLoader stack preservation; surah-search normalization; boot logging; v1→v2 migration proof; notifications scheduling tests (78/86); unencrypted-backup warning + decision record; versionCode 2; Play store package (support email, privacy URLs, runbook, icon, feature graphic).
 - **Push:** `git push origin ac991b9c228e5ca627a79dd02f40c2384a020bc6:refs/heads/main` — `8490ce3..ac991b9`; ls-remote == local HEAD (MATCH); unpushed 0 at push time.
 - **State:** main @ `ac991b9` = origin; local-only after this entry: W-C (`b2a23fb` + its two ledger commits) and this app confirmation — they ride the next window. Store licensing (7 items) remains OPEN-FOR-OWNER.
+
+### Push window — W-C web CI/ops hardening + licensing verification — (ac991b9..5871e7e) — 2026-10-24 — CI GREEN
+- **Owner GO:** «GO لنافذة W-C (5 commits)».
+- **Range:** `ac991b9..5871e7e` — 5 commits: `b2a23fb` `build(web):` CI hardening (Dependabot, workflow timeout, Playwright config) · `1f77229`/`00adc9d`/`2a2e83d` ledger close-outs + app-side confirmation · `5871e7e` `docs(store):` primary-source licensing verification.
+- **Pre-flight:** HEAD `5871e7e`; remote `ac991b9`; FF yes; unpushed 5; porcelain = foreign web WIP + owner debris only; secret scan 0; no keystore/env files in the diff.
+- **Gates:** app tree byte-identical to the CI-verified `ac991b9` (empty diff over `lib test tools pubspec android assets`); web gates at the W-C tip `2a2e83d` — `astro check` 0 errors, unit **32 files**, build **555 pages**, all budgets PASS (CSP 5/5, largest HTML 450.98/480 KB), e2e **85/85**, `npm audit --omit=dev` 0. Gate-transfer proof: `2a2e83d..5871e7e` touches `docs/store/**` only.
+- **Push:** `git push origin 5871e7e8b3ff151b55f077fc3418a216871cc688:refs/heads/main` — `ac991b9..5871e7e`; ls-remote == local HEAD (MATCH); unpushed 0 at push time.
+- **CI on `5871e7e`:** `ci` **40099254551 SUCCESS**; `web-gates` **40099254464 SUCCESS**; the six Dependabot update runs triggered by the new config on the same SHA all succeeded.
+- **Licensing:** `docs/store/licensing-verification-2026-10-24.md` records verified quotes; six shipped packs are RED (`eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`, `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir`). The current catalog is **not upload-safe** until the owner chooses hold/remove or written permissions.
+- **State:** main @ `5871e7e` = origin; this close-out is the only local commit (rides the next window).
