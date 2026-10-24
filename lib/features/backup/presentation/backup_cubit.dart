@@ -60,7 +60,9 @@ class BackupCubit extends Cubit<BackupState> {
       emit(const BackupState.exported());
     } on Object catch (error, stackTrace) {
       dev.log('backup export failed',
-          name: 'quran_yahdi/backup', error: error, stackTrace: stackTrace);
+          name: 'quran_yahdi/backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: true));
     }
@@ -118,7 +120,9 @@ class BackupCubit extends Cubit<BackupState> {
       emit(BackupState.imported(summary: outcome.summary));
     } on Object catch (error, stackTrace) {
       dev.log('backup apply failed',
-          name: 'quran_yahdi/backup', error: error, stackTrace: stackTrace);
+          name: 'quran_yahdi/backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: false));
     }
@@ -205,6 +209,14 @@ class BackupCubit extends Cubit<BackupState> {
     final stamp = DateTime.now().toIso8601String().substring(0, 10);
     final file = File(p.join(dir.path, 'quran_yahdi_backup_$stamp.json'));
     await file.writeAsString(json, flush: true);
-    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+    try {
+      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
+    } finally {
+      try {
+        await file.delete();
+      } on FileSystemException {
+        // Best-effort cleanup: a leftover temp file fails nothing.
+      }
+    }
   }
 }
