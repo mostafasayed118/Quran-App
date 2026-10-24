@@ -211,8 +211,8 @@ void _requirePinned(LibraryPackInfo pack) {
 
 /// Enforces the integrity contract on a raw catalog manifest.
 ///
-/// This is the single gate both the bundled manifest and a remote manifest
-/// go through: every entry is parsed and checked against
+/// This is the single gate every catalog manifest goes through: every entry
+/// is parsed and checked against
 /// [catalogIntegrityGap], and a pack served without its hashes is rejected
 /// with a [FormatException] instead of degrading to shape-sniff-only at
 /// download time. Malformed entries are left alone here - the catalog
@@ -229,7 +229,7 @@ void requirePinnedCatalogEntries(List<Map<String, dynamic>> entries) {
   }
 }
 
-/// The remote-manifest seam (see the library doc comment above).
+/// The catalog-manifest seam (see the library doc comment above).
 abstract class CatalogSource {
   /// Every pack the source offers.
   Future<List<LibraryPackInfo>> all();
@@ -240,25 +240,6 @@ abstract class CatalogSource {
       if (pack.id == id) return pack;
     }
     return null;
-  }
-}
-
-/// A catalog manifest fetched over the network.
-///
-/// The bundled manifest is curated and ships inside the signed APK; a
-/// remote manifest is not covered by that signature, so every pack it
-/// serves must declare its integrity hashes. Entries go through
-/// [parseEntry], which rejects a malformed entry - or one whose hashes are
-/// missing - instead of letting it reach the downloader unverified.
-abstract class RemoteCatalogSource extends CatalogSource {
-  /// Parses one remote entry, enforcing the integrity contract.
-  ///
-  /// Throws a [FormatException] when the entry is malformed or when its
-  /// integrity hashes are missing.
-  LibraryPackInfo parseEntry(Map<String, dynamic> json) {
-    final pack = LibraryPackInfo.fromJson(json);
-    _requirePinned(pack);
-    return pack;
   }
 }
 
