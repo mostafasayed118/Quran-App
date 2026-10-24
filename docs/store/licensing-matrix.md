@@ -44,7 +44,9 @@ Last updated: 2026-10-17 (verification-freshness date)
 > `docs/store/licensing-verification-2026-10-24.md`. Six shipped packs are RED/UNVERIFIED
 > (`eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`,
 > `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir`); the two fonts have embedded terms that
-> must ship with the app. The decision remains OPEN-FOR-OWNER.
+> must ship with the app. **Decision executed for the app catalog:** the six packs were
+> withdrawn on 2026-10-24 (catalog v1.2 ships 3 packs). The web `content-packs.ts` still
+> lists them — pending.
 
 1. **HafsSmart + me_quran font licenses** — bundle a written license/redistribution
    statement for both TTFs before store submission (PRIVACY.md l.91 already promises this
@@ -52,13 +54,15 @@ Last updated: 2026-10-17 (verification-freshness date)
 2. **quranenc text terms (ara-sirajtafseer)** — confirm the quranenc.com (مركز تفسير)
    terms for redistribution inside an app download-pack; attribution is expected.
 3. **Saheeh International (eng-safiurrahmanalm)** — verify the publisher's usage terms.
+   The app catalog switched the shipped translation to `eng-mohammedmarmadu` (Pickthall)
+   on 2026-10-24; it carries the same Tanzil non-commercial clause.
    If restrictive, suggested freely-licensed alternatives available in the SAME editions
    listing (source `http://tanzil.net`, public-domain works): `eng-mohammedmarmadu`
    (Pickthall), `eng-abdullahyusufal` (Abdullah Yusuf Ali).
 4. **The Clear Quran (eng-mustafakhattabg)** — the editions listing carries an EMPTY
    `source` field; verify the license at the publisher before keeping the pack
-   (CC BY-NC-ND 4.0 is the widely-documented claim and would forbid derivatives and
-   commercial use). Same PD alternatives as 3 apply.
+   (the CC BY-NC-ND claim was unverified; the publisher's copyright page requires prior
+   written consent — see the verification doc). Same PD alternatives as 3 apply.
 5. **Bukhari EN translator** — trace the per-edition translator license for
    `eng-bukhari` (the repo/tooling is Unlicense; per-translation terms untraced).
 6. **Tafsir data provenance** — MIT covers the spa5k repo only; confirm the original

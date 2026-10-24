@@ -89,7 +89,7 @@ remain; do not re-encode or claim ownership.
 | Action | Packs |
 |---|---|
 | **Hold/remove** | `eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`, `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir` |
-| **Keep with conditions** | `ara-sirajtafseer` (QuranEnc attribution + version), `eng-safiurrahmanalm` (free/no-ads + Tanzil credit), mp3quran streaming (attribution), `HafsSmart_08.ttf` (ship EULA + attribution), `me_quran.ttf` (free/no-ads) |
+| **Keep with conditions** | `ara-sirajtafseer` (QuranEnc attribution + version), `eng-mohammedmarmadu` (free/no-ads + Tanzil credit), mp3quran streaming (attribution), `HafsSmart_08.ttf` (ship EULA + attribution), `me_quran.ttf` (free/no-ads) |
 | **Already clean/low** | Arabic Quran text, adhkar/duas/asma, Cairo OFL, cities, app-authored assets |
 
 ## Owner decision required
@@ -101,3 +101,24 @@ remain; do not re-encode or claim ownership.
 
 Either way: ship the `HafsSmart` EULA text and an attribution/licenses screen, and keep the
 app free and ad-free unless the permissions cover commercial use.
+
+## Decision executed — app catalog (2026-10-24)
+
+The owner chose **A (hold/remove)**. `assets/data/library_catalog.json` is now
+`catalogVersion: "1.2"` with **3 packs**:
+
+- kept: `ara-sirajtafseer` (translation), `eng-mohammedmarmadu` (Pickthall, translation),
+  `ara-bukhari` (hadith);
+- removed: `eng-mustafakhattabg`, `eng-bukhari`, `eng-muslim`, `ar-tafsir-muyassar`,
+  `ar-tafsir-al-jalalayn`, `en-tafisr-ibn-kathir`.
+
+The shipped translation was switched from Saheeh International to Pickthall
+(`eng-mohammedmarmadu`) on 2026-10-24; Pickthall carries the same Tanzil non-commercial
+clause, so the free/no-ads + attribution condition still applies.
+
+The two frozen catalog tests were updated to pin the new shape (9→3 packs, tafsirs 3→0,
+translations 3→2, hadiths 3→1) — same assertions, new expected catalog.
+
+**Still open:** the web app ships its own list in `web/src/lib/content-packs.ts`, which
+still includes the six withdrawn packs; removing them there is a separate web change
+(requires the web gates). Font EULA/attribution is also still to be shipped in-app.

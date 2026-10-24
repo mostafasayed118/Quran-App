@@ -39,7 +39,7 @@ A full Mushaf, recitations, adhkar, duas, and prayer times — all in one light,
 • Fast surah index with instant search by name or number
 • Verse-by-verse reading or the traditional paginated Mushaf mode
 • Bookmarks and automatic last-read tracking
-• Tafsir and translations right from the ayah sheet
+• Translations right from the ayah sheet
 
 🎧 Recitations
 • 240+ reciters — stream instantly or download for offline listening

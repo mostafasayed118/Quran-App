@@ -86,6 +86,7 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 | Localized screenshot sets | per locale | **None** — one phone set serves both `ar` and `en` |
 
 - [ ] Pick and order the 2–8 screenshots (owner decision; first slot should be `01-home.png`).
+- [ ] `05-ayah-sheet.png` shows the tafsir content that is no longer shipped — recapture it or do not select it.
 - [x] Land `docs/store/feature-graphic-1024x500.png` before uploading (present, 1024×500).
 
 ## 6. Release checklist
@@ -107,7 +108,7 @@ All licensing items are `OPEN-FOR-OWNER` — recorded in `docs/store/licensing-m
 |---|---|---|
 | 1 | `HafsSmart_08.ttf` + `me_quran.ttf` mushaf font licenses | **AMBER** — HafsSmart EULA permits use/copy/distribute (ship it + attribution); `me_quran` is non-commercial only |
 | 2 | quranenc.com text terms for `ara-sirajtafseer` | **AMBER** — republish allowed with attribution, version, no modification; prove the edition |
-| 3 | Saheeh International `eng-safiurrahmanalm` publisher terms | **AMBER** — Tanzil: non-commercial only; keep free/no-ads + credit |
+| 3 | Saheeh International `eng-safiurrahmanalm` publisher terms | **AMBER** — Tanzil: non-commercial only; replaced in the app catalog by Pickthall (`eng-mohammedmarmadu`) on 2026-10-24, same Tanzil clause |
 | 4 | The Clear Quran `eng-mustafakhattabg` | **RED** — publisher requires prior written consent for any reproduction |
 | 5 | Bukhari EN translator license for `eng-bukhari` | **RED** — no license grant (Muhsin Khan; upstream `source` empty) |
 | 6 | Tafsir data provenance for the `spa5k/tafsir_api` packs | **RED** — QF terms require a commercial license for content packages |
@@ -116,8 +117,10 @@ All licensing items are `OPEN-FOR-OWNER` — recorded in `docs/store/licensing-m
 
 Full quotes and the per-pack verdict: `docs/store/licensing-verification-2026-10-24.md`.
 
-**The current catalog is NOT upload-safe** until the six RED packs are held/removed or
-written permissions are obtained.
+**App catalog:** the six RED packs were withdrawn on 2026-10-24 (catalog v1.2 ships 3
+packs: `ara-sirajtafseer`, `eng-mohammedmarmadu` (Pickthall), `ara-bukhari`). **Web:**
+`web/src/lib/content-packs.ts` still lists them — pending a web change. The `HafsSmart`
+EULA + attribution screen is still required in-app.
 
 Play-Console-only items (cannot be completed from the repo):
 
