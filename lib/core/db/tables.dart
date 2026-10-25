@@ -168,3 +168,27 @@ class Reciters extends Table {
   @override
   Set<Column> get primaryKey => {id};
 }
+
+/// Hadith rows imported from an installed hadith pack.
+///
+/// The pack JSON stays the canonical downloaded artifact; this table is a
+/// derived read index so a browse page can use SQL LIMIT/OFFSET instead of
+/// retaining the whole decoded pack in memory.
+class HadithEntries extends Table {
+  /// Catalog id of the owning hadith pack.
+  TextColumn get packId => text()();
+
+  /// Zero-based position in the pack's `hadiths` array. This is the stable
+  /// paging key; malformed source slots keep their ordinal as empty rows.
+  IntColumn get ordinal => integer()();
+
+  /// Printed hadith number; -1 for a malformed source entry.
+  IntColumn get number => integer()();
+
+  /// Hadith body. Empty text is a valid source value (the UI hides those
+  /// rows); a malformed source entry is marked by [number] == -1.
+  TextColumn get body => text()();
+
+  @override
+  Set<Column> get primaryKey => {packId, ordinal};
+}

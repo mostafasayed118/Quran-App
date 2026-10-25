@@ -11,6 +11,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
+import 'hadith_store.dart';
 import 'library_catalog.dart';
 import 'pack_reader.dart';
 import 'pack_store.dart';
@@ -63,6 +64,14 @@ class PackDownloader {
   late final PackReader _reader =
       PackReader(fileDecoder: _fileDecoder, packPath: packPath);
 
+  /// DB-backed hadith read index: imports the install projection once, then
+  /// serves pages with SQL LIMIT/OFFSET instead of retaining the pack list.
+  late final HadithStore _hadithStore = HadithStore(
+    _db,
+    packPath: packPath,
+    fileDecoder: _fileDecoder,
+  );
+
   /// Filesystem side: safe pack-file resolution and the part-file lifecycle.
   late final PackStore _store = PackStore(
     rootResolver: _rootResolver,
@@ -112,6 +121,7 @@ class PackDownloader {
       final projection = pinnedTafsir ? null : await _sniffPack(pack, partFile);
       final promoted = await _store.promote(partFile);
       await _registerRow(pack, promoted);
+      await _importHadith(pack, projection);
       _primeReadCache(pack, mergedIndex, projection);
       return promoted;
     } on Object {
@@ -356,7 +366,10 @@ class PackDownloader {
   }
 
   /// Primes the read cache from the install-time projections: the merged
-  /// per-surah index (tafsir) or the sniffed projection (translation/hadith).
+  /// per-surah index (tafsir) or the sniffed translation index.
+  ///
+  /// Hadith packs are deliberately NOT cached here: the DB import owns their
+  /// read path, and retaining the full list would defeat the paging win.
   void _primeReadCache(
     LibraryPackInfo pack,
     Map<int, String>? mergedIndex,
@@ -370,8 +383,21 @@ class PackDownloader {
         final index = projection;
         if (index is Map<int, String>) _reader.primeAyahIndex(pack.id, index);
       case LibraryPackKind.hadith:
-        final list = projection;
-        if (list is List) _reader.primeList(pack.id, list);
+        break;
+    }
+  }
+
+  /// Imports the install-time hadith projection into the DB index.
+  ///
+  /// Best-effort: a DB failure must not fail an otherwise valid install; the
+  /// first browse retries the import lazily from the pack file.
+  Future<void> _importHadith(LibraryPackInfo pack, Object? projection) async {
+    if (pack.kind != LibraryPackKind.hadith) return;
+    try {
+      await _hadithStore.importProjection(pack.id, projection);
+    } on Object catch (error, stackTrace) {
+      dev.log('hadith pack import failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
   }
 
@@ -416,6 +442,12 @@ class PackDownloader {
             ..where((p) => p.packId.equals(packId)))
           .go();
     }
+    try {
+      await _hadithStore.deletePack(packId);
+    } on Object catch (error, stackTrace) {
+      dev.log('hadith pack index cleanup failed',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+    }
     _reader.invalidate(packId);
   }
 
@@ -457,7 +489,17 @@ class PackDownloader {
 
   /// A paged window of an installed hadith pack:
   /// `([ (hadithnumber, text), ... ], hasMore)`.
+  ///
+  /// DB-backed in production. The in-memory reader stays as a fail-open
+  /// fallback if the derived index cannot be built.
   Future<(List<(int, String)>, bool)> hadithPage(
-          String packId, int offset, int limit) =>
-      _reader.hadithPage(packId, offset, limit);
+      String packId, int offset, int limit) async {
+    try {
+      return await _hadithStore.hadithPage(packId, offset, limit);
+    } on Object catch (error, stackTrace) {
+      dev.log('hadith DB page failed; reading the pack directly',
+          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      return _reader.hadithPage(packId, offset, limit);
+    }
+  }
 }

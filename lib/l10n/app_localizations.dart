@@ -218,6 +218,30 @@ abstract class AppLocalizations {
   /// **'ابحث بسورة…'**
   String get searchSurahHint;
 
+  /// No description provided for @searchQuranTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'البحث في القرآن'**
+  String get searchQuranTitle;
+
+  /// No description provided for @searchQuranHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في آيات القرآن…'**
+  String get searchQuranHint;
+
+  /// No description provided for @searchQuranPrompt.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب حرفين على الأقل للبحث في الآيات'**
+  String get searchQuranPrompt;
+
+  /// No description provided for @searchQuranResultsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدد النتائج: {count}'**
+  String searchQuranResultsCount(String count);
+
   /// No description provided for @revelationMakkah.
   ///
   /// In ar, this message translates to:

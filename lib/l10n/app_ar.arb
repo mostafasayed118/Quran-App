@@ -27,6 +27,17 @@
   },
   "surahIndexTitle": "القرآن الكريم",
   "searchSurahHint": "ابحث بسورة…",
+  "searchQuranTitle": "البحث في القرآن",
+  "searchQuranHint": "ابحث في آيات القرآن…",
+  "searchQuranPrompt": "اكتب حرفين على الأقل للبحث في الآيات",
+  "searchQuranResultsCount": "عدد النتائج: {count}",
+  "@searchQuranResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "revelationMakkah": "مكية",
   "revelationMadinah": "مدنية",
   "ayatCount": "{count} آيات",

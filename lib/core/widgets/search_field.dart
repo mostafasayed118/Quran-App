@@ -9,17 +9,20 @@ class SearchField extends StatelessWidget {
     required this.hint,
     required this.onChanged,
     this.controller,
+    this.autofocus = false,
   });
 
   final String hint;
   final ValueChanged<String> onChanged;
   final TextEditingController? controller;
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: controller,
       onChanged: onChanged,
+      autofocus: autofocus,
       textAlign: TextAlign.right,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.search),

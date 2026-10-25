@@ -44,6 +44,7 @@ import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/last_read_repository.dart';
+import '../features/quran/data/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
@@ -51,6 +52,8 @@ import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
+import '../features/quran/presentation/search/quran_search_cubit.dart';
+import '../features/quran/presentation/search/quran_search_screen.dart';
 import '../features/settings/presentation/settings_cubit.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/prayer/data/city_repository.dart';
@@ -103,6 +106,13 @@ abstract final class AppRouter {
         builder: (_, __) => BlocProvider<SurahIndexCubit>(
           create: (_) => SurahIndexCubit(getIt<SurahSource>()),
           child: const SurahIndexScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.quranSearch,
+        builder: (_, __) => BlocProvider<QuranSearchCubit>(
+          create: (_) => QuranSearchCubit(getIt<QuranSearchSource>()),
+          child: const QuranSearchScreen(),
         ),
       ),
       GoRoute(
@@ -300,7 +310,10 @@ abstract final class AppRouter {
       GoRoute(
         path: AppRoutes.bookmarks,
         builder: (_, __) => BlocProvider<BookmarksCubit>(
-          create: (_) => BookmarksCubit(getIt<AyahRepository>()),
+          create: (_) => BookmarksCubit(
+            getIt<AyahRepository>(),
+            pager: getIt<AyahRepository>(),
+          ),
           child: const BookmarksScreen(),
         ),
       ),

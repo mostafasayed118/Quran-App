@@ -145,7 +145,9 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(List<Verse> entries)? ready,
+    TResult Function(List<Verse> entries, int lastBookmarkId, bool hasMore,
+            bool loadingMore, bool moreFailed)?
+        ready,
     TResult Function()? failed,
     required TResult orElse(),
   }) {
@@ -154,7 +156,8 @@ extension BookmarksStatePatterns on BookmarksState {
       case BookmarksLoading() when loading != null:
         return loading();
       case BookmarksReady() when ready != null:
-        return ready(_that.entries);
+        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
+            _that.loadingMore, _that.moreFailed);
       case BookmarksFailed() when failed != null:
         return failed();
       case _:
@@ -178,7 +181,9 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(List<Verse> entries) ready,
+    required TResult Function(List<Verse> entries, int lastBookmarkId,
+            bool hasMore, bool loadingMore, bool moreFailed)
+        ready,
     required TResult Function() failed,
   }) {
     final _that = this;
@@ -186,7 +191,8 @@ extension BookmarksStatePatterns on BookmarksState {
       case BookmarksLoading():
         return loading();
       case BookmarksReady():
-        return ready(_that.entries);
+        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
+            _that.loadingMore, _that.moreFailed);
       case BookmarksFailed():
         return failed();
     }
@@ -207,7 +213,9 @@ extension BookmarksStatePatterns on BookmarksState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(List<Verse> entries)? ready,
+    TResult? Function(List<Verse> entries, int lastBookmarkId, bool hasMore,
+            bool loadingMore, bool moreFailed)?
+        ready,
     TResult? Function()? failed,
   }) {
     final _that = this;
@@ -215,7 +223,8 @@ extension BookmarksStatePatterns on BookmarksState {
       case BookmarksLoading() when loading != null:
         return loading();
       case BookmarksReady() when ready != null:
-        return ready(_that.entries);
+        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
+            _that.loadingMore, _that.moreFailed);
       case BookmarksFailed() when failed != null:
         return failed();
       case _:
@@ -247,7 +256,13 @@ class BookmarksLoading implements BookmarksState {
 /// @nodoc
 
 class BookmarksReady implements BookmarksState {
-  const BookmarksReady({required List<Verse> entries}) : _entries = entries;
+  const BookmarksReady(
+      {required List<Verse> entries,
+      this.lastBookmarkId = 0,
+      this.hasMore = false,
+      this.loadingMore = false,
+      this.moreFailed = false})
+      : _entries = entries;
 
   final List<Verse> _entries;
   List<Verse> get entries {
@@ -255,6 +270,15 @@ class BookmarksReady implements BookmarksState {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_entries);
   }
+
+  @JsonKey()
+  final int lastBookmarkId;
+  @JsonKey()
+  final bool hasMore;
+  @JsonKey()
+  final bool loadingMore;
+  @JsonKey()
+  final bool moreFailed;
 
   /// Create a copy of BookmarksState
   /// with the given fields replaced by the non-null parameter values.
@@ -268,18 +292,30 @@ class BookmarksReady implements BookmarksState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is BookmarksReady &&
-            const DeepCollectionEquality().equals(other.entries, _entries));
+            const DeepCollectionEquality().equals(other.entries, _entries) &&
+            (identical(other.lastBookmarkId, lastBookmarkId) ||
+                other.lastBookmarkId == lastBookmarkId) &&
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
+            (identical(other.loadingMore, loadingMore) ||
+                other.loadingMore == loadingMore) &&
+            (identical(other.moreFailed, moreFailed) ||
+                other.moreFailed == moreFailed));
   }
 
   @override
   int get hashCode {
     return Object.hash(
-        runtimeType, const DeepCollectionEquality().hash(_entries));
+        runtimeType,
+        const DeepCollectionEquality().hash(_entries),
+        lastBookmarkId,
+        hasMore,
+        loadingMore,
+        moreFailed);
   }
 
   @override
   String toString() {
-    return 'BookmarksState.ready(entries: $entries)';
+    return 'BookmarksState.ready(entries: $entries, lastBookmarkId: $lastBookmarkId, hasMore: $hasMore, loadingMore: $loadingMore, moreFailed: $moreFailed)';
   }
 }
 
@@ -290,7 +326,12 @@ abstract mixin class $BookmarksReadyCopyWith<$Res>
           BookmarksReady value, $Res Function(BookmarksReady) _then) =
       _$BookmarksReadyCopyWithImpl;
   @useResult
-  $Res call({List<Verse> entries});
+  $Res call(
+      {List<Verse> entries,
+      int lastBookmarkId,
+      bool hasMore,
+      bool loadingMore,
+      bool moreFailed});
 }
 
 /// @nodoc
@@ -306,12 +347,32 @@ class _$BookmarksReadyCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? entries = null,
+    Object? lastBookmarkId = null,
+    Object? hasMore = null,
+    Object? loadingMore = null,
+    Object? moreFailed = null,
   }) {
     return _then(BookmarksReady(
       entries: null == entries
           ? _self._entries
           : entries // ignore: cast_nullable_to_non_nullable
               as List<Verse>,
+      lastBookmarkId: null == lastBookmarkId
+          ? _self.lastBookmarkId
+          : lastBookmarkId // ignore: cast_nullable_to_non_nullable
+              as int,
+      hasMore: null == hasMore
+          ? _self.hasMore
+          : hasMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      loadingMore: null == loadingMore
+          ? _self.loadingMore
+          : loadingMore // ignore: cast_nullable_to_non_nullable
+              as bool,
+      moreFailed: null == moreFailed
+          ? _self.moreFailed
+          : moreFailed // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

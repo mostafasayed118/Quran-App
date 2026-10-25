@@ -197,6 +197,17 @@ class PackReader {
     _write(packId, compact);
   }
 
+  /// Projects an installed hadith pack file to the compact `(number, text)`
+  /// list inside a worker isolate.
+  ///
+  /// This is the DB importer's cold path: only the projection crosses the
+  /// port, mirroring the read path's memory discipline.
+  static Future<List<(int, String)?>?> decodeHadithProjectionInIsolate(
+      String path) async {
+    final result = await _decodeProjectionInIsolate(path, 'hadiths');
+    return result is List<(int, String)?> ? result : null;
+  }
+
   /// Drops a pack's cached projection and every per-surah slice (install
   /// failure and uninstall both call this).
   void invalidate(String packId) {

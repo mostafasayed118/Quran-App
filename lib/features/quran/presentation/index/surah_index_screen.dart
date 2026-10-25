@@ -23,7 +23,16 @@ class SurahIndexScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(loc.surahIndexTitle)),
+      appBar: AppBar(
+        title: Text(loc.surahIndexTitle),
+        actions: [
+          IconButton(
+            tooltip: loc.searchQuranTitle,
+            icon: const Icon(Icons.search),
+            onPressed: () => context.push(AppRoutes.quranSearch),
+          ),
+        ],
+      ),
       body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
         builder: (context, state) => switch (state) {
           SurahIndexLoading() => const LoadingView(),

@@ -1,0 +1,149 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/app_routes.dart';
+import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/search_field.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../data/quran_search_source.dart';
+import 'quran_search_cubit.dart';
+import 'quran_search_state.dart';
+
+class QuranSearchScreen extends StatelessWidget {
+  const QuranSearchScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(loc.searchQuranTitle)),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+            child: SearchField(
+              hint: loc.searchQuranHint,
+              autofocus: true,
+              onChanged: context.read<QuranSearchCubit>().search,
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<QuranSearchCubit, QuranSearchState>(
+              builder: (context, state) => switch (state) {
+                QuranSearchLoading() => const LoadingView(),
+                QuranSearchFailed() => errorPane(loc),
+                QuranSearchReady(:final query, :final hits) =>
+                  !quranSearchQueryUsable(query)
+                      ? EmptyState(loc.searchQuranPrompt)
+                      : hits.isEmpty
+                          ? EmptyState(loc.noResults)
+                          : _Results(ready: state),
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Results extends StatelessWidget {
+  const _Results({required this.ready});
+
+  final QuranSearchReady ready;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final showTail = ready.hasMore || ready.loadingMore || ready.moreFailed;
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: Text(
+              loc.searchQuranResultsCount(ready.total.toArabicIndic),
+              style: AppTheme.mutedFootnote(context),
+            ),
+          ),
+        ),
+        Expanded(
+          child: NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification.metrics.extentAfter < 400) {
+                context.read<QuranSearchCubit>().loadMore();
+              }
+              return false;
+            },
+            child: ListView.builder(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              itemCount: ready.hits.length + (showTail ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == ready.hits.length) return _tail(context, loc);
+                return _HitTile(hit: ready.hits[index]);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _tail(BuildContext context, AppLocalizations loc) {
+    if (ready.moreFailed) {
+      return Center(
+        child: TextButton(
+          onPressed: context.read<QuranSearchCubit>().loadMore,
+          child: Text(loc.retry),
+        ),
+      );
+    }
+    return const Padding(
+      padding: EdgeInsets.all(AppSpacing.md),
+      child: Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _HitTile extends StatelessWidget {
+  const _HitTile({required this.hit});
+
+  final QuranSearchHit hit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: ListTile(
+        leading: Text(
+          '${hit.surahId.toArabicIndic}:${hit.numberInSurah.toArabicIndic}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+          textDirection: TextDirection.rtl,
+        ),
+        title: Text(
+          hit.textImlaei,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(hit.surahNameAr),
+        onTap: () => context.push(quranReaderPath(
+          surah: hit.surahId,
+          ayah: hit.numberInSurah,
+        )),
+      ),
+    );
+  }
+}

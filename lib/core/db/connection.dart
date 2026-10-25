@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'app_database.dart';
 import 'content_version.dart';
+import 'search_index.dart';
 
 const dbAssetKey = 'assets/db/quran.sqlite';
 
@@ -187,5 +188,19 @@ Future<QueryExecutor> openAppDatabase() async {
     },
   );
   await _ensureContentCurrentOffUiIsolate(executor, dir);
+  await _ensureSearchIndex(executor);
   return executor;
+}
+
+/// Builds the derived Quran search index when it is missing or stale.
+///
+/// Runs after the content refresh (same best-effort contract): a failure
+/// logs and keeps whatever index was there — boot must never crash.
+Future<void> _ensureSearchIndex(QueryExecutor executor) async {
+  try {
+    await ensureQuranSearchIndex(AppDatabase(executor));
+  } on Object catch (error, stackTrace) {
+    dev.log('search index build failed',
+        name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
+  }
 }

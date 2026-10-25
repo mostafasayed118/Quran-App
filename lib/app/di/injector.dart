@@ -30,6 +30,8 @@ import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
+import 'package:quran_yahdi/features/quran/data/quran_search_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/surah_source.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
@@ -90,6 +92,8 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
+  getIt.registerLazySingleton<QuranSearchSource>(
+      () => QuranSearchRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt
       .registerLazySingleton<LastReadMarker>(() => getIt<LastReadRepository>());

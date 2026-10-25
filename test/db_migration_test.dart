@@ -16,7 +16,8 @@ void main() {
   });
 
   test('v1 schema creates all 8 tables and surah rows roundtrip', () async {
-    expect(db.allTables.length, 9); // w2a: + reciters (PM grant)
+    // w2a: + reciters (PM grant) · 2026-10-25 owner-approved: + hadith_entries
+    expect(db.allTables.length, 10);
 
     await db.into(db.surahs).insert(
           SurahsCompanion.insert(

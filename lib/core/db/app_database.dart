@@ -16,6 +16,7 @@ part 'app_database.g.dart';
   Downloads,
   SettingsTable,
   Reciters,
+  HadithEntries,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
@@ -54,6 +55,19 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
               'CREATE INDEX IF NOT EXISTS idx_downloads_status '
               'ON downloads(status)');
+          // Derived Quran search index (see core/db/search_index.dart). A raw
+          // table on purpose: it is rebuilt content, not a drift entity, and
+          // keeping it out of the drift schema leaves the migration contract
+          // untouched.
+          await customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
+              '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
+          // Hadith pack read index. Already in the drift schema for fresh
+          // databases; this idempotent statement upgrades an existing v2 file
+          // without changing the pinned user_version.
+          await customStatement('CREATE TABLE IF NOT EXISTS hadith_entries '
+              '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '
+              'number INTEGER NOT NULL, body TEXT NOT NULL, '
+              'PRIMARY KEY (pack_id, ordinal))');
         },
       );
 

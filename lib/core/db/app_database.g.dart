@@ -3029,6 +3029,282 @@ class RecitersCompanion extends UpdateCompanion<ReciterRow> {
   }
 }
 
+class $HadithEntriesTable extends HadithEntries
+    with TableInfo<$HadithEntriesTable, HadithEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HadithEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
+  @override
+  late final GeneratedColumn<String> packId = GeneratedColumn<String>(
+      'pack_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _ordinalMeta =
+      const VerificationMeta('ordinal');
+  @override
+  late final GeneratedColumn<int> ordinal = GeneratedColumn<int>(
+      'ordinal', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _numberMeta = const VerificationMeta('number');
+  @override
+  late final GeneratedColumn<int> number = GeneratedColumn<int>(
+      'number', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+      'body', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [packId, ordinal, number, body];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'hadith_entries';
+  @override
+  VerificationContext validateIntegrity(Insertable<HadithEntry> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('pack_id')) {
+      context.handle(_packIdMeta,
+          packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta));
+    } else if (isInserting) {
+      context.missing(_packIdMeta);
+    }
+    if (data.containsKey('ordinal')) {
+      context.handle(_ordinalMeta,
+          ordinal.isAcceptableOrUnknown(data['ordinal']!, _ordinalMeta));
+    } else if (isInserting) {
+      context.missing(_ordinalMeta);
+    }
+    if (data.containsKey('number')) {
+      context.handle(_numberMeta,
+          number.isAcceptableOrUnknown(data['number']!, _numberMeta));
+    } else if (isInserting) {
+      context.missing(_numberMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+          _bodyMeta, body.isAcceptableOrUnknown(data['body']!, _bodyMeta));
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {packId, ordinal};
+  @override
+  HadithEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HadithEntry(
+      packId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}pack_id'])!,
+      ordinal: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}ordinal'])!,
+      number: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}number'])!,
+      body: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}body'])!,
+    );
+  }
+
+  @override
+  $HadithEntriesTable createAlias(String alias) {
+    return $HadithEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class HadithEntry extends DataClass implements Insertable<HadithEntry> {
+  /// Catalog id of the owning hadith pack.
+  final String packId;
+
+  /// Zero-based position in the pack's `hadiths` array. This is the stable
+  /// paging key; malformed source slots keep their ordinal as empty rows.
+  final int ordinal;
+
+  /// Printed hadith number; -1 for a malformed source entry.
+  final int number;
+
+  /// Hadith body. Empty text is a valid source value (the UI hides those
+  /// rows); a malformed source entry is marked by [number] == -1.
+  final String body;
+  const HadithEntry(
+      {required this.packId,
+      required this.ordinal,
+      required this.number,
+      required this.body});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['pack_id'] = Variable<String>(packId);
+    map['ordinal'] = Variable<int>(ordinal);
+    map['number'] = Variable<int>(number);
+    map['body'] = Variable<String>(body);
+    return map;
+  }
+
+  HadithEntriesCompanion toCompanion(bool nullToAbsent) {
+    return HadithEntriesCompanion(
+      packId: Value(packId),
+      ordinal: Value(ordinal),
+      number: Value(number),
+      body: Value(body),
+    );
+  }
+
+  factory HadithEntry.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HadithEntry(
+      packId: serializer.fromJson<String>(json['packId']),
+      ordinal: serializer.fromJson<int>(json['ordinal']),
+      number: serializer.fromJson<int>(json['number']),
+      body: serializer.fromJson<String>(json['body']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'packId': serializer.toJson<String>(packId),
+      'ordinal': serializer.toJson<int>(ordinal),
+      'number': serializer.toJson<int>(number),
+      'body': serializer.toJson<String>(body),
+    };
+  }
+
+  HadithEntry copyWith(
+          {String? packId, int? ordinal, int? number, String? body}) =>
+      HadithEntry(
+        packId: packId ?? this.packId,
+        ordinal: ordinal ?? this.ordinal,
+        number: number ?? this.number,
+        body: body ?? this.body,
+      );
+  HadithEntry copyWithCompanion(HadithEntriesCompanion data) {
+    return HadithEntry(
+      packId: data.packId.present ? data.packId.value : this.packId,
+      ordinal: data.ordinal.present ? data.ordinal.value : this.ordinal,
+      number: data.number.present ? data.number.value : this.number,
+      body: data.body.present ? data.body.value : this.body,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HadithEntry(')
+          ..write('packId: $packId, ')
+          ..write('ordinal: $ordinal, ')
+          ..write('number: $number, ')
+          ..write('body: $body')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(packId, ordinal, number, body);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HadithEntry &&
+          other.packId == this.packId &&
+          other.ordinal == this.ordinal &&
+          other.number == this.number &&
+          other.body == this.body);
+}
+
+class HadithEntriesCompanion extends UpdateCompanion<HadithEntry> {
+  final Value<String> packId;
+  final Value<int> ordinal;
+  final Value<int> number;
+  final Value<String> body;
+  final Value<int> rowid;
+  const HadithEntriesCompanion({
+    this.packId = const Value.absent(),
+    this.ordinal = const Value.absent(),
+    this.number = const Value.absent(),
+    this.body = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  HadithEntriesCompanion.insert({
+    required String packId,
+    required int ordinal,
+    required int number,
+    required String body,
+    this.rowid = const Value.absent(),
+  })  : packId = Value(packId),
+        ordinal = Value(ordinal),
+        number = Value(number),
+        body = Value(body);
+  static Insertable<HadithEntry> custom({
+    Expression<String>? packId,
+    Expression<int>? ordinal,
+    Expression<int>? number,
+    Expression<String>? body,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (packId != null) 'pack_id': packId,
+      if (ordinal != null) 'ordinal': ordinal,
+      if (number != null) 'number': number,
+      if (body != null) 'body': body,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  HadithEntriesCompanion copyWith(
+      {Value<String>? packId,
+      Value<int>? ordinal,
+      Value<int>? number,
+      Value<String>? body,
+      Value<int>? rowid}) {
+    return HadithEntriesCompanion(
+      packId: packId ?? this.packId,
+      ordinal: ordinal ?? this.ordinal,
+      number: number ?? this.number,
+      body: body ?? this.body,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (packId.present) {
+      map['pack_id'] = Variable<String>(packId.value);
+    }
+    if (ordinal.present) {
+      map['ordinal'] = Variable<int>(ordinal.value);
+    }
+    if (number.present) {
+      map['number'] = Variable<int>(number.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HadithEntriesCompanion(')
+          ..write('packId: $packId, ')
+          ..write('ordinal: $ordinal, ')
+          ..write('number: $number, ')
+          ..write('body: $body, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3041,6 +3317,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DownloadsTable downloads = $DownloadsTable(this);
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
   late final $RecitersTable reciters = $RecitersTable(this);
+  late final $HadithEntriesTable hadithEntries = $HadithEntriesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3054,7 +3331,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         installedPacks,
         downloads,
         settingsTable,
-        reciters
+        reciters,
+        hadithEntries
       ];
 }
 
@@ -4674,6 +4952,168 @@ typedef $$RecitersTableProcessedTableManager = ProcessedTableManager<
     (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
     ReciterRow,
     PrefetchHooks Function()>;
+typedef $$HadithEntriesTableCreateCompanionBuilder = HadithEntriesCompanion
+    Function({
+  required String packId,
+  required int ordinal,
+  required int number,
+  required String body,
+  Value<int> rowid,
+});
+typedef $$HadithEntriesTableUpdateCompanionBuilder = HadithEntriesCompanion
+    Function({
+  Value<String> packId,
+  Value<int> ordinal,
+  Value<int> number,
+  Value<String> body,
+  Value<int> rowid,
+});
+
+class $$HadithEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $HadithEntriesTable> {
+  $$HadithEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get packId => $composableBuilder(
+      column: $table.packId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get ordinal => $composableBuilder(
+      column: $table.ordinal, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get number => $composableBuilder(
+      column: $table.number, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get body => $composableBuilder(
+      column: $table.body, builder: (column) => ColumnFilters(column));
+}
+
+class $$HadithEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $HadithEntriesTable> {
+  $$HadithEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get packId => $composableBuilder(
+      column: $table.packId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get ordinal => $composableBuilder(
+      column: $table.ordinal, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get number => $composableBuilder(
+      column: $table.number, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get body => $composableBuilder(
+      column: $table.body, builder: (column) => ColumnOrderings(column));
+}
+
+class $$HadithEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HadithEntriesTable> {
+  $$HadithEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get packId =>
+      $composableBuilder(column: $table.packId, builder: (column) => column);
+
+  GeneratedColumn<int> get ordinal =>
+      $composableBuilder(column: $table.ordinal, builder: (column) => column);
+
+  GeneratedColumn<int> get number =>
+      $composableBuilder(column: $table.number, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+}
+
+class $$HadithEntriesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $HadithEntriesTable,
+    HadithEntry,
+    $$HadithEntriesTableFilterComposer,
+    $$HadithEntriesTableOrderingComposer,
+    $$HadithEntriesTableAnnotationComposer,
+    $$HadithEntriesTableCreateCompanionBuilder,
+    $$HadithEntriesTableUpdateCompanionBuilder,
+    (
+      HadithEntry,
+      BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>
+    ),
+    HadithEntry,
+    PrefetchHooks Function()> {
+  $$HadithEntriesTableTableManager(_$AppDatabase db, $HadithEntriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HadithEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HadithEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HadithEntriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<String> packId = const Value.absent(),
+            Value<int> ordinal = const Value.absent(),
+            Value<int> number = const Value.absent(),
+            Value<String> body = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HadithEntriesCompanion(
+            packId: packId,
+            ordinal: ordinal,
+            number: number,
+            body: body,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String packId,
+            required int ordinal,
+            required int number,
+            required String body,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HadithEntriesCompanion.insert(
+            packId: packId,
+            ordinal: ordinal,
+            number: number,
+            body: body,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable<$HadithEntriesTable, HadithEntry>(table),
+                    BaseReferences<_$AppDatabase, $HadithEntriesTable,
+                        HadithEntry>(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$HadithEntriesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $HadithEntriesTable,
+    HadithEntry,
+    $$HadithEntriesTableFilterComposer,
+    $$HadithEntriesTableOrderingComposer,
+    $$HadithEntriesTableAnnotationComposer,
+    $$HadithEntriesTableCreateCompanionBuilder,
+    $$HadithEntriesTableUpdateCompanionBuilder,
+    (
+      HadithEntry,
+      BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>
+    ),
+    HadithEntry,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -4696,4 +5136,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableTableManager(_db, _db.settingsTable);
   $$RecitersTableTableManager get reciters =>
       $$RecitersTableTableManager(_db, _db.reciters);
+  $$HadithEntriesTableTableManager get hadithEntries =>
+      $$HadithEntriesTableTableManager(_db, _db.hadithEntries);
 }

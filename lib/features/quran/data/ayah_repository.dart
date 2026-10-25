@@ -2,18 +2,13 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
 import 'ayah_source.dart';
+import 'bookmark_pager.dart';
 
-/// One readable bookmark row: the bookmark joined with its ayah.
-class BookmarkEntry {
-  /// A bookmark together with the ayah it points at.
-  const BookmarkEntry({required this.ayah});
-
-  /// The bookmarked ayah.
-  final Ayah ayah;
-}
+export 'bookmark_pager.dart'
+    show BookmarkEntry, BookmarkPage, BookmarkPager, kBookmarkPageSize;
 
 /// Reads ayahs and bookmarks from the local database.
-class AyahRepository implements AyahSource {
+class AyahRepository implements AyahSource, BookmarkPager {
   AyahRepository(this._db);
 
   final AppDatabase _db;
@@ -83,10 +78,54 @@ class AyahRepository implements AyahSource {
       innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
     ])
       ..orderBy([OrderingTerm.desc(_db.bookmarks.id)]);
-    return query.watch().map(
-          (rows) => rows
-              .map((row) => BookmarkEntry(ayah: row.readTable(_db.ayahs)))
-              .toList(),
-        );
+    return query.watch().map(_toEntries);
   }
+
+  @override
+  Stream<BookmarkPage> watchFirstPage({int limit = kBookmarkPageSize}) =>
+      _firstPageQuery(limit).watch().map((rows) => _toPage(rows, limit));
+
+  @override
+  Future<BookmarkPage> entriesBefore(
+    int beforeBookmarkId, {
+    int limit = kBookmarkPageSize,
+  }) async {
+    final rows = await _olderPageQuery(beforeBookmarkId, limit).get();
+    return _toPage(rows, limit);
+  }
+
+  JoinedSelectStatement<HasResultSet, dynamic> _firstPageQuery(int limit) =>
+      _db.select(_db.bookmarks).join([
+        innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
+      ])
+        ..orderBy([OrderingTerm.desc(_db.bookmarks.id)])
+        ..limit(limit + 1);
+
+  JoinedSelectStatement<HasResultSet, dynamic> _olderPageQuery(
+    int beforeBookmarkId,
+    int limit,
+  ) =>
+      _db.select(_db.bookmarks).join([
+        innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
+      ])
+        ..where(_db.bookmarks.id.isSmallerThanValue(beforeBookmarkId))
+        ..orderBy([OrderingTerm.desc(_db.bookmarks.id)])
+        ..limit(limit + 1);
+
+  BookmarkPage _toPage(List<TypedResult> rows, int limit) {
+    final entries = _toEntries(rows);
+    final hasMore = entries.length > limit;
+    return BookmarkPage(
+      entries: hasMore ? entries.sublist(0, limit) : entries,
+      hasMore: hasMore,
+    );
+  }
+
+  List<BookmarkEntry> _toEntries(List<TypedResult> rows) => [
+        for (final row in rows)
+          BookmarkEntry(
+            ayah: row.readTable(_db.ayahs),
+            bookmarkId: row.readTable(_db.bookmarks).id,
+          ),
+      ];
 }

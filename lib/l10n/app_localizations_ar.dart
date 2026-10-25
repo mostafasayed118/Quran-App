@@ -71,6 +71,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchSurahHint => 'ابحث بسورة…';
 
   @override
+  String get searchQuranTitle => 'البحث في القرآن';
+
+  @override
+  String get searchQuranHint => 'ابحث في آيات القرآن…';
+
+  @override
+  String get searchQuranPrompt => 'اكتب حرفين على الأقل للبحث في الآيات';
+
+  @override
+  String searchQuranResultsCount(String count) {
+    return 'عدد النتائج: $count';
+  }
+
+  @override
   String get revelationMakkah => 'مكية';
 
   @override
