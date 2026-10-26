@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,15 +8,15 @@ import 'hijri_state.dart';
 
 /// The Hijri calendar screen: one month grid plus today's header.
 class HijriCubit extends Cubit<HijriState> {
-  /// Creates the cubit and shows the current Hijri month.
-  ///
-  /// The first render is fire-and-forget: the state moves from loading to
-  /// ready on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   HijriCubit({required HijriService service})
       : _service = service,
-        super(const HijriState.loading()) {
-    unawaited(jumpToToday());
-  }
+        super(const HijriState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => jumpToToday();
 
   final HijriService _service;
 

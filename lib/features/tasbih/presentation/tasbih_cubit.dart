@@ -8,15 +8,18 @@ import 'tasbih_state.dart';
 
 /// The tasbih screen: the counter, its target and the persisted snapshot.
 class TasbihCubit extends Cubit<TasbihState> {
-  /// Creates the cubit and hydrates it from the stored snapshot.
+  /// Creates the cubit; the constructor is side-effect free. The route scope
+  /// calls [start] once to hydrate from the stored snapshot.
   ///
-  /// The hydration is fire-and-forget; await [loaded] to wait for it.
+  /// Await [loaded] to wait for the hydration.
   TasbihCubit({
     required TasbihRepository repo,
   })  : _repo = repo,
-        super(const TasbihState.ready()) {
-    unawaited(_hydrate());
-  }
+        super(const TasbihState.ready());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => _hydrate();
 
   /// The counter targets the user can pick (33, 99, 100 and 500).
   static const List<int> targets = <int>[33, 99, 100, 500];

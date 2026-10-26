@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,10 +12,9 @@ import 'settings_state.dart';
 /// scheduler path after every change; when enabling, it also drives the OS
 /// permission flow.
 class SettingsCubit extends Cubit<SettingsState> {
-  /// Creates the cubit and starts the first load.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// ready/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free. The route scope
+  /// calls [start] once to run the first load, which moves the state from
+  /// loading to ready/failed.
   SettingsCubit({
     required ReminderSettingsPort settings,
     required CitySource city,
@@ -26,9 +24,11 @@ class SettingsCubit extends Cubit<SettingsState> {
         _city = city,
         _prayer = prayer,
         _scheduler = scheduler,
-        super(const SettingsState.loading()) {
-    unawaited(load());
-  }
+        super(const SettingsState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => load();
 
   final ReminderSettingsPort _settings;
   final CitySource _city;

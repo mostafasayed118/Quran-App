@@ -10,7 +10,7 @@ import 'qibla_state.dart';
 
 /// The qibla screen: the bearing to the selected city and the live heading.
 class QiblaCubit extends Cubit<QiblaState> {
-  /// Creates the cubit, loads the bearing and binds the heading stream.
+  /// Creates the cubit without doing any work; call [start] to load.
   ///
   /// [heading] is optional — without it the device is treated as having no
   /// magnetometer and the dial stays static.
@@ -21,9 +21,14 @@ class QiblaCubit extends Cubit<QiblaState> {
   })  : _city = city,
         _qibla = qibla,
         _headingService = heading,
-        super(const QiblaState.loading()) {
-    unawaited(reload());
+        super(const QiblaState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() async {
+    final loaded = reload();
     _bindHeading();
+    await loaded;
   }
 
   final CitySource _city;

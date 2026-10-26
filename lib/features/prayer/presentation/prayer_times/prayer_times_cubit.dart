@@ -10,7 +10,7 @@ import 'prayer_times_state.dart';
 
 /// The prayer times screen: today's prayers, the next one and the countdown.
 class PrayerTimesCubit extends Cubit<PrayerTimesState> {
-  /// Creates the cubit and starts the first load.
+  /// Creates the cubit without doing any work; call [start] to load.
   ///
   /// [clock] is the time seam (defaults to [DateTime.now]); [settings] and
   /// [scheduler] are optional — without them no reminder is (re)planned.
@@ -25,9 +25,11 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
         _settings = settings,
         _scheduler = scheduler,
         _clock = clock ?? DateTime.now,
-        super(const PrayerTimesState.loading()) {
-    unawaited(reload());
-  }
+        super(const PrayerTimesState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => reload();
 
   final PrayerTimesPort _prayer;
   final CitySource _city;

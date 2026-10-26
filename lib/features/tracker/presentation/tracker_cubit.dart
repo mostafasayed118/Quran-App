@@ -15,10 +15,11 @@ class TrackerCubit extends Cubit<TrackerState> {
   static const int _last7DayCount = 7;
   static const int _streakGraceDays = 1;
 
-  /// Creates the cubit and hydrates it.
+  /// Creates the cubit; the constructor is side-effect free. The route scope
+  /// calls [start] once to hydrate.
   ///
-  /// [khatma] is optional — without it the khatma card is hidden. The
-  /// hydration is fire-and-forget; await [loaded] to wait for it.
+  /// [khatma] is optional — without it the khatma card is hidden. Await
+  /// [loaded] to wait for the hydration.
   TrackerCubit({
     required PrayerLogRepository repo,
     KhatmaRepository? khatma,
@@ -26,9 +27,11 @@ class TrackerCubit extends Cubit<TrackerState> {
   })  : _repo = repo,
         _khatma = khatma,
         _clock = clock ?? DateTime.now,
-        super(const TrackerState.loading()) {
-    unawaited(_hydrate());
-  }
+        super(const TrackerState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => _hydrate();
 
   /// Used by red-first tests to await the initial load deterministically.
   final Completer<void> _loaded = Completer<void>();

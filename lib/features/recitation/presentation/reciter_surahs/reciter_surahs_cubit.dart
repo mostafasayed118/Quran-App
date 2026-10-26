@@ -11,7 +11,8 @@ import 'reciter_surahs_state.dart';
 
 /// The surahs of one reciter: the available list, the names and the teasers.
 class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
-  /// Creates the cubit for one reciter row and starts the load.
+  /// Creates a side-effect-free cubit for one reciter row; [start] performs
+  /// the load.
   ///
   /// The load is fire-and-forget: the state moves from loading to
   /// ready/failed on its own.
@@ -22,9 +23,11 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
   })  : _reciters = reciters,
         _downloads = downloads,
         _rowId = rowId,
-        super(const ReciterSurahsState.loading()) {
-    unawaited(load());
-  }
+        super(const ReciterSurahsState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => load();
 
   final ReciterSource _reciters;
   final DownloadsCubit _downloads;

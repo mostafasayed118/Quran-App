@@ -11,11 +11,17 @@ import 'surah_index_state.dart';
 
 /// The surah index screen: the surah list and its search box.
 class SurahIndexCubit extends Cubit<SurahIndexState> {
-  /// Creates the cubit and subscribes to the surah stream.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
+  SurahIndexCubit(this._repo) : super(const SurahIndexState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
   ///
   /// The subscription is the source of truth: every change re-emits the
   /// ready state (re-filtered by the current query).
-  SurahIndexCubit(this._repo) : super(const SurahIndexState.loading()) {
+  Future<void> start() async {
+    if (_sub != null) return;
     _sub = _repo.watchSummaries().listen(
       (surahs) {
         _latest = surahs;

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show ValueKey;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -75,6 +74,7 @@ import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'di/injector.dart';
+import 'route_cubit_scope.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
@@ -91,20 +91,24 @@ abstract final class AppRouter {
     routes: [
       GoRoute(
         path: AppRoutes.home,
-        builder: (_, __) => BlocProvider<HomeCubit>(
-          create: (_) => HomeCubit(
+        builder: (_, __) => RouteCubitScope<HomeCubit>(
+          create: () => HomeCubit(
             lastRead: getIt<LastReadMarker>(),
             ayahs: getIt<AyahLookup>(),
             prayer: getIt<PrayerTimesPort>(),
             city: getIt<CitySource>(),
           ),
+          identity: AppRoutes.home,
+          start: (cubit) => cubit.start(),
           child: const HomeScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.quran,
-        builder: (_, __) => BlocProvider<SurahIndexCubit>(
-          create: (_) => SurahIndexCubit(getIt<SurahSource>()),
+        builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
+          create: () => SurahIndexCubit(getIt<SurahSource>()),
+          identity: AppRoutes.quran,
+          start: (cubit) => cubit.start(),
           child: const SurahIndexScreen(),
         ),
       ),
@@ -117,15 +121,19 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.recitation,
-        builder: (_, __) => BlocProvider<RecitersCubit>(
-          create: (_) => RecitersCubit(repo: getIt<ReciterRepository>()),
+        builder: (_, __) => RouteCubitScope<RecitersCubit>(
+          create: () => RecitersCubit(repo: getIt<ReciterRepository>()),
+          identity: AppRoutes.recitation,
+          start: (cubit) => cubit.start(),
           child: const RecitersScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.library,
-        builder: (_, __) => BlocProvider<LibraryCubit>(
-          create: (_) => getIt<LibraryCubit>(),
+        builder: (_, __) => RouteCubitScope<LibraryCubit>(
+          create: () => getIt<LibraryCubit>(),
+          identity: AppRoutes.library,
+          start: (cubit) => cubit.start(),
           child: const LibraryScreen(),
         ),
       ),
@@ -133,82 +141,98 @@ abstract final class AppRouter {
         path: AppRoutes.hadith,
         builder: (context, state) {
           final pack = state.uri.queryParameters[AppRouteQuery.pack] ?? '';
-          return BlocProvider<HadithCubit>(
-            create: (_) => HadithCubit(
+          return RouteCubitScope<HadithCubit>(
+            create: () => HadithCubit(
               downloader: getIt<PackDownloader>(),
               packId: pack,
             ),
+            identity: pack,
+            start: (cubit) => cubit.start(),
             child: const HadithScreen(),
           );
         },
       ),
       GoRoute(
         path: AppRoutes.prayerTimes,
-        builder: (_, __) => BlocProvider<PrayerTimesCubit>(
-          create: (_) => PrayerTimesCubit(
+        builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
+          create: () => PrayerTimesCubit(
             prayer: getIt<PrayerTimesPort>(),
             city: getIt<CitySource>(),
             settings: getIt<ReminderSettingsPort>(),
             scheduler: getIt<ReminderSchedulerPort>(),
           ),
+          identity: AppRoutes.prayerTimes,
+          start: (cubit) => cubit.start(),
           child: const PrayerTimesScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.cityPicker,
-        builder: (_, __) => BlocProvider<CityPickerCubit>(
-          create: (_) => CityPickerCubit(
+        builder: (_, __) => RouteCubitScope<CityPickerCubit>(
+          create: () => CityPickerCubit(
             cityRepo: getIt<CityRepository>(),
             location: getIt<LocationService>(),
           ),
+          identity: AppRoutes.cityPicker,
+          start: (cubit) => cubit.start(),
           child: const CityPickerScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.qibla,
-        builder: (_, __) => BlocProvider<QiblaCubit>(
-          create: (_) => QiblaCubit(
+        builder: (_, __) => RouteCubitScope<QiblaCubit>(
+          create: () => QiblaCubit(
             city: getIt<CitySource>(),
             qibla: getIt<QiblaService>(),
             heading: getIt<HeadingService>(),
           ),
+          identity: AppRoutes.qibla,
+          start: (cubit) => cubit.start(),
           child: const QiblaScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.azkar,
-        builder: (_, __) => BlocProvider<AzkarCubit>(
-          create: (_) => AzkarCubit(
+        builder: (_, __) => RouteCubitScope<AzkarCubit>(
+          create: () => AzkarCubit(
             repository: getIt<AzkarRepository>(),
           ),
+          identity: AppRoutes.azkar,
+          start: (cubit) => cubit.start(),
           child: const AzkarScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.tasbih,
-        builder: (_, __) => BlocProvider<TasbihCubit>(
-          create: (_) => TasbihCubit(repo: getIt<TasbihRepository>()),
+        builder: (_, __) => RouteCubitScope<TasbihCubit>(
+          create: () => TasbihCubit(repo: getIt<TasbihRepository>()),
+          identity: AppRoutes.tasbih,
+          start: (cubit) => cubit.start(),
           child: const TasbihScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.duas,
-        builder: (_, __) => BlocProvider<DuasCubit>(
-          create: (_) => DuasCubit(
+        builder: (_, __) => RouteCubitScope<DuasCubit>(
+          create: () => DuasCubit(
             duas: getIt<DuaRepository>(),
             ruqyah: getIt<RuqyahRepository>(),
             ayahs: getIt<AyahLookup>(),
           ),
+          identity: AppRoutes.duas,
+          start: (cubit) => cubit.start(),
           child: const DuasScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.worship,
-        builder: (_, __) => BlocProvider<TrackerCubit>(
-          create: (_) => TrackerCubit(
+        builder: (_, __) => RouteCubitScope<TrackerCubit>(
+          create: () => TrackerCubit(
             repo: getIt<PrayerLogRepository>(),
             khatma: getIt<KhatmaRepository>(),
           ),
+          identity: AppRoutes.worship,
+          start: (cubit) => cubit.start(),
           child: const TrackerScreen(),
         ),
       ),
@@ -221,15 +245,19 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.hijri,
-        builder: (_, __) => BlocProvider<HijriCubit>(
-          create: (_) => HijriCubit(service: getIt<HijriService>()),
+        builder: (_, __) => RouteCubitScope<HijriCubit>(
+          create: () => HijriCubit(service: getIt<HijriService>()),
+          identity: AppRoutes.hijri,
+          start: (cubit) => cubit.start(),
           child: const HijriScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.asma,
-        builder: (_, __) => BlocProvider<AsmaCubit>(
-          create: (_) => AsmaCubit(repository: getIt<AsmaRepository>()),
+        builder: (_, __) => RouteCubitScope<AsmaCubit>(
+          create: () => AsmaCubit(repository: getIt<AsmaRepository>()),
+          identity: AppRoutes.asma,
+          start: (cubit) => cubit.start(),
           child: const AsmaScreen(),
         ),
       ),
@@ -237,19 +265,21 @@ abstract final class AppRouter {
         path: AppRoutes.settings,
         builder: (_, __) => MultiBlocProvider(
           providers: [
-            BlocProvider<SettingsCubit>(
-              create: (_) => SettingsCubit(
-                settings: getIt<ReminderSettingsPort>(),
-                city: getIt<CitySource>(),
-                prayer: getIt<PrayerTimesPort>(),
-                scheduler: getIt<ReminderSchedulerPort>(),
-              ),
-            ),
             BlocProvider<BackupCubit>(
               create: (_) => BackupCubit(service: getIt<BackupService>()),
             ),
           ],
-          child: const SettingsScreen(backupSection: BackupSection()),
+          child: RouteCubitScope<SettingsCubit>(
+            create: () => SettingsCubit(
+              settings: getIt<ReminderSettingsPort>(),
+              city: getIt<CitySource>(),
+              prayer: getIt<PrayerTimesPort>(),
+              scheduler: getIt<ReminderSchedulerPort>(),
+            ),
+            identity: AppRoutes.settings,
+            start: (cubit) => cubit.start(),
+            child: const SettingsScreen(backupSection: BackupSection()),
+          ),
         ),
       ),
       GoRoute(
@@ -265,21 +295,22 @@ abstract final class AppRouter {
           final ayah = ayahParam < 0 ? 0 : ayahParam;
           return MultiBlocProvider(
             providers: [
-              BlocProvider<ReaderCubit>(
-                key: ValueKey('reader:$surah:$ayah'),
-                create: (_) => ReaderCubit(
-                  ayahRepository: getIt<AyahRepository>(),
-                  lastReadRepository: getIt<LastReadRepository>(),
-                  surahId: surah,
-                  initialAyah: ayah,
-                  wirdProgress: getIt<KhatmaRepository>(),
-                ),
-              ),
               BlocProvider<PlaybackCubit>.value(
                 value: getIt<PlaybackCubit>(),
               ),
             ],
-            child: const ReaderScreen(),
+            child: RouteCubitScope<ReaderCubit>(
+              identity: (surah, ayah),
+              create: () => ReaderCubit(
+                ayahRepository: getIt<AyahRepository>(),
+                lastReadRepository: getIt<LastReadRepository>(),
+                surahId: surah,
+                initialAyah: ayah,
+                wirdProgress: getIt<KhatmaRepository>(),
+              ),
+              start: (cubit) => cubit.start(),
+              child: const ReaderScreen(),
+            ),
           );
         },
       ),
@@ -295,25 +326,29 @@ abstract final class AppRouter {
               BlocProvider<DownloadsCubit>.value(
                 value: getIt<DownloadsCubit>(),
               ),
-              BlocProvider<ReciterSurahsCubit>(
-                create: (_) => ReciterSurahsCubit(
-                  reciters: getIt<ReciterRepository>(),
-                  downloads: getIt<DownloadsCubit>(),
-                  rowId: row,
-                ),
-              ),
             ],
-            child: const ReciterSurahsScreen(),
+            child: RouteCubitScope<ReciterSurahsCubit>(
+              identity: row,
+              create: () => ReciterSurahsCubit(
+                reciters: getIt<ReciterRepository>(),
+                downloads: getIt<DownloadsCubit>(),
+                rowId: row,
+              ),
+              start: (cubit) => cubit.start(),
+              child: const ReciterSurahsScreen(),
+            ),
           );
         },
       ),
       GoRoute(
         path: AppRoutes.bookmarks,
-        builder: (_, __) => BlocProvider<BookmarksCubit>(
-          create: (_) => BookmarksCubit(
+        builder: (_, __) => RouteCubitScope<BookmarksCubit>(
+          create: () => BookmarksCubit(
             getIt<AyahRepository>(),
             pager: getIt<AyahRepository>(),
           ),
+          identity: AppRoutes.bookmarks,
+          start: (cubit) => cubit.start(),
           child: const BookmarksScreen(),
         ),
       ),

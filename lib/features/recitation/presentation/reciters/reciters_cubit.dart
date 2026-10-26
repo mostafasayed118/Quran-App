@@ -11,13 +11,18 @@ import 'reciters_state.dart';
 
 /// The reciters screen: the reciter list and its search box.
 class RecitersCubit extends Cubit<RecitersState> {
-  /// Creates the cubit and subscribes to the reciter stream.
+  /// Creates a side-effect-free cubit; [start] subscribes to the stream.
   ///
   /// The subscription is the source of truth; the first empty emission
   /// triggers a one-shot API refresh.
   RecitersCubit({required ReciterSource repo})
       : _repo = repo,
-        super(const RecitersState.loading()) {
+        super(const RecitersState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() async {
+    if (_sub != null) return;
     _sub = _repo
         .watchAll()
         .map((rows) => [for (final row in sortReciters(rows)) row.toInfo()])

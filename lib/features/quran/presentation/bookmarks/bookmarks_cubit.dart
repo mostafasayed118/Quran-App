@@ -13,11 +13,17 @@ import 'bookmarks_state.dart';
 ///
 /// With a [BookmarkPager] the list is keyset-paged: the first page stays live
 /// and older pages are appended below it. Without one it keeps the original
-/// live full-list stream.
+/// live full-list stream. The constructor is side-effect free and does no
+/// work; [start] subscribes to the live stream.
 class BookmarksCubit extends Cubit<BookmarksState> {
   BookmarksCubit(this._repo, {BookmarkPager? pager})
       : _pager = pager,
-        super(const BookmarksState.loading()) {
+        super(const BookmarksState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() async {
+    if (_sub != null || _pageSub != null) return;
     final pager = _pager;
     if (pager == null) {
       _sub = _repo.watchBookmarkEntries().listen(

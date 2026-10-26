@@ -15,11 +15,12 @@ const Set<int> _basmalaExemptSurahIds = {1, 9};
 
 /// The reader screen: one surah, in verses or in mushaf pages.
 class ReaderCubit extends Cubit<ReaderState> {
-  /// Creates the cubit for one surah and starts the load.
+  /// Creates the cubit for one surah; the constructor is side-effect free
+  /// and does no work — [start] performs the first load.
   ///
   /// [surahId] and [initialAyah] are the route parameters; the first load
-  /// is fire-and-forget and ends in ready or failed. [wirdProgress] is
-  /// optional — without it the reader just does not report wird progress.
+  /// ends in ready or failed. [wirdProgress] is optional — without it the
+  /// reader just does not report wird progress.
   ReaderCubit({
     required AyahSource ayahRepository,
     required LastReadSource lastReadRepository,
@@ -31,8 +32,13 @@ class ReaderCubit extends Cubit<ReaderState> {
         _wirdProgress = wirdProgress,
         _surahId = surahId,
         _initialAyah = initialAyah,
-        super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah)) {
-    _bookmarksSub = ayahRepository.watchBookmarkedIds().listen(
+        super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() async {
+    if (_bookmarksSub != null) return;
+    _bookmarksSub = _ayahRepository.watchBookmarkedIds().listen(
           _onBookmarks,
           onError: (Object error, StackTrace stackTrace) => dev.log(
             'bookmarks stream error',
@@ -41,7 +47,7 @@ class ReaderCubit extends Cubit<ReaderState> {
             stackTrace: stackTrace,
           ),
         );
-    _load();
+    await _load();
   }
 
   final AyahSource _ayahRepository;

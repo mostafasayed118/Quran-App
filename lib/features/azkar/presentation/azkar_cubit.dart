@@ -9,15 +9,15 @@ import 'azkar_state.dart';
 /// The azkar screen: the collection list, the search results and the
 /// reciting view (one counter per item).
 class AzkarCubit extends Cubit<AzkarState> {
-  /// Creates the cubit and starts the first load.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// browsing/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   AzkarCubit({required AzkarRepository repository})
       : _repository = repository,
-        super(const AzkarState.loading()) {
-    unawaited(load());
-  }
+        super(const AzkarState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => load();
 
   final AzkarRepository _repository;
 

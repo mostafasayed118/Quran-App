@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,16 +8,18 @@ import 'city_picker_state.dart';
 
 /// The city picker: the search results and the selected city.
 class CityPickerCubit extends Cubit<CityPickerState> {
-  /// Creates the cubit and runs the first (empty) search.
+  /// Creates the cubit without doing any work; call [start] to load.
   ///
   /// [location] is optional — without it the "locate me" affordance is not
   /// offered.
   CityPickerCubit({required CityRepository cityRepo, LocationService? location})
       : _cityRepo = cityRepo,
         _location = location,
-        super(const CityPickerState.loading()) {
-    unawaited(search(''));
-  }
+        super(const CityPickerState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => search('');
 
   final CityRepository _cityRepo;
   final LocationService? _location;

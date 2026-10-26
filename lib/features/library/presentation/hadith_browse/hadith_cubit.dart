@@ -7,18 +7,18 @@ import 'hadith_state.dart';
 
 /// Pages through an INSTALLED hadith pack with a fixed page size.
 class HadithCubit extends Cubit<HadithState> {
-  /// Creates the cubit for one installed pack and loads its first page.
-  ///
-  /// The first page load is fire-and-forget; the state moves from loading
-  /// to ready/failed on its own.
+  /// Creates the cubit for one installed pack; the constructor is
+  /// side-effect free and does no work — [start] loads the first page.
   HadithCubit({
     required PackDownloader downloader,
     required String packId,
   })  : _downloader = downloader,
         _packId = packId,
-        super(const HadithState.loading()) {
-    _load(0);
-  }
+        super(const HadithState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => _load(0);
 
   /// How many hadith rows one page holds.
   static const int pageSize = 10;

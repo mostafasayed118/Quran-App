@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,10 +11,8 @@ import 'duas_state.dart';
 /// The duas/ruqyah screen: the dua list, the category filter and the ruqyah
 /// tab (its Quran entries resolve to ayah texts through the ayah port).
 class DuasCubit extends Cubit<DuasState> {
-  /// Creates the cubit and loads the dua list.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// duas/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   DuasCubit({
     required DuaRepository duas,
     required RuqyahRepository ruqyah,
@@ -23,9 +20,11 @@ class DuasCubit extends Cubit<DuasState> {
   })  : _duas = duas,
         _ruqyah = ruqyah,
         _ayahs = ayahs,
-        super(const DuasState.loading()) {
-    unawaited(showDuas());
-  }
+        super(const DuasState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => showDuas();
 
   final DuaRepository _duas;
   final RuqyahRepository _ruqyah;

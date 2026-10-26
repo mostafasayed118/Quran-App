@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,10 +10,8 @@ import 'home_state.dart';
 
 /// The home screen's two cards: the last-read ayah and the next prayer.
 class HomeCubit extends Cubit<HomeState> {
-  /// Creates the cubit and starts the first load.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// ready/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   HomeCubit({
     required LastReadMarker lastRead,
     required AyahLookup ayahs,
@@ -24,9 +21,11 @@ class HomeCubit extends Cubit<HomeState> {
         _ayahs = ayahs,
         _prayer = prayer,
         _city = city,
-        super(const HomeState.loading()) {
-    unawaited(reload());
-  }
+        super(const HomeState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => reload();
 
   final LastReadMarker _lastRead;
   final AyahLookup _ayahs;

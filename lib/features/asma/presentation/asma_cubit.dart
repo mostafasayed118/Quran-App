@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,15 +7,15 @@ import 'asma_state.dart';
 
 /// The 99 names screen: the name list and the selected name.
 class AsmaCubit extends Cubit<AsmaState> {
-  /// Creates the cubit and starts the first load.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// ready/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   AsmaCubit({required AsmaRepository repository})
       : _repository = repository,
-        super(const AsmaState.loading()) {
-    unawaited(load());
-  }
+        super(const AsmaState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => load();
 
   final AsmaRepository _repository;
 

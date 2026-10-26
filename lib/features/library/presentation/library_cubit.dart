@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,18 +12,18 @@ import 'library_state.dart';
 /// In-flight progress is transient cubit state only (by design — InstalledPacks
 /// row presence IS the installed status, no drift columns).
 class LibraryCubit extends Cubit<LibraryState> {
-  /// Creates the cubit and starts the first load.
-  ///
-  /// The load is fire-and-forget: the state moves from loading to
-  /// ready/failed on its own.
+  /// Creates the cubit; the constructor is side-effect free and does no
+  /// work — [start] performs the first load.
   LibraryCubit({
     required CatalogRepository catalog,
     required PackDownloader downloader,
   })  : _catalog = catalog,
         _downloader = downloader,
-        super(const LibraryState.loading()) {
-    unawaited(load());
-  }
+        super(const LibraryState.loading());
+
+  /// Starts the route-scoped load; the constructor intentionally does no
+  /// work. The route scope calls this once, from the widget lifecycle.
+  Future<void> start() => load();
 
   final CatalogRepository _catalog;
   final PackDownloader _downloader;
