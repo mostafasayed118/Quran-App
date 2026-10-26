@@ -18,6 +18,7 @@ void main() {
 
   Future<TasbihCubit> build() async {
     final cubit = TasbihCubit(repo: repo);
+    await cubit.start();
     await cubit.loaded;
     return cubit;
   }

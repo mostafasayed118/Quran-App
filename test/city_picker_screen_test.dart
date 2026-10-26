@@ -57,6 +57,7 @@ void main() {
       (tester) async {
     final cubit = CityPickerCubit(cityRepo: repo);
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
       value: cubit,
       child: MaterialApp(
@@ -114,6 +115,7 @@ void main() {
       (tester) async {
     final cubit = CityPickerCubit(cityRepo: _ThrowingSearchRepo(db));
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
       value: cubit,
       child: MaterialApp(

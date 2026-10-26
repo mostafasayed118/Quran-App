@@ -92,7 +92,8 @@ void main() {
       rowId: '51-53',
     );
     addTearDown(cubit.close);
-    await cubit.stream.firstWhere((s) => s is ReciterSurahsReady);
+    await cubit.start().timeout(const Duration(seconds: 10));
+    expect(cubit.state, isA<ReciterSurahsReady>());
 
     await cubit.setAsDefault().timeout(const Duration(seconds: 10));
 
@@ -109,9 +110,8 @@ void main() {
       rowId: '51-53',
     );
     addTearDown(cubit.close);
-    final ready = await cubit.stream
-        .firstWhere((s) => s is ReciterSurahsReady)
-        .timeout(const Duration(seconds: 10)) as ReciterSurahsReady;
+    await cubit.start().timeout(const Duration(seconds: 10));
+    final ready = cubit.state as ReciterSurahsReady;
 
     expect(ready.names, {1: 'الفاتحة'});
     expect(ready.previews, {1: 'الم'});

@@ -75,7 +75,7 @@ void main() {
       prayer: fake,
       city: city,
     );
-    await cubit.reload();
+    await cubit.start();
     return cubit;
   }
 

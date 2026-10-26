@@ -23,6 +23,7 @@ void main() {
     await repo.togglePrayer(DateTime(2026, 6, 14), PrayerSlot.dhuhr);
 
     final cubit = TrackerCubit(repo: repo, clock: () => now);
+    await cubit.start();
     await cubit.loaded;
 
     final ready = cubit.state as TrackerReady;

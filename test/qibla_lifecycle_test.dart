@@ -58,6 +58,7 @@ void main() {
         heading: HeadingService(streamFactory: factory.call),
       );
       addTearDown(cubit.close);
+      await cubit.start();
 
       expect(factory.calls, 1);
       expect(factory.controllers[0].hasListener, isTrue);
@@ -91,7 +92,8 @@ void main() {
       expect(cubit.state.heading, 17.0);
     });
 
-    test('resume is idempotent: an already-bound cubit is not re-bound', () {
+    test('resume is idempotent: an already-bound cubit is not re-bound',
+        () async {
       final factory = _TwoStreamFactory();
       addTearDown(factory.close);
       final cubit = QiblaCubit(
@@ -100,6 +102,7 @@ void main() {
         heading: HeadingService(streamFactory: factory.call),
       );
       addTearDown(cubit.close);
+      await cubit.start();
 
       cubit.resume();
       expect(factory.calls, 1);
@@ -122,6 +125,7 @@ void main() {
         heading: HeadingService(streamFactory: factory.call),
       );
       addTearDown(cubit.close);
+      await cubit.start();
       await pumpAppHost(
         tester,
         wrap: (app) => BlocProvider<QiblaCubit>.value(value: cubit, child: app),

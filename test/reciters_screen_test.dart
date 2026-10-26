@@ -17,14 +17,18 @@ void main() {
     db = newTestDb();
   });
 
-  Widget host(ReciterRepository repo) => BlocProvider<RecitersCubit>(
-        create: (_) => RecitersCubit(repo: repo),
-        child: const RecitersScreen(),
-      );
-
   Future<void> pumpHost(WidgetTester tester, List<ReciterRow> rows) async {
     final repo = _StaticReciterRepository(db, rows);
-    await pumpAppHost(tester, home: host(repo));
+    final cubit = RecitersCubit(repo: repo);
+    addTearDown(cubit.close);
+    await cubit.start();
+    await pumpAppHost(
+      tester,
+      home: BlocProvider<RecitersCubit>.value(
+        value: cubit,
+        child: const RecitersScreen(),
+      ),
+    );
   }
 
   testWidgets('featured row appears first (lower Y), then the rest',

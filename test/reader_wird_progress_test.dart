@@ -141,7 +141,9 @@ void main() {
         surahId: 2,
         initialAyah: 0,
         wirdProgress: sink);
-    await cubit.stream.firstWhere((s) => s is ReaderReady);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    await readyFuture;
 
     await cubit.onMushafPageChanged(0);
     await cubit.onMushafPageChanged(1);
@@ -157,7 +159,9 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0);
-    await cubit.stream.firstWhere((s) => s is ReaderReady);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    await readyFuture;
 
     await cubit.onMushafPageChanged(0);
 
@@ -172,7 +176,9 @@ void main() {
         surahId: 2,
         initialAyah: 0,
         wirdProgress: _ThrowingSink());
-    await cubit.stream.firstWhere((s) => s is ReaderReady);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    await readyFuture;
 
     await cubit.onMushafPageChanged(0);
 
@@ -191,6 +197,7 @@ void main() {
         initialAyah: 0,
         wirdProgress: sink);
     addTearDown(cubit.close);
+    await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),

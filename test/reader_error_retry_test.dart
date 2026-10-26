@@ -86,8 +86,9 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    final failure =
-        await cubit.stream.firstWhere((s) => s is ReaderError) as ReaderError;
+    final failureFuture = cubit.stream.firstWhere((s) => s is ReaderError);
+    await cubit.start();
+    final failure = await failureFuture as ReaderError;
     expect(failure.message, isNotEmpty);
     expect(await lastRead.loadAyahId(), isNull,
         reason: 'an unreadable surah must not overwrite last-read');
@@ -120,7 +121,9 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    await cubit.stream.firstWhere((s) => s is ReaderError);
+    final failureFuture = cubit.stream.firstWhere((s) => s is ReaderError);
+    await cubit.start();
+    await failureFuture;
     await cubit.reload();
     expect(cubit.state, isA<ReaderReady>());
   });
@@ -152,6 +155,7 @@ void main() {
       initialAyah: 0,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),

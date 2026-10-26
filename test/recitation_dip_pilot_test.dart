@@ -64,9 +64,10 @@ void main() {
     final cubit =
         RecitersCubit(repo: _InMemoryReciterSource(const [_other, _featured]));
     addTearDown(cubit.close);
+    await cubit.start();
+    await Future<void>.delayed(Duration.zero);
 
-    final ready = await cubit.stream.firstWhere((s) => s is RecitersReady)
-        as RecitersReady;
+    final ready = cubit.state as RecitersReady;
 
     expect(ready.reciters, everyElement(isA<ReciterInfo>()));
     expect(ready.reciters.map((r) => r.reciterName).toList(),
@@ -78,7 +79,8 @@ void main() {
     final cubit =
         RecitersCubit(repo: _InMemoryReciterSource(const [_other, _featured]));
     addTearDown(cubit.close);
-    await cubit.stream.firstWhere((s) => s is RecitersReady);
+    await cubit.start();
+    await Future<void>.delayed(Duration.zero);
 
     cubit.setQuery('أحمد');
 

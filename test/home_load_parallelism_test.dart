@@ -159,6 +159,8 @@ void main() {
     final sub = cubit.stream.listen(states.add);
     addTearDown(sub.cancel);
 
+    await cubit.start();
+
     await _pumpUntil(() => states.whereType<HomeFailed>().isNotEmpty);
     await Future<void>.delayed(Duration.zero);
 

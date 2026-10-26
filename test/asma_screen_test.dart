@@ -18,6 +18,7 @@ void main() {
       repository: AsmaRepository(loader: () async => fixtureRows()),
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
       value: cubit,
       child: MaterialApp(

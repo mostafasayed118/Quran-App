@@ -69,6 +69,7 @@ void main() {
       city: city,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<HomeCubit>.value(
       value: cubit,
       child: MaterialApp(

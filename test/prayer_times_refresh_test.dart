@@ -61,6 +61,7 @@ void main() {
       city: repo,
       clock: () => DateTime(2026, 3, 15, 14, 0),
     );
+    await cubit.start();
 
     await pumpScreen(tester, cubit);
     expect(fake.todayCalls, 1);
@@ -85,6 +86,7 @@ void main() {
       city: repo,
       clock: () => DateTime(2026, 3, 15, 14, 0),
     );
+    await cubit.start();
 
     await pumpScreen(tester, cubit);
     expect(fake.todayCalls, 1);

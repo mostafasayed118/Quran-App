@@ -72,6 +72,7 @@ void main() {
       ..nextResult =
           PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
     final cubit = PrayerTimesCubit(prayer: fake, city: repo, clock: () => now);
+    await cubit.start();
 
     await pumpScreen(tester, cubit);
     expect(find.text('متبقٍ ٠١:٣٥'), findsOneWidget);
@@ -91,6 +92,7 @@ void main() {
       ..nextResult =
           PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
     final cubit = PrayerTimesCubit(prayer: fake, city: repo, clock: () => now);
+    await cubit.start();
 
     await pumpScreen(tester, cubit);
     expect(find.text('متبقٍ ٠٠:٠١'), findsOneWidget);

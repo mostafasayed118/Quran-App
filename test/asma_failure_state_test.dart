@@ -12,6 +12,7 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 Future<void> pumpAsma(WidgetTester tester, AsmaRepository repository) async {
   final cubit = AsmaCubit(repository: repository);
   addTearDown(cubit.close);
+  await cubit.start();
   await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
     value: cubit,
     child: MaterialApp(

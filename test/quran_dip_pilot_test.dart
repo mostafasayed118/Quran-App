@@ -118,8 +118,9 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    final ready =
-        await cubit.stream.firstWhere((s) => s is ReaderReady) as ReaderReady;
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
 
     expect(ready.surahName, 'البقرة');
     expect(ready.ayahs, hasLength(3));
@@ -145,8 +146,9 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    final ready =
-        await cubit.stream.firstWhere((s) => s is ReaderReady) as ReaderReady;
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
 
     expect(ready.initialAyah, 2);
     expect(lastRead.saved, 9);

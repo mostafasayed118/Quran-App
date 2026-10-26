@@ -22,7 +22,7 @@ void main() {
     final cubit = HijriCubit(service: _ThrowingHijriService());
     addTearDown(cubit.close);
 
-    await pumpEventQueue();
+    await cubit.start();
 
     expect(cubit.state, isA<HijriFailed>());
   });
@@ -31,6 +31,7 @@ void main() {
       (tester) async {
     final cubit = HijriCubit(service: _ThrowingHijriService());
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<HijriCubit>.value(
       value: cubit,
       child: MaterialApp(

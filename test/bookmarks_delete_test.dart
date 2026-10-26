@@ -37,6 +37,7 @@ void main() {
 
     final cubit = BookmarksCubit(AyahRepository(db));
     addTearDown(cubit.close);
+    await cubit.start();
 
     await cubit.stream
         .firstWhere((s) => s is BookmarksReady)

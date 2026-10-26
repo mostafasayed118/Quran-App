@@ -37,6 +37,7 @@ void main() {
     final cubit = SurahIndexCubit(SurahRepository(db));
     expect(cubit.state, isA<SurahIndexLoading>());
 
+    await cubit.start();
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<SurahIndexLoaded>());
     expect((cubit.state as SurahIndexLoaded).surahs.length, 2);
@@ -52,6 +53,7 @@ void main() {
 
   test('whitespace-only query restores the full list', () async {
     final cubit = SurahIndexCubit(SurahRepository(db));
+    await cubit.start();
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<SurahIndexLoaded>());
     cubit.setQuery('البقرة');
@@ -65,6 +67,7 @@ void main() {
     final cubit = SurahIndexCubit(_ThrowingSurahRepository(db));
     expect(cubit.state, isA<SurahIndexLoading>());
 
+    await cubit.start();
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<SurahIndexError>());
     expect((cubit.state as SurahIndexError).message, isNotEmpty);

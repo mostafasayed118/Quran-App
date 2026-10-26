@@ -13,6 +13,7 @@ void main() {
     await db.close();
 
     final cubit = TasbihCubit(repo: repo);
+    await cubit.start();
     await cubit.loaded.timeout(const Duration(seconds: 5));
 
     final ready = cubit.state as TasbihReady;
@@ -27,6 +28,7 @@ void main() {
     await db.close();
 
     final cubit = TasbihCubit(repo: repo);
+    await cubit.start();
     await cubit.loaded.timeout(const Duration(seconds: 5));
 
     await cubit.increment();

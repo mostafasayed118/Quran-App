@@ -66,6 +66,7 @@ void main() {
       clock: () => DateTime(2026, 3, 15, 14, 0),
     );
     addTearDown(cubit.close);
+    await cubit.start();
 
     await pumpScaled(
       tester,
@@ -86,6 +87,7 @@ void main() {
     await repo.select(cairoCity);
     final cubit = CityPickerCubit(cityRepo: repo);
     addTearDown(cubit.close);
+    await cubit.start();
 
     await pumpScaled(
       tester,

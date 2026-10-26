@@ -349,6 +349,7 @@ void main() {
           surahId: 1,
           initialAyah: 0);
       addTearDown(cubit.close);
+      await cubit.start();
       final playbackCubit = PlaybackCubit(
         service: _FakePlaybackService(),
         reciters: ReciterRepository(dbHarness),

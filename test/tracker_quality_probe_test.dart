@@ -27,6 +27,7 @@ void main() {
   }) async {
     final cubit = TrackerCubit(repo: repo);
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
       value: cubit,
       child: MaterialApp(

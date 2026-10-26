@@ -39,6 +39,7 @@ void main() {
       city: city,
     );
     addTearDown(cubit.close);
+    await cubit.start();
 
     final router = GoRouter(
       initialLocation: '/home',

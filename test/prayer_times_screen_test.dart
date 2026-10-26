@@ -35,6 +35,7 @@ void main() {
   Future<void> pumpHost(WidgetTester tester) async {
     final cubit = PrayerTimesCubit(prayer: fake, city: repo);
     addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
       wrap: (app) =>

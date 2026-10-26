@@ -35,6 +35,7 @@ void main() {
       heading: heading,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
       wrap: (app) => BlocProvider<QiblaCubit>.value(value: cubit, child: app),

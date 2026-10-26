@@ -34,7 +34,7 @@ void main() {
     final subscription = cubit.stream.listen(states.add);
     addTearDown(subscription.cancel);
 
-    await cubit.reload();
+    await cubit.start();
     expect(cubit.state, isA<QiblaFailed>());
     expect(states.whereType<QiblaReady>(), isEmpty);
 

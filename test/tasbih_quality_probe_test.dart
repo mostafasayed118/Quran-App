@@ -26,6 +26,7 @@ void main() {
   }) async {
     final cubit = TasbihCubit(repo: repo);
     addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
       wrap: (app) => BlocProvider<TasbihCubit>.value(value: cubit, child: app),

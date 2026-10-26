@@ -35,9 +35,7 @@ void main() {
     final downloader = GatedHadithDownloader(newTestDb());
     final cubit = HadithCubit(downloader: downloader, packId: 'pack');
 
-    for (var i = 0; i < 20 && cubit.state is! HadithReady; i++) {
-      await Future<void>.delayed(Duration.zero);
-    }
+    await cubit.start();
     final initial = cubit.state as HadithReady;
     expect(initial.offset, 0);
     expect(initial.hasMore, isTrue);

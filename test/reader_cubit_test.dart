@@ -92,8 +92,9 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0);
-    final ready =
-        await cubit.stream.firstWhere((s) => s is ReaderReady) as ReaderReady;
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
     expect(ready.showBasmala, isTrue);
     expect(ready.surahName, 'البقرة');
     expect(ready.mushafPages, isNotEmpty);
@@ -104,8 +105,9 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 1,
         initialAyah: 0);
-    final fatihaReady =
-        await cubit.stream.firstWhere((s) => s is ReaderReady) as ReaderReady;
+    final fatihaReadyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final fatihaReady = await fatihaReadyFuture as ReaderReady;
     expect(fatihaReady.showBasmala, isFalse);
     await cubit.close();
   });
@@ -116,7 +118,9 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0);
-    await cubit.stream.firstWhere((s) => s is ReaderReady);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    await readyFuture;
     await cubit.toggleBookmark(8);
     await cubit.stream.firstWhere(
         (s) => s is ReaderReady && (s).bookmarkedAyahIds.contains(8));
@@ -133,8 +137,9 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0);
-    final ready =
-        await cubit.stream.firstWhere((s) => s is ReaderReady) as ReaderReady;
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
     expect(ready.mode, ReaderMode.verses);
     cubit.toggleMode();
     final mushaf = cubit.state as ReaderReady;

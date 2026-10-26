@@ -14,6 +14,7 @@ void main() {
       (tester) async {
     final cubit = HijriCubit(service: HijriService());
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<HijriCubit>.value(
       value: cubit,
       child: MaterialApp(

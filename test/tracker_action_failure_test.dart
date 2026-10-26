@@ -27,6 +27,7 @@ void main() {
 
   Future<TrackerCubit> build() async {
     final cubit = TrackerCubit(repo: _CrashingToggleRepo(db));
+    await cubit.start();
     await cubit.loaded;
     return cubit;
   }

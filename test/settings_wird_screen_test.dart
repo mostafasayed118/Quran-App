@@ -45,6 +45,7 @@ void main() {
       scheduler: scheduler,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
       wrap: (app) =>

@@ -47,10 +47,13 @@ void main() {
   });
 
   Future<void> pumpScreen(WidgetTester tester, ReciterRepository repo) async {
+    final cubit = RecitersCubit(repo: repo);
+    addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
-      home: BlocProvider<RecitersCubit>(
-        create: (_) => RecitersCubit(repo: repo),
+      home: BlocProvider<RecitersCubit>.value(
+        value: cubit,
         child: const RecitersScreen(),
       ),
     );
@@ -64,6 +67,7 @@ void main() {
     final cubit = RecitersCubit(repo: repo);
     addTearDown(cubit.close);
 
+    await cubit.start();
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<RecitersReady>());
     expect((cubit.state as RecitersReady).dataError, isFalse);

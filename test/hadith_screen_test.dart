@@ -60,8 +60,11 @@ void main() {
           packId: 'en-muslim',
         );
 
-    Future<HadithReady> readyOf(HadithCubit c) async =>
-        await c.stream.firstWhere((s) => s is HadithReady) as HadithReady;
+    Future<HadithReady> readyOf(HadithCubit c) async {
+      final ready = c.stream.firstWhere((s) => s is HadithReady);
+      await c.start();
+      return (await ready) as HadithReady;
+    }
 
     test('first page windows 10 items with hasMore', () async {
       final c = cubit();
@@ -140,8 +143,9 @@ void main() {
         packId: 'en-muslim',
       );
       addTearDown(c.close);
-      final failure =
-          await c.stream.firstWhere((s) => s is HadithError) as HadithError;
+      final failureFuture = c.stream.firstWhere((s) => s is HadithError);
+      await c.start();
+      final failure = (await failureFuture) as HadithError;
 
       expect(failure.message, isNotEmpty);
       expect(c.state, isA<HadithError>());
@@ -164,14 +168,17 @@ void main() {
     });
 
     Future<void> pumpScreen(WidgetTester tester) async {
+      final cubit = HadithCubit(
+        downloader: PackDownloader(db,
+            libraryRootResolver: () async => tempRoot,
+            fileDecoder: _syncDecode),
+        packId: 'en-muslim',
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
       await tester.pumpWidget(appShell(
-        home: BlocProvider<HadithCubit>(
-          create: (_) => HadithCubit(
-            downloader: PackDownloader(db,
-                libraryRootResolver: () async => tempRoot,
-                fileDecoder: _syncDecode),
-            packId: 'en-muslim',
-          ),
+        home: BlocProvider<HadithCubit>.value(
+          value: cubit,
           child: const HadithScreen(),
         ),
       ));
@@ -226,6 +233,12 @@ void main() {
 
     testWidgets('error surface shows localized copy, never the raw message',
         (tester) async {
+      final cubit = HadithCubit(
+        downloader: _ThrowingPageDownloader(db),
+        packId: 'en-muslim',
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
       await tester.pumpWidget(MaterialApp(
         locale: const Locale('ar'),
         supportedLocales: const [Locale('ar'), Locale('en')],
@@ -237,10 +250,7 @@ void main() {
         ],
         theme: AppTheme.light,
         home: BlocProvider<HadithCubit>.value(
-          value: HadithCubit(
-            downloader: _ThrowingPageDownloader(db),
-            packId: 'en-muslim',
-          ),
+          value: cubit,
           child: const HadithScreen(),
         ),
       ));

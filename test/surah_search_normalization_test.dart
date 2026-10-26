@@ -37,6 +37,7 @@ class _FakeSurahSource implements SurahSource {
 
 Future<SurahIndexCubit> _readyCubit() async {
   final cubit = SurahIndexCubit(_FakeSurahSource());
+  await cubit.start();
   await Future<void>.delayed(Duration.zero);
   expect(cubit.state, isA<SurahIndexReady>());
   return cubit;

@@ -47,7 +47,7 @@ void main() {
       downloader: _ThrowingUninstallDownloader(db),
     );
     addTearDown(cubit.close);
-    await Future<void>.delayed(Duration.zero);
+    await cubit.start();
     expect(cubit.state, isA<LibraryReady>());
 
     await cubit.uninstall('p1');

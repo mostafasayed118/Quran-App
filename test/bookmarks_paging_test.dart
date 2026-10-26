@@ -65,6 +65,7 @@ void main() {
     final repo = AyahRepository(db);
     final cubit = BookmarksCubit(repo, pager: repo);
     addTearDown(cubit.close);
+    await cubit.start();
 
     await cubit.stream.firstWhere((s) => s is BookmarksReady);
     expect((cubit.state as BookmarksReady).entries, hasLength(20));

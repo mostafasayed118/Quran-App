@@ -64,6 +64,7 @@ void main() {
       repo: repo,
       clock: () => DateTime(2026, 6, 15, 10, 30),
     );
+    await cubit.start();
     await cubit.loaded;
 
     final first = cubit.toggle(PrayerSlot.fajr);
@@ -84,6 +85,7 @@ void main() {
   test('an older overlapping reload cannot emit last', () async {
     final repo = GatedReloadRepository();
     final cubit = TrackerCubit(repo: repo);
+    await cubit.start();
     await cubit.loaded;
     expect(repo.dayViewCalls, 1);
 

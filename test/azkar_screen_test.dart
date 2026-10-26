@@ -29,6 +29,7 @@ void main() {
       repository: AzkarRepository(loader: () async => fixtureRoot()),
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
       value: cubit,
       child: MaterialApp(
@@ -57,6 +58,7 @@ void main() {
       repository: AzkarRepository(loader: () async => fixtureRoot()),
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
       value: cubit,
       child: MaterialApp(

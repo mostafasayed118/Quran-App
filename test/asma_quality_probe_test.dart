@@ -31,6 +31,7 @@ Future<void> pumpAsmaAt2x(WidgetTester tester) async {
     repository: AsmaRepository(loader: () async => stressedFixture()),
   );
   addTearDown(cubit.close);
+  await cubit.start();
   await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
     value: cubit,
     child: MaterialApp(

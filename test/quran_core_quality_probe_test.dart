@@ -157,9 +157,12 @@ void main() {
   Future<void> pumpIndex(WidgetTester tester,
       {Locale locale = const Locale('ar'), TextScaler? textScaler}) async {
     final rows = await db.select(db.surahs).get();
+    final cubit = SurahIndexCubit(_TeardownSafeSurahRepository(db, rows));
+    addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(localizedShell(
-      BlocProvider<SurahIndexCubit>(
-        create: (_) => SurahIndexCubit(_TeardownSafeSurahRepository(db, rows)),
+      BlocProvider<SurahIndexCubit>.value(
+        value: cubit,
         child: const SurahIndexScreen(),
       ),
       locale: locale,
@@ -203,6 +206,7 @@ void main() {
       initialAyah: 0,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),
@@ -281,9 +285,12 @@ void main() {
       ],
     );
 
+    final cubit = BookmarksCubit(repo);
+    addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(localizedShell(
-      BlocProvider<BookmarksCubit>(
-        create: (_) => BookmarksCubit(repo),
+      BlocProvider<BookmarksCubit>.value(
+        value: cubit,
         child: const BookmarksScreen(),
       ),
       textScaler: const TextScaler.linear(2.0),

@@ -18,6 +18,7 @@ void main() {
     final cubit = RecitersCubit(repo: _ThrowingReciterRepository(db));
     expect(cubit.state, isA<RecitersLoading>());
 
+    await cubit.start();
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<RecitersError>());
     expect((cubit.state as RecitersError).message, isNotEmpty);

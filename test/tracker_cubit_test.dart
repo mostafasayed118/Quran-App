@@ -18,6 +18,7 @@ void main() {
 
   Future<TrackerCubit> build() async {
     final cubit = TrackerCubit(repo: repo);
+    await cubit.start();
     await cubit.loaded;
     return cubit;
   }

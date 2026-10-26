@@ -35,6 +35,7 @@ Future<void> _pumpAzkar(WidgetTester tester, {double scale = 1.0}) async {
     repository: AzkarRepository(loader: () async => _root()),
   );
   addTearDown(cubit.close);
+  await cubit.start();
   await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
     value: cubit,
     child: MaterialApp(

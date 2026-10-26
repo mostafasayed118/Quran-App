@@ -130,7 +130,7 @@ void main() {
         downloader: ControllableFakeDownloader(db),
       );
       addTearDown(cubit.close);
-      await Future<void>.delayed(Duration.zero);
+      await cubit.start();
 
       final state = cubit.state as LibraryReady;
       expect(state.packs, hasLength(3));
@@ -147,7 +147,7 @@ void main() {
         downloader: fake,
       );
       addTearDown(cubit.close);
-      await Future<void>.delayed(Duration.zero);
+      await cubit.start();
 
       final pack = (cubit.state as LibraryReady).packs.first;
       final installing = cubit.install(pack);
@@ -172,7 +172,7 @@ void main() {
         downloader: fake,
       );
       addTearDown(cubit.close);
-      await Future<void>.delayed(Duration.zero);
+      await cubit.start();
 
       final pack = (cubit.state as LibraryReady).packs.first;
       await cubit.install(pack);
@@ -194,7 +194,7 @@ void main() {
         downloader: fake,
       );
       addTearDown(cubit.close);
-      await Future<void>.delayed(Duration.zero);
+      await cubit.start();
 
       final pack = (cubit.state as LibraryReady).packs.first;
       await cubit.install(pack);
@@ -251,6 +251,8 @@ void main() {
         ),
         downloader: ControllableFakeDownloader(db),
       );
+      await cubit.start();
+
       await tester.pumpWidget(screen(cubit));
       await tester.pumpAndSettle();
 
@@ -285,6 +287,8 @@ void main() {
         ),
         downloader: downloader,
       );
+      await cubit.start();
+
       await tester.pumpWidget(screen(cubit));
       await tester.pumpAndSettle();
 

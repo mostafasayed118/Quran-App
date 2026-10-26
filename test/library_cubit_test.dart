@@ -26,7 +26,7 @@ void main() {
     );
     expect(cubit.state, isA<LibraryLoading>());
 
-    await Future<void>.delayed(Duration.zero);
+    await cubit.start();
     expect(cubit.state, isA<LibraryFailed>());
     expect((cubit.state as LibraryFailed).message, isNotEmpty);
 
@@ -54,7 +54,7 @@ void main() {
       downloader: PackDownloader(db),
     );
 
-    await Future<void>.delayed(Duration.zero);
+    await cubit.start();
     expect(cubit.state, isA<LibraryReady>());
 
     await cubit.close();

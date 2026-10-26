@@ -124,17 +124,18 @@ void main() {
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
     );
     addTearDown(playbackCubit.close);
+    final surahs = ReciterSurahsCubit(
+      reciters: repo,
+      downloads: downloads,
+      rowId: '51-53',
+    );
+    addTearDown(surahs.close);
+    await surahs.start();
     await tester.pumpWidget(MultiBlocProvider(
       providers: [
         BlocProvider<PlaybackCubit>.value(value: playbackCubit),
         BlocProvider<DownloadsCubit>.value(value: downloads),
-        BlocProvider<ReciterSurahsCubit>(
-          create: (_) => ReciterSurahsCubit(
-            reciters: repo,
-            downloads: downloads,
-            rowId: '51-53',
-          ),
-        ),
+        BlocProvider<ReciterSurahsCubit>.value(value: surahs),
       ],
       child: MaterialApp(
         locale: const Locale('ar'),

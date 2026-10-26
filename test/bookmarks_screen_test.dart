@@ -42,11 +42,16 @@ void main() {
     db = newTestDb();
   });
 
-  Widget host(List<BookmarkEntry> entries) => BlocProvider<BookmarksCubit>(
-        create: (_) =>
-            BookmarksCubit(_TeardownSafeAyahRepository(db, entries: entries)),
-        child: const BookmarksScreen(),
-      );
+  Future<Widget> host(List<BookmarkEntry> entries) async {
+    final cubit =
+        BookmarksCubit(_TeardownSafeAyahRepository(db, entries: entries));
+    addTearDown(cubit.close);
+    await cubit.start();
+    return BlocProvider<BookmarksCubit>.value(
+      value: cubit,
+      child: const BookmarksScreen(),
+    );
+  }
 
   Future<void> pump(WidgetTester tester, Widget child) async {
     await tester.pumpWidget(MaterialApp(
@@ -65,7 +70,7 @@ void main() {
   }
 
   testWidgets('empty state message when no bookmarks', (tester) async {
-    await pump(tester, host(const []));
+    await pump(tester, await host(const []));
     expect(find.byType(ListTile), findsNothing);
   });
 
@@ -79,6 +84,7 @@ void main() {
     // Seed one row so the real delete has something to remove.
     await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 9));
     final cubit = BookmarksCubit(repo);
+    await cubit.start();
     await pump(
       tester,
       BlocProvider<BookmarksCubit>.value(
@@ -94,7 +100,7 @@ void main() {
   testWidgets('delete button exposes a tooltip (a11y label census)',
       (tester) async {
     final text = 'ذلك الكتاب لا ريب فيه';
-    await pump(tester, host([_entry(db, ayahId: 9, text: text)]));
+    await pump(tester, await host([_entry(db, ayahId: 9, text: text)]));
     expect(find.byTooltip('أزل الحفظ'), findsOneWidget);
   });
 }

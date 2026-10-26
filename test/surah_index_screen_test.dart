@@ -44,15 +44,20 @@ void main() {
         ]));
   });
 
-  Widget host(SurahRepository repo) => BlocProvider<SurahIndexCubit>(
-        create: (_) => SurahIndexCubit(repo),
-        child: const SurahIndexScreen(),
-      );
+  Future<Widget> host(SurahRepository repo) async {
+    final cubit = SurahIndexCubit(repo);
+    addTearDown(cubit.close);
+    await cubit.start();
+    return BlocProvider<SurahIndexCubit>.value(
+      value: cubit,
+      child: const SurahIndexScreen(),
+    );
+  }
 
   Future<void> pumpHost(WidgetTester tester) async {
     final rows = await db.select(db.surahs).get();
     final repo = _TeardownSafeSurahRepository(db, rows);
-    await pumpAppHost(tester, home: host(repo));
+    await pumpAppHost(tester, home: await host(repo));
   }
 
   testWidgets('rows render arabic names + counts; search filters live',

@@ -26,6 +26,7 @@ void main() {
       (tester) async {
     final cubit = TasbihCubit(repo: repo);
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<TasbihCubit>.value(
       value: cubit,
       child: MaterialApp(

@@ -160,9 +160,12 @@ void main() {
       _row(id: '51-53', name: 'عبدالباسط عبدالصمد'),
       _row(id: '55-55', name: 'ماهر المعيقلي'),
     ]);
+    final cubit = RecitersCubit(repo: repo);
+    addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(_shell(
-      BlocProvider<RecitersCubit>(
-        create: (_) => RecitersCubit(repo: repo),
+      BlocProvider<RecitersCubit>.value(
+        value: cubit,
         child: const RecitersScreen(),
       ),
     ));
@@ -190,17 +193,18 @@ void main() {
       backgroundActive: () => true,
     );
     addTearDown(playback.close);
+    final surahs = ReciterSurahsCubit(
+      reciters: repo,
+      downloads: downloads,
+      rowId: '51-53',
+    );
+    addTearDown(surahs.close);
+    await surahs.start();
     await tester.pumpWidget(_shell(MultiBlocProvider(
       providers: [
         BlocProvider<PlaybackCubit>.value(value: playback),
         BlocProvider<DownloadsCubit>.value(value: downloads),
-        BlocProvider<ReciterSurahsCubit>(
-          create: (_) => ReciterSurahsCubit(
-            reciters: repo,
-            downloads: downloads,
-            rowId: '51-53',
-          ),
-        ),
+        BlocProvider<ReciterSurahsCubit>.value(value: surahs),
       ],
       child: const ReciterSurahsScreen(),
     )));

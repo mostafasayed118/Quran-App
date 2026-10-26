@@ -58,7 +58,9 @@ void main() {
       (tester) async {
     await repo.select(cairoCity);
     final handle = tester.ensureSemantics();
-    await pumpPicker(tester, CityPickerCubit(cityRepo: repo));
+    final cubit = CityPickerCubit(cityRepo: repo);
+    await cubit.start();
+    await pumpPicker(tester, cubit);
 
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.bySemanticsLabel(RegExp('المدينة الحالية')), findsOneWidget);
@@ -73,7 +75,9 @@ void main() {
   });
 
   testWidgets('with no persisted city, no row is marked', (tester) async {
-    await pumpPicker(tester, CityPickerCubit(cityRepo: repo));
+    final cubit = CityPickerCubit(cityRepo: repo);
+    await cubit.start();
+    await pumpPicker(tester, cubit);
 
     expect(find.byIcon(Icons.check_circle), findsNothing);
   });
@@ -81,6 +85,7 @@ void main() {
   testWidgets('the mark follows the persisted city after picking one',
       (tester) async {
     final cubit = CityPickerCubit(cityRepo: repo);
+    await cubit.start();
     await pumpPicker(tester, cubit);
 
     expect(find.byIcon(Icons.check_circle), findsNothing);

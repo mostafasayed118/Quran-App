@@ -57,10 +57,9 @@ void main() {
   testWidgets('a failed locate offers a working location-settings action',
       (tester) async {
     final location = _RecordingLocation();
-    await pumpPicker(
-      tester,
-      CityPickerCubit(cityRepo: repo, location: location),
-    );
+    final cubit = CityPickerCubit(cityRepo: repo, location: location);
+    await cubit.start();
+    await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
     await tester.pumpAndSettle();
@@ -80,7 +79,9 @@ void main() {
   testWidgets(
       'without a location service the hint still shows and the action '
       'is a safe no-op', (tester) async {
-    await pumpPicker(tester, CityPickerCubit(cityRepo: repo));
+    final cubit = CityPickerCubit(cityRepo: repo);
+    await cubit.start();
+    await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
     await tester.pumpAndSettle();

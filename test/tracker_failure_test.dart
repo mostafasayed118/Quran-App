@@ -32,6 +32,7 @@ void main() {
       () async {
     final db = AppDatabase.test(NativeDatabase.memory());
     final cubit = TrackerCubit(repo: _CrashingLoadRepo(db));
+    await cubit.start();
     await cubit.loaded;
     expect(cubit.state, isA<TrackerFailed>());
     await cubit.close();
@@ -41,6 +42,7 @@ void main() {
   test('a toggle crash is swallowed; the ready state survives', () async {
     final db = AppDatabase.test(NativeDatabase.memory());
     final cubit = TrackerCubit(repo: _CrashingToggleRepo(db));
+    await cubit.start();
     await cubit.loaded;
     await cubit.toggle(PrayerSlot.fajr);
     final ready = cubit.state as TrackerReady;
@@ -55,6 +57,7 @@ void main() {
     addTearDown(db.close);
     final cubit = TrackerCubit(repo: _CrashingLoadRepo(db));
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
       value: cubit,
       child: MaterialApp(

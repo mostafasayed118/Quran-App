@@ -88,6 +88,7 @@ void main() {
       city: city,
     );
     addTearDown(cubit.close);
+    await cubit.start();
 
     await pumpHome(tester, cubit, textScaler: const TextScaler.linear(2.0));
 
@@ -109,6 +110,7 @@ void main() {
       city: city,
     );
     addTearDown(cubit.close);
+    await cubit.start();
 
     await pumpHome(tester, cubit, textScaler: const TextScaler.linear(2.0));
 

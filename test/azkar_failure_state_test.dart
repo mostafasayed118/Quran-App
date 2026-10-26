@@ -12,6 +12,7 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 Future<void> pumpAzkar(WidgetTester tester, AzkarRepository repository) async {
   final cubit = AzkarCubit(repository: repository);
   addTearDown(cubit.close);
+  await cubit.start();
   await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
     value: cubit,
     child: MaterialApp(

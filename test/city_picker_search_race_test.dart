@@ -52,10 +52,8 @@ void main() {
   test('a slow older search cannot overwrite the newer results', () async {
     final repo = GatedCityRepository();
     final cubit = CityPickerCubit(cityRepo: repo);
+    await cubit.start();
 
-    for (var i = 0; i < 20 && cubit.state is! CityPickerReady; i++) {
-      await Future<void>.delayed(Duration.zero);
-    }
     expect(cubit.state, isA<CityPickerReady>());
 
     final slow = cubit.search('slow');

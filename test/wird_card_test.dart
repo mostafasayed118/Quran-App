@@ -59,6 +59,7 @@ void main() {
       khatma: withKhatma ? khatmaRepo : null,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await cubit.loaded;
     return cubit;
   }
@@ -75,6 +76,7 @@ void main() {
       khatma: withKhatma ? khatmaRepo : null,
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(
       appShell(
         wrap: (app) =>

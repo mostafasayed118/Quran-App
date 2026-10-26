@@ -25,7 +25,7 @@ void main() {
   group('QiblaCubit compass availability', () {
     test('no heading service at all marks the compass unavailable', () async {
       final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
-      await cubit.reload();
+      await cubit.start();
       expect(cubit.state.compassUnavailable, isTrue);
       expect(cubit.state.heading, isNull);
       await cubit.close();
@@ -38,7 +38,7 @@ void main() {
         qibla: FakeQiblaService(),
         heading: HeadingService(streamFactory: () => null),
       );
-      await cubit.reload();
+      await cubit.start();
       expect(cubit.state.compassUnavailable, isTrue);
       await cubit.close();
     });
@@ -53,6 +53,7 @@ void main() {
         qibla: FakeQiblaService(),
         heading: HeadingService(streamFactory: () => controller.stream),
       );
+      await cubit.start();
       controller.addError(StateError('NO_SENSOR'));
       await Future<void>.delayed(Duration.zero);
       expect(cubit.state.compassUnavailable, isTrue);
@@ -68,7 +69,7 @@ void main() {
         qibla: FakeQiblaService(),
         heading: HeadingService(streamFactory: () => controller.stream),
       );
-      await cubit.reload();
+      await cubit.start();
       expect(cubit.state.compassUnavailable, isFalse);
       controller.add(90.0);
       await Future<void>.delayed(Duration.zero);
@@ -85,6 +86,7 @@ void main() {
         qibla: FakeQiblaService(),
         heading: HeadingService(streamFactory: () => controller.stream),
       );
+      await cubit.start();
       controller.add(90.0);
       await Future<void>.delayed(Duration.zero);
       expect(cubit.state.heading, 90.0);
@@ -104,7 +106,7 @@ void main() {
         qibla: FakeQiblaService(),
         heading: HeadingService(streamFactory: () => controller.stream),
       );
-      await cubit.reload();
+      await cubit.start();
       controller.add(90.0);
       await Future<void>.delayed(Duration.zero);
       expect(cubit.state.heading, 90.0);
@@ -128,6 +130,7 @@ void main() {
         heading: heading,
       );
       addTearDown(cubit.close);
+      await cubit.start();
       await pumpAppHost(
         tester,
         wrap: (app) => BlocProvider<QiblaCubit>.value(value: cubit, child: app),

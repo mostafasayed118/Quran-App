@@ -65,6 +65,7 @@ void main() {
       downloader: _InstalledHadithDownloader(db),
     );
     addTearDown(cubit.close);
+    await cubit.start();
 
     await tester.pumpWidget(BlocProvider<LibraryCubit>.value(
       value: cubit,

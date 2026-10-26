@@ -85,6 +85,7 @@ void main() {
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0);
+    await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),

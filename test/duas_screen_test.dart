@@ -91,6 +91,7 @@ void main() {
       ayahs: AyahRepository(db),
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await pumpAppHost(
       tester,
       wrap: (app) => BlocProvider<DuasCubit>.value(value: cubit, child: app),
@@ -133,6 +134,7 @@ void main() {
       ayahs: AyahRepository(db),
     );
     addTearDown(cubit.close);
+    await cubit.start();
     await tester.pumpWidget(BlocProvider<DuasCubit>.value(
       value: cubit,
       child: MaterialApp(

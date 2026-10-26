@@ -104,9 +104,11 @@ void main() {
     final cubit = buildCubit();
     addTearDown(cubit.close);
 
-    final ready = await cubit.stream
+    final readyFuture = cubit.stream
         .firstWhere((s) => s is ReaderReady)
         .timeout(const Duration(seconds: 10));
+    await cubit.start();
+    final ready = await readyFuture;
 
     expect(ready, isA<ReaderReady>());
     expect(lastRead.saves, 1,
@@ -117,7 +119,7 @@ void main() {
   test('toggleBookmark completes when the repository write throws', () async {
     final cubit = buildCubit();
     addTearDown(cubit.close);
-    await cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
 
     await cubit.toggleBookmark(1).timeout(const Duration(seconds: 10));
 
@@ -127,7 +129,9 @@ void main() {
   test('onMushafPageChanged completes when the marker write throws', () async {
     final cubit = buildCubit();
     addTearDown(cubit.close);
-    final ready = await cubit.stream.firstWhere((s) => s is ReaderReady);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture;
     expect((ready as ReaderReady).mushafPages, isNotEmpty);
 
     await cubit.onMushafPageChanged(0).timeout(const Duration(seconds: 10));

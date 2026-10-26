@@ -98,13 +98,14 @@ void main() {
     lastRead = LastReadRepository(db);
   });
 
-  Widget host(int surahId) {
+  Future<Widget> host(int surahId) async {
     repo = _TeardownSafeAyahRepository(db);
     final cubit = ReaderCubit(
         ayahRepository: repo,
         lastReadRepository: lastRead,
         surahId: surahId,
         initialAyah: 0);
+    await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: _FakePlaybackService(),
       reciters: ReciterRepository(db),
@@ -123,7 +124,7 @@ void main() {
 
   testWidgets('surah 2 shows basmala banner and ayah cards in verse mode',
       (tester) async {
-    final screen = host(2);
+    final screen = await host(2);
     await tester.pumpWidget(MaterialApp(
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],
@@ -145,7 +146,7 @@ void main() {
   });
 
   testWidgets('bookmark heart toggles the DB row', (tester) async {
-    final screen = host(2);
+    final screen = await host(2);
     await tester.pumpWidget(MaterialApp(
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],
@@ -170,7 +171,7 @@ void main() {
 
   testWidgets('mushaf mode renders page blocks with the page indicator',
       (tester) async {
-    final screen = host(2);
+    final screen = await host(2);
     await tester.pumpWidget(MaterialApp(
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],

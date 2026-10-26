@@ -32,6 +32,7 @@ void main() {
     final repo = _GatedTasbihRepository(newTestDb());
     final cubit = TasbihCubit(repo: repo);
     addTearDown(cubit.close);
+    unawaited(cubit.start());
 
     // Hydration is parked on the gate; the user taps first.
     await cubit.increment();
@@ -50,6 +51,7 @@ void main() {
     final repo = _GatedTasbihRepository(newTestDb());
     final cubit = TasbihCubit(repo: repo);
     addTearDown(cubit.close);
+    unawaited(cubit.start());
 
     repo.loadGate.complete();
     await cubit.loaded;
