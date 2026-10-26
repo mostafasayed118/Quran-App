@@ -120,6 +120,9 @@ class _AssetTile extends StatelessWidget {
 
   Future<void> _open(BuildContext context, String title, String asset) async {
     final loc = AppLocalizations.of(context);
+    // Loaded once, before the dialog mounts: an inline call inside the
+    // builder would start a fresh bundle read on every dialog rebuild.
+    final contents = rootBundle.loadString(asset);
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -127,7 +130,7 @@ class _AssetTile extends StatelessWidget {
         content: SizedBox(
           width: 520,
           child: FutureBuilder<String>(
-            future: rootBundle.loadString(asset),
+            future: contents,
             builder: (context, snapshot) {
               if (snapshot.hasError) return Text(loc.licensesUnavailable);
               final text = snapshot.data;
