@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -19,7 +21,7 @@ import 'ayah_sheet_state.dart';
 /// empty states route to /library. [downloader] is a widget-test seam:
 /// production callers omit it and the registered singleton is resolved here,
 /// so the reader presentation never depends on the library data layer.
-class AyahSheet extends StatelessWidget {
+class AyahSheet extends StatefulWidget {
   const AyahSheet({
     super.key,
     required this.surahId,
@@ -34,17 +36,37 @@ class AyahSheet extends StatelessWidget {
   final PackDownloader? downloader;
 
   @override
+  State<AyahSheet> createState() => _AyahSheetState();
+}
+
+class _AyahSheetState extends State<AyahSheet> {
+  late final AyahSheetCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    // Created outside build so the pack reads start in the mount lifecycle,
+    // not inside a frame's build. The container is resolved through get_it
+    // directly: a feature may not import the app layer (the composition
+    // root), and the compatibility shim exists for the frozen suite only.
+    _cubit = AyahSheetCubit(
+      downloader: widget.downloader ?? GetIt.instance<PackDownloader>(),
+      surah: widget.surahId,
+      ayah: widget.ayah,
+    );
+  }
+
+  @override
+  void dispose() {
+    unawaited(_cubit.close());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider<AyahSheetCubit>(
-      create: (_) => AyahSheetCubit(
-        // The container is resolved through get_it directly: a feature may
-        // not import the app layer (the composition root), and the
-        // compatibility shim exists for the frozen suite only.
-        downloader: downloader ?? GetIt.instance<PackDownloader>(),
-        surah: surahId,
-        ayah: ayah,
-      ),
-      child: _AyahSheetView(surahName: surahName, ayah: ayah),
+    return BlocProvider<AyahSheetCubit>.value(
+      value: _cubit,
+      child: _AyahSheetView(surahName: widget.surahName, ayah: widget.ayah),
     );
   }
 }
