@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'app_system_ui.dart';
 
 abstract final class QuranFonts {
   static const quran = 'HafsSmart';
@@ -72,6 +73,7 @@ abstract final class AppTheme {
         foregroundColor:
             isLight ? AppColors.emeraldDark : AppColors.darkOnSurface,
         centerTitle: true,
+        systemOverlayStyle: AppSystemUi.overlayStyle(brightness),
       ),
       cardTheme: CardThemeData(
         color: colorScheme.surface,
