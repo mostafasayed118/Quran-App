@@ -81,8 +81,16 @@ void main() {
     addTearDown(cubit.close);
 
     await cubit.search('قديم');
-    final more = cubit.loadMore();
+    // The new query is in flight while the old Ready state stays on screen,
+    // so loadMore captures the NEW generation with the OLD query.
     final fresh = cubit.search('جديد');
+    final more = cubit.loadMore();
+    expect(
+      source.queries,
+      ['قديم|null', 'جديد|null', 'قديم|2'],
+      reason: 'the race must be entered: paging the old query under the new '
+          'generation',
+    );
     newPage.complete(_page([9], hasMore: false));
     await fresh;
     oldPage.complete(_page([3], hasMore: false));
