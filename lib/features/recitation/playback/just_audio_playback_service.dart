@@ -8,6 +8,9 @@ import 'package:just_audio_background/just_audio_background.dart';
 import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
+/// Drops the seed a seeded stream replays to each new listener.
+Stream<Duration?> withoutReplaySeed(Stream<Duration?> source) => source.skip(1);
+
 class JustAudioPlaybackService
     implements
         PlaybackService,
@@ -18,18 +21,25 @@ class JustAudioPlaybackService
 
   final AudioPlayer _player;
 
+  /// The single 1 Hz position stream for this service.
+  ///
+  /// `createPositionStream` allocates a controller, a player-event
+  /// subscription, and a timer per call and exposes no close API.
+  late final Stream<Duration> _positionStream = _player.createPositionStream(
+    minPeriod: const Duration(seconds: 1),
+    maxPeriod: const Duration(seconds: 1),
+  );
+
   @override
   Stream<bool> playingStream() =>
       _player.playerStateStream.map((s) => s.playing);
 
   @override
-  Stream<Duration> positionStream() => _player.createPositionStream(
-        minPeriod: const Duration(seconds: 1),
-        maxPeriod: const Duration(seconds: 1),
-      );
+  Stream<Duration> positionStream() => _positionStream;
 
   @override
-  Stream<Duration?> durationStream() => _player.durationStream;
+  Stream<Duration?> durationStream() =>
+      withoutReplaySeed(_player.durationStream);
 
   @override
   Stream<void> completionStream() => _player.processingStateStream
