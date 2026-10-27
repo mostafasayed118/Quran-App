@@ -23,7 +23,10 @@ class JustAudioPlaybackService
       _player.playerStateStream.map((s) => s.playing);
 
   @override
-  Stream<Duration> positionStream() => _player.positionStream;
+  Stream<Duration> positionStream() => _player.createPositionStream(
+        minPeriod: const Duration(seconds: 1),
+        maxPeriod: const Duration(seconds: 1),
+      );
 
   @override
   Stream<Duration?> durationStream() => _player.durationStream;

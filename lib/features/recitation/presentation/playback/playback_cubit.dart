@@ -303,6 +303,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   void _onPositionChanged(Duration position) {
     if (isClosed) return;
     final state = this.state;
+    final current = switch (state) {
+      PlaybackPlaying(position: final p) => p,
+      PlaybackPaused(position: final p) => p,
+      _ => null,
+    };
+    // The plugin stream is already capped at 1 Hz; this dedupe also protects
+    // the UI from a replayed tick at the same wall-clock second.
+    if (current != null && current.inSeconds == position.inSeconds) return;
     if (state is PlaybackPlaying) {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,

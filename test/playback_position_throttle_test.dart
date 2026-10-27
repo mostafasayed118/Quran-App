@@ -115,4 +115,27 @@ void main() {
     expect(
         (cubit.state as PlaybackPlaying).duration, const Duration(minutes: 5));
   });
+
+  test('sub-second position ticks do not rebuild the progress row', () async {
+    final pending = cubit.playSurah(row, 1);
+    await waitForBinding();
+    service.playingCtrl.add(true);
+    await Future<void>.delayed(Duration.zero);
+    expect(cubit.state, isA<PlaybackPlaying>());
+
+    service.positionCtrl.add(const Duration(milliseconds: 200));
+    service.positionCtrl.add(const Duration(milliseconds: 400));
+    service.positionCtrl.add(const Duration(milliseconds: 800));
+    await Future<void>.delayed(Duration.zero);
+
+    expect((cubit.state as PlaybackPlaying).position, Duration.zero);
+
+    service.positionCtrl.add(const Duration(seconds: 1));
+    await Future<void>.delayed(Duration.zero);
+    expect(
+        (cubit.state as PlaybackPlaying).position, const Duration(seconds: 1));
+
+    service.loadGate.complete();
+    await pending;
+  });
 }
