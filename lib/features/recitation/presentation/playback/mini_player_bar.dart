@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/error_strip.dart';
@@ -85,31 +86,35 @@ class _PlaybackStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
+    // Scaffold strips the bottom padding from its bottomSheet slot, so the
+    // inset is read from the frame view and applied inside the Material —
+    // the strip keeps painting behind the system bar.
     return Material(
       color: colors.surface,
       elevation: 4,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-              14, AppSpacing.xs, AppSpacing.xs, AppSpacing.xs),
-          child: Row(
-            children: [
-              Expanded(
-                child: _TrackInfo(
-                  reciterName: reciterName,
-                  surahNumber: surahNumber,
-                ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          14,
+          AppSpacing.xs,
+          AppSpacing.xs,
+          AppSpacing.xs + appBottomInset(context),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _TrackInfo(
+                reciterName: reciterName,
+                surahNumber: surahNumber,
               ),
-              const SizedBox(width: AppSpacing.xs),
-              _PlayToggle(busy: busy, playing: playing),
-              IconButton(
-                tooltip: loc.stopTooltip,
-                icon: const Icon(Icons.stop),
-                onPressed: () => context.read<PlaybackCubit>().stopAndReset(),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            _PlayToggle(busy: busy, playing: playing),
+            IconButton(
+              tooltip: loc.stopTooltip,
+              icon: const Icon(Icons.stop),
+              onPressed: () => context.read<PlaybackCubit>().stopAndReset(),
+            ),
+          ],
         ),
       ),
     );
@@ -217,10 +222,16 @@ class _FailedStrip extends StatelessWidget {
       PlaybackFailureKind.backgroundUnavailable => loc.playbackBackgroundFailed,
       PlaybackFailureKind.noReciters => loc.playbackNoReciters,
     };
-    return ErrorStrip(
-      message,
-      dismissTooltip: loc.stopTooltip,
-      onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.errorContainer,
+      child: Padding(
+        padding: EdgeInsets.only(bottom: appBottomInset(context)),
+        child: ErrorStrip(
+          message,
+          dismissTooltip: loc.stopTooltip,
+          onDismiss: () => context.read<PlaybackCubit>().stopAndReset(),
+        ),
+      ),
     );
   }
 }
