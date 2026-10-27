@@ -52,9 +52,13 @@ void main() {
     await cubit.importFromFile();
     expect(cubit.state, isA<BackupPreviewReady>());
     await cubit.close();
+    final before = cubit.state;
 
     expect(cubit.cancelPreview, returnsNormally);
+    expect(cubit.state, same(before));
+
     expect(cubit.acknowledge, returnsNormally);
+    expect(cubit.state, same(before));
   });
 
   test('export completes after close', () async {

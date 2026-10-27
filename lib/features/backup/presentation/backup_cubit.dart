@@ -89,6 +89,7 @@ class BackupCubit extends Cubit<BackupState> {
         return;
       }
       final result = await _decodeBackup(bytes);
+      if (isClosed) return;
       if (result is! BackupDecodeSuccess) {
         emit(const BackupState.invalidFile());
         return;
