@@ -90,9 +90,14 @@ void main() {
     expect(service.playingCtrl.hasListener, isTrue);
     expect(cubit.state, isA<PlaybackLoading>());
 
+    service.durationCtrl.add(const Duration(minutes: 3));
+    await Future<void>.delayed(Duration.zero);
+
     service.playingCtrl.add(true);
     await Future<void>.delayed(Duration.zero);
     expect(cubit.state, isA<PlaybackPlaying>());
+    expect(
+        (cubit.state as PlaybackPlaying).duration, const Duration(minutes: 3));
 
     service.loadGate.complete();
     await pending;
@@ -116,6 +121,7 @@ void main() {
     for (var i = 0; i < 100 && !service.playingCtrl.hasListener; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 1));
     }
+    expect(service.playingCtrl.hasListener, isTrue);
     service.playingCtrl.add(true);
     await Future<void>.delayed(Duration.zero);
 

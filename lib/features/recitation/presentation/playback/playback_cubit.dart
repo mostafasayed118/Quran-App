@@ -59,6 +59,13 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 
   String _reciterName = '';
 
+  /// The last non-null track duration the service reported.
+  ///
+  /// The duration can arrive while the track is still loading, before the
+  /// cubit holds a [PlaybackPlaying] state; the promotion into that state
+  /// seeds this value instead of starting from zero.
+  Duration _lastDuration = Duration.zero;
+
   /// Monotonic play-attempt counter: bumped by every play attempt and by
   /// [stopAndReset], so a hung attempt's late success/failure is discarded
   /// once a newer attempt (or a stop) superseded it.
@@ -113,6 +120,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: _reciterName,
         surahNumber: surahNumber,
+        duration: _lastDuration,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('playback load failed',
@@ -272,6 +280,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: state.reciterName!,
         surahNumber: state.surahNumber,
+        duration: _lastDuration,
       ));
     } else if (playing && state is PlaybackPaused) {
       emit(PlaybackState.playing(
@@ -312,6 +321,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 
   void _onDurationChanged(Duration? duration) {
     if (isClosed || duration == null) return;
+    _lastDuration = duration;
     final state = this.state;
     if (state is PlaybackPlaying) {
       emit(PlaybackState.playing(
