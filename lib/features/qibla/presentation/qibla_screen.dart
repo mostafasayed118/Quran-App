@@ -60,12 +60,12 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
     final cubit = context.read<QiblaCubit>();
     switch (state) {
       case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.hidden:
         cubit.pause();
       case AppLifecycleState.resumed:
         cubit.resume();
-      case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
         break;
     }
   }
@@ -105,7 +105,12 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
             return EmptyState(
               loc.noCity,
               actionLabel: loc.selectCity,
-              onAction: () => context.push(AppRoutes.cityPicker),
+              onAction: () async {
+                final selected = await context.push<bool>(AppRoutes.cityPicker);
+                if (selected == true && context.mounted) {
+                  await context.read<QiblaCubit>().reload();
+                }
+              },
             );
           }
           return ListView(
