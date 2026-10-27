@@ -75,10 +75,12 @@ import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'di/injector.dart';
 import 'route_cubit_scope.dart';
+import 'route_observer.dart';
 
 abstract final class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.home,
+    observers: [appRouteObserver],
     errorBuilder: (context, state) {
       final loc = AppLocalizations.of(context);
       return PlaceholderScreen(

@@ -32,12 +32,17 @@ class HomeCubit extends Cubit<HomeState> {
   final PrayerTimesPort _prayer;
   final CitySource _city;
 
+  /// Monotonic token: only the newest [reload] may emit, so a slow older
+  /// load can never overwrite the result of a newer one.
+  int _reloadSeq = 0;
+
   /// Loads both cards and emits the ready state.
   ///
   /// The two reads are independent and run concurrently; the first failure
   /// wins and emits [HomeState.failed] (the other chain is consumed, never
   /// an unhandled async error).
   Future<void> reload() async {
+    final seq = ++_reloadSeq;
     try {
       // The two cards are independent. The LIST form of Future.wait completes
       // with the first error and consumes the rest, so a second failing chain
@@ -48,7 +53,7 @@ class HomeCubit extends Cubit<HomeState> {
       ]);
       final lastReadCard = results[0] as LastReadCard?;
       final nextPrayerCard = results[1] as NextPrayerCard?;
-      if (isClosed) return;
+      if (isClosed || seq != _reloadSeq) return;
       emit(HomeState.ready(
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
@@ -56,7 +61,7 @@ class HomeCubit extends Cubit<HomeState> {
     } on Object catch (error, stackTrace) {
       dev.log('home load failed',
           name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
-      if (isClosed) return;
+      if (isClosed || seq != _reloadSeq) return;
       emit(const HomeState.failed());
     }
   }

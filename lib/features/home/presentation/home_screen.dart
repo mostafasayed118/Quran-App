@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/routing/route_observer.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -15,7 +18,7 @@ import '../../../../l10n/app_localizations.dart';
 import 'home_cubit.dart';
 import 'home_state.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   /// Same contract as the prayer-times screen: the picker pops `true` on a
@@ -25,6 +28,51 @@ class HomeScreen extends StatelessWidget {
     final reloaded = await context.push<bool>(AppRoutes.cityPicker);
     if (reloaded == true && context.mounted) {
       await cubit.reload();
+    }
+  }
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with RouteAware, WidgetsBindingObserver {
+  PageRoute<dynamic>? _route;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route is PageRoute<dynamic> && route != _route) {
+      if (_route != null) appRouteObserver.unsubscribe(this);
+      _route = route;
+      appRouteObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didPopNext() {
+    if (!mounted) return;
+    unawaited(context.read<HomeCubit>().reload());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && mounted) {
+      unawaited(context.read<HomeCubit>().reload());
     }
   }
 
