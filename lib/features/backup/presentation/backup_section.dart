@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,7 +36,7 @@ class BackupSection extends StatelessWidget {
             );
             cubit.acknowledge();
           case BackupPreviewReady(:final summary):
-            showDialog<void>(
+            unawaited(showDialog<void>(
               context: context,
               barrierDismissible: false,
               builder: (_) => _PreviewDialog(
@@ -42,7 +44,11 @@ class BackupSection extends StatelessWidget {
                 onCancel: cubit.cancelPreview,
                 onMerge: cubit.confirmImport,
               ),
-            );
+            ).then((_) {
+              if (!cubit.isClosed && cubit.state is BackupPreviewReady) {
+                cubit.cancelPreview();
+              }
+            }));
           case BackupIdle() || BackupFailed() || BackupInvalidFile():
             break;
         }

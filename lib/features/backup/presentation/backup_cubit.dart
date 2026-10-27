@@ -52,6 +52,7 @@ class BackupCubit extends Cubit<BackupState> {
   /// Encodes every backed-up entity and hands the JSON to the share sheet.
   /// Never throws: a failure emits the `failed(duringExport: true)` state.
   Future<void> export() async {
+    if (isClosed) return;
     if (!_canStart) return;
     emit(const BackupState.idle(busy: true));
     try {
@@ -73,6 +74,7 @@ class BackupCubit extends Cubit<BackupState> {
   /// read-only merge preview. Nothing is written here — the write happens in
   /// [confirmImport] after the user confirms.
   Future<void> importFromFile() async {
+    if (isClosed) return;
     if (!_canStart) return;
     emit(const BackupState.idle(busy: true));
     try {
@@ -112,6 +114,7 @@ class BackupCubit extends Cubit<BackupState> {
 
   /// The preview dialog's confirm: applies inside the service transaction.
   Future<void> confirmImport() async {
+    if (isClosed) return;
     final current = state;
     if (current is! BackupPreviewReady) return;
     emit(const BackupState.idle(busy: true));
@@ -131,11 +134,13 @@ class BackupCubit extends Cubit<BackupState> {
 
   /// The preview dialog's cancel — zero writes by construction.
   void cancelPreview() {
+    if (isClosed) return;
     if (state is BackupPreviewReady) emit(const BackupState.idle());
   }
 
   /// After the success snackbar / a dismissed error strip.
   void acknowledge() {
+    if (isClosed) return;
     if (state is! BackupIdle) emit(const BackupState.idle());
   }
 
