@@ -85,6 +85,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       String rowId, String reciterName, String server, int surahNumber) async {
     if (isClosed) return;
     final episode = ++_episode;
+    _lastDuration = Duration.zero;
     _reciterName = reciterName;
     emit(PlaybackState.loading(
       reciterName: reciterName,
