@@ -98,6 +98,7 @@ class _MyLocationTile extends StatelessWidget {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final city = await cubit.locateNearest();
+    if (!context.mounted) return;
     if (city != null) {
       navigator.pop(true);
     } else {
