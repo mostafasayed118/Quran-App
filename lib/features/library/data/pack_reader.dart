@@ -214,6 +214,16 @@ class PackReader {
     _removePack(packId);
   }
 
+  /// Estimated retained bytes of the decoded projections (test/diagnostic).
+  int get cachedBytes => _cacheBytes;
+
+  /// Drops every decoded projection. Called when the app is backgrounded;
+  /// the next read re-decodes from disk.
+  void trim() {
+    _cache.clear();
+    _cacheBytes = 0;
+  }
+
   /// Production cold decode: reads, parses AND projects inside the isolate.
   /// Only the projection crosses the port; an absent/unreadable/corrupt file
   /// projects to null (the same "absent" semantics the read API exposes).

@@ -509,6 +509,9 @@ class PackDownloader {
   Future<String?> tafsirFor(String packId, int surah, int ayah) =>
       _reader.tafsirFor(packId, surah, ayah);
 
+  /// Drops the decoded pack cache; the next read re-decodes from disk.
+  void trimReadCache() => _reader.trim();
+
   /// A paged window of an installed hadith pack:
   /// `([ (hadithnumber, text), ... ], hasMore)`.
   ///
