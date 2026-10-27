@@ -84,12 +84,34 @@ class PackDownloader {
   /// allow up to 2x the declared size plus 64 KiB slack.
   static int _sizeCap(int expectedBytes) => guardedByteCap(expectedBytes);
 
-  /// Installs a pack: download -> validate -> promote -> registry row.
+  /// In-flight installs keyed by pack id (single-flight gate).
+  final Map<String, Future<File>> _installs = {};
+
+  /// Installs a pack at most once at a time. Concurrent callers share the
+  /// in-flight future; the second caller gets the same promoted file and does
+  /// not open a second writer on the same `.part`. Progress callbacks belong
+  /// to the caller that started the install.
   ///
   /// Throws [PackFailure] (or the underlying Dio error) on any failure; on
   /// failure the dot-part is deleted, the final file is untouched and NO
   /// registry row is written.
   Future<File> install(
+    LibraryPackInfo pack, {
+    void Function(int received, int total)? onProgress,
+  }) {
+    final inFlight = _installs[pack.id];
+    if (inFlight != null) return inFlight;
+    final future = _installOnce(pack, onProgress: onProgress);
+    _installs[pack.id] = future;
+    future.whenComplete(() {
+      if (identical(_installs[pack.id], future)) {
+        _installs.remove(pack.id);
+      }
+    }).ignore();
+    return future;
+  }
+
+  Future<File> _installOnce(
     LibraryPackInfo pack, {
     void Function(int received, int total)? onProgress,
   }) async {
