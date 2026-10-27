@@ -112,18 +112,35 @@ Future<Uint8List?> _loadAssetOnWorker(
       return asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes);
     });
 
+/// Upper bound on the worker-isolate asset read.
+///
+/// A background-isolate platform reply can be LOST: observed on Android 16
+/// (API 36), where the `flutter/assets` reply resolves to `null` and the
+/// framework's messenger throws while parsing it, leaving the caller's
+/// completer unresolved — `await` never returns and boot hangs on the splash
+/// forever. The bound turns that class of hang into the existing UI-isolate
+/// fallback.
+const Duration _workerAssetTimeout = Duration(seconds: 3);
+
 /// Writes [assetKey] to [target] without touching the UI isolate.
 ///
 /// The write goes to a `.part` file that is renamed onto the target: a
 /// failed write must never leave a half-written database behind. When the
-/// worker path is unavailable or fails, the historical UI-isolate path runs
-/// (identical behavior, including the error a missing asset raises).
-Future<void> _writeAssetOffUiIsolate(File target, String assetKey) async {
+/// worker path is unavailable, fails, or does not answer within [timeout],
+/// the historical UI-isolate path runs (identical behavior, including the
+/// error a missing asset raises).
+@visibleForTesting
+Future<void> writeAssetOffUiIsolate(
+  File target,
+  String assetKey, {
+  Future<Uint8List?> Function()? workerLoad,
+  Future<ByteData> Function(String assetKey)? loadAsset,
+  Duration timeout = _workerAssetTimeout,
+}) async {
   if (target.existsSync()) return;
-  final token = ServicesBinding.rootIsolateToken;
-  if (token != null) {
+  if (workerLoad != null) {
     try {
-      final bytes = await _loadAssetOnWorker(assetKey, token);
+      final bytes = await workerLoad().timeout(timeout);
       if (bytes != null) {
         await target.parent.create(recursive: true);
         final part = File('${target.path}.part');
@@ -143,7 +160,29 @@ Future<void> _writeAssetOffUiIsolate(File target, String assetKey) async {
   await copyDbAssetIfAbsent(
     target: target,
     assetKey: assetKey,
-    loadAsset: rootBundle.load,
+    loadAsset: loadAsset ?? rootBundle.load,
+  );
+}
+
+/// Production entry: the worker path exists for the mobile boot, where the
+/// asset read would otherwise stall the first frame.
+///
+/// The gate is deliberately `dart:io`'s platform, not the target platform:
+/// a `flutter test` VM also exposes a root-isolate token, but its background
+/// messenger never answers — arming the timeout there would leave a pending
+/// timer in every widget test that boots the app.
+Future<void> _writeAssetOffUiIsolate(File target, String assetKey) {
+  if (!Platform.isAndroid && !Platform.isIOS) {
+    return writeAssetOffUiIsolate(target, assetKey);
+  }
+  final token = ServicesBinding.rootIsolateToken;
+  if (token == null) {
+    return writeAssetOffUiIsolate(target, assetKey);
+  }
+  return writeAssetOffUiIsolate(
+    target,
+    assetKey,
+    workerLoad: () => _loadAssetOnWorker(assetKey, token),
   );
 }
 
