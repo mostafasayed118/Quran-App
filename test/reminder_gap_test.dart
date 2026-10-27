@@ -13,10 +13,28 @@ class _NoCity implements CitySource {
   Future<void> select(City city) async {}
 }
 
+class _OneCity implements CitySource {
+  @override
+  Future<City?> selectedCity() async => const City(
+        id: 'cairo',
+        nameAr: 'القاهرة',
+        nameEn: 'Cairo',
+        lat: 30.0444,
+        lng: 31.2357,
+      );
+  @override
+  Future<void> select(City city) async {}
+}
+
 class _Prayer implements PrayerTimesPort {
+  _Prayer({List<PrayerChoice> today = const <PrayerChoice>[]})
+      : todayPrayers = today;
+
+  final List<PrayerChoice> todayPrayers;
+
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) =>
-      const <PrayerChoice>[];
+      todayPrayers;
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
       PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 16, 4, 45));
@@ -95,5 +113,25 @@ void main() {
     final ids = scheduler.plan!.map((r) => r.id).toSet();
     expect(ids, containsAll({azkarReminderId, wirdReminderId}));
     expect(ids, isNot(contains(prayerReminderId)));
+  });
+
+  test('a selected city after Isha schedules tomorrow Fajr from the port',
+      () async {
+    final scheduler = _Scheduler();
+    await scheduleReminders(
+      city: _OneCity(),
+      prayer: _Prayer(today: [
+        PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+        PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+      ]),
+      settings: _Settings(),
+      scheduler: scheduler,
+      now: DateTime(2026, 3, 15, 21, 0),
+    );
+
+    final plan = scheduler.plan!;
+    expect(plan.map((r) => r.id).toSet(), {1, 2, 3});
+    final prayer = plan.singleWhere((r) => r.id == prayerReminderId);
+    expect(prayer.fireAt, DateTime(2026, 3, 16, 4, 45));
   });
 }
