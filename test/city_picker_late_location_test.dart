@@ -17,6 +17,15 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'prayer_times_cubit_test.dart' show cairoCity;
 import 'support/test_db.dart';
 
+class _RecordingNavigatorObserver extends NavigatorObserver {
+  final List<String?> popped = [];
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    popped.add(route.settings.name);
+  }
+}
+
 void main() {
   late AppDatabase db;
   late CityRepository repo;
@@ -29,6 +38,7 @@ void main() {
   Future<CityPickerCubit> pumpHost(
     WidgetTester tester, {
     LocationService? location,
+    NavigatorObserver? observer,
   }) async {
     final cubit = CityPickerCubit(cityRepo: repo, location: location);
     addTearDown(cubit.close);
@@ -46,6 +56,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           theme: AppTheme.light,
+          navigatorObservers: [if (observer != null) observer],
           home: Scaffold(
             body: Builder(
               builder: (context) => Center(
@@ -58,6 +69,7 @@ void main() {
                         final navigator = Navigator.of(context);
                         navigator.push(
                           MaterialPageRoute<void>(
+                            settings: const RouteSettings(name: 'under'),
                             builder: (_) => const Scaffold(
                               body: Center(child: Text('UNDER')),
                             ),
@@ -65,6 +77,7 @@ void main() {
                         );
                         navigator.push(
                           MaterialPageRoute<void>(
+                            settings: const RouteSettings(name: 'picker'),
                             builder: (_) => BlocProvider<CityPickerCubit>.value(
                               value: cubit,
                               child: const CityPickerScreen(),
@@ -135,5 +148,41 @@ void main() {
 
     expect(find.text('UNDER'), findsOneWidget);
     expect(find.byType(SnackBar), findsNothing);
+  });
+
+  testWidgets(
+      'a locate resolving while the picker is popping does not pop the '
+      'underlying route', (tester) async {
+    final observer = _RecordingNavigatorObserver();
+    final gate = Completer<CityCoordinates?>();
+    await pumpHost(
+      tester,
+      location: LocationService(resolver: () => gate.future),
+      observer: observer,
+    );
+
+    await tester.tap(find.text('استخدم موقعي'));
+    await tester.pump();
+    await tester.tap(find.byType(BackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(observer.popped, ['picker']);
+    expect(find.text('اختر مدينتك'), findsOneWidget);
+    expect(find.text('UNDER'), findsOneWidget);
+
+    gate.complete(const CityCoordinates(30.0444, 31.2357));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(observer.popped, ['picker']);
+    expect(find.text('UNDER'), findsOneWidget);
+    expect(find.byType(SnackBar), findsNothing);
+    expect((await repo.selectedCity())?.id, 'cairo');
+
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(find.text('اختر مدينتك'), findsNothing);
+    expect(find.text('UNDER'), findsOneWidget);
+    expect(find.text('HOME'), findsNothing);
   });
 }
