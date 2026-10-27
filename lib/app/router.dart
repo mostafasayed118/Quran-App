@@ -115,7 +115,10 @@ abstract final class AppRouter {
       GoRoute(
         path: AppRoutes.quranSearch,
         builder: (_, __) => BlocProvider<QuranSearchCubit>(
-          create: (_) => QuranSearchCubit(getIt<QuranSearchSource>()),
+          create: (_) => QuranSearchCubit(
+            getIt<QuranSearchSource>(),
+            debounce: const Duration(milliseconds: 300),
+          ),
           child: const QuranSearchScreen(),
         ),
       ),

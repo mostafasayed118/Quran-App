@@ -32,7 +32,7 @@ class QuranSearchScreen extends StatelessWidget {
             child: SearchField(
               hint: loc.searchQuranHint,
               autofocus: true,
-              onChanged: context.read<QuranSearchCubit>().search,
+              onChanged: context.read<QuranSearchCubit>().onQueryChanged,
             ),
           ),
           Expanded(

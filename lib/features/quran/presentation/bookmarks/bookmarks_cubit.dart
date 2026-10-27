@@ -72,6 +72,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
         current is! BookmarksReady ||
         !current.hasMore ||
         current.loadingMore ||
+        current.moreFailed ||
         current.lastBookmarkId <= 0) {
       return;
     }
