@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/deep_links.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -66,7 +67,7 @@ class _ReaderErrorView extends StatelessWidget {
                 : ErrorView(loc.readerNoAyahs(emptySurahId.toArabicIndic)),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 32),
+            padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
             child: FilledButton(
               onPressed: () => context.read<ReaderCubit>().reload(),
               child: Text(loc.retry),
@@ -172,6 +173,7 @@ class _VersesListState extends State<_VersesList> {
     return ScrollablePositionedList.builder(
       initialScrollIndex: _initialIndex,
       itemScrollController: _controller,
+      padding: EdgeInsets.only(bottom: appBottomInset(context)),
       itemCount: state.ayahs.length,
       itemBuilder: (context, index) {
         final ayah = state.ayahs[index];
@@ -376,7 +378,12 @@ class _MushafPagerState extends State<_MushafPager> {
                 '${a.textUthmani} ${loc.ornateBrackets(a.numberInSurah.toArabicIndic)}')
             .join(' ');
         return Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg + appBottomInset(context),
+          ),
           child: Column(
             children: [
               Expanded(

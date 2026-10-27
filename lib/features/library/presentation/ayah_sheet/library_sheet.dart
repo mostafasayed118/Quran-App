@@ -106,7 +106,10 @@ class _AyahSheetView extends StatelessWidget {
               top: Radius.circular(28),
             ),
             clipBehavior: Clip.antiAlias,
-            child: content,
+            // The modal route's useSafeArea only protects top/left/right;
+            // the sheet still extends under the system navigation bar, so the
+            // content pads itself while the surface keeps painting behind it.
+            child: SafeArea(top: false, child: content),
           ),
         );
       },
