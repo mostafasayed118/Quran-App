@@ -142,8 +142,7 @@ class AudioDownloader {
       } finally {
         await sink.close();
       }
-      if (await target.exists()) await target.delete();
-      final promoted = await part.rename(target.path);
+      final promoted = await _promotePart(part, target);
       final size = await promoted.length();
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
@@ -152,9 +151,41 @@ class AudioDownloader {
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
       if (await part.exists()) await part.delete();
-      if (await target.exists()) await target.delete();
       rethrow;
     }
+  }
+
+  /// Moves [part] onto [target] without discarding the previous target until
+  /// the new file is in place. A rename that cannot replace an existing
+  /// target (Windows) parks the old file at `<target>.bak` and restores it if
+  /// the swap fails.
+  Future<File> _promotePart(File part, File target) async {
+    final backup = File('${target.path}.bak');
+    File? promoted;
+    try {
+      promoted = await part.rename(target.path);
+    } on FileSystemException {
+      if (!await target.exists()) rethrow;
+    }
+    if (promoted != null) {
+      if (await backup.exists()) await backup.delete();
+      return promoted;
+    }
+    if (await backup.exists()) await backup.delete();
+    await target.rename(backup.path);
+    File? swapped;
+    try {
+      swapped = await part.rename(target.path);
+    } on Object {
+      try {
+        if (!await target.exists() && await backup.exists()) {
+          await backup.rename(target.path);
+        }
+      } on Object catch (_) {}
+      rethrow;
+    }
+    if (await backup.exists()) await backup.delete();
+    return swapped;
   }
 
   /// True when the surah finished downloading for that reciter.
