@@ -45,7 +45,14 @@ class AppDatabase extends _$AppDatabase {
           // every call scans the whole 6236-row table.
           await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_page '
               'ON ayahs(page)');
-          await customStatement('CREATE INDEX IF NOT EXISTS idx_bookmarks_ayah '
+          // One bookmark per ayah is a user-visible invariant. Repair any
+          // duplicates left by the old read-then-write toggle before the
+          // unique index is created (a failed CREATE would abort every open).
+          await customStatement('DELETE FROM bookmarks WHERE id NOT IN '
+              '(SELECT MIN(id) FROM bookmarks GROUP BY ayah_id)');
+          await customStatement('DROP INDEX IF EXISTS idx_bookmarks_ayah');
+          await customStatement(
+              'CREATE UNIQUE INDEX IF NOT EXISTS idx_bookmarks_ayah '
               'ON bookmarks(ayah_id)');
           await customStatement(
               'CREATE INDEX IF NOT EXISTS idx_downloads_lookup '

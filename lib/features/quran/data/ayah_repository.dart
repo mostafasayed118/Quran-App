@@ -45,18 +45,21 @@ class AyahRepository implements AyahSource, BookmarkPager {
   }
 
   @override
-  Future<void> toggleBookmark(int ayahId) async {
-    final existing = await (_db.select(_db.bookmarks)
-          ..where((b) => b.ayahId.equals(ayahId)))
-        .get();
-    if (existing.isEmpty) {
-      await _db
-          .into(_db.bookmarks)
-          .insert(BookmarksCompanion.insert(ayahId: ayahId));
-    } else {
-      await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
-          .go();
-    }
+  Future<void> toggleBookmark(int ayahId) {
+    return _db.transaction(() async {
+      final existing = await (_db.select(_db.bookmarks)
+            ..where((b) => b.ayahId.equals(ayahId)))
+          .getSingleOrNull();
+      if (existing == null) {
+        await _db.into(_db.bookmarks).insert(
+              BookmarksCompanion.insert(ayahId: ayahId),
+              mode: InsertMode.insertOrIgnore,
+            );
+      } else {
+        await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
+            .go();
+      }
+    });
   }
 
   @override
