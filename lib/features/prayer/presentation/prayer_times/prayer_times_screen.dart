@@ -74,12 +74,18 @@ class _TimesList extends StatefulWidget {
   State<_TimesList> createState() => _TimesListState();
 }
 
-class _TimesListState extends State<_TimesList> {
+class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
   Timer? _ticker;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _startTicker();
+  }
+
+  void _startTicker() {
+    if (_ticker != null) return;
     final cubit = context.read<PrayerTimesCubit>();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -87,10 +93,31 @@ class _TimesListState extends State<_TimesList> {
     });
   }
 
+  void _stopTicker() {
+    _ticker?.cancel();
+    _ticker = null;
+  }
+
   @override
   void dispose() {
-    _ticker?.cancel();
+    _stopTicker();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted) return;
+    switch (state) {
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        _stopTicker();
+      case AppLifecycleState.resumed:
+        _startTicker();
+      case AppLifecycleState.detached:
+        break;
+    }
   }
 
   @override
