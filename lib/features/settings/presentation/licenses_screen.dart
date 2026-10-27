@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/insets.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -24,7 +25,10 @@ class LicensesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(loc.licensesTitle)),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+        padding: appScrollPadding(
+          context,
+          const EdgeInsets.only(bottom: AppSpacing.lg),
+        ),
         children: [
           SectionHeader(title: loc.licensesContentSection),
           _InfoTile(

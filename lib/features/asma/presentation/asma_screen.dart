@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -76,7 +77,12 @@ class _NameSheet extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Card(
-        margin: const EdgeInsets.all(AppSpacing.md),
+        margin: EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md + appBottomInset(context),
+        ),
         color: colors.surface,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -142,7 +148,7 @@ class _NamesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
         mainAxisSpacing: 8,

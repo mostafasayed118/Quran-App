@@ -5,6 +5,7 @@ import '../../../core/domain/reminders.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/utils/insets.dart';
 import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../l10n/app_localizations.dart';
@@ -74,6 +75,7 @@ class _SettingsList extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<SettingsCubit>();
     return ListView(
+      padding: EdgeInsets.only(bottom: appBottomInset(context)),
       children: [
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),

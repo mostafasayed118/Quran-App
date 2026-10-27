@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -59,6 +60,7 @@ class _BookmarkList extends StatelessWidget {
         return false;
       },
       child: ListView.builder(
+        padding: EdgeInsets.only(bottom: appBottomInset(context)),
         itemCount: entries.length + (showTail ? 1 : 0),
         itemBuilder: (context, index) {
           if (index == entries.length) return _tail(context, loc);

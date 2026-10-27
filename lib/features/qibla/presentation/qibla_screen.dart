@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -108,7 +109,8 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
             );
           }
           return ListView(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding:
+                appScrollPadding(context, const EdgeInsets.all(AppSpacing.lg)),
             children: [
               _CityTile(title: city.nameAr),
               const SizedBox(height: AppSpacing.sm),

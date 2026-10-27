@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -51,6 +52,8 @@ class SurahIndexScreen extends StatelessWidget {
                   child: surahs.isEmpty
                       ? EmptyState(loc.noResults)
                       : ListView.builder(
+                          padding:
+                              EdgeInsets.only(bottom: appBottomInset(context)),
                           itemCount: surahs.length,
                           itemBuilder: (context, i) =>
                               _SurahRow(surah: surahs[i]),

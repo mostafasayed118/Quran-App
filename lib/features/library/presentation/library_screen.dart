@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/format_bytes.dart';
+import '../../../core/utils/insets.dart';
 import '../../../core/widgets/async_view.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
@@ -129,7 +130,10 @@ class _PackList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: appScrollPadding(
+        context,
+        const EdgeInsets.only(bottom: AppSpacing.md),
+      ),
       itemCount: packs.length,
       itemBuilder: (context, index) =>
           _PackRow(pack: packs[index], ready: ready),

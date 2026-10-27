@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -107,7 +108,10 @@ class _DuasView extends StatelessWidget {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: appScrollPadding(
+                  context,
+                  const EdgeInsets.all(AppSpacing.md),
+                ),
                 itemCount: view.entries.length,
                 itemBuilder: (context, i) {
                   final entry = view.entries[i];
@@ -142,7 +146,10 @@ class _RuqyahView extends StatelessWidget {
           return EmptyState(loc.noResults);
         }
         return ListView.builder(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: appScrollPadding(
+            context,
+            const EdgeInsets.all(AppSpacing.md),
+          ),
           itemCount: view.entries.length,
           itemBuilder: (context, i) {
             final entry = view.entries[i];

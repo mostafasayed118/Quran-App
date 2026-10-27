@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'zakat_cubit.dart';
 import 'zakat_state.dart';
@@ -43,7 +44,8 @@ class ZakatScreen extends StatelessWidget {
                   ? loc.zakatDue
                   : loc.zakatNotDue;
           return ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding:
+                appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
             children: [
               _NisabToggle(ready: ready),
               const SizedBox(height: 10),

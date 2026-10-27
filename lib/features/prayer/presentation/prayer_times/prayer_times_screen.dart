@@ -10,6 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -99,7 +100,7 @@ class _TimesListState extends State<_TimesList> {
     final state = widget.state;
     final city = widget.city;
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
+      padding: appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
       physics: const AlwaysScrollableScrollPhysics(),
       itemCount: state.entries.length + 1,
       itemBuilder: (context, i) {

@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -65,6 +66,7 @@ class ReciterSurahsScreen extends StatelessWidget {
           ) =>
             BlocBuilder<DownloadsCubit, DownloadsState>(
               builder: (context, dl) => ListView.builder(
+                padding: EdgeInsets.only(bottom: appBottomInset(context)),
                 itemCount: surahNumbers.length,
                 itemBuilder: (context, i) {
                   final n = surahNumbers[i];

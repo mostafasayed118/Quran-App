@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -49,7 +50,10 @@ class TrackerScreen extends StatelessWidget {
               :final khatma,
             ) =>
               ListView(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: appScrollPadding(
+                  context,
+                  const EdgeInsets.all(AppSpacing.md),
+                ),
                 children: [
                   _TodayCard(today: today),
                   const SizedBox(height: AppSpacing.sm),

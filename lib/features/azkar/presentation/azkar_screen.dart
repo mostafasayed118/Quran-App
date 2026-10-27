@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -119,7 +120,10 @@ class _BrowsingView extends StatelessWidget {
               ? (collections.isEmpty
                   ? EmptyState(loc.noResults)
                   : ListView.builder(
-                      padding: const EdgeInsets.all(AppSpacing.md),
+                      padding: appScrollPadding(
+                        context,
+                        const EdgeInsets.all(AppSpacing.md),
+                      ),
                       itemCount: collections.length,
                       itemBuilder: (context, i) =>
                           _CollectionTile(collection: collections[i]),
@@ -156,7 +160,10 @@ class _SearchResultsList extends StatelessWidget {
         ),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: appScrollPadding(
+              context,
+              const EdgeInsets.all(AppSpacing.md),
+            ),
             itemCount: results.length + (hasMore ? 1 : 0),
             itemBuilder: (context, i) {
               if (i == results.length) {
@@ -251,7 +258,10 @@ class _RecitingList extends StatelessWidget {
       builder: (context, state) {
         final reciting = state as AzkarReciting;
         return ListView.builder(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: appScrollPadding(
+            context,
+            const EdgeInsets.all(AppSpacing.md),
+          ),
           itemCount: reciting.collection.items.length,
           itemBuilder: (context, i) {
             final item = reciting.collection.items[i];

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -123,6 +124,7 @@ class _CityResults extends StatelessWidget {
     return results.isEmpty
         ? EmptyState(loc.noResults)
         : ListView.builder(
+            padding: EdgeInsets.only(bottom: appBottomInset(context)),
             itemCount: results.length,
             itemBuilder: (context, i) {
               final city = results[i];
