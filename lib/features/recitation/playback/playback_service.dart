@@ -22,8 +22,15 @@ abstract interface class PlaybackService {
   Stream<bool> playingStream();
   Stream<Duration> positionStream();
   Stream<Duration?> durationStream();
+
+  /// Issues the load and the play request.
+  ///
+  /// The returned future completes when the request has been issued; it must
+  /// NOT wait for playback to pause, stop, or finish.
   Future<void> loadAndPlay(PlaybackSource source);
   Future<void> pause();
+
+  /// Issues the resume request; completes when issued, not when playback ends.
   Future<void> resume();
   Future<void> stop();
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
@@ -56,7 +57,13 @@ class JustAudioPlaybackService
           tag: _mediaItem(id: id, source: source),
         );
     }
-    await _player.play();
+    // just_audio's play() future resolves on pause/stop/completion, not when
+    // playback starts. Awaiting it here would block the cubit's loading state
+    // for the whole track and let a later pause emit "playing".
+    unawaited(_player.play().catchError((Object error, StackTrace stackTrace) {
+      dev.log('playback play request failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+    }));
   }
 
   MediaItem _mediaItem({required String id, required PlaybackSource source}) {
@@ -74,7 +81,12 @@ class JustAudioPlaybackService
   Future<void> pause() => _player.pause();
 
   @override
-  Future<void> resume() => _player.play();
+  Future<void> resume() async {
+    unawaited(_player.play().catchError((Object error, StackTrace stackTrace) {
+      dev.log('playback resume request failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+    }));
+  }
 
   @override
   Future<void> stop() => _player.stop();

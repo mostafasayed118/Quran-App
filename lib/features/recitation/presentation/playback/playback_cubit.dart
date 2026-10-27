@@ -109,6 +109,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       await _service.loadAndPlay(source);
       if (isClosed || episode != _episode) return;
+      if (state is! PlaybackLoading) return;
       emit(PlaybackState.playing(
         reciterName: _reciterName,
         surahNumber: surahNumber,
@@ -267,7 +268,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   void _onPlayingChanged(bool playing) {
     if (isClosed) return;
     final state = this.state;
-    if (playing && state is PlaybackPaused) {
+    if (playing && state is PlaybackLoading && state.reciterName != null) {
+      emit(PlaybackState.playing(
+        reciterName: state.reciterName!,
+        surahNumber: state.surahNumber,
+      ));
+    } else if (playing && state is PlaybackPaused) {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
