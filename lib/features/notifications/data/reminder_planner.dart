@@ -51,10 +51,10 @@ class ReminderTexts {
 }
 
 /// Pure scheduling policy (PM ruling, keep it dumb): the next prayer still
-/// ahead today + the daily azkar and wird at their settings times (today if
-/// still ahead, else tomorrow). Missed-while-dead reminders are accepted v1
-/// and are not back-filled; the app re-plans on every open and on every city
-/// change.
+/// ahead today, else the supplied `nextPrayer` (tomorrow's Fajr), + the daily
+/// azkar and wird at their settings times (today if still ahead, else
+/// tomorrow). Missed-while-dead reminders are accepted v1 and are not
+/// back-filled; the app re-plans on every open and on every city change.
 List<ScheduledReminder> planReminders({
   required DateTime now,
   required List<PrayerChoice> todayPrayers,
