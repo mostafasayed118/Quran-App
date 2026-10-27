@@ -68,7 +68,6 @@ flutter:
   uses-material-design: true
   generate: true
   assets:
-    - assets/icons/
     - assets/db/
     - assets/data/
     - assets/licenses/

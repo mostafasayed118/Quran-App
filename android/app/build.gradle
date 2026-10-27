@@ -53,6 +53,11 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        ndk {
+            // Upload-only native symbols: keep function names for crash
+            // symbolication without the FULL per-ABI DWARF payload.
+            debugSymbolLevel 'SYMBOL_TABLE'
+        }
     }
 
     signingConfigs {
