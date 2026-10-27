@@ -106,6 +106,7 @@ class AudioDownloader {
     CancelToken? cancelToken,
   }) async {
     final target = await _targetFile(reciter.id, surahNumber);
+    final part = File('${target.path}.part');
     final url = surahAudioUrl(reciter.server, surahNumber);
     await _markStatus(
         reciter.id, surahNumber, DownloadStatus.downloading, 0, target.path);
@@ -120,9 +121,9 @@ class AudioDownloader {
               0;
       var received = 0;
       final throttle = ProgressThrottle();
-      final sink = target.openWrite();
       final body = res.data;
       if (body == null) throw DownloadFailure('empty audio response');
+      final sink = part.openWrite();
       try {
         await for (final chunk in body.stream) {
           received += chunk.length;
@@ -134,20 +135,24 @@ class AudioDownloader {
             onProgress?.call(received, total);
           }
         }
+        if (total > 0 && received != total) {
+          throw DownloadFailure('audio body ended before its declared size');
+        }
         await sink.flush();
       } finally {
         await sink.close();
       }
-      final size = await target.length();
+      if (await target.exists()) await target.delete();
+      final promoted = await part.rename(target.path);
+      final size = await promoted.length();
       await _markStatus(
-          reciter.id, surahNumber, DownloadStatus.done, size, target.path);
-      return target;
+          reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
+      return promoted;
     } on Object {
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
-      if (await target.exists()) {
-        await target.delete();
-      }
+      if (await part.exists()) await part.delete();
+      if (await target.exists()) await target.delete();
       rethrow;
     }
   }
