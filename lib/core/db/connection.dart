@@ -191,10 +191,9 @@ Future<void> _writeAssetOffUiIsolate(File target, String assetKey) {
 /// rows, same transaction, same best-effort contract as
 /// [ensureContentCurrent].
 Future<void> _ensureContentCurrentOffUiIsolate(
-  QueryExecutor executor,
+  AppDatabase db,
   Directory tempDir,
 ) async {
-  final db = AppDatabase(executor);
   final installed = await db.installedContentVersion();
   if (installed >= kContentVersion) return;
   final seedFile = File(p.join(tempDir.path, 'quran_yahdi.seed.tmp'));
@@ -226,8 +225,9 @@ Future<QueryExecutor> openAppDatabase() async {
       database.execute('PRAGMA synchronous = NORMAL;');
     },
   );
-  await _ensureContentCurrentOffUiIsolate(executor, dir);
-  await _ensureSearchIndex(executor);
+  final db = AppDatabase(executor);
+  await _ensureContentCurrentOffUiIsolate(db, dir);
+  await _ensureSearchIndex(db);
   return executor;
 }
 
@@ -235,9 +235,9 @@ Future<QueryExecutor> openAppDatabase() async {
 ///
 /// Runs after the content refresh (same best-effort contract): a failure
 /// logs and keeps whatever index was there — boot must never crash.
-Future<void> _ensureSearchIndex(QueryExecutor executor) async {
+Future<void> _ensureSearchIndex(AppDatabase db) async {
   try {
-    await ensureQuranSearchIndex(AppDatabase(executor));
+    await ensureQuranSearchIndex(db);
   } on Object catch (error, stackTrace) {
     dev.log('search index build failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
