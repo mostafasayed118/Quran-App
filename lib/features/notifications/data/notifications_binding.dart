@@ -82,6 +82,12 @@ class NotificationsBinding implements ReminderScheduler {
   /// and the alarms it would write are identical.
   String? _appliedPlan;
 
+  /// The tail of the apply chain. A plan change reaches the binding from
+  /// several callers (boot, settings, the prayer screen); the applies must
+  /// never interleave, or a slower earlier plan would overwrite a newer one
+  /// after both have already cleared the alarms.
+  Future<void>? _applyQueue;
+
   /// One-time plugin init; safe to call repeatedly, never rethrows. A
   /// notification tap fires the injected `onTap` callback (payloadless taps)
   /// or `onTapPayload` when the tapped reminder carries a routing tag — the
@@ -262,7 +268,19 @@ class NotificationsBinding implements ReminderScheduler {
       _pendingPlan = List<ScheduledReminder>.of(reminders);
       return;
     }
-    await _applyPlan(reminders);
+    final previous = _applyQueue;
+    final run = () async {
+      if (previous != null) {
+        try {
+          await previous;
+        } on Object {
+          // _applyPlan swallows its own failures; keep the chain alive.
+        }
+      }
+      await _applyPlan(reminders);
+    }();
+    _applyQueue = run;
+    await run;
   }
 
   /// Cancels the previously scheduled alarms and schedules [reminders].
@@ -281,6 +299,9 @@ class NotificationsBinding implements ReminderScheduler {
       final mode = exact
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexactAllowWhileIdle;
+      // The alarms are about to be cleared. From this point the old
+      // fingerprint is a lie even if a later zonedSchedule throws.
+      _appliedPlan = null;
       await _plugin.cancelAll();
       for (final reminder in reminders) {
         await _plugin.zonedSchedule(
