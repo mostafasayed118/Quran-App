@@ -114,7 +114,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     await loadMore();
   }
 
-  void _emit() {
+  void _emit({bool loadingMore = false}) {
     if (isClosed) return;
     final firstIds = {for (final entry in _first) entry.ayah.id};
     final entries = [
@@ -127,7 +127,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       entries: entries,
       lastBookmarkId: _cursor(),
       hasMore: _hasMore(),
-      loadingMore: current is BookmarksReady && current.loadingMore,
+      loadingMore: loadingMore,
       moreFailed: current is BookmarksReady && current.moreFailed,
     ));
   }
@@ -149,9 +149,46 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   void _onPage(BookmarkPage page) {
     if (isClosed) return;
+    final previousFirst = _first;
+    final previousFirstHasMore = _firstHasMore;
     _first = page.entries;
     _firstHasMore = page.hasMore;
-    _emit();
+    _alignOlderWithFirstPage(previousFirst, previousFirstHasMore);
+    final current = state;
+    _emit(
+      loadingMore: current is BookmarksReady && current.loadingMore,
+    );
+  }
+
+  /// Keeps [_older] ordered directly below the new page-1 window.
+  ///
+  /// Older pages are fetched strictly below the cursor that existed when the
+  /// fetch ran. A new bookmark shifts page 1, so the row that drops off its
+  /// end is in neither list; carry those rows into the head of [_older], where
+  /// they are newer than everything already there. Rows the new window already
+  /// covers are dropped instead: a delete pulls an older row up into page 1.
+  void _alignOlderWithFirstPage(
+    List<BookmarkEntry> previousFirst,
+    bool previousFirstHasMore,
+  ) {
+    final floorId = _first.isEmpty ? null : _first.last.bookmarkId;
+    if (floorId == null) {
+      _older.clear();
+      return;
+    }
+    _older.removeWhere((entry) => entry.bookmarkId >= floorId);
+    final firstIds = {for (final entry in _first) entry.bookmarkId};
+    final carried = [
+      for (final entry in previousFirst)
+        if (entry.bookmarkId < floorId && !firstIds.contains(entry.bookmarkId))
+          entry,
+    ];
+    if (carried.isEmpty) return;
+    final hadOlder = _older.isNotEmpty;
+    _older.insertAll(0, carried);
+    // With no older page fetched yet, [_hasMore] now reads this flag: the rows
+    // below the carried ones are exactly the ones page 1 reported.
+    if (!hadOlder) _olderHasMore = previousFirstHasMore;
   }
 
   void _onError(Object error, StackTrace stackTrace) {
