@@ -131,23 +131,29 @@ class _SheetBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    // A tab is only shown when its pane can have content. With nothing
+    // installed the translation tab stays as the fallback so the hint is
+    // still reachable: a zero-length DefaultTabController is not a tab bar.
+    final showTafsir = ready.tafsirEntries.isNotEmpty;
+    final showTranslation = ready.translationEntries.isNotEmpty || !showTafsir;
     return DefaultTabController(
-      length: 2,
+      length: showTafsir && showTranslation ? 2 : 1,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _SheetHeader(surahName: surahName, ayah: ayah),
           TabBar(
             tabs: [
-              Tab(text: loc.ayahSheetTafsir),
-              Tab(text: loc.ayahSheetTranslation),
+              if (showTafsir) Tab(text: loc.ayahSheetTafsir),
+              if (showTranslation) Tab(text: loc.ayahSheetTranslation),
             ],
           ),
           Flexible(
             child: TabBarView(
               children: [
-                _SheetPane(entries: ready.tafsirEntries),
-                _SheetPane(entries: ready.translationEntries),
+                if (showTafsir) _SheetPane(entries: ready.tafsirEntries),
+                if (showTranslation)
+                  _SheetPane(entries: ready.translationEntries),
               ],
             ),
           ),
