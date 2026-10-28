@@ -218,8 +218,7 @@ void main() {
     await binding.scheduleAll(plan);
 
     // Two applies, each clearing the three planner ids:
-    expect(
-        _methods(calls).where((method) => method == 'cancel'), hasLength(6));
+    expect(_methods(calls).where((method) => method == 'cancel'), hasLength(6));
     expect(_zoned(calls), hasLength(2));
   });
 
