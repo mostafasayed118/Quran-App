@@ -70,6 +70,16 @@ abstract interface class ReminderRescheduler {
   });
 }
 
+/// Separate seam for the prayer-reminder toggle. Kept out of
+/// [ReminderSettingsPort] so existing implementers are unaffected.
+abstract interface class PrayerReminderSettingsPort {
+  /// Whether the prayer reminder is enabled. Defaults to true when unset.
+  Future<bool> prayerEnabled();
+
+  /// Persists the prayer-reminder on/off state.
+  Future<void> setPrayerEnabled(bool enabled);
+}
+
 /// Cross-feature seam for the reminder settings storage. It also carries the
 /// shared [ReminderRescheduler] path, so a screen that owns the settings can
 /// re-plan without importing the notifications feature.

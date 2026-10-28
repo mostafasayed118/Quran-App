@@ -878,6 +878,12 @@ abstract class AppLocalizations {
   /// **'وقت تذكير الورد'**
   String get settingsWirdReminderTime;
 
+  /// No description provided for @settingsPrayerReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير الصلاة'**
+  String get settingsPrayerReminder;
+
   /// No description provided for @stopAction.
   ///
   /// In ar, this message translates to:

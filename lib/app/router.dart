@@ -277,6 +277,7 @@ abstract final class AppRouter {
           child: RouteCubitScope<SettingsCubit>(
             create: () => SettingsCubit(
               settings: getIt<ReminderSettingsPort>(),
+              prayerSettings: getIt<PrayerReminderSettingsPort>(),
               city: getIt<CitySource>(),
               prayer: getIt<PrayerTimesPort>(),
               scheduler: getIt<ReminderSchedulerPort>(),

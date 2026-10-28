@@ -147,6 +147,7 @@ extension SettingsStatePatterns on SettingsState {
     TResult Function()? loading,
     TResult Function()? failed,
     TResult Function(
+            bool prayerEnabled,
             bool azkarEnabled,
             String azkarTimeHm,
             bool wirdEnabled,
@@ -164,6 +165,7 @@ extension SettingsStatePatterns on SettingsState {
         return failed();
       case SettingsReady() when ready != null:
         return ready(
+            _that.prayerEnabled,
             _that.azkarEnabled,
             _that.azkarTimeHm,
             _that.wirdEnabled,
@@ -193,6 +195,7 @@ extension SettingsStatePatterns on SettingsState {
     required TResult Function() loading,
     required TResult Function() failed,
     required TResult Function(
+            bool prayerEnabled,
             bool azkarEnabled,
             String azkarTimeHm,
             bool wirdEnabled,
@@ -209,6 +212,7 @@ extension SettingsStatePatterns on SettingsState {
         return failed();
       case SettingsReady():
         return ready(
+            _that.prayerEnabled,
             _that.azkarEnabled,
             _that.azkarTimeHm,
             _that.wirdEnabled,
@@ -235,6 +239,7 @@ extension SettingsStatePatterns on SettingsState {
     TResult? Function()? loading,
     TResult? Function()? failed,
     TResult? Function(
+            bool prayerEnabled,
             bool azkarEnabled,
             String azkarTimeHm,
             bool wirdEnabled,
@@ -251,6 +256,7 @@ extension SettingsStatePatterns on SettingsState {
         return failed();
       case SettingsReady() when ready != null:
         return ready(
+            _that.prayerEnabled,
             _that.azkarEnabled,
             _that.azkarTimeHm,
             _that.wirdEnabled,
@@ -307,13 +313,16 @@ class SettingsFailed implements SettingsState {
 
 class SettingsReady implements SettingsState {
   const SettingsReady(
-      {this.azkarEnabled = false,
+      {this.prayerEnabled = true,
+      this.azkarEnabled = false,
       this.azkarTimeHm = defaultAzkarTimeHm,
       this.wirdEnabled = false,
       this.wirdTimeHm = defaultWirdTimeHm,
       this.azkarPermissionDenied = false,
       this.wirdPermissionDenied = false});
 
+  @JsonKey()
+  final bool prayerEnabled;
   @JsonKey()
   final bool azkarEnabled;
   @JsonKey()
@@ -339,6 +348,8 @@ class SettingsReady implements SettingsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is SettingsReady &&
+            (identical(other.prayerEnabled, prayerEnabled) ||
+                other.prayerEnabled == prayerEnabled) &&
             (identical(other.azkarEnabled, azkarEnabled) ||
                 other.azkarEnabled == azkarEnabled) &&
             (identical(other.azkarTimeHm, azkarTimeHm) ||
@@ -355,13 +366,13 @@ class SettingsReady implements SettingsState {
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, azkarEnabled, azkarTimeHm, wirdEnabled,
-        wirdTimeHm, azkarPermissionDenied, wirdPermissionDenied);
+    return Object.hash(runtimeType, prayerEnabled, azkarEnabled, azkarTimeHm,
+        wirdEnabled, wirdTimeHm, azkarPermissionDenied, wirdPermissionDenied);
   }
 
   @override
   String toString() {
-    return 'SettingsState.ready(azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, wirdEnabled: $wirdEnabled, wirdTimeHm: $wirdTimeHm, azkarPermissionDenied: $azkarPermissionDenied, wirdPermissionDenied: $wirdPermissionDenied)';
+    return 'SettingsState.ready(prayerEnabled: $prayerEnabled, azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, wirdEnabled: $wirdEnabled, wirdTimeHm: $wirdTimeHm, azkarPermissionDenied: $azkarPermissionDenied, wirdPermissionDenied: $wirdPermissionDenied)';
   }
 }
 
@@ -373,7 +384,8 @@ abstract mixin class $SettingsReadyCopyWith<$Res>
       _$SettingsReadyCopyWithImpl;
   @useResult
   $Res call(
-      {bool azkarEnabled,
+      {bool prayerEnabled,
+      bool azkarEnabled,
       String azkarTimeHm,
       bool wirdEnabled,
       String wirdTimeHm,
@@ -393,6 +405,7 @@ class _$SettingsReadyCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
+    Object? prayerEnabled = null,
     Object? azkarEnabled = null,
     Object? azkarTimeHm = null,
     Object? wirdEnabled = null,
@@ -401,6 +414,10 @@ class _$SettingsReadyCopyWithImpl<$Res>
     Object? wirdPermissionDenied = null,
   }) {
     return _then(SettingsReady(
+      prayerEnabled: null == prayerEnabled
+          ? _self.prayerEnabled
+          : prayerEnabled // ignore: cast_nullable_to_non_nullable
+              as bool,
       azkarEnabled: null == azkarEnabled
           ? _self.azkarEnabled
           : azkarEnabled // ignore: cast_nullable_to_non_nullable

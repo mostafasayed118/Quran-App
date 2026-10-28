@@ -8,7 +8,6 @@ import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
-import 'package:quran_yahdi/features/notifications/data/reminder_scheduling.dart';
 
 import 'di/injector.dart';
 
@@ -65,10 +64,11 @@ Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
 
 /// W7b boot glue: recompute + reschedule reminders once per app start (PM
 /// ruling — no background isolate, no boot receiver in v1; missed-while-dead
-/// reminders are accepted). The shared helper is guarded and never throws.
-Future<void> runBootReminderSchedule() => scheduleReminders(
+/// reminders are accepted). The shared helper is guarded and never throws, and
+/// it honours the persisted prayer-reminder toggle.
+Future<void> runBootReminderSchedule() =>
+    getIt<ReminderRescheduler>().reschedule(
       city: getIt<CitySource>(),
       prayer: getIt<PrayerTimesPort>(),
-      settings: getIt<ReminderSettingsPort>(),
       scheduler: getIt<ReminderSchedulerPort>(),
     );

@@ -59,6 +59,7 @@ List<ScheduledReminder> planReminders({
   required DateTime now,
   required List<PrayerChoice> todayPrayers,
   PrayerChoice? nextPrayer,
+  bool prayerEnabled = true,
   required bool azkarEnabled,
   required String? azkarTimeHm,
   bool wirdEnabled = false,
@@ -67,26 +68,28 @@ List<ScheduledReminder> planReminders({
 }) {
   final byId = <int, ScheduledReminder>{};
 
-  var prayerPlanned = false;
-  for (final choice in todayPrayers) {
-    if (choice.name == PrayerName.sunrise) continue;
-    if (!choice.time.isAfter(now)) continue;
-    byId[prayerReminderId] = ScheduledReminder(
-      id: prayerReminderId,
-      fireAt: choice.time,
-      title: texts.prayerTitle(choice.name),
-      payload: prayerReminderPayload,
-    );
-    prayerPlanned = true;
-    break;
-  }
-  if (!prayerPlanned && nextPrayer != null && nextPrayer.time.isAfter(now)) {
-    byId[prayerReminderId] = ScheduledReminder(
-      id: prayerReminderId,
-      fireAt: nextPrayer.time,
-      title: texts.prayerTitle(nextPrayer.name),
-      payload: prayerReminderPayload,
-    );
+  if (prayerEnabled) {
+    var prayerPlanned = false;
+    for (final choice in todayPrayers) {
+      if (choice.name == PrayerName.sunrise) continue;
+      if (!choice.time.isAfter(now)) continue;
+      byId[prayerReminderId] = ScheduledReminder(
+        id: prayerReminderId,
+        fireAt: choice.time,
+        title: texts.prayerTitle(choice.name),
+        payload: prayerReminderPayload,
+      );
+      prayerPlanned = true;
+      break;
+    }
+    if (!prayerPlanned && nextPrayer != null && nextPrayer.time.isAfter(now)) {
+      byId[prayerReminderId] = ScheduledReminder(
+        id: prayerReminderId,
+        fireAt: nextPrayer.time,
+        title: texts.prayerTitle(nextPrayer.name),
+        payload: prayerReminderPayload,
+      );
+    }
   }
 
   if (azkarEnabled) {

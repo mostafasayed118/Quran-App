@@ -443,6 +443,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsWirdReminderTime => 'Wird reminder time';
 
   @override
+  String get settingsPrayerReminder => 'Prayer reminder';
+
+  @override
   String get stopAction => 'Stop';
 
   @override

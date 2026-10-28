@@ -11,6 +11,7 @@ sealed class SettingsState with _$SettingsState {
   const factory SettingsState.failed() = SettingsFailed;
 
   const factory SettingsState.ready({
+    @Default(true) bool prayerEnabled,
     @Default(false) bool azkarEnabled,
     @Default(defaultAzkarTimeHm) String azkarTimeHm,
     @Default(false) bool wirdEnabled,

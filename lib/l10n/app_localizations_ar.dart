@@ -440,6 +440,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsWirdReminderTime => 'وقت تذكير الورد';
 
   @override
+  String get settingsPrayerReminder => 'تذكير الصلاة';
+
+  @override
   String get stopAction => 'وقف';
 
   @override

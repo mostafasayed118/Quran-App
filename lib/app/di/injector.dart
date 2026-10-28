@@ -21,7 +21,6 @@ import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/library/presentation/library_cubit.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_scheduler.dart';
-import 'package:quran_yahdi/features/notifications/data/reminder_scheduling.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
@@ -108,6 +107,10 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(db));
   getIt.registerLazySingleton<ReminderSettingsPort>(
       () => getIt<ReminderSettings>());
+  getIt.registerLazySingleton<PrayerReminderSettingsPort>(
+      () => getIt<ReminderSettings>());
+  getIt.registerLazySingleton<ReminderRescheduler>(
+      () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<NotificationsBinding>(
       () => NotificationsBinding());
   getIt.registerLazySingleton<ReminderScheduler>(
@@ -123,10 +126,9 @@ Future<void> configureDependencies({
   // (`runBootReminderSchedule` composition; no feature import lands on backup).
   getIt.registerLazySingleton<BackupService>(() => BackupService(
         db: db,
-        reschedule: () => scheduleReminders(
+        reschedule: () => getIt<ReminderRescheduler>().reschedule(
           city: getIt<CitySource>(),
           prayer: getIt<PrayerTimesPort>(),
-          settings: getIt<ReminderSettingsPort>(),
           scheduler: getIt<ReminderSchedulerPort>(),
         ),
       ));

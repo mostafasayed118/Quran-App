@@ -7,20 +7,26 @@ import 'package:quran_yahdi/core/domain/reminders.dart';
 
 import 'settings_state.dart';
 
-/// W7b settings surface: the azkar and wird reminder toggles + times. Persists
-/// through the reminder settings port and re-plans through the shared guarded
-/// scheduler path after every change; when enabling, it also drives the OS
-/// permission flow.
+/// W7b settings surface: the prayer, azkar and wird reminder toggles + times.
+/// Persists through the reminder settings ports and re-plans through the
+/// shared guarded scheduler path after every change; when enabling azkar or
+/// wird, it also drives the OS permission flow.
 class SettingsCubit extends Cubit<SettingsState> {
   /// Creates the cubit; the constructor is side-effect free. The route scope
   /// calls [start] once to run the first load, which moves the state from
   /// loading to ready/failed.
+  ///
+  /// [prayerSettings] is optional so existing constructions (and fakes) that
+  /// only know [ReminderSettingsPort] keep compiling; when it is absent the
+  /// prayer reminder is reported as enabled (its historical behaviour).
   SettingsCubit({
     required ReminderSettingsPort settings,
+    PrayerReminderSettingsPort? prayerSettings,
     required CitySource city,
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
   })  : _settings = settings,
+        _prayerSettings = prayerSettings,
         _city = city,
         _prayer = prayer,
         _scheduler = scheduler,
@@ -31,6 +37,7 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> start() => load();
 
   final ReminderSettingsPort _settings;
+  final PrayerReminderSettingsPort? _prayerSettings;
   final CitySource _city;
   final PrayerTimesPort _prayer;
   final ReminderSchedulerPort _scheduler;
@@ -51,12 +58,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// an unhandled async error).
   Future<void> load() async {
     try {
+      final prayerEnabled = await _prayerSettings?.prayerEnabled() ?? true;
       final enabled = await _settings.azkarEnabled();
       final time = await _settings.azkarTimeHm() ?? defaultAzkarTimeHm;
       final wirdEnabled = await _settings.wirdEnabled();
       final wirdTime = await _settings.wirdTimeHm() ?? defaultWirdTimeHm;
       if (isClosed) return;
       emit(SettingsState.ready(
+        prayerEnabled: prayerEnabled,
         azkarEnabled: enabled,
         azkarTimeHm: time,
         wirdEnabled: wirdEnabled,
@@ -70,6 +79,31 @@ class SettingsCubit extends Cubit<SettingsState> {
       if (isClosed) return;
       emit(const SettingsState.failed());
     }
+  }
+
+  /// Enables or disables the prayer reminder and re-plans the schedule.
+  ///
+  /// The prayer reminder needs no extra OS permission flow. A failed write is
+  /// logged and the last confirmed state is kept.
+  Future<void> setPrayerEnabled(bool enabled) {
+    return _serialized(() async {
+      try {
+        await _prayerSettings?.setPrayerEnabled(enabled);
+        await _reschedule();
+        if (isClosed) return;
+        emit(SettingsState.ready(
+          prayerEnabled: enabled,
+          azkarEnabled: _enabledOf(state),
+          azkarTimeHm: _timeOf(state),
+          wirdEnabled: _wirdEnabledOf(state),
+          wirdTimeHm: _wirdTimeOf(state),
+          azkarPermissionDenied: _azkarDeniedOf(state),
+          wirdPermissionDenied: _wirdDeniedOf(state),
+        ));
+      } on Object catch (error, stackTrace) {
+        _logMutationFailure('setPrayerEnabled', error, stackTrace);
+      }
+    });
   }
 
   /// Enables or disables the azkar reminder and re-plans the schedule.
@@ -88,6 +122,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         await _reschedule();
         if (isClosed) return;
         emit(SettingsState.ready(
+          prayerEnabled: _prayerEnabledOf(state),
           azkarEnabled: enabled,
           azkarTimeHm: _timeOf(state),
           wirdEnabled: _wirdEnabledOf(state),
@@ -111,6 +146,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         await _reschedule();
         if (isClosed) return;
         emit(SettingsState.ready(
+          prayerEnabled: _prayerEnabledOf(state),
           azkarEnabled: _enabledOf(state),
           azkarTimeHm: hm,
           wirdEnabled: _wirdEnabledOf(state),
@@ -140,6 +176,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         await _reschedule();
         if (isClosed) return;
         emit(SettingsState.ready(
+          prayerEnabled: _prayerEnabledOf(state),
           azkarEnabled: _enabledOf(state),
           azkarTimeHm: _timeOf(state),
           wirdEnabled: enabled,
@@ -163,6 +200,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         await _reschedule();
         if (isClosed) return;
         emit(SettingsState.ready(
+          prayerEnabled: _prayerEnabledOf(state),
           azkarEnabled: _enabledOf(state),
           azkarTimeHm: _timeOf(state),
           wirdEnabled: _wirdEnabledOf(state),
@@ -207,6 +245,12 @@ class SettingsCubit extends Cubit<SettingsState> {
         SettingsReady(:final azkarEnabled) => azkarEnabled,
         SettingsLoading() => false,
         SettingsFailed() => false,
+      };
+
+  bool _prayerEnabledOf(SettingsState state) => switch (state) {
+        SettingsReady(:final prayerEnabled) => prayerEnabled,
+        SettingsLoading() => true,
+        SettingsFailed() => true,
       };
 
   bool _azkarDeniedOf(SettingsState state) => switch (state) {

@@ -17,6 +17,7 @@ Future<void> scheduleReminders({
   required PrayerTimesPort prayer,
   required ReminderSettingsPort settings,
   required ReminderSchedulerPort scheduler,
+  bool prayerEnabled = true,
   DateTime? now,
 }) async {
   try {
@@ -36,6 +37,7 @@ Future<void> scheduleReminders({
       nextPrayer: selected != null && !hasFuturePrayer
           ? prayer.nextPrayer(selected.coordinates, nowLocal)
           : null,
+      prayerEnabled: prayerEnabled,
       azkarEnabled: await settings.azkarEnabled(),
       azkarTimeHm: await settings.azkarTimeHm(),
       wirdEnabled: await settings.wirdEnabled(),

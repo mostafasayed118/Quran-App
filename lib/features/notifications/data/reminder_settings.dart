@@ -11,10 +11,12 @@ const String azkarReminderEnabledKey = 'azkar_reminder_enabled';
 const String azkarReminderTimeKey = 'azkar_reminder_time';
 const String wirdReminderEnabledKey = 'wird_reminder_enabled';
 const String wirdReminderTimeKey = 'wird_reminder_time';
+const String prayerReminderEnabledKey = 'prayer_reminder_enabled';
 
 /// Settings-table reads/writes for the reminder engine (W3 CityRepository
 /// pattern; bool stored as the 'true'/'false' string, time as 'HH:mm').
-class ReminderSettings implements ReminderSettingsPort {
+class ReminderSettings
+    implements ReminderSettingsPort, PrayerReminderSettingsPort {
   ReminderSettings(this._db);
 
   final AppDatabase _db;
@@ -85,19 +87,51 @@ class ReminderSettings implements ReminderSettingsPort {
         );
   }
 
+  /// Missing row means ENABLED, so every existing install keeps the prayer
+  /// reminder it had before the toggle existed.
+  @override
+  Future<bool> prayerEnabled() async {
+    final row = await (_db.select(_db.settingsTable)
+          ..where((s) => s.key.equals(prayerReminderEnabledKey)))
+        .getSingleOrNull();
+    return row?.value != 'false';
+  }
+
+  @override
+  Future<void> setPrayerEnabled(bool enabled) async {
+    await _db.into(_db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(
+            key: prayerReminderEnabledKey,
+            value: enabled ? 'true' : 'false',
+          ),
+        );
+  }
+
   /// The shared (re)planning path (boot, prayer times, settings) — the
   /// notifications engine composes the plan; this class only owns the
   /// settings it reads.
+  ///
+  /// The port contract is "never throws": a failed prayer-toggle read
+  /// degrades to the historical enabled behaviour instead of failing the
+  /// re-plan.
   @override
   Future<void> reschedule({
     required CitySource city,
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
-  }) =>
-      scheduleReminders(
-        city: city,
-        prayer: prayer,
-        settings: this,
-        scheduler: scheduler,
-      );
+  }) async {
+    var enabled = true;
+    try {
+      enabled = await prayerEnabled();
+    } on Object {
+      // Fall through with the default.
+    }
+    await scheduleReminders(
+      city: city,
+      prayer: prayer,
+      settings: this,
+      scheduler: scheduler,
+      prayerEnabled: enabled,
+    );
+  }
 }

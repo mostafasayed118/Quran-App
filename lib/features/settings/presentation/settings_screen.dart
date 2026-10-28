@@ -30,6 +30,7 @@ class SettingsScreen extends StatelessWidget {
           SettingsLoading() => const LoadingView(),
           SettingsFailed() => errorPane(loc),
           SettingsReady(
+            :final prayerEnabled,
             :final azkarEnabled,
             :final azkarTimeHm,
             :final wirdEnabled,
@@ -38,6 +39,7 @@ class SettingsScreen extends StatelessWidget {
             :final wirdPermissionDenied,
           ) =>
             _SettingsList(
+              prayerEnabled: prayerEnabled,
               azkarEnabled: azkarEnabled,
               azkarTimeHm: azkarTimeHm,
               wirdEnabled: wirdEnabled,
@@ -51,10 +53,11 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-/// The settings list: the two reminder switches, their times, the permission
+/// The settings list: the three reminder switches, their times, the permission
 /// hint and the (host-composed) backup section.
 class _SettingsList extends StatelessWidget {
   const _SettingsList({
+    required this.prayerEnabled,
     required this.azkarEnabled,
     required this.azkarTimeHm,
     required this.wirdEnabled,
@@ -63,6 +66,7 @@ class _SettingsList extends StatelessWidget {
     required this.backupSection,
   });
 
+  final bool prayerEnabled;
   final bool azkarEnabled;
   final String azkarTimeHm;
   final bool wirdEnabled;
@@ -77,6 +81,12 @@ class _SettingsList extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.only(bottom: appBottomInset(context)),
       children: [
+        SwitchListTile(
+          secondary: const Icon(Icons.notifications_outlined),
+          title: Text(loc.settingsPrayerReminder),
+          value: prayerEnabled,
+          onChanged: (value) => cubit.setPrayerEnabled(value),
+        ),
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),
           title: Text(loc.azkarReminder),
