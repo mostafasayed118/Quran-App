@@ -2,7 +2,11 @@ import 'dart:ui' show Locale, VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
-    show shouldRequestBootPermission;
+    show
+        azkarReminderId,
+        prayerReminderId,
+        shouldRequestBootPermission,
+        wirdReminderId;
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -283,7 +287,13 @@ class NotificationsBinding implements ReminderScheduler {
     await run;
   }
 
-  /// Cancels the previously scheduled alarms and schedules [reminders].
+  /// Cancels the previous reminder alarms and schedules [reminders].
+  ///
+  /// The clear is TARGETED: only the ids the planner owns are cancelled.
+  /// A blanket `cancelAll()` would also wipe every other notification the
+  /// app posted — most visibly the playback notification owned by
+  /// `just_audio_background` — and this path runs at boot, on the prayer
+  /// screen load, on a city change and on a settings save.
   ///
   /// The plan fingerprint skips the platform round-trip when the new plan
   /// schedules exactly the same alarms as the applied one.
@@ -302,7 +312,15 @@ class NotificationsBinding implements ReminderScheduler {
       // The alarms are about to be cleared. From this point the old
       // fingerprint is a lie even if a later zonedSchedule throws.
       _appliedPlan = null;
-      await _plugin.cancelAll();
+      // All three planner ids go up front, so a reminder that is no longer
+      // part of the new plan is still removed (replace-all semantics).
+      for (final id in const <int>[
+        prayerReminderId,
+        azkarReminderId,
+        wirdReminderId,
+      ]) {
+        await _plugin.cancel(id: id);
+      }
       for (final reminder in reminders) {
         await _plugin.zonedSchedule(
           id: reminder.id,

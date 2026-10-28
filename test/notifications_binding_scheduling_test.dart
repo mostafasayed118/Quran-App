@@ -79,7 +79,9 @@ void main() {
     expect(_methods(calls), [
       'initialize',
       'canScheduleExactNotifications',
-      'cancelAll',
+      'cancel',
+      'cancel',
+      'cancel',
       'zonedSchedule',
       'zonedSchedule',
     ]);
@@ -119,7 +121,8 @@ void main() {
     await binding.scheduleAll([_reminder(id: 1, title: 'new title')]);
 
     final added = _methods(calls.sublist(before));
-    expect(added, containsAllInOrder(['cancelAll', 'zonedSchedule']));
+    expect(added,
+        containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']));
     expect(_zoned(calls.sublist(before)), hasLength(1));
   });
 
@@ -136,7 +139,8 @@ void main() {
     ]);
 
     final added = _methods(calls.sublist(before));
-    expect(added, containsAllInOrder(['cancelAll', 'zonedSchedule']));
+    expect(added,
+        containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']));
     expect(_zoned(calls.sublist(before)), hasLength(1));
   });
 
@@ -178,7 +182,9 @@ void main() {
         containsAllInOrder([
           'requestNotificationsPermission',
           'requestExactAlarmsPermission',
-          'cancelAll',
+          'cancel',
+          'cancel',
+          'cancel',
           'zonedSchedule',
         ]));
   });
@@ -211,8 +217,9 @@ void main() {
     throwOn = null;
     await binding.scheduleAll(plan);
 
+    // Two applies, each clearing the three planner ids:
     expect(
-        _methods(calls).where((method) => method == 'cancelAll'), hasLength(2));
+        _methods(calls).where((method) => method == 'cancel'), hasLength(6));
     expect(_zoned(calls), hasLength(2));
   });
 
