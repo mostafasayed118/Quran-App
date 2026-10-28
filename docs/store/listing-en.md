@@ -72,13 +72,13 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 
 ## Screenshot checklist — captured candidates
 
-> REL-1 status (updated 2026-10-24): all 11 captures **are committed** at `docs/store/screenshots/` at **1080×2160** — this checklist is captured, not missing. Re-capture only if the UI changes (build an installable APK, then `tools/device_smoke.ps1` to install and boot-verify).
+> REL-1 status (updated 2026-10-28): all 11 captures **are committed** at `docs/store/screenshots/` at **1080×2160**, all re-shot from the signed `1.0.0+3` build (APK, `x86_64` on a Pixel 9 Pro emulator set to 1080×2160). Re-capture only if the UI changes.
 
 - [x] `01-home.png` — Home: next-prayer hero + continue reading + feature grid (most important — first slot)
 - [x] `02-index.png` — Surah index with search field
 - [x] `03-reader.png` — Verse-by-verse reader in the gold text tone
 - [x] `04-mushaf.png` — Paginated Mushaf mode with the page indicator
-- [x] `05-ayah-sheet.png` — Ayah sheet: only the panes whose pack is installed (translation/tafsir), and no bookmark control — bookmarks live on the reader's ayah row. **Must be recaptured before upload**
+- [x] `05-ayah-sheet.png` — Ayah sheet: only the panes whose pack is installed (translation/tafsir), and no bookmark control — bookmarks live on the reader's ayah row.
 - [x] `06-recitation.png` — Reciters catalog with the featured section on top
 - [x] `07-prayer-times.png` — Prayer times for a chosen city
 - [x] `08-qibla.png` — Live Qibla compass
@@ -88,4 +88,4 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 
 Specs: phone (portrait) 16:9 or 9:16, no real personal data in frame, light theme preferred.
 
-> 2026-10-18 status: all 11 candidates captured from the real device (light theme — `11` dark) under `docs/store/screenshots/` at **1080×2160** (a 2:1 crop, Play-compliant). Final picks and ordering belong to the owner.
+> 2026-10-28 status: all 11 candidates re-shot from the signed `1.0.0+3` build on a Pixel 9 Pro emulator at **1080×2160** (a 2:1 crop, Play-compliant); the 2026-10-18 real-device set was replaced wholesale. Final picks and ordering belong to the owner.

@@ -88,7 +88,7 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 | Localized screenshot sets | per locale | **None** — one phone set serves both `ar` and `en` |
 
 - [ ] Pick and order the 2–8 screenshots (owner decision; first slot should be `01-home.png`).
-- [ ] `05-ayah-sheet.png` shows the tafsir content that is no longer shipped — recapture it or do not select it.
+- [ ] `05-ayah-sheet.png` — re-shot on 2026-10-28 from `1.0.0+3`: it now shows only the installed pane (translation) with the Siraj text, no dead tafsir tab.
 - [x] Land `docs/store/feature-graphic-1024x500.png` before uploading (present, 1024×500).
 
 ## 6. Release checklist
