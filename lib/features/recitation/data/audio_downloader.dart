@@ -81,21 +81,31 @@ class AudioDownloader {
               (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber)))
         .getSingleOrNull();
     if (existing == null) {
-      await _db.into(_db.downloads).insert(DownloadsCompanion.insert(
-            reciterId: rowId,
-            surahId: surahNumber,
-            status: status.name,
-            path: path,
-            bytes: Value(bytes),
-          ));
-    } else {
-      await (_db.update(_db.downloads)..where((d) => d.id.equals(existing.id)))
-          .write(DownloadsCompanion(
-        status: Value(status.name),
-        bytes: Value(bytes),
-        path: Value(path),
-      ));
+      // Read-then-write made conflict-safe: the (reciter, surah) pair is
+      // unique, so a racing first-write must reuse the surviving row instead
+      // of inserting a duplicate or throwing a constraint error.
+      await _db.into(_db.downloads).insert(
+            DownloadsCompanion.insert(
+              reciterId: rowId,
+              surahId: surahNumber,
+              status: status.name,
+              path: path,
+              bytes: Value(bytes),
+            ),
+            mode: InsertMode.insertOrIgnore,
+          );
     }
+    // Runs for both branches: drift's insertOrIgnore reports the surviving
+    // rowid (not an affected-row count), so this pair-scoped write is what
+    // converges the racing caller onto the row that exists.
+    await (_db.update(_db.downloads)
+          ..where(
+              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber)))
+        .write(DownloadsCompanion(
+      status: Value(status.name),
+      bytes: Value(bytes),
+      path: Value(path),
+    ));
   }
 
   /// Downloads one surah for [reciter]; reports progress and honours [cancelToken].

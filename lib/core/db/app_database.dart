@@ -54,8 +54,17 @@ class AppDatabase extends _$AppDatabase {
           await customStatement(
               'CREATE UNIQUE INDEX IF NOT EXISTS idx_bookmarks_ayah '
               'ON bookmarks(ayah_id)');
+          // One download per (reciter, surah) is a user-visible invariant: the
+          // row is the registry entry of exactly one audio file, and every
+          // read of it uses getSingleOrNull(). Repair any duplicates left by
+          // the old read-then-write markStatus before the unique index is
+          // created (a failed CREATE would abort every open); the oldest row
+          // wins because it is the one that already owns the file.
+          await customStatement('DELETE FROM downloads WHERE id NOT IN '
+              '(SELECT MIN(id) FROM downloads GROUP BY reciter_id, surah_id)');
+          await customStatement('DROP INDEX IF EXISTS idx_downloads_lookup');
           await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_downloads_lookup '
+              'CREATE UNIQUE INDEX IF NOT EXISTS idx_downloads_lookup '
               'ON downloads(reciter_id, surah_id)');
           // The downloads screen filters `status='done'`; without this index
           // every open of that screen scans the whole downloads table.
