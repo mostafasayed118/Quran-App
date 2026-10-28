@@ -4,12 +4,35 @@ import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:meta/meta.dart';
 
 import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
 /// Drops the seed a seeded stream replays to each new listener.
 Stream<Duration?> withoutReplaySeed(Stream<Duration?> source) => source.skip(1);
+
+/// Issues a play request without waiting for it.
+///
+/// just_audio's `play()` future resolves on pause/stop/completion, not when
+/// playback starts; awaiting it would hold the cubit's loading state for the
+/// whole track and let a later pause emit "playing".
+@visibleForTesting
+void issuePlayRequest(
+  Future<void> Function() play, {
+  required String operation,
+  void Function(String message, Object error, StackTrace stackTrace)? log,
+}) {
+  final logger = log ?? _logPlayFailure;
+  unawaited(play().catchError((Object error, StackTrace stackTrace) {
+    logger(operation, error, stackTrace);
+  }));
+}
+
+void _logPlayFailure(String operation, Object error, StackTrace stackTrace) {
+  dev.log(operation,
+      name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+}
 
 class JustAudioPlaybackService
     implements
@@ -73,10 +96,10 @@ class JustAudioPlaybackService
     // just_audio's play() future resolves on pause/stop/completion, not when
     // playback starts. Awaiting it here would block the cubit's loading state
     // for the whole track and let a later pause emit "playing".
-    unawaited(_player.play().catchError((Object error, StackTrace stackTrace) {
-      dev.log('playback play request failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
-    }));
+    issuePlayRequest(
+      () => _player.play(),
+      operation: 'playback play request failed',
+    );
   }
 
   MediaItem _mediaItem({required String id, required PlaybackSource source}) {
@@ -95,10 +118,10 @@ class JustAudioPlaybackService
 
   @override
   Future<void> resume() async {
-    unawaited(_player.play().catchError((Object error, StackTrace stackTrace) {
-      dev.log('playback resume request failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
-    }));
+    issuePlayRequest(
+      () => _player.play(),
+      operation: 'playback resume request failed',
+    );
   }
 
   @override
