@@ -1,7 +1,7 @@
 # ملاحظات الإصدار 1.0.0 — Arabic (Play "What's new" ≤500 chars)
 
 > Derived ONLY from the shipped waves recorded in `docs/campaign-ledger.md`.
-> Honest first-release tone — no invented features. Measured body: 471 chars.
+> Honest first-release tone — no invented features. Measured body: 464 chars.
 
 ---
 
@@ -11,4 +11,4 @@
 • مواقيت الصلاة والقبلة مع اختيار أقرب مدينة إليك تلقائيًا على جهازك
 • الأذكار والسبحة والأدعية والرقية وأسماء الله الحسنى
 • متابعة الصلوات وحاسبة الزكاة والتقويم الهجري والتنبيهات
-• تفسير وترجمات وأحاديث عبر حِزم تُنزَّل داخل التطبيق
+• ترجمات وأحاديث عبر حِزم تُنزَّل داخل التطبيق

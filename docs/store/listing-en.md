@@ -64,7 +64,7 @@ A full Mushaf, recitations, adhkar, duas, and prayer times — all in one light,
 • Zakat calculator with gold and silver nisab modes
 • Hijri calendar with the Gregorian date
 • The 99 names of Allah with their meanings
-• Authentic mushaf typography and comfortable Arabic fonts at any size
+• Authentic mushaf typography and comfortable Arabic fonts
 
 Privacy matters: no accounts, no ads, no tracking, no data collection — everything stays on your device.
 
@@ -78,7 +78,7 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 - [x] `02-index.png` — Surah index with search field
 - [x] `03-reader.png` — Verse-by-verse reader in the gold text tone
 - [x] `04-mushaf.png` — Paginated Mushaf mode with the page indicator
-- [x] `05-ayah-sheet.png` — Ayah sheet: tafsir, translation, bookmark
+- [x] `05-ayah-sheet.png` — Ayah sheet: only the panes whose pack is installed (translation/tafsir), and no bookmark control — bookmarks live on the reader's ayah row. **Must be recaptured before upload**
 - [x] `06-recitation.png` — Reciters catalog with the featured section on top
 - [x] `07-prayer-times.png` — Prayer times for a chosen city
 - [x] `08-qibla.png` — Live Qibla compass

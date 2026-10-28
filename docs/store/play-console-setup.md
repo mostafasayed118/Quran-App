@@ -12,13 +12,15 @@ Last updated: 2026-10-24 · Android only for this submission (no iOS/web listing
 | Field | Value | Source |
 |---|---|---|
 | Package name | `com.mostafasayed.quranyahdi` | `android/app/build.gradle:49` |
-| Version name | `1.0.0` | `pubspec.yaml` (`version: 1.0.0+2`) |
-| Version code | `2` | `pubspec.yaml` (`version: 1.0.0+2`) — exceeds the 2026-10-22 `+1` build whether or not it was uploaded |
+| Version name | `1.0.0` | `pubspec.yaml` (`version: 1.0.0+3`) |
+| Version code | `3` | `pubspec.yaml` (`version: 1.0.0+3`) — exceeds the 2026-10-24 `+2` build and the 2026-10-22 `+1` build whether or not either was uploaded |
 | minSdk | `24` | `docs/campaign-ledger.md:878` |
 | targetSdk | `36` | `docs/campaign-ledger.md:878` |
 | Release AAB path | `build/app/outputs/bundle/release/app-release.aab` | Gradle output |
 | Last verified signed artifact (2026-10-24, `+2`) | AAB `68,195,926 B` · SHA-256 `90745181…CB713` · APK `69,497,234 B` · SHA-256 `61C95D0D…B63987` · versionCode `2` · `jarsigner` + `apksigner` V2 verified · cert `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` (SHA-256 `DB:7F:FE:F4…46:85`) | This session's rebuild |
 | Keystore | `C:\Users\ASUS\keystores\quran-yahdi-release.jks` (`android/key.properties` is gitignored) | `docs/campaign-ledger.md:877` |
+
+> The `+3` artifact must be rebuilt and re-verified (size, SHA-256, `apksigner`) before upload; the `+2` row above is historical.
 
 - [x] Package name confirmed against the build script, not the store listing.
 - [ ] Confirm the AAB was built after the latest code change (`git log -1` at build time).
@@ -94,7 +96,7 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 - [ ] Set `PUBLISH_RELEASE=true` (or `-PpublishRelease=true`) for the store-bound build — without it the Gradle build stays debug-signed by design; with it and no keystore the build **fails** instead of shipping a debug-signed artifact.
 - [ ] Build the bundle: `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`.
 - [ ] Verify the signer before upload: `jarsigner -verify -verbose -certs` on the AAB; expect `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` and record the certificate SHA-256.
-- [ ] Confirm the versionCode rule: the uploaded code **must exceed every versionCode previously uploaded to any track**. Current build is `1.0.0+1` → versionCode `1`; bump `pubspec.yaml` if `1` was ever uploaded.
+- [ ] Confirm the versionCode rule: the uploaded code **must exceed every versionCode previously uploaded to any track**. Current build is `1.0.0+3` → versionCode `3`; nothing on this branch is published, but the earlier `+2`/`+1` builds may already sit on a track — **re-check the highest versionCode in Play Console before every upload** and bump `pubspec.yaml` again if `3` is not strictly greater.
 - [ ] Upload to an internal/staging track first and install from Play on a real device (smoke: launch, open a surah, play a recitation, prayer times, qibla).
 - [ ] Closed testing: new personal developer accounts require **12 testers for 14 continuous days** before production access — **verify the current policy in Play Console** (`PLAY-CONSOLE-ONLY`, rules change).
 - [ ] Promote to production and complete the staged rollout.

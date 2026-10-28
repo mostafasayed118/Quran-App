@@ -4,7 +4,7 @@
 > permission census of the codebase. Evidence-or-silence rule: every answer below cites its
 > source fact. Anything not citable would be flagged `OPEN-FOR-OWNER` — there are none.
 
-Last updated: 2026-10-19 · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+1
+Last updated: 2026-10-19 · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+3
 
 ## 1. Permission census (run live against the code)
 
@@ -12,7 +12,7 @@ Release manifest `android/app/src/main/AndroidManifest.xml`:
 
 | Permission | Location | Why it exists |
 |---|---|---|
-| `INTERNET` | `AndroidManifest.xml:3` | Audio recitation streaming/download (mp3quran CDN) + text-pack downloads (pinned jsDelivr endpoints). `lib/features/recitation/data/reciter_repository.dart:57` (`https://mp3quran.net/api/v3/reciters?language=ar`), `assets/data/library_catalog.json` (jsDelivr URLs). Cited in `PRIVACY.md` line 20 (AR) / `PRIVACY.en.md` line 20 (EN). |
+| `INTERNET` | `AndroidManifest.xml:3` | Audio recitation streaming/download (mp3quran CDN) + text-pack downloads (pinned jsDelivr endpoints). `lib/features/recitation/data/reciter_repository.dart` (`recitersApiEndpoint` — `https://mp3quran.net/api/v3/reciters?language=ar`), `assets/data/library_catalog.json` (jsDelivr URLs). Cited in `PRIVACY.md` line 20 (AR) / `PRIVACY.en.md` line 20 (EN). |
 | `ACCESS_COARSE_LOCATION` | `AndroidManifest.xml:7` | Nearest-city detection for prayer times & Qibla — **processed on-device only, never transmitted** (`lib/features/prayer/data/location_service.dart:27-36`; bundled 156-city list `assets/data/cities.json`; `PRIVACY.md` line 19 (AR) / `PRIVACY.en.md` line 19 (EN)). |
 | `ACCESS_FINE_LOCATION` | `AndroidManifest.xml:8` | Same flow as coarse (higher accuracy for the same on-device computation). |
 | `SCHEDULE_EXACT_ALARM` | `AndroidManifest.xml:9` | User-enabled prayer/azkar reminders, computed and scheduled locally (`PRIVACY.md` line 21 (AR) / `PRIVACY.en.md` line 21 (EN)). |
@@ -27,7 +27,8 @@ resolved plugin's own manifest, merged at build time —
 `flutter_local_notifications-22.3.2` pub cache,
 `android/src/main/AndroidManifest.xml:4`
 (`<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>`),
-with the runtime grace flow in `lib/features/notifications/data/notifications_binding.dart:81`.
+with the runtime grace flow in `lib/features/notifications/data/notifications_binding.dart`
+(`requestBootPermission` — the first-boot POST_NOTIFICATIONS grace helper).
 
 Debug/profile manifests also declare `INTERNET` (`android/app/src/debug/AndroidManifest.xml:6`,
 `android/app/src/profile/AndroidManifest.xml:6`) — development tooling only, absent from
@@ -69,7 +70,7 @@ which is why the top-level answer above is NO.
 **Answer: Nothing is stored remotely.** All app data lives in app-private storage on the
 device (settings, bookmarks, last-read, downloads, worship logs) and **uninstalling the
 app permanently deletes all of it; no copy exists anywhere else** (`PRIVACY.md`
-line 35 (AR) / `PRIVACY.en.md` line 35 (EN)). In-app deletion of downloads/packs is also available.
+line 36 (AR) / `PRIVACY.en.md` line 36 (EN)). In-app deletion of downloads/packs is also available.
 
 ### Q: Account deletion URL
 
@@ -79,6 +80,12 @@ line 35 (AR) / `PRIVACY.en.md` line 35 (EN)). In-app deletion of downloads/packs
 
 **N/A — nothing is transmitted** (the form skips this when the top-level answer is NO).
 
+> The CDNs that serve user-initiated content still see the request: streaming and downloaded
+> recitations come from `mp3quran.net` and text-pack installs from `cdn.jsdelivr.net`, so each
+> service necessarily sees the user's IP as ordinary service-provider processing. No device
+> identifier, account, or personal data is attached to those requests, so the answers above
+> stay **NO**.
+
 ## 3. Cross-check against `PRIVACY.md` (AR) / `PRIVACY.en.md` (EN)
 
 | Privacy-source claim | Form answer | Verdict |
@@ -87,7 +94,7 @@ line 35 (AR) / `PRIVACY.en.md` line 35 (EN)). In-app deletion of downloads/packs
 | Location on-device only, never sent/stored/shared (l.19 AR / `PRIVACY.en.md` l.19 EN) | Location matrix: accessed, never transmitted | MATCH |
 | Connections limited to pinned CDN endpoints, no identifiers (l.20 AR / `PRIVACY.en.md` l.20 EN) | Network = content downloads only | MATCH |
 | Reminders computed & scheduled locally (l.21 AR / `PRIVACY.en.md` l.21 EN) | `SCHEDULE_EXACT_ALARM` justification | MATCH |
-| "Uninstalling the app permanently deletes all of it. We keep no copy." (l.35 AR / `PRIVACY.en.md` l.35 EN) | Deletion answer | MATCH |
+| "Uninstalling the app permanently deletes all of it. We keep no copy." (l.36 AR / `PRIVACY.en.md` l.36 EN) | Deletion answer | MATCH |
 | Foreground audio playback info stays on device (l.22 AR / `PRIVACY.en.md` l.22 EN) | WAKE_LOCK / FOREGROUND_SERVICE census note | MATCH |
 
 **Result: no mismatch found — the privacy sources required no data-safety edits.**

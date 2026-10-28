@@ -27,7 +27,7 @@ Last updated: 2026-10-24 · Applies to version 1.0.0
 
 Everything the app stores stays **on your device only**, inside the app's private storage:
 
-- Your settings (dark mode, font size, selected city, reminder time).
+- Your settings (selected city, reminder times).
 - Your bookmarks and last-read position.
 - The audio files and text packs you downloaded.
 - Your worship-tracker and tasbih logs.
