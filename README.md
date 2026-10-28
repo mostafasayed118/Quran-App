@@ -4,7 +4,7 @@
 
 Quran Yahdi is a complete, offline-first Quran companion for Android: the full Mushaf bundled on-device, audio recitations you can stream or download, adhkar, duas, prayer times and a live Qibla compass — with no accounts, no ads, and no data collection.
 
-> **الحالة الحالية (بأمانة):** MVP أندرويد مكتمل (v1.0.0 قيد التحضير للمتجر) · رفع iOS ومسودة عرض المتجر قيد التنفيذ — انظر `docs/store/` و`PRIVACY.md`.
+> **الحالة الحالية (بأمانة):** MVP أندرويد مكتمل (v1.0.0 قيد التحضير للمتجر) · مسودة عرض المتجر جاهزة في `docs/store/`، أما iOS فلم يُبنَ ولم يُجرَّب بعد (لا `Podfile` ولا `DEVELOPMENT_TEAM` ولا مهمة بناء على macOS) — انظر `docs/store/` و`PRIVACY.md`.
 
 ## الميزات (إصدار v1)
 
@@ -13,11 +13,11 @@ Quran Yahdi is a complete, offline-first Quran companion for Android: the full M
 | 1 | الرئيسية | بطاقة الصلاة القادمة + متابعة القراءة + شبكة الميزات |
 | 2 | فهرس السور | 114 سورة مع بحث فوري بالاسم أو الرقم |
 | 3 | قارئ القرآن | قراءة آية-بآية أو وضع المصحف الصفحي التقليدي |
-| 4 | شاشة الآية | الترجمات وعلامة الحفظ من مكان واحد |
+| 4 | شاشة الآية | ورقة سفلية للتفسير والترجمة المثبَّتين تُخفي اللوح الفارغ — وعلامة الحفظ في سطر القارئ لا في الورقة |
 | 5 | متابعة القراءة | حفظ آخر موضع وعلامات مرجعية متعددة |
 | 6 | التلاوات | أكثر من 240 قارئًا (خدمة mp3quran) — بث فوري أو تحميل كامل للأوفلاين |
 | 7 | المشغّل والتنزيلات | مشغّل مصغّر يلازمك + مدير تنزيلات بحالة كل ملف |
-| 8 | مواقيت الصلاة | أوقات دقيقة لاختيار مدينتك (أو أقرب مدينة تحديدًا على جهازك) + تنبيه صلاة اختياري |
+| 8 | مواقيت الصلاة | أوقات دقيقة لاختيار مدينتك (أو أقرب مدينة تحديدًا على جهازك) + تذكيرات اختيارية للصلاة والأذكار والورد |
 | 9 | القبلة | بوصلة بتوجيه حي من حساسات الهاتف |
 | 10 | الأذكار | أذكار مصنّفة مع عدّاد لكل ذكر |
 | 11 | السبحة | عدّاد إلكتروني دائري بأهداف قابلة للتبديل |
@@ -27,7 +27,7 @@ Quran Yahdi is a complete, offline-first Quran companion for Android: the full M
 
 ## لقطات الشاشات
 
-يُرفق المالك صور PNG حقيقية لاحقًا (المسودة وقائمة اللقطات في `docs/store/listing-ar.md` و`docs/store/listing-en.md`، والمستهدفات تحت `docs/store/screenshots/`):
+لقطات حقيقية من التطبيق في `docs/store/screenshots/` (المسودة وقائمة اللقطات في `docs/store/listing-ar.md` و`docs/store/listing-en.md`):
 
 ![الرئيسية](docs/store/screenshots/01-home.png)
 ![فهرس السور](docs/store/screenshots/02-index.png)
@@ -35,8 +35,6 @@ Quran Yahdi is a complete, offline-first Quran companion for Android: the full M
 ![وضع المصحف](docs/store/screenshots/04-mushaf.png)
 ![التلاوات](docs/store/screenshots/06-recitation.png)
 ![مواقيت الصلاة](docs/store/screenshots/07-prayer-times.png)
-
-<!-- PLACEHOLDER LINKS — الملفات أعلاه غير موجودة بعد؛ تُستبدل عند إرفاق اللقطات -->
 
 ## التقنيات
 
@@ -55,15 +53,15 @@ flutter gen-l10n
 dart run build_runner build --delete-conflicting-outputs
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 641 اختبار
+flutter test           # البوابة الكاملة: 760+ اختبار
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
-flutter build appbundle --release  # مخرجات المتجر
+PUBLISH_RELEASE=true flutter build appbundle --release  # مخرجات المتجر (بلا مفتاح = فشل بناء)
 flutter build apk --split-per-abi  # APK مباشر أصغر حجمًا لكل معمارية (الافتراضي يبقى AAB أعلاه)
 tools/device_smoke.ps1             # بوابة دخان الجهاز: تثبيت + إقلاع بلا أخطاء قاتلة
 ```
 
-التوقيع عند الإصدار: إن وُجد `android/key.properties` (مستثنى من Git) وُقّعت المخرجات منه، وإلا يبنى التطبيق موقّعًا بـ debug مع تنبيه صريح في السجل حتى يستلم المالك مفتاحه (W7c).
+التوقيع عند الإصدار: على جهاز المالك يوجد المفتاح و`android/key.properties` (مستثنى من Git) فتُوقَّع المخرجات بمفتاح المالك. وفي نسخة نظيفة بلا هذا الملف يُبنى التطبيق موقّعًا بـ debug مع تنبيه صريح في السجل. ونسخة المتجر يجب أن تكون موقّعة، لذا `PUBLISH_RELEASE=true` (أو `-PpublishRelease=true`) يجعل غياب المفتاح خطأً يُفشل البناء بدل إخراج نسخة debug، بينما بناء CI يكتفي بتحذير.
 
 ## المحتوى والمصادر
 

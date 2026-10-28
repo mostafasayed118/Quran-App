@@ -25,7 +25,7 @@ For every meaningful change: 1) explain the problem, 2) explain the plan + files
 
 Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; compare alternatives; stop over-engineering, warn on under-engineering; challenge code accepted without understanding. Do not silently generate code; do not hide architecture decisions. "Build passes" ≠ "learning complete". Use a Mermaid diagram only when it beats prose (keep reusable ones in `docs/`).
 
-## 2) Project truth — verified 2026-10-18 (do not invent alternatives)
+## 2) Project truth — verified 2026-10-18, amended 2026-10-28 (do not invent alternatives)
 
 **Toolchain:** Flutter 3.47.5 stable / Dart 3.13.4 · Windows PowerShell 5.1 (no `&&`; use `;`).
 **CI runs the SAME version** (`.github/workflows/ci.yml` → `flutter-version: 3.47.5`, pinned on purpose): the `dart format` gate is formatter-version-sensitive, so a floating `stable` made CI red on a green tree. Bumping the toolchain is a deliberate commit that changes this line and the workflow together.
@@ -37,16 +37,16 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 - Domain packages: `just_audio` (+ `just_audio_background`), `flutter_local_notifications` + `timezone`, `geolocator`, `sensors_plus`, `adhan`, `hijri`, `app_links`, `share_plus`
 
 **Layout:**
-- `lib/app/` — app, bootstrap, router, deep links, **`di/` = the composition root** (the only layer allowed to import features)
+- `lib/app/` + `lib/main.dart` — app, bootstrap, router, deep links, **`di/` = the composition root** (the only layer allowed to import features; `lib/main.dart` is part of the composition root and imports the feature boot glue — the notifications binding/reminders and the recitation background-init guard)
 - `lib/core/` — db, domain, l10n, theme, utils, widgets · `lib/core/di/injector.dart` is a **compatibility shim** that re-exports `lib/app/di/injector.dart` (kept so existing imports keep working; it must never import a feature)
-- `lib/features/<feature>/` — `data/` + `presentation/` (cubit + freezed state + screens) — **16 features**; exceptions to the uniform split: `home/` and `settings/` have no `data/`, `notifications/` has no `presentation/`, `recitation/` adds `playback/` + `domain/`
+- `lib/features/<feature>/` — `data/` + `presentation/` (cubit + freezed state + screens) — **16 features**; exceptions to the uniform split: `home/` and `settings/` have no `data/`, `notifications/` has no `presentation/`, `quran/` adds `domain/`, `recitation/` adds `domain/` + `playback/`
 - `lib/l10n/` · `test/` (flutter_test only; fakes/hand-rolled harnesses — `bloc_test`/`mocktail` are NOT in the repo; adding any package needs an explicit owner grant)
 - `web/` — the Astro site, a separate owner-supervised campaign (sanctioned-foreign for app waves)
-- `tools/` · `docs/` (`campaign-ledger.md` = the append-only campaign record; `store/` = Play assets; `superpowers/{plans,specs,audits}`)
+- `tools/` · `docs/` (`campaign-ledger.md` = the append-only campaign record; `store/` = Play assets; `superpowers/{plans,specs,audits}`; `archive/` = retired docs kept for history)
 
-**Error handling:** repositories surface failures; cubits expose explicit **Loading / Ready / Failed** states (the variant names are exactly `loading` / `ready` / `failed` across every feature — a rename needs a deprecated type alias when a frozen test names the old class); UI shows **localized copy only** (never raw exceptions — diagnostics to dev.log; the error variants carry NO raw exception string). A `Result<T>` layer is NOT in use (introducing one = explicit owner decision).
+**Error handling:** repositories surface failures; cubits expose explicit **Loading / Ready / Failed** states (**most features**; the documented exceptions carry their own variant sets — `backup`, `downloads`, `playback`, `azkar`, `duas`, `tasbih`, `zakat`): `lib/features/backup/presentation/backup_state.dart`, `lib/features/recitation/presentation/downloads/downloads_state.dart`, `lib/features/recitation/presentation/playback/playback_state.dart`, `lib/features/azkar/presentation/azkar_state.dart`, `lib/features/duas/presentation/duas_state.dart`, `lib/features/tasbih/presentation/tasbih_state.dart`, `lib/features/zakat/presentation/zakat_state.dart` (a rename needs a deprecated type alias when a frozen test names the old class); UI shows **localized copy only** (never raw exceptions — diagnostics to dev.log; the error variants carry NO raw exception string). A `Result<T>` layer is NOT in use (introducing one = explicit owner decision).
 
-**Dependency direction:** `lib/app/` → features → `lib/core/` → packages. `lib/core/` must never import a feature, and a feature's `presentation/` must never import another feature's `data/` — cross-feature needs go through a port in `lib/core/domain/`. `test/architecture_guard_test.dart` pins the allowed cross-feature edges; adding one is an architecture decision.
+**Dependency direction:** `lib/app/` (+ `lib/main.dart`) → features → `lib/core/` → packages. `lib/core/` must never import a feature, and a feature's `presentation/` must never import another feature's `data/` — cross-feature needs go through a port in `lib/core/domain/` by default. A small set of direct feature→feature imports is ratified: the `allowedFeatureEdges` allowlist in `test/architecture_guard_test.dart` is the **exact** set of permitted direct edges, and adding one is an architecture decision.
 
 **NOT in this project:** Supabase · Sentry · Firebase · Provider (banned for new features) · GetX · Riverpod · Stacked.
 
@@ -73,7 +73,7 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 - Report format: start-gate output verbatim · per-commit SHA/stat · gate tails · confirmation bullets · STOPs/deviations/disclosures · final porcelain + unpushed count.
 - Sanctioned-foreign during app waves: `web/**`, `.github/workflows/web.yml`, docs-only deltas, `tools/export_web_data.dart`, `docs/campaign-ledger.md`. `INSTRUCTIONS.md` and `.vscode/settings.json` are expected debris — **never touch/stage/commit**. Never `fetch/pull/rebase/merge`.
 - Device legs (PM-owned, no device work inside executor waves): full adb path `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe`; test device Infinix X6882 (`13372704AR007777`); screenshots = device-side `screencap` + `adb pull` (never pipe binary through PowerShell).
-- Release: **W7c pending** — `android/key.properties` is gitignored; the production keystore lives OUTSIDE the repo (never lost). Local release builds stay debug-signed (fails-soft by design). A **store-bound** build must set `PUBLISH_RELEASE=true` (or `-PpublishRelease=true`): without a keystore the Gradle build then FAILS instead of producing a debug-signed artifact. `CI=true` builds only WARN.
+- Release: the owner keystore lives OUTSIDE the repo; `android/key.properties` is gitignored and wired on the owner machine, so release builds there are signed with the owner cert. A clean clone without that file builds **debug-signed** (loud notice; `CI=true` builds only WARN). A **store-bound** build must set `PUBLISH_RELEASE=true` (or `-PpublishRelease=true`): without a keystore the Gradle build then FAILS instead of producing a debug-signed artifact.
 
 ## 5) Branches
 
@@ -104,4 +104,4 @@ The `skills.sh` list in `INSTRUCTIONS.md` (Section H) is a Claude-Code-plugin ar
 getx · riverpod (comparison only) · stacked · firebase/flutterfire · flutter-after-layout (use `addPostFrameCallback`) · kt.dart · bolt · flutterfire_desktop — all excluded.
 
 ---
-*Last updated: 2026-10-18 — adapted for `quran_yahdi`; owner-ratified (recorded in `docs/campaign-ledger.md`).*
+*Last updated: 2026-10-28 — adapted for `quran_yahdi`; owner-ratified (recorded in `docs/campaign-ledger.md`).*

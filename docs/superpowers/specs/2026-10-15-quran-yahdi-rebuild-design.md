@@ -1,7 +1,7 @@
 # Quran Yahdi (قرآن يَهدي) — Full Rebuild Design Spec
 
 Date: 2026-10-15 · Status: APPROVED by owner (all 4 design sections + 15 UI mockups)
-Replaces/assets-follows: `RECOVERY_PLAN.md` (the new build supersedes its fix-in-place path)
+Replaces/assets-follows: `docs/archive/RECOVERY_PLAN.md` (the new build supersedes its fix-in-place path)
 
 ## 1. Goal
 

@@ -1,3 +1,5 @@
+> Archived 2026-10-28 — superseded; kept for history.
+
 # Quran-App Recovery Plan
 
 > **SUPERSEDED 2026-10-15 — historical pre-rebuild plan.** This file describes
