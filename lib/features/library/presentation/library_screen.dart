@@ -24,6 +24,7 @@ class LibraryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<LibraryCubit, LibraryState>(
+      buildWhen: _rebuildRoot,
       builder: (context, state) {
         final loc = AppLocalizations.of(context);
         final kinds = switch (state) {
@@ -53,10 +54,7 @@ class LibraryScreen extends StatelessWidget {
                       child: TabBarView(
                         children: [
                           for (final kind in kinds)
-                            _PackList(
-                              packs: ready.packsWhere(kind),
-                              ready: ready,
-                            ),
+                            _PackList(packs: ready.packsWhere(kind)),
                         ],
                       ),
                     ),
@@ -83,6 +81,40 @@ class LibraryScreen extends StatelessWidget {
       onDismiss: () => cubit.dismissFailure(packId),
     );
   }
+}
+
+/// Root rebuild gate: an install reports progress per 1 % step, and rebuilding
+/// the scaffold + tab bar + both lists on every tick is wasted work — the
+/// progress itself is read per row by [_PackRow]'s [BlocSelector].
+///
+/// Structural transitions still rebuild the root: the state variant, the pack
+/// catalog, the failure set, and the empty/non-empty flip of
+/// [LibraryReady.progress] (the failure strip is only shown while no download
+/// is in flight, so that flip changes the layout).
+bool _rebuildRoot(LibraryState previous, LibraryState current) {
+  return switch ((previous, current)) {
+    (LibraryLoading(), LibraryLoading()) => false,
+    (LibraryFailed(), LibraryFailed()) => false,
+    (final LibraryReady before, final LibraryReady after) =>
+      _rootChanged(before, after),
+    _ => true,
+  };
+}
+
+bool _rootChanged(LibraryReady before, LibraryReady after) {
+  if (before.progress.isEmpty != after.progress.isEmpty) return true;
+  if (before.failed.length != after.failed.length ||
+      !after.failed.containsAll(before.failed)) {
+    return true;
+  }
+  if (identical(before.packs, after.packs)) return false;
+  if (before.packs.length != after.packs.length) return true;
+  for (var i = 0; i < before.packs.length; i++) {
+    final old = before.packs[i];
+    final updated = after.packs[i];
+    if (old.id != updated.id || old.kind != updated.kind) return true;
+  }
+  return false;
 }
 
 extension on LibraryReady {
@@ -122,10 +154,9 @@ String _libraryTabLabel(AppLocalizations loc, LibraryPackKind kind) =>
     };
 
 class _PackList extends StatelessWidget {
-  const _PackList({required this.packs, required this.ready});
+  const _PackList({required this.packs});
 
   final List<LibraryPackInfo> packs;
-  final LibraryReady ready;
 
   @override
   Widget build(BuildContext context) {
@@ -135,33 +166,64 @@ class _PackList extends StatelessWidget {
         const EdgeInsets.only(bottom: AppSpacing.md),
       ),
       itemCount: packs.length,
-      itemBuilder: (context, index) =>
-          _PackRow(pack: packs[index], ready: ready),
+      itemBuilder: (context, index) => _PackRow(pack: packs[index]),
     );
   }
 }
 
+/// The per-row slice of [LibraryReady] the trailing area reads.
+///
+/// A value record on purpose: [BlocSelector] compares it with `==`, so a
+/// progress tick for one pack rebuilds that pack's row and nothing else.
+typedef _PackRowStatus = ({bool installed, (int, int)? progress});
+
 class _PackRow extends StatelessWidget {
-  const _PackRow({required this.pack, required this.ready});
+  const _PackRow({required this.pack});
 
   final LibraryPackInfo pack;
-  final LibraryReady ready;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final cubit = context.read<LibraryCubit>();
-    final progress = ready.progress[pack.id];
-    final installed = ready.installed.contains(pack.id);
     final subtitle = loc.libraryPackMeta(
       pack.approxSizeMb.toString().toArabicIndicDigits,
       pack.version,
     );
 
-    final Widget trailing;
+    return ListTile(
+      title: Text(
+        pack.titleAr,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+      subtitle: Text(loc.libraryPackSubtitle(subtitle, pack.titleEn)),
+      trailing: BlocSelector<LibraryCubit, LibraryState, _PackRowStatus>(
+        selector: _statusOf,
+        builder: (context, status) => _trailing(context, loc, status),
+      ),
+    );
+  }
+
+  _PackRowStatus _statusOf(LibraryState state) => switch (state) {
+        final LibraryReady ready => (
+            installed: ready.installed.contains(pack.id),
+            progress: ready.progress[pack.id],
+          ),
+        _ => (installed: false, progress: null),
+      };
+
+  Widget _trailing(
+    BuildContext context,
+    AppLocalizations loc,
+    _PackRowStatus status,
+  ) {
+    final cubit = context.read<LibraryCubit>();
+    final progress = status.progress;
+    final installed = status.installed;
+
+    final Widget action;
     if (progress != null) {
       final (received, total) = progress;
-      trailing = DownloadProgressLabel(
+      action = DownloadProgressLabel(
         received: received,
         total: total,
         format: (r, t) => loc.downloadProgressOfTotal(
@@ -170,42 +232,35 @@ class _PackRow extends StatelessWidget {
         ),
       );
     } else if (installed) {
-      trailing = IconButton(
+      action = IconButton(
         tooltip: loc.libraryDelete,
         icon: const Icon(Icons.delete_outline),
         onPressed: () => _confirmDelete(context, cubit, loc),
       );
     } else {
-      trailing = FilledButton(
+      action = FilledButton(
         onPressed: () => cubit.install(pack),
         child: Text(loc.libraryInstall),
       );
     }
 
-    return ListTile(
-      title: Text(
-        pack.titleAr,
-        style: const TextStyle(fontWeight: FontWeight.w600),
-      ),
-      subtitle: Text(loc.libraryPackSubtitle(subtitle, pack.titleEn)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (installed && progress == null)
-            Text(
-              loc.libraryInstalled,
-              style: TextStyle(color: AppTheme.goldText(context), fontSize: 12),
-            ),
-          if (installed && pack.kind == LibraryPackKind.hadith)
-            IconButton(
-              tooltip: loc.hadithRead,
-              icon: const Icon(Icons.menu_book_outlined),
-              onPressed: () => context.push(hadithBrowsePath(pack.id)),
-            ),
-          const SizedBox(width: AppSpacing.sm),
-          trailing,
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (installed && progress == null)
+          Text(
+            loc.libraryInstalled,
+            style: TextStyle(color: AppTheme.goldText(context), fontSize: 12),
+          ),
+        if (installed && pack.kind == LibraryPackKind.hadith)
+          IconButton(
+            tooltip: loc.hadithRead,
+            icon: const Icon(Icons.menu_book_outlined),
+            onPressed: () => context.push(hadithBrowsePath(pack.id)),
+          ),
+        const SizedBox(width: AppSpacing.sm),
+        action,
+      ],
     );
   }
 

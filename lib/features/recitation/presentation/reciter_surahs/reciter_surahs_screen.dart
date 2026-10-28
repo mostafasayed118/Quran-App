@@ -64,21 +64,18 @@ class ReciterSurahsScreen extends StatelessWidget {
             :final names,
             :final previews,
           ) =>
-            BlocBuilder<DownloadsCubit, DownloadsState>(
-              builder: (context, dl) => ListView.builder(
-                padding: EdgeInsets.only(bottom: appBottomInset(context)),
-                itemCount: surahNumbers.length,
-                itemBuilder: (context, i) {
-                  final n = surahNumbers[i];
-                  return _SurahDownloadRow(
-                    reciter: row,
-                    surahNumber: n,
-                    name: names[n] ?? loc.surahFallbackName(n.toArabicIndic),
-                    teaser: previews[n],
-                    item: dl.items[downloadKey(row.id, n)],
-                  );
-                },
-              ),
+            ListView.builder(
+              padding: EdgeInsets.only(bottom: appBottomInset(context)),
+              itemCount: surahNumbers.length,
+              itemBuilder: (context, i) {
+                final n = surahNumbers[i];
+                return _SurahDownloadRow(
+                  reciter: row,
+                  surahNumber: n,
+                  name: names[n] ?? loc.surahFallbackName(n.toArabicIndic),
+                  teaser: previews[n],
+                );
+              },
             ),
         },
       ),
@@ -104,20 +101,16 @@ class _SurahDownloadRow extends StatelessWidget {
     required this.surahNumber,
     required this.name,
     this.teaser,
-    this.item,
   });
 
   final ReciterInfo reciter;
   final int surahNumber;
   final String name;
   final String? teaser;
-  final DownloadItem? item;
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final cubit = context.read<DownloadsCubit>();
-    final status = item?.status;
     final teaserText = teaser;
     return ListTile(
       contentPadding: AppTheme.tileContentPadding,
@@ -142,7 +135,12 @@ class _SurahDownloadRow extends StatelessWidget {
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
             ),
-      trailing: _buildTrailing(context, cubit, colors, status),
+      // One surah's download item only: a progress tick for another surah
+      // must not rebuild this row (or the 114-row list above it).
+      trailing: BlocSelector<DownloadsCubit, DownloadsState, DownloadItem?>(
+        selector: (state) => state.items[downloadKey(reciter.id, surahNumber)],
+        builder: (context, item) => _buildTrailing(context, item, colors),
+      ),
     );
   }
 
@@ -177,12 +175,12 @@ class _SurahDownloadRow extends StatelessWidget {
 
   Widget _buildTrailing(
     BuildContext context,
-    DownloadsCubit cubit,
+    DownloadItem? download,
     ColorScheme colors,
-    DownloadStatus? status,
   ) {
     final loc = AppLocalizations.of(context);
-    switch (status) {
+    final cubit = context.read<DownloadsCubit>();
+    switch (download?.status) {
       case DownloadStatus.done:
         return Row(
           mainAxisSize: MainAxisSize.min,
@@ -205,12 +203,14 @@ class _SurahDownloadRow extends StatelessWidget {
           ],
         );
       case DownloadStatus.downloading:
-        final item = this.item;
-        if (item == null) return const SizedBox.shrink();
+        if (download == null) return const SizedBox.shrink();
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _DownloadProgress(received: item.received, total: item.total),
+            _DownloadProgress(
+              received: download.received,
+              total: download.total,
+            ),
             _CancelDownloadButton(
               onPressed: () => cubit.cancelDownload(reciter.id, surahNumber),
             ),
