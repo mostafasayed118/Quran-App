@@ -161,6 +161,10 @@ class _ResultTile extends StatelessWidget {
       onTap: () async {
         final persisted = await context.read<CityPickerCubit>().persist(city);
         if (!context.mounted) return;
+        // While the picker is popping its subtree stays mounted, so the route
+        // itself must be current before this continuation touches navigation.
+        final route = ModalRoute.of(context);
+        if (route?.isCurrent != true) return;
         if (persisted) {
           Navigator.of(context).pop(true);
           return;
