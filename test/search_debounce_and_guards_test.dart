@@ -64,7 +64,51 @@ void main() {
     await cubit.loadMore();
 
     final calls = source.queries.where((q) => q.endsWith('|2')).length;
-    expect(calls, 1, reason: 'only the explicit Retry may reissue the page');
+    expect(calls, 1,
+        reason: 'repeated scroll notifications must not reissue a failed page');
+  });
+
+  test('a failed page is reissued only by the explicit retry', () async {
+    var nextPageCalls = 0;
+    final source = _Fake((q, after) async {
+      if (after == null) return _page([1, 2], hasMore: true);
+      nextPageCalls++;
+      if (nextPageCalls == 1) throw StateError('page failed');
+      if (nextPageCalls == 2) return _page([3], hasMore: true);
+      throw StateError('page failed again');
+    });
+    final cubit = QuranSearchCubit(source, debounce: Duration.zero);
+    addTearDown(cubit.close);
+
+    await cubit.search('الصلاة');
+    await cubit.loadMore();
+
+    var state = cubit.state as QuranSearchReady;
+    expect(state.moreFailed, isTrue);
+    expect(source.queries, ['الصلاة|null', 'الصلاة|2']);
+
+    await cubit.loadMore();
+    await cubit.loadMore();
+    expect(source.queries, ['الصلاة|null', 'الصلاة|2'],
+        reason: 'scroll notifications must not reissue a failed page');
+
+    await cubit.retryMore();
+    state = cubit.state as QuranSearchReady;
+    expect(state.moreFailed, isFalse);
+    expect(source.queries, ['الصلاة|null', 'الصلاة|2', 'الصلاة|2'],
+        reason: 'the retry reissues exactly one page at the same cursor');
+    expect(state.hits.map((h) => h.ayahId), [1, 2, 3]);
+
+    await cubit.loadMore();
+    state = cubit.state as QuranSearchReady;
+    expect(state.moreFailed, isTrue);
+
+    await cubit.retryMore();
+    state = cubit.state as QuranSearchReady;
+    expect(state.moreFailed, isTrue,
+        reason: 'a second failure keeps the retry affordance available');
+    expect(source.queries,
+        ['الصلاة|null', 'الصلاة|2', 'الصلاة|2', 'الصلاة|3', 'الصلاة|3']);
   });
 
   test('a page from the old query cannot merge into the new query', () async {

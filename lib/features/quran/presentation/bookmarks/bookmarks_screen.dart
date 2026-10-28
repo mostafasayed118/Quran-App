@@ -95,7 +95,7 @@ class _BookmarkList extends StatelessWidget {
     if (state.moreFailed) {
       return Center(
         child: TextButton(
-          onPressed: context.read<BookmarksCubit>().loadMore,
+          onPressed: context.read<BookmarksCubit>().retryMore,
           child: Text(loc.retry),
         ),
       );

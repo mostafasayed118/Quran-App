@@ -106,6 +106,21 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
     }
   }
 
+  /// Reissues the failed next page; a no-op unless the last page failed.
+  ///
+  /// [loadMore] refuses while [QuranSearchReady.moreFailed] is set, so the
+  /// caller clears the flag first and then runs the normal paging path.
+  Future<void> retryMore() async {
+    final current = state;
+    if (current is! QuranSearchReady ||
+        !current.moreFailed ||
+        current.loadingMore) {
+      return;
+    }
+    emit(current.copyWith(moreFailed: false));
+    await loadMore();
+  }
+
   /// Cancels a pending debounce before closing the cubit.
   @override
   Future<void> close() {

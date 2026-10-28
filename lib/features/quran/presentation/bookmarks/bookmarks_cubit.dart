@@ -99,6 +99,21 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     }
   }
 
+  /// Reissues the failed older page; a no-op unless the last page failed.
+  ///
+  /// [loadMore] refuses while [BookmarksReady.moreFailed] is set, so the
+  /// caller clears the flag first and then runs the normal paging path.
+  Future<void> retryMore() async {
+    final current = state;
+    if (current is! BookmarksReady ||
+        !current.moreFailed ||
+        current.loadingMore) {
+      return;
+    }
+    emit(current.copyWith(moreFailed: false));
+    await loadMore();
+  }
+
   void _emit() {
     if (isClosed) return;
     final firstIds = {for (final entry in _first) entry.ayah.id};

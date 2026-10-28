@@ -103,7 +103,7 @@ class _Results extends StatelessWidget {
     if (ready.moreFailed) {
       return Center(
         child: TextButton(
-          onPressed: context.read<QuranSearchCubit>().loadMore,
+          onPressed: context.read<QuranSearchCubit>().retryMore,
           child: Text(loc.retry),
         ),
       );
