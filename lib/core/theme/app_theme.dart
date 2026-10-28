@@ -46,8 +46,15 @@ abstract final class AppTheme {
   static TextStyle mutedAt(ColorScheme colors, double fontSize) =>
       TextStyle(fontSize: fontSize, color: colors.onSurfaceVariant);
 
-  static ThemeData get light => _theme(Brightness.light);
-  static ThemeData get dark => _theme(Brightness.dark);
+  // `_theme` builds a full ColorScheme.fromSeed palette plus ThemeData, and the
+  // root build in lib/app/app.dart reads both getters on every rebuild, so the
+  // built objects are cached. Static finals are lazily initialized: nothing is
+  // computed until the first read.
+  static final ThemeData _light = _theme(Brightness.light);
+  static final ThemeData _dark = _theme(Brightness.dark);
+
+  static ThemeData get light => _light;
+  static ThemeData get dark => _dark;
 
   static ThemeData _theme(Brightness brightness) {
     final isLight = brightness == Brightness.light;
