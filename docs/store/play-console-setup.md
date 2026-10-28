@@ -17,10 +17,12 @@ Last updated: 2026-10-24 · Android only for this submission (no iOS/web listing
 | minSdk | `24` | `docs/campaign-ledger.md:878` |
 | targetSdk | `36` | `docs/campaign-ledger.md:878` |
 | Release AAB path | `build/app/outputs/bundle/release/app-release.aab` | Gradle output |
-| Last verified signed artifact (2026-10-24, `+2`) | AAB `68,195,926 B` · SHA-256 `90745181…CB713` · APK `69,497,234 B` · SHA-256 `61C95D0D…B63987` · versionCode `2` · `jarsigner` + `apksigner` V2 verified · cert `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` (SHA-256 `DB:7F:FE:F4…46:85`) | This session's rebuild |
+| Last verified signed artifact (2026-10-28, `+3`) | AAB `68,892,199 B` · SHA-256 `AFAFD398…F0588` · versionCode `3` · `jarsigner` verified · cert `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` (SHA-256 `DB:7F:FE:F4…46:85`) | Built from `76da2d7` with `PUBLISH_RELEASE=true` |
+| Signed APK from the same tree (2026-10-28, `+3`) | `app-release.apk` `27,279,615 B` · SHA-256 `2A0E8E2C…73E423` · versionCode `3` · same cert · used for the emulator screenshot pass | `flutter build apk --release --target-platform android-x64` |
+| Historical (2026-10-24, `+2`) | AAB `68,195,926 B` · SHA-256 `90745181…CB713` · APK `69,497,234 B` · SHA-256 `61C95D0D…B63987` · versionCode `2` | Superseded; never published |
 | Keystore | `C:\Users\ASUS\keystores\quran-yahdi-release.jks` (`android/key.properties` is gitignored) | `docs/campaign-ledger.md:877` |
 
-> The `+3` artifact must be rebuilt and re-verified (size, SHA-256, `apksigner`) before upload; the `+2` row above is historical.
+> Both `+3` artifacts are built and verified (size, SHA-256, `jarsigner`, versionCode 3). The `+2` row is historical. Re-verify again if any commit lands before upload only when it touches `lib/`, `assets/`, `android/`, or `pubspec.yaml`; docs-only commits do not change the artifact.
 
 - [x] Package name confirmed against the build script, not the store listing.
 - [ ] Confirm the AAB was built after the latest code change (`git log -1` at build time).
