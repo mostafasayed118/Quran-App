@@ -38,7 +38,8 @@ source-verified findings are listed here.
 | 11 | 4 | Version + store docs truth pass | docs |
 | 12 | 4 | README/AGENTS truth pass + campaign ledger close-out | docs |
 
-Deferred with rulings (see `.superpowers/sdd/postaudit/ledger.md`): tafsir
+Deferred with rulings (see
+`2026-10-28-post-audit-remediation-ledger.md`): tafsir
 reclassification to `kind: tafsir` (needs single-file tafsir install support), language
 switch, `pumpAndSettle` migration, screenshots, push/CI, iOS.
 
