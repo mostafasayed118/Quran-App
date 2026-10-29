@@ -37,7 +37,10 @@ const EN_SEARCH_INDEX_GZIP_BUDGET_BYTES = 360 * 1024;
 // Every other lazily imported chunk (today: the reciters snapshot) shares this ceiling.
 const LAZY_CHUNK_GZIP_BUDGET_BYTES = 64 * 1024;
 // Per-page CSS the browser must parse before the first paint.
-const CSS_GZIP_BUDGET_BYTES = 8 * 1024;
+// Raised 8 → 10 KB on 2026-10-29 (owner decision): the home page is now a full
+// design (heritage.css ~1.2k lines, shared by AR and EN), and 8 KB forced
+// byte-shaving on every edit. Every other page still sits far below this.
+const CSS_GZIP_BUDGET_BYTES = 10 * 1024;
 // Every shipped woff2 face, preloaded or not.
 const FONT_PAYLOAD_BUDGET_BYTES = 280 * 1024;
 // The runtime-fetched prayer-times JSON: the whole payload the city pages can

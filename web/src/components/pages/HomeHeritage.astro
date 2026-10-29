@@ -99,6 +99,12 @@ const faqs = [1, 2, 3, 4].map((n) => ({
   q: t(locale, `heritageFaq${n}Q` as 'heritageFaq1Q'),
   a: t(locale, `heritageFaq${n}A` as 'heritageFaq1A'),
 }));
+
+const truth = [
+  t(locale, 'heritageTruth1'),
+  t(locale, 'heritageTruth2'),
+  t(locale, 'heritageTruth3'),
+];
 ---
 
 <section class="heritage" data-heritage aria-labelledby="heritage-title">
@@ -252,9 +258,11 @@ const faqs = [1, 2, 3, 4].map((n) => ({
               <p class="folio__text" aria-label={copy.hero.ayah}>
                 <span class="words" aria-hidden="true">
                   {words.map((word, index) => (
-                    <span class="word" style={`--i: ${index}`}>
-                      {word}{' '}
-                    </span>
+                    <>
+                      <span class="word" style={`--i: ${index}`}>
+                        {word}
+                      </span>{' '}
+                    </>
                   ))}
                 </span>
               </p>
@@ -336,12 +344,12 @@ const faqs = [1, 2, 3, 4].map((n) => ({
           <ol class="track" data-timeline-track>
             {eras.map((era) => (
               <li class="era">
-                <div class="era__top">
+                <div class="era__head">
                   <span class="era__num" aria-hidden="true">
                     {era.num}
                   </span>
+                  <p class="era__era">{era.era}</p>
                 </div>
-                <p class="era__era">{era.era}</p>
                 <h3 class="era__title">{era.title}</h3>
                 <p class="era__text">{era.text}</p>
                 <p class="era__foot">{era.foot}</p>
@@ -400,7 +408,7 @@ const faqs = [1, 2, 3, 4].map((n) => ({
         </h2>
         <p class="h-lead">{t(locale, 'heritageTruthLead')}</p>
         <ul class="promises">
-          {copy.promise.map((item) => (
+          {truth.map((item) => (
             <li class="promise-item">{item}</li>
           ))}
         </ul>

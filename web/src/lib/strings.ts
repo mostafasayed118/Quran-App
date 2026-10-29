@@ -238,7 +238,10 @@ const dict = {
     heritageTruthEyebrow: 'لماذا هذا الموقع',
     heritageTruthTitle: 'لا شيءَ نجمعُه منك.',
     heritageTruthLead:
-      'الموقع والتطبيق مجانيان بالكامل، ويعملان بلا حساب. لا إعلانات، ولا أدوات تتبّع، ولا بيانات تُباع. النصّ نفسه مولّد من قاعدة بيانات التطبيق — لا وسيط ولا تعديل يدوي.',
+      'النصّ نفسه مولّد من قاعدة بيانات التطبيق — بلا وسيط ولا تعديل يدوي. والباقي وعودٌ لا تُخالف.',
+    heritageTruth1: 'مجاني بالكامل — بلا اشتراك ولا نسخة مدفوعة.',
+    heritageTruth2: 'بلا حساب: لا تسجيل، ولا بريد، ولا كلمة مرور.',
+    heritageTruth3: 'بلا إعلانات ولا أدوات تتبّع، ولا بيانات تُباع.',
     heritageTruthSource: 'المصدر على GitHub',
     heritageTruthPrivacy: 'سياسة الخصوصية',
     heritageStatLocales: 'لغة: عربية وإنجليزية',
@@ -511,7 +514,10 @@ const dict = {
     heritageTruthEyebrow: 'Why this site',
     heritageTruthTitle: 'We collect nothing from you.',
     heritageTruthLead:
-      'The site and the app are free and need no account. No ads, no trackers, no data for sale. The text itself is generated from the app database — no middleman, no hand edits.',
+      'The text itself is generated from the app database — no middleman, no hand edits. The rest are promises we keep.',
+    heritageTruth1: 'Free — no subscription, no paid edition.',
+    heritageTruth2: 'No account: no sign-up, no email, no password.',
+    heritageTruth3: 'No ads, no trackers, and no data for sale.',
     heritageTruthSource: 'Source on GitHub',
     heritageTruthPrivacy: 'Privacy policy',
     heritageStatLocales: 'languages: Arabic and English',

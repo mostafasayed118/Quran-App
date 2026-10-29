@@ -426,11 +426,12 @@
 }
 
 .chapter__tags li {
-  padding: 3px 11px;
-  border: 1px solid var(--h-line);
+  padding: 4px 13px;
+  border: 1px solid rgba(239, 227, 200, 0.3);
   border-radius: 999px;
-  color: var(--h-text-3);
-  font-size: 0.6875rem;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--h-text-2);
+  font-size: 0.72rem;
   white-space: nowrap;
 }
 
@@ -648,7 +649,6 @@
 .layer--audio .wave i {
   width: 2px;
   height: var(--h, 50%);
-  border-radius: 1px;
   background: var(--f-gold);
   opacity: 0.55;
 }
@@ -680,12 +680,6 @@
   margin: 14px 0 0;
   color: var(--h-text-3);
   font-size: 0.6875rem;
-}
-
-.journey__caption span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
 }
 
 /* ---------- the track (pinned horizontal) ---------- */
@@ -817,32 +811,43 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 500px;
-  min-height: 400px;
-  padding: 32px 30px 26px;
-  border: 1px solid color-mix(in srgb, var(--h-gold) 42%, transparent);
+  width: 440px;
+  padding: 26px 26px 22px 32px;
+  overflow: hidden;
+  border: 1px solid rgba(216, 188, 130, 0.28);
   border-radius: 3px;
   background: linear-gradient(160deg, #17453a, #0b2620);
-  box-shadow: 0 30px 60px -34px #000;
+  box-shadow: 0 26px 50px -30px #000;
 }
 
-.era__top {
+/* The rail is what ties the card to the horizontal timeline. */
+.era::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--h-gold), rgba(201, 164, 94, 0.06));
+}
+
+.era__head {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: baseline;
+  gap: 10px;
+  margin-block-end: 6px;
 }
 
 .era__num {
   font-family: var(--h-display);
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--h-gold);
 }
 
 .era__era {
-  margin: 18px 0 4px;
+  margin: 0;
   color: var(--h-gold-soft);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
 }
 
 .era__title {
@@ -862,10 +867,11 @@
 
 .era__foot {
   margin: auto 0 0;
-  padding-block-start: 18px;
-  border-block-start: 1px solid rgba(216, 188, 130, 0.2);
-  color: var(--h-text-3);
+  padding-block-start: 16px;
+  border-block-start: 1px solid rgba(216, 188, 130, 0.16);
+  color: var(--h-gold-soft);
   font-size: 0.6875rem;
+  opacity: 0.75;
 }
 
 .timeline__foot {
@@ -885,8 +891,7 @@
   background: linear-gradient(
     180deg,
     rgba(4, 23, 19, 0) 0%,
-    rgba(4, 23, 19, 0.74) 16%,
-    rgba(4, 23, 19, 0.86) 62%,
+    rgba(4, 23, 19, 0.8) 22%,
     rgba(4, 23, 19, 0) 100%
   );
 }
@@ -1162,27 +1167,28 @@
 
 .promises {
   display: grid;
-  gap: 9px;
-  margin: 18px 0 0;
-  padding: 0;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-block-start: 1px solid var(--h-line);
   list-style: none;
 }
 
 .promise-item {
   position: relative;
-  padding-inline-start: 20px;
-  color: var(--h-text-2);
-  font-size: 0.875rem;
-  line-height: 1.85;
+  padding-inline-start: 22px;
+  color: var(--h-text);
+  font-size: 0.9375rem;
+  line-height: 1.8;
 }
 
 .promise-item::before {
   content: '';
   position: absolute;
-  inset-block-start: 0.72em;
-  inset-inline-start: 4px;
-  width: 6px;
-  height: 6px;
+  inset-block-start: 0.62em;
+  inset-inline-start: 3px;
+  width: 7px;
+  height: 7px;
   background: var(--h-gold);
   transform: rotate(45deg);
 }
