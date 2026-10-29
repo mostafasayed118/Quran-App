@@ -53,23 +53,28 @@ body {
 }
 .site-header {
   justify-content: space-between;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 42%, transparent);
 }
 .site-footer {
-  border-top: 1px solid var(--hairline);
+  border-top: 1px solid color-mix(in srgb, var(--gold-line) 42%, transparent);
   flex-wrap: wrap;
 }
 .brand {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: var(--accent);
+  color: var(--gold-ink);
   font-weight: 700;
+  letter-spacing: -0.01em;
   text-decoration: none;
+}
+.brand img {
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold-line) 55%, transparent);
 }
 .site-header nav {
   display: flex;
-  gap: 16px;
+  gap: 4px;
   flex-wrap: wrap;
   justify-content: center;
   min-width: 0;
@@ -79,18 +84,73 @@ body {
   color: var(--muted-strong);
   text-decoration: none;
 }
+/* A hairline under the current section instead of a colour change: the link
+   stays in the same rhythm, the marker does the talking. */
+.site-header nav a {
+  position: relative;
+  padding-block: 6px;
+  padding-inline: 8px;
+  border-radius: 3px;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+.site-header nav a::after {
+  content: '';
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline: 8px;
+  height: 1px;
+  background: var(--gold-line);
+  transform: scaleX(0);
+  transition: transform 0.25s ease;
+}
+.site-header nav a:hover {
+  color: var(--ink);
+}
+.site-header nav a:hover::after,
+.site-header nav a[aria-current='page']::after {
+  transform: scaleX(1);
+}
+.site-header nav a[aria-current='page'] {
+  color: var(--gold-ink);
+}
+.site-footer a:hover {
+  color: var(--gold-ink);
+}
+/* The toggle is chrome, not a call to action: a quiet round glyph. The label
+   still lives in aria-label (set by the toggle's own script). */
 .theme-toggle {
-  background: var(--btn-bg);
-  color: var(--btn-ink);
-  border: 0;
-  border-radius: 999px;
-  padding: 9px 18px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gold-ink);
   font-family: inherit;
-  font-weight: 700;
+  font-size: 0;
   cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+.theme-toggle::before {
+  content: '☾';
+  font-size: 1rem;
+  line-height: 1;
+}
+html[data-theme='night'] .theme-toggle::before {
+  content: '☀';
+}
+.theme-toggle:hover {
+  border-color: var(--gold-line);
 }
 @media (pointer: coarse) {
   .theme-toggle {
+    width: 44px;
     min-height: 44px;
   }
 }
@@ -131,17 +191,6 @@ body {
   }
   .lang-switch {
     font-size: 0.75rem;
-  }
-  .theme-toggle {
-    font-size: 0;
-    padding: 8px 10px;
-  }
-  .theme-toggle::before {
-    content: '☾';
-    font-size: 0.95rem;
-  }
-  html[data-theme='night'] .theme-toggle::before {
-    content: '☀';
   }
 }
 .surah-list {
