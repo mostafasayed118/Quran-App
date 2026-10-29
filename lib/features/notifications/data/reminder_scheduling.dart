@@ -1,10 +1,8 @@
-import 'dart:ui' show Locale;
-
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/l10n/prayer_names.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'reminder_planner.dart';
 
@@ -30,7 +28,7 @@ Future<void> scheduleReminders({
       (choice) =>
           choice.name != PrayerName.sunrise && choice.time.isAfter(nowLocal),
     );
-    final loc = lookupAppLocalizations(const Locale('ar'));
+    final loc = platformLocalizations();
     final plan = planReminders(
       now: nowLocal,
       todayPrayers: todayPrayers,
