@@ -319,11 +319,44 @@ html[data-theme='night'] .theme-toggle::before {
   }
 }
 .ayah {
-  padding: 16px 2px;
+  position: relative;
+  padding: 14px 2px;
   border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 24%, transparent);
+  scroll-margin-top: 24px;
 }
 .ayah:last-of-type {
   border-bottom: 0;
+}
+/* The row under the pointer, or the one a deep link points at, gets a gold rail on
+   its start edge: the same mark the prayer table gives today's row. Deep links to
+   an ayah were previously indistinguishable from the text around them. */
+.ayah::before {
+  content: '';
+  position: absolute;
+  inset-block: 6px;
+  inset-inline-start: -10px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--gold-line);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.ayah:focus-visible::before,
+.ayah:target::before {
+  opacity: 1;
+}
+.ayah:target {
+  background: color-mix(in srgb, var(--gold-line) 9%, transparent);
+}
+@media (hover: hover) {
+  .ayah:hover::before {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ayah::before {
+    transition: none;
+  }
 }
 .ayah-text {
   margin: 0;
@@ -401,7 +434,12 @@ html[data-reader-step='3'] {
   border-color: transparent;
 }
 @media (pointer: fine) {
+  /* The actions stay in flow (they must remain clickable and tabbable from the
+     start, and the e2e clicks them without hovering first), so the row keeps its
+     height: the collapse that would have saved ~4,200px on al-Kahf turned the
+     buttons into zero-height boxes and the frozen specs timed out. */
   .ayah-actions {
+    margin-top: 6px;
     opacity: 0;
   }
   .ayah:hover .ayah-actions,
