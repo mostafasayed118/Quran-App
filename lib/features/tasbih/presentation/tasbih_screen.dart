@@ -23,25 +23,31 @@ class TasbihScreen extends StatelessWidget {
           };
           final colors = Theme.of(context).colorScheme;
           final done = ready.count >= ready.target;
-          return Column(
-            children: [
-              const SizedBox(height: AppSpacing.lg),
-              _TasbihDial(ready: ready),
-              const SizedBox(height: 20),
-              _TargetChips(ready: ready),
-              const SizedBox(height: AppSpacing.md),
-              OutlinedButton.icon(
-                onPressed: () => context.read<TasbihCubit>().reset(),
-                icon: const Icon(Icons.refresh),
-                label: Text(loc.tasbihReset),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              if (done)
-                Text(
-                  loc.azkarDone,
-                  style: TextStyle(color: colors.secondary, fontSize: 13),
+          // Full width so the dial and the chips centre on the screen: a bare
+          // Column in a loose body shrink-wraps to its widest child and sits
+          // against the start edge.
+          return SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                const SizedBox(height: AppSpacing.lg),
+                _TasbihDial(ready: ready),
+                const SizedBox(height: 20),
+                _TargetChips(ready: ready),
+                const SizedBox(height: AppSpacing.md),
+                OutlinedButton.icon(
+                  onPressed: () => context.read<TasbihCubit>().reset(),
+                  icon: const Icon(Icons.refresh),
+                  label: Text(loc.tasbihReset),
                 ),
-            ],
+                const SizedBox(height: AppSpacing.sm),
+                if (done)
+                  Text(
+                    loc.azkarDone,
+                    style: TextStyle(color: colors.secondary, fontSize: 13),
+                  ),
+              ],
+            ),
           );
         },
       ),

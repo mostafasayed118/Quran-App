@@ -205,11 +205,27 @@ class _Field extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(14),
+      borderSide: BorderSide(color: colors.outlineVariant),
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: TextField(
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        decoration: InputDecoration(labelText: label),
+        // Filled + outlined like the app's cards: the raw Material underline
+        // read as an empty row on the beige page.
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: colors.surface,
+          border: border,
+          enabledBorder: border,
+          focusedBorder: border.copyWith(
+            borderSide: BorderSide(color: colors.primary, width: 1.4),
+          ),
+        ),
         onChanged: onChanged,
       ),
     );
