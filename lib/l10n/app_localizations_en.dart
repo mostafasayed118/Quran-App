@@ -717,6 +717,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryPackSize(String size) {
+    return '$size MB';
+  }
+
+  @override
   String libraryFailedForPack(String failed, String pack) {
     return '$failed — $pack';
   }

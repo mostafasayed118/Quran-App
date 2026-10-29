@@ -185,9 +185,11 @@ class _PackRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final subtitle = loc.libraryPackMeta(
-      pack.approxSizeMb.toString().toArabicIndicDigits,
-      pack.version,
+    // Size + English title only: the pack's `version` is an upstream commit
+    // SHA (a 40-char hex id) and means nothing to the reader.
+    final subtitle = loc.libraryPackSubtitle(
+      loc.libraryPackSize(pack.approxSizeMb.toString().toArabicIndicDigits),
+      pack.titleEn,
     );
 
     return ListTile(
@@ -195,7 +197,7 @@ class _PackRow extends StatelessWidget {
         pack.titleAr,
         style: const TextStyle(fontWeight: FontWeight.w600),
       ),
-      subtitle: Text(loc.libraryPackSubtitle(subtitle, pack.titleEn)),
+      subtitle: Text(subtitle),
       trailing: BlocSelector<LibraryCubit, LibraryState, _PackRowStatus>(
         selector: _statusOf,
         builder: (context, status) => _trailing(context, loc, status),

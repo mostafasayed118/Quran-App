@@ -714,6 +714,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String libraryPackSize(String size) {
+    return '$size م.ب';
+  }
+
+  @override
   String libraryFailedForPack(String failed, String pack) {
     return '$failed — $pack';
   }

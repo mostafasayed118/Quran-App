@@ -437,6 +437,14 @@
       }
     }
   },
+  "libraryPackSize": "{size} MB",
+  "@libraryPackSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
   "libraryFailedForPack": "{failed} — {pack}",
   "@libraryFailedForPack": {
     "placeholders": {

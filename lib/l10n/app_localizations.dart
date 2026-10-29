@@ -1352,6 +1352,12 @@ abstract class AppLocalizations {
   /// **'{meta} · {titleEn}'**
   String libraryPackSubtitle(String meta, String titleEn);
 
+  /// No description provided for @libraryPackSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'{size} م.ب'**
+  String libraryPackSize(String size);
+
   /// No description provided for @libraryFailedForPack.
   ///
   /// In ar, this message translates to:
