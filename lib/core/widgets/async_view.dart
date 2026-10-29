@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Centered progress indicator for a route-level load.
 class LoadingView extends StatelessWidget {
   const LoadingView({super.key});
 
@@ -9,6 +10,7 @@ class LoadingView extends StatelessWidget {
   }
 }
 
+/// Centered plain-text failure message; callers pass already-localized copy.
 class ErrorView extends StatelessWidget {
   const ErrorView(this.message, {super.key});
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 
+/// RTL-aligned search input with the shared filled-pill decoration.
 class SearchField extends StatelessWidget {
   const SearchField({
     super.key,

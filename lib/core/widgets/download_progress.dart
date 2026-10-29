@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Label + linear bar for one download's byte progress.
 class DownloadProgressLabel extends StatelessWidget {
   const DownloadProgressLabel({
     super.key,

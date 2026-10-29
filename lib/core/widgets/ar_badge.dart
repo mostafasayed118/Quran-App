@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Compact rounded badge for a short label (ayah, juz, or count) — one
+/// visual weight app-wide.
 class ArabicBadge extends StatelessWidget {
   const ArabicBadge(
     this.label, {

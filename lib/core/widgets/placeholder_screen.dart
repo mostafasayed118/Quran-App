@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 
+/// Scaffold for a screen whose content has not shipped yet.
 class PlaceholderScreen extends StatelessWidget {
   const PlaceholderScreen({
     super.key,

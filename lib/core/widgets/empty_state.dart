@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_spacing.dart';
 
+/// Centered empty-state message with an optional action button.
 class EmptyState extends StatelessWidget {
   const EmptyState(this.message, {super.key, this.actionLabel, this.onAction});
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// Dismissible inline error banner with an optional retry action.
 class ErrorStrip extends StatelessWidget {
   const ErrorStrip(
     this.message, {
