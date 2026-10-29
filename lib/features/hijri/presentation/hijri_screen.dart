@@ -61,7 +61,7 @@ class _TodayCard extends StatelessWidget {
           children: [
             Text(
               todayHeader,
-              style: AppTheme.meQuranHead,
+              style: AppTheme.rowTitle,
             ),
           ],
         ),
@@ -156,8 +156,8 @@ class _DayCell extends StatelessWidget {
           Text(
             cell.hDay.toArabicIndic,
             style: const TextStyle(
-              fontFamily: QuranFonts.meQuran,
-              fontSize: 17,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
             ),
           ),
           Text(

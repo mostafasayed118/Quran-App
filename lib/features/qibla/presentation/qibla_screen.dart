@@ -215,7 +215,7 @@ class _DegreesLabel extends StatelessWidget {
     return Center(
       child: Text(
         loc.degreesFromNorth(bearing.round().toArabicIndic),
-        style: AppTheme.meQuranTitle,
+        style: AppTheme.rowTitle,
       ),
     );
   }

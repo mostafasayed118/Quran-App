@@ -116,6 +116,9 @@ class _NameSheet extends StatelessWidget {
                 Text(
                   name.nameEn,
                   textAlign: TextAlign.center,
+                  // Latin transliteration: LTR keeps a trailing hamza mark
+                  // ("Al-Bari'") at the end instead of flipping it to the start.
+                  textDirection: TextDirection.ltr,
                   style: _sheetNameEnStyle(colors),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -200,6 +203,7 @@ class _NameCell extends StatelessWidget {
               child: Text(
                 name.nameEn,
                 textAlign: TextAlign.center,
+                textDirection: TextDirection.ltr,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTheme.mutedFootnote(context),
