@@ -272,77 +272,45 @@ class BackupService {
     }
 
     final khatma = plan.khatma.toWrite;
+    final khatmaWrite = khatma == null
+        ? null
+        : KhatmaProgressCompanion(
+            ayahId: Value(khatma.ayahId),
+            targetPages: Value(khatma.targetPages),
+            updatedAt: Value(khatma.updatedAt),
+          );
     final khatmaRowId = plan.khatmaRowId;
-    final settingsEntries = plan.settings.toWrite.entries.toList();
     final totalWrites = bookmarks.length +
         prayerDays.length +
-        settingsEntries.length +
-        (lastRead == null ? 0 : 1) +
-        (tasbih == null ? 0 : 1) +
-        (khatma == null ? 0 : 1);
+        settings.length +
+        (khatmaWrite == null ? 0 : 1);
     if (totalWrites < _batchThreshold) {
       for (final bookmark in bookmarks) {
         await _db.into(_db.bookmarks).insert(bookmark);
       }
-      if (lastRead != null) {
-        await _writeSetting(backupKeyLastReadAyahId, lastRead.toString());
-      }
-      if (khatma != null) {
-        if (khatmaRowId != null) {
-          await (_db.update(_db.khatmaProgress)
-                ..where((t) => t.id.equals(khatmaRowId)))
-              .write(KhatmaProgressCompanion(
-            ayahId: Value(khatma.ayahId),
-            targetPages: Value(khatma.targetPages),
-            updatedAt: Value(khatma.updatedAt),
-          ));
-        } else {
-          await _db.into(_db.khatmaProgress).insert(
-                KhatmaProgressCompanion.insert(
-                  ayahId: khatma.ayahId,
-                  targetPages: khatma.targetPages,
-                  updatedAt: Value(khatma.updatedAt),
-                ),
-              );
-        }
+      if (khatmaWrite != null) {
+        await _writeKhatma(khatmaWrite, khatmaRowId);
       }
       for (final day in prayerDays) {
         await _db.into(_db.prayerLog).insertOnConflictUpdate(day);
       }
-      if (tasbih != null) {
-        await _writeSetting(
-          backupKeyTasbihState,
-          jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
-        );
-      }
-      for (final entry in settingsEntries) {
-        await _writeSetting(entry.key, entry.value);
+      for (final setting in settings) {
+        await _db.into(_db.settingsTable).insertOnConflictUpdate(setting);
       }
       return;
     }
 
     await _db.batch((batch) {
       batch.insertAll(_db.bookmarks, bookmarks);
-      if (khatma != null) {
+      if (khatmaWrite != null) {
         if (khatmaRowId != null) {
           batch.update(
             _db.khatmaProgress,
-            KhatmaProgressCompanion(
-              ayahId: Value(khatma.ayahId),
-              targetPages: Value(khatma.targetPages),
-              updatedAt: Value(khatma.updatedAt),
-            ),
+            khatmaWrite,
             where: (t) => t.id.equals(khatmaRowId),
           );
         } else {
-          batch.insert(
-            _db.khatmaProgress,
-            KhatmaProgressCompanion.insert(
-              ayahId: khatma.ayahId,
-              targetPages: khatma.targetPages,
-              updatedAt: Value(khatma.updatedAt),
-            ),
-          );
+          batch.insert(_db.khatmaProgress, khatmaWrite);
         }
       }
       batch.insertAllOnConflictUpdate(_db.prayerLog, prayerDays);
@@ -350,10 +318,18 @@ class BackupService {
     });
   }
 
-  Future<void> _writeSetting(String key, String value) =>
-      _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(key: key, value: value),
-          );
+  /// Single khatma row: update in place when one exists, insert otherwise.
+  Future<void> _writeKhatma(
+    KhatmaProgressCompanion values,
+    int? rowId,
+  ) async {
+    if (rowId == null) {
+      await _db.into(_db.khatmaProgress).insert(values);
+      return;
+    }
+    await (_db.update(_db.khatmaProgress)..where((t) => t.id.equals(rowId)))
+        .write(values);
+  }
 }
 
 class _ApplyPlan {
