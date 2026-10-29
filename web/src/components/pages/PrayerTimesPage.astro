@@ -1,6 +1,7 @@
 ---
 import { t, type Locale } from '../../lib/strings';
 import { cityLabel, getCities } from '../../lib/cities';
+import { digitsFor } from '../../lib/arabic-digits';
 
 interface Props {
   locale?: Locale;
@@ -9,59 +10,174 @@ const { locale = 'ar' } = Astro.props;
 const base = locale === 'en' ? '/en' : '';
 const placeholder = t(locale, 'ptSearchPlaceholder');
 const cities = getCities();
+const count = t(locale, 'ptCityCount').replace('{count}', digitsFor(cities.length, locale));
 ---
 
 <h1 class="page-title">{t(locale, 'ptTitle')}</h1>
 <p class="page-lead">{t(locale, 'ptLead')}</p>
-<div data-qy="pt-cities" data-locale={locale}>
-  <input
-    type="search"
-    class="index-search"
-    id="prayer-city-search"
-    name="prayer-city-search"
-    placeholder={placeholder}
-    aria-label={placeholder}
-  />
+<div class="pt-index" data-qy="pt-cities" data-locale={locale}>
+  <div class="pt-index-bar">
+    <p class="pt-index-count">{count}</p>
+    <div class="pt-search">
+      <svg class="pt-search-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="8.7" cy="8.7" r="5.7"></circle>
+        <path d="M13 13 L17.2 17.2"></path>
+      </svg>
+      <input
+        type="search"
+        class="index-search"
+        id="prayer-city-search"
+        name="prayer-city-search"
+        placeholder={placeholder}
+        aria-label={placeholder}
+      />
+    </div>
+  </div>
   <p class="empty" hidden>
     {t(locale, 'noResults')}
   </p>
   <ul class="city-list">
     {cities.map((city) => (
       <li data-name-ar={city.nameAr} data-name-en={city.nameEn}>
-        <a href={`${base}/prayer-times/${city.id}/`}>{cityLabel(city, locale)}</a>
+        <a href={`${base}/prayer-times/${city.id}/`}>
+          <span class="city-name">{cityLabel(city, locale)}</span>
+          <span class="city-leader" aria-hidden="true"></span>
+        </a>
       </li>
     ))}
   </ul>
 </div>
 <style>
-  .page-lead {
-    width: min(760px, calc(100% - 40px));
-    margin: 0 auto 8px;
-    color: var(--muted-strong);
-  }
-  .city-list {
-    list-style: none;
-    margin: 4px auto 60px;
-    padding: 0;
-    max-width: 760px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    column-gap: 18px;
-  }
-  .city-list a {
+  /* The city index reads as a manuscript index: names on the start edge, a dotted
+     leader running to the end of the measure, four columns on a wide screen so 156
+     cities stay two screens instead of six. */
+  .pt-index .pt-index-bar {
     display: flex;
-    padding: 10px 4px;
-    border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 24%, transparent);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    width: min(920px, calc(100% - 40px));
+    margin: 20px auto 4px;
+  }
+  .pt-index .pt-index-count {
+    flex: none;
+    margin: 0;
+    padding: 5px 14px;
+    border: 1px solid color-mix(in srgb, var(--gold-line) 40%, transparent);
+    border-radius: 999px;
+    color: var(--gold-ink);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+  .pt-index .pt-search {
+    position: relative;
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+  .pt-index .pt-search-icon {
+    position: absolute;
+    inset-inline-start: 17px;
+    top: 50%;
+    width: 17px;
+    height: 17px;
+    translate: 0 -50%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    color: var(--muted-strong);
+    pointer-events: none;
+  }
+  .pt-index .index-search {
+    width: 100%;
+    margin: 0;
+    padding-inline-start: 45px;
+  }
+  .pt-index .empty {
+    width: min(920px, calc(100% - 40px));
+    margin: 16px auto;
+    padding: 28px 20px;
+    border: 1px dashed color-mix(in srgb, var(--gold-line) 40%, transparent);
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  .pt-index .city-list {
+    list-style: none;
+    margin: 6px auto 64px;
+    padding: 0;
+    width: min(920px, calc(100% - 40px));
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 26px;
+  }
+  .pt-index .city-list li {
+    min-width: 0;
+  }
+  .pt-index .city-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 9px;
+    padding: 9px 2px;
+    border-radius: 3px;
     color: var(--ink);
     text-decoration: none;
   }
-  .city-list a:hover {
-    color: var(--accent);
+  .pt-index .city-name {
+    flex: none;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
-  @media (pointer: coarse) {
-    .city-list a {
-      min-height: 44px;
-      align-items: center;
+  .pt-index .city-leader {
+    flex: 1 1 auto;
+    min-width: 10px;
+    align-self: center;
+    height: 2px;
+    background-image: radial-gradient(
+      circle,
+      color-mix(in srgb, var(--gold-line) 78%, transparent) 1px,
+      transparent 1.2px
+    );
+    background-size: 6px 2px;
+    background-repeat: repeat-x;
+    opacity: 0.4;
+  }
+  @media (hover: hover) {
+    .pt-index .city-list a:hover {
+      background: color-mix(in srgb, var(--gold-line) 9%, transparent);
+    }
+    .pt-index .city-list a:hover .city-name {
+      color: var(--accent);
+    }
+    .pt-index .city-list a:hover .city-leader {
+      opacity: 0.85;
+    }
+  }
+  @media (max-width: 1099px) {
+    .pt-index .city-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 819px) {
+    .pt-index .city-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 18px;
+    }
+  }
+  /* Two columns survive down to 320px: one column turned 156 cities into 7,000px
+     of scrolling, and the longest name still clears half the measure. */
+  @media (max-width: 519px) {
+    .pt-index .city-list {
+      column-gap: 16px;
+    }
+    .pt-index .city-name {
+      font-size: 0.88rem;
+    }
+    .pt-index .pt-index-bar {
+      gap: 10px;
+    }
+    .pt-index .pt-search {
+      flex-basis: 100%;
     }
   }
 </style>

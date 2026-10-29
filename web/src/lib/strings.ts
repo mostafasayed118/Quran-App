@@ -71,6 +71,7 @@ const dict = {
     ptLead:
       'مواقيت الصلاة لأكثر من ١٥٠ مدينة — محسوبة فلكيًا على الطريقة المصرية وبتوقيت كل مدينة المحلي.',
     ptSearchPlaceholder: 'ابحث عن مدينة…',
+    ptCityCount: '{count} مدينة',
     ptCityTitle: 'مواقيت الصلاة في {city}',
     ptDay: 'اليوم',
     ptToday: 'اليوم',
@@ -335,6 +336,7 @@ const dict = {
     ptLead:
       "Prayer times for 150+ cities — astronomically computed with the Egyptian method, shown in each city's local time.",
     ptSearchPlaceholder: 'Search for a city…',
+    ptCityCount: '{count} cities',
     ptCityTitle: 'Prayer times in {city}',
     ptDay: 'Day',
     ptToday: 'Today',

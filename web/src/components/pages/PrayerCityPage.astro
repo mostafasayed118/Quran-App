@@ -25,9 +25,19 @@ const month = data.months[currentIdx];
 const todayISO = `${todayY}-${todayM}-${todayD}`;
 
 const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, locale));
+const altName = cityLabel(city, locale === 'ar' ? 'en' : 'ar');
 ---
 
 <h1 class="page-title">{heading}</h1>
+<p class="pt-city-meta">
+  <span class="pt-city-alt">{altName}</span>
+  <span class="pt-city-sep" aria-hidden="true">
+    ·
+  </span>
+  <span class="pt-city-tz" dir="ltr">
+    {city.tz}
+  </span>
+</p>
 <div
   class="pt-city"
   data-qy="pt-city"
@@ -69,28 +79,56 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
         </tr>
       </thead>
       <tbody>
-        {month.days.map((row, i) => (
-          <tr
-            data-day={i + 1}
-            data-today={inRange && i + 1 === todayD ? '1' : undefined}
-            class={inRange && i + 1 === todayD ? 'is-today' : undefined}
-          >
-            <td data-col="day">{digitsFor(i + 1, locale)}</td>
-            <td data-col="imsak">{formatClock(row[6], locale)}</td>
-            <td data-col="fajr">{formatClock(row[0], locale)}</td>
-            <td data-col="sunrise">{formatClock(row[1], locale)}</td>
-            <td data-col="dhuhr">{formatClock(row[2], locale)}</td>
-            <td data-col="asr">{formatClock(row[3], locale)}</td>
-            <td data-col="maghrib">{formatClock(row[4], locale)}</td>
-            <td data-col="isha">{formatClock(row[5], locale)}</td>
-          </tr>
-        ))}
+        {month.days.map((row, i) => {
+          const isToday = inRange && i + 1 === todayD;
+          return (
+            <tr
+              data-day={i + 1}
+              data-today={isToday ? '1' : undefined}
+              class={isToday ? 'is-today' : undefined}
+            >
+              <td data-col="day">
+                {isToday && <span class="sr-only">{`${t(locale, 'ptToday')} `}</span>}
+                {digitsFor(i + 1, locale)}
+              </td>
+              <td data-col="imsak">{formatClock(row[6], locale)}</td>
+              <td data-col="fajr">{formatClock(row[0], locale)}</td>
+              <td data-col="sunrise">{formatClock(row[1], locale)}</td>
+              <td data-col="dhuhr">{formatClock(row[2], locale)}</td>
+              <td data-col="asr">{formatClock(row[3], locale)}</td>
+              <td data-col="maghrib">{formatClock(row[4], locale)}</td>
+              <td data-col="isha">{formatClock(row[5], locale)}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   </div>
   <p class="pt-note">{t(locale, 'ptNote')}</p>
 </div>
 <style is:global>
+  /* A ledger page, not a data dump: the month is the running head, the columns are
+     ruled like a table in a manuscript, and the /maghrib/ column is the day's hinge
+     (the one time a fasting reader looks for first), so it carries the tint. */
+  .pt-city-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    width: min(760px, calc(100% - 40px));
+    margin: 0 auto 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .pt-city-meta .pt-city-alt {
+    letter-spacing: 0.03em;
+  }
+  .pt-city-meta .pt-city-sep {
+    opacity: 0.6;
+  }
+  .pt-city-meta .pt-city-tz {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
   .pt-city {
     width: min(920px, calc(100% - 40px));
     margin: 0 auto 60px;
@@ -99,23 +137,28 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    margin: 14px 0 10px;
+    margin: 16px 0 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
   }
   .pt-city .pt-month {
     display: flex;
     align-items: center;
     gap: 8px;
     color: var(--muted-strong);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
   }
   .pt-city .pt-month select {
-    padding: 8px 12px;
+    padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid var(--hairline);
+    border: 1px solid color-mix(in srgb, var(--gold-line) 40%, transparent);
     background: var(--surface);
     color: var(--ink);
     font: inherit;
+    font-size: 0.9rem;
   }
   @media (pointer: coarse) {
     .pt-city .pt-month select {
@@ -124,6 +167,9 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
   }
   .pt-city .pt-table-wrap {
     overflow-x: auto;
+    margin-top: 4px;
+    border-top: 2px solid color-mix(in srgb, var(--gold-line) 50%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 30%, transparent);
   }
   .pt-city table {
     width: 100%;
@@ -137,17 +183,48 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
     text-align: center;
     white-space: nowrap;
   }
+  .pt-city th + th,
+  .pt-city td + td {
+    border-inline-start: 1px solid color-mix(in srgb, var(--gold-line) 10%, transparent);
+  }
   .pt-city th {
-    color: var(--muted-strong);
-    font-size: 0.82rem;
+    padding-block: 10px;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 45%, transparent);
+    background: color-mix(in srgb, var(--gold-line) 6%, transparent);
+    color: var(--gold-ink);
+    font-size: 0.78rem;
     font-weight: 700;
+    letter-spacing: 0.03em;
   }
   .pt-city td {
     font-size: 0.95rem;
+    line-height: 1.35;
+  }
+  .pt-city td[data-col='day'] {
+    color: var(--muted-strong);
+    font-size: 0.88rem;
+  }
+  .pt-city th[data-col='maghrib'],
+  .pt-city td[data-col='maghrib'] {
+    background: color-mix(in srgb, var(--gold-line) 7%, transparent);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .pt-city tbody tr:last-child td {
+    border-bottom: none;
+  }
+  @media (hover: hover) {
+    .pt-city tbody tr:hover td {
+      background: color-mix(in srgb, var(--gold-line) 8%, transparent);
+    }
   }
   .pt-city tr.is-today td {
-    background: color-mix(in srgb, var(--gold-line) 14%, transparent);
+    background: color-mix(in srgb, var(--gold-line) 15%, transparent);
+    color: var(--ink);
     font-weight: 700;
+  }
+  .pt-city tr.is-today td:first-child {
+    border-inline-start: 3px solid var(--gold-line);
   }
   .pt-city .lbl-imsakiah {
     display: none;
@@ -165,9 +242,12 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
     display: none;
   }
   .pt-city .pt-note {
+    margin: 14px 0 0;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, var(--gold-line) 14%, transparent);
     color: var(--muted-strong);
-    font-size: 0.85rem;
-    margin-top: 10px;
+    font-size: 0.82rem;
+    line-height: 1.85;
   }
   .pt-city .pt-error {
     display: flex;
@@ -213,10 +293,16 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
 
     const hm = (min: number): string => formatClock(min, locale);
 
-    const cell = (col: string, text: string): HTMLTableCellElement => {
+    const cell = (col: string, text: string, srPrefix?: string): HTMLTableCellElement => {
       const td = document.createElement('td');
       td.dataset.col = col;
-      td.textContent = text;
+      if (srPrefix !== undefined) {
+        const sr = document.createElement('span');
+        sr.className = 'sr-only';
+        sr.textContent = `${srPrefix} `;
+        td.appendChild(sr);
+      }
+      td.append(text);
       return td;
     };
 
@@ -236,7 +322,7 @@ const heading = t(locale, 'ptCityTitle').replace('{city}', cityLabel(city, local
           tr.classList.add('is-today');
         }
         tr.append(
-          cell('day', digitsFor(day, locale)),
+          cell('day', digitsFor(day, locale), day === todayDay ? t(locale, 'ptToday') : undefined),
           cell('imsak', hm(row[6])),
           cell('fajr', hm(row[0])),
           cell('sunrise', hm(row[1])),
