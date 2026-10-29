@@ -116,12 +116,14 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.quranSearch,
-        builder: (_, __) => BlocProvider<QuranSearchCubit>(
+        builder: (context, state) => BlocProvider<QuranSearchCubit>(
           create: (_) => QuranSearchCubit(
             getIt<QuranSearchSource>(),
             debounce: const Duration(milliseconds: 300),
           ),
-          child: const QuranSearchScreen(),
+          child: QuranSearchScreen(
+            initialQuery: state.uri.queryParameters[AppRouteQuery.q] ?? '',
+          ),
         ),
       ),
       GoRoute(

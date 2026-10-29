@@ -34,6 +34,19 @@ abstract final class AppRouteQuery {
   static const ayah = 'ayah';
   static const pack = 'pack';
   static const row = 'row';
+  static const q = 'q';
+}
+
+/// `/quran/search[?q={query}]`
+///
+/// The surah index hands the reader's typed text over so a no-match filter can
+/// jump straight to a verse search for the same words.
+String quranSearchPath({String query = ''}) {
+  final trimmed = query.trim();
+  return trimmed.isEmpty
+      ? AppRoutes.quranSearch
+      : '${AppRoutes.quranSearch}?${AppRouteQuery.q}='
+          '${Uri.encodeQueryComponent(trimmed)}';
 }
 
 /// `/quran/reader?surah={surah}[&ayah={ayah}]`

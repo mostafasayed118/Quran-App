@@ -16,8 +16,35 @@ import '../../data/quran_search_source.dart';
 import 'quran_search_cubit.dart';
 import 'quran_search_state.dart';
 
-class QuranSearchScreen extends StatelessWidget {
-  const QuranSearchScreen({super.key});
+class QuranSearchScreen extends StatefulWidget {
+  const QuranSearchScreen({super.key, this.initialQuery = ''});
+
+  /// Text handed over by the surah index when its own filter found nothing;
+  /// the screen opens on that search instead of an empty prompt.
+  final String initialQuery;
+
+  @override
+  State<QuranSearchScreen> createState() => _QuranSearchScreenState();
+}
+
+class _QuranSearchScreenState extends State<QuranSearchScreen> {
+  late final TextEditingController _controller =
+      TextEditingController(text: widget.initialQuery);
+
+  @override
+  void initState() {
+    super.initState();
+    final query = widget.initialQuery.trim();
+    if (query.isNotEmpty) {
+      context.read<QuranSearchCubit>().search(query);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +58,10 @@ class QuranSearchScreen extends StatelessWidget {
                 AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
             child: SearchField(
               hint: loc.searchQuranHint,
-              autofocus: true,
+              controller: _controller,
+              // Arriving with a query means the results are the point; only
+              // the empty prompt wants the keyboard.
+              autofocus: widget.initialQuery.trim().isEmpty,
               onChanged: context.read<QuranSearchCubit>().onQueryChanged,
             ),
           ),

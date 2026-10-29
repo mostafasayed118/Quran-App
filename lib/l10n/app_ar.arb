@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "ar",
   "appName": "قرآن يَهدي",
   "home": "الرئيسية",
@@ -286,6 +286,14 @@
     }
   },
   "noResults": "لا نتائج مطابقة",
+  "searchAyahsFor": "ابحث عن «{query}» في الآيات",
+  "@searchAyahsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "recitersRefreshFailed": "تعذّر تحديث قائمة القرّاء",
   "downloadProgressReceived": "{received} م.ب",
   "@downloadProgressReceived": {

@@ -482,6 +482,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noResults => 'لا نتائج مطابقة';
 
   @override
+  String searchAyahsFor(String query) {
+    return 'ابحث عن «$query» في الآيات';
+  }
+
+  @override
   String get recitersRefreshFailed => 'تعذّر تحديث قائمة القرّاء';
 
   @override

@@ -485,6 +485,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noResults => 'No matching results';
 
   @override
+  String searchAyahsFor(String query) {
+    return 'Search \"$query\" in the verses';
+  }
+
+  @override
   String get recitersRefreshFailed => 'Couldn\'t refresh the reciters list';
 
   @override

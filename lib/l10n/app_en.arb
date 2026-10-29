@@ -265,6 +265,14 @@
     }
   },
   "noResults": "No matching results",
+  "searchAyahsFor": "Search \"{query}\" in the verses",
+  "@searchAyahsFor": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "recitersRefreshFailed": "Couldn't refresh the reciters list",
   "downloadProgressReceived": "{received} MB",
   "@downloadProgressReceived": {

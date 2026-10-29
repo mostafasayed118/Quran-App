@@ -956,6 +956,12 @@ abstract class AppLocalizations {
   /// **'لا نتائج مطابقة'**
   String get noResults;
 
+  /// No description provided for @searchAyahsFor.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث عن «{query}» في الآيات'**
+  String searchAyahsFor(String query);
+
   /// No description provided for @recitersRefreshFailed.
   ///
   /// In ar, this message translates to:

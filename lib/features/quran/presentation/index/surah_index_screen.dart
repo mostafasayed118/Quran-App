@@ -38,7 +38,7 @@ class SurahIndexScreen extends StatelessWidget {
         builder: (context, state) => switch (state) {
           SurahIndexLoading() => const LoadingView(),
           SurahIndexFailed() => errorPane(loc),
-          SurahIndexReady(:final surahs) => Column(
+          SurahIndexReady(:final surahs, :final query) => Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(AppSpacing.md,
@@ -50,7 +50,17 @@ class SurahIndexScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: surahs.isEmpty
-                      ? EmptyState(loc.noResults)
+                      ? (query.isEmpty
+                          ? EmptyState(loc.noResults)
+                          : EmptyState(
+                              loc.noResults,
+                              // The typed words matched no surah name: offer
+                              // the verse search for the same words instead
+                              // of a dead end.
+                              actionLabel: loc.searchAyahsFor(query),
+                              onAction: () =>
+                                  context.push(quranSearchPath(query: query)),
+                            ))
                       : ListView.builder(
                           padding:
                               EdgeInsets.only(bottom: appBottomInset(context)),
