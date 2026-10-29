@@ -232,6 +232,7 @@ const dict = {
     heritageEra4Title: 'التحقّق',
     heritageEra4Text: 'نسخٌ رقمية تُقابل على المصاحف المطبوعة، آيةً بكلمة، قبل أن تصل إلى شاشتك.',
     heritageEra4Foot: 'مقابلة النصّ',
+    heritageQuietTitle: 'آية',
     heritageQuietAyah: 'وَقُل رَّبِّ زِدْنِي عِلْمًا',
     heritageQuietRef: 'طه ١١٤',
     heritageTruthEyebrow: 'لماذا هذا الموقع',
@@ -504,6 +505,7 @@ const dict = {
     heritageEra4Text:
       'Digital copies are collated against printed mushafs, word by word, before they reach your screen.',
     heritageEra4Foot: 'Collating the text',
+    heritageQuietTitle: 'A verse',
     heritageQuietAyah: 'And say: My Lord, increase me in knowledge.',
     heritageQuietRef: 'Ta-Ha 114',
     heritageTruthEyebrow: 'Why this site',

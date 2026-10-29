@@ -933,6 +933,7 @@
   top: 57%;
   left: 50%;
   width: min(252px, 63vw);
+  margin: 0;
   transform: translate(-50%, -50%);
   text-align: center;
 }

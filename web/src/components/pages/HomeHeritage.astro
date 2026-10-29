@@ -381,13 +381,13 @@ const faqs = [1, 2, 3, 4].map((n) => ({
         <circle class="arch__boss" cx="210" cy="96" r="6"></circle>
       </svg>
 
-      <div class="quiet__content">
+      <figure class="quiet__content">
         <h2 class="sr-only" id="quiet-title">
-          {t(locale, 'heritageQuietRef')}
+          {t(locale, 'heritageQuietTitle')}
         </h2>
-        <p class="quiet__ayah">{t(locale, 'heritageQuietAyah')}</p>
-        <p class="quiet__ref">{t(locale, 'heritageQuietRef')}</p>
-      </div>
+        <blockquote class="quiet__ayah">{t(locale, 'heritageQuietAyah')}</blockquote>
+        <figcaption class="quiet__ref">{t(locale, 'heritageQuietRef')}</figcaption>
+      </figure>
     </div>
   </section>
 
