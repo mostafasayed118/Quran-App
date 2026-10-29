@@ -45,6 +45,13 @@ class AudioDownloader {
   /// Folder name under the app documents directory: 'audio'.
   static const audioFolderName = 'audio';
 
+  /// Redirect hops honoured before the download is failed. Audio bytes carry
+  /// no sha256 pin, so every hop is re-validated instead of letting the
+  /// transport follow the CDN wherever it likes.
+  static const int maxRedirectHops = 3;
+
+  static const Set<int> _redirectStatuses = {301, 302, 303, 307, 308};
+
   /// Guard against a lying/compromised host streaming unbounded bytes:
   /// up to 2x the sent content-length plus 64 KiB slack, never above the
   /// [maxAcceptedBytesCeiling] absolute ceiling (a surah mp3 is ~1-2 MB) —
@@ -108,6 +115,66 @@ class AudioDownloader {
     ));
   }
 
+  /// Fetches [start] while following at most [maxRedirectHops] redirects
+  /// manually: a compromised CDN must not steer the download to `http://` or
+  /// a foreign host. Returns the final (2xx) streaming response.
+  Future<Response<ResponseBody>> _fetchTrustedRedirects(
+    Uri start, {
+    CancelToken? cancelToken,
+  }) async {
+    var current = start;
+    for (var hop = 0; hop <= maxRedirectHops; hop++) {
+      final res = await _dio.get<ResponseBody>(
+        current.toString(),
+        options: Options(
+          responseType: ResponseType.stream,
+          // Dio must hand every 3xx back instead of following it itself.
+          followRedirects: false,
+          validateStatus: _acceptSuccessOrRedirect,
+        ),
+        cancelToken: cancelToken,
+      );
+      final status = res.statusCode ?? 0;
+      if (!_redirectStatuses.contains(status)) return res;
+      final location = res.headers.value('location')?.trim();
+      await _discardRedirectBody(res.data);
+      if (location == null || location.isEmpty) {
+        throw DownloadFailure(
+            'audio redirect $status is missing a Location header');
+      }
+      final next = current.resolve(location);
+      if (next.scheme != 'http' && next.scheme != 'https') {
+        throw DownloadFailure(
+            'audio redirect to unsupported scheme "${next.scheme}"');
+      }
+      // Reuses the catalog allowlist (https + mp3quran.net) — one rule, one
+      // place: a host that cannot be a reciter server cannot serve bytes.
+      if (!isTrustedAudioServer(next.toString())) {
+        throw DownloadFailure('audio redirect to untrusted host ${next.host}');
+      }
+      current = next;
+    }
+    throw DownloadFailure(
+        'audio redirect chain exceeded $maxRedirectHops hops');
+  }
+
+  /// 2xx streams as before; 3xx must reach the hop guard rather than being
+  /// collapsed into a [DioException] before its Location can be inspected.
+  static bool _acceptSuccessOrRedirect(int? status) =>
+      status != null &&
+      ((status >= 200 && status < 300) || _redirectStatuses.contains(status));
+
+  /// Releases a redirect response body so its socket is not left half-read.
+  /// Bounded by the receive timeout; a redirect body is normally empty.
+  static Future<void> _discardRedirectBody(ResponseBody? body) async {
+    if (body == null) return;
+    try {
+      await body.stream.drain<void>();
+    } on Object catch (_) {
+      // A broken redirect body cannot change the guard's verdict.
+    }
+  }
+
   /// Downloads one surah for [reciter]; reports progress and honours [cancelToken].
   Future<File> downloadSurah({
     required ReciterRow reciter,
@@ -121,9 +188,8 @@ class AudioDownloader {
     await _markStatus(
         reciter.id, surahNumber, DownloadStatus.downloading, 0, target.path);
     try {
-      final res = await _dio.get<ResponseBody>(
-        url,
-        options: Options(responseType: ResponseType.stream),
+      final res = await _fetchTrustedRedirects(
+        Uri.parse(url),
         cancelToken: cancelToken,
       );
       final total =
