@@ -229,7 +229,7 @@ class _AyahCard extends StatelessWidget {
         textDirection: TextDirection.rtl,
         children: [
           Text(
-            ayah.textUthmani,
+            stripAyahEndMarker(ayah.textUthmani),
             style: AppTheme.hafsAyah,
             textAlign: TextAlign.center,
             textDirection: TextDirection.rtl,
@@ -283,6 +283,8 @@ class _AyahActions extends StatelessWidget {
             context: context,
             useSafeArea: true,
             isScrollControlled: true,
+            // The drag handle is part of the sheet's contract (pinned by the
+            // textScale probe); the rounded strip above the card is intended.
             showDragHandle: true,
             builder: (_) => AyahSheet(
               surahId: ayah.surahId,
@@ -373,10 +375,26 @@ class _MushafPagerState extends State<_MushafPager> {
       onPageChanged: cubit.onMushafPageChanged,
       itemBuilder: (context, i) {
         final block = pages[i];
-        final text = block.ayahs
-            .map((a) =>
-                '${a.textUthmani} ${loc.ornateBrackets(a.numberInSurah.toArabicIndic)}')
-            .join(' ');
+        // The page is one shaped paragraph: the HafsSmart verse text plus a
+        // me_quran ornament for the number (the face that actually has
+        // U+FD3F/FD3E). Drawing the number in the HafsSmart run turned it into
+        // a fallback bracket, and the text already carries its own end marker.
+        final numberStyle = TextStyle(
+          fontFamily: QuranFonts.meQuran,
+          color: AppTheme.goldText(context),
+        );
+        final spans = <InlineSpan>[
+          for (final a in block.ayahs) ...[
+            // Non-breaking space: the medallion must wrap WITH the ayah's last
+            // word, never land at the start of the next line (where it would
+            // read as if it belonged to the following verse).
+            TextSpan(text: '${stripAyahEndMarker(a.textUthmani)}\u00A0'),
+            TextSpan(
+              text: '${loc.ornateBrackets(a.numberInSurah.toArabicIndic)} ',
+              style: numberStyle,
+            ),
+          ],
+        ];
         return Padding(
           padding: EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -388,8 +406,8 @@ class _MushafPagerState extends State<_MushafPager> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Text(
-                    text,
+                  child: Text.rich(
+                    TextSpan(children: spans),
                     style: const TextStyle(
                       fontFamily: QuranFonts.quran,
                       fontSize: 22,
