@@ -1,7 +1,6 @@
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/utils/date_only.dart';
-
-import 'reminder_scheduler.dart';
 
 // Compat: existing importers of this file keep resolving the fallback times.
 export 'package:quran_yahdi/core/domain/reminders.dart'

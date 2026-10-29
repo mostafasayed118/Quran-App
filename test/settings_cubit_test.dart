@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
-import 'package:quran_yahdi/features/notifications/data/reminder_scheduler.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
@@ -12,7 +12,7 @@ import 'prayer_times_cubit_test.dart'
     show FakePrayerTimeService, cairoCity, fakeDay;
 import 'support/test_db.dart';
 
-class FakeReminderScheduler implements ReminderScheduler {
+class FakeReminderScheduler implements ReminderSchedulerPort {
   final plans = <List<ScheduledReminder>>[];
   bool permissionsResult = true;
   int permissionCalls = 0;

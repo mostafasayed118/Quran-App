@@ -1,6 +1,7 @@
 import 'dart:ui' show Locale, VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show
         azkarReminderId,
@@ -9,8 +10,6 @@ import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
         wirdReminderId;
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'package:timezone/timezone.dart' as tz;
-
-import 'reminder_scheduler.dart';
 
 /// The ONE file that touches the flutter_local_notifications plugin (W7b
 /// headless law): planned reminders arrive as plain data and UI texts arrive
@@ -41,7 +40,7 @@ import 'reminder_scheduler.dart';
 /// QUEUED, never dropped — [init] applies it as soon as the plugin is ready
 /// and discards it when the init fails. Nothing on this path waits for the
 /// plugin: a caller that awaited readiness would hang instead of queueing.
-class NotificationsBinding implements ReminderScheduler {
+class NotificationsBinding implements ReminderSchedulerPort {
   NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 

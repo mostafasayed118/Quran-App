@@ -19,7 +19,6 @@ import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
-import 'package:quran_yahdi/features/notifications/data/reminder_scheduler.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
@@ -112,10 +111,8 @@ Future<void> configureDependencies({
       () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<NotificationsBinding>(
       () => NotificationsBinding());
-  getIt.registerLazySingleton<ReminderScheduler>(
-      () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<ReminderSchedulerPort>(
-      () => getIt<ReminderScheduler>());
+      () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<PrayerLogRepository>(
       () => PrayerLogRepository(db));
