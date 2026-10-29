@@ -183,6 +183,7 @@
   "zakatDue": "Zakat due",
   "zakatNotDue": "No zakat due",
   "zakatFootnote": "The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.",
+  "zakatRateNote": "The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.",
   "zakatableLabel": "Money subject to zakat",
   "nisabLabel": "Threshold",
   "zakatEnterPrice": "Enter the gold/silver price to compute the nisab",

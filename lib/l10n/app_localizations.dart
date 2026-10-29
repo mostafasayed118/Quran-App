@@ -650,6 +650,12 @@ abstract class AppLocalizations {
   /// **'النسبة ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك.'**
   String get zakatFootnote;
 
+  /// No description provided for @zakatRateNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسبة ثابتة ٢٫٥٪ والعتبار على العتبة — راجع أهل العلم في تقديرك.'**
+  String get zakatRateNote;
+
   /// No description provided for @zakatableLabel.
   ///
   /// In ar, this message translates to:

@@ -216,6 +216,7 @@ const List<_Feature> _features = [
   (Icons.payments_outlined, _locZakat, AppRoutes.zakat),
   (Icons.calendar_month, _locHijri, AppRoutes.hijri),
   (Icons.auto_awesome, _locAsma, AppRoutes.asma),
+  (Icons.bookmarks_outlined, _locBookmarks, AppRoutes.bookmarks),
   (Icons.settings, _locSettings, AppRoutes.settings),
 ];
 
@@ -231,6 +232,9 @@ String _locWorship(AppLocalizations loc) => loc.worshipTracker;
 String _locZakat(AppLocalizations loc) => loc.zakat;
 String _locHijri(AppLocalizations loc) => loc.hijriCalendar;
 String _locAsma(AppLocalizations loc) => loc.asmaUlHusna;
+
+String _locBookmarks(AppLocalizations loc) => loc.bookmarks;
+
 String _locSettings(AppLocalizations loc) => loc.settings;
 
 class _FeatureTile extends StatelessWidget {

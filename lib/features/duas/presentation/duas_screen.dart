@@ -156,9 +156,11 @@ class _RuqyahView extends StatelessWidget {
             final citation = entry.citation;
             return DuaCard(
               text: entry.displayText,
-              fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.meQuran,
-              fontSize: entry.isQuran ? 18 : 17,
-              height: entry.isQuran ? 2.0 : 1.8,
+              // Quranic quotations keep the mushaf face; the supplication
+              // prose reads in the UI face.
+              fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.ui,
+              fontSize: entry.isQuran ? 18 : 16,
+              height: entry.isQuran ? 2.0 : 2.1,
               citation: citation == null ? null : loc.ornateBrackets(citation),
               count: entry.count,
               reference: entry.reference,

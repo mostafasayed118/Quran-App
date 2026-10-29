@@ -65,7 +65,7 @@ class TrackerScreen extends StatelessWidget {
                     style: AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
                   ),
                   const SizedBox(height: 6),
-                  _Last7Row(last7: last7),
+                  _Last7Row(last7: last7, today: today.day),
                   if (streakDays > 0) _StreakChip(streakDays: streakDays),
                   if (khatmaAvailable) ...[
                     const SizedBox(height: AppSpacing.md),
@@ -155,9 +155,12 @@ class _SlotTile extends StatelessWidget {
 }
 
 class _Last7Row extends StatelessWidget {
-  const _Last7Row({required this.last7});
+  const _Last7Row({required this.last7, required this.today});
 
   final List<bool> last7;
+
+  /// The newest day in [last7]; the row walks backwards from it.
+  final DateTime today;
 
   String _dotLabel(AppLocalizations loc, int index) {
     final day = switch (index) {
@@ -175,6 +178,8 @@ class _Last7Row extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final weekdays = MaterialLocalizations.of(context).narrowWeekdays;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -182,14 +187,35 @@ class _Last7Row extends StatelessWidget {
           Semantics(
             container: true,
             label: _dotLabel(loc, i),
+            // The weekday glyph is decoration for the eye; the label above
+            // already spells the day out for screen readers.
+            excludeSemantics: true,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Icon(
-                last7[i] ? Icons.circle : Icons.circle_outlined,
-                size: 14,
-                color: last7[i]
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.outline,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    last7[i] ? Icons.circle : Icons.circle_outlined,
+                    size: 14,
+                    color: last7[i] ? colors.primary : colors.outline,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    // Calendar arithmetic: the weekday label must not shift
+                    // on a DST day the way a Duration subtraction would.
+                    weekdays[DateTime(
+                          today.year,
+                          today.month,
+                          today.day - i,
+                        ).weekday %
+                        7],
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: i == 0 ? colors.primary : colors.outline,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

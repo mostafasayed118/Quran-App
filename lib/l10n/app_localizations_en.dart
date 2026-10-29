@@ -319,6 +319,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.';
 
   @override
+  String get zakatRateNote =>
+      'The rate is fixed at 2.5% and the threshold applies — consult scholars for your estimate.';
+
+  @override
   String get zakatableLabel => 'Money subject to zakat';
 
   @override

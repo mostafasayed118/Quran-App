@@ -318,6 +318,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'النسبة ثابتة 2.5% والعتبار على العتبة — راجع أهل العلم في تقديرك.';
 
   @override
+  String get zakatRateNote =>
+      'النسبة ثابتة ٢٫٥٪ والعتبار على العتبة — راجع أهل العلم في تقديرك.';
+
+  @override
   String get zakatableLabel => 'المال الزكوي';
 
   @override

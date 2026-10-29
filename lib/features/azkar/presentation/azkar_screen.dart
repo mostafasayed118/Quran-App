@@ -349,10 +349,12 @@ class _ZikrLine extends StatelessWidget {
           child: Text(
             item.text,
             textAlign: TextAlign.right,
+            // Long-form dhikr prose reads in the UI face; the mushaf face is
+            // for Quran text (its word spacing and kashida suit a page).
             style: const TextStyle(
-              fontFamily: QuranFonts.meQuran,
-              fontSize: 18,
-              height: 1.9,
+              fontFamily: QuranFonts.ui,
+              fontSize: 17,
+              height: 2.1,
             ),
           ),
         ),

@@ -77,14 +77,17 @@ class BackupSection extends StatelessWidget {
                   Icon(
                     Icons.info_outline,
                     size: 16,
-                    color: Theme.of(context).colorScheme.error,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       loc.backupUnencryptedWarning,
+                      // A permanent caveat, not an error: real failures below
+                      // keep the error styling via ErrorStrip.
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.error),
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
                     ),
                   ),
                 ],

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -75,6 +75,13 @@ class RecitersScreen extends StatelessWidget {
   }
 }
 
+class _ReciterEntry {
+  const _ReciterEntry(this.row, this.showTitle);
+
+  final ReciterInfo row;
+  final bool showTitle;
+}
+
 class _RecitersList extends StatelessWidget {
   const _RecitersList({required this.reciters});
 
@@ -88,24 +95,32 @@ class _RecitersList extends StatelessWidget {
     final entries = <Object>[];
     var featuredHeaderDone = false;
     var allHeaderDone = false;
+    // A reciter with several moshafs spans several rows: print the name once
+    // and let the repeated rows read as its moshaf variants.
+    String? lastRowName;
     for (final row in reciters) {
       final featured = isFeaturedReciterInfo(row);
       if (featured && !featuredHeaderDone) {
         entries.add(loc.featured);
         featuredHeaderDone = true;
+        lastRowName = null;
       }
       if (!featured && !allHeaderDone) {
         entries.add(loc.allReciters);
         allHeaderDone = true;
+        lastRowName = null;
       }
-      entries.add(row);
+      final trimmed = row.reciterName.trim();
+      entries.add(_ReciterEntry(row, trimmed != lastRowName));
+      lastRowName = trimmed;
     }
     return ListView.builder(
       padding: EdgeInsets.only(bottom: appBottomInset(context)),
       itemCount: entries.length,
       itemBuilder: (context, index) => switch (entries[index]) {
         final String title => SectionHeader(title: title),
-        final ReciterInfo row => _ReciterRow(reciter: row),
+        final _ReciterEntry entry =>
+          _ReciterRow(reciter: entry.row, showTitle: entry.showTitle),
         _ => const SizedBox.shrink(),
       },
     );
@@ -113,9 +128,13 @@ class _RecitersList extends StatelessWidget {
 }
 
 class _ReciterRow extends StatelessWidget {
-  const _ReciterRow({required this.reciter});
+  const _ReciterRow({required this.reciter, required this.showTitle});
 
   final ReciterInfo reciter;
+
+  /// False for the 2nd..nth moshaf of the same reciter: the name is already
+  /// printed on the row above, so this row leads with the moshaf.
+  final bool showTitle;
 
   @override
   Widget build(BuildContext context) {
@@ -133,16 +152,20 @@ class _ReciterRow extends StatelessWidget {
         textStyle: const TextStyle(fontSize: 16),
       ),
       title: Text(
-        reciter.reciterName,
-        style: AppTheme.rowTitle,
+        showTitle ? reciter.reciterName : reciter.moshafName,
+        style: showTitle
+            ? AppTheme.rowTitle
+            : const TextStyle(fontWeight: FontWeight.w500),
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),
-      subtitle: Text(
-        reciter.moshafName,
-        style: TextStyle(color: colors.onSurfaceVariant),
-        textAlign: TextAlign.right,
-      ),
+      subtitle: showTitle
+          ? Text(
+              reciter.moshafName,
+              style: TextStyle(color: colors.onSurfaceVariant),
+              textAlign: TextAlign.right,
+            )
+          : null,
       trailing: Text(
         loc.surahCountLabel(reciter.surahTotal.toArabicIndic),
         style: TextStyle(color: colors.onSurfaceVariant),
