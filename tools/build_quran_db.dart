@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/content_version.dart';
+import 'package:quran_yahdi/core/db/search_index.dart';
 
 Future<void> main() async {
   final repoRoot = Directory.current.path;
@@ -108,12 +109,30 @@ Future<void> main() async {
         ),
       );
 
+  // Ship the derived search index prebuilt. Boot's ensureQuranSearchIndex then
+  // short-circuits on the matching stamp, so a fresh install never rebuilds
+  // 6,236 rows on the DB executor. Same DDL as AppDatabase.beforeOpen; the rows
+  // come from the runtime builder so the normalization is never forked.
+  await db.customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
+      '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
+  await rebuildQuranSearchIndex(db);
+
   final surahCount = (await db.select(db.surahs).get()).length;
   final ayahCount = (await db.select(db.ayahs).get()).length;
+  final indexCount = (await db
+          .customSelect('SELECT COUNT(*) AS c FROM ayah_search')
+          .getSingle())
+      .read<int>('c');
+  final indexStamp = await (db.select(db.settingsTable)
+        ..where((s) => s.key.equals(kSearchIndexVersionKey)))
+      .getSingleOrNull();
   await db.close();
-  stdout.writeln(
-      'surahs=$surahCount ayahs=$ayahCount bytes=${dbFile.lengthSync()}');
-  if (surahCount != 114 || ayahCount != 6236) {
+  stdout.writeln('surahs=$surahCount ayahs=$ayahCount '
+      'index_rows=$indexCount bytes=${dbFile.lengthSync()}');
+  if (surahCount != 114 ||
+      ayahCount != 6236 ||
+      indexCount != 6236 ||
+      indexStamp?.value != '$kContentVersion') {
     stderr.writeln('COUNT MISMATCH — deleting artifact; nothing to commit');
     dbFile.deleteSync();
     exitCode = 1;
