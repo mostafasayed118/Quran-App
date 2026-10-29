@@ -581,8 +581,19 @@ html[data-reading-view='imlaei'] .ayah-i {
 }
 .page-title {
   width: min(760px, calc(100% - 40px));
-  margin: 28px auto 6px;
-  font-size: 1.35rem;
+  margin: 32px auto 10px;
+  font-size: 1.45rem;
+}
+/* One gold mark under every page title: the cheapest way to make the rest of
+   the site speak the home's language without touching each page body. */
+.page-title::after {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin-block-start: 10px;
+  border-radius: 2px;
+  background: var(--gold-line);
 }
 .index-search {
   display: block;
@@ -735,7 +746,7 @@ body.has-player {
   max-width: 760px;
 }
 .reciter-row {
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
 }
 .reciter-head {
   display: flex;
@@ -805,6 +816,7 @@ body.has-player {
   background: var(--btn-bg);
   color: var(--btn-ink);
   border-color: transparent;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold-line) 18%, transparent);
 }
 .surah-sublist {
   list-style: none;
@@ -874,6 +886,7 @@ body.has-player {
 .legal h2 {
   margin: 26px 0 8px;
   font-size: 1.05rem;
+  color: var(--gold-ink);
 }
 .legal p,
 .legal li {
