@@ -138,6 +138,11 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.library,
+        // A degraded boot registers no PackDownloader (it needs a writable
+        // root); the hub has nothing to show then, so it goes home instead of
+        // throwing on the missing registration.
+        redirect: (_, __) =>
+            getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
         builder: (_, __) => RouteCubitScope<LibraryCubit>(
           create: () => LibraryCubit(
             catalog: getIt<CatalogRepository>(),
@@ -150,6 +155,10 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.hadith,
+        // Same degraded-boot guard as /library (the hadith browser reads
+        // packs through the downloader).
+        redirect: (_, __) =>
+            getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
         builder: (context, state) {
           final pack = state.uri.queryParameters[AppRouteQuery.pack] ?? '';
           return RouteCubitScope<HadithCubit>(

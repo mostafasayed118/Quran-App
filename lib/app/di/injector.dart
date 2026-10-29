@@ -53,6 +53,17 @@ bool _configured = false;
 Future<List<Map<String, dynamic>>> _emptyCitiesLoader() async =>
     const <Map<String, dynamic>>[];
 
+/// Fallback content catalogs: the azkar/duas/ruqyah/asma/library repositories
+/// are always registered, so a boot (or a test) without their bundled assets
+/// degrades to the feature's empty state instead of a missing-registration
+/// crash on the first route that resolves them.
+Future<List<Map<String, dynamic>>> _emptyRowsLoader() async =>
+    const <Map<String, dynamic>>[];
+
+/// The azkar catalog is an object (`{'collections': [...]}`), not a list.
+Future<Map<String, dynamic>> _emptyAzkarLoader() async =>
+    const <String, dynamic>{'collections': <Map<String, dynamic>>[]};
+
 /// Registers every feature's dependencies in the app's service locator.
 ///
 /// This is the composition root: it is the ONLY layer allowed to know all
@@ -66,9 +77,11 @@ Future<List<Map<String, dynamic>>> _emptyCitiesLoader() async =>
 ///   a shared instance would leak state between two visits to the route.
 ///
 /// The optional loader arguments are the seam for boot (assets) and for the
-/// tests; a loader left out means that feature registers nothing, so the
-/// screen degrades to its empty state instead of crashing on a missing
-/// registration.
+/// tests; a loader left out means that feature registers its empty fallback,
+/// so the screen degrades to its empty state instead of crashing on a missing
+/// registration. [PackDownloader] is the exception: it needs a writable root,
+/// so it registers only when both the catalog and the root resolver are
+/// passed, and its routes redirect home while it is absent.
 ///
 /// Calling it twice is a no-op: the second call returns immediately.
 Future<void> configureDependencies({
@@ -131,26 +144,18 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<CityRepository>(
       () => CityRepository(db: db, loader: citiesLoader ?? _emptyCitiesLoader));
   getIt.registerLazySingleton<CitySource>(() => getIt<CityRepository>());
-  if (azkarLoader != null) {
-    getIt.registerLazySingleton<AzkarRepository>(
-        () => AzkarRepository(loader: azkarLoader));
-  }
-  if (duasLoader != null && ruqyahLoader != null) {
-    getIt.registerLazySingleton<DuaRepository>(
-        () => DuaRepository(loader: duasLoader));
-    getIt.registerLazySingleton<RuqyahRepository>(
-        () => RuqyahRepository(loader: ruqyahLoader));
-  }
-  if (asmaLoader != null) {
-    getIt.registerLazySingleton<AsmaRepository>(
-        () => AsmaRepository(loader: asmaLoader));
-  }
-  if (libraryCatalogLoader != null) {
-    getIt.registerLazySingleton<CatalogSource>(
-        () => BundledCatalogSource(loader: libraryCatalogLoader));
-    getIt.registerLazySingleton<CatalogRepository>(
-        () => CatalogRepository(source: getIt<CatalogSource>()));
-  }
+  getIt.registerLazySingleton<AzkarRepository>(
+      () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
+  getIt.registerLazySingleton<DuaRepository>(
+      () => DuaRepository(loader: duasLoader ?? _emptyRowsLoader));
+  getIt.registerLazySingleton<RuqyahRepository>(
+      () => RuqyahRepository(loader: ruqyahLoader ?? _emptyRowsLoader));
+  getIt.registerLazySingleton<AsmaRepository>(
+      () => AsmaRepository(loader: asmaLoader ?? _emptyRowsLoader));
+  getIt.registerLazySingleton<CatalogSource>(() =>
+      BundledCatalogSource(loader: libraryCatalogLoader ?? _emptyRowsLoader));
+  getIt.registerLazySingleton<CatalogRepository>(
+      () => CatalogRepository(source: getIt<CatalogSource>()));
   if (libraryCatalogLoader != null && libraryRootResolver != null) {
     getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(
           db,
