@@ -34,6 +34,7 @@ import '../features/zakat/presentation/zakat_screen.dart';
 import '../features/hijri/data/hijri_service.dart';
 import '../features/library/presentation/hadith_browse/hadith_cubit.dart';
 import '../features/library/presentation/hadith_browse/hadith_screen.dart';
+import '../features/library/data/catalog_repository.dart';
 import '../features/library/data/pack_downloader.dart';
 import '../features/library/presentation/library_cubit.dart';
 import '../features/library/presentation/library_screen.dart';
@@ -138,7 +139,10 @@ abstract final class AppRouter {
       GoRoute(
         path: AppRoutes.library,
         builder: (_, __) => RouteCubitScope<LibraryCubit>(
-          create: () => getIt<LibraryCubit>(),
+          create: () => LibraryCubit(
+            catalog: getIt<CatalogRepository>(),
+            downloader: getIt<PackDownloader>(),
+          ),
           identity: AppRoutes.library,
           start: (cubit) => cubit.start(),
           child: const LibraryScreen(),

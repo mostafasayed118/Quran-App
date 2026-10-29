@@ -18,7 +18,6 @@ import 'package:quran_yahdi/features/hijri/data/hijri_service.dart';
 import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
-import 'package:quran_yahdi/features/library/presentation/library_cubit.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_scheduler.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
@@ -159,12 +158,6 @@ Future<void> configureDependencies({
     getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(
           db,
           libraryRootResolver: libraryRootResolver,
-        ));
-    // Route-scoped: the library screen owns its own cubit, so a fresh one is
-    // built per route entry (a shared instance leaks state between visits).
-    getIt.registerFactory<LibraryCubit>(() => LibraryCubit(
-          catalog: getIt<CatalogRepository>(),
-          downloader: getIt<PackDownloader>(),
         ));
   }
   getIt
