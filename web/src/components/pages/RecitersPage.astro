@@ -8,8 +8,14 @@ const { locale = 'ar' } = Astro.props;
 
 <section class="reciters">
   <h1 class="page-title">{t(locale, 'navReciters')}</h1>
-  <p class="empty" id="reciters-status">
-    {t(locale, 'recitersLoading')}
+  <p class="empty reciters-loading" id="reciters-status" role="status">
+    <span class="reciters-loading-label">{t(locale, 'recitersLoading')}</span>
+    <span class="reciters-skeleton" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
   </p>
   <div id="reciters-content" data-locale={locale} hidden>
     <section

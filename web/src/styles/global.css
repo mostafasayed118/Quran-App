@@ -746,16 +746,78 @@ body.has-player {
   margin: 20px auto 6px;
   font-size: 1.02rem;
   font-weight: 700;
-  color: var(--muted-strong);
+  color: var(--gold-ink);
 }
 .reciters-list {
   list-style: none;
   margin: 0 auto;
   padding: 0;
-  max-width: 760px;
+  width: min(760px, calc(100% - 40px));
+}
+/* The list is entirely client-rendered, so on a slow first paint the page used to
+   be a title and one line of text. Four bars hold the shape of what is coming. */
+.reciters .reciters-loading {
+  display: grid;
+  gap: 12px;
+  width: min(760px, calc(100% - 40px));
+  margin: 18px auto 0;
+  padding: 0;
+  text-align: start;
+}
+.reciters-loading[hidden] {
+  display: none;
+}
+.reciters-loading-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.reciters-skeleton {
+  display: grid;
+  gap: 14px;
+  padding: 6px 0;
+}
+.reciters-skeleton > span {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--gold-line);
+  opacity: 0.14;
+  animation: reciters-shimmer 1.6s ease-in-out infinite;
+}
+.reciters-skeleton > span:nth-child(1) {
+  width: 46%;
+}
+.reciters-skeleton > span:nth-child(2) {
+  width: 62%;
+  animation-delay: 0.15s;
+}
+.reciters-skeleton > span:nth-child(3) {
+  width: 38%;
+  animation-delay: 0.3s;
+}
+.reciters-skeleton > span:nth-child(4) {
+  width: 54%;
+  animation-delay: 0.45s;
+}
+@keyframes reciters-shimmer {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.26;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reciters-skeleton > span {
+    animation: none;
+    opacity: 0.16;
+  }
 }
 .reciter-row {
   border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
+}
+.reciters-list > .reciter-row:first-child {
+  border-block-start: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
 }
 .reciter-head {
   display: flex;
@@ -766,9 +828,11 @@ body.has-player {
   flex: 1;
   min-width: 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  padding: 12px 4px;
+  column-gap: 8px;
+  row-gap: 2px;
+  padding: 10px 4px;
   border: 0;
   background: transparent;
   color: var(--ink);
@@ -777,32 +841,50 @@ body.has-player {
   cursor: pointer;
 }
 .reciter-name {
+  flex: 0 1 auto;
   min-width: 0;
   font-weight: 600;
+  line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The moshaf used to be a bordered pill on every row: 299 green chips made the
+   page read as a chip wall and drowned the names. As a subtitle it keeps the
+   same information in the second line, where it belongs. */
 .reciter-moshaf {
-  flex: none;
-  max-width: 46%;
+  order: 3;
+  flex: 1 1 100%;
+  max-width: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 2px 10px;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  color: var(--muted-strong);
+  margin-inline-start: 0;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
   font-size: 0.78rem;
+  letter-spacing: 0.01em;
 }
 .reciter-chevron {
+  order: 2;
   flex: none;
-  margin-inline-start: auto;
+  margin-inline-start: 0;
   color: var(--muted-strong);
+  font-size: 0.85rem;
+  line-height: 1;
   transition: transform 0.18s ease;
 }
 .reciter-toggle[aria-expanded='true'] .reciter-chevron {
   transform: rotate(180deg);
+}
+.reciter-toggle[aria-expanded='true'] .reciter-name {
+  color: var(--gold-ink);
+}
+@media (hover: hover) {
+  .reciter-head:hover {
+    background: color-mix(in srgb, var(--gold-line) 7%, transparent);
+  }
 }
 .reciter-play,
 .surah-play {
@@ -825,12 +907,22 @@ body.has-player {
   background: var(--btn-bg);
   color: var(--btn-ink);
   border-color: transparent;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold-line) 18%, transparent);
 }
+@media (hover: hover) {
+  .surah-play:hover,
+  .surah-download:hover {
+    border-color: var(--gold-line);
+    color: var(--gold-ink);
+  }
+}
+/* The surahs are children of the row above them: the rail says so without a card. */
 .surah-sublist {
   list-style: none;
-  margin: 0;
-  padding: 0 10px 8px;
+  margin: 0 0 8px;
+  margin-inline-start: 12px;
+  padding: 0;
+  padding-inline-start: 14px;
+  border-inline-start: 1px solid color-mix(in srgb, var(--gold-line) 32%, transparent);
 }
 .surah-sublist[hidden] {
   display: none;
@@ -857,7 +949,26 @@ body.has-player {
   text-decoration: none;
 }
 .reciters-all summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 2px;
+  border-block: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
   cursor: pointer;
+}
+/* A collapsible section deserves a control, not a heading that happens to click. */
+.reciters-all summary::after {
+  content: '▾';
+  color: var(--muted-strong);
+  font-size: 0.8rem;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+.reciters-all[open] summary::after {
+  transform: rotate(180deg);
+}
+.reciters-all .reciters-list > .reciter-row:first-child {
+  border-block-start: 0;
 }
 .reciters-all[hidden] {
   display: none;
