@@ -11,8 +11,8 @@ const copy = LANDING[locale].about;
 <article class="about">
   <h1 class="page-title">{t(locale, 'navAbout')}</h1>
   <div class="about-story">
-    {copy.story.map((paragraph) => (
-      <p class="about-para">{paragraph}</p>
+    {copy.story.map((paragraph, i) => (
+      <p class={i === 0 ? 'about-para about-para--lead' : 'about-para'}>{paragraph}</p>
     ))}
   </div>
   <ul class="about-bullets">
@@ -34,30 +34,52 @@ const copy = LANDING[locale].about;
     color: var(--muted-strong);
     line-height: 1.9;
   }
+  /* The first paragraph is the page's opening statement, not more body copy. */
+  .about-para--lead {
+    color: var(--ink);
+    font-size: 1.02rem;
+  }
+  /* Four claims read as a spec plate: a double gold rule, a 2x2 grid, hairlines
+     between the cells instead of a heavy box around them. */
   .about-bullets {
     list-style: none;
     width: min(760px, calc(100% - 40px));
-    margin: 20px auto 0;
-    padding: 18px 22px;
+    margin: 26px auto 0;
+    padding: 4px;
     display: grid;
-    gap: 12px;
-    border: 1px solid var(--gold-line);
-    border-radius: 14px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    border: 1px solid color-mix(in srgb, var(--gold-line) 55%, transparent);
+    border-radius: 4px;
   }
   .about-bullet {
-    position: relative;
-    padding-inline-start: 18px;
+    display: list-item;
+    list-style: '◆' inside;
+    padding: 16px 18px;
     color: var(--ink);
-    line-height: 1.8;
+    line-height: 1.75;
+    border-inline-start: 1px solid color-mix(in srgb, var(--gold-line) 18%, transparent);
+    border-block-start: 1px solid color-mix(in srgb, var(--gold-line) 18%, transparent);
   }
-  .about-bullet::before {
-    content: '';
-    position: absolute;
-    inset-inline-start: 2px;
-    top: 0.72em;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--gold-line);
+  .about-bullet:nth-child(-n + 2) {
+    border-block-start: 0;
+  }
+  .about-bullet:nth-child(odd) {
+    border-inline-start: 0;
+  }
+  .about-bullet::marker {
+    color: var(--gold-line);
+    font-size: 0.62em;
+  }
+  @media (max-width: 619px) {
+    .about-bullets {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .about-bullet {
+      border-inline-start: 0;
+    }
+    .about-bullet:nth-child(2) {
+      border-block-start: 1px solid color-mix(in srgb, var(--gold-line) 18%, transparent);
+    }
   }
 </style>
