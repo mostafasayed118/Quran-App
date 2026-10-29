@@ -45,7 +45,10 @@ class PrayerTimeService implements PrayerTimesPort {
       if (choice.name == PrayerName.sunrise) continue;
       if (choice.time.isAfter(whenLocal)) return choice;
     }
-    final tomorrow = day.add(const Duration(days: 1));
+    // Calendar-day arithmetic, NOT +24 h: a DST transition makes a local day
+    // 23 h or 25 h long, so `add(const Duration(days: 1))` can land back on
+    // the same calendar date (Egypt, 2026-10-29) and return today's fajr.
+    final tomorrow = DateTime(day.year, day.month, day.day + 1);
     final tomorrowTimes = _timesFor(c, tomorrow);
     return PrayerChoice(PrayerName.fajr, tomorrowTimes.fajr);
   }
