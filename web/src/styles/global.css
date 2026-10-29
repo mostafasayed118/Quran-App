@@ -256,7 +256,7 @@ html[data-theme='night'] .theme-toggle::before {
 .reader-head {
   text-align: center;
   padding-bottom: 18px;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 55%, transparent);
 }
 .reader-head h1 {
   margin: 0 0 6px;
@@ -278,7 +278,7 @@ html[data-theme='night'] .theme-toggle::before {
   min-width: 40px;
   padding: 7px 14px;
   border-radius: 999px;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in srgb, var(--gold-line) 40%, transparent);
   background: transparent;
   color: var(--ink);
   font: inherit;
@@ -307,7 +307,7 @@ html[data-theme='night'] .theme-toggle::before {
   max-width: min(340px, 62vw);
   padding: 7px 12px;
   border-radius: 999px;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in srgb, var(--gold-line) 40%, transparent);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
@@ -319,8 +319,11 @@ html[data-theme='night'] .theme-toggle::before {
   }
 }
 .ayah {
-  padding: 14px 2px;
-  border-bottom: 1px solid var(--hairline);
+  padding: 16px 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 24%, transparent);
+}
+.ayah:last-of-type {
+  border-bottom: 0;
 }
 .ayah-text {
   margin: 0;
@@ -387,7 +390,7 @@ html[data-reader-step='3'] {
   font-weight: 700;
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid var(--hairline);
+  border: 1px solid color-mix(in srgb, var(--gold-line) 40%, transparent);
   background: transparent;
   color: var(--muted-strong);
   cursor: pointer;
