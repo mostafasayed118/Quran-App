@@ -28,16 +28,35 @@ const cardinal = {
   <div class="qb-result" data-qy="qb-result" hidden>
     <svg
       viewBox="0 0 200 200"
-      width="230"
-      height="230"
+      width="260"
+      height="260"
       role="img"
       aria-label={t(locale, 'qbTitle')}
     >
-      <circle cx="100" cy="100" r="96" class="qb-ring"></circle>
-      <line x1="100" y1="6" x2="100" y2="18" class="qb-tick"></line>
-      <line x1="100" y1="182" x2="100" y2="194" class="qb-tick"></line>
-      <line x1="6" y1="100" x2="18" y2="100" class="qb-tick"></line>
-      <line x1="182" y1="100" x2="194" y2="100" class="qb-tick"></line>
+      <circle cx="100" cy="100" r="97" class="qb-bezel"></circle>
+      <circle cx="100" cy="100" r="90" class="qb-ring"></circle>
+      <circle cx="100" cy="100" r="68" class="qb-inner"></circle>
+
+      {Array.from({ length: 72 }, (_, i) => {
+        const angle = (i * 5 * Math.PI) / 180;
+        const major = i % 6 === 0;
+        const inner = major ? 80 : 85;
+        return (
+          <line
+            x1={100 + Math.sin(angle) * inner}
+            y1={100 - Math.cos(angle) * inner}
+            x2={100 + Math.sin(angle) * 89}
+            y2={100 - Math.cos(angle) * 89}
+            class={major ? 'qb-scale qb-scale--major' : 'qb-scale'}
+          />
+        );
+      })}
+
+      <g class="qb-rosette" aria-hidden="true">
+        <rect x="76" y="76" width="48" height="48"></rect>
+        <rect x="76" y="76" width="48" height="48" transform="rotate(45 100 100)"></rect>
+      </g>
+
       <text x="100" y="34" class="qb-card" text-anchor="middle">
         {cardinal.n}
       </text>
@@ -50,10 +69,14 @@ const cardinal = {
       <text x="26" y="105" class="qb-card" text-anchor="middle">
         {cardinal.w}
       </text>
+
       <g class="qb-needle" data-qy="qb-needle" transform="rotate(0 100 100)">
-        <path d="M100 16 L109 106 L100 94 L91 106 Z" class="qb-arrow"></path>
+        <path d="M100 22 L107 100 L100 111 L93 100 Z" class="qb-arrow"></path>
+        <path d="M100 178 L104 112 L100 100 L96 112 Z" class="qb-tail"></path>
       </g>
-      <circle cx="100" cy="100" r="6" class="qb-hub"></circle>
+
+      <circle cx="100" cy="100" r="7" class="qb-hub"></circle>
+      <circle cx="100" cy="100" r="2.6" class="qb-hub-core"></circle>
     </svg>
     <p class="qb-readout">
       <span class="qb-readout-label">{t(locale, 'qbDirection')}</span>
@@ -108,10 +131,35 @@ const cardinal = {
     text-align: center;
     margin-top: 8px;
   }
+  .qb .qb-bezel {
+    fill: none;
+    stroke: var(--gold-line);
+    stroke-width: 1.4;
+    opacity: 0.55;
+  }
   .qb .qb-ring {
     fill: var(--surface);
     stroke: var(--hairline);
-    stroke-width: 2;
+    stroke-width: 1;
+  }
+  .qb .qb-inner {
+    fill: none;
+    stroke: color-mix(in srgb, var(--gold-line) 32%, transparent);
+    stroke-width: 1;
+  }
+  .qb .qb-scale {
+    stroke: color-mix(in srgb, var(--gold-line) 42%, transparent);
+    stroke-width: 0.8;
+  }
+  .qb .qb-scale--major {
+    stroke: var(--gold-line);
+    stroke-width: 1.6;
+  }
+  .qb .qb-rosette {
+    fill: none;
+    stroke: var(--gold-line);
+    stroke-width: 0.7;
+    opacity: 0.22;
   }
   .qb .qb-tick {
     stroke: var(--gold-line);
@@ -125,7 +173,15 @@ const cardinal = {
   .qb .qb-arrow {
     fill: var(--accent);
   }
+  .qb .qb-tail {
+    fill: color-mix(in srgb, var(--gold-line) 55%, transparent);
+  }
   .qb .qb-hub {
+    fill: var(--surface);
+    stroke: var(--gold-ink);
+    stroke-width: 1.4;
+  }
+  .qb .qb-hub-core {
     fill: var(--gold-ink);
   }
   .qb .qb-needle {

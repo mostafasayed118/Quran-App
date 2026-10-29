@@ -595,6 +595,15 @@ html[data-reading-view='imlaei'] .ayah-i {
   border-radius: 2px;
   background: var(--gold-line);
 }
+/* .page-lead had no rule at all: on the qibla and prayer-times pages the lead
+   ran the full viewport width while the title above it was capped at 760. */
+.page-lead {
+  width: min(760px, calc(100% - 40px));
+  margin: 0 auto 8px;
+  color: var(--muted-strong);
+  font-size: 0.9rem;
+  line-height: 1.9;
+}
 .index-search {
   display: block;
   width: min(760px, calc(100% - 40px));
