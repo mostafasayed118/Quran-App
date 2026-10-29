@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -8,7 +8,7 @@ import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/ar_badge.dart';
-import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/insets.dart';
-import '../../../../core/widgets/async_view.dart';
+import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';

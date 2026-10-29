@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
-import 'package:quran_yahdi/core/widgets/async_view.dart';
+import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
 import 'package:quran_yahdi/features/duas/presentation/duas_cubit.dart';

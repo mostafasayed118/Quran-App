@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
-import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_cubit.dart';
-import 'package:quran_yahdi/features/library/presentation/hadith_browse/hadith_state.dart';
+import 'package:quran_yahdi/features/library/presentation/hadith/hadith_cubit.dart';
+import 'package:quran_yahdi/features/library/presentation/hadith/hadith_state.dart';
 
 import 'support/test_db.dart';
 

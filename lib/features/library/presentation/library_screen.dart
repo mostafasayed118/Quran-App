@@ -8,7 +8,7 @@ import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/format_bytes.dart';
 import '../../../core/utils/insets.dart';
-import '../../../core/widgets/async_view.dart';
+import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
 import '../../../core/widgets/error_pane.dart';
