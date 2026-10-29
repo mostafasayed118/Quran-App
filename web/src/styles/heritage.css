@@ -35,7 +35,7 @@
   --h-display: 'Cairo', system-ui, sans-serif;
   --h-body: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
 
-  --h-container: min(1240px, 100% - 2 * clamp(20px, 5vw, 56px));
+  --h-container: min(1080px, 100% - 2 * clamp(20px, 5vw, 56px));
   --h-section-y: clamp(64px, 8vw, 116px);
 
   position: relative;
@@ -394,7 +394,7 @@
 }
 
 .chapter__num {
-  font-family: var(--h-serif);
+  font-family: var(--h-display);
   font-size: 0.9375rem;
   color: var(--h-gold);
   opacity: 0.9;
@@ -803,7 +803,7 @@
   width: max-content;
   margin: 0;
   padding-block: clamp(28px, 4vw, 44px) clamp(32px, 5vw, 56px);
-  padding-inline: max(20px, calc((100vw - 1240px) / 2));
+  padding-inline: max(20px, calc((100vw - 1080px) / 2));
   list-style: none;
 }
 

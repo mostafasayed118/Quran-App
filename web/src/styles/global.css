@@ -56,8 +56,20 @@ body {
   border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 42%, transparent);
 }
 .site-footer {
-  border-top: 1px solid color-mix(in srgb, var(--gold-line) 42%, transparent);
+  justify-content: center;
   flex-wrap: wrap;
+  gap: 6px 12px;
+  padding-block: 26px;
+  border-top: 1px solid color-mix(in srgb, var(--gold-line) 42%, transparent);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.site-footer > span:first-child {
+  color: var(--gold-ink);
+  font-weight: 600;
+}
+.site-footer > span[aria-hidden] {
+  color: color-mix(in srgb, var(--gold-line) 65%, transparent);
 }
 .brand {
   display: flex;
