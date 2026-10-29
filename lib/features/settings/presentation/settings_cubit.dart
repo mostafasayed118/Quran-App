@@ -11,6 +11,10 @@ import 'settings_state.dart';
 /// Persists through the reminder settings ports and re-plans through the
 /// shared guarded scheduler path after every change; when enabling azkar or
 /// wird, it also drives the OS permission flow.
+///
+/// A mutation only ever builds on a confirmed [SettingsReady]: issued while
+/// the load is still running or after it failed, it is dropped instead of
+/// emitting a ready state with values that were never read from storage.
 class SettingsCubit extends Cubit<SettingsState> {
   /// Creates the cubit; the constructor is side-effect free. The route scope
   /// calls [start] once to run the first load, which moves the state from
@@ -87,19 +91,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// logged and the last confirmed state is kept.
   Future<void> setPrayerEnabled(bool enabled) {
     return _serialized(() async {
+      var current = _readyState();
+      if (current == null) return;
       try {
         await _prayerSettings?.setPrayerEnabled(enabled);
         await _reschedule();
-        if (isClosed) return;
-        emit(SettingsState.ready(
-          prayerEnabled: enabled,
-          azkarEnabled: _enabledOf(state),
-          azkarTimeHm: _timeOf(state),
-          wirdEnabled: _wirdEnabledOf(state),
-          wirdTimeHm: _wirdTimeOf(state),
-          azkarPermissionDenied: _azkarDeniedOf(state),
-          wirdPermissionDenied: _wirdDeniedOf(state),
-        ));
+        current = _readyState();
+        if (current == null) return;
+        emit(current.copyWith(prayerEnabled: enabled));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setPrayerEnabled', error, stackTrace);
       }
@@ -113,6 +112,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// failed write is logged and the last confirmed state is kept.
   Future<void> setAzkarEnabled(bool enabled) {
     return _serialized(() async {
+      var current = _readyState();
+      if (current == null) return;
       try {
         await _settings.setAzkarEnabled(enabled);
         var denied = false;
@@ -120,15 +121,11 @@ class SettingsCubit extends Cubit<SettingsState> {
           denied = !(await _scheduler.ensurePermissions());
         }
         await _reschedule();
-        if (isClosed) return;
-        emit(SettingsState.ready(
-          prayerEnabled: _prayerEnabledOf(state),
+        current = _readyState();
+        if (current == null) return;
+        emit(current.copyWith(
           azkarEnabled: enabled,
-          azkarTimeHm: _timeOf(state),
-          wirdEnabled: _wirdEnabledOf(state),
-          wirdTimeHm: _wirdTimeOf(state),
           azkarPermissionDenied: denied,
-          wirdPermissionDenied: _wirdDeniedOf(state),
         ));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setAzkarEnabled', error, stackTrace);
@@ -141,19 +138,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// A failed write is logged and the last confirmed state is kept.
   Future<void> setTime(String hm) {
     return _serialized(() async {
+      var current = _readyState();
+      if (current == null) return;
       try {
         await _settings.setAzkarTime(hm);
         await _reschedule();
-        if (isClosed) return;
-        emit(SettingsState.ready(
-          prayerEnabled: _prayerEnabledOf(state),
-          azkarEnabled: _enabledOf(state),
-          azkarTimeHm: hm,
-          wirdEnabled: _wirdEnabledOf(state),
-          wirdTimeHm: _wirdTimeOf(state),
-          azkarPermissionDenied: _azkarDeniedOf(state),
-          wirdPermissionDenied: _wirdDeniedOf(state),
-        ));
+        current = _readyState();
+        if (current == null) return;
+        emit(current.copyWith(azkarTimeHm: hm));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setTime', error, stackTrace);
       }
@@ -167,6 +159,8 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// failed write is logged and the last confirmed state is kept.
   Future<void> toggleWird(bool enabled) {
     return _serialized(() async {
+      var current = _readyState();
+      if (current == null) return;
       try {
         await _settings.setWirdEnabled(enabled);
         var denied = false;
@@ -174,14 +168,10 @@ class SettingsCubit extends Cubit<SettingsState> {
           denied = !(await _scheduler.ensurePermissions());
         }
         await _reschedule();
-        if (isClosed) return;
-        emit(SettingsState.ready(
-          prayerEnabled: _prayerEnabledOf(state),
-          azkarEnabled: _enabledOf(state),
-          azkarTimeHm: _timeOf(state),
+        current = _readyState();
+        if (current == null) return;
+        emit(current.copyWith(
           wirdEnabled: enabled,
-          wirdTimeHm: _wirdTimeOf(state),
-          azkarPermissionDenied: _azkarDeniedOf(state),
           wirdPermissionDenied: denied,
         ));
       } on Object catch (error, stackTrace) {
@@ -195,19 +185,14 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// A failed write is logged and the last confirmed state is kept.
   Future<void> changeWirdTime(String hm) {
     return _serialized(() async {
+      var current = _readyState();
+      if (current == null) return;
       try {
         await _settings.setWirdTime(hm);
         await _reschedule();
-        if (isClosed) return;
-        emit(SettingsState.ready(
-          prayerEnabled: _prayerEnabledOf(state),
-          azkarEnabled: _enabledOf(state),
-          azkarTimeHm: _timeOf(state),
-          wirdEnabled: _wirdEnabledOf(state),
-          wirdTimeHm: hm,
-          azkarPermissionDenied: _azkarDeniedOf(state),
-          wirdPermissionDenied: _wirdDeniedOf(state),
-        ));
+        current = _readyState();
+        if (current == null) return;
+        emit(current.copyWith(wirdTimeHm: hm));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('changeWirdTime', error, stackTrace);
       }
@@ -235,45 +220,13 @@ class SettingsCubit extends Cubit<SettingsState> {
         scheduler: _scheduler,
       );
 
-  String _timeOf(SettingsState state) => switch (state) {
-        SettingsReady(:final azkarTimeHm) => azkarTimeHm,
-        SettingsLoading() => defaultAzkarTimeHm,
-        SettingsFailed() => defaultAzkarTimeHm,
-      };
-
-  bool _enabledOf(SettingsState state) => switch (state) {
-        SettingsReady(:final azkarEnabled) => azkarEnabled,
-        SettingsLoading() => false,
-        SettingsFailed() => false,
-      };
-
-  bool _prayerEnabledOf(SettingsState state) => switch (state) {
-        SettingsReady(:final prayerEnabled) => prayerEnabled,
-        SettingsLoading() => true,
-        SettingsFailed() => true,
-      };
-
-  bool _azkarDeniedOf(SettingsState state) => switch (state) {
-        SettingsReady(:final azkarPermissionDenied) => azkarPermissionDenied,
-        SettingsLoading() => false,
-        SettingsFailed() => false,
-      };
-
-  bool _wirdDeniedOf(SettingsState state) => switch (state) {
-        SettingsReady(:final wirdPermissionDenied) => wirdPermissionDenied,
-        SettingsLoading() => false,
-        SettingsFailed() => false,
-      };
-
-  bool _wirdEnabledOf(SettingsState state) => switch (state) {
-        SettingsReady(:final wirdEnabled) => wirdEnabled,
-        SettingsLoading() => false,
-        SettingsFailed() => false,
-      };
-
-  String _wirdTimeOf(SettingsState state) => switch (state) {
-        SettingsReady(:final wirdTimeHm) => wirdTimeHm,
-        SettingsLoading() => defaultWirdTimeHm,
-        SettingsFailed() => defaultWirdTimeHm,
-      };
+  /// The state a mutation may build on, or null when there is nothing
+  /// confirmed to build on: the cubit is closed, still loading, or the load
+  /// failed. Reading it again after the awaits also covers a load that lands
+  /// (and fails) while a mutation is in flight.
+  SettingsReady? _readyState() {
+    if (isClosed) return null;
+    final current = state;
+    return current is SettingsReady ? current : null;
+  }
 }
