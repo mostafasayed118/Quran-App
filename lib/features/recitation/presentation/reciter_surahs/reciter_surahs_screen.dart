@@ -168,6 +168,7 @@ class _SurahDownloadRow extends StatelessWidget {
       onPressed: () => context.read<PlaybackCubit>().playReciter(
             reciter,
             surahNumber,
+            surahName: name,
           ),
     );
   }

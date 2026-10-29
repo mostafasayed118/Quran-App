@@ -78,11 +78,16 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 
   /// Entity entry for the re-typed screens (ready states carry
   /// [ReciterInfo], never drift rows).
-  Future<void> playReciter(ReciterInfo reciter, int surahNumber) =>
-      _start(reciter.id, reciter.reciterName, reciter.server, surahNumber);
+  ///
+  /// [surahName] is the display name when the caller knows it; the player
+  /// shows it instead of a bare number.
+  Future<void> playReciter(ReciterInfo reciter, int surahNumber,
+          {String surahName = ''}) =>
+      _start(reciter.id, reciter.reciterName, reciter.server, surahNumber,
+          surahName);
 
-  Future<void> _start(
-      String rowId, String reciterName, String server, int surahNumber) async {
+  Future<void> _start(String rowId, String reciterName, String server,
+      int surahNumber, String surahName) async {
     if (isClosed) return;
     final episode = ++_episode;
     _lastDuration = Duration.zero;
@@ -90,6 +95,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     emit(PlaybackState.loading(
       reciterName: reciterName,
       surahNumber: surahNumber,
+      surahName: surahName,
     ));
     String? downloaded;
     try {
@@ -121,6 +127,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: _reciterName,
         surahNumber: surahNumber,
+        surahName: surahName,
         duration: _lastDuration,
       ));
     } on Object catch (error, stackTrace) {
@@ -139,7 +146,8 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   ///
   /// A missing default reciter fails with [PlaybackFailureKind.noReciters];
   /// a lookup error fails with [PlaybackFailureKind.network].
-  Future<void> playDefaultForSurah(int surahNumber) async {
+  Future<void> playDefaultForSurah(int surahNumber,
+      {String surahName = ''}) async {
     final episode = ++_episode;
     final ReciterInfo? reciter;
     try {
@@ -158,7 +166,23 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       ));
       return;
     }
-    await playReciter(reciter, surahNumber);
+    await playReciter(reciter, surahNumber, surahName: surahName);
+  }
+
+  /// Seeks inside the loaded track.
+  ///
+  /// A service without the [SeekablePlaybackService] capability (the plain
+  /// test seam) ignores the request; a seek failure is logged and keeps the
+  /// current state — the position stream remains the source of truth.
+  Future<void> seek(Duration to) async {
+    if (_service case final SeekablePlaybackService seekable) {
+      try {
+        await seekable.seek(to);
+      } on Object catch (error, stackTrace) {
+        dev.log('seek failed',
+            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      }
+    }
   }
 
   /// Pauses a playing track, resumes a paused one; a no-op otherwise.
@@ -181,6 +205,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: state.duration,
       ));
@@ -197,6 +222,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: state.duration,
       ));
@@ -281,12 +307,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: state.reciterName!,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         duration: _lastDuration,
       ));
     } else if (playing && state is PlaybackPaused) {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: state.duration,
       ));
@@ -294,6 +322,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: state.duration,
       ));
@@ -315,6 +344,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: position,
         duration: state.duration,
       ));
@@ -322,6 +352,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: position,
         duration: state.duration,
       ));
@@ -336,6 +367,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.playing(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: duration,
       ));
@@ -343,6 +375,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       emit(PlaybackState.paused(
         reciterName: state.reciterName,
         surahNumber: state.surahNumber,
+        surahName: state.surahName,
         position: state.position,
         duration: duration,
       ));

@@ -98,6 +98,7 @@ class _ReadyView extends StatelessWidget {
             icon: const Icon(Icons.headphones),
             onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
                   state.surahId,
+                  surahName: state.surahName,
                 ),
           ),
           IconButton(

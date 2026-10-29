@@ -38,7 +38,8 @@ class JustAudioPlaybackService
     implements
         PlaybackService,
         DisposablePlaybackService,
-        CompletingPlaybackService {
+        CompletingPlaybackService,
+        SeekablePlaybackService {
   JustAudioPlaybackService([AudioPlayer? player])
       : _player = player ?? AudioPlayer();
 
@@ -115,6 +116,9 @@ class JustAudioPlaybackService
 
   @override
   Future<void> pause() => _player.pause();
+
+  @override
+  Future<void> seek(Duration position) => _player.seek(position);
 
   @override
   Future<void> resume() async {

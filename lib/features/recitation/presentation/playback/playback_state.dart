@@ -14,6 +14,7 @@ sealed class PlaybackState with _$PlaybackState {
   const factory PlaybackState.initial({
     String? reciterName,
     @Default(0) int surahNumber,
+    @Default('') String surahName,
   }) = PlaybackLoading;
 
   /// The player is preparing a track.
@@ -24,12 +25,18 @@ sealed class PlaybackState with _$PlaybackState {
   static PlaybackState loading({
     required String reciterName,
     required int surahNumber,
+    String surahName = '',
   }) =>
-      PlaybackLoading(reciterName: reciterName, surahNumber: surahNumber);
+      PlaybackLoading(
+        reciterName: reciterName,
+        surahNumber: surahNumber,
+        surahName: surahName,
+      );
 
   const factory PlaybackState.playing({
     required String reciterName,
     required int surahNumber,
+    @Default('') String surahName,
     @Default(Duration.zero) Duration position,
     @Default(Duration.zero) Duration duration,
   }) = PlaybackPlaying;
@@ -37,6 +44,7 @@ sealed class PlaybackState with _$PlaybackState {
   const factory PlaybackState.paused({
     required String reciterName,
     required int surahNumber,
+    @Default('') String surahName,
     @Default(Duration.zero) Duration position,
     @Default(Duration.zero) Duration duration,
   }) = PlaybackPaused;

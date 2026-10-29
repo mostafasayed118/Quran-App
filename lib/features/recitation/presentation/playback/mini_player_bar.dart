@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
@@ -8,6 +8,7 @@ import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
+import 'player_sheet.dart';
 import 'playback_state.dart';
 
 /// Rebuild gate for the mini-player shell. Position ticks arrive ~5 Hz and
@@ -40,27 +41,42 @@ class MiniPlayerBar extends StatelessWidget {
       buildWhen: miniPlayerShellShouldRebuild,
       builder: (context, state) => switch (state) {
         // No track known yet (idle) — the mini player shows nothing.
-        PlaybackLoading(:final reciterName, :final surahNumber) =>
+        PlaybackLoading(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName
+        ) =>
           reciterName == null
               ? const SizedBox.shrink()
               : _PlaybackStrip(
                   reciterName: reciterName,
                   surahNumber: surahNumber,
+                  surahName: surahName,
                   busy: true,
                   playing: false,
                 ),
         PlaybackFailed(:final kind) => _FailedStrip(kind: kind),
-        PlaybackPlaying(:final reciterName, :final surahNumber) =>
+        PlaybackPlaying(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName
+        ) =>
           _PlaybackStrip(
             reciterName: reciterName,
             surahNumber: surahNumber,
+            surahName: surahName,
             busy: false,
             playing: true,
           ),
-        PlaybackPaused(:final reciterName, :final surahNumber) =>
+        PlaybackPaused(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName
+        ) =>
           _PlaybackStrip(
             reciterName: reciterName,
             surahNumber: surahNumber,
+            surahName: surahName,
             busy: false,
             playing: false,
           ),
@@ -73,12 +89,14 @@ class _PlaybackStrip extends StatelessWidget {
   const _PlaybackStrip({
     required this.reciterName,
     required this.surahNumber,
+    required this.surahName,
     required this.busy,
     required this.playing,
   });
 
   final String reciterName;
   final int surahNumber;
+  final String surahName;
   final bool busy;
   final bool playing;
 
@@ -102,9 +120,13 @@ class _PlaybackStrip extends StatelessWidget {
         child: Row(
           children: [
             Expanded(
-              child: _TrackInfo(
-                reciterName: reciterName,
-                surahNumber: surahNumber,
+              child: InkWell(
+                onTap: () => showPlayerSheet(context),
+                child: _TrackInfo(
+                  reciterName: reciterName,
+                  surahNumber: surahNumber,
+                  surahName: surahName,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -122,10 +144,15 @@ class _PlaybackStrip extends StatelessWidget {
 }
 
 class _TrackInfo extends StatelessWidget {
-  const _TrackInfo({required this.reciterName, required this.surahNumber});
+  const _TrackInfo({
+    required this.reciterName,
+    required this.surahNumber,
+    required this.surahName,
+  });
 
   final String reciterName;
   final int surahNumber;
+  final String surahName;
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +168,11 @@ class _TrackInfo extends StatelessWidget {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
         ),
         Text(
-          loc.surahBadge(surahNumber.toArabicIndic),
+          surahName.isEmpty
+              ? loc.surahBadge(surahNumber.toArabicIndic)
+              : surahName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
           style: AppTheme.mutedFootnote(context),
         ),
         const _ProgressRow(),

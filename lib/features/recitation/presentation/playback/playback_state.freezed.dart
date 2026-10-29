@@ -153,12 +153,13 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
-    TResult Function(String? reciterName, int surahNumber)? initial,
-    TResult Function(String reciterName, int surahNumber, Duration position,
-            Duration duration)?
+    TResult Function(String? reciterName, int surahNumber, String surahName)?
+        initial,
+    TResult Function(String reciterName, int surahNumber, String surahName,
+            Duration position, Duration duration)?
         playing,
-    TResult Function(String reciterName, int surahNumber, Duration position,
-            Duration duration)?
+    TResult Function(String reciterName, int surahNumber, String surahName,
+            Duration position, Duration duration)?
         paused,
     TResult Function(PlaybackFailureKind kind)? failed,
     required TResult orElse(),
@@ -166,13 +167,13 @@ extension PlaybackStatePatterns on PlaybackState {
     final _that = this;
     switch (_that) {
       case PlaybackLoading() when initial != null:
-        return initial(_that.reciterName, _that.surahNumber);
+        return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying() when playing != null:
-        return playing(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackPaused() when paused != null:
-        return paused(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackFailed() when failed != null:
         return failed(_that.kind);
       case _:
@@ -195,25 +196,27 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
-    required TResult Function(String? reciterName, int surahNumber) initial,
+    required TResult Function(
+            String? reciterName, int surahNumber, String surahName)
+        initial,
     required TResult Function(String reciterName, int surahNumber,
-            Duration position, Duration duration)
+            String surahName, Duration position, Duration duration)
         playing,
     required TResult Function(String reciterName, int surahNumber,
-            Duration position, Duration duration)
+            String surahName, Duration position, Duration duration)
         paused,
     required TResult Function(PlaybackFailureKind kind) failed,
   }) {
     final _that = this;
     switch (_that) {
       case PlaybackLoading():
-        return initial(_that.reciterName, _that.surahNumber);
+        return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying():
-        return playing(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackPaused():
-        return paused(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackFailed():
         return failed(_that.kind);
     }
@@ -233,25 +236,26 @@ extension PlaybackStatePatterns on PlaybackState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function(String? reciterName, int surahNumber)? initial,
-    TResult? Function(String reciterName, int surahNumber, Duration position,
-            Duration duration)?
+    TResult? Function(String? reciterName, int surahNumber, String surahName)?
+        initial,
+    TResult? Function(String reciterName, int surahNumber, String surahName,
+            Duration position, Duration duration)?
         playing,
-    TResult? Function(String reciterName, int surahNumber, Duration position,
-            Duration duration)?
+    TResult? Function(String reciterName, int surahNumber, String surahName,
+            Duration position, Duration duration)?
         paused,
     TResult? Function(PlaybackFailureKind kind)? failed,
   }) {
     final _that = this;
     switch (_that) {
       case PlaybackLoading() when initial != null:
-        return initial(_that.reciterName, _that.surahNumber);
+        return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying() when playing != null:
-        return playing(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackPaused() when paused != null:
-        return paused(_that.reciterName, _that.surahNumber, _that.position,
-            _that.duration);
+        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
+            _that.position, _that.duration);
       case PlaybackFailed() when failed != null:
         return failed(_that.kind);
       case _:
@@ -263,11 +267,14 @@ extension PlaybackStatePatterns on PlaybackState {
 /// @nodoc
 
 class PlaybackLoading implements PlaybackState {
-  const PlaybackLoading({this.reciterName, this.surahNumber = 0});
+  const PlaybackLoading(
+      {this.reciterName, this.surahNumber = 0, this.surahName = ''});
 
   final String? reciterName;
   @JsonKey()
   final int surahNumber;
+  @JsonKey()
+  final String surahName;
 
   /// Create a copy of PlaybackState
   /// with the given fields replaced by the non-null parameter values.
@@ -284,17 +291,19 @@ class PlaybackLoading implements PlaybackState {
             (identical(other.reciterName, reciterName) ||
                 other.reciterName == reciterName) &&
             (identical(other.surahNumber, surahNumber) ||
-                other.surahNumber == surahNumber));
+                other.surahNumber == surahNumber) &&
+            (identical(other.surahName, surahName) ||
+                other.surahName == surahName));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, reciterName, surahNumber);
+    return Object.hash(runtimeType, reciterName, surahNumber, surahName);
   }
 
   @override
   String toString() {
-    return 'PlaybackState.initial(reciterName: $reciterName, surahNumber: $surahNumber)';
+    return 'PlaybackState.initial(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName)';
   }
 }
 
@@ -305,7 +314,7 @@ abstract mixin class $PlaybackLoadingCopyWith<$Res>
           PlaybackLoading value, $Res Function(PlaybackLoading) _then) =
       _$PlaybackLoadingCopyWithImpl;
   @useResult
-  $Res call({String? reciterName, int surahNumber});
+  $Res call({String? reciterName, int surahNumber, String surahName});
 }
 
 /// @nodoc
@@ -322,6 +331,7 @@ class _$PlaybackLoadingCopyWithImpl<$Res>
   $Res call({
     Object? reciterName = freezed,
     Object? surahNumber = null,
+    Object? surahName = null,
   }) {
     return _then(PlaybackLoading(
       reciterName: freezed == reciterName
@@ -332,6 +342,10 @@ class _$PlaybackLoadingCopyWithImpl<$Res>
           ? _self.surahNumber
           : surahNumber // ignore: cast_nullable_to_non_nullable
               as int,
+      surahName: null == surahName
+          ? _self.surahName
+          : surahName // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
@@ -342,11 +356,14 @@ class PlaybackPlaying implements PlaybackState {
   const PlaybackPlaying(
       {required this.reciterName,
       required this.surahNumber,
+      this.surahName = '',
       this.position = Duration.zero,
       this.duration = Duration.zero});
 
   final String reciterName;
   final int surahNumber;
+  @JsonKey()
+  final String surahName;
   @JsonKey()
   final Duration position;
   @JsonKey()
@@ -368,6 +385,8 @@ class PlaybackPlaying implements PlaybackState {
                 other.reciterName == reciterName) &&
             (identical(other.surahNumber, surahNumber) ||
                 other.surahNumber == surahNumber) &&
+            (identical(other.surahName, surahName) ||
+                other.surahName == surahName) &&
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.duration, duration) ||
@@ -377,12 +396,12 @@ class PlaybackPlaying implements PlaybackState {
   @override
   int get hashCode {
     return Object.hash(
-        runtimeType, reciterName, surahNumber, position, duration);
+        runtimeType, reciterName, surahNumber, surahName, position, duration);
   }
 
   @override
   String toString() {
-    return 'PlaybackState.playing(reciterName: $reciterName, surahNumber: $surahNumber, position: $position, duration: $duration)';
+    return 'PlaybackState.playing(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration)';
   }
 }
 
@@ -396,6 +415,7 @@ abstract mixin class $PlaybackPlayingCopyWith<$Res>
   $Res call(
       {String reciterName,
       int surahNumber,
+      String surahName,
       Duration position,
       Duration duration});
 }
@@ -414,6 +434,7 @@ class _$PlaybackPlayingCopyWithImpl<$Res>
   $Res call({
     Object? reciterName = null,
     Object? surahNumber = null,
+    Object? surahName = null,
     Object? position = null,
     Object? duration = null,
   }) {
@@ -426,6 +447,10 @@ class _$PlaybackPlayingCopyWithImpl<$Res>
           ? _self.surahNumber
           : surahNumber // ignore: cast_nullable_to_non_nullable
               as int,
+      surahName: null == surahName
+          ? _self.surahName
+          : surahName // ignore: cast_nullable_to_non_nullable
+              as String,
       position: null == position
           ? _self.position
           : position // ignore: cast_nullable_to_non_nullable
@@ -444,11 +469,14 @@ class PlaybackPaused implements PlaybackState {
   const PlaybackPaused(
       {required this.reciterName,
       required this.surahNumber,
+      this.surahName = '',
       this.position = Duration.zero,
       this.duration = Duration.zero});
 
   final String reciterName;
   final int surahNumber;
+  @JsonKey()
+  final String surahName;
   @JsonKey()
   final Duration position;
   @JsonKey()
@@ -470,6 +498,8 @@ class PlaybackPaused implements PlaybackState {
                 other.reciterName == reciterName) &&
             (identical(other.surahNumber, surahNumber) ||
                 other.surahNumber == surahNumber) &&
+            (identical(other.surahName, surahName) ||
+                other.surahName == surahName) &&
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.duration, duration) ||
@@ -479,12 +509,12 @@ class PlaybackPaused implements PlaybackState {
   @override
   int get hashCode {
     return Object.hash(
-        runtimeType, reciterName, surahNumber, position, duration);
+        runtimeType, reciterName, surahNumber, surahName, position, duration);
   }
 
   @override
   String toString() {
-    return 'PlaybackState.paused(reciterName: $reciterName, surahNumber: $surahNumber, position: $position, duration: $duration)';
+    return 'PlaybackState.paused(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration)';
   }
 }
 
@@ -498,6 +528,7 @@ abstract mixin class $PlaybackPausedCopyWith<$Res>
   $Res call(
       {String reciterName,
       int surahNumber,
+      String surahName,
       Duration position,
       Duration duration});
 }
@@ -516,6 +547,7 @@ class _$PlaybackPausedCopyWithImpl<$Res>
   $Res call({
     Object? reciterName = null,
     Object? surahNumber = null,
+    Object? surahName = null,
     Object? position = null,
     Object? duration = null,
   }) {
@@ -528,6 +560,10 @@ class _$PlaybackPausedCopyWithImpl<$Res>
           ? _self.surahNumber
           : surahNumber // ignore: cast_nullable_to_non_nullable
               as int,
+      surahName: null == surahName
+          ? _self.surahName
+          : surahName // ignore: cast_nullable_to_non_nullable
+              as String,
       position: null == position
           ? _self.position
           : position // ignore: cast_nullable_to_non_nullable

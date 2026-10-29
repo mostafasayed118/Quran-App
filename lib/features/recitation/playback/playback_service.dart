@@ -46,6 +46,17 @@ abstract interface class DisposablePlaybackService {
   Future<void> dispose();
 }
 
+/// Optional capability: a playback service that can seek inside the loaded
+/// track.
+///
+/// Kept separate from [PlaybackService] for the same reason as
+/// [DisposablePlaybackService]: the frozen test doubles implement the plain
+/// seam, and adding a member there would break them.
+abstract interface class SeekablePlaybackService {
+  /// Moves the playhead to [position].
+  Future<void> seek(Duration position);
+}
+
 /// Optional capability: a playback service that reports when the loaded
 /// track reaches its end.
 ///
