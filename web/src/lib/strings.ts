@@ -173,6 +173,93 @@ const dict = {
       'استمع إلى القرآن بأصوات أكثر من 240 قارئًا — بث فوري أو تحميل للاستماع بلا إنترنت. مجاني، بلا إعلانات ولا تتبع.',
     metaPrivacy:
       'سياسة خصوصية {app}: بلا حسابات، بلا إعلانات، بلا تحليلات ولا تتبع — التطبيق يعمل بلا إنترنت ولا يجمع أي بيانات.',
+    heritageChapterRead: 'اقرأ',
+    heritageChapterListen: 'اسمع',
+    heritageChapterTime: 'اعرف وقتك',
+    heritageChapterRemember: 'اذكر',
+    heritageChapterReadDesc:
+      'المصحف كاملًا، وفهرس ببحث فوري، وقراءة آية أو على هيئة صفحة مصحف، مع حفظ آخر موضع وعلامات مرجعية.',
+    heritageChapterListenDesc:
+      'تلاوات صوتية مع مشغّل مصغّر يلازمك، وتفسير وترجمة للآية من مكان واحد، وتريلّات تعمل بلا إنترنت.',
+    heritageChapterTimeDesc:
+      'مواقيت الصلاة لمدينتك، والقبلة بوصلة حيّة من حساسات الرافد، والتقويم الهجري — كلها بلا إنترنت.',
+    heritageChapterRememberDesc:
+      'أذكار مصنّفة بعدّاد وسيحة إلكترونية، وأدعية ورقة من المصحّفات، ومتتبّع للورد اليومي وخطّ الختمة.',
+    heritageBandAyahs: 'آية',
+    heritageBandSurahs: 'سورة',
+    heritageBandLocales: 'لغة',
+    heritageBandAccounts: 'حساب · إعلان · تتبّع',
+    heritageBasmala: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيم',
+    heritageSurahLabel: 'سُورَةُ',
+    heritageJourneyEyebrow: 'الصفحة الحيّة',
+    heritageJourneyTitle: 'صفحةٌ لا تُقرأ فقط… بل تنبض.',
+    heritageJourneyLead:
+      'انزل بالصفحة: ورقةٌ مذهّبة، ثم حرف، ثم صوت، ثم معنى. كلّ طبقةٍ تُضاف فوق الأخرى، حتى تكتمل الصفحة كما تكتمل الآية.',
+    heritageStep1Title: 'الورقة',
+    heritageStep1Text: 'إطارٌ مذهّب وورقٌ بلون العاج، على هيئة صفحة مصحف.',
+    heritageStep2Title: 'الحرف',
+    heritageStep2Text: 'النصّ العثماني بخطّ مصحفٍ أصيل، بلا تشويهٍ ولا تبسيط.',
+    heritageStep3Title: 'الصوت',
+    heritageStep3Text: 'تلاوةٌ تبدأ من الآية التي تقف عندها، والمشغّل لا يغادر الشاشة.',
+    heritageStep4Title: 'المعنى',
+    heritageStep4Text: 'تفسيرٌ وترجمة في هامش الصفحة — كما تُقرأ الحواشي.',
+    heritageTafsirLabel: 'التفسير المختصر',
+    heritageTafsirBody:
+      '«لِلَّتِي هِيَ أَقْوَمُ»: للطريقة التي هي أقوم الطرق وأعدلها — وهي الإسلام.',
+    heritageAudioLabel: 'تلاوة مرتّلة',
+    heritageCaption: 'نصّ عثماني · ترجمة · تفسير',
+    heritageOffline: 'بلا إنترنت',
+    heritageTimelineEyebrow: 'رحلة النصّ',
+    heritageTimelineTitle: 'نصٌّ تواترَ قرنًا بعد قرن.',
+    heritageTimelineLead: 'لم يصل القرآن إلينا صفحةً واحدة، بل عبر مراحلَ حفظته كما أُنزل.',
+    heritageTimelineHint: 'مراحل تاريخية عامة؛ التفاصيل في كتب علوم القرآن.',
+    heritageDragHint: 'اسحب',
+    heritageEra1Era: 'عهد النبوة',
+    heritageEra1Title: 'الوحي',
+    heritageEra1Text:
+      'يُتلى على الصحابة ويُكتب بأيدي الكُتّاب، آيةً آية، على الرِّقاع والعظام واللَّخاف.',
+    heritageEra1Foot: 'كتابة الوحي',
+    heritageEra2Era: 'خلافة أبي بكر',
+    heritageEra2Title: 'الجمع',
+    heritageEra2Text: 'تُجمع الصحف في مصحفٍ واحد، خوفًا على النصّ من التفرّق بعد كثرة الحفّاظ.',
+    heritageEra2Foot: 'جمع الصحف',
+    heritageEra3Era: 'خلافة عثمان',
+    heritageEra3Title: 'النسخ',
+    heritageEra3Text:
+      'تُنسخ المصاحف وتُرسل إلى الأمصار، بقراءةٍ واحدة ورسمٍ واحد، فتُحفظ الأمة على نصٍّ واحد.',
+    heritageEra3Foot: 'المصاحف العثمانية',
+    heritageEra4Era: 'العصر الرقمي',
+    heritageEra4Title: 'التحقّق',
+    heritageEra4Text: 'نسخٌ رقمية تُقابل على المصاحف المطبوعة، آيةً بكلمة، قبل أن تصل إلى شاشتك.',
+    heritageEra4Foot: 'مقابلة النصّ',
+    heritageQuietAyah: 'وَقُل رَّبِّ زِدْنِي عِلْمًا',
+    heritageQuietRef: 'طه ١١٤',
+    heritageTruthEyebrow: 'لماذا هذا الموقع',
+    heritageTruthTitle: 'لا شيءَ نجمعُه منك.',
+    heritageTruthLead:
+      'الموقع والتطبيق مجانيان بالكامل، ويعملان بلا حساب. لا إعلانات، ولا أدوات تتبّع، ولا بيانات تُباع. النصّ نفسه مولّد من قاعدة بيانات التطبيق — لا وسيط ولا تعديل يدوي.',
+    heritageTruthSource: 'المصدر على GitHub',
+    heritageTruthPrivacy: 'سياسة الخصوصية',
+    heritageStatLocales: 'لغة: عربية وإنجليزية',
+    heritageStatZero: 'حسابات · إعلانات · تتبّع',
+    heritageFaqEyebrow: 'أسئلة متكررة',
+    heritageFaqTitle: 'قبل أن تبدأ.',
+    heritageFaqLead: 'أربعة أسئلة تُغني عن البحث في صفحاتٍ أخرى.',
+    heritageFaq1Q: 'هل يعمل بلا إنترنت؟',
+    heritageFaq1A:
+      'نعم. المصحف كامل — ١١٤ سورة و٦٢٣٦ آية — مضمّن داخل التطبيق. والموقع يخزّن الصفحات التي زرتها للقراءة دون اتصال.',
+    heritageFaq2Q: 'هل تحتاج حسابًا؟',
+    heritageFaq2A:
+      'لا. لا تسجيل ولا بريد ولا كلمة مرور. الإعدادات والعلامات والموضع الأخير تُحفظ على جهازك وحده.',
+    heritageFaq3Q: 'من أين النصّ والتفسير؟',
+    heritageFaq3A:
+      'النصّ العثماني من قاعدة بيانات التطبيق، والتفسير من «التفسير المختصر»، والترجمة الإنجليزية من طبعة بيكثال.',
+    heritageFaq4Q: 'ما الفرق بين الموقع والتطبيق؟',
+    heritageFaq4A:
+      'الموقع للقراءة السريعة والمشاركة وفتح المصحف من أي متصفح، والتطبيق للقراءة الكاملة بلا إنترنت مع التلاوات والمواقيت والقبلة والأذكار.',
+    heritageFinalEyebrow: 'ابدأ الآن',
+    heritageFinalTitle: 'افتح المصحف، وابدأ من حيث توقّفت.',
+    heritageFinalLead: 'بلا تسجيل. بلا إعلانات. بلا انتظار.',
   },
   en: {
     appName: 'Quran Yahdi',
@@ -352,6 +439,99 @@ const dict = {
       'Listen to the Quran recited by 240+ reciters — stream instantly or download for offline listening. Free, no ads, no tracking.',
     metaPrivacy:
       'Privacy policy for {app}: no accounts, no ads, no analytics, no tracking — the app runs offline and collects nothing.',
+    heritageChapterRead: 'Read',
+    heritageChapterListen: 'Listen',
+    heritageChapterTime: 'Know your time',
+    heritageChapterRemember: 'Remember',
+    heritageChapterReadDesc:
+      'The complete mushaf, an instant index, verse-by-verse or page reading, with your last position and bookmarks kept.',
+    heritageChapterListenDesc:
+      'Recitations with a mini player that follows you, tafsir and translation for the verse in one place, offline-ready.',
+    heritageChapterTimeDesc:
+      'Prayer times for your city, a live Qibla compass from the device sensors, and the Hijri calendar — all offline.',
+    heritageChapterRememberDesc:
+      'Categorised adhkar with a counter and a digital tasbih, duas, a daily wird tracker, and a khatma plan.',
+    heritageBandAyahs: 'ayahs',
+    heritageBandSurahs: 'surahs',
+    heritageBandLocales: 'languages',
+    heritageBandAccounts: 'accounts · ads · tracking',
+    heritageBasmala: 'بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيم',
+    heritageSurahLabel: 'Surah',
+    heritageJourneyEyebrow: 'The living page',
+    heritageJourneyTitle: 'A page that does not just read — it breathes.',
+    heritageJourneyLead:
+      'Scroll the page: paper, then letter, then voice, then meaning. Each layer settles on the one before it, until the page is as complete as the verse.',
+    heritageStep1Title: 'The paper',
+    heritageStep1Text: 'A gilded frame and ivory stock, shaped like a mushaf page.',
+    heritageStep2Title: 'The letter',
+    heritageStep2Text: 'The Uthmani text in a true mushaf face — no distortion, no shortcuts.',
+    heritageStep3Title: 'The voice',
+    heritageStep3Text:
+      'Recitation begins at the verse you stopped on; the player never leaves the screen.',
+    heritageStep4Title: 'The meaning',
+    heritageStep4Text:
+      'Tafsir and translation in the page margin — read the way footnotes are read.',
+    heritageTafsirLabel: 'Abridged tafsir',
+    heritageTafsirBody:
+      '“That which is most upright”: the straightest and most just of paths — and that is Islam.',
+    heritageAudioLabel: 'Measured recitation',
+    heritageCaption: 'Uthmani text · translation · tafsir',
+    heritageOffline: 'Offline',
+    heritageTimelineEyebrow: 'The journey of the text',
+    heritageTimelineTitle: 'A text transmitted century after century.',
+    heritageTimelineLead:
+      'The Quran did not reach us as a single page, but through stages that preserved it as it was revealed.',
+    heritageTimelineHint:
+      'General historical stages; the detail belongs to the sciences of the Quran.',
+    heritageDragHint: 'Drag',
+    heritageEra1Era: 'The Prophetic era',
+    heritageEra1Title: 'Revelation',
+    heritageEra1Text:
+      'Recited to the Companions and written down by the scribes, verse by verse, on parchments, bones and shards.',
+    heritageEra1Foot: 'Writing the revelation',
+    heritageEra2Era: 'The caliphate of Abu Bakr',
+    heritageEra2Title: 'Collection',
+    heritageEra2Text:
+      'The scattered sheets are gathered into one codex, for fear the text would fragment as reciters multiplied.',
+    heritageEra2Foot: 'Gathering the sheets',
+    heritageEra3Era: 'The caliphate of Uthman',
+    heritageEra3Title: 'Copies',
+    heritageEra3Text:
+      'Codices are copied and sent to the provinces in one reading and one script, holding the community to a single text.',
+    heritageEra3Foot: 'The Uthmanic codices',
+    heritageEra4Era: 'The digital age',
+    heritageEra4Title: 'Verification',
+    heritageEra4Text:
+      'Digital copies are collated against printed mushafs, word by word, before they reach your screen.',
+    heritageEra4Foot: 'Collating the text',
+    heritageQuietAyah: 'And say: My Lord, increase me in knowledge.',
+    heritageQuietRef: 'Ta-Ha 114',
+    heritageTruthEyebrow: 'Why this site',
+    heritageTruthTitle: 'We collect nothing from you.',
+    heritageTruthLead:
+      'The site and the app are free and need no account. No ads, no trackers, no data for sale. The text itself is generated from the app database — no middleman, no hand edits.',
+    heritageTruthSource: 'Source on GitHub',
+    heritageTruthPrivacy: 'Privacy policy',
+    heritageStatLocales: 'languages: Arabic and English',
+    heritageStatZero: 'accounts · ads · tracking',
+    heritageFaqEyebrow: 'Frequent questions',
+    heritageFaqTitle: 'Before you start.',
+    heritageFaqLead: 'Four questions that save you searching other pages.',
+    heritageFaq1Q: 'Does it work offline?',
+    heritageFaq1A:
+      'Yes. The whole mushaf — 114 surahs and 6,236 ayahs — ships inside the app. The site caches the pages you visit for offline reading.',
+    heritageFaq2Q: 'Does it need an account?',
+    heritageFaq2A:
+      'No. No sign-up, no email, no password. Settings, bookmarks and your last position stay on your device.',
+    heritageFaq3Q: 'Where do the text and tafsir come from?',
+    heritageFaq3A:
+      'The Uthmani text from the app database, the tafsir from “At-Tafsir Al-Mukhtasar”, and the English translation from Pickthall.',
+    heritageFaq4Q: 'What is the difference between the site and the app?',
+    heritageFaq4A:
+      'The site is for quick reading, sharing and opening the mushaf in any browser; the app is the complete offline reading with recitations, prayer times, qibla and adhkar.',
+    heritageFinalEyebrow: 'Start now',
+    heritageFinalTitle: 'Open the mushaf and begin where you stopped.',
+    heritageFinalLead: 'No sign-up. No ads. No waiting.',
   },
 } as const;
 

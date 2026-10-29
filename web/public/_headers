@@ -18,7 +18,7 @@
 # style-src needs no 'unsafe-inline' either: astro.config.mjs sets
 # `build.inlineStylesheets: 'never'`, so every component stylesheet ships as a hashed
 # /_astro/*.css file.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-y+FotC7GvV2idFnvsHR8JtbzfaPMXDmGo1GwuHabR48=' 'sha256-n02J/sGih6I+q0Kyx2TU0X2d9oJeTTflM4KQd54nGIA=' 'sha256-Ww6sTKppW0rgelzPh/PhX/+YvgITXp0bdCjH3Ryru6I=' 'sha256-G5aS6TaYBTD7E/8OuihOhkAzs/Re+fUZuixw0warWkY=' 'sha256-0boEBuwJjk7eoujXOmvvT+avW+qwl8oqdkohBNZjTi8=' 'sha256-6v76vjvJjMq/WtmOQjM7kro8Di+dVSihucPojR1yyvQ='; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://mp3quran.net https://*.mp3quran.net; connect-src 'self' https://mp3quran.net https://*.mp3quran.net https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-y+FotC7GvV2idFnvsHR8JtbzfaPMXDmGo1GwuHabR48=' 'sha256-n02J/sGih6I+q0Kyx2TU0X2d9oJeTTflM4KQd54nGIA=' 'sha256-Ww6sTKppW0rgelzPh/PhX/+YvgITXp0bdCjH3Ryru6I=' 'sha256-G5aS6TaYBTD7E/8OuihOhkAzs/Re+fUZuixw0warWkY=' 'sha256-0boEBuwJjk7eoujXOmvvT+avW+qwl8oqdkohBNZjTi8=' 'sha256-wBhZXIN45VtuqzvZXGR/6tUoBljrLjUCTcosLUjkhCo=' 'sha256-6v76vjvJjMq/WtmOQjM7kro8Di+dVSihucPojR1yyvQ='; style-src 'self'; img-src 'self' data:; font-src 'self'; media-src 'self' https://mp3quran.net https://*.mp3quran.net; connect-src 'self' https://mp3quran.net https://*.mp3quran.net https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

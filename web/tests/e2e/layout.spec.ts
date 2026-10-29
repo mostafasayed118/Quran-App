@@ -22,7 +22,7 @@ test.describe('coarse-pointer targets are at least 44px at 360', () => {
       'header nav a',
       'header .lang-switch',
       'header .theme-toggle',
-      '.hero-cta',
+      '.hero__actions .heritage__btn',
       '.site-footer a',
     ]) {
       await expectMinHeight(page, sel);

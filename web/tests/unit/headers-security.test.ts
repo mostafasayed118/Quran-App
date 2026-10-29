@@ -48,8 +48,11 @@ describe('_headers security policy', () => {
     expect(scriptSrc).toContain("'self'");
     expect(scriptSrc).not.toContain("'unsafe-inline'");
     expect(scriptSrc).not.toContain("'unsafe-eval'");
-    // The six inline scripts (five executable + the static JSON-LD) are allowed by their exact bytes.
-    expect(scriptSrc.match(/'sha256-[^']+'/g)).toHaveLength(6);
+    // Every inline script is allowed by its exact bytes. The count is bookkeeping:
+    // it moves when a page adds a hashed inline script (the heritage preview added
+    // one on 2026-10-29). The security invariant is that NONE is uncovered, which
+    // `npm run budget` enforces across dist/.
+    expect(scriptSrc.match(/'sha256-[^']+'/g)).toHaveLength(7);
   });
 
   it('allows styles from the site only (the CSS ships as a hashed file)', () => {

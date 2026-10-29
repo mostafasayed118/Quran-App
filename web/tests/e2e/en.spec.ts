@@ -23,9 +23,11 @@ test('EN home renders LTR chrome with the EN hero lead and 14 features', async (
   await page.goto('/en/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
-  await expect(page.locator('.hero-lead')).toHaveText(LANDING.en.hero.lead);
-  await expect(page.locator('.feat-item')).toHaveCount(14);
-  await expect(page.locator('.feat-item').first()).toContainText(LANDING.en.features[0].title);
+  await expect(page.locator('.hero__lead')).toHaveText(LANDING.en.hero.lead);
+  await expect(page.locator('.chapter__tags li')).toHaveCount(14);
+  await expect(page.locator('.chapter__tags li').first()).toContainText(
+    LANDING.en.features[0].title,
+  );
   await expect(page.locator('.hero a[href="/en/quran/"]')).toBeVisible();
   await expect(page.locator('.hero a[href="/en/about/"]')).toBeVisible();
 });

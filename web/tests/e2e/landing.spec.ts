@@ -13,12 +13,12 @@ test('landing renders the hero ayah and both CTAs', async ({ page }) => {
   await expect(page.locator('.hero a[href="/about/"]')).toBeVisible();
 });
 
-test('landing shows the features heading, exactly 14 feature rows and the promise', async ({
+test('landing groups the fourteen features into four chapters and states the promise', async ({
   page,
 }) => {
   await page.goto('/');
-  await expect(page.locator('.features h2')).toBeVisible();
-  await expect(page.locator('.feat-item')).toHaveCount(14);
+  await expect(page.locator('.chapter')).toHaveCount(4);
+  await expect(page.locator('.chapter__tags li')).toHaveCount(14);
   await expect(page.locator('.promise-item').first()).toBeVisible();
   expect(await page.locator('.promise-item').count()).toBeGreaterThanOrEqual(3);
 });

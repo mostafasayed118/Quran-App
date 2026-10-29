@@ -3,7 +3,9 @@ import { test, expect } from '@playwright/test';
 // This is the one spec that needs the real service worker; the global config blocks it.
 test.use({ serviceWorkers: 'allow' });
 
-const HOME_H1 = 'رفيق إسلامي متكامل يعمل بلا إنترنت أولًا';
+// The home's h1 is the ayah since the heritage redesign (2026-10-29); the old
+// kicker moved to a paragraph. The marker only proves the page rendered offline.
+const HOME_H1 = '﴿إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ﴾';
 const OFFLINE_H1 = 'أنت غير متصل';
 
 test('a visited home page still renders after going offline', async ({ page, context }) => {

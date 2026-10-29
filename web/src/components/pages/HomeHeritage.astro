@@ -1,0 +1,494 @@
+﻿---
+/**
+ * Heritage home — the approved «مخطوطة مُضاءة» direction.
+ *
+ * Wave 1 of the port: hero folio, numbers band, and the four chapter rows.
+ * The scroll scenes (living page, journey track), the mihrab band and the
+ * closing CTA are the next waves; they need their own string keys first.
+ *
+ * The folio is driven by real data: surah 17 from src/data/surahs.json, not
+ * hard-coded metadata.
+ */
+import { t, type Locale } from '../../lib/strings';
+import { getSurahs } from '../../lib/surahs';
+import { surahDisplayName } from '../../lib/surah-name';
+import { toArabicDigits } from '../../lib/arabic-digits';
+import { LANDING, GITHUB_RELEASES_URL } from '../../lib/landing-content';
+import ResumeCard from '../ResumeCard.astro';
+import '../../styles/heritage.css';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const copy = LANDING[locale];
+const num = (n: number) => (locale === 'ar' ? toArabicDigits(n) : String(n));
+/** Internal links must carry the locale prefix, or the EN page leaks into AR routes. */
+const href = (path: string) => `${locale === 'en' ? '/en' : ''}${path}`;
+const surah = getSurahs().find((s) => s.id === 17) ?? getSurahs()[0];
+
+const chapters = [
+  {
+    num: '٠١',
+    title: t(locale, 'heritageChapterRead'),
+    desc: t(locale, 'heritageChapterReadDesc'),
+    tags: [
+      t(locale, 'landingFeatureHome'),
+      t(locale, 'landingFeatureIndex'),
+      t(locale, 'landingFeatureReader'),
+      t(locale, 'landingFeatureAyahSheet'),
+      t(locale, 'resumeTitle'),
+    ],
+    href: href('/quran/'),
+  },
+  {
+    num: '٠٢',
+    title: t(locale, 'heritageChapterListen'),
+    desc: t(locale, 'heritageChapterListenDesc'),
+    tags: [t(locale, 'navReciters'), t(locale, 'landingFeaturePlayer')],
+    href: href('/reciters/'),
+  },
+  {
+    num: '٠٣',
+    title: t(locale, 'heritageChapterTime'),
+    desc: t(locale, 'heritageChapterTimeDesc'),
+    tags: [t(locale, 'landingFeaturePrayerTimes'), t(locale, 'qbTitle')],
+    href: href('/prayer-times/'),
+  },
+  {
+    num: '٠٤',
+    title: t(locale, 'heritageChapterRemember'),
+    desc: t(locale, 'heritageChapterRememberDesc'),
+    tags: [
+      t(locale, 'landingFeatureAdhkar'),
+      t(locale, 'landingFeatureTasbih'),
+      t(locale, 'landingFeatureDuas'),
+      t(locale, 'landingFeatureTracker'),
+      t(locale, 'landingFeatureSettings'),
+    ],
+    href: href('/about/'),
+  },
+];
+
+const band = [
+  { value: num(114), label: t(locale, 'heritageBandSurahs') },
+  { value: num(6236), label: t(locale, 'heritageBandAyahs') },
+  { value: num(2), label: t(locale, 'heritageBandLocales') },
+  { value: num(0), label: t(locale, 'heritageBandAccounts') },
+];
+
+const steps = [1, 2, 3, 4].map((n) => ({
+  num: locale === 'ar' ? toArabicDigits(`0${n}`) : `0${n}`,
+  title: t(locale, `heritageStep${n}Title` as 'heritageStep1Title'),
+  text: t(locale, `heritageStep${n}Text` as 'heritageStep1Text'),
+}));
+
+const eras = [1, 2, 3, 4].map((n) => ({
+  num: locale === 'ar' ? toArabicDigits(`0${n}`) : `0${n}`,
+  era: t(locale, `heritageEra${n}Era` as 'heritageEra1Era'),
+  title: t(locale, `heritageEra${n}Title` as 'heritageEra1Title'),
+  text: t(locale, `heritageEra${n}Text` as 'heritageEra1Text'),
+  foot: t(locale, `heritageEra${n}Foot` as 'heritageEra1Foot'),
+}));
+
+const words = copy.hero.ayah.split(' ');
+const wave = [34, 72, 48, 88, 56, 96, 40, 78, 62, 90, 46, 68, 30, 54];
+
+const faqs = [1, 2, 3, 4].map((n) => ({
+  q: t(locale, `heritageFaq${n}Q` as 'heritageFaq1Q'),
+  a: t(locale, `heritageFaq${n}A` as 'heritageFaq1A'),
+}));
+---
+
+<section class="heritage" data-heritage aria-labelledby="heritage-title">
+  <div class="heritage__scene" aria-hidden="true">
+    <div class="heritage__photo"></div>
+    <div class="heritage__scrim"></div>
+  </div>
+
+  <div class="heritage__container hero">
+    <div>
+      <h1 class="hero__title hero-ayah" id="heritage-title">
+        <span>{copy.hero.ayah.split(' ').slice(0, 3).join(' ')}</span>{' '}
+        <span>{copy.hero.ayah.split(' ').slice(3).join(' ')}</span>
+      </h1>
+      <p class="hero__ref hero-ref">{copy.hero.ayahRef}</p>
+
+      <p class="hero__kicker">{copy.hero.kicker}</p>
+      <p class="hero__lead">{copy.hero.lead}</p>
+      <div class="hero__actions">
+        <a class="heritage__btn heritage__btn--primary" href={href('/quran/')}>
+          {copy.hero.ctaPrimary}
+        </a>
+        <a class="heritage__btn heritage__btn--ghost" href={href('/about/')}>
+          {copy.hero.ctaSecondary}
+        </a>
+      </div>
+    </div>
+
+    <div class="hero__visual">
+      <figure class="folio">
+        <div class="folio__head">
+          <span class="folio__rule" aria-hidden="true"></span>
+          <span class="folio__cartouche">
+            {t(locale, 'heritageSurahLabel')} {surahDisplayName(surah, locale)}
+          </span>
+          <span class="folio__rule" aria-hidden="true"></span>
+        </div>
+        <p class="folio__meta">
+          {t(locale, 'chipMeccan')} · {num(surah.ayahCount)}
+          {t(locale, 'heritageBandAyahs')}
+        </p>
+        <p class="folio__basmala">{t(locale, 'heritageBasmala')}</p>
+
+        <div class="folio__body">
+          <p class="folio__text">{copy.hero.ayah}</p>
+        </div>
+
+        <span class="folio__page">{num(surah.pagesStart)}</span>
+      </figure>
+    </div>
+  </div>
+
+  <div class="heritage__resume">
+    <ResumeCard locale={locale} />
+  </div>
+
+  <div class="band">
+    <div class="heritage__container band__inner">
+      {band.map((item) => (
+        <p class="band__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" />
+            <rect
+              x="3"
+              y="3"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              transform="rotate(45 12 12)"
+            />
+          </svg>
+          <b>{item.value}</b> {item.label}
+        </p>
+      ))}
+    </div>
+  </div>
+
+  <div class="heritage__container">
+    <div class="chapters">
+      {chapters.map((chapter) => (
+        <a class="chapter" href={chapter.href}>
+          <span class="chapter__num" aria-hidden="true">
+            {chapter.num}
+          </span>
+          <div>
+            <h2 class="chapter__title">{chapter.title}</h2>
+            <p class="chapter__desc">{chapter.desc}</p>
+          </div>
+          <ul class="chapter__tags">
+            {chapter.tags.map((tag) => (
+              <li>{tag}</li>
+            ))}
+          </ul>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <section class="journey" aria-labelledby="journey-title">
+    <div class="heritage__container journey__head">
+      <p class="h-eyebrow">
+        <svg viewBox="0 0 24 24" width="9" height="9" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" />
+          <rect
+            x="3"
+            y="3"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            transform="rotate(45 12 12)"
+          />
+        </svg>
+        {t(locale, 'heritageJourneyEyebrow')}
+      </p>
+      <h2 class="h-title" id="journey-title">
+        {t(locale, 'heritageJourneyTitle')}
+      </h2>
+      <p class="h-lead">{t(locale, 'heritageJourneyLead')}</p>
+    </div>
+
+    <div class="journey__wrap" data-journey>
+      <div class="journey__pin" data-journey-pin data-stage="4">
+        <div class="journey__steps">
+          {steps.map((step) => (
+            <div class="step" data-journey-step>
+              <span class="step__num" aria-hidden="true">
+                {step.num}
+              </span>
+              <div>
+                <p class="step__title">{step.title}</p>
+                <p class="step__text">{step.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="journey__visual">
+          <figure class="folio">
+            <div class="folio__head">
+              <span class="folio__rule" aria-hidden="true"></span>
+              <span class="folio__cartouche">
+                {t(locale, 'heritageSurahLabel')} {surahDisplayName(surah, locale)}
+              </span>
+              <span class="folio__rule" aria-hidden="true"></span>
+            </div>
+            <p class="folio__meta">{copy.hero.ayahRef}</p>
+
+            <div class="folio__body">
+              <p class="folio__text" aria-label={copy.hero.ayah}>
+                <span class="words" aria-hidden="true">
+                  {words.map((word, index) => (
+                    <span class="word" style={`--i: ${index}`}>
+                      {word}{' '}
+                    </span>
+                  ))}
+                </span>
+              </p>
+            </div>
+
+            <span class="folio__page">{num(surah.pagesStart)}</span>
+
+            <aside class="layer layer--margin">
+              <b>{t(locale, 'heritageTafsirLabel')}</b>
+              <p>{t(locale, 'heritageTafsirBody')}</p>
+            </aside>
+
+            <div class="layer layer--audio">
+              <span class="play" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5.5v13l11-6.5Z" fill="currentColor" />
+                </svg>
+              </span>
+              <span class="who">
+                <b>{t(locale, 'heritageAudioLabel')}</b>
+              </span>
+              <span class="wave" aria-hidden="true">
+                {wave.map((h, i) => (
+                  <i style={`--i: ${i}; --h: ${h}%`} />
+                ))}
+              </span>
+            </div>
+          </figure>
+
+          <p class="journey__caption">
+            <span>{t(locale, 'heritageCaption')}</span>
+            <span>{t(locale, 'heritageOffline')}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="timeline" aria-labelledby="timeline-title">
+    <div class="timeline__wrap" data-timeline>
+      <div class="timeline__pin">
+        <div class="timeline__head">
+          <div>
+            <p class="h-eyebrow">
+              <svg viewBox="0 0 24 24" width="9" height="9" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" fill="none" stroke="currentColor" />
+                <rect
+                  x="3"
+                  y="3"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  transform="rotate(45 12 12)"
+                />
+              </svg>
+              {t(locale, 'heritageTimelineEyebrow')}
+            </p>
+            <h2 class="h-title" id="timeline-title">
+              {t(locale, 'heritageTimelineTitle')}
+            </h2>
+          </div>
+
+          <div class="timeline__aside">
+            <p class="h-lead">{t(locale, 'heritageTimelineLead')}</p>
+            <div class="timeline__meter">
+              <span class="timeline__count">
+                <b data-timeline-current>{num(1)}</b> / {num(eras.length)}
+              </span>
+              <span class="timeline__rail" aria-hidden="true">
+                <i data-timeline-fill></i>
+              </span>
+              <span class="timeline__hint">{t(locale, 'heritageDragHint')}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline__track-wrap" data-timeline-scroll>
+          <ol class="track" data-timeline-track>
+            {eras.map((era) => (
+              <li class="era">
+                <div class="era__top">
+                  <span class="era__num" aria-hidden="true">
+                    {era.num}
+                  </span>
+                </div>
+                <p class="era__era">{era.era}</p>
+                <h3 class="era__title">{era.title}</h3>
+                <p class="era__text">{era.text}</p>
+                <p class="era__foot">{era.foot}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <p class="timeline__foot">{t(locale, 'heritageTimelineHint')}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="quiet" aria-labelledby="quiet-title">
+    <div class="quiet__inner">
+      <svg class="arch" viewBox="0 0 420 560" aria-hidden="true">
+        <defs>
+          <radialGradient id="heritage-niche" cx="50%" cy="58%" r="62%">
+            <stop offset="0" stop-color="#e6c98f" stop-opacity="0.26"></stop>
+            <stop offset="0.55" stop-color="#c9a45e" stop-opacity="0.08"></stop>
+            <stop offset="1" stop-color="#c9a45e" stop-opacity="0"></stop>
+          </radialGradient>
+        </defs>
+        <path
+          class="arch__fill"
+          d="M50 540V300C50 190 118 128 210 78c92 50 160 112 160 222v240Z"
+          fill="url(#heritage-niche)"
+        ></path>
+        <path
+          class="arch__outer"
+          d="M50 540V300C50 190 118 128 210 78c92 50 160 112 160 222v240"
+        ></path>
+        <path
+          class="arch__inner"
+          d="M74 540V306c0-100 62-156 136-200 74 44 136 100 136 200v234"
+        ></path>
+        <circle class="arch__boss" cx="210" cy="96" r="6"></circle>
+      </svg>
+
+      <div class="quiet__content">
+        <h2 class="sr-only" id="quiet-title">
+          {t(locale, 'heritageQuietRef')}
+        </h2>
+        <p class="quiet__ayah">{t(locale, 'heritageQuietAyah')}</p>
+        <p class="quiet__ref">{t(locale, 'heritageQuietRef')}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="truth" aria-labelledby="truth-title">
+    <div class="heritage__container truth__grid">
+      <div>
+        <p class="h-eyebrow">{t(locale, 'heritageTruthEyebrow')}</p>
+        <h2 class="h-title" id="truth-title">
+          {t(locale, 'heritageTruthTitle')}
+        </h2>
+        <p class="h-lead">{t(locale, 'heritageTruthLead')}</p>
+        <ul class="promises">
+          {copy.promise.map((item) => (
+            <li class="promise-item">{item}</li>
+          ))}
+        </ul>
+        <div class="truth__links">
+          <a
+            class="text-link"
+            href="https://github.com/mostafasayed118/Quran-App"
+            target="_blank"
+            rel="noopener"
+          >
+            {t(locale, 'heritageTruthSource')}
+          </a>
+          <a class="text-link" href={`/${locale === 'en' ? 'en/' : ''}privacy/`}>
+            {t(locale, 'heritageTruthPrivacy')}
+          </a>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <b>{num(114)}</b>
+          <span>{t(locale, 'heritageBandSurahs')}</span>
+        </div>
+        <div class="stat">
+          <b>{num(6236)}</b>
+          <span>{t(locale, 'heritageBandAyahs')}</span>
+        </div>
+        <div class="stat">
+          <b>{num(2)}</b>
+          <span>{t(locale, 'heritageStatLocales')}</span>
+        </div>
+        <div class="stat">
+          <b>{num(0)}</b>
+          <span>{t(locale, 'heritageStatZero')}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" aria-labelledby="faq-title">
+    <div class="heritage__container faq__grid">
+      <div>
+        <p class="h-eyebrow">{t(locale, 'heritageFaqEyebrow')}</p>
+        <h2 class="h-title" id="faq-title">
+          {t(locale, 'heritageFaqTitle')}
+        </h2>
+        <p class="h-lead">{t(locale, 'heritageFaqLead')}</p>
+      </div>
+
+      <div>
+        {faqs.map((faq, index) => (
+          <details class="qa" open={index === 0}>
+            <summary>{faq.q}</summary>
+            <p>{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="final cta" aria-labelledby="final-title">
+    <div class="heritage__container">
+      <p class="h-eyebrow">{t(locale, 'heritageFinalEyebrow')}</p>
+      <h2 class="final__title" id="final-title">
+        {t(locale, 'heritageFinalTitle')}
+      </h2>
+      <p class="final__lead">{t(locale, 'heritageFinalLead')}</p>
+      <div class="final__actions">
+        <a class="heritage__btn heritage__btn--primary" href={href('/quran/')}>
+          {copy.hero.ctaPrimary}
+        </a>
+        <a
+          class="heritage__btn heritage__btn--ghost cta-github"
+          href={GITHUB_RELEASES_URL}
+          target="_blank"
+          rel="noopener"
+        >
+          {copy.cta.githubLabel}
+        </a>
+        <span class="heritage__btn heritage__btn--ghost cta-play" aria-disabled="true">
+          {copy.cta.playLabel}
+        </span>
+      </div>
+      <p class="final__note">{copy.cta.lead}</p>
+    </div>
+  </section>
+</section>
+
+<script>
+  import '../../scripts/heritage-scenes';
+</script>

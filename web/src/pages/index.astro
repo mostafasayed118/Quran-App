@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import LandingPage from '../components/pages/LandingPage.astro';
+import HomeHeritage from '../components/pages/HomeHeritage.astro';
 import { t } from '../lib/strings';
 import { LANDING } from '../lib/landing-content';
 
@@ -8,5 +8,5 @@ const copy = LANDING.ar;
 ---
 
 <BaseLayout title={t('ar', 'appName')} description={copy.hero.lead} preloadFont={['hafs']}>
-  <LandingPage locale="ar" />
+  <HomeHeritage locale="ar" />
 </BaseLayout>
