@@ -17,6 +17,7 @@ import 'features/notifications/data/notifications_binding.dart';
 import 'features/notifications/data/reminder_planner.dart'
     show azkarReminderPayload, prayerReminderPayload, wirdReminderPayload;
 import 'features/notifications/data/reminder_settings.dart';
+import 'features/recitation/data/reciter_repository.dart';
 import 'features/recitation/playback/background_init_guard.dart';
 
 /// F-D1 fail-open budgets: the two plugin inits may each take at most this
@@ -83,6 +84,25 @@ Future<void> _initPlugins(String audioChannelName) async {
   unawaited(_openDeepLinkLaunchTarget());
   _listenForDeepLinks();
   unawaited(runBootReminderSchedule());
+  unawaited(_warmReciterCatalog());
+}
+
+/// First-run warm-up for the audio catalog.
+///
+/// The reader's play button resolves a reciter from the DB, which is empty
+/// until the mp3quran catalog has been fetched once. Fetching here (behind the
+/// first frame, never on the boot path) makes playback work before the user
+/// ever opens the recitations screen. Fail-open: offline stays offline, and
+/// the recitations screen keeps its own retry path.
+Future<void> _warmReciterCatalog() async {
+  try {
+    await getIt<ReciterRepository>().ensureCatalog();
+  } on Object catch (error, stackTrace) {
+    dev.log('reciter catalog warm-up failed',
+        name: 'quran_yahdi/boot',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
+  }
 }
 
 /// Tap-target route for a reminder payload; null for unknown/absent payloads

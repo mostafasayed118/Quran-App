@@ -193,6 +193,19 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   @override
   Stream<List<ReciterRow>> watchAll() => _db.select(_db.reciters).watch();
 
+  /// First-run warm-up: fetches the catalog only when the table is empty.
+  ///
+  /// The reader's play button resolves its reciter from this table; without a
+  /// warm-up it stays empty until the user opens the recitations screen, and
+  /// the first play attempt fails with "no reciters". Returns true when a
+  /// fetch ran. Failures propagate; the boot hook is fail-open.
+  Future<bool> ensureCatalog() async {
+    final rows = await watchAll().first;
+    if (rows.isNotEmpty) return false;
+    await refreshFromApi();
+    return true;
+  }
+
   /// The selected reciter, or the first featured one when nothing is picked.
   /// The repository is the mapping boundary: rows become entities here.
   @override
@@ -240,12 +253,16 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
 
   /// Opening-ayah teasers for the reciter's surah rows (W2a plan T6 shape),
   /// keyed by surah id from the bundled ayahs table.
+  ///
+  /// Uses the plain-Arabic `text_imlaei` column, not the HafsSmart glyph run:
+  /// the teaser is rendered in the UI face, and the glyph run's private-use
+  /// codepoints have no glyph there (they came out as tofu).
   @override
   Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
     final rows = await (_db.select(_db.ayahs)
           ..where((a) => a.surahId.isIn(surahIds) & a.numberInSurah.equals(1)))
         .get();
-    return {for (final a in rows) a.surahId: a.textUthmani};
+    return {for (final a in rows) a.surahId: a.textImlaei};
   }
 }

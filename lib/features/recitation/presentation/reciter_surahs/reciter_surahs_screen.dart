@@ -128,7 +128,6 @@ class _SurahDownloadRow extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontFamily: QuranFonts.meQuran,
                 fontSize: 13,
                 color: colors.onSurfaceVariant,
               ),
