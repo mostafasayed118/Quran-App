@@ -1,6 +1,7 @@
 ---
 import { t, type Locale } from '../../lib/strings';
 import { surahDisplayName } from '../../lib/surah-name';
+import { digitsFor } from '../../lib/arabic-digits';
 import { getSurahs } from '../../lib/surahs';
 interface Props {
   locale?: Locale;
@@ -28,10 +29,10 @@ const chip = (type: string) => t(locale, type === 'makkah' ? 'chipMeccan' : 'chi
     {getSurahs().map((s) => (
       <li>
         <a href={`${base}/surah/${s.id}/`}>
-          <span class="surah-num">{s.id}</span>
+          <span class="surah-num">{digitsFor(s.id, locale)}</span>
           <span class="surah-name">{surahDisplayName(s, locale)}</span>
           <span class="surah-meta">
-            {chip(s.revelationType)} · {s.ayahCount}
+            {chip(s.revelationType)} · {digitsFor(s.ayahCount, locale)}
           </span>
         </a>
       </li>

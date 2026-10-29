@@ -214,20 +214,39 @@ html[data-theme='night'] .theme-toggle::before {
 .surah-list a {
   display: flex;
   gap: 14px;
-  align-items: baseline;
-  padding: 12px 4px;
-  border-bottom: 1px solid var(--hairline);
+  align-items: center;
+  padding: 13px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
+  border-radius: 3px;
   color: var(--ink);
   text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+.surah-list li:first-child a {
+  border-block-start: 1px solid color-mix(in srgb, var(--gold-line) 26%, transparent);
+}
+.surah-list a:hover {
+  background: color-mix(in srgb, var(--gold-line) 9%, transparent);
 }
 .surah-num {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  border: 1px solid color-mix(in srgb, var(--gold-line) 55%, transparent);
+  border-radius: 50%;
   color: var(--gold-ink);
-  min-width: 2.2em;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
 }
 .surah-meta {
   margin-inline-start: auto;
-  color: var(--muted-strong);
-  font-size: 0.85em;
+  color: var(--muted);
+  font-size: 0.8em;
+  font-variant-numeric: tabular-nums;
 }
 .reader {
   max-width: 760px;
@@ -565,13 +584,21 @@ html[data-reading-view='imlaei'] .ayah-i {
 .index-search {
   display: block;
   width: min(760px, calc(100% - 40px));
-  margin: 14px auto 10px;
-  padding: 11px 16px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
+  margin: 16px auto 12px;
+  padding: 13px 18px;
+  border: 1px solid color-mix(in srgb, var(--gold-line) 45%, transparent);
+  border-radius: 999px;
   background: var(--surface);
   color: var(--ink);
   font: inherit;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.index-search:focus-visible {
+  border-color: var(--gold-line);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold-line) 22%, transparent);
+  outline: none;
 }
 .index-search::placeholder {
   color: var(--muted-strong);
