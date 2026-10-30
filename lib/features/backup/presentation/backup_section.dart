@@ -145,6 +145,8 @@ class _PreviewDialog extends StatelessWidget {
       if (summary.tasbihChanged) loc.backupPreviewTasbih,
       if (summary.settingsKeysApplied > 0)
         loc.backupPreviewSettings(summary.settingsKeysApplied.toArabicIndic),
+      if (summary.rejectedEntries > 0)
+        loc.backupPreviewRejected(summary.rejectedEntries.toArabicIndic),
     ];
     return AlertDialog(
       title: Text(loc.backupPreviewTitle),

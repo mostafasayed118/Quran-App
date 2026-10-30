@@ -15,10 +15,13 @@ String backupDayKey(DateTime d) => dayKey(d);
 
 /// Result of merging imported bookmarks with the local ones.
 class BookmarkMerge {
-  const BookmarkMerge(this.toInsert);
+  const BookmarkMerge(this.toInsert, {this.rejected = 0});
 
   /// Bookmarks that are new and must be written.
   final List<BackupBookmark> toInsert;
+
+  /// Imported bookmarks whose ayah id was outside 1..6236.
+  final int rejected;
 
   int get newCount => toInsert.length;
 }
@@ -31,10 +34,18 @@ BookmarkMerge mergeBookmarks({
 }) {
   final seen = <int>{...existingAyahIds};
   final toInsert = <BackupBookmark>[];
+  var rejected = 0;
   for (final bookmark in imported) {
+    if (bookmark.ayahId < 1 || bookmark.ayahId > kBackupMaxAyahId) {
+      rejected++;
+      continue;
+    }
     if (seen.add(bookmark.ayahId)) toInsert.add(bookmark);
   }
-  return BookmarkMerge(List<BackupBookmark>.unmodifiable(toInsert));
+  return BookmarkMerge(
+    List<BackupBookmark>.unmodifiable(toInsert),
+    rejected: rejected,
+  );
 }
 
 /// Result of merging the imported last-read position.
@@ -58,13 +69,20 @@ LastReadMerge mergeLastRead({required int? existing, required int? imported}) {
 
 /// Result of merging the imported khatma plan.
 class KhatmaMerge {
-  const KhatmaMerge({required this.toWrite, required this.replaced});
+  const KhatmaMerge({
+    required this.toWrite,
+    required this.replaced,
+    this.rejected = 0,
+  });
 
   /// The plan row to write, or null to keep the current plan.
   final BackupKhatmaRow? toWrite;
 
   /// True when the imported plan replaced the existing one.
   final bool replaced;
+
+  /// Imported rows with an out-of-range ayah id or a non-positive target.
+  final int rejected;
 }
 
 /// Newer `updatedAt` wins (the file may carry several historical rows; the
@@ -74,15 +92,34 @@ KhatmaMerge mergeKhatma({
   required List<BackupKhatmaRow> imported,
 }) {
   BackupKhatmaRow? newest;
+  var rejected = 0;
   for (final row in imported) {
+    if (row.ayahId < 1 ||
+        row.ayahId > kBackupMaxAyahId ||
+        row.targetPages <= 0) {
+      rejected++;
+      continue;
+    }
     if (newest == null || row.updatedAt.isAfter(newest.updatedAt)) newest = row;
   }
-  if (newest == null) return const KhatmaMerge(toWrite: null, replaced: false);
-  if (existing == null) return KhatmaMerge(toWrite: newest, replaced: true);
-  if (newest.updatedAt.isAfter(existing.updatedAt)) {
-    return KhatmaMerge(toWrite: newest, replaced: true);
+  if (newest == null) {
+    return KhatmaMerge(toWrite: null, replaced: false, rejected: rejected);
   }
-  return const KhatmaMerge(toWrite: null, replaced: false);
+  if (existing == null) {
+    return KhatmaMerge(
+      toWrite: newest,
+      replaced: true,
+      rejected: rejected,
+    );
+  }
+  if (newest.updatedAt.isAfter(existing.updatedAt)) {
+    return KhatmaMerge(
+      toWrite: newest,
+      replaced: true,
+      rejected: rejected,
+    );
+  }
+  return KhatmaMerge(toWrite: null, replaced: false, rejected: rejected);
 }
 
 /// Result of merging the imported prayer log.
@@ -207,6 +244,7 @@ class BackupSummary {
     required this.tasbihChanged,
     required this.lastReadChanged,
     required this.settingsKeysApplied,
+    this.rejectedEntries = 0,
   });
 
   /// New bookmarks a merge would add (existing rows stay).
@@ -230,6 +268,9 @@ class BackupSummary {
   /// Whitelisted settings keys that would be (re)written.
   final int settingsKeysApplied;
 
+  /// Imported bookmark/khatma rows rejected by the id/range guards.
+  final int rejectedEntries;
+
   /// True when the import changed nothing at all.
   bool get isEmpty =>
       newBookmarks == 0 &&
@@ -237,5 +278,6 @@ class BackupSummary {
       !planReplaced &&
       !tasbihChanged &&
       !lastReadChanged &&
-      settingsKeysApplied == 0;
+      settingsKeysApplied == 0 &&
+      rejectedEntries == 0;
 }

@@ -331,8 +331,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get zakatEnterPrice => 'أدخل سعر الذهب/الفضة لحساب النصاب';
 
   @override
+  String get zakatInvalidNumber => 'أدخل رقمًا صحيحًا';
+
+  @override
+  String get zakatFixInputs => 'صحّح الحقول غير الصحيحة أولًا';
+
+  @override
   String hijriDate(String month, String year) {
     return 'الشهر $month سنة $year';
+  }
+
+  @override
+  String hijriCellSemantics(String hijri, String gregorian) {
+    return 'هجري $hijri، ميلادي $gregorian';
   }
 
   @override
@@ -346,6 +357,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hadithTab => 'الأحاديث';
+
+  @override
+  String get setAsDefaultReciter => 'تعيين كقارئ افتراضي';
 
   @override
   String get libraryInstall => 'تنزيل';
@@ -694,6 +708,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String backupPreviewSettings(String count) {
     return '$count إعداد';
+  }
+
+  @override
+  String backupPreviewRejected(String count) {
+    return 'تم تجاهل $count عنصرًا غير صالح';
   }
 
   @override

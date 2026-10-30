@@ -1,3 +1,4 @@
+import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -175,6 +176,69 @@ class AudioDownloader {
     }
   }
 
+  /// Reconciles rows and dot-part files left by a killed process.
+  ///
+  /// A row that still says `downloading`/`queued` but has a complete target
+  /// file is promoted to `done`; a row without a usable file becomes `failed`
+  /// so it is retryable. Orphan `.part` files under the audio root are
+  /// removed. This must run before any new download starts.
+  Future<void> reconcileOnStart() async {
+    final root = await _root();
+    final rows = await (_db.select(_db.downloads)
+          ..where((d) => d.status.isIn([
+                DownloadStatus.downloading.name,
+                DownloadStatus.queued.name,
+              ])))
+        .get();
+    for (final row in rows) {
+      try {
+        final target = row.path.isEmpty ? null : File(row.path);
+        final part = row.path.isEmpty ? null : File('${row.path}.part');
+        // Sync file checks keep this safe under the widget-test fake clock;
+        // they are metadata-only and bounded to the audio root.
+        if (target != null && target.existsSync() && target.lengthSync() > 0) {
+          await _markStatus(
+            row.reciterId,
+            row.surahId,
+            DownloadStatus.done,
+            target.lengthSync(),
+            target.path,
+          );
+        } else {
+          await _markStatus(
+            row.reciterId,
+            row.surahId,
+            DownloadStatus.failed,
+            0,
+            row.path,
+          );
+        }
+        if (part != null && part.existsSync()) part.deleteSync();
+      } on Object catch (error, stackTrace) {
+        dev.log('download reconcile row failed',
+            name: 'quran_yahdi/downloads',
+            error: error,
+            stackTrace: stackTrace);
+      }
+    }
+    final audioDir = Directory(
+      '${root.path}${Platform.pathSeparator}$audioFolderName',
+    );
+    if (!audioDir.existsSync()) return;
+    for (final entity
+        in audioDir.listSync(recursive: true, followLinks: false)) {
+      if (entity is! File || !entity.path.endsWith('.part')) continue;
+      try {
+        entity.deleteSync();
+      } on Object catch (error, stackTrace) {
+        dev.log('download part cleanup failed',
+            name: 'quran_yahdi/downloads',
+            error: error,
+            stackTrace: stackTrace);
+      }
+    }
+  }
+
   /// Downloads one surah for [reciter]; reports progress and honours [cancelToken].
   Future<File> downloadSurah({
     required ReciterRow reciter,
@@ -192,6 +256,12 @@ class AudioDownloader {
         Uri.parse(url),
         cancelToken: cancelToken,
       );
+      final contentType =
+          res.headers.value(Headers.contentTypeHeader)?.toLowerCase().trim();
+      if (contentType != null && contentType.contains('html')) {
+        throw DownloadFailure(
+            'audio response is an HTML page, not an audio stream');
+      }
       final total =
           int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ??
               0;

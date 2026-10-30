@@ -21,9 +21,12 @@ typedef BackupPickBytes = Future<Uint8List?> Function();
 /// Injectable seam for the export share step; receives the encoded document.
 typedef BackupShareJson = Future<void> Function(String json);
 
-/// The picked file is over [kBackupMaxBytes]: the picker reports the
-/// on-disk length before the bytes are read, so an oversized file never
-/// reaches memory.
+/// A backup payload is over [kBackupMaxBytes].
+///
+/// On import the picker reports the on-disk length before the bytes are read,
+/// so an oversized file never reaches memory. On export the encoded JSON is
+/// measured before it is shared: the app must never emit a file its own
+/// importer would reject.
 class _BackupTooLarge implements Exception {
   const _BackupTooLarge();
 }
@@ -57,6 +60,9 @@ class BackupCubit extends Cubit<BackupState> {
     emit(const BackupState.idle(busy: true));
     try {
       final json = await _service.exportJson();
+      if (utf8.encode(json).length > kBackupMaxBytes) {
+        throw const _BackupTooLarge();
+      }
       await _shareJson(json);
       if (isClosed) return;
       emit(const BackupState.exported());

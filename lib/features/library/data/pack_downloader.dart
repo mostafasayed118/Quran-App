@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' as dev;
 import 'dart:io';
@@ -14,6 +15,7 @@ import '../../../core/utils/progress_throttle.dart';
 import 'hadith_store.dart';
 import 'library_catalog.dart';
 import 'pack_reader.dart';
+import 'pack_redirect_guard.dart';
 import 'pack_store.dart';
 
 part 'pack_downloader_sniff.dart';
@@ -87,10 +89,26 @@ class PackDownloader {
   /// In-flight installs keyed by pack id (single-flight gate).
   final Map<String, Future<File>> _installs = {};
 
+  /// In-flight progress owned by the app-scoped downloader, not by whichever
+  /// route cubit happened to start the install.
+  final Map<String, (int, int)> _progress = {};
+  final StreamController<Map<String, (int, int)>> _progressController =
+      StreamController<Map<String, (int, int)>>.broadcast();
+
+  /// A snapshot of the current in-flight progress, for a cubit that mounts
+  /// while an install is already running.
+  Map<String, (int, int)> get progress => Map.unmodifiable(_progress);
+
+  /// Emits a snapshot whenever an install starts, reports bytes, or settles.
+  Stream<Map<String, (int, int)>> get progressStream =>
+      _progressController.stream;
+
   /// Installs a pack at most once at a time. Concurrent callers share the
   /// in-flight future; the second caller gets the same promoted file and does
-  /// not open a second writer on the same `.part`. Progress callbacks belong
-  /// to the caller that started the install.
+  /// not open a second writer on the same `.part`.
+  ///
+  /// Progress is recorded on this app-scoped object and broadcast; the
+  /// caller's optional callback is retained for the existing UI seam.
   ///
   /// Throws [PackFailure] (or the underlying Dio error) on any failure; on
   /// failure the dot-part is deleted, the final file is untouched and NO
@@ -101,14 +119,28 @@ class PackDownloader {
   }) {
     final inFlight = _installs[pack.id];
     if (inFlight != null) return inFlight;
-    final future = _installOnce(pack, onProgress: onProgress);
+    final future = _installOnce(
+      pack,
+      onProgress: (received, total) {
+        _progress[pack.id] = (received, total);
+        _emitProgress();
+        onProgress?.call(received, total);
+      },
+    );
     _installs[pack.id] = future;
     future.whenComplete(() {
       if (identical(_installs[pack.id], future)) {
         _installs.remove(pack.id);
       }
+      if (_progress.remove(pack.id) != null) {
+        _emitProgress();
+      }
     }).ignore();
     return future;
+  }
+
+  void _emitProgress() {
+    _progressController.add(Map.unmodifiable(_progress));
   }
 
   Future<File> _installOnce(
@@ -142,7 +174,15 @@ class PackDownloader {
       }
       final projection = pinnedTafsir ? null : await _sniffPack(pack, partFile);
       final promoted = await _store.promote(partFile);
-      await _registerRow(pack, promoted);
+      try {
+        await _registerRow(pack, promoted);
+      } on Object {
+        // The file was promoted before the registry row was written. Leaving
+        // it behind would create an invisible multi-MB orphan that the next
+        // install overwrites and `uninstall` can never reach.
+        await _store.deleteIfExists(promoted);
+        rethrow;
+      }
       await _importHadith(pack, projection);
       _primeReadCache(pack, mergedIndex, projection);
       return promoted;
@@ -261,6 +301,56 @@ class PackDownloader {
     return merged;
   }
 
+  /// Fetches [start] while following at most [kMaxPackRedirectHops] redirects
+  /// manually. Every hop must stay on HTTPS and [kTrustedPackHosts]; Dio is not
+  /// allowed to follow a redirect it cannot re-validate.
+  Future<Response<ResponseBody>> _fetchTrustedPack(Uri start) async {
+    var current = start;
+    for (var hop = 0; hop <= kMaxPackRedirectHops; hop++) {
+      final res = await _dio.get<ResponseBody>(
+        current.toString(),
+        options: Options(
+          responseType: ResponseType.stream,
+          // Dio must hand every 3xx back instead of following it itself.
+          followRedirects: false,
+          validateStatus: _acceptSuccessOrRedirect,
+        ),
+      );
+      final status = res.statusCode ?? 0;
+      if (!_redirectStatuses.contains(status)) return res;
+      final location = res.headers.value('location')?.trim();
+      await _discardRedirectBody(res.data);
+      if (location == null || location.isEmpty) {
+        throw PackFailure('pack redirect $status is missing a Location header');
+      }
+      try {
+        current = resolveTrustedPackRedirect(current, location);
+      } on PackRedirectException catch (error) {
+        throw PackFailure(error.message);
+      }
+    }
+    throw PackFailure(
+        'pack redirect chain exceeded $kMaxPackRedirectHops hops');
+  }
+
+  /// 2xx streams as before; 3xx must reach the hop guard rather than being
+  /// collapsed into a [DioException] before its Location can be inspected.
+  static bool _acceptSuccessOrRedirect(int? status) =>
+      status != null &&
+      ((status >= 200 && status < 300) || _redirectStatuses.contains(status));
+
+  /// Releases a redirect response body so its socket is not left half-read.
+  static Future<void> _discardRedirectBody(ResponseBody? body) async {
+    if (body == null) return;
+    try {
+      await body.stream.drain<void>();
+    } on Object catch (_) {
+      // A broken redirect body cannot change the guard's verdict.
+    }
+  }
+
+  static const Set<int> _redirectStatuses = {301, 302, 303, 307, 308};
+
   /// Streams one surah body, enforcing the pack-wide size cap.
   ///
   /// The cap counts every byte received for the whole pack, so the received
@@ -279,10 +369,7 @@ class PackDownloader {
     // Streamed, not buffered: a compromised/mutable upstream must not be able
     // to force a full multi-MB body into memory before the size guard fires.
     // The cap is checked per chunk.
-    final res = await _dio.get<ResponseBody>(
-      url,
-      options: Options(responseType: ResponseType.stream),
-    );
+    final res = await _fetchTrustedPack(Uri.parse(url));
     final body = res.data;
     if (body == null) throw PackFailure('empty response body');
     final bytes = BytesBuilder(copy: false);
@@ -310,10 +397,7 @@ class PackDownloader {
     if (sourceUrl == null) {
       throw PackFailure('single-file pack missing sourceUrl');
     }
-    final res = await _dio.get<ResponseBody>(
-      sourceUrl,
-      options: Options(responseType: ResponseType.stream),
-    );
+    final res = await _fetchTrustedPack(Uri.parse(sourceUrl));
     final contentLength =
         int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ?? 0;
     final total = contentLength > 0 ? contentLength : expectedBytes;
@@ -457,8 +541,8 @@ class PackDownloader {
     final row = await (_db.select(_db.installedPacks)
           ..where((p) => p.packId.equals(packId)))
         .getSingleOrNull();
-    final finalFile = await _store.packFile(packId);
-    await _store.deleteIfExists(finalFile);
+    // Row/index first, file last: a failed DB delete must leave a usable
+    // installed pack, never a row whose file is already gone.
     if (row != null) {
       await (_db.delete(_db.installedPacks)
             ..where((p) => p.packId.equals(packId)))
@@ -470,6 +554,8 @@ class PackDownloader {
       dev.log('hadith pack index cleanup failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
+    final finalFile = await _store.packFile(packId);
+    await _store.deleteIfExists(finalFile);
     _reader.invalidate(packId);
   }
 

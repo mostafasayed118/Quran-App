@@ -208,6 +208,8 @@
   "zakatableLabel": "المال الزكوي",
   "nisabLabel": "العتبة",
   "zakatEnterPrice": "أدخل سعر الذهب/الفضة لحساب النصاب",
+  "zakatInvalidNumber": "أدخل رقمًا صحيحًا",
+  "zakatFixInputs": "صحّح الحقول غير الصحيحة أولًا",
   "hijriDate": "الشهر {month} سنة {year}",
   "@hijriDate": {
     "placeholders": {
@@ -219,10 +221,22 @@
       }
     }
   },
+  "hijriCellSemantics": "هجري {hijri}، ميلادي {gregorian}",
+  "@hijriCellSemantics": {
+    "placeholders": {
+      "hijri": {
+        "type": "String"
+      },
+      "gregorian": {
+        "type": "String"
+      }
+    }
+  },
   "jumpToToday": "اليوم",
   "tafsirTab": "التفسير",
   "translationsTab": "الترجمات",
   "hadithTab": "الأحاديث",
+  "setAsDefaultReciter": "تعيين كقارئ افتراضي",
   "libraryInstall": "تنزيل",
   "libraryDelete": "حذف",
   "libraryInstalled": "مثبّت",
@@ -421,6 +435,14 @@
   "backupPreviewTasbih": "ستُدمج بيانات المسبحة",
   "backupPreviewSettings": "{count} إعداد",
   "@backupPreviewSettings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewRejected": "تم تجاهل {count} عنصرًا غير صالح",
+  "@backupPreviewRejected": {
     "placeholders": {
       "count": {
         "type": "String"

@@ -187,6 +187,8 @@
   "zakatableLabel": "Money subject to zakat",
   "nisabLabel": "Threshold",
   "zakatEnterPrice": "Enter the gold/silver price to compute the nisab",
+  "zakatInvalidNumber": "Enter a valid number",
+  "zakatFixInputs": "Fix the invalid fields first",
   "hijriDate": "{month} {year} AH",
   "@hijriDate": {
     "placeholders": {
@@ -198,10 +200,22 @@
       }
     }
   },
+  "hijriCellSemantics": "Hijri {hijri}, Gregorian {gregorian}",
+  "@hijriCellSemantics": {
+    "placeholders": {
+      "hijri": {
+        "type": "String"
+      },
+      "gregorian": {
+        "type": "String"
+      }
+    }
+  },
   "jumpToToday": "Today",
   "tafsirTab": "Tafsir",
   "translationsTab": "Translations",
   "hadithTab": "Hadith",
+  "setAsDefaultReciter": "Set as default reciter",
   "libraryInstall": "Install",
   "libraryDelete": "Delete",
   "libraryInstalled": "Installed",
@@ -400,6 +414,14 @@
   "backupPreviewTasbih": "Tasbih data will be merged",
   "backupPreviewSettings": "{count} settings",
   "@backupPreviewSettings": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPreviewRejected": "Skipped {count} invalid entries",
+  "@backupPreviewRejected": {
     "placeholders": {
       "count": {
         "type": "String"

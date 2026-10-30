@@ -674,11 +674,29 @@ abstract class AppLocalizations {
   /// **'أدخل سعر الذهب/الفضة لحساب النصاب'**
   String get zakatEnterPrice;
 
+  /// No description provided for @zakatInvalidNumber.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل رقمًا صحيحًا'**
+  String get zakatInvalidNumber;
+
+  /// No description provided for @zakatFixInputs.
+  ///
+  /// In ar, this message translates to:
+  /// **'صحّح الحقول غير الصحيحة أولًا'**
+  String get zakatFixInputs;
+
   /// No description provided for @hijriDate.
   ///
   /// In ar, this message translates to:
   /// **'الشهر {month} سنة {year}'**
   String hijriDate(String month, String year);
+
+  /// No description provided for @hijriCellSemantics.
+  ///
+  /// In ar, this message translates to:
+  /// **'هجري {hijri}، ميلادي {gregorian}'**
+  String hijriCellSemantics(String hijri, String gregorian);
 
   /// No description provided for @jumpToToday.
   ///
@@ -703,6 +721,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الأحاديث'**
   String get hadithTab;
+
+  /// No description provided for @setAsDefaultReciter.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعيين كقارئ افتراضي'**
+  String get setAsDefaultReciter;
 
   /// No description provided for @libraryInstall.
   ///
@@ -1327,6 +1351,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} إعداد'**
   String backupPreviewSettings(String count);
+
+  /// No description provided for @backupPreviewRejected.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تجاهل {count} عنصرًا غير صالح'**
+  String backupPreviewRejected(String count);
 
   /// No description provided for @azkarSearchPlaceholder.
   ///

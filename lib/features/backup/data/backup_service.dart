@@ -369,6 +369,7 @@ class _ApplyPlan {
         tasbihChanged: tasbih.changed,
         lastReadChanged: lastRead.changed,
         settingsKeysApplied: settings.appliedCount,
+        rejectedEntries: bookmarks.rejected + khatma.rejected,
       );
 
   bool get reminderRelevantChanged =>

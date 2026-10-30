@@ -58,8 +58,13 @@ class KhatmaRepository implements WirdProgressSink {
   @override
   Future<void> advanceTo(int ayahId) async {
     final row = await _row();
-    if (row == null || ayahId <= row.ayahId) return;
-    await (_db.update(_db.khatmaProgress)..where((t) => t.id.equals(row.id)))
+    if (row == null) return;
+    // One conditional statement, not read-then-write: two overlapping page
+    // changes can both read the same old pointer, and the slower one must not
+    // move it backwards.
+    await (_db.update(_db.khatmaProgress)
+          ..where(
+              (t) => t.id.equals(row.id) & t.ayahId.isSmallerThanValue(ayahId)))
         .write(KhatmaProgressCompanion(
       ayahId: Value(ayahId),
       updatedAt: Value(DateTime.now()),

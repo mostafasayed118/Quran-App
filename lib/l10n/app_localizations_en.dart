@@ -333,8 +333,19 @@ class AppLocalizationsEn extends AppLocalizations {
       'Enter the gold/silver price to compute the nisab';
 
   @override
+  String get zakatInvalidNumber => 'Enter a valid number';
+
+  @override
+  String get zakatFixInputs => 'Fix the invalid fields first';
+
+  @override
   String hijriDate(String month, String year) {
     return '$month $year AH';
+  }
+
+  @override
+  String hijriCellSemantics(String hijri, String gregorian) {
+    return 'Hijri $hijri, Gregorian $gregorian';
   }
 
   @override
@@ -348,6 +359,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hadithTab => 'Hadith';
+
+  @override
+  String get setAsDefaultReciter => 'Set as default reciter';
 
   @override
   String get libraryInstall => 'Install';
@@ -697,6 +711,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String backupPreviewSettings(String count) {
     return '$count settings';
+  }
+
+  @override
+  String backupPreviewRejected(String count) {
+    return 'Skipped $count invalid entries';
   }
 
   @override
