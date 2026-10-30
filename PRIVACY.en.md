@@ -1,6 +1,6 @@
 # Privacy Policy — Quran Yahdi
 
-Last updated: 2026-10-24 · Applies to version 1.0.0
+Last updated: 2026-10-30 · Applies to version 1.0.0
 
 > **Honest TL;DR:** This app is **fully offline at its core**. **We collect no data about you. At all.** No accounts, no sign-in, no analytics, no ads, no tracking, and no server of ours ever receives anything from your device.
 
@@ -11,13 +11,16 @@ Last updated: 2026-10-24 · Applies to version 1.0.0
 - Contains no analytics/usage-tracking SDKs.
 - Shows no ads.
 - Does not send any data from your device to any server of ours — we do not operate any user-data server at all.
+- Contains no crash-reporting SDK and uploads no diagnostics. Local diagnostic logs are used during development only and contain no passwords, session tokens, or personal data.
+
+> Google Play may collect aggregated crash/ANR data when the app is installed from the store, under Google Play’s own policy and outside the app’s data channel. See `docs/operations-runbook.md` for the privacy-preserving investigation procedure.
 
 ## Permissions the app requests, and why
 
 | Permission | Why it is needed | Where it is used |
 |---|---|---|
-| Location (fine/coarse) | To compute the **nearest city to you** automatically, for accurate prayer times and Qibla direction | Processed **on-device only**; your position is compared against a city list bundled inside the app to pick the nearest one. **The location is never sent, stored, or shared with any party — ever.** |
-| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to two fixed, pinned endpoints hardcoded in the app: `mp3quran.net` (audio) and `cdn.jsdelivr.net` (tafsir and translation packs, pinned to a specific commit). No device identifiers or personal data are attached to these requests. |
+| Location (coarse only) | To compute the **nearest city to you** automatically, for accurate prayer times and Qibla direction | Processed **on-device only**; your position is compared against a city list bundled inside the app to pick the nearest one. **The location is never sent, stored, or shared with any party — ever.** |
+| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to two fixed, pinned endpoints hardcoded in the app: `mp3quran.net` (audio) and `cdn.jsdelivr.net` (tafsir and translation packs, pinned to a specific commit). **At startup**, when the reciter list is empty (normally only the first run), the app fetches the reciter catalog from `mp3quran.net` automatically to populate the list and caches it on your device. No device identifiers or personal data are attached to any of these requests. |
 | Notifications / exact alarms | To remind you of prayer times **that you enable yourself** in settings | Reminders are computed and scheduled locally on your device. |
 | Foreground service (audio) | To keep recitation playing when the app is minimized | Playback info (reciter & surah names) appears in the media bar and stays on your device. |
 

@@ -56,8 +56,8 @@ flutter analyze        # بوابة الحملة: 0 مشكلات
 flutter test           # البوابة الكاملة: 760+ اختبار
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
-PUBLISH_RELEASE=true flutter build appbundle --release  # مخرجات المتجر (بلا مفتاح = فشل بناء)
-flutter build apk --split-per-abi  # APK مباشر أصغر حجمًا لكل معمارية (الافتراضي يبقى AAB أعلاه)
+$env:PUBLISH_RELEASE="true"; flutter build appbundle --release  # مخرجات المتجر (بلا مفتاح = فشل بناء)
+flutter build apk --release --split-per-abi  # APK مباشر أصغر حجمًا لكل معمارية (الافتراضي يبقى AAB أعلاه)
 tools/device_smoke.ps1             # بوابة دخان الجهاز: تثبيت + إقلاع بلا أخطاء قاتلة
 ```
 
