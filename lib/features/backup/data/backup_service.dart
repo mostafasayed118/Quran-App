@@ -30,19 +30,27 @@ class BackupOutcome {
 /// path); it runs only after a successful commit and only when a
 /// reminder-relevant settings key changed. An import never deletes user data.
 class BackupService {
+  /// Creates the service. [batchThreshold] is a test seam that forces the
+  /// per-row (< threshold) or batch (>= threshold) write path; production
+  /// leaves it null and gets [_batchThreshold].
   BackupService({
     required AppDatabase db,
     required Future<void> Function() reschedule,
+    int? batchThreshold,
   })  : _db = db,
-        _reschedule = reschedule;
+        _reschedule = reschedule,
+        _batchThresholdOverride = batchThreshold;
 
   final AppDatabase _db;
   final Future<void> Function() _reschedule;
+  final int? _batchThresholdOverride;
 
   /// Small imports keep the per-row path (it preserves statement order and
   /// keeps the rollback probe observable); a real import batches the writes
   /// into one round-trip.
   static const int _batchThreshold = 64;
+
+  int get _threshold => _batchThresholdOverride ?? _batchThreshold;
 
   /// Gathers every backed-up entity in one read transaction and encodes the
   /// versioned document (settings filtered to the whitelist).
@@ -284,7 +292,7 @@ class BackupService {
         prayerDays.length +
         settings.length +
         (khatmaWrite == null ? 0 : 1);
-    if (totalWrites < _batchThreshold) {
+    if (totalWrites < _threshold) {
       for (final bookmark in bookmarks) {
         await _db.into(_db.bookmarks).insert(bookmark);
       }
