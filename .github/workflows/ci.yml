@@ -4,12 +4,15 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   analyze-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           # PINNED to the documented toolchain (AGENTS.md §2). The format gate
@@ -25,28 +28,31 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed lib test tools
       - run: flutter test
 
-  # Release artifacts built on every push to main. NOTE: artifacts are
-  # debug-signed until the owner's keystore lands (W7c) — android/key.properties
-  # is gitignored and intentionally absent on CI.
+  # DEBUG-SIGNED ARTIFACTS ONLY. This job is gated on analyze-test and its
+  # outputs are deliberately named `debug-signed-*`: android/key.properties is
+  # gitignored and absent on CI, so these builds must never be mistaken for a
+  # store upload. The store-bound AAB is built locally with PUBLISH_RELEASE=true
+  # and the owner keystore (docs/store/play-console-setup.md).
   release-artifact:
+    needs: [analyze-test]
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
           channel: stable
           flutter-version: 3.47.5
       - run: flutter pub get
       - run: flutter build apk --release --split-per-abi
       - run: flutter build appbundle --release
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: app-release-apk
+          name: debug-signed-apk
           path: build/app/outputs/flutter-apk/app-*-release.apk
           retention-days: 14
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: app-release-aab
+          name: debug-signed-aab
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 14
