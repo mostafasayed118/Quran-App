@@ -42,25 +42,36 @@ class AsmaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(title: Text(loc.asmaUlHusna)),
-      body: BlocBuilder<AsmaCubit, AsmaState>(
-        builder: (context, state) => switch (state) {
-          AsmaLoading() => const LoadingView(),
-          AsmaFailed() => errorPane(loc),
-          AsmaReady(:final names) when names.isEmpty =>
-            EmptyState(loc.noResults),
-          AsmaReady(:final names, :final selected) => Stack(
-              children: [
-                _NamesGrid(names: names),
-                if (selected != null) ...[
-                  const Positioned.fill(child: _Scrim()),
-                  _NameSheet(name: selected),
-                ],
-              ],
-            ),
-        },
-      ),
+    return BlocBuilder<AsmaCubit, AsmaState>(
+      builder: (context, state) {
+        final sheetOpen = state is AsmaReady && state.selected != null;
+        return PopScope(
+          canPop: !sheetOpen,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && sheetOpen) {
+              context.read<AsmaCubit>().select(null);
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(title: Text(loc.asmaUlHusna)),
+            body: switch (state) {
+              AsmaLoading() => const LoadingView(),
+              AsmaFailed() => errorPane(loc),
+              AsmaReady(:final names) when names.isEmpty =>
+                EmptyState(loc.noResults),
+              AsmaReady(:final names, :final selected) => Stack(
+                  children: [
+                    _NamesGrid(names: names),
+                    if (selected != null) ...[
+                      const Positioned.fill(child: _Scrim()),
+                      _NameSheet(name: selected),
+                    ],
+                  ],
+                ),
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -152,8 +163,8 @@ class _NamesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 130,
         mainAxisSpacing: 8,
         crossAxisSpacing: 8,
         childAspectRatio: 0.92,

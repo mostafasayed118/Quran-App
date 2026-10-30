@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +37,10 @@ class HomeCubit extends Cubit<HomeState> {
   /// load can never overwrite the result of a newer one.
   int _reloadSeq = 0;
 
+  /// Wakes the card when the shown prayer time passes; a Home screen left
+  /// open must not keep advertising a past prayer as "next".
+  Timer? _nextPrayerRefresh;
+
   /// Loads both cards and emits the ready state.
   ///
   /// The two reads are independent and run concurrently; the first failure
@@ -43,6 +48,7 @@ class HomeCubit extends Cubit<HomeState> {
   /// an unhandled async error).
   Future<void> reload() async {
     final seq = ++_reloadSeq;
+    _nextPrayerRefresh?.cancel();
     try {
       // The two cards are independent. The LIST form of Future.wait completes
       // with the first error and consumes the rest, so a second failing chain
@@ -58,6 +64,7 @@ class HomeCubit extends Cubit<HomeState> {
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
       ));
+      _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
       dev.log('home load failed',
           name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
@@ -85,5 +92,24 @@ class HomeCubit extends Cubit<HomeState> {
     if (selected == null) return null;
     final next = _prayer.nextPrayer(selected.coordinates, DateTime.now());
     return (name: next.name, time: next.time);
+  }
+
+  void _scheduleNextPrayerRefresh(NextPrayerCard? card) {
+    _nextPrayerRefresh?.cancel();
+    if (card == null) return;
+    final delay = card.time.difference(DateTime.now());
+    if (delay.isNegative) return;
+    _nextPrayerRefresh = Timer(
+      delay + const Duration(seconds: 1),
+      () {
+        if (!isClosed) unawaited(reload());
+      },
+    );
+  }
+
+  @override
+  Future<void> close() {
+    _nextPrayerRefresh?.cancel();
+    return super.close();
   }
 }

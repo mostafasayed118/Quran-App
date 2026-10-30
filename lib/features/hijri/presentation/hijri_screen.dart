@@ -143,31 +143,46 @@ class _DayCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cell.isToday
-            ? Theme.of(context).colorScheme.primaryContainer
-            : Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            cell.hDay.toArabicIndic,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
+    final loc = AppLocalizations.of(context);
+    final label = loc.hijriCellSemantics(
+      cell.hDay.toArabicIndic,
+      cell.gDay.toArabicIndic,
+    );
+    return Semantics(
+      label: cell.isToday ? '$label، ${loc.trackerDotToday}' : label,
+      excludeSemantics: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: cell.isToday
+              ? Theme.of(context).colorScheme.primaryContainer
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(10),
+          border: cell.isToday
+              ? Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 1.4,
+                )
+              : null,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              cell.hDay.toArabicIndic,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          Text(
-            cell.gDay.toArabicIndic,
-            style: TextStyle(
-              fontSize: 9,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            Text(
+              cell.gDay.toArabicIndic,
+              style: TextStyle(
+                fontSize: 11,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

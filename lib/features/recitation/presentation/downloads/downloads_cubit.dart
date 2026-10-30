@@ -25,7 +25,24 @@ class DownloadsCubit extends Cubit<DownloadsState> {
 
   final AudioDownloader _downloader;
   final ReciterRepository _reciters;
+
+  /// One-shot startup reconciliation. `enqueue`/`refreshDone` await it so a
+  /// new download can never have its `.part` swept as an orphan.
+  Future<void>? _reconcile;
   final List<(String, int)> _queue = <(String, int)>[];
+
+  Future<void> _ensureReconciled() =>
+      _reconcile ??= _reconcileDownloader(_downloader);
+
+  static Future<void> _reconcileDownloader(AudioDownloader downloader) async {
+    try {
+      await downloader.reconcileOnStart();
+    } on Object catch (error, stackTrace) {
+      dev.log('download reconciliation failed',
+          name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
+    }
+  }
+
   bool _draining = false;
   (String, int)? _active;
   CancelToken? _activeToken;
@@ -37,6 +54,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   /// A failure is soft: the screen keeps rendering, the done rows simply
   /// stay missing until the next refresh.
   Future<void> refreshDone() async {
+    await _ensureReconciled();
     try {
       final rows = await _downloader.listDone();
       final items = {
@@ -113,6 +131,9 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     if (_draining) return;
     _draining = true;
     try {
+      // Reconcile before the first transfer, but after the synchronous
+      // queued-state emission in enqueue (the queue must react immediately).
+      await _ensureReconciled();
       while (_queue.isNotEmpty && !isClosed) {
         final (rowId, surahNumber) = _queue.first;
         _queue.removeAt(0);

@@ -212,7 +212,7 @@ class DuaCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
-                  color: colors.secondary,
+                  color: AppTheme.goldText(context),
                 ),
               ),
             Text(

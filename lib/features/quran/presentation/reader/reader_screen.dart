@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -154,9 +156,14 @@ class _VersesListState extends State<_VersesList> {
   /// controller mid-scroll, which re-applied initialScrollIndex.
   final ItemScrollController _controller = ItemScrollController();
 
+  /// Tracks the first verse the reader can see, so the Home continue-reading
+  /// card advances in the default verse mode as well as in mushaf mode.
+  final ItemPositionsListener _positions = ItemPositionsListener.create();
+
   /// The list's start index, computed once per surah: scanning the surah on
   /// every build re-ran the scan on each rebuild.
   late final int _initialIndex;
+  int? _lastReportedIndex;
 
   @override
   void initState() {
@@ -165,6 +172,33 @@ class _VersesListState extends State<_VersesList> {
     final index =
         state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
     _initialIndex = index > 0 ? index : 0;
+    _positions.itemPositions.addListener(_reportFirstVisible);
+  }
+
+  @override
+  void dispose() {
+    _positions.itemPositions.removeListener(_reportFirstVisible);
+    super.dispose();
+  }
+
+  void _reportFirstVisible() {
+    if (!mounted) return;
+    final visible = _positions.itemPositions.value
+        .where((p) => p.itemTrailingEdge > 0 && p.itemLeadingEdge < 1)
+        .toList();
+    if (visible.isEmpty) return;
+    visible.sort((a, b) => a.itemLeadingEdge.compareTo(b.itemLeadingEdge));
+    final index = visible.first.index;
+    if (index == _lastReportedIndex) return;
+    final state = widget.state;
+    if (index < 0 || index >= state.ayahs.length) return;
+    final firstReport = _lastReportedIndex == null;
+    _lastReportedIndex = index;
+    // The initial load already saved the requested start. If the list's first
+    // layout report is index 0 before the initial scroll is applied, do not
+    // overwrite that marker with the top of the surah.
+    if (firstReport && index != _initialIndex) return;
+    unawaited(context.read<ReaderCubit>().onVisibleAyah(state.ayahs[index].id));
   }
 
   @override
@@ -174,6 +208,7 @@ class _VersesListState extends State<_VersesList> {
     return ScrollablePositionedList.builder(
       initialScrollIndex: _initialIndex,
       itemScrollController: _controller,
+      itemPositionsListener: _positions,
       padding: EdgeInsets.only(bottom: appBottomInset(context)),
       itemCount: state.ayahs.length,
       itemBuilder: (context, index) {

@@ -8,7 +8,12 @@ const int _arabicDecimalSeparator = 0x066B;
 const int _arabicThousandsSeparator = 0x066C;
 const int _asciiZero = 0x30;
 
-double parseDecimal(String raw) {
+double parseDecimal(String raw) => parseDecimalOrNull(raw) ?? 0;
+
+/// Parses [raw] like [parseDecimal], but returns null when the text is not a
+/// finite, non-negative number. The UI uses this to reject invalid input
+/// instead of silently treating it as zero.
+double? parseDecimalOrNull(String raw) {
   final s = _toWesternNumerals(raw.trim()).replaceAll(' ', '');
   if (s.isEmpty) return 0;
   final hasComma = s.contains(',');
@@ -22,7 +27,7 @@ double parseDecimal(String raw) {
     normalized = s.replaceAll(',', '.');
   }
   final parsed = double.tryParse(normalized);
-  if (parsed == null || !parsed.isFinite || parsed < 0) return 0;
+  if (parsed == null || !parsed.isFinite || parsed < 0) return null;
   return parsed;
 }
 

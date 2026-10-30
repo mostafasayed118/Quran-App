@@ -21,30 +21,41 @@ class AzkarScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    return Scaffold(
-      appBar: AppBar(
-        title: const _AzkarTitle(),
-        leading: const _AzkarBackButton(),
-      ),
-      body: BlocBuilder<AzkarCubit, AzkarState>(
-        builder: (context, state) => switch (state) {
-          AzkarLoading() => const LoadingView(),
-          AzkarFailed() => errorPane(loc),
-          AzkarBrowsing(
-            :final collections,
-            :final query,
-            :final searchResults,
-            :final searchHasMore,
-          ) =>
-            _BrowsingView(
-              collections: collections,
-              query: query,
-              searchResults: searchResults,
-              searchHasMore: searchHasMore,
+    return BlocBuilder<AzkarCubit, AzkarState>(
+      builder: (context, state) {
+        final reciting = state is AzkarReciting;
+        return PopScope(
+          canPop: !reciting,
+          onPopInvokedWithResult: (didPop, _) {
+            if (!didPop && reciting) {
+              context.read<AzkarCubit>().back();
+            }
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              title: const _AzkarTitle(),
+              leading: const _AzkarBackButton(),
             ),
-          AzkarReciting() => const _RecitingList(),
-        },
-      ),
+            body: switch (state) {
+              AzkarLoading() => const LoadingView(),
+              AzkarFailed() => errorPane(loc),
+              AzkarBrowsing(
+                :final collections,
+                :final query,
+                :final searchResults,
+                :final searchHasMore,
+              ) =>
+                _BrowsingView(
+                  collections: collections,
+                  query: query,
+                  searchResults: searchResults,
+                  searchHasMore: searchHasMore,
+                ),
+              AzkarReciting() => const _RecitingList(),
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -290,7 +301,9 @@ class _RecitingCard extends StatelessWidget {
     final done = remaining == 0;
     final colors = Theme.of(context).colorScheme;
     return Opacity(
-      opacity: done ? 0.45 : 1,
+      // 0.45 dropped the completed body text to ~2.6:1. 0.8 keeps a clear
+      // "done" affordance while the text remains readable.
+      opacity: done ? 0.8 : 1,
       child: Card(
         color: done ? colors.surfaceContainerHighest : null,
         child: InkWell(

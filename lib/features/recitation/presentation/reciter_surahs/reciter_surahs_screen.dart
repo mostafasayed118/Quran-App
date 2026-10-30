@@ -48,7 +48,7 @@ class ReciterSurahsScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            tooltip: loc.featured,
+            tooltip: loc.setAsDefaultReciter,
             icon: const Icon(Icons.star_border),
             onPressed: () => _setDefault(context),
           ),
@@ -86,10 +86,14 @@ class ReciterSurahsScreen extends StatelessWidget {
   Future<void> _setDefault(BuildContext context) async {
     await context.read<ReciterSurahsCubit>().setAsDefault();
     if (!context.mounted) return;
+    final colors = Theme.of(context).colorScheme;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(AppLocalizations.of(context).defaultReciterSet),
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        content: Text(
+          AppLocalizations.of(context).defaultReciterSet,
+          style: TextStyle(color: colors.onPrimary),
+        ),
+        backgroundColor: colors.primary,
       ),
     );
   }

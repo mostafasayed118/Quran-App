@@ -9,6 +9,7 @@ import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';
@@ -60,10 +61,12 @@ class RecitersScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: reciters.isEmpty
-                      ? Center(
-                          child: Text(
-                            query.isEmpty ? loc.noReciters : loc.noResults,
-                          ),
+                      ? EmptyState(
+                          query.isEmpty ? loc.noReciters : loc.noResults,
+                          actionLabel: query.isEmpty ? loc.refresh : null,
+                          onAction: query.isEmpty
+                              ? () => context.read<RecitersCubit>().refresh()
+                              : null,
                         )
                       : _RecitersList(reciters: reciters),
                 ),

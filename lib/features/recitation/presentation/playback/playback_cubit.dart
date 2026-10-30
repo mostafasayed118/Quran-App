@@ -134,6 +134,8 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       dev.log('playback load failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       if (isClosed || episode != _episode) return;
+      await _stopBestEffort();
+      if (isClosed || episode != _episode) return;
       emit(PlaybackState.failed(
         kind: _backgroundActive()
             ? PlaybackFailureKind.network
@@ -156,17 +158,34 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       dev.log('reciter lookup failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       if (isClosed || episode != _episode) return;
+      await _stopBestEffort();
+      if (isClosed || episode != _episode) return;
       emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
       return;
     }
     if (isClosed || episode != _episode) return;
     if (reciter == null) {
+      await _stopBestEffort();
+      if (isClosed || episode != _episode) return;
       emit(const PlaybackState.failed(
         kind: PlaybackFailureKind.noReciters,
       ));
       return;
     }
     await playReciter(reciter, surahNumber, surahName: surahName);
+  }
+
+  /// Stops the audio before a failed attempt becomes visible.
+  ///
+  /// The failure strip must never sit above a track that is still audible;
+  /// a stop failure is logged and does not block the failure state.
+  Future<void> _stopBestEffort() async {
+    try {
+      await _service.stop();
+    } on Object catch (error, stackTrace) {
+      dev.log('playback stop failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+    }
   }
 
   /// Seeks inside the loaded track.

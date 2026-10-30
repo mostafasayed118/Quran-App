@@ -88,20 +88,22 @@ class SettingsCubit extends Cubit<SettingsState> {
   /// Enables or disables the prayer reminder and re-plans the schedule.
   ///
   /// The prayer reminder needs no extra OS permission flow. A failed write is
-  /// logged and the last confirmed state is kept.
+  /// logged and the last confirmed state is kept. A failed re-plan still
+  /// commits the confirmed setting: the next boot/settings load re-plans.
   Future<void> setPrayerEnabled(bool enabled) {
     return _serialized(() async {
       var current = _readyState();
       if (current == null) return;
       try {
         await _prayerSettings?.setPrayerEnabled(enabled);
-        await _reschedule();
-        current = _readyState();
-        if (current == null) return;
-        emit(current.copyWith(prayerEnabled: enabled));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setPrayerEnabled', error, stackTrace);
+        return;
       }
+      current = _readyState();
+      if (current == null) return;
+      emit(current.copyWith(prayerEnabled: enabled));
+      await _rescheduleBestEffort();
     });
   }
 
@@ -109,46 +111,47 @@ class SettingsCubit extends Cubit<SettingsState> {
   ///
   /// Enabling asks for the OS notification permission; a refusal is reported
   /// through [SettingsReady.azkarPermissionDenied], not as an error state. A
-  /// failed write is logged and the last confirmed state is kept.
+  /// failed write is logged and the last confirmed state is kept. A failed
+  /// permission request or re-plan does not hide the committed setting.
   Future<void> setAzkarEnabled(bool enabled) {
     return _serialized(() async {
       var current = _readyState();
       if (current == null) return;
       try {
         await _settings.setAzkarEnabled(enabled);
-        var denied = false;
-        if (enabled) {
-          denied = !(await _scheduler.ensurePermissions());
-        }
-        await _reschedule();
-        current = _readyState();
-        if (current == null) return;
-        emit(current.copyWith(
-          azkarEnabled: enabled,
-          azkarPermissionDenied: denied,
-        ));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setAzkarEnabled', error, stackTrace);
+        return;
       }
+      final denied = enabled ? await _requestPermissionBestEffort() : false;
+      current = _readyState();
+      if (current == null) return;
+      emit(current.copyWith(
+        azkarEnabled: enabled,
+        azkarPermissionDenied: denied,
+      ));
+      await _rescheduleBestEffort();
     });
   }
 
   /// Stores the azkar reminder time [hm] ('HH:mm') and re-plans.
   ///
-  /// A failed write is logged and the last confirmed state is kept.
+  /// A failed write is logged and the last confirmed state is kept. A failed
+  /// re-plan still commits the confirmed time.
   Future<void> setTime(String hm) {
     return _serialized(() async {
       var current = _readyState();
       if (current == null) return;
       try {
         await _settings.setAzkarTime(hm);
-        await _reschedule();
-        current = _readyState();
-        if (current == null) return;
-        emit(current.copyWith(azkarTimeHm: hm));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('setTime', error, stackTrace);
+        return;
       }
+      current = _readyState();
+      if (current == null) return;
+      emit(current.copyWith(azkarTimeHm: hm));
+      await _rescheduleBestEffort();
     });
   }
 
@@ -156,47 +159,79 @@ class SettingsCubit extends Cubit<SettingsState> {
   ///
   /// Enabling asks for the OS notification permission; a refusal is reported
   /// through [SettingsReady.wirdPermissionDenied], not as an error state. A
-  /// failed write is logged and the last confirmed state is kept.
+  /// failed write is logged and the last confirmed state is kept. A failed
+  /// permission request or re-plan does not hide the committed setting.
   Future<void> toggleWird(bool enabled) {
     return _serialized(() async {
       var current = _readyState();
       if (current == null) return;
       try {
         await _settings.setWirdEnabled(enabled);
-        var denied = false;
-        if (enabled) {
-          denied = !(await _scheduler.ensurePermissions());
-        }
-        await _reschedule();
-        current = _readyState();
-        if (current == null) return;
-        emit(current.copyWith(
-          wirdEnabled: enabled,
-          wirdPermissionDenied: denied,
-        ));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('toggleWird', error, stackTrace);
+        return;
       }
+      final denied = enabled ? await _requestPermissionBestEffort() : false;
+      current = _readyState();
+      if (current == null) return;
+      emit(current.copyWith(
+        wirdEnabled: enabled,
+        wirdPermissionDenied: denied,
+      ));
+      await _rescheduleBestEffort();
     });
   }
 
   /// Stores the wird reminder time [hm] ('HH:mm') and re-plans.
   ///
-  /// A failed write is logged and the last confirmed state is kept.
+  /// A failed write is logged and the last confirmed state is kept. A failed
+  /// re-plan still commits the confirmed time.
   Future<void> changeWirdTime(String hm) {
     return _serialized(() async {
       var current = _readyState();
       if (current == null) return;
       try {
         await _settings.setWirdTime(hm);
-        await _reschedule();
-        current = _readyState();
-        if (current == null) return;
-        emit(current.copyWith(wirdTimeHm: hm));
       } on Object catch (error, stackTrace) {
         _logMutationFailure('changeWirdTime', error, stackTrace);
+        return;
       }
+      current = _readyState();
+      if (current == null) return;
+      emit(current.copyWith(wirdTimeHm: hm));
+      await _rescheduleBestEffort();
     });
+  }
+
+  /// A permission probe failure is reported as "denied", but never erases the
+  /// setting the user just confirmed.
+  Future<bool> _requestPermissionBestEffort() async {
+    try {
+      return !(await _scheduler.ensurePermissions());
+    } on Object catch (error, stackTrace) {
+      dev.log(
+        'settings notification permission failed',
+        name: 'quran_yahdi/settings',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+      return true;
+    }
+  }
+
+  /// Re-planning is best-effort: the setting is already persisted and shown;
+  /// the next boot/settings load retries the schedule.
+  Future<void> _rescheduleBestEffort() async {
+    try {
+      await _reschedule();
+    } on Object catch (error, stackTrace) {
+      dev.log(
+        'settings reschedule failed',
+        name: 'quran_yahdi/settings',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// Logs a failed mutation; the UI keeps the last confirmed state

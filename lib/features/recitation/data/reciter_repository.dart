@@ -107,6 +107,11 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   final http.Client _client;
   final String _endpoint;
 
+  /// Single-flight gate: a first-run boot warm-up and the reciters screen can
+  /// request the catalog at the same time; both must share one HTTP request
+  /// and one table rewrite.
+  Future<void>? _refreshInFlight;
+
   /// Parses the catalog payload on a worker isolate.
   ///
   /// It is STATIC on purpose: a closure created inside an instance method
@@ -126,7 +131,20 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   /// response is rejected (the caller surfaces the localized error) instead
   /// of replacing the cached list with an empty one.
   @override
-  Future<void> refreshFromApi() async {
+  Future<void> refreshFromApi() {
+    final inFlight = _refreshInFlight;
+    if (inFlight != null) return inFlight;
+    final future = _refreshFromApi();
+    _refreshInFlight = future;
+    future.whenComplete(() {
+      if (identical(_refreshInFlight, future)) {
+        _refreshInFlight = null;
+      }
+    }).ignore();
+    return future;
+  }
+
+  Future<void> _refreshFromApi() async {
     final res =
         await _client.get(Uri.parse(_endpoint)).timeout(_catalogTimeout);
     if (res.statusCode != 200) {

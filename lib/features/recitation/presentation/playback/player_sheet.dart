@@ -56,9 +56,12 @@ class _PlayerSheetState extends State<_PlayerSheet> {
   double? _dragging;
 
   String _clock(Duration d) {
-    final minutes = d.inMinutes;
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds'.toArabicIndicDigits;
+    final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    if (d.inHours > 0) {
+      return '${d.inHours}:$minutes:$seconds'.toArabicIndicDigits;
+    }
+    return '${d.inMinutes}:$seconds'.toArabicIndicDigits;
   }
 
   _Track? _trackOf(BuildContext context, PlaybackState state) {
@@ -190,10 +193,11 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                   IconButton(
                     tooltip: loc.stopTooltip,
                     icon: const Icon(Icons.stop),
-                    onPressed: () {
-                      context.read<PlaybackCubit>().stopAndReset();
-                      Navigator.of(context).maybePop();
-                    },
+                    // The state-driven branch above closes the sheet once the
+                    // cubit reaches its initial state; popping here as well
+                    // could close the underlying route on a double pop.
+                    onPressed: () =>
+                        context.read<PlaybackCubit>().stopAndReset(),
                   ),
                 ],
               ),

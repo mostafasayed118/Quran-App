@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../data/zakat_calculator.dart';
 import 'zakat_cubit.dart';
 import 'zakat_state.dart';
 
@@ -36,13 +37,25 @@ class ZakatScreen extends StatelessWidget {
           final ZakatReady ready = switch (state) {
             ZakatReady() => state,
           };
+          final hasInvalid = <String>[
+            ready.goldGrams,
+            ready.silverGrams,
+            ready.goldPrice,
+            ready.silverPrice,
+            ready.cash,
+            ready.debts,
+          ].any(_isInvalid);
           final needsNisabPrice =
               ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
-          final verdictText = needsNisabPrice
-              ? loc.zakatEnterPrice
-              : ready.result.due
-                  ? loc.zakatDue
-                  : loc.zakatNotDue;
+          final verdictText = hasInvalid
+              ? loc.zakatFixInputs
+              : needsNisabPrice
+                  ? loc.zakatEnterPrice
+                  : ready.result.due
+                      ? loc.zakatDue
+                      : loc.zakatNotDue;
+          String? errorFor(String text) =>
+              _isInvalid(text) ? loc.zakatInvalidNumber : null;
           return ListView(
             padding:
                 appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
@@ -51,21 +64,27 @@ class ZakatScreen extends StatelessWidget {
               const SizedBox(height: 10),
               _Field(
                   label: loc.goldGrams,
+                  errorText: errorFor(ready.goldGrams),
                   onChanged: context.read<ZakatCubit>().setGoldGrams),
               _Field(
                   label: loc.silverGrams,
+                  errorText: errorFor(ready.silverGrams),
                   onChanged: context.read<ZakatCubit>().setSilverGrams),
               _Field(
                   label: loc.goldPrice,
+                  errorText: errorFor(ready.goldPrice),
                   onChanged: context.read<ZakatCubit>().setGoldPrice),
               _Field(
                   label: loc.silverPrice,
+                  errorText: errorFor(ready.silverPrice),
                   onChanged: context.read<ZakatCubit>().setSilverPrice),
               _Field(
                   label: loc.cash,
+                  errorText: errorFor(ready.cash),
                   onChanged: context.read<ZakatCubit>().setCash),
               _Field(
                   label: loc.debts,
+                  errorText: errorFor(ready.debts),
                   onChanged: context.read<ZakatCubit>().setDebts),
               const SizedBox(height: 14),
               _SummaryCard(
@@ -141,7 +160,7 @@ class _SummaryCard extends StatelessWidget {
               textAlign: TextAlign.right,
               style: AppTheme.rowTitle.copyWith(
                 color: ready.result.due
-                    ? colors.secondary
+                    ? AppTheme.goldText(context)
                     : colors.onSurfaceVariant,
               ),
             ),
@@ -194,14 +213,19 @@ class _ZakatLine extends StatelessWidget {
   }
 }
 
+bool _isInvalid(String text) =>
+    text.trim().isNotEmpty && parseDecimalOrNull(text) == null;
+
 class _Field extends StatelessWidget {
   const _Field({
     required this.label,
     required this.onChanged,
+    this.errorText,
   });
 
   final String label;
   final ValueChanged<String> onChanged;
+  final String? errorText;
 
   @override
   Widget build(BuildContext context) {
@@ -218,6 +242,7 @@ class _Field extends StatelessWidget {
         // read as an empty row on the beige page.
         decoration: InputDecoration(
           labelText: label,
+          errorText: errorText,
           filled: true,
           fillColor: colors.surface,
           border: border,

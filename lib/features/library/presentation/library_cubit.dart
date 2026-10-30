@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,10 +24,21 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
-  Future<void> start() => load();
+  Future<void> start() {
+    _progressSub ??= _downloader.progressStream.listen(_onProgress);
+    return load();
+  }
 
   final CatalogRepository _catalog;
   final PackDownloader _downloader;
+  StreamSubscription<Map<String, (int, int)>>? _progressSub;
+
+  void _onProgress(Map<String, (int, int)> progress) {
+    if (isClosed) return;
+    final current = state;
+    if (current is! LibraryReady) return;
+    emit(current.copyWith(progress: progress));
+  }
 
   /// Loads the catalog and the installed pack ids and emits them.
   ///
@@ -47,7 +59,13 @@ class LibraryCubit extends Cubit<LibraryState> {
       return;
     }
     if (isClosed) return;
-    emit(LibraryState.ready(packs: packs, installed: installed));
+    emit(LibraryState.ready(
+      packs: packs,
+      installed: installed,
+      // A route that re-enters while an app-scoped install is still running
+      // must show the current bytes, not a reset 0 %.
+      progress: {..._downloader.progress},
+    ));
   }
 
   /// Downloads and installs [pack], reporting progress on the state.
@@ -96,6 +114,13 @@ class LibraryCubit extends Cubit<LibraryState> {
 
   /// Hook for subclasses/tests that need the freshly-installed pack id.
   void onInstalled(String packId) {}
+
+  @override
+  Future<void> close() async {
+    await _progressSub?.cancel();
+    _progressSub = null;
+    return super.close();
+  }
 
   /// Removes the installed pack [packId] and drops it from the installed set.
   ///

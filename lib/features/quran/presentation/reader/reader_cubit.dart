@@ -57,6 +57,7 @@ class ReaderCubit extends Cubit<ReaderState> {
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
   final Set<int> _bookmarkedIds = <int>{};
+  int? _lastVisibleAyahId;
 
   Future<void> _load() async {
     try {
@@ -74,9 +75,10 @@ class ReaderCubit extends Cubit<ReaderState> {
       if (isClosed) return;
       final startList =
           ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      unawaited(_saveLastRead(
-        startList.isNotEmpty ? startList.first.id : ayahs.first.id,
-      ));
+      final startAyahId =
+          startList.isNotEmpty ? startList.first.id : ayahs.first.id;
+      _lastVisibleAyahId = startAyahId;
+      unawaited(_saveLastRead(startAyahId));
       final verses = ayahs.map((a) => a.toVerse()).toList();
       emit(ReaderState.ready(
         surahId: _surahId,
@@ -104,6 +106,17 @@ class ReaderCubit extends Cubit<ReaderState> {
       dev.log('last-read save failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
+  }
+
+  /// Records the first verse currently visible in the verse list.
+  ///
+  /// The verse list reports the leading visible index; duplicate reports for
+  /// the same ayah are dropped, so scrolling within one card does not write
+  /// the database on every frame.
+  Future<void> onVisibleAyah(int ayahId) async {
+    if (ayahId <= 0 || ayahId == _lastVisibleAyahId) return;
+    _lastVisibleAyahId = ayahId;
+    await _saveLastRead(ayahId);
   }
 
   /// Re-runs the load after a failure (error-state retry).

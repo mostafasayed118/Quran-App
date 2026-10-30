@@ -164,19 +164,21 @@ Future<void> configureDependencies({
   }
   getIt
       .registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
-  if (audioRootResolver != null) {
-    getIt.registerLazySingleton<AudioDownloader>(
-        () => AudioDownloader(db, audioRootResolver: audioRootResolver));
-    // App-scoped: the download queue must survive leaving the route.
-    getIt.registerLazySingleton<DownloadsCubit>(() => DownloadsCubit(
+  // Registered unconditionally: the reader and reciter routes read these
+  // cubits directly. A degraded boot without a writable audio root must still
+  // reach the reader; only starting a download then fails (AudioDownloader
+  // throws DownloadFailure from its missing root).
+  getIt.registerLazySingleton<AudioDownloader>(
+      () => AudioDownloader(db, audioRootResolver: audioRootResolver));
+  // App-scoped: the download queue must survive leaving the route.
+  getIt.registerLazySingleton<DownloadsCubit>(() => DownloadsCubit(
+      downloader: getIt<AudioDownloader>(),
+      reciters: getIt<ReciterRepository>()));
+  // App-scoped: the player (and its mini player) must survive navigation.
+  getIt.registerLazySingleton<PlaybackCubit>(() => PlaybackCubit(
+        service: getIt<PlaybackService>(),
+        reciters: getIt<ReciterRepository>(),
         downloader: getIt<AudioDownloader>(),
-        reciters: getIt<ReciterRepository>()));
-    // App-scoped: the player (and its mini player) must survive navigation.
-    getIt.registerLazySingleton<PlaybackCubit>(() => PlaybackCubit(
-          service: getIt<PlaybackService>(),
-          reciters: getIt<ReciterRepository>(),
-          downloader: getIt<AudioDownloader>(),
-        ));
-  }
+      ));
   _configured = true;
 }
