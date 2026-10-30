@@ -13,13 +13,16 @@ ASCII-only output (PS 5.1). Default -ApkPath resolves against the repo root.
 #>
 [CmdletBinding()]
 param(
-    [string]$ApkPath = "build\app\outputs\flutter-apk\app-debug.apk"
+    [string]$ApkPath = "build\app\outputs\flutter-apk\app-debug.apk",
+    [string]$PackageId = "com.mostafasayed.quranyahdi.debug"
 )
 
 $ErrorActionPreference = "Stop"
 
-$packageId = "com.mostafasayed.quranyahdi"
-$component = "com.mostafasayed.quranyahdi/.MainActivity"
+# The debug build carries the `.debug` applicationId suffix (REL-13). Pass
+# -PackageId com.mostafasayed.quranyahdi when smoking the signed release APK.
+$packageId = $PackageId
+$component = "$PackageId/.MainActivity"
 
 function Fail-Smoke {
     param([int]$Code, [string]$Message)
