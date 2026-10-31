@@ -19,7 +19,7 @@
     "gates": "npm run format:check && npm run check && npm run test && npm run build && npm run budget && npm run test:e2e"
   },
   "dependencies": {
-    "astro": "^7.4.0"
+    "astro": "^7.4.2"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
