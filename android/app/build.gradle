@@ -81,6 +81,16 @@ android {
             versionNameSuffix = "-debug"
         }
         release {
+            // D2: the store artifact is minified and resource-shrunk. R8 renames
+            // and removes unused classes, so everything resolved by name at
+            // runtime needs an explicit keep in proguard-rules.pro (the
+            // notification plugin deserialises scheduled payloads with Gson).
+            // A signed build plus a real-device smoke is the gate for changing
+            // these two flags, and `mapping.txt` must be archived with the
+            // artifact.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             if (hasReleaseKeystore) {
                 signingConfig = signingConfigs.release
             } else {
