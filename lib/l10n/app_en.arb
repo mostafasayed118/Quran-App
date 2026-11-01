@@ -564,5 +564,7 @@
   "languageEnglish": "English",
   "downloadsTitle": "Downloads",
   "downloadsEmpty": "No downloaded recitations yet",
-  "downloadsDeleteBody": "This file will be removed from your device."
+  "downloadsDeleteBody": "This file will be removed from your device.",
+  "licensesQuranUthmani": "Uthmani Quran text (Unicode) — Tanzil Project",
+  "licensesTanzilTerms": "Attribution and terms"
 }

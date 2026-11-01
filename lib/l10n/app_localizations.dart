@@ -1531,6 +1531,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'سيُحذف هذا الملف من جهازك.'**
   String get downloadsDeleteBody;
+
+  /// No description provided for @licensesQuranUthmani.
+  ///
+  /// In ar, this message translates to:
+  /// **'نص القرآن العثماني (يونيكود) — مشروع تَنزيل'**
+  String get licensesQuranUthmani;
+
+  /// No description provided for @licensesTanzilTerms.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإسناد وشروط الاستخدام'**
+  String get licensesTanzilTerms;
 }
 
 class _AppLocalizationsDelegate

@@ -825,4 +825,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get downloadsDeleteBody => 'سيُحذف هذا الملف من جهازك.';
+
+  @override
+  String get licensesQuranUthmani =>
+      'نص القرآن العثماني (يونيكود) — مشروع تَنزيل';
+
+  @override
+  String get licensesTanzilTerms => 'الإسناد وشروط الاستخدام';
 }

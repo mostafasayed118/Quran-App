@@ -16,6 +16,20 @@ void main() {
     expect(text, contains('Free of Cost'));
   });
 
+  test('the Tanzil attribution ships and documents the import adjustments',
+      () async {
+    final text = await rootBundle.loadString(
+      'assets/licenses/tanzil-quran-uthmani.txt',
+    );
+
+    expect(text, contains('Tanzil Project'));
+    expect(text, contains('tanzil.net'));
+    // The two presentational adjustments must stay documented next to the
+    // attribution, because they are the only deviation from the verbatim text.
+    expect(text, contains('basmala'));
+    expect(text, contains('rub-el-hizb'));
+  });
+
   testWidgets('the screen lists the shipped content and font sources',
       (tester) async {
     await pumpAppHost(tester, home: const LicensesScreen());
@@ -25,12 +39,17 @@ void main() {
     expect(find.textContaining('بيكثال'), findsOneWidget);
     expect(find.textContaining('mp3quran.net'), findsOneWidget);
     expect(find.textContaining('KFGQPC'), findsOneWidget);
+    expect(find.textContaining('تَنزيل'), findsOneWidget);
   });
 
   testWidgets('opening the HafsSmart terms shows the embedded EULA',
       (tester) async {
     await pumpAppHost(tester, home: const LicensesScreen());
 
+    // The list grew with the Tanzil attribution tile, so the fonts section is
+    // below the fold on the 800x600 test surface.
+    await tester.ensureVisible(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));
     await tester.pump();
 

@@ -18,6 +18,7 @@ class LicensesScreen extends StatelessWidget {
   static const String _hafsEula = 'assets/licenses/HafsSmart-EULA.txt';
   static const String _meQuranTerms = 'assets/licenses/me_quran-terms.txt';
   static const String _cairoOfl = 'assets/fonts/Cairo-OFL.txt';
+  static const String _tanzilTerms = 'assets/licenses/tanzil-quran-uthmani.txt';
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +35,15 @@ class LicensesScreen extends StatelessWidget {
           _InfoTile(
             icon: Icons.menu_book_outlined,
             text: loc.licensesQuranText,
+          ),
+          // The shipped verse text is Tanzil's Uthmani edition; the reader now
+          // renders it verbatim, so the attribution lives beside the content
+          // list, not only in the font section.
+          _AssetTile(
+            icon: Icons.verified_outlined,
+            title: loc.licensesQuranUthmani,
+            action: loc.licensesTanzilTerms,
+            asset: _tanzilTerms,
           ),
           _InfoTile(icon: Icons.translate_outlined, text: loc.licensesSiraj),
           _InfoTile(

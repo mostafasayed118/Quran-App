@@ -585,5 +585,7 @@
   "languageEnglish": "الإنجليزية",
   "downloadsTitle": "التنزيلات",
   "downloadsEmpty": "لا توجد تلاوات منزّلة بعد",
-  "downloadsDeleteBody": "سيُحذف هذا الملف من جهازك."
+  "downloadsDeleteBody": "سيُحذف هذا الملف من جهازك.",
+  "licensesQuranUthmani": "نص القرآن العثماني (يونيكود) — مشروع تَنزيل",
+  "licensesTanzilTerms": "الإسناد وشروط الاستخدام"
 }

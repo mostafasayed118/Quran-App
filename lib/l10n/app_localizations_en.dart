@@ -830,4 +830,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get downloadsDeleteBody =>
       'This file will be removed from your device.';
+
+  @override
+  String get licensesQuranUthmani =>
+      'Uthmani Quran text (Unicode) — Tanzil Project';
+
+  @override
+  String get licensesTanzilTerms => 'Attribution and terms';
 }
