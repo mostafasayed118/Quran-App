@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.12.2",
+  "checkpoint_id": "01M6BRTGKJG8X0TB5Y8EGFCBWP",
+  "session_id": "ses_e689cfd95ffeSU89DdlHUtbe6D",
+  "strategy": "manual-commit",
+  "created_at": "2026-11-01T14:39:40.3037727Z",
+  "branch": "finish/2026-11-01",
+  "checkpoints_count": 6,
+  "save_step_count": 6,
+  "files_touched": [
+    "assets/licenses/tanzil-quran-uthmani.txt",
+    "lib/features/settings/presentation/licenses_screen.dart",
+    "lib/l10n/app_ar.arb",
+    "lib/l10n/app_en.arb",
+    "lib/l10n/app_localizations.dart",
+    "lib/l10n/app_localizations_ar.dart",
+    "lib/l10n/app_localizations_en.dart",
+    "test/licenses_screen_test.dart"
+  ],
+  "agent": "OpenCode 2",
+  "model": "",
+  "turn_id": "dbe483f5582a",
+  "redaction": {
+    "replacements": 0,
+    "layers": {
+      "betterleaks": 0,
+      "connection_string": 0,
+      "credential_key": 0,
+      "credential_value": 0,
+      "credentialed_uri": 0,
+      "entropy": 0,
+      "key_context": 0,
+      "provider_token": 0,
+      "shell_stdin": 0
+    }
+  },
+  "session_metrics": {
+    "turn_count": 6
+  }
+}
