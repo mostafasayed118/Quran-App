@@ -19,6 +19,7 @@ mixin _$QiblaState {
   double? get bearing;
   double? get heading;
   bool get compassUnavailable;
+  bool get calibrationNeeded;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,20 +40,22 @@ mixin _$QiblaState {
             (identical(other.heading, _this.heading) ||
                 other.heading == _this.heading) &&
             (identical(other.compassUnavailable, _this.compassUnavailable) ||
-                other.compassUnavailable == _this.compassUnavailable));
+                other.compassUnavailable == _this.compassUnavailable) &&
+            (identical(other.calibrationNeeded, _this.calibrationNeeded) ||
+                other.calibrationNeeded == _this.calibrationNeeded));
   }
 
   @override
   int get hashCode {
     final _this = this as QiblaState;
     return Object.hash(runtimeType, _this.city, _this.bearing, _this.heading,
-        _this.compassUnavailable);
+        _this.compassUnavailable, _this.calibrationNeeded);
   }
 
   @override
   String toString() {
     final _this = this as QiblaState;
-    return 'QiblaState(city: ${_this.city}, bearing: ${_this.bearing}, heading: ${_this.heading}, compassUnavailable: ${_this.compassUnavailable})';
+    return 'QiblaState(city: ${_this.city}, bearing: ${_this.bearing}, heading: ${_this.heading}, compassUnavailable: ${_this.compassUnavailable}, calibrationNeeded: ${_this.calibrationNeeded})';
   }
 }
 
@@ -63,7 +66,11 @@ abstract mixin class $QiblaStateCopyWith<$Res> {
       _$QiblaStateCopyWithImpl;
   @useResult
   $Res call(
-      {City? city, double? bearing, double? heading, bool compassUnavailable});
+      {City? city,
+      double? bearing,
+      double? heading,
+      bool compassUnavailable,
+      bool calibrationNeeded});
 }
 
 /// @nodoc
@@ -82,6 +89,7 @@ class _$QiblaStateCopyWithImpl<$Res> implements $QiblaStateCopyWith<$Res> {
     Object? bearing = freezed,
     Object? heading = freezed,
     Object? compassUnavailable = null,
+    Object? calibrationNeeded = null,
   }) {
     return _then(_self.copyWith(
       city: freezed == city
@@ -99,6 +107,10 @@ class _$QiblaStateCopyWithImpl<$Res> implements $QiblaStateCopyWith<$Res> {
       compassUnavailable: null == compassUnavailable
           ? _self.compassUnavailable
           : compassUnavailable // ignore: cast_nullable_to_non_nullable
+              as bool,
+      calibrationNeeded: null == calibrationNeeded
+          ? _self.calibrationNeeded
+          : calibrationNeeded // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }
@@ -214,27 +226,27 @@ extension QiblaStatePatterns on QiblaState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         loading,
     TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         ready,
     TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         failed,
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case QiblaLoading() when loading != null:
-        return loading(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return loading(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaReady() when ready != null:
-        return ready(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return ready(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaFailed() when failed != null:
-        return failed(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return failed(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case _:
         return orElse();
     }
@@ -256,26 +268,26 @@ extension QiblaStatePatterns on QiblaState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)
+            bool compassUnavailable, bool calibrationNeeded)
         loading,
     required TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)
+            bool compassUnavailable, bool calibrationNeeded)
         ready,
     required TResult Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)
+            bool compassUnavailable, bool calibrationNeeded)
         failed,
   }) {
     final _that = this;
     switch (_that) {
       case QiblaLoading():
-        return loading(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return loading(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaReady():
-        return ready(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return ready(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaFailed():
-        return failed(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return failed(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
     }
   }
 
@@ -294,26 +306,26 @@ extension QiblaStatePatterns on QiblaState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         loading,
     TResult? Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         ready,
     TResult? Function(City? city, double? bearing, double? heading,
-            bool compassUnavailable)?
+            bool compassUnavailable, bool calibrationNeeded)?
         failed,
   }) {
     final _that = this;
     switch (_that) {
       case QiblaLoading() when loading != null:
-        return loading(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return loading(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaReady() when ready != null:
-        return ready(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return ready(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case QiblaFailed() when failed != null:
-        return failed(
-            _that.city, _that.bearing, _that.heading, _that.compassUnavailable);
+        return failed(_that.city, _that.bearing, _that.heading,
+            _that.compassUnavailable, _that.calibrationNeeded);
       case _:
         return null;
     }
@@ -327,7 +339,8 @@ class QiblaLoading implements QiblaState {
       {this.city = null,
       this.bearing = null,
       this.heading = null,
-      this.compassUnavailable = false});
+      this.compassUnavailable = false,
+      this.calibrationNeeded = false});
 
   @override
   @JsonKey()
@@ -341,6 +354,9 @@ class QiblaLoading implements QiblaState {
   @override
   @JsonKey()
   final bool compassUnavailable;
+  @override
+  @JsonKey()
+  final bool calibrationNeeded;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -359,17 +375,20 @@ class QiblaLoading implements QiblaState {
             (identical(other.bearing, bearing) || other.bearing == bearing) &&
             (identical(other.heading, heading) || other.heading == heading) &&
             (identical(other.compassUnavailable, compassUnavailable) ||
-                other.compassUnavailable == compassUnavailable));
+                other.compassUnavailable == compassUnavailable) &&
+            (identical(other.calibrationNeeded, calibrationNeeded) ||
+                other.calibrationNeeded == calibrationNeeded));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable);
+    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable,
+        calibrationNeeded);
   }
 
   @override
   String toString() {
-    return 'QiblaState.loading(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable)';
+    return 'QiblaState.loading(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable, calibrationNeeded: $calibrationNeeded)';
   }
 }
 
@@ -382,7 +401,11 @@ abstract mixin class $QiblaLoadingCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {City? city, double? bearing, double? heading, bool compassUnavailable});
+      {City? city,
+      double? bearing,
+      double? heading,
+      bool compassUnavailable,
+      bool calibrationNeeded});
 }
 
 /// @nodoc
@@ -401,6 +424,7 @@ class _$QiblaLoadingCopyWithImpl<$Res> implements $QiblaLoadingCopyWith<$Res> {
     Object? bearing = freezed,
     Object? heading = freezed,
     Object? compassUnavailable = null,
+    Object? calibrationNeeded = null,
   }) {
     return _then(QiblaLoading(
       city: freezed == city
@@ -419,6 +443,10 @@ class _$QiblaLoadingCopyWithImpl<$Res> implements $QiblaLoadingCopyWith<$Res> {
           ? _self.compassUnavailable
           : compassUnavailable // ignore: cast_nullable_to_non_nullable
               as bool,
+      calibrationNeeded: null == calibrationNeeded
+          ? _self.calibrationNeeded
+          : calibrationNeeded // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -430,7 +458,8 @@ class QiblaReady implements QiblaState {
       {this.city = null,
       this.bearing = null,
       this.heading = null,
-      this.compassUnavailable = false});
+      this.compassUnavailable = false,
+      this.calibrationNeeded = false});
 
   @override
   @JsonKey()
@@ -444,6 +473,9 @@ class QiblaReady implements QiblaState {
   @override
   @JsonKey()
   final bool compassUnavailable;
+  @override
+  @JsonKey()
+  final bool calibrationNeeded;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -462,17 +494,20 @@ class QiblaReady implements QiblaState {
             (identical(other.bearing, bearing) || other.bearing == bearing) &&
             (identical(other.heading, heading) || other.heading == heading) &&
             (identical(other.compassUnavailable, compassUnavailable) ||
-                other.compassUnavailable == compassUnavailable));
+                other.compassUnavailable == compassUnavailable) &&
+            (identical(other.calibrationNeeded, calibrationNeeded) ||
+                other.calibrationNeeded == calibrationNeeded));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable);
+    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable,
+        calibrationNeeded);
   }
 
   @override
   String toString() {
-    return 'QiblaState.ready(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable)';
+    return 'QiblaState.ready(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable, calibrationNeeded: $calibrationNeeded)';
   }
 }
 
@@ -485,7 +520,11 @@ abstract mixin class $QiblaReadyCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {City? city, double? bearing, double? heading, bool compassUnavailable});
+      {City? city,
+      double? bearing,
+      double? heading,
+      bool compassUnavailable,
+      bool calibrationNeeded});
 }
 
 /// @nodoc
@@ -504,6 +543,7 @@ class _$QiblaReadyCopyWithImpl<$Res> implements $QiblaReadyCopyWith<$Res> {
     Object? bearing = freezed,
     Object? heading = freezed,
     Object? compassUnavailable = null,
+    Object? calibrationNeeded = null,
   }) {
     return _then(QiblaReady(
       city: freezed == city
@@ -522,6 +562,10 @@ class _$QiblaReadyCopyWithImpl<$Res> implements $QiblaReadyCopyWith<$Res> {
           ? _self.compassUnavailable
           : compassUnavailable // ignore: cast_nullable_to_non_nullable
               as bool,
+      calibrationNeeded: null == calibrationNeeded
+          ? _self.calibrationNeeded
+          : calibrationNeeded // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -533,7 +577,8 @@ class QiblaFailed implements QiblaState {
       {this.city = null,
       this.bearing = null,
       this.heading = null,
-      this.compassUnavailable = false});
+      this.compassUnavailable = false,
+      this.calibrationNeeded = false});
 
   @override
   @JsonKey()
@@ -547,6 +592,9 @@ class QiblaFailed implements QiblaState {
   @override
   @JsonKey()
   final bool compassUnavailable;
+  @override
+  @JsonKey()
+  final bool calibrationNeeded;
 
   /// Create a copy of QiblaState
   /// with the given fields replaced by the non-null parameter values.
@@ -565,17 +613,20 @@ class QiblaFailed implements QiblaState {
             (identical(other.bearing, bearing) || other.bearing == bearing) &&
             (identical(other.heading, heading) || other.heading == heading) &&
             (identical(other.compassUnavailable, compassUnavailable) ||
-                other.compassUnavailable == compassUnavailable));
+                other.compassUnavailable == compassUnavailable) &&
+            (identical(other.calibrationNeeded, calibrationNeeded) ||
+                other.calibrationNeeded == calibrationNeeded));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable);
+    return Object.hash(runtimeType, city, bearing, heading, compassUnavailable,
+        calibrationNeeded);
   }
 
   @override
   String toString() {
-    return 'QiblaState.failed(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable)';
+    return 'QiblaState.failed(city: $city, bearing: $bearing, heading: $heading, compassUnavailable: $compassUnavailable, calibrationNeeded: $calibrationNeeded)';
   }
 }
 
@@ -588,7 +639,11 @@ abstract mixin class $QiblaFailedCopyWith<$Res>
   @override
   @useResult
   $Res call(
-      {City? city, double? bearing, double? heading, bool compassUnavailable});
+      {City? city,
+      double? bearing,
+      double? heading,
+      bool compassUnavailable,
+      bool calibrationNeeded});
 }
 
 /// @nodoc
@@ -607,6 +662,7 @@ class _$QiblaFailedCopyWithImpl<$Res> implements $QiblaFailedCopyWith<$Res> {
     Object? bearing = freezed,
     Object? heading = freezed,
     Object? compassUnavailable = null,
+    Object? calibrationNeeded = null,
   }) {
     return _then(QiblaFailed(
       city: freezed == city
@@ -624,6 +680,10 @@ class _$QiblaFailedCopyWithImpl<$Res> implements $QiblaFailedCopyWith<$Res> {
       compassUnavailable: null == compassUnavailable
           ? _self.compassUnavailable
           : compassUnavailable // ignore: cast_nullable_to_non_nullable
+              as bool,
+      calibrationNeeded: null == calibrationNeeded
+          ? _self.calibrationNeeded
+          : calibrationNeeded // ignore: cast_nullable_to_non_nullable
               as bool,
     ));
   }

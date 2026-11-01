@@ -29,6 +29,7 @@ bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
     (final QiblaReady a, final QiblaReady b) => a.city != b.city ||
         a.bearing != b.bearing ||
         a.compassUnavailable != b.compassUnavailable ||
+        a.calibrationNeeded != b.calibrationNeeded ||
         a.heading?.round() != b.heading?.round(),
     (QiblaFailed(), QiblaFailed()) => false,
     (QiblaLoading(), QiblaLoading()) => false,
@@ -99,25 +100,33 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
               onRetry: () => context.read<QiblaCubit>().reload(),
             );
           }
-          final (:city, :bearing, :heading, :compassUnavailable) =
-              switch (state) {
+          final (
+            :city,
+            :bearing,
+            :heading,
+            :compassUnavailable,
+            :calibrationNeeded,
+          ) = switch (state) {
             QiblaReady() => (
                 city: state.city,
                 bearing: state.bearing,
                 heading: state.heading,
                 compassUnavailable: state.compassUnavailable,
+                calibrationNeeded: state.calibrationNeeded,
               ),
             QiblaLoading() => (
                 city: state.city,
                 bearing: state.bearing,
                 heading: state.heading,
                 compassUnavailable: state.compassUnavailable,
+                calibrationNeeded: state.calibrationNeeded,
               ),
             QiblaFailed() => (
                 city: null,
                 bearing: null,
                 heading: null,
                 compassUnavailable: false,
+                calibrationNeeded: false,
               ),
           };
           if (city == null || bearing == null) {
@@ -156,6 +165,10 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
               else
                 _CompassNote(text: loc.compassLive),
               const SizedBox(height: AppSpacing.sm),
+              if (heading != null && calibrationNeeded)
+                _CalibrationHint(text: loc.qiblaCalibrationHint),
+              if (heading != null && calibrationNeeded)
+                const SizedBox(height: AppSpacing.sm),
               if (heading != null)
                 _AlignmentHint(delta: delta, aligned: aligned)
               else
@@ -313,6 +326,43 @@ class _CompassNote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Text(text, style: AppTheme.mutedFootnote(context)),
+    );
+  }
+}
+
+/// Shown when the raw field is disturbed or the phone is near-vertical.
+class _CalibrationHint extends StatelessWidget {
+  const _CalibrationHint({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      decoration: BoxDecoration(
+        color: colors.errorContainer.withValues(alpha: 0.35),
+        borderRadius: AppRadius.mdAll,
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.explore_off_outlined, size: 18, color: colors.error),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              text,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: colors.onErrorContainer),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

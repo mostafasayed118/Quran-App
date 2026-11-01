@@ -1633,6 +1633,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الحنفي'**
   String get madhabHanafi;
+
+  /// No description provided for @qiblaCalibrationHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨.'**
+  String get qiblaCalibrationHint;
 }
 
 class _AppLocalizationsDelegate

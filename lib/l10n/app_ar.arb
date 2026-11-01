@@ -602,5 +602,6 @@
   "methodTurkey": "ديانت — تركيا",
   "methodNorthAmerica": "ISNA — أمريكا الشمالية",
   "madhabShafi": "الشافعي (الافتراضي)",
-  "madhabHanafi": "الحنفي"
+  "madhabHanafi": "الحنفي",
+  "qiblaCalibrationHint": "الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨."
 }

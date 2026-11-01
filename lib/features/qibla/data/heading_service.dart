@@ -16,6 +16,31 @@ double headingFromMagnetometer(double x, double y) {
 double dialAngleDeg(double bearingDeg, double headingDeg) =>
     (bearingDeg - headingDeg) % 360.0;
 
+/// EMA weight for one magnetometer sample. sensors_plus' default interval is
+/// 200 ms (5 Hz), so 0.3 is a ~0.5 s time constant.
+const double kHeadingSmoothingAlpha = 0.3;
+
+/// A step this large is a real turn, not jitter: pass it straight through so
+/// a 30° turn does not take two seconds to arrive on the dial.
+const double kHeadingSnapDeg = 10.0;
+
+/// Signed shortest turn from [from] to [to], in (-180, 180].
+double shortestAngleDeltaDeg(double to, double from) {
+  final delta = (to - from) % 360.0;
+  return delta > 180.0 ? delta - 360.0 : delta;
+}
+
+/// One low-pass step on the compass circle.
+///
+/// Callers must pass null [previous] for the first sample after (re)binding:
+/// seeding from a stale heading would drag the dial, and the frozen qibla
+/// suite pins the first sample through unchanged.
+double smoothHeadingDeg(double previous, double sample) {
+  final delta = shortestAngleDeltaDeg(sample, previous);
+  if (delta.abs() >= kHeadingSnapDeg) return sample % 360.0;
+  return (previous + kHeadingSmoothingAlpha * delta + 360.0) % 360.0;
+}
+
 /// Injectable heading source for the qibla dial.
 ///
 /// [headingStream] returns null when sensors are unavailable on the device

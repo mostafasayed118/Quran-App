@@ -878,4 +878,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get madhabHanafi => 'الحنفي';
+
+  @override
+  String get qiblaCalibrationHint =>
+      'الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨.';
 }

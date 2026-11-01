@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 
+import '../data/compass_calibration.dart';
 import '../data/heading_service.dart';
 import '../data/qibla_service.dart';
 import 'qibla_state.dart';
@@ -18,9 +19,11 @@ class QiblaCubit extends Cubit<QiblaState> {
     required CitySource city,
     required QiblaService qibla,
     HeadingService? heading,
+    CompassCalibration? calibration,
   })  : _city = city,
         _qibla = qibla,
         _headingService = heading,
+        _calibration = calibration,
         super(const QiblaState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -34,10 +37,14 @@ class QiblaCubit extends Cubit<QiblaState> {
   final CitySource _city;
   final QiblaService _qibla;
   final HeadingService? _headingService;
+  final CompassCalibration? _calibration;
 
   StreamSubscription<double>? _headingSub;
+  StreamSubscription<bool>? _calibrationSub;
   double? _heading;
+  double? _smoothedHeading;
   bool _compassUnavailable = false;
+  bool _calibrationNeeded = false;
 
   /// Loads the selected city and its bearing and emits the ready state.
   ///
@@ -54,6 +61,7 @@ class QiblaCubit extends Cubit<QiblaState> {
         bearing: bearing,
         heading: _heading,
         compassUnavailable: _compassUnavailable,
+        calibrationNeeded: _calibrationNeeded,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('qibla reload failed',
@@ -66,12 +74,15 @@ class QiblaCubit extends Cubit<QiblaState> {
   /// Stops the sensor stream while the app is backgrounded. The last heading
   /// stays displayed (no emission).
   Future<void> pause() async {
-    final sub = _headingSub;
+    final headingSub = _headingSub;
+    final calibrationSub = _calibrationSub;
     // Detach synchronously: a resume arriving while the cancel is still in
     // flight must be able to bind a fresh stream, and the late continuation
     // must not clobber that new subscription.
     _headingSub = null;
-    await sub?.cancel();
+    _calibrationSub = null;
+    await headingSub?.cancel();
+    await calibrationSub?.cancel();
   }
 
   /// Re-acquires the heading stream after a [pause] (the service hands out a
@@ -80,6 +91,7 @@ class QiblaCubit extends Cubit<QiblaState> {
 
   void _bindHeading() {
     if (_headingSub != null) return;
+    _smoothedHeading = null;
     final stream = _headingService?.headingStream();
     if (stream == null) {
       _markCompassUnavailable();
@@ -101,11 +113,32 @@ class QiblaCubit extends Cubit<QiblaState> {
         _markCompassUnavailable();
       },
     );
+    _bindCalibration();
+  }
+
+  void _bindCalibration() {
+    if (_calibrationSub != null) return;
+    final stream = _calibration?.needsCalibrationStream();
+    if (stream == null) return;
+    _calibrationSub = stream.listen(
+      _onCalibration,
+      onError: (Object error, StackTrace stackTrace) {
+        dev.log(
+          'calibration stream error',
+          name: 'quran_yahdi/qibla',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        _onCalibration(false);
+      },
+    );
   }
 
   void _markCompassUnavailable() {
     _heading = null;
+    _smoothedHeading = null;
     _compassUnavailable = true;
+    _calibrationNeeded = false;
     if (isClosed) return;
     final state = this.state;
     if (state is! QiblaReady) return;
@@ -114,11 +147,16 @@ class QiblaCubit extends Cubit<QiblaState> {
       bearing: state.bearing,
       heading: null,
       compassUnavailable: true,
+      calibrationNeeded: false,
     ));
   }
 
   void _onHeading(double degrees) {
-    _heading = degrees;
+    final previous = _smoothedHeading;
+    final smoothed =
+        previous == null ? degrees : smoothHeadingDeg(previous, degrees);
+    _smoothedHeading = smoothed;
+    _heading = smoothed;
     _compassUnavailable = false;
     if (isClosed) return;
     final state = this.state;
@@ -126,16 +164,33 @@ class QiblaCubit extends Cubit<QiblaState> {
     emit(QiblaState.ready(
       city: state.city,
       bearing: state.bearing,
-      heading: degrees,
+      heading: smoothed,
       compassUnavailable: false,
+      calibrationNeeded: _calibrationNeeded,
     ));
   }
 
-  /// Cancels the heading subscription before closing the cubit.
+  void _onCalibration(bool needed) {
+    if (isClosed || _calibrationNeeded == needed) return;
+    _calibrationNeeded = needed;
+    final state = this.state;
+    if (state is! QiblaReady) return;
+    emit(QiblaState.ready(
+      city: state.city,
+      bearing: state.bearing,
+      heading: state.heading,
+      compassUnavailable: state.compassUnavailable,
+      calibrationNeeded: needed,
+    ));
+  }
+
+  /// Cancels the heading and calibration subscriptions before closing.
   @override
   Future<void> close() async {
     await _headingSub?.cancel();
+    await _calibrationSub?.cancel();
     _headingSub = null;
+    _calibrationSub = null;
     return super.close();
   }
 }

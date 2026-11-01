@@ -883,4 +883,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get madhabHanafi => 'Hanafi';
+
+  @override
+  String get qiblaCalibrationHint =>
+      'Direction is unreliable — move away from metal and wave the phone in a figure-8.';
 }

@@ -27,6 +27,7 @@ import 'package:quran_yahdi/features/prayer/data/configured_prayer_times.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_config_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
+import 'package:quran_yahdi/features/qibla/data/compass_calibration.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
@@ -129,6 +130,7 @@ Future<void> configureDependencies({
       () => ConfiguredPrayerTimes(getIt<PrayerConfigSource>()));
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
+  getIt.registerLazySingleton<CompassCalibration>(() => CompassCalibration());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
   getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(db));
   getIt.registerLazySingleton<ReminderSettingsPort>(

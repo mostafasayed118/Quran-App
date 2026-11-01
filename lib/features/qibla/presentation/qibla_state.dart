@@ -13,6 +13,7 @@ sealed class QiblaState with _$QiblaState {
     @Default(null) double? bearing,
     @Default(null) double? heading,
     @Default(false) bool compassUnavailable,
+    @Default(false) bool calibrationNeeded,
   }) = QiblaLoading;
 
   /// The compass is ready: the selected city, the bearing to it and — when
@@ -26,6 +27,7 @@ sealed class QiblaState with _$QiblaState {
     @Default(null) double? bearing,
     @Default(null) double? heading,
     @Default(false) bool compassUnavailable,
+    @Default(false) bool calibrationNeeded,
   }) = QiblaReady;
 
   /// The load failed (the city lookup or the compass service threw).
@@ -37,5 +39,6 @@ sealed class QiblaState with _$QiblaState {
     @Default(null) double? bearing,
     @Default(null) double? heading,
     @Default(false) bool compassUnavailable,
+    @Default(false) bool calibrationNeeded,
   }) = QiblaFailed;
 }

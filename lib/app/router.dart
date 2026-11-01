@@ -74,6 +74,7 @@ import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
 import '../features/recitation/presentation/reciters/reciters_screen.dart';
 import '../features/recitation/presentation/playback/playback_cubit.dart';
+import '../features/qibla/data/compass_calibration.dart';
 import '../features/qibla/data/heading_service.dart';
 import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
@@ -258,6 +259,7 @@ abstract final class AppRouter {
             city: getIt<CitySource>(),
             qibla: getIt<QiblaService>(),
             heading: getIt<HeadingService>(),
+            calibration: getIt<CompassCalibration>(),
           ),
           identity: AppRoutes.qibla,
           start: (cubit) => cubit.start(),

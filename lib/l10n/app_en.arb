@@ -581,5 +581,6 @@
   "methodTurkey": "Diyanet, Turkey",
   "methodNorthAmerica": "ISNA, North America",
   "madhabShafi": "Shafi (default)",
-  "madhabHanafi": "Hanafi"
+  "madhabHanafi": "Hanafi",
+  "qiblaCalibrationHint": "Direction is unreliable — move away from metal and wave the phone in a figure-8."
 }
