@@ -28,6 +28,11 @@ class SurahIndexScreen extends StatelessWidget {
         title: Text(loc.surahIndexTitle),
         actions: [
           IconButton(
+            tooltip: loc.juzIndexTitle,
+            icon: const Icon(Icons.format_list_numbered),
+            onPressed: () => context.push(AppRoutes.juzIndex),
+          ),
+          IconButton(
             tooltip: loc.searchQuranTitle,
             icon: const Icon(Icons.search),
             onPressed: () => context.push(AppRoutes.quranSearch),

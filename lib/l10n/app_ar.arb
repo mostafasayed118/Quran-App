@@ -612,6 +612,18 @@
   "preAdhanFifteen": "١٥ دقيقة",
   "reminderAdhanSoon": "اقتربت صلاة {prayer} — بعد {minutes} دقيقة",
   "monthlyTimetable": "جدول الشهر",
+  "juzIndexTitle": "فهرس الأجزاء",
+  "juzLabel": "الجزء {number}",
+  "@juzLabel": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "pageJump": "الانتقال إلى صفحة",
+  "pageJumpHint": "رقم الصفحة ١–٦٠٤",
+  "pageJumpInvalid": "صفحة غير موجودة",
+  "pageJumpGo": "انتقال",
+  "readerFontSize": "حجم الخط",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

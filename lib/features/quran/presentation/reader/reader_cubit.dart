@@ -6,6 +6,8 @@ import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
 
 import '../../data/ayah_source.dart';
 import '../../data/last_read_source.dart';
+import '../../data/page_anchor_source.dart';
+import '../../data/reader_settings_source.dart';
 import '../../data/uthmani_text_source.dart';
 import '../../data/verse_mapping.dart';
 import 'mushaf_page_block.dart';
@@ -29,10 +31,14 @@ class ReaderCubit extends Cubit<ReaderState> {
     required int initialAyah,
     WirdProgressSink? wirdProgress,
     UthmaniTextSource? uthmani,
+    PageAnchorSource? pageAnchors,
+    ReaderSettingsSource? settings,
   })  : _ayahRepository = ayahRepository,
         _lastReadRepository = lastReadRepository,
         _wirdProgress = wirdProgress,
         _uthmani = uthmani,
+        _pageAnchors = pageAnchors,
+        _settings = settings,
         _surahId = surahId,
         _initialAyah = initialAyah,
         super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
@@ -57,6 +63,8 @@ class ReaderCubit extends Cubit<ReaderState> {
   final LastReadSource _lastReadRepository;
   final WirdProgressSink? _wirdProgress;
   final UthmaniTextSource? _uthmani;
+  final PageAnchorSource? _pageAnchors;
+  final ReaderSettingsSource? _settings;
   final int _surahId;
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
@@ -87,6 +95,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       // verses keep glyph text and the reader turns selection off.
       final unicode =
           await _uthmani?.forSurah(_surahId) ?? const <int, String>{};
+      final fontScale = await _loadFontScale();
       if (isClosed) return;
       final verses = ayahs
           .map((a) => a.toVerse().withUnicode(unicode[a.numberInSurah]))
@@ -99,6 +108,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         mushafPages: groupVersesByPage(verses),
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
+        fontScale: fontScale,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('reader load failed',
@@ -156,6 +166,46 @@ class ReaderCubit extends Cubit<ReaderState> {
           ? ReaderMode.mushaf
           : ReaderMode.verses,
     ));
+  }
+
+  Future<double> _loadFontScale() async {
+    try {
+      return await _settings?.loadFontScale() ?? 1.0;
+    } on Object catch (error, stackTrace) {
+      dev.log('reader font scale read failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      return 1.0;
+    }
+  }
+
+  /// Sets the reader font scale (0.8–2.0); a failed write keeps the on-screen
+  /// value and only logs.
+  Future<void> setFontScale(double scale) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = scale < 0.8 ? 0.8 : (scale > 2.0 ? 2.0 : scale);
+    if (safe == current.fontScale) return;
+    emit(current.copyWith(fontScale: safe));
+    try {
+      await _settings?.saveFontScale(safe);
+    } on Object catch (error, stackTrace) {
+      dev.log('reader font scale write failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+    }
+  }
+
+  /// The surah + ayah of [page]'s first row; null without a source or on a
+  /// failed read.
+  Future<({int surahId, int numberInSurah})?> anchorForPage(int page) async {
+    final source = _pageAnchors;
+    if (source == null) return null;
+    try {
+      return await source.anchorForPage(page);
+    } on Object catch (error, stackTrace) {
+      dev.log('page anchor read failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      return null;
+    }
   }
 
   /// Toggles the bookmark of [ayahId]; the stream re-emits the new set.

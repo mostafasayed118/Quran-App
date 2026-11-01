@@ -9,6 +9,7 @@ library;
 abstract final class AppRoutes {
   static const home = '/home';
   static const quran = '/quran';
+  static const juzIndex = '/quran/juz';
   static const reader = '/quran/reader';
   static const quranSearch = '/quran/search';
   static const recitation = '/recitation';

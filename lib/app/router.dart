@@ -44,6 +44,9 @@ import '../features/hijri/presentation/hijri_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
+import '../features/quran/data/juz_index_source.dart';
+import '../features/quran/data/page_anchor_source.dart';
+import '../features/quran/data/reader_settings_source.dart';
 import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
@@ -52,6 +55,8 @@ import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
+import '../features/quran/presentation/index/juz_index_cubit.dart';
+import '../features/quran/presentation/index/juz_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
@@ -134,6 +139,15 @@ abstract final class AppRouter {
               identity: AppRoutes.quran,
               start: (cubit) => cubit.start(),
               child: const SurahIndexScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.juzIndex,
+            builder: (_, __) => RouteCubitScope<JuzIndexCubit>(
+              create: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
+              identity: AppRoutes.juzIndex,
+              start: (cubit) => cubit.start(),
+              child: const JuzIndexScreen(),
             ),
           ),
           GoRoute(
@@ -387,6 +401,8 @@ abstract final class AppRouter {
                 initialAyah: ayah,
                 wirdProgress: getIt<KhatmaRepository>(),
                 uthmani: getIt<UthmaniTextSource>(),
+                pageAnchors: getIt<PageAnchorSource>(),
+                settings: getIt<ReaderSettingsSource>(),
               ),
               start: (cubit) => cubit.start(),
               child: const ReaderScreen(),

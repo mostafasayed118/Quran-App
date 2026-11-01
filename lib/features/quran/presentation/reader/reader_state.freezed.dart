@@ -153,7 +153,8 @@ extension ReaderStatePatterns on ReaderState {
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
-            bool showBasmala)?
+            bool showBasmala,
+            double fontScale)?
         ready,
     TResult Function(int? emptySurahId)? failed,
     required TResult orElse(),
@@ -171,7 +172,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
-            _that.showBasmala);
+            _that.showBasmala,
+            _that.fontScale);
       case ReaderFailed() when failed != null:
         return failed(_that.emptySurahId);
       case _:
@@ -203,7 +205,8 @@ extension ReaderStatePatterns on ReaderState {
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
-            bool showBasmala)
+            bool showBasmala,
+            double fontScale)
         ready,
     required TResult Function(int? emptySurahId) failed,
   }) {
@@ -220,7 +223,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
-            _that.showBasmala);
+            _that.showBasmala,
+            _that.fontScale);
       case ReaderFailed():
         return failed(_that.emptySurahId);
     }
@@ -249,7 +253,8 @@ extension ReaderStatePatterns on ReaderState {
             List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
-            bool showBasmala)?
+            bool showBasmala,
+            double fontScale)?
         ready,
     TResult? Function(int? emptySurahId)? failed,
   }) {
@@ -266,7 +271,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
-            _that.showBasmala);
+            _that.showBasmala,
+            _that.fontScale);
       case ReaderFailed() when failed != null:
         return failed(_that.emptySurahId);
       case _:
@@ -360,7 +366,8 @@ class ReaderReady implements ReaderState {
       required List<MushafPageBlock> mushafPages,
       this.mode = ReaderMode.verses,
       Set<int> bookmarkedAyahIds = const <int>{},
-      this.showBasmala = true})
+      this.showBasmala = true,
+      this.fontScale = 1.0})
       : _ayahs = ayahs,
         _mushafPages = mushafPages,
         _bookmarkedAyahIds = bookmarkedAyahIds;
@@ -395,6 +402,8 @@ class ReaderReady implements ReaderState {
 
   @JsonKey()
   final bool showBasmala;
+  @JsonKey()
+  final double fontScale;
 
   /// Create a copy of ReaderState
   /// with the given fields replaced by the non-null parameter values.
@@ -420,7 +429,9 @@ class ReaderReady implements ReaderState {
             const DeepCollectionEquality()
                 .equals(other.bookmarkedAyahIds, _bookmarkedAyahIds) &&
             (identical(other.showBasmala, showBasmala) ||
-                other.showBasmala == showBasmala));
+                other.showBasmala == showBasmala) &&
+            (identical(other.fontScale, fontScale) ||
+                other.fontScale == fontScale));
   }
 
   @override
@@ -434,12 +445,13 @@ class ReaderReady implements ReaderState {
         const DeepCollectionEquality().hash(_mushafPages),
         mode,
         const DeepCollectionEquality().hash(_bookmarkedAyahIds),
-        showBasmala);
+        showBasmala,
+        fontScale);
   }
 
   @override
   String toString() {
-    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mushafPages: $mushafPages, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala)';
+    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mushafPages: $mushafPages, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale)';
   }
 }
 
@@ -458,7 +470,8 @@ abstract mixin class $ReaderReadyCopyWith<$Res>
       List<MushafPageBlock> mushafPages,
       ReaderMode mode,
       Set<int> bookmarkedAyahIds,
-      bool showBasmala});
+      bool showBasmala,
+      double fontScale});
 }
 
 /// @nodoc
@@ -480,6 +493,7 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
     Object? mode = null,
     Object? bookmarkedAyahIds = null,
     Object? showBasmala = null,
+    Object? fontScale = null,
   }) {
     return _then(ReaderReady(
       surahId: null == surahId
@@ -514,6 +528,10 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
           ? _self.showBasmala
           : showBasmala // ignore: cast_nullable_to_non_nullable
               as bool,
+      fontScale: null == fontScale
+          ? _self.fontScale
+          : fontScale // ignore: cast_nullable_to_non_nullable
+              as double,
     ));
   }
 }

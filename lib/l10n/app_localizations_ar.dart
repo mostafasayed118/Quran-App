@@ -908,4 +908,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get monthlyTimetable => 'جدول الشهر';
+
+  @override
+  String get juzIndexTitle => 'فهرس الأجزاء';
+
+  @override
+  String juzLabel(String number) {
+    return 'الجزء $number';
+  }
+
+  @override
+  String get pageJump => 'الانتقال إلى صفحة';
+
+  @override
+  String get pageJumpHint => 'رقم الصفحة ١–٦٠٤';
+
+  @override
+  String get pageJumpInvalid => 'صفحة غير موجودة';
+
+  @override
+  String get pageJumpGo => 'انتقال';
+
+  @override
+  String get readerFontSize => 'حجم الخط';
 }

@@ -30,7 +30,13 @@ import 'package:quran_yahdi/features/qibla/data/compass_calibration.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
+import 'package:quran_yahdi/features/quran/data/juz_index_source.dart';
+import 'package:quran_yahdi/features/quran/data/juz_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+import 'package:quran_yahdi/features/quran/data/page_anchor_repository.dart';
+import 'package:quran_yahdi/features/quran/data/page_anchor_source.dart';
+import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
+import 'package:quran_yahdi/features/quran/data/reader_settings_source.dart';
 import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
 import 'package:quran_yahdi/features/quran/data/quran_search_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
@@ -115,6 +121,12 @@ Future<void> configureDependencies({
   );
   getIt.registerLazySingleton<QuranSearchSource>(
       () => QuranSearchRepository(db));
+  getIt.registerLazySingleton<JuzIndexSource>(() => JuzRepository(db));
+  getIt.registerLazySingleton<PageAnchorSource>(() => PageAnchorRepository(db));
+  getIt.registerLazySingleton<ReaderSettingsRepository>(
+      () => ReaderSettingsRepository(db));
+  getIt.registerLazySingleton<ReaderSettingsSource>(
+      () => getIt<ReaderSettingsRepository>());
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt
       .registerLazySingleton<LastReadMarker>(() => getIt<LastReadRepository>());

@@ -913,4 +913,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get monthlyTimetable => 'Monthly timetable';
+
+  @override
+  String get juzIndexTitle => 'Juz index';
+
+  @override
+  String juzLabel(String number) {
+    return 'Juz $number';
+  }
+
+  @override
+  String get pageJump => 'Go to page';
+
+  @override
+  String get pageJumpHint => 'Page number 1–604';
+
+  @override
+  String get pageJumpInvalid => 'Page not found';
+
+  @override
+  String get pageJumpGo => 'Go';
+
+  @override
+  String get readerFontSize => 'Font size';
 }

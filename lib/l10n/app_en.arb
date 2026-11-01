@@ -591,6 +591,18 @@
   "preAdhanFifteen": "15 min",
   "reminderAdhanSoon": "{prayer} is in {minutes} minutes",
   "monthlyTimetable": "Monthly timetable",
+  "juzIndexTitle": "Juz index",
+  "juzLabel": "Juz {number}",
+  "@juzLabel": {
+    "placeholders": {
+      "number": { "type": "String" }
+    }
+  },
+  "pageJump": "Go to page",
+  "pageJumpHint": "Page number 1–604",
+  "pageJumpInvalid": "Page not found",
+  "pageJumpGo": "Go",
+  "readerFontSize": "Font size",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

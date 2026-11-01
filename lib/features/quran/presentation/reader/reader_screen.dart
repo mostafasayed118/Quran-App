@@ -114,6 +114,16 @@ class _ReadyView extends StatelessWidget {
             icon: const Icon(Icons.bookmarks_outlined),
             onPressed: () => context.push(AppRoutes.bookmarks),
           ),
+          IconButton(
+            tooltip: loc.pageJump,
+            icon: const Icon(Icons.pin_outlined),
+            onPressed: () => unawaited(_openPageJump(context, cubit, loc)),
+          ),
+          IconButton(
+            tooltip: loc.readerFontSize,
+            icon: const Icon(Icons.format_size),
+            onPressed: () => _showFontSheet(context, cubit, state.fontScale),
+          ),
         ],
       ),
       // Selection is enabled only when the surah's Unicode Uthmani asset is
@@ -234,6 +244,7 @@ class _VersesListState extends State<_VersesList> {
             ayah: ayah,
             surahName: state.surahName,
             bookmarked: bookmarked,
+            fontScale: state.fontScale,
             onToggle: () => cubit.toggleBookmark(ayah.id),
           ),
         );
@@ -247,12 +258,14 @@ class _AyahCard extends StatelessWidget {
     required this.ayah,
     required this.surahName,
     required this.bookmarked,
+    required this.fontScale,
     required this.onToggle,
   });
 
   final Verse ayah;
   final String surahName;
   final bool bookmarked;
+  final double fontScale;
   final VoidCallback onToggle;
 
   @override
@@ -285,7 +298,9 @@ class _AyahCard extends StatelessWidget {
               final text = unicode ?? stripAyahEndMarker(ayah.textUthmani);
               final widget = Text(
                 text,
-                style: AppTheme.hafsAyah,
+                style: AppTheme.hafsAyah.copyWith(
+                  fontSize: AppTheme.hafsAyah.fontSize! * fontScale,
+                ),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
               );
@@ -510,10 +525,13 @@ class _MushafPagerState extends State<_MushafPager> {
                   child: Text.rich(
                     TextSpan(children: spans),
                     style: unicode
-                        ? AppTheme.hafsAyah.copyWith(fontSize: 22, height: 2.2)
-                        : const TextStyle(
+                        ? AppTheme.hafsAyah.copyWith(
+                            fontSize: 22 * widget.state.fontScale,
+                            height: 2.2,
+                          )
+                        : TextStyle(
                             fontFamily: QuranFonts.quran,
-                            fontSize: 22,
+                            fontSize: 22 * widget.state.fontScale,
                             height: 2.2,
                           ),
                     textAlign: TextAlign.center,
@@ -536,4 +554,96 @@ class _MushafPagerState extends State<_MushafPager> {
       },
     );
   }
+}
+
+/// Resolves a page to the reader's (surah, ayah) route.
+Future<void> _openPageJump(
+  BuildContext context,
+  ReaderCubit cubit,
+  AppLocalizations loc,
+) async {
+  final controller = TextEditingController();
+  final page = await showDialog<int>(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(loc.pageJump),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(hintText: loc.pageJumpHint),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: Text(loc.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(
+            int.tryParse(controller.text.toWesternDigits),
+          ),
+          child: Text(loc.pageJumpGo),
+        ),
+      ],
+    ),
+  );
+  controller.dispose();
+  if (!context.mounted || page == null) return;
+  if (page < 1 || page > 604) {
+    _showInvalidPage(context, loc);
+    return;
+  }
+  final anchor = await cubit.anchorForPage(page);
+  if (!context.mounted) return;
+  if (anchor == null) {
+    _showInvalidPage(context, loc);
+    return;
+  }
+  unawaited(context.push(
+    quranReaderPath(surah: anchor.surahId, ayah: anchor.numberInSurah),
+  ));
+}
+
+void _showInvalidPage(BuildContext context, AppLocalizations loc) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(loc.pageJumpInvalid)),
+  );
+}
+
+void _showFontSheet(
+  BuildContext context,
+  ReaderCubit cubit,
+  double initial,
+) {
+  var value = initial;
+  unawaited(showModalBottomSheet<void>(
+    context: context,
+    builder: (sheetContext) => StatefulBuilder(
+      builder: (context, setSheetState) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context).readerFontSize,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Slider(
+                value: value,
+                min: 0.8,
+                max: 2,
+                divisions: 12,
+                label: value.toStringAsFixed(1),
+                onChanged: (next) {
+                  setSheetState(() => value = next);
+                  unawaited(cubit.setFontScale(next));
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  ));
 }

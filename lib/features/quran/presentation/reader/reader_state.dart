@@ -23,6 +23,7 @@ sealed class ReaderState with _$ReaderState {
     @Default(ReaderMode.verses) ReaderMode mode,
     @Default(<int>{}) Set<int> bookmarkedAyahIds,
     @Default(true) bool showBasmala,
+    @Default(1.0) double fontScale,
   }) = ReaderReady;
 
   /// The load failed. [emptySurahId] is set when the surah itself has no

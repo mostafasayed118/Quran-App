@@ -1687,6 +1687,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'جدول الشهر'**
   String get monthlyTimetable;
+
+  /// No description provided for @juzIndexTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'فهرس الأجزاء'**
+  String get juzIndexTitle;
+
+  /// No description provided for @juzLabel.
+  ///
+  /// In ar, this message translates to:
+  /// **'الجزء {number}'**
+  String juzLabel(String number);
+
+  /// No description provided for @pageJump.
+  ///
+  /// In ar, this message translates to:
+  /// **'الانتقال إلى صفحة'**
+  String get pageJump;
+
+  /// No description provided for @pageJumpHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'رقم الصفحة ١–٦٠٤'**
+  String get pageJumpHint;
+
+  /// No description provided for @pageJumpInvalid.
+  ///
+  /// In ar, this message translates to:
+  /// **'صفحة غير موجودة'**
+  String get pageJumpInvalid;
+
+  /// No description provided for @pageJumpGo.
+  ///
+  /// In ar, this message translates to:
+  /// **'انتقال'**
+  String get pageJumpGo;
+
+  /// No description provided for @readerFontSize.
+  ///
+  /// In ar, this message translates to:
+  /// **'حجم الخط'**
+  String get readerFontSize;
 }
 
 class _AppLocalizationsDelegate
