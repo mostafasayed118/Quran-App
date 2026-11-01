@@ -26,27 +26,25 @@ typedef MagneticStreamFactory = Stream<MagneticSample>? Function();
 const double kMinFieldMicroTesla = 20;
 const double kMaxFieldMicroTesla = 70;
 
-/// A near-vertical phone makes the 2-D heading invalid; |z|/|B| above this
-/// ratio is treated as "lay the phone flatter".
-const double kMaxTiltRatio = 0.90;
-
 /// Consecutive bad samples before the hint appears (~2 s at 5 Hz).
 const int kBadSamplesToRaise = 10;
 
 /// Consecutive good samples before the hint clears (~4 s at 5 Hz).
 const int kGoodSamplesToClear = 20;
 
-/// Whether [sample] looks like a disturbed field or an invalid tilt.
+/// Whether [sample] has a field magnitude outside the normal range.
+///
+/// This deliberately does **not** infer phone tilt from the magnetic z axis:
+/// with the phone flat, z carries the local magnetic inclination (about 0.9 of
+/// the magnitude in London), so that ratio would false-positive a correctly
+/// held phone. Tilt needs the accelerometer and is out of scope.
 bool fieldLooksDisturbed(MagneticSample sample) {
   final magnitude = math.sqrt(
     sample.x * sample.x + sample.y * sample.y + sample.z * sample.z,
   );
-  if (magnitude <= 0 ||
+  return magnitude <= 0 ||
       magnitude < kMinFieldMicroTesla ||
-      magnitude > kMaxFieldMicroTesla) {
-    return true;
-  }
-  return sample.z.abs() / magnitude > kMaxTiltRatio;
+      magnitude > kMaxFieldMicroTesla;
 }
 
 /// Watches the raw field and emits a debounced "needs calibration" signal.
@@ -63,11 +61,15 @@ class CompassCalibration {
   final MagneticStreamFactory _field;
 
   /// Emits only when the debounced state changes; null without a sensor.
-  Stream<bool>? needsCalibrationStream() {
+  ///
+  /// [initialNeeded] seeds the debouncer so a resumed stream can clear a hint
+  /// that was already showing; without it the fresh debouncer would start at
+  /// false and never emit the clearing event.
+  Stream<bool>? needsCalibrationStream({bool initialNeeded = false}) {
     try {
       final raw = _field();
       if (raw == null) return null;
-      return _debounced(raw);
+      return _debounced(raw, initialNeeded);
     } on Object {
       return null;
     }
@@ -78,12 +80,15 @@ class CompassCalibration {
         (event) => MagneticSample(event.x, event.y, event.z),
       );
 
-  static Stream<bool> _debounced(Stream<MagneticSample> raw) {
+  static Stream<bool> _debounced(
+    Stream<MagneticSample> raw,
+    bool initialNeeded,
+  ) {
     late StreamController<bool> out;
     StreamSubscription<MagneticSample>? sub;
     var bad = 0;
     var good = 0;
-    var needed = false;
+    var needed = initialNeeded;
 
     void onSample(MagneticSample sample) {
       if (fieldLooksDisturbed(sample)) {

@@ -32,9 +32,8 @@ double shortestAngleDeltaDeg(double to, double from) {
 
 /// One low-pass step on the compass circle.
 ///
-/// Callers must pass null [previous] for the first sample after (re)binding:
-/// seeding from a stale heading would drag the dial, and the frozen qibla
-/// suite pins the first sample through unchanged.
+/// [previous] is the last smoothed heading; the caller seeds the first sample
+/// by assigning it directly, so this function never sees a null seed.
 double smoothHeadingDeg(double previous, double sample) {
   final delta = shortestAngleDeltaDeg(sample, previous);
   if (delta.abs() >= kHeadingSnapDeg) return sample % 360.0;

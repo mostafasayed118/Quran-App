@@ -90,6 +90,20 @@ void main() {
     expect(cubit.state, isA<PrayerConfigFailed>());
   });
 
+  test('overlapping method and madhab selections both persist', () async {
+    final source = _FakeSource();
+    final cubit = PrayerConfigCubit(source: source);
+    await cubit.start();
+
+    final method = cubit.setMethod(PrayerCalculationMethod.karachi);
+    final madhab = cubit.setMadhab(PrayerMadhab.hanafi);
+    await Future.wait([method, madhab]);
+
+    expect(source.current.method, PrayerCalculationMethod.karachi);
+    expect(source.current.madhab, PrayerMadhab.hanafi);
+    expect(source.saves, 2);
+  });
+
   test('setters before the first load are dropped', () async {
     final source = _FakeSource();
     final cubit = PrayerConfigCubit(source: source);

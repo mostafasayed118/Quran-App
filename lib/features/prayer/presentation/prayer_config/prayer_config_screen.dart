@@ -12,8 +12,8 @@ import 'prayer_config_state.dart';
 
 /// Lets the user choose the calculation method and the Asr madhab.
 ///
-/// Every tap persists immediately; the prayer screen reloads when this route
-/// is popped, so the visible times and the reminders follow the new setting.
+/// Every tap persists immediately; the prayer and home cubits listen to the
+/// config stream and reload when the save lands.
 class PrayerConfigScreen extends StatelessWidget {
   /// Creates the screen.
   const PrayerConfigScreen({super.key});

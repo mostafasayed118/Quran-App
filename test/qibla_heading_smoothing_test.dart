@@ -31,8 +31,7 @@ void main() {
     expect(shortestAngleDeltaDeg(0, 180), 180);
   });
 
-  test('smoothHeadingDeg is a no-op on the first sample and snaps big turns',
-      () {
+  test('smoothHeadingDeg damps small changes and snaps big turns', () {
     expect(smoothHeadingDeg(90, 92), closeTo(90.6, 1e-9));
     expect(smoothHeadingDeg(350, 355), closeTo(351.5, 1e-9));
     expect(smoothHeadingDeg(10, 5), closeTo(8.5, 1e-9));

@@ -30,11 +30,12 @@ class _City implements CitySource {
 }
 
 void main() {
-  test('fieldLooksDisturbed rejects weak, strong and vertical fields', () {
+  test('fieldLooksDisturbed rejects a normal field at any inclination', () {
     expect(fieldLooksDisturbed(const MagneticSample(20, 20, 0)), isFalse);
+    // Vertical z is the local inclination, not phone tilt; it must stay valid.
+    expect(fieldLooksDisturbed(const MagneticSample(0, 0, 50)), isFalse);
     expect(fieldLooksDisturbed(const MagneticSample(1, 1, 0)), isTrue);
     expect(fieldLooksDisturbed(const MagneticSample(100, 0, 0)), isTrue);
-    expect(fieldLooksDisturbed(const MagneticSample(0, 0, 50)), isTrue);
   });
 
   test('the calibration hint needs 10 bad and 20 good samples', () async {
@@ -66,6 +67,26 @@ void main() {
     field.add(const MagneticSample(20, 20, 0));
     await Future<void>.delayed(const Duration(milliseconds: 10));
     expect(events, [true, false]);
+  });
+
+  test('an initially-needed stream can clear after 20 good samples', () async {
+    final field = StreamController<MagneticSample>();
+    final calibration = CompassCalibration(field: () => field.stream);
+    final events = <bool>[];
+    final sub = calibration
+        .needsCalibrationStream(initialNeeded: true)!
+        .listen(events.add);
+    addTearDown(() async {
+      await field.close();
+      await sub.cancel();
+    });
+
+    for (var i = 0; i < 20; i++) {
+      field.add(const MagneticSample(20, 20, 0));
+    }
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+
+    expect(events, [false]);
   });
 
   testWidgets('the screen shows the hint when the field is disturbed',

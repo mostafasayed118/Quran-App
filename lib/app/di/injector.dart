@@ -26,7 +26,6 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/configured_prayer_times.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_config_repository.dart';
-import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/qibla/data/compass_calibration.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
@@ -120,8 +119,6 @@ Future<void> configureDependencies({
   getIt
       .registerLazySingleton<LastReadMarker>(() => getIt<LastReadRepository>());
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
-  getIt.registerLazySingleton<PrayerTimeService>(
-      () => const PrayerTimeService());
   getIt.registerLazySingleton<PrayerConfigRepository>(
       () => PrayerConfigRepository(db));
   getIt.registerLazySingleton<PrayerConfigSource>(

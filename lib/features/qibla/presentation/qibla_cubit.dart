@@ -118,7 +118,9 @@ class QiblaCubit extends Cubit<QiblaState> {
 
   void _bindCalibration() {
     if (_calibrationSub != null) return;
-    final stream = _calibration?.needsCalibrationStream();
+    final stream = _calibration?.needsCalibrationStream(
+      initialNeeded: _calibrationNeeded,
+    );
     if (stream == null) return;
     _calibrationSub = stream.listen(
       _onCalibration,

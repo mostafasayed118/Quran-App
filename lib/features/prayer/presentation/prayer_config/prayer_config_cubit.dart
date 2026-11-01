@@ -18,6 +18,10 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
 
   final PrayerConfigSource _source;
 
+  /// Serializes overlapping selections so a quick method + madhab tap cannot
+  /// write the old method back when the second save lands.
+  Future<void> _pending = Future<void>.value();
+
   /// Loads the persisted configuration.
   Future<void> start() async {
     try {
@@ -31,24 +35,24 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   }
 
   /// Selects [method] and persists it.
-  Future<void> setMethod(PrayerCalculationMethod method) {
-    final current = state;
-    if (current is! PrayerConfigReady || current.config.method == method) {
-      return Future<void>.value();
-    }
-    return _save(current.config.copyWith(method: method));
-  }
+  Future<void> setMethod(PrayerCalculationMethod method) =>
+      _enqueue((config) => config.copyWith(method: method));
 
   /// Selects [madhab] and persists it.
-  Future<void> setMadhab(PrayerMadhab madhab) {
-    final current = state;
-    if (current is! PrayerConfigReady || current.config.madhab == madhab) {
-      return Future<void>.value();
-    }
-    return _save(current.config.copyWith(madhab: madhab));
+  Future<void> setMadhab(PrayerMadhab madhab) =>
+      _enqueue((config) => config.copyWith(madhab: madhab));
+
+  Future<void> _enqueue(PrayerConfig Function(PrayerConfig) update) {
+    final next = _pending.then((_) => _apply(update));
+    _pending = next.catchError((Object _) {});
+    return next;
   }
 
-  Future<void> _save(PrayerConfig next) async {
+  Future<void> _apply(PrayerConfig Function(PrayerConfig) update) async {
+    final current = state;
+    if (current is! PrayerConfigReady) return;
+    final next = update(current.config);
+    if (next == current.config) return;
     try {
       await _source.save(next);
       if (!isClosed) emit(PrayerConfigState.ready(next));
