@@ -3,7 +3,7 @@
   "checkpoint_id": "01M6BVNP2PVZ6XVMS6K9DYN88N",
   "strategy": "manual-commit",
   "branch": "feat/tanzil-attribution",
-  "checkpoints_count": 16,
+  "checkpoints_count": 29,
   "files_touched": [
     "assets/licenses/tanzil-quran-uthmani.txt",
     "lib/features/settings/presentation/licenses_screen.dart",
@@ -26,6 +26,12 @@
       "transcript": "/1/full.jsonl",
       "content_hash": "/1/content_hash.txt",
       "prompt": "/1/prompt.txt"
+    },
+    {
+      "metadata": "/2/metadata.json",
+      "transcript": "/2/full.jsonl",
+      "content_hash": "/2/content_hash.txt",
+      "prompt": "/2/prompt.txt"
     }
   ],
   "redaction": {
