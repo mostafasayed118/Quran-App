@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/prayer_config.dart';
+import '../../../../core/domain/prayer_name.dart';
+import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -67,6 +71,51 @@ class _Ready extends StatelessWidget {
             selected: config.madhab == madhab,
             onTap: () => cubit.setMadhab(madhab),
           ),
+        const Divider(height: AppSpacing.xl),
+        _SectionLabel(loc.prayerReminderPerPrayer),
+        for (final prayer in PrayerName.values)
+          if (prayer != PrayerName.sunrise)
+            SwitchListTile(
+              title: Text(prayer.label(loc)),
+              value: config.enabledPrayers.contains(prayer),
+              onChanged: (enabled) => cubit.setPrayerEnabled(prayer, enabled),
+            ),
+        const Divider(height: AppSpacing.xl),
+        _SectionLabel(loc.preAdhanReminder),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              _PreAdhanChip(
+                label: loc.preAdhanOff,
+                selected: config.preAdhanMinutes == 0,
+                onTap: () => cubit.setPreAdhanMinutes(0),
+              ),
+              _PreAdhanChip(
+                label: loc.preAdhanFive,
+                selected: config.preAdhanMinutes == 5,
+                onTap: () => cubit.setPreAdhanMinutes(5),
+              ),
+              _PreAdhanChip(
+                label: loc.preAdhanTen,
+                selected: config.preAdhanMinutes == 10,
+                onTap: () => cubit.setPreAdhanMinutes(10),
+              ),
+              _PreAdhanChip(
+                label: loc.preAdhanFifteen,
+                selected: config.preAdhanMinutes == 15,
+                onTap: () => cubit.setPreAdhanMinutes(15),
+              ),
+            ],
+          ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.calendar_month_outlined),
+          title: Text(loc.monthlyTimetable),
+          onTap: () => context.push(AppRoutes.prayerMonth),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
@@ -130,6 +179,27 @@ class _ChoiceTile extends StatelessWidget {
           ? Icon(Icons.check, color: Theme.of(context).colorScheme.primary)
           : null,
       onTap: onTap,
+    );
+  }
+}
+
+class _PreAdhanChip extends StatelessWidget {
+  const _PreAdhanChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: selected,
+      onSelected: (_) => onTap(),
     );
   }
 }

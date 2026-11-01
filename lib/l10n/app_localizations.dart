@@ -1639,6 +1639,54 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨.'**
   String get qiblaCalibrationHint;
+
+  /// No description provided for @prayerReminderPerPrayer.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنبيه الصلوات'**
+  String get prayerReminderPerPrayer;
+
+  /// No description provided for @preAdhanReminder.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير قبل الأذان'**
+  String get preAdhanReminder;
+
+  /// No description provided for @preAdhanOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون'**
+  String get preAdhanOff;
+
+  /// No description provided for @preAdhanFive.
+  ///
+  /// In ar, this message translates to:
+  /// **'٥ دقائق'**
+  String get preAdhanFive;
+
+  /// No description provided for @preAdhanTen.
+  ///
+  /// In ar, this message translates to:
+  /// **'١٠ دقائق'**
+  String get preAdhanTen;
+
+  /// No description provided for @preAdhanFifteen.
+  ///
+  /// In ar, this message translates to:
+  /// **'١٥ دقيقة'**
+  String get preAdhanFifteen;
+
+  /// No description provided for @reminderAdhanSoon.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقتربت صلاة {prayer} — بعد {minutes} دقيقة'**
+  String reminderAdhanSoon(String prayer, String minutes);
+
+  /// No description provided for @monthlyTimetable.
+  ///
+  /// In ar, this message translates to:
+  /// **'جدول الشهر'**
+  String get monthlyTimetable;
 }
 
 class _AppLocalizationsDelegate

@@ -887,4 +887,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get qiblaCalibrationHint =>
       'Direction is unreliable — move away from metal and wave the phone in a figure-8.';
+
+  @override
+  String get prayerReminderPerPrayer => 'Prayer alerts';
+
+  @override
+  String get preAdhanReminder => 'Pre-adhan reminder';
+
+  @override
+  String get preAdhanOff => 'Off';
+
+  @override
+  String get preAdhanFive => '5 min';
+
+  @override
+  String get preAdhanTen => '10 min';
+
+  @override
+  String get preAdhanFifteen => '15 min';
+
+  @override
+  String reminderAdhanSoon(String prayer, String minutes) {
+    return '$prayer is in $minutes minutes';
+  }
+
+  @override
+  String get monthlyTimetable => 'Monthly timetable';
 }

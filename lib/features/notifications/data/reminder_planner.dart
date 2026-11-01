@@ -1,3 +1,4 @@
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/utils/date_only.dart';
@@ -10,6 +11,10 @@ export 'package:quran_yahdi/core/domain/reminders.dart'
 const int prayerReminderId = 1;
 const int azkarReminderId = 2;
 const int wirdReminderId = 3;
+
+/// Optional early reminder for the chosen prayer; only present when the user
+/// sets a pre-adhan lead time. Kept above the frozen 1/2/3 ids.
+const int preAdhanReminderId = 4;
 
 /// Tap payloads: cold/warm notification taps carry these tags so the app
 /// layer can route to the reminder's own screen (W7b non-goal closed).
@@ -28,6 +33,7 @@ class ReminderTexts {
   const ReminderTexts({
     required this.prayerTitle,
     required this.azkarTitle,
+    this.prayerSoonTitle,
     this.azkarBody,
     this.wirdTitle,
     this.wirdBody,
@@ -35,6 +41,9 @@ class ReminderTexts {
 
   /// Title builder for a prayer reminder.
   final String Function(PrayerName prayer) prayerTitle;
+
+  /// Optional title builder for the pre-adhan reminder; null skips it.
+  final String Function(PrayerName prayer, int minutes)? prayerSoonTitle;
 
   /// Title of the azkar reminder.
   final String azkarTitle;
@@ -59,6 +68,8 @@ List<ScheduledReminder> planReminders({
   required List<PrayerChoice> todayPrayers,
   PrayerChoice? nextPrayer,
   bool prayerEnabled = true,
+  Set<PrayerName> enabledPrayers = PrayerConfig.defaultEnabledPrayers,
+  int preAdhanMinutes = 0,
   required bool azkarEnabled,
   required String? azkarTimeHm,
   bool wirdEnabled = false,
@@ -68,26 +79,39 @@ List<ScheduledReminder> planReminders({
   final byId = <int, ScheduledReminder>{};
 
   if (prayerEnabled) {
-    var prayerPlanned = false;
+    PrayerChoice? chosen;
     for (final choice in todayPrayers) {
       if (choice.name == PrayerName.sunrise) continue;
+      if (!enabledPrayers.contains(choice.name)) continue;
       if (!choice.time.isAfter(now)) continue;
-      byId[prayerReminderId] = ScheduledReminder(
-        id: prayerReminderId,
-        fireAt: choice.time,
-        title: texts.prayerTitle(choice.name),
-        payload: prayerReminderPayload,
-      );
-      prayerPlanned = true;
+      chosen = choice;
       break;
     }
-    if (!prayerPlanned && nextPrayer != null && nextPrayer.time.isAfter(now)) {
+    if (chosen == null &&
+        nextPrayer != null &&
+        nextPrayer.time.isAfter(now) &&
+        enabledPrayers.contains(nextPrayer.name)) {
+      chosen = nextPrayer;
+    }
+    if (chosen != null) {
       byId[prayerReminderId] = ScheduledReminder(
         id: prayerReminderId,
-        fireAt: nextPrayer.time,
-        title: texts.prayerTitle(nextPrayer.name),
+        fireAt: chosen.time,
+        title: texts.prayerTitle(chosen.name),
         payload: prayerReminderPayload,
       );
+      final soonTitle = texts.prayerSoonTitle;
+      if (preAdhanMinutes > 0 && soonTitle != null) {
+        final fireAt = chosen.time.subtract(Duration(minutes: preAdhanMinutes));
+        if (fireAt.isAfter(now)) {
+          byId[preAdhanReminderId] = ScheduledReminder(
+            id: preAdhanReminderId,
+            fireAt: fireAt,
+            title: soonTitle(chosen.name, preAdhanMinutes),
+            payload: prayerReminderPayload,
+          );
+        }
+      }
     }
   }
 

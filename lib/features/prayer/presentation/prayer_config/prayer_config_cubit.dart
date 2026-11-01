@@ -2,6 +2,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
 
 import 'prayer_config_state.dart';
 
@@ -41,6 +42,24 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   /// Selects [madhab] and persists it.
   Future<void> setMadhab(PrayerMadhab madhab) =>
       _enqueue((config) => config.copyWith(madhab: madhab));
+
+  /// Enables or disables the reminder for [prayer].
+  Future<void> setPrayerEnabled(PrayerName prayer, bool enabled) =>
+      _enqueue((config) {
+        final prayers = <PrayerName>{...config.enabledPrayers};
+        if (enabled) {
+          prayers.add(prayer);
+        } else {
+          prayers.remove(prayer);
+        }
+        return config.copyWith(enabledPrayers: prayers);
+      });
+
+  /// Sets the pre-adhan lead time; 0 disables the early reminder.
+  Future<void> setPreAdhanMinutes(int minutes) {
+    final safe = minutes < 0 ? 0 : (minutes > 60 ? 60 : minutes);
+    return _enqueue((config) => config.copyWith(preAdhanMinutes: safe));
+  }
 
   Future<void> _enqueue(PrayerConfig Function(PrayerConfig) update) {
     final next = _pending.then((_) => _apply(update));

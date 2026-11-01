@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_state.dart';
 
@@ -102,6 +103,34 @@ void main() {
     expect(source.current.method, PrayerCalculationMethod.karachi);
     expect(source.current.madhab, PrayerMadhab.hanafi);
     expect(source.saves, 2);
+  });
+
+  test('per-prayer toggles and pre-adhan minutes persist', () async {
+    final source = _FakeSource();
+    final cubit = PrayerConfigCubit(source: source);
+    await cubit.start();
+
+    await cubit.setPrayerEnabled(PrayerName.fajr, false);
+    await cubit.setPrayerEnabled(PrayerName.isha, false);
+    await cubit.setPreAdhanMinutes(10);
+
+    expect(source.current.enabledPrayers, isNot(contains(PrayerName.fajr)));
+    expect(source.current.enabledPrayers, isNot(contains(PrayerName.isha)));
+    expect(source.current.enabledPrayers, contains(PrayerName.dhuhr));
+    expect(source.current.preAdhanMinutes, 10);
+    expect(source.saves, 3);
+  });
+
+  test('pre-adhan minutes are clamped to the supported range', () async {
+    final source = _FakeSource();
+    final cubit = PrayerConfigCubit(source: source);
+    await cubit.start();
+
+    await cubit.setPreAdhanMinutes(999);
+    expect(source.current.preAdhanMinutes, 60);
+
+    await cubit.setPreAdhanMinutes(-5);
+    expect(source.current.preAdhanMinutes, 0);
   });
 
   test('setters before the first load are dropped', () async {

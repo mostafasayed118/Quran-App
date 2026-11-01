@@ -85,6 +85,10 @@ class NotificationsBinding implements ReminderSchedulerPort {
   /// and the alarms it would write are identical.
   String? _appliedPlan;
 
+  /// The ids the last applied plan wrote, so a reminder removed from the plan
+  /// (e.g. the pre-adhan id when the user turns it off) is still cleared.
+  Set<int> _appliedPlanIds = const <int>{};
+
   /// The tail of the apply chain. A plan change reaches the binding from
   /// several callers (boot, settings, the prayer screen); the applies must
   /// never interleave, or a slower earlier plan would overwrite a newer one
@@ -311,15 +315,22 @@ class NotificationsBinding implements ReminderSchedulerPort {
       // The alarms are about to be cleared. From this point the old
       // fingerprint is a lie even if a later zonedSchedule throws.
       _appliedPlan = null;
-      // All three planner ids go up front, so a reminder that is no longer
+      // All three fixed planner ids go up front, plus any id a previous plan
+      // wrote (the optional pre-adhan id), so a reminder that is no longer
       // part of the new plan is still removed (replace-all semantics).
-      for (final id in const <int>[
+      final ids = <int>{
         prayerReminderId,
         azkarReminderId,
         wirdReminderId,
-      ]) {
+        ..._appliedPlanIds,
+      };
+      for (final id in ids) {
         await _plugin.cancel(id: id);
       }
+      _appliedPlanIds = <int>{
+        ..._appliedPlanIds,
+        ...reminders.map((reminder) => reminder.id),
+      };
       for (final reminder in reminders) {
         await _plugin.zonedSchedule(
           id: reminder.id,

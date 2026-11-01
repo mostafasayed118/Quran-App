@@ -582,5 +582,19 @@
   "methodNorthAmerica": "ISNA, North America",
   "madhabShafi": "Shafi (default)",
   "madhabHanafi": "Hanafi",
-  "qiblaCalibrationHint": "Direction is unreliable — move away from metal and wave the phone in a figure-8."
+  "qiblaCalibrationHint": "Direction is unreliable — move away from metal and wave the phone in a figure-8.",
+  "prayerReminderPerPrayer": "Prayer alerts",
+  "preAdhanReminder": "Pre-adhan reminder",
+  "preAdhanOff": "Off",
+  "preAdhanFive": "5 min",
+  "preAdhanTen": "10 min",
+  "preAdhanFifteen": "15 min",
+  "reminderAdhanSoon": "{prayer} is in {minutes} minutes",
+  "monthlyTimetable": "Monthly timetable",
+  "@reminderAdhanSoon": {
+    "placeholders": {
+      "prayer": { "type": "String" },
+      "minutes": { "type": "String" }
+    }
+  }
 }

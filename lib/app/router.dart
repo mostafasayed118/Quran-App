@@ -66,6 +66,8 @@ import '../features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import '../features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import '../features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
 import '../features/prayer/presentation/prayer_config/prayer_config_screen.dart';
+import '../features/prayer/presentation/prayer_month/prayer_month_cubit.dart';
+import '../features/prayer/presentation/prayer_month/prayer_month_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
 import '../features/recitation/presentation/downloads/downloads_cubit.dart';
 import '../features/recitation/presentation/downloads/downloads_screen.dart';
@@ -250,6 +252,18 @@ abstract final class AppRouter {
           identity: AppRoutes.prayerSettings,
           start: (cubit) => cubit.start(),
           child: const PrayerConfigScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.prayerMonth,
+        builder: (_, __) => RouteCubitScope<PrayerMonthCubit>(
+          create: () => PrayerMonthCubit(
+            city: getIt<CitySource>(),
+            prayer: getIt<PrayerTimesPort>(),
+          ),
+          identity: AppRoutes.prayerMonth,
+          start: (cubit) => cubit.start(),
+          child: const PrayerMonthScreen(),
         ),
       ),
       GoRoute(

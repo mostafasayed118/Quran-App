@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_config_repository.dart';
 
 import 'support/test_db.dart';
@@ -11,6 +12,8 @@ void main() {
     final repo = PrayerConfigRepository(db);
 
     expect(repo.current, PrayerConfig.egyptian);
+    expect(repo.current.enabledPrayers, PrayerConfig.defaultEnabledPrayers);
+    expect(repo.current.preAdhanMinutes, 0);
     expect(await repo.load(), PrayerConfig.egyptian);
     expect(repo.current, PrayerConfig.egyptian);
   });
@@ -21,6 +24,8 @@ void main() {
     const config = PrayerConfig(
       method: PrayerCalculationMethod.ummAlQura,
       madhab: PrayerMadhab.hanafi,
+      enabledPrayers: {PrayerName.fajr, PrayerName.isha},
+      preAdhanMinutes: 15,
     );
 
     await repo.save(config);
@@ -44,10 +49,38 @@ void main() {
             value: 'not-a-madhab',
           ),
         );
+    await db.into(db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(
+            key: PrayerConfig.enabledPrayersKey,
+            value: 'sunrise,unknown',
+          ),
+        );
+    await db.into(db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(
+            key: PrayerConfig.preAdhanMinutesKey,
+            value: '999',
+          ),
+        );
     final repo = PrayerConfigRepository(db);
 
-    expect(await repo.load(), PrayerConfig.egyptian);
-    expect(repo.current, PrayerConfig.egyptian);
+    final loaded = await repo.load();
+    expect(loaded.method, PrayerCalculationMethod.egyptian);
+    expect(loaded.madhab, PrayerMadhab.shafi);
+    expect(loaded.enabledPrayers, isEmpty);
+    expect(loaded.preAdhanMinutes, 60);
+  });
+
+  test('negative pre-adhan minutes clamp to zero', () async {
+    final db = newTestDb();
+    await db.into(db.settingsTable).insertOnConflictUpdate(
+          SettingsTableCompanion.insert(
+            key: PrayerConfig.preAdhanMinutesKey,
+            value: '-5',
+          ),
+        );
+    final repo = PrayerConfigRepository(db);
+
+    expect((await repo.load()).preAdhanMinutes, 0);
   });
 
   test('changes emits after a successful save', () async {

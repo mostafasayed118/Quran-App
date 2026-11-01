@@ -1,5 +1,6 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 
@@ -17,9 +18,11 @@ const String prayerReminderEnabledKey = 'prayer_reminder_enabled';
 /// pattern; bool stored as the 'true'/'false' string, time as 'HH:mm').
 class ReminderSettings
     implements ReminderSettingsPort, PrayerReminderSettingsPort {
-  ReminderSettings(this._db);
+  ReminderSettings(this._db, {PrayerConfigSource? prayerConfig})
+      : _prayerConfig = prayerConfig;
 
   final AppDatabase _db;
+  final PrayerConfigSource? _prayerConfig;
 
   @override
   Future<bool> azkarEnabled() async {
@@ -132,6 +135,7 @@ class ReminderSettings
       settings: this,
       scheduler: scheduler,
       prayerEnabled: enabled,
+      config: _prayerConfig?.current ?? PrayerConfig.egyptian,
     );
   }
 }

@@ -27,7 +27,12 @@ class PrayerConfigRepository implements PrayerConfigSource {
     try {
       final rows = await (_db.select(_db.settingsTable)
             ..where((t) => t.key.isIn(
-                  [PrayerConfig.methodKey, PrayerConfig.madhabKey],
+                  [
+                    PrayerConfig.methodKey,
+                    PrayerConfig.madhabKey,
+                    PrayerConfig.enabledPrayersKey,
+                    PrayerConfig.preAdhanMinutesKey,
+                  ],
                 )))
           .get();
       final values = <String, String>{
@@ -59,6 +64,19 @@ class PrayerConfigRepository implements PrayerConfigSource {
             SettingsTableCompanion.insert(
               key: PrayerConfig.madhabKey,
               value: config.madhab.name,
+            ),
+          );
+      await _db.into(_db.settingsTable).insertOnConflictUpdate(
+            SettingsTableCompanion.insert(
+              key: PrayerConfig.enabledPrayersKey,
+              value:
+                  config.enabledPrayers.map((prayer) => prayer.name).join(','),
+            ),
+          );
+      await _db.into(_db.settingsTable).insertOnConflictUpdate(
+            SettingsTableCompanion.insert(
+              key: PrayerConfig.preAdhanMinutesKey,
+              value: '${config.preAdhanMinutes}',
             ),
           );
     });

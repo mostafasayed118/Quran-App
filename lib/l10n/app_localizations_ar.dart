@@ -882,4 +882,30 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get qiblaCalibrationHint =>
       'الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨.';
+
+  @override
+  String get prayerReminderPerPrayer => 'تنبيه الصلوات';
+
+  @override
+  String get preAdhanReminder => 'تذكير قبل الأذان';
+
+  @override
+  String get preAdhanOff => 'بدون';
+
+  @override
+  String get preAdhanFive => '٥ دقائق';
+
+  @override
+  String get preAdhanTen => '١٠ دقائق';
+
+  @override
+  String get preAdhanFifteen => '١٥ دقيقة';
+
+  @override
+  String reminderAdhanSoon(String prayer, String minutes) {
+    return 'اقتربت صلاة $prayer — بعد $minutes دقيقة';
+  }
+
+  @override
+  String get monthlyTimetable => 'جدول الشهر';
 }

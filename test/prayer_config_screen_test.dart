@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_screen.dart';
 
@@ -59,5 +60,25 @@ void main() {
     await tester.pump();
 
     expect(source.current.madhab, PrayerMadhab.hanafi);
+
+    await tester.scrollUntilVisible(find.text('تنبيه الصلوات'), 200);
+    final fajr = find.text('فجر');
+    await tester.scrollUntilVisible(fajr, 200);
+    await tester.tap(fajr);
+    await tester.pump();
+    expect(
+      source.current.enabledPrayers,
+      isNot(contains(PrayerName.fajr)),
+    );
+
+    await tester.scrollUntilVisible(find.text('تذكير قبل الأذان'), 200);
+    final tenMinutes = find.text('١٠ دقائق');
+    await tester.scrollUntilVisible(tenMinutes, 200);
+    await tester.tap(tenMinutes);
+    await tester.pump();
+    expect(source.current.preAdhanMinutes, 10);
+
+    await tester.scrollUntilVisible(find.text('جدول الشهر'), 200);
+    expect(find.text('جدول الشهر'), findsOneWidget);
   });
 }

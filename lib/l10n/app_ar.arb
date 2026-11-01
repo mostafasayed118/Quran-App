@@ -603,5 +603,19 @@
   "methodNorthAmerica": "ISNA — أمريكا الشمالية",
   "madhabShafi": "الشافعي (الافتراضي)",
   "madhabHanafi": "الحنفي",
-  "qiblaCalibrationHint": "الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨."
+  "qiblaCalibrationHint": "الاتجاه غير دقيق — أبعد الهاتف عن المعادن وحرّكه على شكل ٨.",
+  "prayerReminderPerPrayer": "تنبيه الصلوات",
+  "preAdhanReminder": "تذكير قبل الأذان",
+  "preAdhanOff": "بدون",
+  "preAdhanFive": "٥ دقائق",
+  "preAdhanTen": "١٠ دقائق",
+  "preAdhanFifteen": "١٥ دقيقة",
+  "reminderAdhanSoon": "اقتربت صلاة {prayer} — بعد {minutes} دقيقة",
+  "monthlyTimetable": "جدول الشهر",
+  "@reminderAdhanSoon": {
+    "placeholders": {
+      "prayer": { "type": "String" },
+      "minutes": { "type": "String" }
+    }
+  }
 }

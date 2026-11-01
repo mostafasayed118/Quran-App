@@ -4,6 +4,8 @@
 /// the presentation layer can share it without importing each other.
 library;
 
+import 'prayer_name.dart';
+
 /// The calculation methods the app exposes.
 ///
 /// The names are the persisted identifiers; adding a value is additive, and an
@@ -56,9 +58,11 @@ class PrayerConfig {
   const PrayerConfig({
     this.method = PrayerCalculationMethod.egyptian,
     this.madhab = PrayerMadhab.shafi,
+    this.enabledPrayers = defaultEnabledPrayers,
+    this.preAdhanMinutes = 0,
   });
 
-  /// The historical default (Egyptian, Shafi).
+  /// The historical default (Egyptian, Shafi, all five prayers, no pre-adhan).
   static const egyptian = PrayerConfig();
 
   /// Persisted key for [method].
@@ -67,20 +71,49 @@ class PrayerConfig {
   /// Persisted key for [madhab].
   static const madhabKey = 'prayer_madhab';
 
+  /// Persisted key for [enabledPrayers].
+  static const enabledPrayersKey = 'prayer_enabled_prayers';
+
+  /// Persisted key for [preAdhanMinutes].
+  static const preAdhanMinutesKey = 'prayer_pre_adhan_minutes';
+
+  /// The five prayers a reminder can target; sunrise is never included.
+  static const defaultEnabledPrayers = <PrayerName>{
+    PrayerName.fajr,
+    PrayerName.dhuhr,
+    PrayerName.asr,
+    PrayerName.maghrib,
+    PrayerName.isha,
+  };
+
   /// The selected calculation method.
   final PrayerCalculationMethod method;
 
   /// The selected Asr madhab.
   final PrayerMadhab madhab;
 
+  /// The prayers that may schedule the prayer reminder.
+  ///
+  /// Callers must treat this as immutable; the cubit replaces the set.
+  final Set<PrayerName> enabledPrayers;
+
+  /// Minutes before the chosen prayer for the optional early reminder.
+  ///
+  /// 0 disables the early reminder; stored values are clamped to 0..60.
+  final int preAdhanMinutes;
+
   /// A copy with the given fields replaced.
   PrayerConfig copyWith({
     PrayerCalculationMethod? method,
     PrayerMadhab? madhab,
+    Set<PrayerName>? enabledPrayers,
+    int? preAdhanMinutes,
   }) {
     return PrayerConfig(
       method: method ?? this.method,
       madhab: madhab ?? this.madhab,
+      enabledPrayers: enabledPrayers ?? this.enabledPrayers,
+      preAdhanMinutes: preAdhanMinutes ?? this.preAdhanMinutes,
     );
   }
 
@@ -88,6 +121,9 @@ class PrayerConfig {
   Map<String, String> toJson() => {
         methodKey: method.name,
         madhabKey: madhab.name,
+        enabledPrayersKey:
+            enabledPrayers.map((prayer) => prayer.name).join(','),
+        preAdhanMinutesKey: '$preAdhanMinutes',
       };
 
   /// Decodes a persisted map; unknown or missing values fall back to the
@@ -96,6 +132,10 @@ class PrayerConfig {
     return PrayerConfig(
       method: methodFromName(json[methodKey]),
       madhab: madhabFromName(json[madhabKey]),
+      enabledPrayers: json.containsKey(enabledPrayersKey)
+          ? _prayersFromCsv(json[enabledPrayersKey])
+          : defaultEnabledPrayers,
+      preAdhanMinutes: _minutesFromString(json[preAdhanMinutesKey]),
     );
   }
 
@@ -115,12 +155,42 @@ class PrayerConfig {
     return PrayerMadhab.shafi;
   }
 
-  @override
-  bool operator ==(Object other) =>
-      other is PrayerConfig && other.method == method && other.madhab == madhab;
+  static Set<PrayerName> _prayersFromCsv(String? csv) {
+    if (csv == null || csv.trim().isEmpty) return <PrayerName>{};
+    final names = csv.split(',').map((name) => name.trim());
+    return <PrayerName>{
+      for (final name in names)
+        if (name != PrayerName.sunrise.name)
+          for (final prayer in PrayerName.values)
+            if (prayer.name == name && prayer != PrayerName.sunrise) prayer,
+    };
+  }
+
+  static int _minutesFromString(String? value) {
+    final minutes = int.tryParse(value ?? '') ?? 0;
+    if (minutes < 0) return 0;
+    if (minutes > 60) return 60;
+    return minutes;
+  }
 
   @override
-  int get hashCode => Object.hash(method, madhab);
+  bool operator ==(Object other) =>
+      other is PrayerConfig &&
+      other.method == method &&
+      other.madhab == madhab &&
+      other.preAdhanMinutes == preAdhanMinutes &&
+      _samePrayers(other.enabledPrayers, enabledPrayers);
+
+  @override
+  int get hashCode => Object.hash(
+        method,
+        madhab,
+        preAdhanMinutes,
+        Object.hashAllUnordered(enabledPrayers),
+      );
+
+  static bool _samePrayers(Set<PrayerName> a, Set<PrayerName> b) =>
+      a.length == b.length && a.containsAll(b);
 }
 
 /// Cross-feature seam: read the current preferences synchronously (the
