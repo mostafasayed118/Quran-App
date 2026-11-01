@@ -91,7 +91,7 @@ Future<void> _seedContentFromFile(
 
 /// Loads the bundled asset on a WORKER isolate.
 ///
-/// The DB asset is ~3.3 MB; loading and writing it on the UI isolate costs
+/// The DB asset is ~4.0 MiB (4,173,824 B); loading and writing it on the UI isolate costs
 /// a boot-time frame stall and a full-size allocation on the isolate that
 /// renders the app. [rootBundle] cannot be used on a background isolate (a
 /// background isolate has no ServicesBinding), so the worker talks to the
@@ -212,7 +212,7 @@ Future<void> _ensureContentCurrentOffUiIsolate(
 ///
 /// The UI isolate only ever receives the executor: the asset copy and the
 /// content re-seed run on a worker isolate (and on drift's background
-/// isolate for the SQL), so the 3.3 MB asset never lands on the isolate
+/// isolate for the SQL), so the 4.0 MiB asset never lands on the isolate
 /// that renders the first frame.
 Future<QueryExecutor> openAppDatabase() async {
   final dir = await getApplicationSupportDirectory();

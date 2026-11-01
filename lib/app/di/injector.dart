@@ -75,8 +75,9 @@ Future<Map<String, dynamic>> _emptyAzkarLoader() async =>
 /// Registration rules:
 /// - a repository, a service or a port is a LAZY SINGLETON — one instance
 ///   for the whole app lifetime;
-/// - a route-scoped cubit (one the router creates per entry) is a FACTORY —
-///   a shared instance would leak state between two visits to the route.
+/// - a route-scoped cubit is never registered here: the router's
+///   `RouteCubitScope` creates one instance per entry and closes it on exit,
+///   because a shared instance would leak state between two visits to the route.
 ///
 /// The optional loader arguments are the seam for boot (assets) and for the
 /// tests; a loader left out means that feature registers its empty fallback,

@@ -1243,3 +1243,30 @@ performance pack index (needs a migration decision), or feature gaps (product sc
 
 **Plan prepared:** 2026-10-30 · **Commit:** `d39c1f7` · **Only file created:**
 `PRODUCTION_REMEDIATION_PLAN.md` · **Application source modified: none.**
+
+---
+
+## 26. Status corrections — 2026-11-01 source verification
+
+The rows above are the audit snapshot at `d39c1f7` and are deliberately not rewritten.
+A fresh source check of the finishing worktree (`main` @ `73e0e9b` + the licensing WIP)
+shows these rows have moved:
+
+| Row | Table said | Verified now | Evidence |
+|---|---|---|---|
+| REL-02 | Release job not gated; debug-signed but release-named | **fixed** | `ci.yml` `needs: [analyze-test]`; artifacts `debug-signed-apk` / `debug-signed-aab` |
+| REL-07 | SDK levels inherited from local Flutter; no `.fvmrc` | **fixed** | `.fvmrc` pins 3.47.5; `build.gradle` compileSdk 36 / minSdk 24 / targetSdk 36 |
+| REL-10 | Bash env syntax; split APK line missing `--release` | **fixed** | README uses `$env:PUBLISH_RELEASE`; `flutter build apk --release --split-per-abi` |
+| REL-11 / SEC-05 | Wrapper ignored; no checksum | **fixed** | both wrapper files tracked; `distributionSha256Sum` present |
+| SEC-02 | `FINE` location declared but unused | **fixed** | manifest declares `ACCESS_COARSE_LOCATION` only |
+| SEC-03 | `file` domain not excluded from transfer | **fixed** | `data_extraction_rules.xml` excludes `domain="file"` twice (pinned by test) |
+| SEC-04 | Mutable action tags; no permissions block | **fixed** | 40-hex action SHAs; `permissions: contents: read` |
+| SEC-07 | Same `applicationId` for debug/release | **fixed** | debug buildType adds `applicationIdSuffix = ".debug"` + `versionNameSuffix = "-debug"` |
+| REL-03 | Licensing open | **still open** | seven `OPEN-FOR-OWNER` rows in `docs/store/licensing-matrix.md` |
+| REL-04 | Only the upload-cert fingerprint is pinned | **still open** | `web/public/.well-known/assetlinks.json` has one fingerprint |
+| REL-05 | No R8 / shrink / symbol archive | **still open** | no `minifyEnabled` / `shrinkResources` in `build.gradle` |
+| REL-06 | No adaptive/monochrome icon; v31 splash omitted background | **still open** | no `mipmap-anydpi-v26` directory |
+| REL-08 | No crash channel / staged rollout / rollback doc | **still open** | no crash SDK; the runbook requires an owner decision first |
+
+The launch decisions for the still-open rows are recorded in
+`docs/decisions/2026-11-01-v1-launch-decisions.md`.

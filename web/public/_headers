@@ -1,12 +1,13 @@
 /*
 # script-src no longer allows 'unsafe-inline' (owner-ordered 2026-10-20; the 2026-10-19
-# accepted risk is closed). The six inline scripts that remain are allowed by their exact
+# accepted risk is closed). The seven inline scripts that remain are allowed by their exact
 # sha256 of the shipped bytes instead:
 #   sha256-y+FotC7GvV2idFnvsHR8JtbzfaPMXDmGo1GwuHabR48=  BaseLayout theme bootstrap  (every page)
 #   sha256-n02J/sGih6I+q0Kyx2TU0X2d9oJeTTflM4KQd54nGIA=  ThemeToggle wiring           (every page)
 #   sha256-Ww6sTKppW0rgelzPh/PhX/+YvgITXp0bdCjH3Ryru6I=  BaseLayout JSON-LD           (every page; inert data)
 #   sha256-G5aS6TaYBTD7E/8OuihOhkAzs/Re+fUZuixw0warWkY=  404 AR/EN swap + switch      (dist/404.html)
 #   sha256-0boEBuwJjk7eoujXOmvvT+avW+qwl8oqdkohBNZjTi8=  reader reading view/layout (the surah pages)
+#   sha256-wBhZXIN45VtuqzvZXGR/6tUoBljrLjUCTcosLUjkhCo=  heritage home scene          (dist/index.html + dist/en/index.html)
 #   sha256-6v76vjvJjMq/WtmOQjM7kro8Di+dVSihucPojR1yyvQ=  service-worker registration (every page; on load)
 # The four paint-blocking ones (theme, toggle label, 404 locale, reading view) must run before
 # the first paint, so they cannot be deferred into a module; and Astro's build inlines every

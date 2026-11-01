@@ -51,9 +51,10 @@ Flutter · Dart ·
 flutter pub get
 flutter gen-l10n
 dart run build_runner build --delete-conflicting-outputs
+dart run tools/build_quran_db.dart   # يعيد بناء assets/db/quran.sqlite من المصدر (حتمي)
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 760+ اختبار
+flutter test           # البوابة الكاملة: 921 اختبار
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
 $env:PUBLISH_RELEASE="true"; flutter build appbundle --release  # مخرجات المتجر (بلا مفتاح = فشل بناء)

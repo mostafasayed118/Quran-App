@@ -893,8 +893,8 @@ again; `pubspec.yaml` gained only the asset directory.
 - `UthmaniTextSource` / `AssetUthmaniTextSource` loads and caches one surah's JSON. It is injected
   into `ReaderCubit` as an **optional** dependency, so every existing construction site and frozen
   test keeps compiling and simply gets the fallback.
-- The reader renders `textUnicode` with `AmiriQuran` and falls back to `stripAyahEndMarker(textUthmani)`
-  with HafsSmart.
+- The reader renders `textUnicode` with `HafsSmart` (`AppTheme.hafsAyah`, 22/2.2) and falls back to
+  `stripAyahEndMarker(textUthmani)` with the same face.
 - **Selection is enabled only when every verse of the surah has Unicode text** (`state.ayahs.every`),
   so a missing asset degrades to the previous behaviour instead of exposing glyph garbage.
 - Copy, share and the long-press all prefer the Unicode text; the imlaei column remains the
