@@ -71,6 +71,16 @@ void main() {
       ]),
     );
   });
+
+  test('cancelPreAdhan clears id 4 directly after a restart', () async {
+    final binding = NotificationsBinding();
+    await binding.init();
+    calls.clear();
+
+    await binding.cancelPreAdhan();
+
+    expect(_cancelIds(calls), [preAdhanReminderId]);
+  });
 }
 
 ScheduledReminder _reminder({

@@ -5,6 +5,7 @@ import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
 import '../core/domain/prayer_config.dart';
+import '../core/domain/pre_adhan_canceller.dart';
 import '../core/domain/prayer_times.dart';
 import '../core/domain/quran_limits.dart';
 import '../core/domain/reminders.dart';
@@ -262,6 +263,7 @@ abstract final class AppRouter {
         builder: (_, __) => RouteCubitScope<PrayerConfigCubit>(
           create: () => PrayerConfigCubit(
             source: getIt<PrayerConfigSource>(),
+            preAdhanCanceller: getIt<PreAdhanCanceller>(),
           ),
           identity: AppRoutes.prayerSettings,
           start: (cubit) => cubit.start(),

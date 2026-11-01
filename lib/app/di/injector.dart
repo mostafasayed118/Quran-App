@@ -10,6 +10,7 @@ import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
@@ -151,6 +152,8 @@ Future<void> configureDependencies({
       () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<NotificationsBinding>(
       () => NotificationsBinding());
+  getIt.registerLazySingleton<PreAdhanCanceller>(
+      () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<ReminderSchedulerPort>(
       () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));

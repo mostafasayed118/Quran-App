@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_name.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_config/prayer_config_state.dart';
 
@@ -12,7 +13,6 @@ class _FakeSource implements PrayerConfigSource {
   bool throwOnLoad = false;
   bool throwOnSave = false;
   int saves = 0;
-
   @override
   PrayerConfig get current => _current;
 
@@ -31,6 +31,15 @@ class _FakeSource implements PrayerConfigSource {
     saves++;
     _current = config;
     _changes.add(config);
+  }
+}
+
+class _FakeCanceller implements PreAdhanCanceller {
+  int calls = 0;
+
+  @override
+  Future<void> cancelPreAdhan() async {
+    calls++;
   }
 }
 
@@ -131,6 +140,22 @@ void main() {
 
     await cubit.setPreAdhanMinutes(-5);
     expect(source.current.preAdhanMinutes, 0);
+  });
+
+  test('turning the pre-adhan off clears the OS alarm', () async {
+    final source = _FakeSource();
+    final canceller = _FakeCanceller();
+    final cubit = PrayerConfigCubit(
+      source: source,
+      preAdhanCanceller: canceller,
+    );
+    await cubit.start();
+
+    await cubit.setPreAdhanMinutes(10);
+    expect(canceller.calls, 0);
+
+    await cubit.setPreAdhanMinutes(0);
+    expect(canceller.calls, 1);
   });
 
   test('setters before the first load are dropped', () async {

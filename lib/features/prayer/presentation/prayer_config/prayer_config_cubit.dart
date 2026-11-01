@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_name.dart';
 
@@ -13,11 +14,15 @@ import 'prayer_config_state.dart';
 /// last saved configuration if the write fails.
 class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   /// Creates the cubit over [source].
-  PrayerConfigCubit({required PrayerConfigSource source})
-      : _source = source,
+  PrayerConfigCubit({
+    required PrayerConfigSource source,
+    PreAdhanCanceller? preAdhanCanceller,
+  })  : _source = source,
+        _preAdhanCanceller = preAdhanCanceller,
         super(const PrayerConfigState.loading());
 
   final PrayerConfigSource _source;
+  final PreAdhanCanceller? _preAdhanCanceller;
 
   /// Serializes overlapping selections so a quick method + madhab tap cannot
   /// write the old method back when the second save lands.
@@ -55,10 +60,19 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
         return config.copyWith(enabledPrayers: prayers);
       });
 
-  /// Sets the pre-adhan lead time; 0 disables the early reminder.
+  /// Sets the pre-adhan lead time; 0 disables the early reminder and clears
+  /// any alarm left over from a previous run.
   Future<void> setPreAdhanMinutes(int minutes) {
     final safe = minutes < 0 ? 0 : (minutes > 60 ? 60 : minutes);
-    return _enqueue((config) => config.copyWith(preAdhanMinutes: safe));
+    final saved = _enqueue((config) => config.copyWith(preAdhanMinutes: safe));
+    return saved.then((_) async {
+      final current = state;
+      if (safe == 0 &&
+          current is PrayerConfigReady &&
+          current.config.preAdhanMinutes == 0) {
+        await _preAdhanCanceller?.cancelPreAdhan();
+      }
+    });
   }
 
   Future<void> _enqueue(PrayerConfig Function(PrayerConfig) update) {

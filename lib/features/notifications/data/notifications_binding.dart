@@ -1,11 +1,13 @@
 import 'dart:ui' show Locale, VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show
         azkarReminderId,
         prayerReminderId,
+        preAdhanReminderId,
         shouldRequestBootPermission,
         wirdReminderId;
 import 'package:quran_yahdi/l10n/app_localizations.dart';
@@ -40,7 +42,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// QUEUED, never dropped — [init] applies it as soon as the plugin is ready
 /// and discards it when the init fails. Nothing on this path waits for the
 /// plugin: a caller that awaited readiness would hang instead of queueing.
-class NotificationsBinding implements ReminderSchedulerPort {
+class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
@@ -300,6 +302,17 @@ class NotificationsBinding implements ReminderSchedulerPort {
   ///
   /// The plan fingerprint skips the platform round-trip when the new plan
   /// schedules exactly the same alarms as the applied one.
+  @override
+  Future<void> cancelPreAdhan() async {
+    try {
+      await _plugin.cancel(id: preAdhanReminderId);
+    } on Object {
+      // Best-effort: the plugin may not be initialized yet.
+    }
+    _appliedPlan = null;
+    _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
+  }
+
   Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
     if (details == null) return;
