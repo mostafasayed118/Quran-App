@@ -24,6 +24,14 @@ jobs:
       - run: flutter pub get
       - run: flutter gen-l10n
       - run: dart run build_runner build --delete-conflicting-outputs
+      # Committed generated sources must be current. Without this, a hand-edited
+      # (or stale) app_localizations*.dart / *.freezed.dart / *.g.dart can pass
+      # as long as it still compiles — the same class of drift the web data gate
+      # catches on the other side of the repo.
+      - name: Generated code is current
+        run: |
+          git diff --exit-code -- lib/l10n ':(glob)**/*.g.dart' ':(glob)**/*.freezed.dart'
+          test -z "$(git ls-files --others --exclude-standard -- lib/l10n ':(glob)**/*.g.dart' ':(glob)**/*.freezed.dart')"
       - run: flutter analyze
       - run: dart format --output=none --set-exit-if-changed lib test tools
       - run: flutter test

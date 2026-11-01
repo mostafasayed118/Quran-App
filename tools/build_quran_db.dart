@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/content_version.dart';
@@ -15,9 +16,9 @@ import 'package:quran_yahdi/core/db/search_index.dart';
 
 Future<void> main() async {
   final repoRoot = Directory.current.path;
-  final jsonPath = '$repoRoot\\assets\\json\\hafs_smart_v8.json';
-  final dbPath = '$repoRoot\\assets\\db\\quran.sqlite';
-  final cachePath = '$repoRoot\\tools\\chapters_cache.json';
+  final jsonPath = p.join(repoRoot, 'assets', 'json', 'hafs_smart_v8.json');
+  final dbPath = p.join(repoRoot, 'assets', 'db', 'quran.sqlite');
+  final cachePath = p.join(repoRoot, 'tools', 'chapters_cache.json');
 
   final data =
       jsonDecode(File(jsonPath).readAsStringSync()) as Map<String, dynamic>;

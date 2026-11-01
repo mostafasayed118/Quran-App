@@ -1,0 +1,52 @@
+name: db-drift
+
+# The Quran DB is a committed derived artifact. This gate rebuilds it from the
+# legacy JSON + the pinned chapter cache and fails if the bytes drift — the
+# mobile twin of the web `data-drift` job.
+#
+# It runs on Windows because that is the platform that produces the committed
+# artifact, so the comparison has one fewer variable (the platform SQLite
+# build). The generator was proven byte-identical across three runs on Windows
+# (SHA-256 9EC04B54…1C2DA846, 4,173,824 B).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'assets/db/**'
+      - 'assets/json/**'
+      - 'lib/core/db/**'
+      - 'tools/build_quran_db.dart'
+      - 'tools/chapters_cache.json'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/db-drift.yml'
+  pull_request:
+    paths:
+      - 'assets/db/**'
+      - 'assets/json/**'
+      - 'lib/core/db/**'
+      - 'tools/build_quran_db.dart'
+      - 'tools/chapters_cache.json'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - '.github/workflows/db-drift.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  db-drift:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+      - run: flutter pub get
+      - run: dart run tools/build_quran_db.dart
+      - name: Committed Quran DB matches its source
+        run: git diff --exit-code -- assets/db/quran.sqlite tools/chapters_cache.json
