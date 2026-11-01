@@ -41,6 +41,16 @@ class PrayerTimesScreen extends StatelessWidget {
         title: Text(loc.prayerTimes),
         actions: [
           IconButton(
+            tooltip: loc.prayerSettings,
+            icon: const Icon(Icons.tune_outlined),
+            onPressed: () async {
+              await context.push(AppRoutes.prayerSettings);
+              if (context.mounted) {
+                await context.read<PrayerTimesCubit>().reload();
+              }
+            },
+          ),
+          IconButton(
             tooltip: loc.refresh,
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<PrayerTimesCubit>().reload(),

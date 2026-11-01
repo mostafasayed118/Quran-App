@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
+import '../core/domain/prayer_config.dart';
 import '../core/domain/prayer_times.dart';
 import '../core/domain/quran_limits.dart';
 import '../core/domain/reminders.dart';
@@ -63,6 +64,8 @@ import '../features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import '../features/prayer/presentation/city_picker/city_picker_screen.dart';
 import '../features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import '../features/prayer/presentation/prayer_times/prayer_times_screen.dart';
+import '../features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
+import '../features/prayer/presentation/prayer_config/prayer_config_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
 import '../features/recitation/presentation/downloads/downloads_cubit.dart';
 import '../features/recitation/presentation/downloads/downloads_screen.dart';
@@ -114,6 +117,7 @@ abstract final class AppRouter {
                 ayahs: getIt<AyahLookup>(),
                 prayer: getIt<PrayerTimesPort>(),
                 city: getIt<CitySource>(),
+                configChanges: getIt<PrayerConfigSource>().changes,
               ),
               identity: AppRoutes.home,
               start: (cubit) => cubit.start(),
@@ -137,6 +141,7 @@ abstract final class AppRouter {
                 city: getIt<CitySource>(),
                 settings: getIt<ReminderSettingsPort>(),
                 scheduler: getIt<ReminderSchedulerPort>(),
+                configChanges: getIt<PrayerConfigSource>().changes,
               ),
               identity: AppRoutes.prayerTimes,
               start: (cubit) => cubit.start(),
@@ -233,6 +238,17 @@ abstract final class AppRouter {
           identity: AppRoutes.cityPicker,
           start: (cubit) => cubit.start(),
           child: const CityPickerScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.prayerSettings,
+        builder: (_, __) => RouteCubitScope<PrayerConfigCubit>(
+          create: () => PrayerConfigCubit(
+            source: getIt<PrayerConfigSource>(),
+          ),
+          identity: AppRoutes.prayerSettings,
+          start: (cubit) => cubit.start(),
+          child: const PrayerConfigScreen(),
         ),
       ),
       GoRoute(

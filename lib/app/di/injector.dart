@@ -8,6 +8,7 @@ import 'package:quran_yahdi/core/db/connection.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
@@ -22,7 +23,9 @@ import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
+import 'package:quran_yahdi/features/prayer/data/configured_prayer_times.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
+import 'package:quran_yahdi/features/prayer/data/prayer_config_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
@@ -118,8 +121,12 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<ReciterRepository>(() => ReciterRepository(db));
   getIt.registerLazySingleton<PrayerTimeService>(
       () => const PrayerTimeService());
-  getIt
-      .registerLazySingleton<PrayerTimesPort>(() => getIt<PrayerTimeService>());
+  getIt.registerLazySingleton<PrayerConfigRepository>(
+      () => PrayerConfigRepository(db));
+  getIt.registerLazySingleton<PrayerConfigSource>(
+      () => getIt<PrayerConfigRepository>());
+  getIt.registerLazySingleton<PrayerTimesPort>(
+      () => ConfiguredPrayerTimes(getIt<PrayerConfigSource>()));
   getIt.registerLazySingleton<QiblaService>(() => const QiblaService());
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<LocationService>(() => LocationService());

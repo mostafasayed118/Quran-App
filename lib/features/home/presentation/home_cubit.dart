@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 
 import 'home_state.dart';
@@ -18,20 +19,32 @@ class HomeCubit extends Cubit<HomeState> {
     required AyahLookup ayahs,
     required PrayerTimesPort prayer,
     required CitySource city,
+    Stream<PrayerConfig>? configChanges,
   })  : _lastRead = lastRead,
         _ayahs = ayahs,
         _prayer = prayer,
         _city = city,
+        _configChanges = configChanges,
         super(const HomeState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
-  Future<void> start() => reload();
+  Future<void> start() async {
+    final changes = _configChanges;
+    if (changes != null) {
+      _configSub ??= changes.listen((_) {
+        if (!isClosed) unawaited(reload());
+      });
+    }
+    await reload();
+  }
 
   final LastReadMarker _lastRead;
   final AyahLookup _ayahs;
   final PrayerTimesPort _prayer;
   final CitySource _city;
+  final Stream<PrayerConfig>? _configChanges;
+  StreamSubscription<PrayerConfig>? _configSub;
 
   /// Monotonic token: only the newest [reload] may emit, so a slow older
   /// load can never overwrite the result of a newer one.
@@ -112,7 +125,8 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
+    await _configSub?.cancel();
     _nextPrayerRefresh?.cancel();
     return super.close();
   }

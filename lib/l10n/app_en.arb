@@ -566,5 +566,20 @@
   "downloadsEmpty": "No downloaded recitations yet",
   "downloadsDeleteBody": "This file will be removed from your device.",
   "licensesQuranUthmani": "Uthmani Quran text (Unicode) — Tanzil Project",
-  "licensesTanzilTerms": "Attribution and terms"
+  "licensesTanzilTerms": "Attribution and terms",
+  "prayerSettings": "Prayer settings",
+  "prayerCalcMethod": "Calculation method",
+  "prayerMadhab": "Asr madhab",
+  "prayerConfigNote": "These settings apply to prayer times and reminders on this device.",
+  "methodEgyptian": "Egyptian General Authority of Survey",
+  "methodMuslimWorldLeague": "Muslim World League",
+  "methodKarachi": "University of Islamic Sciences, Karachi",
+  "methodUmmAlQura": "Umm al-Qura, Makkah",
+  "methodDubai": "Dubai",
+  "methodKuwait": "Kuwait",
+  "methodQatar": "Qatar",
+  "methodTurkey": "Diyanet, Turkey",
+  "methodNorthAmerica": "ISNA, North America",
+  "madhabShafi": "Shafi (default)",
+  "madhabHanafi": "Hanafi"
 }

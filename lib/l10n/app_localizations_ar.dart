@@ -832,4 +832,50 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get licensesTanzilTerms => 'الإسناد وشروط الاستخدام';
+
+  @override
+  String get prayerSettings => 'إعدادات الصلاة';
+
+  @override
+  String get prayerCalcMethod => 'طريقة حساب المواقيت';
+
+  @override
+  String get prayerMadhab => 'مذهب العصر';
+
+  @override
+  String get prayerConfigNote =>
+      'تُطبَّق هذه الإعدادات على المواقيت والتذكيرات في هذا الجهاز.';
+
+  @override
+  String get methodEgyptian => 'الهيئة المصرية العامة للمساحة';
+
+  @override
+  String get methodMuslimWorldLeague => 'رابطة العالم الإسلامي';
+
+  @override
+  String get methodKarachi => 'جامعة العلوم الإسلامية — كراتشي';
+
+  @override
+  String get methodUmmAlQura => 'أم القرى — مكة المكرمة';
+
+  @override
+  String get methodDubai => 'دبي';
+
+  @override
+  String get methodKuwait => 'الكويت';
+
+  @override
+  String get methodQatar => 'قطر';
+
+  @override
+  String get methodTurkey => 'ديانت — تركيا';
+
+  @override
+  String get methodNorthAmerica => 'ISNA — أمريكا الشمالية';
+
+  @override
+  String get madhabShafi => 'الشافعي (الافتراضي)';
+
+  @override
+  String get madhabHanafi => 'الحنفي';
 }

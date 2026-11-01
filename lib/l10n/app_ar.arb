@@ -587,5 +587,20 @@
   "downloadsEmpty": "لا توجد تلاوات منزّلة بعد",
   "downloadsDeleteBody": "سيُحذف هذا الملف من جهازك.",
   "licensesQuranUthmani": "نص القرآن العثماني (يونيكود) — مشروع تَنزيل",
-  "licensesTanzilTerms": "الإسناد وشروط الاستخدام"
+  "licensesTanzilTerms": "الإسناد وشروط الاستخدام",
+  "prayerSettings": "إعدادات الصلاة",
+  "prayerCalcMethod": "طريقة حساب المواقيت",
+  "prayerMadhab": "مذهب العصر",
+  "prayerConfigNote": "تُطبَّق هذه الإعدادات على المواقيت والتذكيرات في هذا الجهاز.",
+  "methodEgyptian": "الهيئة المصرية العامة للمساحة",
+  "methodMuslimWorldLeague": "رابطة العالم الإسلامي",
+  "methodKarachi": "جامعة العلوم الإسلامية — كراتشي",
+  "methodUmmAlQura": "أم القرى — مكة المكرمة",
+  "methodDubai": "دبي",
+  "methodKuwait": "الكويت",
+  "methodQatar": "قطر",
+  "methodTurkey": "ديانت — تركيا",
+  "methodNorthAmerica": "ISNA — أمريكا الشمالية",
+  "madhabShafi": "الشافعي (الافتراضي)",
+  "madhabHanafi": "الحنفي"
 }

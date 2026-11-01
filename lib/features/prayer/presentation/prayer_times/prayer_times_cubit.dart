@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 
@@ -20,22 +21,34 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     ReminderSettingsPort? settings,
     ReminderSchedulerPort? scheduler,
     DateTime Function()? clock,
+    Stream<PrayerConfig>? configChanges,
   })  : _prayer = prayer,
         _city = city,
         _settings = settings,
         _scheduler = scheduler,
         _clock = clock ?? DateTime.now,
+        _configChanges = configChanges,
         super(const PrayerTimesState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
-  Future<void> start() => reload();
+  Future<void> start() async {
+    final changes = _configChanges;
+    if (changes != null) {
+      _configSub ??= changes.listen((_) {
+        if (!isClosed) unawaited(reload());
+      });
+    }
+    await reload();
+  }
 
   final PrayerTimesPort _prayer;
   final CitySource _city;
   final ReminderSettingsPort? _settings;
   final ReminderSchedulerPort? _scheduler;
   final DateTime Function() _clock;
+  final Stream<PrayerConfig>? _configChanges;
+  StreamSubscription<PrayerConfig>? _configSub;
 
   DateTime? _loadedDay;
   bool _reloading = false;
@@ -174,5 +187,11 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       prayer: _prayer,
       scheduler: scheduler,
     ));
+  }
+
+  @override
+  Future<void> close() async {
+    await _configSub?.cancel();
+    return super.close();
   }
 }

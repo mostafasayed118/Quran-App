@@ -17,6 +17,7 @@ abstract final class AppRoutes {
   static const library = '/library';
   static const hadith = '/library/hadith';
   static const prayerTimes = '/prayer-times';
+  static const prayerSettings = '/prayer-times/settings';
   static const cityPicker = '/prayer-times/city';
   static const qibla = '/qibla';
   static const azkar = '/azkar';

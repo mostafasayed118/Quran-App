@@ -1543,6 +1543,96 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'الإسناد وشروط الاستخدام'**
   String get licensesTanzilTerms;
+
+  /// No description provided for @prayerSettings.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعدادات الصلاة'**
+  String get prayerSettings;
+
+  /// No description provided for @prayerCalcMethod.
+  ///
+  /// In ar, this message translates to:
+  /// **'طريقة حساب المواقيت'**
+  String get prayerCalcMethod;
+
+  /// No description provided for @prayerMadhab.
+  ///
+  /// In ar, this message translates to:
+  /// **'مذهب العصر'**
+  String get prayerMadhab;
+
+  /// No description provided for @prayerConfigNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُطبَّق هذه الإعدادات على المواقيت والتذكيرات في هذا الجهاز.'**
+  String get prayerConfigNote;
+
+  /// No description provided for @methodEgyptian.
+  ///
+  /// In ar, this message translates to:
+  /// **'الهيئة المصرية العامة للمساحة'**
+  String get methodEgyptian;
+
+  /// No description provided for @methodMuslimWorldLeague.
+  ///
+  /// In ar, this message translates to:
+  /// **'رابطة العالم الإسلامي'**
+  String get methodMuslimWorldLeague;
+
+  /// No description provided for @methodKarachi.
+  ///
+  /// In ar, this message translates to:
+  /// **'جامعة العلوم الإسلامية — كراتشي'**
+  String get methodKarachi;
+
+  /// No description provided for @methodUmmAlQura.
+  ///
+  /// In ar, this message translates to:
+  /// **'أم القرى — مكة المكرمة'**
+  String get methodUmmAlQura;
+
+  /// No description provided for @methodDubai.
+  ///
+  /// In ar, this message translates to:
+  /// **'دبي'**
+  String get methodDubai;
+
+  /// No description provided for @methodKuwait.
+  ///
+  /// In ar, this message translates to:
+  /// **'الكويت'**
+  String get methodKuwait;
+
+  /// No description provided for @methodQatar.
+  ///
+  /// In ar, this message translates to:
+  /// **'قطر'**
+  String get methodQatar;
+
+  /// No description provided for @methodTurkey.
+  ///
+  /// In ar, this message translates to:
+  /// **'ديانت — تركيا'**
+  String get methodTurkey;
+
+  /// No description provided for @methodNorthAmerica.
+  ///
+  /// In ar, this message translates to:
+  /// **'ISNA — أمريكا الشمالية'**
+  String get methodNorthAmerica;
+
+  /// No description provided for @madhabShafi.
+  ///
+  /// In ar, this message translates to:
+  /// **'الشافعي (الافتراضي)'**
+  String get madhabShafi;
+
+  /// No description provided for @madhabHanafi.
+  ///
+  /// In ar, this message translates to:
+  /// **'الحنفي'**
+  String get madhabHanafi;
 }
 
 class _AppLocalizationsDelegate

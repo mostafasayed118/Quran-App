@@ -5,6 +5,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
 import 'package:quran_yahdi/core/domain/city.dart';
+import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
@@ -66,9 +67,16 @@ Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
 /// ruling — no background isolate, no boot receiver in v1; missed-while-dead
 /// reminders are accepted). The shared helper is guarded and never throws, and
 /// it honours the persisted prayer-reminder toggle.
-Future<void> runBootReminderSchedule() =>
-    getIt<ReminderRescheduler>().reschedule(
-      city: getIt<CitySource>(),
-      prayer: getIt<PrayerTimesPort>(),
-      scheduler: getIt<ReminderSchedulerPort>(),
-    );
+Future<void> runBootReminderSchedule() async {
+  // Read the saved method before composing reminders so the plan follows the
+  // user's setting. `load` is tolerant and never throws; until it lands the
+  // port keeps the Egyptian/Shafi default.
+  if (getIt.isRegistered<PrayerConfigSource>()) {
+    await getIt<PrayerConfigSource>().load();
+  }
+  await getIt<ReminderRescheduler>().reschedule(
+    city: getIt<CitySource>(),
+    prayer: getIt<PrayerTimesPort>(),
+    scheduler: getIt<ReminderSchedulerPort>(),
+  );
+}
