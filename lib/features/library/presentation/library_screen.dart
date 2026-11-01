@@ -11,6 +11,7 @@ import '../../../core/utils/insets.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
+import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../l10n/app_localizations.dart';
@@ -31,21 +32,34 @@ class LibraryScreen extends StatelessWidget {
           LibraryReady(:final packs) => visibleLibraryKinds(packs),
           _ => _libraryKinds,
         };
+        // An empty catalog falls back to the three tabs so the controller is
+        // never zero-length, which would otherwise render three blank pages:
+        // the whole-empty case is one state instead of a tab bar.
+        final catalogEmpty = switch (state) {
+          LibraryReady(:final packs) => packs.isEmpty,
+          _ => false,
+        };
         return DefaultTabController(
           length: kinds.length,
           child: Scaffold(
             appBar: AppBar(
               title: Text(loc.library),
-              bottom: TabBar(
-                tabs: [
-                  for (final kind in kinds)
-                    Tab(text: _libraryTabLabel(loc, kind)),
-                ],
-              ),
+              bottom: catalogEmpty
+                  ? null
+                  : TabBar(
+                      tabs: [
+                        for (final kind in kinds)
+                          Tab(text: _libraryTabLabel(loc, kind)),
+                      ],
+                    ),
             ),
             body: switch (state) {
               LibraryLoading() => const LoadingView(),
               LibraryFailed() => errorPane(loc),
+              final LibraryReady ready when ready.packs.isEmpty => EmptyState(
+                  loc.libraryEmpty,
+                  icon: Icons.inventory_2_outlined,
+                ),
               final LibraryReady ready => Column(
                   children: [
                     if (ready.failed.isNotEmpty && ready.progress.isEmpty)
@@ -160,6 +174,14 @@ class _PackList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A visible tab always has a pack today, but a kind whose packs vanish
+    // must not fall back to a blank page.
+    if (packs.isEmpty) {
+      return EmptyState(
+        AppLocalizations.of(context).libraryEmpty,
+        icon: Icons.inventory_2_outlined,
+      );
+    }
     return ListView.builder(
       padding: appScrollPadding(
         context,
@@ -195,7 +217,7 @@ class _PackRow extends StatelessWidget {
     return ListTile(
       title: Text(
         pack.titleAr,
-        style: const TextStyle(fontWeight: FontWeight.w600),
+        style: const TextStyle(fontWeight: FontWeight.w700),
       ),
       subtitle: Text(subtitle),
       trailing: BlocSelector<LibraryCubit, LibraryState, _PackRowStatus>(

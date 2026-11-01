@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'playback_state.dart';
@@ -122,11 +123,14 @@ class _PlayerSheetState extends State<_PlayerSheet> {
         final value = (_dragging ?? track.position.inMilliseconds.toDouble())
             .clamp(0.0, maxMs > 0 ? maxMs : 0.0);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(
+          // `useSafeArea: true` only protects the top/sides of a modal sheet;
+          // the bottom keeps the system inset so the transport row never sits
+          // in the gesture/navigation strip on an edge-to-edge build.
+          padding: EdgeInsets.fromLTRB(
             AppSpacing.lg,
             AppSpacing.xs,
             AppSpacing.lg,
-            AppSpacing.lg,
+            AppSpacing.lg + appBottomInset(context),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

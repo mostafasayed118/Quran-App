@@ -31,6 +31,11 @@ class RecitersScreen extends StatelessWidget {
         title: Text(loc.recitationsTitle),
         actions: [
           IconButton(
+            tooltip: loc.downloadsTitle,
+            icon: const Icon(Icons.download_done_outlined),
+            onPressed: () => context.push(AppRoutes.downloads),
+          ),
+          IconButton(
             tooltip: loc.refresh,
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<RecitersCubit>().refresh(),
@@ -158,7 +163,7 @@ class _ReciterRow extends StatelessWidget {
         showTitle ? reciter.reciterName : reciter.moshafName,
         style: showTitle
             ? AppTheme.rowTitle
-            : const TextStyle(fontWeight: FontWeight.w500),
+            : const TextStyle(fontWeight: FontWeight.w400),
         textAlign: TextAlign.right,
         textDirection: TextDirection.rtl,
       ),

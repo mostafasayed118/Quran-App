@@ -10,6 +10,38 @@ import '../../data/recitation_keys.dart';
 import '../../data/reciter_repository.dart';
 import 'downloads_state.dart';
 
+/// One installed download with its display names resolved.
+///
+/// A read-side projection, not cubit state: the list is rebuilt from the
+/// downloader on every read, so it never needs to ride the freezed state.
+/// [reciterName] and [surahName] are empty when the catalog cannot resolve
+/// them; the screen owns the localized fallback.
+class InstalledDownload {
+  /// Creates one row of the installed list.
+  const InstalledDownload({
+    required this.rowId,
+    required this.surahNumber,
+    required this.reciterName,
+    required this.surahName,
+    required this.bytes,
+  });
+
+  /// Reciter (moshaf) row id that owns the file.
+  final String rowId;
+
+  /// Surah number of the installed file.
+  final int surahNumber;
+
+  /// Display name of the reciter.
+  final String reciterName;
+
+  /// Display name of the surah.
+  final String surahName;
+
+  /// Size of the installed file in bytes.
+  final int bytes;
+}
+
 /// The downloads screen: the per-surah download queue and the done rows.
 class DownloadsCubit extends Cubit<DownloadsState> {
   /// Creates the cubit with the downloader and the reciter catalog.
@@ -71,6 +103,44 @@ class DownloadsCubit extends Cubit<DownloadsState> {
       dev.log('downloads refresh failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
     }
+  }
+
+  /// The installed downloads, resolved for the downloads list.
+  ///
+  /// Reciter names come from [ReciterRepository.byId] and surah names from
+  /// [ReciterRepository.surahNamesFor] — the same bundled catalog the reciter
+  /// surahs screen reads. A failure propagates: the screen owns the error arm,
+  /// unlike [refreshDone], which is a soft merge into the state.
+  Future<List<InstalledDownload>> installed() async {
+    await _ensureReconciled();
+    final rows = await _downloader.listDone();
+    if (rows.isEmpty) return const <InstalledDownload>[];
+    final reciterNames = <String, String>{};
+    for (final rowId in {for (final row in rows) row.reciterId}) {
+      final reciter = await _reciters.byId(rowId);
+      if (reciter != null) reciterNames[rowId] = reciter.reciterName.trim();
+    }
+    final surahNames = await _reciters.surahNamesFor(
+      {for (final row in rows) row.surahId}.toList(growable: false),
+    );
+    final items = <InstalledDownload>[
+      for (final row in rows)
+        InstalledDownload(
+          rowId: row.reciterId,
+          surahNumber: row.surahId,
+          reciterName: reciterNames[row.reciterId] ?? '',
+          surahName: surahNames[row.surahId] ?? '',
+          bytes: row.bytes,
+        ),
+    ];
+    // A stable order keeps the list from reshuffling between refreshes.
+    items.sort((a, b) {
+      final byReciter = a.reciterName.compareTo(b.reciterName);
+      return byReciter != 0
+          ? byReciter
+          : a.surahNumber.compareTo(b.surahNumber);
+    });
+    return items;
   }
 
   /// Removes an installed download through the existing

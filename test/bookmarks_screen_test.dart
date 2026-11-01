@@ -94,6 +94,9 @@ void main() {
     expect(find.textContaining(text), findsOneWidget);
     await tester.tap(find.byIcon(Icons.delete_outline));
     await tester.pumpAndSettle();
+    // Owner-requested behaviour change: deleting a bookmark now asks first.
+    await tester.tap(find.widgetWithText(TextButton, 'حذف'));
+    await tester.pumpAndSettle();
     expect(await db.select(db.bookmarks).get(), isEmpty);
   });
 

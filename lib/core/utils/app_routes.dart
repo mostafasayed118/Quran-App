@@ -13,6 +13,7 @@ abstract final class AppRoutes {
   static const quranSearch = '/quran/search';
   static const recitation = '/recitation';
   static const reciter = '/recitation/reciter';
+  static const downloads = '/downloads';
   static const library = '/library';
   static const hadith = '/library/hadith';
   static const prayerTimes = '/prayer-times';

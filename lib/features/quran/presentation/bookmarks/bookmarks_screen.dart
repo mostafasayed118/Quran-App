@@ -7,6 +7,7 @@ import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -79,7 +80,7 @@ class _BookmarkList extends StatelessWidget {
             trailing: IconButton(
               tooltip: loc.bookmarkRemove,
               icon: const Icon(Icons.delete_outline),
-              onPressed: () => context.read<BookmarksCubit>().remove(ayah.id),
+              onPressed: () => _confirmRemove(context, ayah.id, loc),
             ),
             onTap: () => context.push(quranReaderPath(
               surah: ayah.surahId,
@@ -89,6 +90,20 @@ class _BookmarkList extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Future<void> _confirmRemove(
+      BuildContext context, int ayahId, AppLocalizations loc) async {
+    // The cubit is resolved before the await so the confirmation cannot
+    // outlive the provider lookup.
+    final cubit = context.read<BookmarksCubit>();
+    final confirmed = await confirmDeleteDialog(
+      context,
+      title: loc.bookmarkRemove,
+      body: loc.bookmarkRemoveBody,
+    );
+    if (!context.mounted || !confirmed) return;
+    await cubit.remove(ayahId);
   }
 
   Widget _tail(BuildContext context, AppLocalizations loc) {

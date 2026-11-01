@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hadith_cubit.dart';
 import 'hadith_state.dart';
@@ -20,8 +22,12 @@ class HadithScreen extends StatelessWidget {
       body: BlocBuilder<HadithCubit, HadithState>(
         builder: (context, state) {
           final Widget content = switch (state) {
-            HadithLoading() => const Center(child: CircularProgressIndicator()),
+            HadithLoading() => const LoadingView(),
             HadithFailed() => errorPane(loc),
+            final HadithReady ready when ready.items.isEmpty => EmptyState(
+                loc.hadithEmpty,
+                icon: Icons.menu_book_outlined,
+              ),
             final HadithReady ready => Column(
                 children: [
                   Expanded(child: _HadithVerses(ready: ready)),
@@ -55,7 +61,7 @@ class _HadithTitle extends StatelessWidget {
             if (s is HadithReady && s.language.isNotEmpty) ...[
               const SizedBox(width: AppSpacing.sm),
               Text(
-                s.language.toUpperCase(),
+                _languageLabel(AppLocalizations.of(context), s.language),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
                       color: AppTheme.goldText(context),
                     ),
@@ -66,6 +72,16 @@ class _HadithTitle extends StatelessWidget {
       },
     );
   }
+}
+
+/// Localized name for a pack language code; anything unknown keeps the raw
+/// code (upper-cased, as the chip always rendered it).
+String _languageLabel(AppLocalizations loc, String code) {
+  return switch (code.toLowerCase()) {
+    'ar' => loc.languageArabic,
+    'en' => loc.languageEnglish,
+    _ => code.toUpperCase(),
+  };
 }
 
 class _HadithVerses extends StatelessWidget {
@@ -103,19 +119,35 @@ class _HadithVerseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final direction = rtl ? TextDirection.rtl : TextDirection.ltr;
     return Padding(
       padding:
           const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+        textDirection: direction,
         children: [
-          CircleAvatar(
-            radius: 14,
-            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-            child: Text(
-              number.toArabicIndic,
-              style: const TextStyle(fontSize: 12),
+          // Fixed 28 dp badge: a FittedBox shrinks the numeral inside the
+          // circle at large text scales instead of letting it overflow.
+          SizedBox(
+            width: 28,
+            height: 28,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: colors.secondaryContainer,
+                shape: BoxShape.circle,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    number.toArabicIndic,
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -123,7 +155,7 @@ class _HadithVerseRow extends StatelessWidget {
             child: Text(
               text,
               style: const TextStyle(fontSize: 15, height: 1.8),
-              textDirection: rtl ? TextDirection.rtl : TextDirection.ltr,
+              textDirection: direction,
             ),
           ),
         ],
