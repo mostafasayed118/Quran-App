@@ -522,5 +522,47 @@
         "type": "String"
       }
     }
-  }
+  },
+  "homeSectionQuran": "Quran & listening",
+  "homeSectionWorship": "Daily worship",
+  "homeSectionMore": "More",
+  "qiblaAligned": "You are facing the Qibla",
+  "qiblaTurnRight": "Turn the phone {degrees}° right",
+  "@qiblaTurnRight": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaTurnLeft": "Turn the phone {degrees}° left",
+  "@qiblaTurnLeft": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "more": "More",
+  "copyAyah": "Copy verse",
+  "ayahCopied": "Verse copied",
+  "libraryEmpty": "No knowledge packs yet",
+  "bookmarkRemoveBody": "This bookmark will be removed from your list.",
+  "nextPrayerTomorrow": "Tomorrow {name} {time}",
+  "@nextPrayerTomorrow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "hadithEmpty": "No hadith in this pack",
+  "languageArabic": "Arabic",
+  "languageEnglish": "English",
+  "downloadsTitle": "Downloads",
+  "downloadsEmpty": "No downloaded recitations yet",
+  "downloadsDeleteBody": "This file will be removed from your device."
 }

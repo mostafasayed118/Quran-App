@@ -1423,6 +1423,114 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{text}\n\n{url}'**
   String shareAyahText(String text, String url);
+
+  /// No description provided for @homeSectionQuran.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن والاستماع'**
+  String get homeSectionQuran;
+
+  /// No description provided for @homeSectionWorship.
+  ///
+  /// In ar, this message translates to:
+  /// **'العبادة اليومية'**
+  String get homeSectionWorship;
+
+  /// No description provided for @homeSectionMore.
+  ///
+  /// In ar, this message translates to:
+  /// **'المزيد'**
+  String get homeSectionMore;
+
+  /// No description provided for @qiblaAligned.
+  ///
+  /// In ar, this message translates to:
+  /// **'أنت تواجه القبلة'**
+  String get qiblaAligned;
+
+  /// No description provided for @qiblaTurnRight.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدر الهاتف {degrees}° يمينًا'**
+  String qiblaTurnRight(String degrees);
+
+  /// No description provided for @qiblaTurnLeft.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدر الهاتف {degrees}° يسارًا'**
+  String qiblaTurnLeft(String degrees);
+
+  /// No description provided for @more.
+  ///
+  /// In ar, this message translates to:
+  /// **'المزيد'**
+  String get more;
+
+  /// No description provided for @copyAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ الآية'**
+  String get copyAyah;
+
+  /// No description provided for @ayahCopied.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم نسخ الآية'**
+  String get ayahCopied;
+
+  /// No description provided for @libraryEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد حزم معرفية بعد'**
+  String get libraryEmpty;
+
+  /// No description provided for @bookmarkRemoveBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستُحذف هذه العلامة من قائمتك.'**
+  String get bookmarkRemoveBody;
+
+  /// No description provided for @nextPrayerTomorrow.
+  ///
+  /// In ar, this message translates to:
+  /// **'غدًا {name} {time}'**
+  String nextPrayerTomorrow(String name, String time);
+
+  /// No description provided for @hadithEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أحاديث في هذه الحزمة'**
+  String get hadithEmpty;
+
+  /// No description provided for @languageArabic.
+  ///
+  /// In ar, this message translates to:
+  /// **'العربية'**
+  String get languageArabic;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإنجليزية'**
+  String get languageEnglish;
+
+  /// No description provided for @downloadsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنزيلات'**
+  String get downloadsTitle;
+
+  /// No description provided for @downloadsEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد تلاوات منزّلة بعد'**
+  String get downloadsEmpty;
+
+  /// No description provided for @downloadsDeleteBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيُحذف هذا الملف من جهازك.'**
+  String get downloadsDeleteBody;
 }
 
 class _AppLocalizationsDelegate

@@ -171,7 +171,7 @@ class _DayCell extends StatelessWidget {
               cell.hDay.toArabicIndic,
               style: const TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
             Text(

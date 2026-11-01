@@ -19,6 +19,21 @@ abstract final class AppColors {
   static const darkBackground = Color(0xFF101410);
   static const darkHairline = Color(0xFF2A362F);
 
+  /// Highlight surface for "the one row that matters" (next prayer, active
+  /// dhikr, today's hijri day).
+  ///
+  /// Declared explicitly instead of letting `ColorScheme.fromSeed` invent it:
+  /// the generated value was a saturated mint that read as a different app
+  /// against the ivory page.
+  static const emeraldTintLight = Color(0xFFDCE8E1);
+  static const onEmeraldTintLight = Color(0xFF1E3A30);
+  static const emeraldTintDark = Color(0xFF1E2F27);
+  static const onEmeraldTintDark = Color(0xFFD7E7DD);
+
+  /// Quiet grouping surface for grids and inset panels.
+  static const tileLight = Color(0xFFE6E2D4);
+  static const tileDark = Color(0xFF1A251F);
+
   static const double badgeTintAlpha = 0.12;
   static const double fieldTintAlpha = 0.08;
   static const double mutedSurfaceAlpha = 0.5;

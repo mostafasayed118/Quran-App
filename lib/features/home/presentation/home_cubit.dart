@@ -91,7 +91,11 @@ class HomeCubit extends Cubit<HomeState> {
     final selected = await _city.selectedCity();
     if (selected == null) return null;
     final next = _prayer.nextPrayer(selected.coordinates, DateTime.now());
-    return (name: next.name, time: next.time);
+    return (
+      name: next.name,
+      time: next.time,
+      cityName: selected.nameAr,
+    );
   }
 
   void _scheduleNextPrayerRefresh(NextPrayerCard? card) {

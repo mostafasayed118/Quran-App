@@ -61,3 +61,16 @@ String formatDurationHm(Duration duration) {
       '${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}';
   return clock.toArabicIndicDigits;
 }
+
+/// HH:mm:ss label for a live countdown.
+///
+/// A negative remainder (the moment the target time has just passed and the
+/// state has not reloaded yet) renders as zero instead of a minus sign, so the
+/// hero never shows "-00:00:01".
+String formatDurationHms(Duration duration) {
+  final safe = duration.isNegative ? Duration.zero : duration;
+  final clock = '${safe.inHours.toString().padLeft(2, '0')}:'
+      '${safe.inMinutes.remainder(60).toString().padLeft(2, '0')}:'
+      '${safe.inSeconds.remainder(60).toString().padLeft(2, '0')}';
+  return clock.toArabicIndicDigits;
+}

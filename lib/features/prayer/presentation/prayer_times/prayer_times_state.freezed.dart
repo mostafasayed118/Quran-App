@@ -148,7 +148,12 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     TResult Function()? loading,
     TResult Function()? failed,
     TResult Function(
-            City? city, List<PrayerEntry> entries, Duration? remaining)?
+            City? city,
+            List<PrayerEntry> entries,
+            Duration? remaining,
+            PrayerName? nextTomorrowName,
+            DateTime? nextTomorrowTime,
+            Duration? nextTomorrowRemaining)?
         ready,
     required TResult orElse(),
   }) {
@@ -159,7 +164,13 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
       case PrayerTimesFailed() when failed != null:
         return failed();
       case PrayerTimesReady() when ready != null:
-        return ready(_that.city, _that.entries, _that.remaining);
+        return ready(
+            _that.city,
+            _that.entries,
+            _that.remaining,
+            _that.nextTomorrowName,
+            _that.nextTomorrowTime,
+            _that.nextTomorrowRemaining);
       case _:
         return orElse();
     }
@@ -183,7 +194,12 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     required TResult Function() loading,
     required TResult Function() failed,
     required TResult Function(
-            City? city, List<PrayerEntry> entries, Duration? remaining)
+            City? city,
+            List<PrayerEntry> entries,
+            Duration? remaining,
+            PrayerName? nextTomorrowName,
+            DateTime? nextTomorrowTime,
+            Duration? nextTomorrowRemaining)
         ready,
   }) {
     final _that = this;
@@ -193,7 +209,13 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
       case PrayerTimesFailed():
         return failed();
       case PrayerTimesReady():
-        return ready(_that.city, _that.entries, _that.remaining);
+        return ready(
+            _that.city,
+            _that.entries,
+            _that.remaining,
+            _that.nextTomorrowName,
+            _that.nextTomorrowTime,
+            _that.nextTomorrowRemaining);
     }
   }
 
@@ -214,7 +236,12 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
     TResult? Function()? loading,
     TResult? Function()? failed,
     TResult? Function(
-            City? city, List<PrayerEntry> entries, Duration? remaining)?
+            City? city,
+            List<PrayerEntry> entries,
+            Duration? remaining,
+            PrayerName? nextTomorrowName,
+            DateTime? nextTomorrowTime,
+            Duration? nextTomorrowRemaining)?
         ready,
   }) {
     final _that = this;
@@ -224,7 +251,13 @@ extension PrayerTimesStatePatterns on PrayerTimesState {
       case PrayerTimesFailed() when failed != null:
         return failed();
       case PrayerTimesReady() when ready != null:
-        return ready(_that.city, _that.entries, _that.remaining);
+        return ready(
+            _that.city,
+            _that.entries,
+            _that.remaining,
+            _that.nextTomorrowName,
+            _that.nextTomorrowTime,
+            _that.nextTomorrowRemaining);
       case _:
         return null;
     }
@@ -277,7 +310,10 @@ class PrayerTimesReady implements PrayerTimesState {
   const PrayerTimesReady(
       {this.city,
       List<PrayerEntry> entries = const <PrayerEntry>[],
-      this.remaining = null})
+      this.remaining = null,
+      this.nextTomorrowName = null,
+      this.nextTomorrowTime = null,
+      this.nextTomorrowRemaining = null})
       : _entries = entries;
 
   final City? city;
@@ -291,6 +327,22 @@ class PrayerTimesReady implements PrayerTimesState {
 
   @JsonKey()
   final Duration? remaining;
+
+  /// The first prayer after today's list is over (after Isha this is
+  /// tomorrow's Fajr). Null while a today entry is still ahead.
+  ///
+  /// Carried separately instead of appended to [entries] because the panel
+  /// must stay "today's six times"; the screen renders this as a footer.
+  @JsonKey()
+  final PrayerName? nextTomorrowName;
+  @JsonKey()
+  final DateTime? nextTomorrowTime;
+
+  /// Countdown to [nextTomorrowTime]. Kept apart from [remaining], which
+  /// stays null once no row is next — the frozen contract the row subtitle
+  /// and the ticker tests rely on.
+  @JsonKey()
+  final Duration? nextTomorrowRemaining;
 
   /// Create a copy of PrayerTimesState
   /// with the given fields replaced by the non-null parameter values.
@@ -307,18 +359,30 @@ class PrayerTimesReady implements PrayerTimesState {
             (identical(other.city, city) || other.city == city) &&
             const DeepCollectionEquality().equals(other.entries, _entries) &&
             (identical(other.remaining, remaining) ||
-                other.remaining == remaining));
+                other.remaining == remaining) &&
+            (identical(other.nextTomorrowName, nextTomorrowName) ||
+                other.nextTomorrowName == nextTomorrowName) &&
+            (identical(other.nextTomorrowTime, nextTomorrowTime) ||
+                other.nextTomorrowTime == nextTomorrowTime) &&
+            (identical(other.nextTomorrowRemaining, nextTomorrowRemaining) ||
+                other.nextTomorrowRemaining == nextTomorrowRemaining));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, city,
-        const DeepCollectionEquality().hash(_entries), remaining);
+    return Object.hash(
+        runtimeType,
+        city,
+        const DeepCollectionEquality().hash(_entries),
+        remaining,
+        nextTomorrowName,
+        nextTomorrowTime,
+        nextTomorrowRemaining);
   }
 
   @override
   String toString() {
-    return 'PrayerTimesState.ready(city: $city, entries: $entries, remaining: $remaining)';
+    return 'PrayerTimesState.ready(city: $city, entries: $entries, remaining: $remaining, nextTomorrowName: $nextTomorrowName, nextTomorrowTime: $nextTomorrowTime, nextTomorrowRemaining: $nextTomorrowRemaining)';
   }
 }
 
@@ -329,7 +393,13 @@ abstract mixin class $PrayerTimesReadyCopyWith<$Res>
           PrayerTimesReady value, $Res Function(PrayerTimesReady) _then) =
       _$PrayerTimesReadyCopyWithImpl;
   @useResult
-  $Res call({City? city, List<PrayerEntry> entries, Duration? remaining});
+  $Res call(
+      {City? city,
+      List<PrayerEntry> entries,
+      Duration? remaining,
+      PrayerName? nextTomorrowName,
+      DateTime? nextTomorrowTime,
+      Duration? nextTomorrowRemaining});
 }
 
 /// @nodoc
@@ -347,6 +417,9 @@ class _$PrayerTimesReadyCopyWithImpl<$Res>
     Object? city = freezed,
     Object? entries = null,
     Object? remaining = freezed,
+    Object? nextTomorrowName = freezed,
+    Object? nextTomorrowTime = freezed,
+    Object? nextTomorrowRemaining = freezed,
   }) {
     return _then(PrayerTimesReady(
       city: freezed == city
@@ -360,6 +433,18 @@ class _$PrayerTimesReadyCopyWithImpl<$Res>
       remaining: freezed == remaining
           ? _self.remaining
           : remaining // ignore: cast_nullable_to_non_nullable
+              as Duration?,
+      nextTomorrowName: freezed == nextTomorrowName
+          ? _self.nextTomorrowName
+          : nextTomorrowName // ignore: cast_nullable_to_non_nullable
+              as PrayerName?,
+      nextTomorrowTime: freezed == nextTomorrowTime
+          ? _self.nextTomorrowTime
+          : nextTomorrowTime // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      nextTomorrowRemaining: freezed == nextTomorrowRemaining
+          ? _self.nextTomorrowRemaining
+          : nextTomorrowRemaining // ignore: cast_nullable_to_non_nullable
               as Duration?,
     ));
   }

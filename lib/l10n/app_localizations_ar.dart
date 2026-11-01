@@ -765,4 +765,64 @@ class AppLocalizationsAr extends AppLocalizations {
   String shareAyahText(String text, String url) {
     return '$text\n\n$url';
   }
+
+  @override
+  String get homeSectionQuran => 'القرآن والاستماع';
+
+  @override
+  String get homeSectionWorship => 'العبادة اليومية';
+
+  @override
+  String get homeSectionMore => 'المزيد';
+
+  @override
+  String get qiblaAligned => 'أنت تواجه القبلة';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'أدر الهاتف $degrees° يمينًا';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'أدر الهاتف $degrees° يسارًا';
+  }
+
+  @override
+  String get more => 'المزيد';
+
+  @override
+  String get copyAyah => 'نسخ الآية';
+
+  @override
+  String get ayahCopied => 'تم نسخ الآية';
+
+  @override
+  String get libraryEmpty => 'لا توجد حزم معرفية بعد';
+
+  @override
+  String get bookmarkRemoveBody => 'ستُحذف هذه العلامة من قائمتك.';
+
+  @override
+  String nextPrayerTomorrow(String name, String time) {
+    return 'غدًا $name $time';
+  }
+
+  @override
+  String get hadithEmpty => 'لا توجد أحاديث في هذه الحزمة';
+
+  @override
+  String get languageArabic => 'العربية';
+
+  @override
+  String get languageEnglish => 'الإنجليزية';
+
+  @override
+  String get downloadsTitle => 'التنزيلات';
+
+  @override
+  String get downloadsEmpty => 'لا توجد تلاوات منزّلة بعد';
+
+  @override
+  String get downloadsDeleteBody => 'سيُحذف هذا الملف من جهازك.';
 }

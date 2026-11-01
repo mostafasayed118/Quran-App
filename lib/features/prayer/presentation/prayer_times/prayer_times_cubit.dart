@@ -78,7 +78,12 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       final nextEntry = entries
           .where((e) => e.isNext)
           .fold<PrayerEntry?>(null, (best, e) => best ?? e);
+      // After Isha no today row is next and the service has already rolled
+      // over to tomorrow's Fajr. Keep it out of [entries] (the panel is
+      // today's six times) but carry it so the screen can say what is coming.
+      final tomorrow = nextEntry == null ? next : null;
       final remaining = nextEntry?.time.difference(now);
+      final tomorrowRemaining = tomorrow?.time.difference(now);
       if (isClosed) return;
       _loadedDay = DateTime(now.year, now.month, now.day);
       emit(PrayerTimesState.ready(
@@ -86,6 +91,12 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
         entries: entries,
         remaining:
             remaining != null && remaining > Duration.zero ? remaining : null,
+        nextTomorrowName: tomorrow?.name,
+        nextTomorrowTime: tomorrow?.time,
+        nextTomorrowRemaining:
+            tomorrowRemaining != null && tomorrowRemaining > Duration.zero
+                ? tomorrowRemaining
+                : null,
       ));
       _scheduleReminders();
     } on Object catch (error, stackTrace) {
@@ -125,7 +136,22 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
         break;
       }
     }
-    if (nextEntry == null) return;
+    if (nextEntry == null) {
+      // Nothing left today: tick the footer's "tomorrow" countdown instead of
+      // freezing it at whatever the first frame showed.
+      final tomorrow = state.nextTomorrowTime;
+      if (tomorrow == null) return;
+      final left = tomorrow.difference(now);
+      if (left <= Duration.zero) {
+        unawaited(reload());
+        return;
+      }
+      final current = state.nextTomorrowRemaining;
+      if (current == null || current.inMinutes != left.inMinutes) {
+        emit(state.copyWith(nextTomorrowRemaining: left));
+      }
+      return;
+    }
     final remaining = nextEntry.time.difference(now);
     if (remaining <= Duration.zero) {
       unawaited(reload());

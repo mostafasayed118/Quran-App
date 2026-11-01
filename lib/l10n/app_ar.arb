@@ -543,5 +543,47 @@
         "type": "String"
       }
     }
-  }
+  },
+  "homeSectionQuran": "القرآن والاستماع",
+  "homeSectionWorship": "العبادة اليومية",
+  "homeSectionMore": "المزيد",
+  "qiblaAligned": "أنت تواجه القبلة",
+  "qiblaTurnRight": "أدر الهاتف {degrees}° يمينًا",
+  "@qiblaTurnRight": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "qiblaTurnLeft": "أدر الهاتف {degrees}° يسارًا",
+  "@qiblaTurnLeft": {
+    "placeholders": {
+      "degrees": {
+        "type": "String"
+      }
+    }
+  },
+  "more": "المزيد",
+  "copyAyah": "نسخ الآية",
+  "ayahCopied": "تم نسخ الآية",
+  "libraryEmpty": "لا توجد حزم معرفية بعد",
+  "bookmarkRemoveBody": "ستُحذف هذه العلامة من قائمتك.",
+  "nextPrayerTomorrow": "غدًا {name} {time}",
+  "@nextPrayerTomorrow": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "hadithEmpty": "لا توجد أحاديث في هذه الحزمة",
+  "languageArabic": "العربية",
+  "languageEnglish": "الإنجليزية",
+  "downloadsTitle": "التنزيلات",
+  "downloadsEmpty": "لا توجد تلاوات منزّلة بعد",
+  "downloadsDeleteBody": "سيُحذف هذا الملف من جهازك."
 }

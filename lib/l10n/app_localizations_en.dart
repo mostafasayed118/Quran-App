@@ -768,4 +768,66 @@ class AppLocalizationsEn extends AppLocalizations {
   String shareAyahText(String text, String url) {
     return '$text\n\n$url';
   }
+
+  @override
+  String get homeSectionQuran => 'Quran & listening';
+
+  @override
+  String get homeSectionWorship => 'Daily worship';
+
+  @override
+  String get homeSectionMore => 'More';
+
+  @override
+  String get qiblaAligned => 'You are facing the Qibla';
+
+  @override
+  String qiblaTurnRight(String degrees) {
+    return 'Turn the phone $degrees° right';
+  }
+
+  @override
+  String qiblaTurnLeft(String degrees) {
+    return 'Turn the phone $degrees° left';
+  }
+
+  @override
+  String get more => 'More';
+
+  @override
+  String get copyAyah => 'Copy verse';
+
+  @override
+  String get ayahCopied => 'Verse copied';
+
+  @override
+  String get libraryEmpty => 'No knowledge packs yet';
+
+  @override
+  String get bookmarkRemoveBody =>
+      'This bookmark will be removed from your list.';
+
+  @override
+  String nextPrayerTomorrow(String name, String time) {
+    return 'Tomorrow $name $time';
+  }
+
+  @override
+  String get hadithEmpty => 'No hadith in this pack';
+
+  @override
+  String get languageArabic => 'Arabic';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get downloadsTitle => 'Downloads';
+
+  @override
+  String get downloadsEmpty => 'No downloaded recitations yet';
+
+  @override
+  String get downloadsDeleteBody =>
+      'This file will be removed from your device.';
 }
