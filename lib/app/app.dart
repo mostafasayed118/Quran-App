@@ -49,7 +49,10 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
+      // v1.0 is Arabic-only (docs/decisions/2026-11-01-v1-launch-decisions.md D1).
+      // The EN ARB stays as v1.1 groundwork; advertising `en` here would offer a
+      // language the app cannot switch to.
+      supportedLocales: const [Locale('ar')],
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
