@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -115,27 +116,38 @@ class _ReadyView extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          if (state.showBasmala)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Text(
-                loc.basmala,
-                style: TextStyle(
-                  fontFamily: QuranFonts.meQuran,
-                  fontSize: 22,
-                  color: AppTheme.goldText(context),
+      // Selection is enabled only when the surah's Unicode Uthmani asset is
+      // present: the fallback glyph column is a private-use encoding, and
+      // selecting it used to copy `   …` into WhatsApp. With the Unicode
+      // text the selection is real Arabic and the native toolbar is correct.
+      body: Builder(
+        builder: (context) {
+          final content = Column(
+            children: [
+              if (state.showBasmala)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    loc.basmala,
+                    style: TextStyle(
+                      fontFamily: QuranFonts.meQuran,
+                      fontSize: 22,
+                      color: AppTheme.goldText(context),
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
                 ),
-                textDirection: TextDirection.rtl,
+              Expanded(
+                child: isVerses
+                    ? _VersesList(state: state)
+                    : _MushafPager(state: state),
               ),
-            ),
-          Expanded(
-            child: isVerses
-                ? _VersesList(state: state)
-                : _MushafPager(state: state),
-          ),
-        ],
+            ],
+          );
+          return state.ayahs.every((v) => v.textUnicode != null)
+              ? SelectionArea(child: content)
+              : content;
+        },
       ),
       bottomSheet: const MiniPlayerBar(),
     );
@@ -264,11 +276,26 @@ class _AyahCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         textDirection: TextDirection.rtl,
         children: [
-          Text(
-            stripAyahEndMarker(ayah.textUthmani),
-            style: AppTheme.hafsAyah,
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.rtl,
+          // With Unicode text the SelectionArea owns the long-press (that is
+          // how a selection starts). Only the glyph fallback needs the
+          // copy-on-long-press shortcut, because selection there is invalid.
+          Builder(
+            builder: (context) {
+              final unicode = ayah.textUnicode;
+              final text = unicode ?? stripAyahEndMarker(ayah.textUthmani);
+              final widget = Text(
+                text,
+                style: AppTheme.hafsAyah,
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+              );
+              if (unicode != null) return widget;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onLongPress: () => copyAyahText(context, ayah),
+                child: widget,
+              );
+            },
           ),
           _AyahActions(
             ayah: ayah,
@@ -337,8 +364,42 @@ class _AyahActions extends StatelessWidget {
           ),
           onPressed: onToggle,
         ),
+        _CopyAyahButton(ayah: ayah),
         _ShareAyahButton(ayah: ayah),
       ],
+    );
+  }
+}
+
+/// Copies [ayah] as real Arabic and confirms it.
+///
+/// The mushaf renders `text_uthmani`, a private-use glyph encoding only the
+/// bundled Hafs face understands; `text_imlaei` is the copyable, searchable
+/// orthography. Shared by the copy button and the long-press on the verse.
+Future<void> copyAyahText(BuildContext context, Verse ayah) async {
+  final loc = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  await Clipboard.setData(ClipboardData(text: ayah.copyText));
+  messenger.showSnackBar(SnackBar(content: Text(loc.ayahCopied)));
+}
+
+/// Copies the verse as real Arabic.
+///
+/// The rendered mushaf glyphs are a private-use encoding of `text_uthmani`,
+/// so the clipboard must take `text_imlaei` (the same column the share action
+/// and the bookmarks list use) or other apps receive boxes.
+class _CopyAyahButton extends StatelessWidget {
+  const _CopyAyahButton({required this.ayah});
+
+  final Verse ayah;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return IconButton(
+      tooltip: loc.copyAyah,
+      icon: const Icon(Icons.copy_outlined),
+      onPressed: () => copyAyahText(context, ayah),
     );
   }
 }
@@ -356,7 +417,7 @@ class _ShareAyahButton extends StatelessWidget {
       icon: const Icon(Icons.share_outlined),
       onPressed: () => SharePlus.instance.share(ShareParams(
         text: loc.shareAyahText(
-          ayah.textImlaei,
+          ayah.copyText,
           webSurahUrl(ayah.surahId, ayah.numberInSurah),
         ),
       )),
@@ -411,10 +472,11 @@ class _MushafPagerState extends State<_MushafPager> {
       onPageChanged: cubit.onMushafPageChanged,
       itemBuilder: (context, i) {
         final block = pages[i];
-        // The page is one shaped paragraph: the HafsSmart verse text plus a
-        // me_quran ornament for the number (the face that actually has
-        // U+FD3F/FD3E). Drawing the number in the HafsSmart run turned it into
-        // a fallback bracket, and the text already carries its own end marker.
+        // The page is one shaped paragraph: the verse text plus a me_quran
+        // ornament for the number (the face that actually has U+FD3F/FD3E).
+        // The text is the Unicode Uthmani asset when available; the glyph
+        // column is the fallback and carries its own end marker.
+        final unicode = block.ayahs.every((a) => a.textUnicode != null);
         final numberStyle = TextStyle(
           fontFamily: QuranFonts.meQuran,
           color: AppTheme.goldText(context),
@@ -424,7 +486,10 @@ class _MushafPagerState extends State<_MushafPager> {
             // Non-breaking space: the medallion must wrap WITH the ayah's last
             // word, never land at the start of the next line (where it would
             // read as if it belonged to the following verse).
-            TextSpan(text: '${stripAyahEndMarker(a.textUthmani)}\u00A0'),
+            TextSpan(
+              text:
+                  '${a.textUnicode ?? stripAyahEndMarker(a.textUthmani)}\u00A0',
+            ),
             TextSpan(
               text: '${loc.ornateBrackets(a.numberInSurah.toArabicIndic)} ',
               style: numberStyle,
@@ -444,11 +509,13 @@ class _MushafPagerState extends State<_MushafPager> {
                 child: SingleChildScrollView(
                   child: Text.rich(
                     TextSpan(children: spans),
-                    style: const TextStyle(
-                      fontFamily: QuranFonts.quran,
-                      fontSize: 22,
-                      height: 2.2,
-                    ),
+                    style: unicode
+                        ? AppTheme.hafsAyah.copyWith(fontSize: 22, height: 2.2)
+                        : const TextStyle(
+                            fontFamily: QuranFonts.quran,
+                            fontSize: 22,
+                            height: 2.2,
+                          ),
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.rtl,
                   ),

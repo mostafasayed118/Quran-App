@@ -6,6 +6,7 @@ import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
 
 import '../../data/ayah_source.dart';
 import '../../data/last_read_source.dart';
+import '../../data/uthmani_text_source.dart';
 import '../../data/verse_mapping.dart';
 import 'mushaf_page_block.dart';
 import 'reader_state.dart';
@@ -27,9 +28,11 @@ class ReaderCubit extends Cubit<ReaderState> {
     required int surahId,
     required int initialAyah,
     WirdProgressSink? wirdProgress,
+    UthmaniTextSource? uthmani,
   })  : _ayahRepository = ayahRepository,
         _lastReadRepository = lastReadRepository,
         _wirdProgress = wirdProgress,
+        _uthmani = uthmani,
         _surahId = surahId,
         _initialAyah = initialAyah,
         super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
@@ -53,6 +56,7 @@ class ReaderCubit extends Cubit<ReaderState> {
   final AyahSource _ayahRepository;
   final LastReadSource _lastReadRepository;
   final WirdProgressSink? _wirdProgress;
+  final UthmaniTextSource? _uthmani;
   final int _surahId;
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
@@ -79,7 +83,14 @@ class ReaderCubit extends Cubit<ReaderState> {
           startList.isNotEmpty ? startList.first.id : ayahs.first.id;
       _lastVisibleAyahId = startAyahId;
       unawaited(_saveLastRead(startAyahId));
-      final verses = ayahs.map((a) => a.toVerse()).toList();
+      // Unicode Uthmani is an asset (no DB migration). When it is missing the
+      // verses keep glyph text and the reader turns selection off.
+      final unicode =
+          await _uthmani?.forSurah(_surahId) ?? const <int, String>{};
+      if (isClosed) return;
+      final verses = ayahs
+          .map((a) => a.toVerse().withUnicode(unicode[a.numberInSurah]))
+          .toList();
       emit(ReaderState.ready(
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',

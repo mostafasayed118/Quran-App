@@ -40,7 +40,21 @@ class Verse {
     required this.textUthmani,
     required this.textImlaei,
     required this.sajda,
+    this.textUnicode,
   });
+
+  /// Same verse, with the Unicode Uthmani reading attached.
+  Verse withUnicode(String? unicode) => Verse(
+        id: id,
+        surahId: surahId,
+        numberInSurah: numberInSurah,
+        juz: juz,
+        page: page,
+        textUthmani: textUthmani,
+        textImlaei: textImlaei,
+        sajda: sajda,
+        textUnicode: unicode,
+      );
 
   final int id;
   final int surahId;
@@ -50,4 +64,15 @@ class Verse {
   final String textUthmani;
   final String textImlaei;
   final bool sajda;
+
+  /// The same verse in real Unicode Uthmani (OFL asset, one file per surah).
+  ///
+  /// Null only when the asset is missing for this surah; the reader then falls
+  /// back to [textUthmani] (a private-use glyph encoding) and disables text
+  /// selection for it, because copying those glyphs is meaningless elsewhere.
+  final String? textUnicode;
+
+  /// What belongs on the clipboard: Unicode Uthmani when available, otherwise
+  /// the imlaei orthography. Never [textUthmani] — that is a glyph encoding.
+  String get copyText => textUnicode ?? textImlaei;
 }

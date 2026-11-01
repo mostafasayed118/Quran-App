@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart' show LazyDatabase;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/connection.dart';
@@ -31,6 +32,7 @@ import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
 import 'package:quran_yahdi/features/quran/data/quran_search_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/surah_source.dart';
+import 'package:quran_yahdi/features/quran/data/uthmani_text_source.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/just_audio_playback_service.dart';
@@ -102,6 +104,11 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
+  // Unicode Uthmani reading assets (OFL). Separate from the DB on purpose:
+  // no migration, and a missing asset only disables selection for that surah.
+  getIt.registerLazySingleton<UthmaniTextSource>(
+    () => AssetUthmaniTextSource(rootBundle),
+  );
   getIt.registerLazySingleton<QuranSearchSource>(
       () => QuranSearchRepository(db));
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));

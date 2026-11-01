@@ -46,6 +46,7 @@ import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
+import '../features/quran/data/uthmani_text_source.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
@@ -64,6 +65,7 @@ import '../features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import '../features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
 import '../features/recitation/presentation/downloads/downloads_cubit.dart';
+import '../features/recitation/presentation/downloads/downloads_screen.dart';
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.dart';
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart';
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
@@ -74,6 +76,7 @@ import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
+import 'app_shell.dart';
 import 'di/injector.dart';
 import 'route_cubit_scope.dart';
 import 'route_observer.dart';
@@ -92,28 +95,66 @@ abstract final class AppRouter {
       );
     },
     routes: [
-      GoRoute(
-        path: AppRoutes.home,
-        builder: (_, __) => RouteCubitScope<HomeCubit>(
-          create: () => HomeCubit(
-            lastRead: getIt<LastReadMarker>(),
-            ayahs: getIt<AyahLookup>(),
-            prayer: getIt<PrayerTimesPort>(),
-            city: getIt<CitySource>(),
+      ShellRoute(
+        builder: (context, state, child) => BlocProvider<PlaybackCubit>.value(
+          // The player is an app-level singleton (registered in DI) so the
+          // mini player can live above the tabs instead of inside the reader.
+          value: getIt<PlaybackCubit>(),
+          child: AppShell(
+            location: state.uri.path,
+            child: child,
           ),
-          identity: AppRoutes.home,
-          start: (cubit) => cubit.start(),
-          child: const HomeScreen(),
         ),
-      ),
-      GoRoute(
-        path: AppRoutes.quran,
-        builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
-          create: () => SurahIndexCubit(getIt<SurahSource>()),
-          identity: AppRoutes.quran,
-          start: (cubit) => cubit.start(),
-          child: const SurahIndexScreen(),
-        ),
+        routes: [
+          GoRoute(
+            path: AppRoutes.home,
+            builder: (_, __) => RouteCubitScope<HomeCubit>(
+              create: () => HomeCubit(
+                lastRead: getIt<LastReadMarker>(),
+                ayahs: getIt<AyahLookup>(),
+                prayer: getIt<PrayerTimesPort>(),
+                city: getIt<CitySource>(),
+              ),
+              identity: AppRoutes.home,
+              start: (cubit) => cubit.start(),
+              child: const HomeScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.quran,
+            builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
+              create: () => SurahIndexCubit(getIt<SurahSource>()),
+              identity: AppRoutes.quran,
+              start: (cubit) => cubit.start(),
+              child: const SurahIndexScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.prayerTimes,
+            builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
+              create: () => PrayerTimesCubit(
+                prayer: getIt<PrayerTimesPort>(),
+                city: getIt<CitySource>(),
+                settings: getIt<ReminderSettingsPort>(),
+                scheduler: getIt<ReminderSchedulerPort>(),
+              ),
+              identity: AppRoutes.prayerTimes,
+              start: (cubit) => cubit.start(),
+              child: const PrayerTimesScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.azkar,
+            builder: (_, __) => RouteCubitScope<AzkarCubit>(
+              create: () => AzkarCubit(
+                repository: getIt<AzkarRepository>(),
+              ),
+              identity: AppRoutes.azkar,
+              start: (cubit) => cubit.start(),
+              child: const AzkarScreen(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.quranSearch,
@@ -134,6 +175,16 @@ abstract final class AppRouter {
           identity: AppRoutes.recitation,
           start: (cubit) => cubit.start(),
           child: const RecitersScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.downloads,
+        // The cubit is app-scoped on purpose (the queue survives leaving the
+        // route); a second instance here would desync its done rows from the
+        // per-surah delete affordances.
+        builder: (_, __) => BlocProvider<DownloadsCubit>.value(
+          value: getIt<DownloadsCubit>(),
+          child: const DownloadsScreen(),
         ),
       ),
       GoRoute(
@@ -173,20 +224,6 @@ abstract final class AppRouter {
         },
       ),
       GoRoute(
-        path: AppRoutes.prayerTimes,
-        builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
-          create: () => PrayerTimesCubit(
-            prayer: getIt<PrayerTimesPort>(),
-            city: getIt<CitySource>(),
-            settings: getIt<ReminderSettingsPort>(),
-            scheduler: getIt<ReminderSchedulerPort>(),
-          ),
-          identity: AppRoutes.prayerTimes,
-          start: (cubit) => cubit.start(),
-          child: const PrayerTimesScreen(),
-        ),
-      ),
-      GoRoute(
         path: AppRoutes.cityPicker,
         builder: (_, __) => RouteCubitScope<CityPickerCubit>(
           create: () => CityPickerCubit(
@@ -209,17 +246,6 @@ abstract final class AppRouter {
           identity: AppRoutes.qibla,
           start: (cubit) => cubit.start(),
           child: const QiblaScreen(),
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.azkar,
-        builder: (_, __) => RouteCubitScope<AzkarCubit>(
-          create: () => AzkarCubit(
-            repository: getIt<AzkarRepository>(),
-          ),
-          identity: AppRoutes.azkar,
-          start: (cubit) => cubit.start(),
-          child: const AzkarScreen(),
         ),
       ),
       GoRoute(
@@ -328,6 +354,7 @@ abstract final class AppRouter {
                 surahId: surah,
                 initialAyah: ayah,
                 wirdProgress: getIt<KhatmaRepository>(),
+                uthmani: getIt<UthmaniTextSource>(),
               ),
               start: (cubit) => cubit.start(),
               child: const ReaderScreen(),
