@@ -1,3 +1,5 @@
+import 'dart:convert' show jsonDecode;
+
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -16,7 +18,7 @@ void main() {
     expect(text, contains('Free of Cost'));
   });
 
-  test('the Tanzil attribution ships and documents the import adjustments',
+  test('the Tanzil attribution ships and states the basmala omission',
       () async {
     final text = await rootBundle.loadString(
       'assets/licenses/tanzil-quran-uthmani.txt',
@@ -24,9 +26,26 @@ void main() {
 
     expect(text, contains('Tanzil Project'));
     expect(text, contains('tanzil.net'));
-    // The two presentational adjustments must stay documented next to the
-    // attribution, because they are the only deviation from the verbatim text.
+    // The stored copy is not verbatim, and the file has to say so: the terms it
+    // quotes two paragraphs above forbid modification.
     expect(text, contains('basmala'));
+    expect(text, contains('not a verbatim copy'));
+  });
+
+  test('the stored text drops the repeated basmala the reader draws itself',
+      () async {
+    Future<Map<String, dynamic>> surah(int number) async => jsonDecode(
+          await rootBundle.loadString('assets/quran/uthmani/$number.json'),
+        ) as Map<String, dynamic>;
+
+    final basmala = (await surah(1))['1'] as String;
+    for (var number = 2; number <= 114; number++) {
+      expect(
+        (await surah(number))['1'],
+        isNot(contains(basmala)),
+        reason: 'surah $number stores the repeated basmala',
+      );
+    }
   });
 
   testWidgets('the screen lists the shipped content and font sources',
@@ -47,7 +66,7 @@ void main() {
     // The list grew with the Tanzil attribution tile, so the fonts section is
     // below the fold on the 800x600 test surface.
     await tester.ensureVisible(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));
-    await tester.pumpAndSettle();
+    await tester.pump();
     await tester.tap(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));
     await tester.pump();
 
