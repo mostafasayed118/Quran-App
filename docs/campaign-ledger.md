@@ -1030,4 +1030,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 ### Finishing wave close-out — 2026-11-01 — NO PUSH
 - **Commits (branch `finish/2026-11-01`, based on `main` @ `73e0e9b`):** `fc64acf` Tanzil attribution; `7cb7224` generated-code + DB-drift gates; `ef2807b` Arabic-only locale surface; `6929698` launch decisions + docs truth.
 - **Gates at `6929698`:** `dart format` 511 files / **0 changed** · `flutter analyze` **0** · `flutter test` **921/921** (3m02s); porcelain clean.
-- **State:** 5 commits ahead of `main` after this docs-only close-out; **no push, no merge**. Next: owner GO for the merge + push window. The shared checkout is still on `chore/entire-port-smoke`, so the merge waits for that session to finish.
+- **State:** 5 commits ahead of `main` after this docs-only close-out; **no push, no merge**. Next: owner GO for the merge + push window. The shared checkout was still on `chore/entire-port-smoke` when this line was written; it later returned to `main` and was left untouched.
+
+### Finishing wave push window — 2026-11-01
+- **Owner GO:** merge + push window.
+- **Pre-flight:** remote `main` = `73e0e9b`; `finish/2026-11-01` = `cde181d`; `git merge-base --is-ancestor` confirmed a fast-forward; format **0** · analyze **0** · **921/921** (3m15s) re-run at `cde181d`; secret scan 0; forbidden-file scan 0; `git -c core.whitespace=cr-at-eol diff --check` clean.
+- **Push:** `73e0e9b..cde181d` → `main`, exit 0; `ls-remote` = `cde181d20c77f65f5e7434ccb92a41611e0923cc`; unpushed 0 at the code tip.
+- **CI on `cde181d`:** `ci` **41320329876 success** (analyze-test + release-artifact); `db-drift` **41320329863 success** — first run of the new Windows gate, the rebuilt DB matched the committed bytes; `web-gates` **41320330009 success**.
+- **Shared tree:** untouched. It had returned to `main` @ `73e0e9b` with the redundant WIP: 7 of the 8 files byte-match the commits, and the test file is the same change plus the two extra assertions. Stash/discard the WIP, then a fast-forward pull brings it to the new tip.
+- **State:** this docs-only ledger commit is the second push of the window; no code changed after the green code tip. The shared checkout's local `main` is intentionally untouched (it is checked out there), so it fast-forwards on the next pull.
