@@ -51,7 +51,7 @@ jobs:
       # Pinned to the commit of the v4 tag: a mutable tag can be moved to a
       # different commit, and this workflow runs the deploy gate.
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
       - run: npm ci
       # The e2e specs drive a real Chromium; the runner does not ship one.
