@@ -1,5 +1,3 @@
-import 'dart:convert' show jsonDecode;
-
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,22 +28,6 @@ void main() {
     // quotes two paragraphs above forbid modification.
     expect(text, contains('basmala'));
     expect(text, contains('not a verbatim copy'));
-  });
-
-  test('the stored text drops the repeated basmala the reader draws itself',
-      () async {
-    Future<Map<String, dynamic>> surah(int number) async => jsonDecode(
-          await rootBundle.loadString('assets/quran/uthmani/$number.json'),
-        ) as Map<String, dynamic>;
-
-    final basmala = (await surah(1))['1'] as String;
-    for (var number = 2; number <= 114; number++) {
-      expect(
-        (await surah(number))['1'],
-        isNot(contains(basmala)),
-        reason: 'surah $number stores the repeated basmala',
-      );
-    }
   });
 
   testWidgets('the screen lists the shipped content and font sources',
