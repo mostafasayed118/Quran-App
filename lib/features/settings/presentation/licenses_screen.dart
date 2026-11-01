@@ -36,9 +36,6 @@ class LicensesScreen extends StatelessWidget {
             icon: Icons.menu_book_outlined,
             text: loc.licensesQuranText,
           ),
-          // The shipped verse text is Tanzil's Uthmani edition; the reader now
-          // renders it verbatim, so the attribution lives beside the content
-          // list, not only in the font section.
           _AssetTile(
             icon: Icons.verified_outlined,
             title: loc.licensesQuranUthmani,
