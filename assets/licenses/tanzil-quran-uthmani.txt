@@ -1,0 +1,22 @@
+Quran text attribution — Tanzil Project
+=======================================
+
+Source: Tanzil Project (https://tanzil.net), Uthmani edition.
+Retrieved via the public api.alquran.cloud mirror and shipped verbatim inside
+this application as one JSON file per surah (assets/quran/uthmani/).
+
+Copyright (C) 2007-2025 Tanzil Project.
+
+Tanzil grants permission to copy and distribute verbatim copies of the Quran
+text, but not to modify it, and requires that the Tanzil Project be
+acknowledged wherever the text is used.
+
+The verse text in this application is distributed unmodified, with two
+presentational adjustments applied at import time and documented here:
+
+1. The surah-opening basmala that the source repeats before the first verse of
+   each surah is removed from that verse, because the reader draws the basmala
+   once as its own header (Al-Fatiha 1:1 is the basmala and is kept).
+2. Leading structural symbols that an edition may prefix to a verse (the
+   rub-el-hizb and sajda marks, byte-order and bidi marks) are removed so they
+   are not drawn twice by the reader.
