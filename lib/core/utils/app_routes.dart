@@ -30,6 +30,7 @@ abstract final class AppRoutes {
   static const hijri = '/hijri';
   static const asma = '/asma';
   static const settings = '/settings';
+  static const onboarding = '/onboarding';
   static const bookmarks = '/bookmarks';
 }
 

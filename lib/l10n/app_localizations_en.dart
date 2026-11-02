@@ -210,6 +210,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectCity => 'Select your city';
 
   @override
+  String get onboardingTitle => 'Get started';
+
+  @override
+  String get onboardingIntro => 'Two quick steps and the app is ready for you.';
+
+  @override
+  String onboardingCityDone(String city) {
+    return 'City: $city';
+  }
+
+  @override
+  String get onboardingChangeCity => 'Change city';
+
+  @override
+  String get onboardingRemindersTitle => 'Turn on prayer reminders';
+
+  @override
+  String get onboardingRemindersBody =>
+      'You get an alert when a prayer time begins, and you can turn it off any time.';
+
+  @override
+  String get onboardingAllow => 'Enable';
+
+  @override
+  String get onboardingEnabled => 'Reminders are on';
+
+  @override
+  String get onboardingStart => 'Start using the app';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get homeSetupTitle => 'Finish setup';
+
+  @override
+  String get homeSetupBody => 'Pick your city and turn on reminders.';
+
+  @override
   String get searchCity => 'Search a city…';
 
   @override

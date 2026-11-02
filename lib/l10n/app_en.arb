@@ -123,6 +123,25 @@
     }
   },
   "selectCity": "Select your city",
+  "onboardingTitle": "Get started",
+  "onboardingIntro": "Two quick steps and the app is ready for you.",
+  "onboardingCityDone": "City: {city}",
+  "@onboardingCityDone": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingChangeCity": "Change city",
+  "onboardingRemindersTitle": "Turn on prayer reminders",
+  "onboardingRemindersBody": "You get an alert when a prayer time begins, and you can turn it off any time.",
+  "onboardingAllow": "Enable",
+  "onboardingEnabled": "Reminders are on",
+  "onboardingStart": "Start using the app",
+  "onboardingSkip": "Skip",
+  "homeSetupTitle": "Finish setup",
+  "homeSetupBody": "Pick your city and turn on reminders.",
   "searchCity": "Search a city…",
   "noCity": "No city selected yet",
   "degreesFromNorth": "{degrees}° from north",

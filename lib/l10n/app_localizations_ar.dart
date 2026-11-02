@@ -209,6 +209,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectCity => 'اختر مدينتك';
 
   @override
+  String get onboardingTitle => 'البداية';
+
+  @override
+  String get onboardingIntro => 'خطوتان سريعتان ويصبح التطبيق جاهزًا لك.';
+
+  @override
+  String onboardingCityDone(String city) {
+    return 'المدينة: $city';
+  }
+
+  @override
+  String get onboardingChangeCity => 'تغيير المدينة';
+
+  @override
+  String get onboardingRemindersTitle => 'تفعيل تذكير الصلوات';
+
+  @override
+  String get onboardingRemindersBody =>
+      'يصلك تنبيه عند دخول وقت الصلاة، ويمكنك إيقافه في أي وقت.';
+
+  @override
+  String get onboardingAllow => 'تفعيل';
+
+  @override
+  String get onboardingEnabled => 'التنبيهات مفعّلة';
+
+  @override
+  String get onboardingStart => 'ابدأ الاستخدام';
+
+  @override
+  String get onboardingSkip => 'تخطّي';
+
+  @override
+  String get homeSetupTitle => 'أكمل الإعداد';
+
+  @override
+  String get homeSetupBody => 'اختر مدينتك وفعّل التنبيهات.';
+
+  @override
   String get searchCity => 'ابحث عن مدينة…';
 
   @override

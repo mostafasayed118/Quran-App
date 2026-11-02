@@ -25,6 +25,8 @@ import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
+import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
+import 'package:quran_yahdi/core/domain/onboarding_status.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/configured_prayer_times.dart';
 import 'package:quran_yahdi/features/prayer/data/location_service.dart';
@@ -168,17 +170,27 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<HijriService>(() => HijriService());
   // Restore reschedules reminders through the same guarded path as boot
   // (`runBootReminderSchedule` composition; no feature import lands on backup).
+  // The prayer configuration is re-read first: an import may have replaced the
+  // calculation method, madhab, per-prayer set or pre-adhan lead, and the
+  // configured prayer port reads the repository's cached `current`.
   getIt.registerLazySingleton<BackupService>(() => BackupService(
         db: db,
-        reschedule: () => getIt<ReminderRescheduler>().reschedule(
-          city: getIt<CitySource>(),
-          prayer: getIt<PrayerTimesPort>(),
-          scheduler: getIt<ReminderSchedulerPort>(),
-        ),
+        reschedule: () async {
+          await getIt<PrayerConfigRepository>().load();
+          await getIt<ReminderRescheduler>().reschedule(
+            city: getIt<CitySource>(),
+            prayer: getIt<PrayerTimesPort>(),
+            scheduler: getIt<ReminderSchedulerPort>(),
+          );
+        },
       ));
   getIt.registerLazySingleton<CityRepository>(
       () => CityRepository(db: db, loader: citiesLoader ?? _emptyCitiesLoader));
   getIt.registerLazySingleton<CitySource>(() => getIt<CityRepository>());
+  getIt.registerLazySingleton<OnboardingRepository>(
+      () => OnboardingRepository(db));
+  getIt.registerLazySingleton<OnboardingStatusSource>(
+      () => getIt<OnboardingRepository>());
   getIt.registerLazySingleton<AzkarRepository>(
       () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
   getIt.registerLazySingleton<AzkarSavedStateRepository>(

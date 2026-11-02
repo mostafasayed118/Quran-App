@@ -458,6 +458,78 @@ abstract class AppLocalizations {
   /// **'اختر مدينتك'**
   String get selectCity;
 
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'البداية'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'خطوتان سريعتان ويصبح التطبيق جاهزًا لك.'**
+  String get onboardingIntro;
+
+  /// No description provided for @onboardingCityDone.
+  ///
+  /// In ar, this message translates to:
+  /// **'المدينة: {city}'**
+  String onboardingCityDone(String city);
+
+  /// No description provided for @onboardingChangeCity.
+  ///
+  /// In ar, this message translates to:
+  /// **'تغيير المدينة'**
+  String get onboardingChangeCity;
+
+  /// No description provided for @onboardingRemindersTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل تذكير الصلوات'**
+  String get onboardingRemindersTitle;
+
+  /// No description provided for @onboardingRemindersBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'يصلك تنبيه عند دخول وقت الصلاة، ويمكنك إيقافه في أي وقت.'**
+  String get onboardingRemindersBody;
+
+  /// No description provided for @onboardingAllow.
+  ///
+  /// In ar, this message translates to:
+  /// **'تفعيل'**
+  String get onboardingAllow;
+
+  /// No description provided for @onboardingEnabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنبيهات مفعّلة'**
+  String get onboardingEnabled;
+
+  /// No description provided for @onboardingStart.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابدأ الاستخدام'**
+  String get onboardingStart;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In ar, this message translates to:
+  /// **'تخطّي'**
+  String get onboardingSkip;
+
+  /// No description provided for @homeSetupTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أكمل الإعداد'**
+  String get homeSetupTitle;
+
+  /// No description provided for @homeSetupBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر مدينتك وفعّل التنبيهات.'**
+  String get homeSetupBody;
+
   /// No description provided for @searchCity.
   ///
   /// In ar, this message translates to:

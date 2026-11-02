@@ -8,6 +8,7 @@ import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 
+import '../../../core/domain/onboarding_status.dart';
 import 'home_state.dart';
 
 /// The home screen's two cards: the last-read ayah and the next prayer.
@@ -20,11 +21,13 @@ class HomeCubit extends Cubit<HomeState> {
     required PrayerTimesPort prayer,
     required CitySource city,
     Stream<PrayerConfig>? configChanges,
+    OnboardingStatusSource? onboarding,
   })  : _lastRead = lastRead,
         _ayahs = ayahs,
         _prayer = prayer,
         _city = city,
         _configChanges = configChanges,
+        _onboarding = onboarding,
         super(const HomeState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -44,6 +47,7 @@ class HomeCubit extends Cubit<HomeState> {
   final PrayerTimesPort _prayer;
   final CitySource _city;
   final Stream<PrayerConfig>? _configChanges;
+  final OnboardingStatusSource? _onboarding;
   StreamSubscription<PrayerConfig>? _configSub;
 
   /// Monotonic token: only the newest [reload] may emit, so a slow older
@@ -69,13 +73,16 @@ class HomeCubit extends Cubit<HomeState> {
       final results = await Future.wait<Object?>([
         _loadLastReadCard(),
         _loadNextPrayerCard(),
+        _loadShowSetup(),
       ]);
       final lastReadCard = results[0] as LastReadCard?;
       final nextPrayerCard = results[1] as NextPrayerCard?;
+      final showSetup = results[2] as bool;
       if (isClosed || seq != _reloadSeq) return;
       emit(HomeState.ready(
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
+        showSetup: showSetup,
       ));
       _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
@@ -98,6 +105,19 @@ class HomeCubit extends Cubit<HomeState> {
       surahName: surah.nameAr,
       ayahNumber: ayah.numberInSurah,
     );
+  }
+
+  /// Whether Home should advertise the setup flow (flag missing or unread).
+  Future<bool> _loadShowSetup() async {
+    final source = _onboarding;
+    if (source == null) return false;
+    try {
+      return !await source.isCompleted();
+    } on Object catch (error, stackTrace) {
+      dev.log('home setup flag read failed',
+          name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
+      return false;
+    }
   }
 
   Future<NextPrayerCard?> _loadNextPrayerCard() async {

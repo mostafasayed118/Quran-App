@@ -45,6 +45,9 @@ import '../features/hijri/presentation/hijri_cubit.dart';
 import '../features/hijri/presentation/hijri_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../core/domain/onboarding_status.dart';
+import '../features/onboarding/presentation/onboarding_cubit.dart';
+import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/juz_index_source.dart';
 import '../features/quran/data/page_anchor_source.dart';
@@ -128,6 +131,7 @@ abstract final class AppRouter {
                 prayer: getIt<PrayerTimesPort>(),
                 city: getIt<CitySource>(),
                 configChanges: getIt<PrayerConfigSource>().changes,
+                onboarding: getIt<OnboardingStatusSource>(),
               ),
               identity: AppRoutes.home,
               start: (cubit) => cubit.start(),
@@ -413,6 +417,19 @@ abstract final class AppRouter {
             ),
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (_, __) => RouteCubitScope<OnboardingCubit>(
+          create: () => OnboardingCubit(
+            city: getIt<CitySource>(),
+            status: getIt<OnboardingStatusSource>(),
+            reminders: getIt<ReminderSchedulerPort>(),
+          ),
+          identity: AppRoutes.onboarding,
+          start: (cubit) => cubit.start(),
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.reciter,

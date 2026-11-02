@@ -130,6 +130,25 @@
     }
   },
   "selectCity": "اختر مدينتك",
+  "onboardingTitle": "البداية",
+  "onboardingIntro": "خطوتان سريعتان ويصبح التطبيق جاهزًا لك.",
+  "onboardingCityDone": "المدينة: {city}",
+  "@onboardingCityDone": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingChangeCity": "تغيير المدينة",
+  "onboardingRemindersTitle": "تفعيل تذكير الصلوات",
+  "onboardingRemindersBody": "يصلك تنبيه عند دخول وقت الصلاة، ويمكنك إيقافه في أي وقت.",
+  "onboardingAllow": "تفعيل",
+  "onboardingEnabled": "التنبيهات مفعّلة",
+  "onboardingStart": "ابدأ الاستخدام",
+  "onboardingSkip": "تخطّي",
+  "homeSetupTitle": "أكمل الإعداد",
+  "homeSetupBody": "اختر مدينتك وفعّل التنبيهات.",
   "searchCity": "ابحث عن مدينة…",
   "noCity": "لم تُحدَّد مدينة بعد",
   "degreesFromNorth": "{degrees}° عن الشمال",

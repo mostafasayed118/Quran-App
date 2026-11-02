@@ -100,7 +100,8 @@ class _HomeScreenState extends State<HomeScreen>
               loc,
               onRetry: () => context.read<HomeCubit>().reload(),
             ),
-          HomeReady(:final lastRead, :final nextPrayer) => ListView(
+          HomeReady(:final lastRead, :final nextPrayer, :final showSetup) =>
+            ListView(
               padding: appScrollPadding(
                 context,
                 const EdgeInsets.fromLTRB(
@@ -117,6 +118,10 @@ class _HomeScreenState extends State<HomeScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (showSetup) ...[
+                      const _SetupCard(),
+                      const SizedBox(height: AppSpacing.sm),
+                    ],
                     if (lastRead != null)
                       _ContinueReadingCard(lastRead: lastRead),
                     if (lastRead != null) const SizedBox(height: AppSpacing.sm),
@@ -377,6 +382,45 @@ class _LiveCountdownState extends State<_LiveCountdown> {
       formatDurationHms(widget.target.difference(DateTime.now())),
       style: AppTheme.heroValue.copyWith(color: colors.onPrimaryContainer),
       maxLines: 2,
+    );
+  }
+}
+
+class _SetupCard extends StatelessWidget {
+  const _SetupCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colors.primaryContainer,
+      child: InkWell(
+        borderRadius: AppRadius.lgAll,
+        onTap: () => context.push(AppRoutes.onboarding),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Icon(Icons.checklist_rtl, color: colors.onPrimaryContainer),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(loc.homeSetupTitle, style: AppTheme.cardTitle),
+                    const SizedBox(height: 2),
+                    Text(loc.homeSetupBody,
+                        style: AppTheme.mutedFootnote(context)),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_left, color: colors.onPrimaryContainer),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
