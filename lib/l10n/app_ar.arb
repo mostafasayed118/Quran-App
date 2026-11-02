@@ -147,8 +147,6 @@
   "onboardingEnabled": "التنبيهات مفعّلة",
   "onboardingStart": "ابدأ الاستخدام",
   "onboardingSkip": "تخطّي",
-  "homeSetupTitle": "أكمل الإعداد",
-  "homeSetupBody": "اختر مدينتك وفعّل التنبيهات.",
   "searchCity": "ابحث عن مدينة…",
   "noCity": "لم تُحدَّد مدينة بعد",
   "degreesFromNorth": "{degrees}° عن الشمال",

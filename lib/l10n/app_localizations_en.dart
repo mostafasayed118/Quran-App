@@ -243,12 +243,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSkip => 'Skip';
 
   @override
-  String get homeSetupTitle => 'Finish setup';
-
-  @override
-  String get homeSetupBody => 'Pick your city and turn on reminders.';
-
-  @override
   String get searchCity => 'Search a city…';
 
   @override

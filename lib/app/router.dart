@@ -93,14 +93,27 @@ import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
 import 'app_shell.dart';
+import 'onboarding_gate.dart';
 import 'di/injector.dart';
 import 'route_cubit_scope.dart';
 import 'route_observer.dart';
 
 abstract final class AppRouter {
+  /// The first-run gate shared with the router (`refreshListenable`) and the
+  /// onboarding flow (it is the app's `OnboardingStatusSource`).
+  static final OnboardingGate onboardingGate = OnboardingGate();
+
+  /// The redirect for [location]; null keeps the requested route.
+  ///
+  /// A thin seam so the decision is testable without booting the router.
+  static String? redirectFor(String location) =>
+      onboardingGate.decide(location);
+
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.home,
     observers: [appRouteObserver],
+    refreshListenable: onboardingGate,
+    redirect: (_, state) => redirectFor(state.matchedLocation),
     errorBuilder: (context, state) {
       final loc = AppLocalizations.of(context);
       return PlaceholderScreen(
@@ -131,7 +144,6 @@ abstract final class AppRouter {
                 prayer: getIt<PrayerTimesPort>(),
                 city: getIt<CitySource>(),
                 configChanges: getIt<PrayerConfigSource>().changes,
-                onboarding: getIt<OnboardingStatusSource>(),
               ),
               identity: AppRoutes.home,
               start: (cubit) => cubit.start(),

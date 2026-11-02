@@ -140,8 +140,6 @@
   "onboardingEnabled": "Reminders are on",
   "onboardingStart": "Start using the app",
   "onboardingSkip": "Skip",
-  "homeSetupTitle": "Finish setup",
-  "homeSetupBody": "Pick your city and turn on reminders.",
   "searchCity": "Search a city…",
   "noCity": "No city selected yet",
   "degreesFromNorth": "{degrees}° from north",

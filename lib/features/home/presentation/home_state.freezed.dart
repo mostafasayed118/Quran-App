@@ -146,9 +146,7 @@ extension HomeStatePatterns on HomeState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(
-            LastReadCard? lastRead, NextPrayerCard? nextPrayer, bool showSetup)?
-        ready,
+    TResult Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)? ready,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -158,7 +156,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed() when failed != null:
         return failed();
       case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer, _that.showSetup);
+        return ready(_that.lastRead, _that.nextPrayer);
       case _:
         return orElse();
     }
@@ -182,7 +180,7 @@ extension HomeStatePatterns on HomeState {
     required TResult Function() loading,
     required TResult Function() failed,
     required TResult Function(
-            LastReadCard? lastRead, NextPrayerCard? nextPrayer, bool showSetup)
+            LastReadCard? lastRead, NextPrayerCard? nextPrayer)
         ready,
   }) {
     final _that = this;
@@ -192,7 +190,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed():
         return failed();
       case HomeReady():
-        return ready(_that.lastRead, _that.nextPrayer, _that.showSetup);
+        return ready(_that.lastRead, _that.nextPrayer);
     }
   }
 
@@ -212,8 +210,7 @@ extension HomeStatePatterns on HomeState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(
-            LastReadCard? lastRead, NextPrayerCard? nextPrayer, bool showSetup)?
+    TResult? Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)?
         ready,
   }) {
     final _that = this;
@@ -223,7 +220,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed() when failed != null:
         return failed();
       case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer, _that.showSetup);
+        return ready(_that.lastRead, _that.nextPrayer);
       case _:
         return null;
     }
@@ -273,18 +270,12 @@ class HomeFailed implements HomeState {
 /// @nodoc
 
 class HomeReady implements HomeState {
-  const HomeReady(
-      {this.lastRead = null, this.nextPrayer = null, this.showSetup = false});
+  const HomeReady({this.lastRead = null, this.nextPrayer = null});
 
   @JsonKey()
   final LastReadCard? lastRead;
   @JsonKey()
   final NextPrayerCard? nextPrayer;
-
-  /// True until the setup flow is finished or skipped; Home then advertises
-  /// it above the cards.
-  @JsonKey()
-  final bool showSetup;
 
   /// Create a copy of HomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -301,19 +292,17 @@ class HomeReady implements HomeState {
             (identical(other.lastRead, lastRead) ||
                 other.lastRead == lastRead) &&
             (identical(other.nextPrayer, nextPrayer) ||
-                other.nextPrayer == nextPrayer) &&
-            (identical(other.showSetup, showSetup) ||
-                other.showSetup == showSetup));
+                other.nextPrayer == nextPrayer));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, lastRead, nextPrayer, showSetup);
+    return Object.hash(runtimeType, lastRead, nextPrayer);
   }
 
   @override
   String toString() {
-    return 'HomeState.ready(lastRead: $lastRead, nextPrayer: $nextPrayer, showSetup: $showSetup)';
+    return 'HomeState.ready(lastRead: $lastRead, nextPrayer: $nextPrayer)';
   }
 }
 
@@ -323,8 +312,7 @@ abstract mixin class $HomeReadyCopyWith<$Res>
   factory $HomeReadyCopyWith(HomeReady value, $Res Function(HomeReady) _then) =
       _$HomeReadyCopyWithImpl;
   @useResult
-  $Res call(
-      {LastReadCard? lastRead, NextPrayerCard? nextPrayer, bool showSetup});
+  $Res call({LastReadCard? lastRead, NextPrayerCard? nextPrayer});
 }
 
 /// @nodoc
@@ -340,7 +328,6 @@ class _$HomeReadyCopyWithImpl<$Res> implements $HomeReadyCopyWith<$Res> {
   $Res call({
     Object? lastRead = freezed,
     Object? nextPrayer = freezed,
-    Object? showSetup = null,
   }) {
     return _then(HomeReady(
       lastRead: freezed == lastRead
@@ -351,10 +338,6 @@ class _$HomeReadyCopyWithImpl<$Res> implements $HomeReadyCopyWith<$Res> {
           ? _self.nextPrayer
           : nextPrayer // ignore: cast_nullable_to_non_nullable
               as NextPrayerCard?,
-      showSetup: null == showSetup
-          ? _self.showSetup
-          : showSetup // ignore: cast_nullable_to_non_nullable
-              as bool,
     ));
   }
 }

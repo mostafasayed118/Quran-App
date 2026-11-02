@@ -8,6 +8,7 @@ import 'package:just_audio_background/just_audio_background.dart';
 import 'app/app.dart';
 import 'app/bootstrap.dart';
 import 'app/di/injector.dart';
+import 'app/onboarding_gate.dart';
 import 'app/router.dart';
 import 'core/l10n/platform_localizations.dart';
 import 'core/utils/app_routes.dart';
@@ -42,6 +43,12 @@ Future<void> main() async {
     libraryRootResolver: defaultLibraryRootResolver,
   );
   final loc = platformLocalizations();
+  // Arm the first-run gate: constructing it attaches the persisted flag and
+  // kicks the first read. The router consults the cache synchronously and
+  // re-runs its redirect when the read lands, so the flow opens as soon as the
+  // answer is known — and a launch target (reminder tap, deep link) is
+  // remembered and restored after the flow.
+  getIt<OnboardingGate>();
   // The first frame never waits for a plugin: the audio and notifications
   // plugins initialize behind the running app, and the app tolerates a
   // not-yet-initialized notifications binding (every call is a no-op until

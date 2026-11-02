@@ -518,18 +518,6 @@ abstract class AppLocalizations {
   /// **'تخطّي'**
   String get onboardingSkip;
 
-  /// No description provided for @homeSetupTitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'أكمل الإعداد'**
-  String get homeSetupTitle;
-
-  /// No description provided for @homeSetupBody.
-  ///
-  /// In ar, this message translates to:
-  /// **'اختر مدينتك وفعّل التنبيهات.'**
-  String get homeSetupBody;
-
   /// No description provided for @searchCity.
   ///
   /// In ar, this message translates to:

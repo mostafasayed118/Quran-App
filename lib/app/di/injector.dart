@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:drift/drift.dart' show LazyDatabase;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
+import 'package:quran_yahdi/app/onboarding_gate.dart';
+import 'package:quran_yahdi/app/router.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/connection.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
@@ -189,8 +191,12 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<CitySource>(() => getIt<CityRepository>());
   getIt.registerLazySingleton<OnboardingRepository>(
       () => OnboardingRepository(db));
+  // One instance serves both the router gate and the flow: the gate caches the
+  // flag for the synchronous redirect, and a finish/skip notifies the router.
+  getIt.registerLazySingleton<OnboardingGate>(
+      () => AppRouter.onboardingGate..attach(getIt<OnboardingRepository>()));
   getIt.registerLazySingleton<OnboardingStatusSource>(
-      () => getIt<OnboardingRepository>());
+      () => getIt<OnboardingGate>());
   getIt.registerLazySingleton<AzkarRepository>(
       () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
   getIt.registerLazySingleton<AzkarSavedStateRepository>(

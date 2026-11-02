@@ -24,9 +24,5 @@ sealed class HomeState with _$HomeState {
   const factory HomeState.ready({
     @Default(null) LastReadCard? lastRead,
     @Default(null) NextPrayerCard? nextPrayer,
-
-    /// True until the setup flow is finished or skipped; Home then advertises
-    /// it above the cards.
-    @Default(false) bool showSetup,
   }) = HomeReady;
 }

@@ -242,12 +242,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get onboardingSkip => 'تخطّي';
 
   @override
-  String get homeSetupTitle => 'أكمل الإعداد';
-
-  @override
-  String get homeSetupBody => 'اختر مدينتك وفعّل التنبيهات.';
-
-  @override
   String get searchCity => 'ابحث عن مدينة…';
 
   @override
