@@ -654,6 +654,23 @@
   "principlesNoAccount": "No account — everything stays on your device, and backups are yours to keep.",
   "principlesAttribution": "Recitations are credited to their reciters — any future list is reviewed by a human before it ships.",
   "principlesFuturePaid": "If we ever add a paid feature, every feature here today stays free.",
+  "reciterPacksTitle": "Reciter packs",
+  "reciterPacksIntro": "Shortlists of reciters, chosen with care and reviewed by a human before publishing — no paid placement and no commercial criterion. Recitations stream from their sources as they are, and downloading stays your choice per surah.",
+  "reciterPacksCriteriaTitle": "Selection criteria",
+  "reciterPacksCriterion1": "Accurate performance and pronunciation — human review",
+  "reciterPacksCriterion2": "Complete Quran (114 surahs)",
+  "reciterPacksCriterion3": "Recording quality and consistency",
+  "reciterPacksCriterion4": "Variety of style (murattal / mujawwad / teaching)",
+  "reciterPacksCriterion5": "No commercial criterion and no paid ranking",
+  "reciterPacksReviewer": "Reviewed by: {reviewer}",
+  "@reciterPacksReviewer": {
+    "placeholders": {
+      "reviewer": {
+        "type": "String"
+      }
+    }
+  },
+  "reciterPacksEmpty": "No pack published yet — the first one ships once a human reviewer signs it.",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

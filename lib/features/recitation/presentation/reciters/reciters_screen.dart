@@ -31,6 +31,11 @@ class RecitersScreen extends StatelessWidget {
         title: Text(loc.recitationsTitle),
         actions: [
           IconButton(
+            tooltip: loc.reciterPacksTitle,
+            icon: const Icon(Icons.collections_bookmark_outlined),
+            onPressed: () => context.push(AppRoutes.reciterPacks),
+          ),
+          IconButton(
             tooltip: loc.downloadsTitle,
             icon: const Icon(Icons.download_done_outlined),
             onPressed: () => context.push(AppRoutes.downloads),

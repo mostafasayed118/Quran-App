@@ -1043,4 +1043,41 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get principlesFuturePaid =>
       'If we ever add a paid feature, every feature here today stays free.';
+
+  @override
+  String get reciterPacksTitle => 'Reciter packs';
+
+  @override
+  String get reciterPacksIntro =>
+      'Shortlists of reciters, chosen with care and reviewed by a human before publishing — no paid placement and no commercial criterion. Recitations stream from their sources as they are, and downloading stays your choice per surah.';
+
+  @override
+  String get reciterPacksCriteriaTitle => 'Selection criteria';
+
+  @override
+  String get reciterPacksCriterion1 =>
+      'Accurate performance and pronunciation — human review';
+
+  @override
+  String get reciterPacksCriterion2 => 'Complete Quran (114 surahs)';
+
+  @override
+  String get reciterPacksCriterion3 => 'Recording quality and consistency';
+
+  @override
+  String get reciterPacksCriterion4 =>
+      'Variety of style (murattal / mujawwad / teaching)';
+
+  @override
+  String get reciterPacksCriterion5 =>
+      'No commercial criterion and no paid ranking';
+
+  @override
+  String reciterPacksReviewer(String reviewer) {
+    return 'Reviewed by: $reviewer';
+  }
+
+  @override
+  String get reciterPacksEmpty =>
+      'No pack published yet — the first one ships once a human reviewer signs it.';
 }

@@ -675,6 +675,23 @@
   "principlesNoAccount": "بلا حساب — كل شيء يبقى على جهازك، والنسخ الاحتياطي بيدك أنت.",
   "principlesAttribution": "التلاوات منسوبة لأصحابها — أي قائمة مستقبلية تُراجع بشريًا قبل النشر.",
   "principlesFuturePaid": "إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.",
+  "reciterPacksTitle": "حزم القرّاء",
+  "reciterPacksIntro": "قوائم قرّاء مختارة بعناية، تُراجع بشريًا قبل النشر — بلا ترتيب مدفوع وبلا معيار تجاري. التلاوات تُبثّ من مصادرها كما هي، والتنزيل قرارك في كل سورة.",
+  "reciterPacksCriteriaTitle": "معايير الانتقاء",
+  "reciterPacksCriterion1": "صحة الأداء ومخارج الحروف — مراجعة بشرية",
+  "reciterPacksCriterion2": "اكتمال المصحف (١١٤ سورة)",
+  "reciterPacksCriterion3": "جودة التسجيل وثباته",
+  "reciterPacksCriterion4": "تنوّع الأسلوب (مرتل/مجوّد/معلّم)",
+  "reciterPacksCriterion5": "لا معيار تجاري ولا ترتيب مدفوع",
+  "reciterPacksReviewer": "راجعها: {reviewer}",
+  "@reciterPacksReviewer": {
+    "placeholders": {
+      "reviewer": {
+        "type": "String"
+      }
+    }
+  },
+  "reciterPacksEmpty": "لا توجد حزمة منشورة بعد — تُنشر أول حزمة بعد توقيع مراجع بشري.",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

@@ -1909,6 +1909,66 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.'**
   String get principlesFuturePaid;
+
+  /// No description provided for @reciterPacksTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزم القرّاء'**
+  String get reciterPacksTitle;
+
+  /// No description provided for @reciterPacksIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'قوائم قرّاء مختارة بعناية، تُراجع بشريًا قبل النشر — بلا ترتيب مدفوع وبلا معيار تجاري. التلاوات تُبثّ من مصادرها كما هي، والتنزيل قرارك في كل سورة.'**
+  String get reciterPacksIntro;
+
+  /// No description provided for @reciterPacksCriteriaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'معايير الانتقاء'**
+  String get reciterPacksCriteriaTitle;
+
+  /// No description provided for @reciterPacksCriterion1.
+  ///
+  /// In ar, this message translates to:
+  /// **'صحة الأداء ومخارج الحروف — مراجعة بشرية'**
+  String get reciterPacksCriterion1;
+
+  /// No description provided for @reciterPacksCriterion2.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتمال المصحف (١١٤ سورة)'**
+  String get reciterPacksCriterion2;
+
+  /// No description provided for @reciterPacksCriterion3.
+  ///
+  /// In ar, this message translates to:
+  /// **'جودة التسجيل وثباته'**
+  String get reciterPacksCriterion3;
+
+  /// No description provided for @reciterPacksCriterion4.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنوّع الأسلوب (مرتل/مجوّد/معلّم)'**
+  String get reciterPacksCriterion4;
+
+  /// No description provided for @reciterPacksCriterion5.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا معيار تجاري ولا ترتيب مدفوع'**
+  String get reciterPacksCriterion5;
+
+  /// No description provided for @reciterPacksReviewer.
+  ///
+  /// In ar, this message translates to:
+  /// **'راجعها: {reviewer}'**
+  String reciterPacksReviewer(String reviewer);
+
+  /// No description provided for @reciterPacksEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد حزمة منشورة بعد — تُنشر أول حزمة بعد توقيع مراجع بشري.'**
+  String get reciterPacksEmpty;
 }
 
 class _AppLocalizationsDelegate

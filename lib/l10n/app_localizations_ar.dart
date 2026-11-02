@@ -1036,4 +1036,39 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get principlesFuturePaid =>
       'إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.';
+
+  @override
+  String get reciterPacksTitle => 'حزم القرّاء';
+
+  @override
+  String get reciterPacksIntro =>
+      'قوائم قرّاء مختارة بعناية، تُراجع بشريًا قبل النشر — بلا ترتيب مدفوع وبلا معيار تجاري. التلاوات تُبثّ من مصادرها كما هي، والتنزيل قرارك في كل سورة.';
+
+  @override
+  String get reciterPacksCriteriaTitle => 'معايير الانتقاء';
+
+  @override
+  String get reciterPacksCriterion1 =>
+      'صحة الأداء ومخارج الحروف — مراجعة بشرية';
+
+  @override
+  String get reciterPacksCriterion2 => 'اكتمال المصحف (١١٤ سورة)';
+
+  @override
+  String get reciterPacksCriterion3 => 'جودة التسجيل وثباته';
+
+  @override
+  String get reciterPacksCriterion4 => 'تنوّع الأسلوب (مرتل/مجوّد/معلّم)';
+
+  @override
+  String get reciterPacksCriterion5 => 'لا معيار تجاري ولا ترتيب مدفوع';
+
+  @override
+  String reciterPacksReviewer(String reviewer) {
+    return 'راجعها: $reviewer';
+  }
+
+  @override
+  String get reciterPacksEmpty =>
+      'لا توجد حزمة منشورة بعد — تُنشر أول حزمة بعد توقيع مراجع بشري.';
 }

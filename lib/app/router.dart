@@ -83,6 +83,7 @@ import '../features/prayer/presentation/prayer_month/prayer_month_screen.dart';
 import '../features/recitation/data/reciter_repository.dart';
 import '../features/recitation/presentation/downloads/downloads_cubit.dart';
 import '../features/recitation/presentation/downloads/downloads_screen.dart';
+import '../features/recitation/presentation/packs/reciter_packs_screen.dart';
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_cubit.dart';
 import '../features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart';
 import '../features/recitation/presentation/reciters/reciters_cubit.dart';
@@ -219,6 +220,10 @@ abstract final class AppRouter {
           start: (cubit) => cubit.start(),
           child: const RecitersScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.reciterPacks,
+        builder: (_, __) => const ReciterPacksScreen(),
       ),
       GoRoute(
         path: AppRoutes.downloads,
