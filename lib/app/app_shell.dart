@@ -19,9 +19,18 @@ abstract final class AppTabs {
     AppRoutes.azkar,
   ];
 
+  /// The tab that owns [location].
+  ///
+  /// Nested destinations inside the shell (`/quran/juz`, `/quran/search`,
+  /// `/prayer-times/month`, `/prayer-times/settings`) belong to their parent
+  /// tab; matching by prefix keeps the right destination highlighted and stops
+  /// its tap from short-circuiting as "already selected".
   static int indexOf(String location) {
-    final index = paths.indexOf(location);
-    return index < 0 ? 0 : index;
+    for (var index = 0; index < paths.length; index++) {
+      final path = paths[index];
+      if (location == path || location.startsWith('$path/')) return index;
+    }
+    return 0;
   }
 }
 
