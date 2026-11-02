@@ -55,7 +55,9 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 - Smallest change that solves the problem; fix root causes; read the code before modifying; never break existing behavior.
 - Layer boundaries: widgets render + dispatch; logic in cubits; persistence behind repositories (feature-local — there is no global `lib/data/`).
 - **Composition root:** registrations live in `lib/app/di/injector.dart`; `lib/core/di/injector.dart` only re-exports it. Never register a route-scoped cubit as a shared singleton (the router creates one per entry) — a shared route cubit leaks state between visits.
-- **FROZEN TESTS:** existing tests are never edited in campaign waves. Any perceived need to touch one = STOP and report.
+- **FROZEN TESTS — two classes** (`docs/decisions/2026-11-02-frozen-test-policy.md`):
+  - **Class A (behaviour pins) — FROZEN.** Asserts what a user sees or what the app does. Never edited in a wave; a perceived need = STOP and report.
+  - **Class B (inventory pins) — editable.** Asserts that a declared set equals the code's set (backup whitelist, planner ids, route map, l10n surface). A wave may extend it when the change is additive (or a deliberate rename), every existing assertion keeps its intent, no behaviour assertion is touched, and the report + ledger record the file and the exact set delta. The registry of Class B files is in the decision doc; anything not listed is Class A.
 - **l10n is additive + symmetric:** never change existing ARB values; AR template → EN mirror; regenerate + commit generated files.
 - Dependencies: justify (why now / alternatives / deferrable), latest stable, explicit owner grant per package.
 - Commits: small, focused, English; **explicit pathspecs — never `git add -A`**; review `git status` + `git diff` first; never commit keystores, `android/key.properties`, secrets, `.env`, `local.properties`, generated junk.
