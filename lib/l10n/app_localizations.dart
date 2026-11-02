@@ -1813,6 +1813,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حجم الخط'**
   String get readerFontSize;
+
+  /// No description provided for @reminderReliabilityTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'موثوقية التذكيرات'**
+  String get reminderReliabilityTitle;
+
+  /// No description provided for @reminderReliabilityIntro.
+  ///
+  /// In ar, this message translates to:
+  /// **'قد يوقف نظام التشغيل تذكيرات الصلاة والأذكار — راجع الحالات التالية.'**
+  String get reminderReliabilityIntro;
+
+  /// No description provided for @reminderIssueNotifications.
+  ///
+  /// In ar, this message translates to:
+  /// **'إذن الإشعارات مغلق — فعِّله من إعدادات جهازك.'**
+  String get reminderIssueNotifications;
+
+  /// No description provided for @reminderIssueExactAlarms.
+  ///
+  /// In ar, this message translates to:
+  /// **'التنبيهات الدقيقة غير مسموحة — قد تتأخر التذكيرات.'**
+  String get reminderIssueExactAlarms;
+
+  /// No description provided for @reminderIssueBattery.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.'**
+  String get reminderIssueBattery;
+
+  /// No description provided for @reminderIssueBatteryUnknown.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.'**
+  String get reminderIssueBatteryUnknown;
+
+  /// No description provided for @reminderFixAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'إصلاح'**
+  String get reminderFixAction;
 }
 
 class _AppLocalizationsDelegate

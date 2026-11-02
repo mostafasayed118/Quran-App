@@ -976,4 +976,30 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get readerFontSize => 'حجم الخط';
+
+  @override
+  String get reminderReliabilityTitle => 'موثوقية التذكيرات';
+
+  @override
+  String get reminderReliabilityIntro =>
+      'قد يوقف نظام التشغيل تذكيرات الصلاة والأذكار — راجع الحالات التالية.';
+
+  @override
+  String get reminderIssueNotifications =>
+      'إذن الإشعارات مغلق — فعِّله من إعدادات جهازك.';
+
+  @override
+  String get reminderIssueExactAlarms =>
+      'التنبيهات الدقيقة غير مسموحة — قد تتأخر التذكيرات.';
+
+  @override
+  String get reminderIssueBattery =>
+      'تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.';
+
+  @override
+  String get reminderIssueBatteryUnknown =>
+      'تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.';
+
+  @override
+  String get reminderFixAction => 'إصلاح';
 }

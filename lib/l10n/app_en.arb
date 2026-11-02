@@ -624,6 +624,13 @@
   "pageJumpInvalid": "Page not found",
   "pageJumpGo": "Go",
   "readerFontSize": "Font size",
+  "reminderReliabilityTitle": "Reminder reliability",
+  "reminderReliabilityIntro": "Your system may block prayer and azkar reminders — review the items below.",
+  "reminderIssueNotifications": "Notification permission is off — enable it in your device settings.",
+  "reminderIssueExactAlarms": "Exact alarms are not allowed — reminders may arrive late.",
+  "reminderIssueBattery": "Battery optimisation may block reminders — exempt this app.",
+  "reminderIssueBatteryUnknown": "Battery optimisation could not be checked — make sure this app is exempt from it.",
+  "reminderFixAction": "Fix",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

@@ -645,6 +645,13 @@
   "pageJumpInvalid": "صفحة غير موجودة",
   "pageJumpGo": "انتقال",
   "readerFontSize": "حجم الخط",
+  "reminderReliabilityTitle": "موثوقية التذكيرات",
+  "reminderReliabilityIntro": "قد يوقف نظام التشغيل تذكيرات الصلاة والأذكار — راجع الحالات التالية.",
+  "reminderIssueNotifications": "إذن الإشعارات مغلق — فعِّله من إعدادات جهازك.",
+  "reminderIssueExactAlarms": "التنبيهات الدقيقة غير مسموحة — قد تتأخر التذكيرات.",
+  "reminderIssueBattery": "تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.",
+  "reminderIssueBatteryUnknown": "تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.",
+  "reminderFixAction": "إصلاح",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

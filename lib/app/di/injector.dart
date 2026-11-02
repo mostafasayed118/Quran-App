@@ -14,6 +14,7 @@ import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
+import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/app_locale_controller.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
@@ -28,6 +29,7 @@ import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_diagnostics_channel.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
 import 'package:quran_yahdi/core/domain/onboarding_status.dart';
@@ -168,6 +170,11 @@ Future<void> configureDependencies({
       () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<ReminderSchedulerPort>(
       () => getIt<NotificationsBinding>());
+  // Reminder-health readout for the settings screen: a thin platform channel
+  // with no state of its own, so each call re-reads the OS (a permission
+  // revoked while the app was backgrounded must show up on resume).
+  getIt.registerLazySingleton<ReminderDiagnostics>(
+      () => const ReminderDiagnosticsChannel());
   getIt.registerLazySingleton<TasbihRepository>(() => TasbihRepository(db));
   getIt.registerLazySingleton<PrayerLogRepository>(
       () => PrayerLogRepository(db));

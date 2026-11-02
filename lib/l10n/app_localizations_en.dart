@@ -981,4 +981,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readerFontSize => 'Font size';
+
+  @override
+  String get reminderReliabilityTitle => 'Reminder reliability';
+
+  @override
+  String get reminderReliabilityIntro =>
+      'Your system may block prayer and azkar reminders — review the items below.';
+
+  @override
+  String get reminderIssueNotifications =>
+      'Notification permission is off — enable it in your device settings.';
+
+  @override
+  String get reminderIssueExactAlarms =>
+      'Exact alarms are not allowed — reminders may arrive late.';
+
+  @override
+  String get reminderIssueBattery =>
+      'Battery optimisation may block reminders — exempt this app.';
+
+  @override
+  String get reminderIssueBatteryUnknown =>
+      'Battery optimisation could not be checked — make sure this app is exempt from it.';
+
+  @override
+  String get reminderFixAction => 'Fix';
 }
