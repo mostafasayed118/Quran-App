@@ -48,6 +48,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings => 'الإعدادات';
 
   @override
+  String get language => 'اللغة';
+
+  @override
   String get recitations => 'التلاوات';
 
   @override

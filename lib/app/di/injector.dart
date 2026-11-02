@@ -8,12 +8,14 @@ import 'package:quran_yahdi/app/router.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/connection.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
+import 'package:quran_yahdi/core/domain/app_locale.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/core/l10n/app_locale_controller.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state.dart';
@@ -55,6 +57,7 @@ import 'package:quran_yahdi/features/recitation/playback/just_audio_playback_ser
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
+import 'package:quran_yahdi/features/settings/data/app_locale_repository.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 import 'package:quran_yahdi/features/tracker/data/khatma_repository.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
@@ -197,6 +200,14 @@ Future<void> configureDependencies({
       () => AppRouter.onboardingGate..attach(getIt<OnboardingRepository>()));
   getIt.registerLazySingleton<OnboardingStatusSource>(
       () => getIt<OnboardingGate>());
+  getIt.registerLazySingleton<AppLocaleRepository>(
+      () => AppLocaleRepository(db));
+  getIt.registerLazySingleton<AppLocaleSource>(
+      () => getIt<AppLocaleRepository>());
+  // One controller feeds the app root (MaterialApp.locale) and the settings
+  // row; the app entry point calls load() behind the first frame.
+  getIt.registerLazySingleton<AppLocaleController>(
+      () => AppLocaleController(getIt<AppLocaleSource>()));
   getIt.registerLazySingleton<AzkarRepository>(
       () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
   getIt.registerLazySingleton<AzkarSavedStateRepository>(

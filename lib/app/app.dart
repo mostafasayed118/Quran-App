@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import '../core/l10n/app_locale_controller.dart';
 import '../core/theme/app_system_ui.dart';
 import '../core/theme/app_theme.dart';
 import '../features/library/data/pack_downloader.dart';
@@ -18,6 +19,10 @@ class QuranYahdiApp extends StatefulWidget {
 
 class _QuranYahdiAppState extends State<QuranYahdiApp>
     with WidgetsBindingObserver {
+  /// The language switch (D1 v1.1): the settings row flips it and the root
+  /// rebuilds, so `Directionality` follows (ar → RTL, en → LTR).
+  late final AppLocaleController _locale = getIt<AppLocaleController>();
+
   @override
   void initState() {
     super.initState();
@@ -43,27 +48,29 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.system,
-      locale: const Locale('ar'),
-      // v1.0 is Arabic-only (docs/decisions/2026-11-01-v1-launch-decisions.md D1).
-      // The EN ARB stays as v1.1 groundwork; advertising `en` here would offer a
-      // language the app cannot switch to.
-      supportedLocales: const [Locale('ar')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
-        child: child!,
+    return ListenableBuilder(
+      listenable: _locale,
+      builder: (context, _) => MaterialApp.router(
+        onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: ThemeMode.system,
+        locale: _locale.locale,
+        // Arabic stays the default (AppLanguage.arabic); English is opt-in from
+        // the settings row, and the EN ARB is a full mirror of the AR template.
+        supportedLocales: kSupportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
+          value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
+          child: child!,
+        ),
+        routerConfig: AppRouter.router,
       ),
-      routerConfig: AppRouter.router,
     );
   }
 }
