@@ -50,6 +50,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with RouteAware, WidgetsBindingObserver {
   PageRoute<dynamic>? _route;
+  GoRouter? _router;
+  String? _lastLocation;
 
   @override
   void initState() {
@@ -66,13 +68,51 @@ class _HomeScreenState extends State<HomeScreen>
       _route = route;
       appRouteObserver.subscribe(this, route);
     }
+    final router = GoRouter.maybeOf(context);
+    if (router != _router) {
+      _router?.routerDelegate.removeListener(_onLocationChanged);
+      _router = router;
+      // Seeded, not fired: the cubit's own start() already loaded this screen.
+      _lastLocation = router == null ? null : _locationOf(router);
+      router?.routerDelegate.addListener(_onLocationChanged);
+    }
   }
 
   @override
   void dispose() {
+    _router?.routerDelegate.removeListener(_onLocationChanged);
     appRouteObserver.unsubscribe(this);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// The location the router shows, including an imperatively pushed route.
+  ///
+  /// `currentConfiguration.uri` deliberately leaves out `ImperativeRouteMatch`s
+  /// (go_router 18), and the reader is pushed above the shell, so that member
+  /// would still read `/home` for the whole round trip. The delegate's
+  /// top-most state is the one that actually moves.
+  String? _locationOf(GoRouter router) {
+    final configuration = router.routerDelegate.currentConfiguration;
+    if (configuration.isEmpty) return null;
+    return router.state.uri.path;
+  }
+
+  /// Reloads when the router lands back on Home from somewhere else.
+  ///
+  /// Home subscribes to the inner route, while the reader is a root-level
+  /// route above the shell, so `didPopNext` never reaches this screen: the
+  /// location is the one re-entry signal that crosses the navigator boundary.
+  void _onLocationChanged() {
+    final router = _router;
+    if (router == null) return;
+    final location = _locationOf(router);
+    if (location == null || location == _lastLocation) return;
+    final previous = _lastLocation;
+    _lastLocation = location;
+    if (location == AppRoutes.home && previous != AppRoutes.home && mounted) {
+      unawaited(context.read<HomeCubit>().reload());
+    }
   }
 
   @override
