@@ -670,6 +670,11 @@
   "reminderIssueBattery": "تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.",
   "reminderIssueBatteryUnknown": "تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.",
   "reminderFixAction": "إصلاح",
+  "principlesTitle": "مبادئ التطبيق",
+  "principlesFree": "مجاني بلا إعلانات — ولا نيّة لإدخال إعلانات.",
+  "principlesNoAccount": "بلا حساب — كل شيء يبقى على جهازك، والنسخ الاحتياطي بيدك أنت.",
+  "principlesAttribution": "التلاوات منسوبة لأصحابها — أي قائمة مستقبلية تُراجع بشريًا قبل النشر.",
+  "principlesFuturePaid": "إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

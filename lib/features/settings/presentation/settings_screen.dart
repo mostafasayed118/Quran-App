@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/domain/app_locale.dart';
 import '../../../core/domain/reminder_diagnostics.dart';
@@ -11,6 +12,7 @@ import '../../../core/domain/reminders.dart';
 import '../../../core/l10n/app_locale_controller.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/insets.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
@@ -174,6 +176,11 @@ class _SettingsList extends StatelessWidget {
           onTap: () => Navigator.of(context).push(
             MaterialPageRoute<void>(builder: (_) => const LicensesScreen()),
           ),
+        ),
+        ListTile(
+          leading: const Icon(Icons.policy_outlined),
+          title: Text(loc.principlesTitle),
+          onTap: () => context.push(AppRoutes.principles),
         ),
         const Divider(),
         Padding(

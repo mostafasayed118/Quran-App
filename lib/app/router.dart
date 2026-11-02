@@ -67,6 +67,7 @@ import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
 import '../features/quran/presentation/search/quran_search_screen.dart';
+import '../features/settings/presentation/principles_screen.dart';
 import '../features/settings/presentation/settings_cubit.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/prayer/data/city_repository.dart';
@@ -398,6 +399,10 @@ abstract final class AppRouter {
             ),
           ),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.principles,
+        builder: (_, __) => const PrinciplesScreen(),
       ),
       GoRoute(
         path: AppRoutes.reader,

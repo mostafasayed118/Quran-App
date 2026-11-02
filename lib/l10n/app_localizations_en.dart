@@ -1024,4 +1024,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderFixAction => 'Fix';
+
+  @override
+  String get principlesTitle => 'Principles';
+
+  @override
+  String get principlesFree =>
+      'Free, with no ads — and no intention of adding any.';
+
+  @override
+  String get principlesNoAccount =>
+      'No account — everything stays on your device, and backups are yours to keep.';
+
+  @override
+  String get principlesAttribution =>
+      'Recitations are credited to their reciters — any future list is reviewed by a human before it ships.';
+
+  @override
+  String get principlesFuturePaid =>
+      'If we ever add a paid feature, every feature here today stays free.';
 }

@@ -649,6 +649,11 @@
   "reminderIssueBattery": "Battery optimisation may block reminders — exempt this app.",
   "reminderIssueBatteryUnknown": "Battery optimisation could not be checked — make sure this app is exempt from it.",
   "reminderFixAction": "Fix",
+  "principlesTitle": "Principles",
+  "principlesFree": "Free, with no ads — and no intention of adding any.",
+  "principlesNoAccount": "No account — everything stays on your device, and backups are yours to keep.",
+  "principlesAttribution": "Recitations are credited to their reciters — any future list is reviewed by a human before it ships.",
+  "principlesFuturePaid": "If we ever add a paid feature, every feature here today stays free.",
   "@reminderAdhanSoon": {
     "placeholders": {
       "prayer": { "type": "String" },

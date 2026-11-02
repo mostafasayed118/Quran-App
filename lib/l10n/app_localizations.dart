@@ -1879,6 +1879,36 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إصلاح'**
   String get reminderFixAction;
+
+  /// No description provided for @principlesTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'مبادئ التطبيق'**
+  String get principlesTitle;
+
+  /// No description provided for @principlesFree.
+  ///
+  /// In ar, this message translates to:
+  /// **'مجاني بلا إعلانات — ولا نيّة لإدخال إعلانات.'**
+  String get principlesFree;
+
+  /// No description provided for @principlesNoAccount.
+  ///
+  /// In ar, this message translates to:
+  /// **'بلا حساب — كل شيء يبقى على جهازك، والنسخ الاحتياطي بيدك أنت.'**
+  String get principlesNoAccount;
+
+  /// No description provided for @principlesAttribution.
+  ///
+  /// In ar, this message translates to:
+  /// **'التلاوات منسوبة لأصحابها — أي قائمة مستقبلية تُراجع بشريًا قبل النشر.'**
+  String get principlesAttribution;
+
+  /// No description provided for @principlesFuturePaid.
+  ///
+  /// In ar, this message translates to:
+  /// **'إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.'**
+  String get principlesFuturePaid;
 }
 
 class _AppLocalizationsDelegate

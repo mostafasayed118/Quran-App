@@ -1018,4 +1018,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reminderFixAction => 'إصلاح';
+
+  @override
+  String get principlesTitle => 'مبادئ التطبيق';
+
+  @override
+  String get principlesFree => 'مجاني بلا إعلانات — ولا نيّة لإدخال إعلانات.';
+
+  @override
+  String get principlesNoAccount =>
+      'بلا حساب — كل شيء يبقى على جهازك، والنسخ الاحتياطي بيدك أنت.';
+
+  @override
+  String get principlesAttribution =>
+      'التلاوات منسوبة لأصحابها — أي قائمة مستقبلية تُراجع بشريًا قبل النشر.';
+
+  @override
+  String get principlesFuturePaid =>
+      'إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.';
 }
