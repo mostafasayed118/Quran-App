@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as dev;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -277,8 +278,13 @@ class _ReminderReliabilitySectionState
         );
         _batteryUnknown = battery == null;
       });
-    } on Object {
-      return;
+    } on Object catch (error, stackTrace) {
+      dev.log(
+        'settings reminder diagnostics read failed',
+        name: 'quran_yahdi/settings',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -290,7 +296,10 @@ class _ReminderReliabilitySectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        SectionHeader(title: loc.reminderReliabilityTitle),
+        SectionHeader(
+          title: loc.reminderReliabilityTitle,
+          inset: AppSpacing.lg,
+        ),
         Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(
               AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm),
