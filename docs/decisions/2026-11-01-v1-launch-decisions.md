@@ -43,3 +43,25 @@ wire that generated list into `MaterialApp.supportedLocales` until the switch ex
 - The Play Console track/rollout percentages and the highest versionCode.
 - The final licensing sign-off (legal, not engineering).
 - Whether the web site gets a custom domain.
+
+## Amendment — 2026-11-02: D1 delivered as a runtime switch (v1.1 work)
+
+D1 originally pinned the app to Arabic because advertising `en` without a switch would have
+been a false claim. The v1.1 groundwork is now paid and the switch exists:
+
+- **Domain/storage:** `AppLanguage` + `AppLocaleSource` (`lib/core/domain/app_locale.dart`),
+  stored by `AppLocaleRepository` under the `app_locale` key (`ar` default; an unknown or
+  unreadable value falls back to Arabic).
+- **Runtime:** `AppLocaleController` (`lib/core/l10n/app_locale_controller.dart`) holds the
+  choice and notifies the root; `MaterialApp.locale` reads it and `supportedLocales` is
+  `kSupportedLocales` (`ar`, `en`), so `Directionality` follows the language (RTL/LTR).
+  The controller is loaded behind the first frame from `lib/main.dart`.
+- **Surface:** a language row in Settings (`lib/features/settings/presentation/settings_screen.dart`)
+  offering each shipped language; the pick applies immediately and persists.
+- **Platform:** `android/app/src/main/res/xml/locales_config.xml` now declares `ar` **and** `en`.
+- **Backup:** `app_locale` is deliberately **device-scoped** and stays out of the backup
+  whitelist (a restore onto another phone must not flip the reading language); the coverage
+  pin in `test/backup_settings_coverage_test.dart` enforces that split.
+
+Arabic remains the default for a fresh install. The EN ARB stays a full mirror of the AR
+template (285 keys each, no drift), so a new string still needs both sides.

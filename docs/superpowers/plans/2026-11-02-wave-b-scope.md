@@ -93,3 +93,11 @@ Each wave is independently shippable, gated by `dart format` 0 / `flutter analyz
 - `4aa850e` **quran search**: `SearchTotalCache` memoizes the `COUNT(*)` for one token signature, so load-more stops re-running a full LIKE scan per page. The page contract is unchanged (`total` is still reported on every page).
 - Gates at `4aa850e`: `dart format` 0 changed (577 files) · `flutter analyze` 0 · `flutter test` **1069/1069** · generated-code check 0/0. Baseline before the wave: 1052/1052. **17 new tests**, no existing test edited.
 - Push: `a950b88..4aa850e` → `main`; `ls-remote` == `4aa850e2bb6a709755b6ae82864b1fde57cbcc4c`; unpushed 0.
+
+### B2 — English switch — LANDED 2026-11-02 (`d1bf27b`, `a296e25`)
+- **Runtime:** `AppLanguage` + `AppLocaleSource` (`lib/core/domain/app_locale.dart`), `AppLocaleController` (`lib/core/l10n/app_locale_controller.dart`) and `kSupportedLocales`. `MaterialApp.locale`/`supportedLocales` now come from the controller, so `Directionality` follows the pick (ar → RTL, en → LTR). Arabic stays the default; an unknown or unreadable stored value falls back to it, and a failed write only costs the choice on the next launch.
+- **Storage + surface:** `AppLocaleRepository` (`app_locale` key) and a language row in Settings with a two-option picker; the row is wired by the router (the settings feature keeps no DI access) and stays out when a host passes no controller.
+- **Platform:** `locales_config.xml` declares `ar` and `en` (the manifest already points at it).
+- **Scope call (disclosed):** `app_locale` is **device-scoped** and stays out of the backup whitelist — a restore onto another phone must not flip the reading language. The coverage pin now models that split (`deviceScopedKeys` = `app_locale`, `onboarding_completed`) instead of only enumerating exported keys.
+- **Docs:** the D1 amendment in `docs/decisions/2026-11-01-v1-launch-decisions.md` records the delivery and the device-scoped ruling.
+- Gates after B2: `dart format` 0 changed · `flutter analyze` 0 · `flutter test` **1087/1087** (+18). No existing test edited.
