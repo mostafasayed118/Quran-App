@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -186,13 +187,23 @@ class _SettingsList extends StatelessWidget {
     );
   }
 
-  /// The reminder-health readout, or an empty box when this host provides
-  /// none: the constructor argument first, then the service locator.
+  /// The reminder-health readout, or an empty box when this host has none:
+  /// the service locator registration, or the diagnostics a host passes in.
   ///
-  /// A missing dependency is a normal state (the frozen widget test builds
+  /// Android-only: every check behind the port is an Android OS capability
+  /// (notification-alert permission, exact alarms, battery optimisation). On
+  /// any other platform the channel answers "cannot report", which the section
+  /// would render as a permanent «تعذّر الفحص» row naming a remedy that does
+  /// not exist there — so the section stays out instead (an unreadable read on
+  /// Android is still a real OEM gap and keeps its instruction row).
+  ///
+  /// A missing dependency is a normal state too (the frozen widget test builds
   /// `const SettingsScreen()` with only a cubit provider), so nothing here may
-  /// throw and nothing may look broken — the section simply stays out.
+  /// throw and nothing may look broken.
   Widget _reminderReliabilitySection() {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return const SizedBox.shrink();
+    }
     final diagnostics = reminderDiagnostics ??
         (GetIt.I.isRegistered<ReminderDiagnostics>()
             ? GetIt.I<ReminderDiagnostics>()

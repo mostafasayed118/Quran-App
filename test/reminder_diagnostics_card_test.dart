@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -141,6 +142,27 @@ void main() {
     expect(find.text(_batteryUnknown), findsOneWidget);
     expect(find.text(_fixAction), findsNothing);
     expect(find.text(_batteryIssue), findsNothing);
+  });
+
+  testWidgets('a platform without battery optimisation shows no section',
+      (tester) async {
+    // Reset in the body too: the widget binding asserts that debug foundation
+    // variables are unset before tearDown callbacks run.
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    try {
+      // On iOS the channel has no handler, so it answers (true, true, null).
+      // That null must not become a permanent, unfixable row: there is no
+      // battery-optimisation screen on that platform to send the user to.
+      diagnostics.battery = null;
+      await pumpSettings(tester);
+
+      expect(find.text(_title), findsNothing);
+      expect(find.text(_batteryUnknown), findsNothing);
+      expect(find.text(_fixAction), findsNothing);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   testWidgets('a denied notification permission shows the permission row',
