@@ -45,6 +45,20 @@ const String backupKeyAzkarReminderEnabled = 'azkar_reminder_enabled';
 const String backupKeyAzkarReminderTime = 'azkar_reminder_time';
 const String backupKeyWirdReminderEnabled = 'wird_reminder_enabled';
 const String backupKeyWirdReminderTime = 'wird_reminder_time';
+const String backupKeyPrayerReminderEnabled = 'prayer_reminder_enabled';
+
+/// `lib/core/domain/prayer_config.dart`.
+const String backupKeyPrayerCalcMethod = 'prayer_calc_method';
+const String backupKeyPrayerMadhab = 'prayer_madhab';
+const String backupKeyPrayerEnabledPrayers = 'prayer_enabled_prayers';
+const String backupKeyPrayerPreAdhanMinutes = 'prayer_pre_adhan_minutes';
+
+/// `lib/features/quran/data/reader_settings_repository.dart`.
+const String backupKeyReaderFontScale = 'reader_font_scale';
+
+/// `lib/features/azkar/data/azkar_saved_state_repository.dart`.
+const String backupKeyAzkarProgress = 'azkar_progress_v1';
+const String backupKeyAzkarFavorites = 'azkar_favorites_v1';
 
 /// `lib/features/prayer/data/city_repository.dart`.
 const String backupKeySelectedCity = 'selected_city';
@@ -59,24 +73,41 @@ const String backupKeySelectedMoshafRow = 'selected_moshaf_row';
 const String backupKeyTasbihState = 'tasbih_state';
 
 /// The settings keys a restore may import (import wins, key-by-key).
-/// The last-read pointer and tasbih state travel as their own typed entities
-/// and are deliberately NOT part of this map; app-managed keys such as
+///
+/// Every user preference the app persists belongs here: losing it on a
+/// restore would silently reset the user's configuration. The last-read
+/// pointer and tasbih state travel as their own typed entities and are
+/// deliberately NOT part of this map; app-managed keys such as
 /// `content_version` are deliberately excluded.
 const Set<String> kBackupSettingsWhitelist = {
   backupKeyAzkarReminderEnabled,
   backupKeyAzkarReminderTime,
   backupKeyWirdReminderEnabled,
   backupKeyWirdReminderTime,
+  backupKeyPrayerReminderEnabled,
+  backupKeyPrayerCalcMethod,
+  backupKeyPrayerMadhab,
+  backupKeyPrayerEnabledPrayers,
+  backupKeyPrayerPreAdhanMinutes,
+  backupKeyReaderFontScale,
+  backupKeyAzkarProgress,
+  backupKeyAzkarFavorites,
   backupKeySelectedCity,
   backupKeySelectedMoshafRow,
 };
 
 /// Keys whose change needs a reminder re-plan after apply — mirrors the boot
-/// scheduler inputs (city + azkar/wird settings; see `scheduleReminders`).
+/// scheduler inputs (city, azkar/wird settings and the whole prayer
+/// configuration; see `scheduleReminders`).
 const Set<String> kBackupReminderRelevantKeys = {
   backupKeyAzkarReminderEnabled,
   backupKeyAzkarReminderTime,
   backupKeyWirdReminderEnabled,
   backupKeyWirdReminderTime,
+  backupKeyPrayerReminderEnabled,
+  backupKeyPrayerCalcMethod,
+  backupKeyPrayerMadhab,
+  backupKeyPrayerEnabledPrayers,
+  backupKeyPrayerPreAdhanMinutes,
   backupKeySelectedCity,
 };

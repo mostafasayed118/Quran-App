@@ -6,7 +6,8 @@ class ReaderSettingsRepository implements ReaderSettingsSource {
   /// Creates the repository over [db].
   ReaderSettingsRepository(this._db);
 
-  /// The settings key; deliberately outside the backup whitelist for v1.
+  /// The settings key; exported by the backup whitelist so a restore keeps
+  /// the user's chosen reading size.
   static const fontScaleKey = 'reader_font_scale';
 
   final AppDatabase _db;
