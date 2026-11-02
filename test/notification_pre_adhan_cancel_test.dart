@@ -72,6 +72,16 @@ void main() {
     );
   });
 
+  test('a pre-adhan cancellation requested before init is queued', () async {
+    final binding = NotificationsBinding();
+    await binding.cancelPreAdhan();
+    calls.clear();
+
+    await binding.init();
+
+    expect(_cancelIds(calls), [preAdhanReminderId]);
+  });
+
   test('cancelPreAdhan clears id 4 directly after a restart', () async {
     final binding = NotificationsBinding();
     await binding.init();

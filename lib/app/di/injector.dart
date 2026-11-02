@@ -142,8 +142,11 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<CompassCalibration>(() => CompassCalibration());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
-  getIt.registerLazySingleton<ReminderSettings>(
-      () => ReminderSettings(db, prayerConfig: getIt<PrayerConfigSource>()));
+  getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(
+        db,
+        prayerConfig: getIt<PrayerConfigSource>(),
+        preAdhanCanceller: getIt<NotificationsBinding>(),
+      ));
   getIt.registerLazySingleton<ReminderSettingsPort>(
       () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<PrayerReminderSettingsPort>(

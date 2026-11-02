@@ -24,6 +24,11 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   final PrayerConfigSource _source;
   final PreAdhanCanceller? _preAdhanCanceller;
 
+  /// The latest configuration actually persisted, independent of whether the
+  /// route is still mounted/emitting. A queued mutation builds on this, so a
+  /// closed cubit cannot overwrite an earlier pending selection.
+  PrayerConfig? _confirmed;
+
   /// Serializes overlapping selections so a quick method + madhab tap cannot
   /// write the old method back when the second save lands.
   Future<void> _pending = Future<void>.value();
@@ -32,6 +37,7 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   Future<void> start() async {
     try {
       final config = await _source.load();
+      _confirmed = config;
       if (!isClosed) emit(PrayerConfigState.ready(config));
     } on Object catch (error, stackTrace) {
       dev.log('prayer config load failed',
@@ -66,10 +72,7 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
     final safe = minutes < 0 ? 0 : (minutes > 60 ? 60 : minutes);
     final saved = _enqueue((config) => config.copyWith(preAdhanMinutes: safe));
     return saved.then((_) async {
-      final current = state;
-      if (safe == 0 &&
-          current is PrayerConfigReady &&
-          current.config.preAdhanMinutes == 0) {
+      if (safe == 0 && _confirmed?.preAdhanMinutes == 0) {
         await _preAdhanCanceller?.cancelPreAdhan();
       }
     });
@@ -82,12 +85,13 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   }
 
   Future<void> _apply(PrayerConfig Function(PrayerConfig) update) async {
-    final current = state;
-    if (current is! PrayerConfigReady) return;
-    final next = update(current.config);
-    if (next == current.config) return;
+    final current = _confirmed;
+    if (current == null) return;
+    final next = update(current);
+    if (next == current) return;
     try {
       await _source.save(next);
+      _confirmed = next;
       if (!isClosed) emit(PrayerConfigState.ready(next));
     } on Object catch (error, stackTrace) {
       // Keep the last confirmed state; the screen keeps showing it.

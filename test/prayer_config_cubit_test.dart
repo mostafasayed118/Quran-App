@@ -158,6 +158,21 @@ void main() {
     expect(canceller.calls, 1);
   });
 
+  test('queued mutations survive a close without overwriting each other',
+      () async {
+    final source = _FakeSource();
+    final cubit = PrayerConfigCubit(source: source);
+    await cubit.start();
+
+    final method = cubit.setMethod(PrayerCalculationMethod.karachi);
+    final madhab = cubit.setMadhab(PrayerMadhab.hanafi);
+    await cubit.close();
+    await Future.wait([method, madhab]);
+
+    expect(source.current.method, PrayerCalculationMethod.karachi);
+    expect(source.current.madhab, PrayerMadhab.hanafi);
+  });
+
   test('setters before the first load are dropped', () async {
     final source = _FakeSource();
     final cubit = PrayerConfigCubit(source: source);

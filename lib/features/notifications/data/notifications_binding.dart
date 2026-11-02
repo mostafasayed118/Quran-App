@@ -79,6 +79,9 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// change. Cleared when an init is attempted again.
   bool _initFailed = false;
 
+  /// Whether a pre-adhan cancellation arrived before the plugin was ready.
+  bool _pendingCancelPreAdhan = false;
+
   /// The fingerprint of the last plan this binding applied to the OS.
   ///
   /// A reload that produces the SAME plan (a city change that moves no
@@ -146,6 +149,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       // wish that will never be fulfilled.
       _pendingPlan = null;
       _pendingPermission = false;
+      _pendingCancelPreAdhan = false;
       return;
     }
     await _drainPending();
@@ -162,6 +166,10 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     if (_pendingPermission) {
       _pendingPermission = false;
       await ensurePermissions();
+    }
+    if (_pendingCancelPreAdhan) {
+      _pendingCancelPreAdhan = false;
+      await _cancelPreAdhanNow();
     }
     final plan = _pendingPlan;
     _pendingPlan = null;
@@ -292,6 +300,45 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     await run;
   }
 
+  /// Clears the optional pre-adhan alarm.
+  ///
+  /// This is separate from the frozen 1/2/3 replace-all trio: the optional id
+  /// is not in that set, so turning it off must clear it explicitly. A call
+  /// made before the plugin is ready is queued (never dropped) and applied by
+  /// [init]; the cancel joins the same apply chain as a plan so it cannot
+  /// interleave with an in-flight schedule.
+  @override
+  Future<void> cancelPreAdhan() async {
+    if (!_ready || _details == null) {
+      if (_initFailed) return;
+      _pendingCancelPreAdhan = true;
+      return;
+    }
+    final previous = _applyQueue;
+    final run = () async {
+      if (previous != null) {
+        try {
+          await previous;
+        } on Object {
+          // _applyPlan swallows its own failures; keep the chain alive.
+        }
+      }
+      await _cancelPreAdhanNow();
+    }();
+    _applyQueue = run;
+    await run;
+  }
+
+  Future<void> _cancelPreAdhanNow() async {
+    try {
+      await _plugin.cancel(id: preAdhanReminderId);
+    } on Object {
+      // Best-effort, like every other reminder write.
+    }
+    _appliedPlan = null;
+    _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
+  }
+
   /// Cancels the previous reminder alarms and schedules [reminders].
   ///
   /// The clear is TARGETED: only the ids the planner owns are cancelled.
@@ -302,17 +349,6 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   ///
   /// The plan fingerprint skips the platform round-trip when the new plan
   /// schedules exactly the same alarms as the applied one.
-  @override
-  Future<void> cancelPreAdhan() async {
-    try {
-      await _plugin.cancel(id: preAdhanReminderId);
-    } on Object {
-      // Best-effort: the plugin may not be initialized yet.
-    }
-    _appliedPlan = null;
-    _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
-  }
-
   Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
     if (details == null) return;

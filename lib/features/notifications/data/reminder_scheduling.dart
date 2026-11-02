@@ -33,13 +33,34 @@ Future<void> scheduleReminders({
           config.enabledPrayers.contains(choice.name) &&
           choice.time.isAfter(nowLocal),
     );
+    PrayerChoice? nextEnabled;
+    if (selected != null && !hasFuturePrayer) {
+      final tomorrow =
+          DateTime(nowLocal.year, nowLocal.month, nowLocal.day + 1);
+      final tomorrowPrayers = prayer.today(selected.coordinates, tomorrow);
+      for (final choice in tomorrowPrayers) {
+        if (choice.name == PrayerName.sunrise) continue;
+        if (!config.enabledPrayers.contains(choice.name)) continue;
+        if (!choice.time.isAfter(nowLocal)) continue;
+        nextEnabled = choice;
+        break;
+      }
+      // Keep the historical seam for sources that only implement nextPrayer
+      // for the day boundary (the frozen fake does): if the tomorrow list
+      // yields nothing, use the port's next prayer when it is enabled.
+      if (nextEnabled == null) {
+        final fallback = prayer.nextPrayer(selected.coordinates, nowLocal);
+        if (config.enabledPrayers.contains(fallback.name) &&
+            fallback.time.isAfter(nowLocal)) {
+          nextEnabled = fallback;
+        }
+      }
+    }
     final loc = platformLocalizations();
     final plan = planReminders(
       now: nowLocal,
       todayPrayers: todayPrayers,
-      nextPrayer: selected != null && !hasFuturePrayer
-          ? prayer.nextPrayer(selected.coordinates, nowLocal)
-          : null,
+      nextPrayer: nextEnabled,
       prayerEnabled: prayerEnabled,
       enabledPrayers: config.enabledPrayers,
       preAdhanMinutes: config.preAdhanMinutes,

@@ -2,6 +2,7 @@ import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 
 import 'reminder_scheduling.dart';
@@ -18,11 +19,16 @@ const String prayerReminderEnabledKey = 'prayer_reminder_enabled';
 /// pattern; bool stored as the 'true'/'false' string, time as 'HH:mm').
 class ReminderSettings
     implements ReminderSettingsPort, PrayerReminderSettingsPort {
-  ReminderSettings(this._db, {PrayerConfigSource? prayerConfig})
-      : _prayerConfig = prayerConfig;
+  ReminderSettings(
+    this._db, {
+    PrayerConfigSource? prayerConfig,
+    PreAdhanCanceller? preAdhanCanceller,
+  })  : _prayerConfig = prayerConfig,
+        _preAdhanCanceller = preAdhanCanceller;
 
   final AppDatabase _db;
   final PrayerConfigSource? _prayerConfig;
+  final PreAdhanCanceller? _preAdhanCanceller;
 
   @override
   Future<bool> azkarEnabled() async {
@@ -129,13 +135,24 @@ class ReminderSettings
     } on Object {
       // Fall through with the default.
     }
+    final config = _prayerConfig?.current ?? PrayerConfig.egyptian;
+    // The optional id 4 is not in the fixed trio; clear it whenever the new
+    // config cannot schedule it (master switch off, all prayers off, or a
+    // zero lead time). This also covers a restart, where the in-memory
+    // last-plan ids are empty.
+    final needsPreAdhanCancel = !enabled ||
+        config.preAdhanMinutes == 0 ||
+        config.enabledPrayers.isEmpty;
+    if (needsPreAdhanCancel) {
+      await _preAdhanCanceller?.cancelPreAdhan();
+    }
     await scheduleReminders(
       city: city,
       prayer: prayer,
       settings: this,
       scheduler: scheduler,
       prayerEnabled: enabled,
-      config: _prayerConfig?.current ?? PrayerConfig.egyptian,
+      config: config,
     );
   }
 }
