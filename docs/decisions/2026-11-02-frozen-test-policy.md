@@ -3,8 +3,7 @@
 > **Status:** owner-requested (2026-11-02): «قرار تجميد التيست ده هيوقفنا كل شويه عايزين نحله».
 > **Scope:** `quran_yahdi` campaign waves (Mode B). Replaces the blanket
 > "existing tests are never edited in campaign waves" rule with a two-class rule.
-> **Owner ratification:** pending — this doc is the proposal the next wave runs under;
-> until the owner ratifies it, Class B edits still need an explicit per-wave grant.
+> **Owner ratification:** ratified 2026-11-02 («موافق»).
 
 ## The problem
 
