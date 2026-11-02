@@ -84,3 +84,12 @@ Each wave is independently shippable, gated by `dart format` 0 / `flutter analyz
 - Zakat persistence (D8 stands).
 - Any `web/` work (separate campaign).
 - Re-litigating the launch decisions D1–D12 without a written owner change.
+
+## 6. Execution log
+
+### B1 — perf residuals — LANDED 2026-11-02 (`66028c7`, `57b7dda`, `4aa850e`)
+- `66028c7` **azkar**: `azkarScreenShouldRebuild` ignores counter-only emissions and each row is a `BlocSelector` on its own `remaining` value, so a tap repaints one card instead of the scaffold plus every visible prose card. Search/favourites/session/failure transitions still rebuild.
+- `57b7dda` **playback**: `playerSheetShouldRebuild` skips a position-only emission while the seek thumb is held (the on-screen position is local then); track, play/pause, duration and failure changes still rebuild.
+- `4aa850e` **quran search**: `SearchTotalCache` memoizes the `COUNT(*)` for one token signature, so load-more stops re-running a full LIKE scan per page. The page contract is unchanged (`total` is still reported on every page).
+- Gates at `4aa850e`: `dart format` 0 changed (577 files) · `flutter analyze` 0 · `flutter test` **1069/1069** · generated-code check 0/0. Baseline before the wave: 1052/1052. **17 new tests**, no existing test edited.
+- Push: `a950b88..4aa850e` → `main`; `ls-remote` == `4aa850e2bb6a709755b6ae82864b1fde57cbcc4c`; unpushed 0.
