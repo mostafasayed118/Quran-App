@@ -54,6 +54,13 @@ void main() {
     );
   });
 
+  test('an empty reviewer string is the same defect as whitespace', () {
+    expect(
+      validateReciterPack(_pack(reviewedBy: '')),
+      contains(ReciterPackDefect.missingReviewer),
+    );
+  });
+
   test('an entry without a reason blocks publication', () {
     expect(
       validateReciterPack(_pack(reason: '')),

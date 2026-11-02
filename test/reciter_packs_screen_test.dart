@@ -67,6 +67,18 @@ const ReciterPack _unsignedPack = ReciterPack(
   ],
 );
 
+/// The page's own list, named.
+///
+/// `find.byType(Scrollable)` alone matches two scrollables as soon as
+/// `EmptyState` (which scrolls internally) is on the page; the list's own
+/// scrollable is the outermost descendant, hence `.first`.
+Finder _packsScrollable() => find
+    .descendant(
+      of: find.byKey(const Key('reciterPacksList')),
+      matching: find.byType(Scrollable),
+    )
+    .first;
+
 void main() {
   testWidgets('publishes the intro, the five criteria and the empty state',
       (tester) async {
@@ -120,7 +132,11 @@ void main() {
       ..._signedReasons,
       'راجعها: $_signedReviewer',
     ]) {
-      await tester.scrollUntilVisible(find.text(copy), 120);
+      await tester.scrollUntilVisible(
+        find.text(copy),
+        120,
+        scrollable: _packsScrollable(),
+      );
       expect(find.text(copy), findsOneWidget);
       expect(tester.takeException(), isNull);
     }
@@ -135,9 +151,38 @@ void main() {
       textScale: 2.0,
     );
 
-    await tester.scrollUntilVisible(find.text(_emptyCopy), 120);
+    await tester.scrollUntilVisible(
+      find.text(_emptyCopy),
+      120,
+      scrollable: _packsScrollable(),
+    );
     expect(find.text(_emptyCopy), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the decorative bullet is silent; the copy is still announced',
+      (tester) async {
+    final handle = tester.ensureSemantics();
+    try {
+      await pumpAppHost(
+        tester,
+        home: const ReciterPacksScreen(packs: [_signedPack]),
+      );
+
+      // The bullet is decoration: a screen reader must read the criterion, not
+      // «•» before every line. The merged node is what carries these lines to
+      // TalkBack, so the copy has to be in it exactly as before.
+      final criteria = tester.getSemantics(find.text(_criteria.first)).label;
+      expect(criteria, contains(_criteria.first));
+      expect(criteria, isNot(contains('•')));
+
+      final card = tester.getSemantics(find.text(_signedReasons.first)).label;
+      expect(card, contains(_signedReasons.first));
+      expect(card, contains('راجعها: $_signedReviewer'));
+      expect(card, isNot(contains('•')));
+    } finally {
+      handle.dispose();
+    }
   });
 
   testWidgets('the reciters AppBar action opens the declared packs route',

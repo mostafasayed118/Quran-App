@@ -40,6 +40,7 @@ class ReciterPacksScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(loc.reciterPacksTitle)),
       body: ListView(
+        key: const Key('reciterPacksList'),
         padding: appScrollPadding(
           context,
           const EdgeInsets.symmetric(vertical: AppSpacing.md),
@@ -93,9 +94,12 @@ class _Bullet extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '•',
-            style: AppTheme.bodyText.copyWith(color: colors.primary),
+          // Decoration only: screen readers must read the line, not «•».
+          ExcludeSemantics(
+            child: Text(
+              '•',
+              style: AppTheme.bodyText.copyWith(color: colors.primary),
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(text, style: AppTheme.bodyText)),
