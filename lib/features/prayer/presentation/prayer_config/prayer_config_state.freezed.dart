@@ -284,13 +284,12 @@ class PrayerConfigReady implements PrayerConfigState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is PrayerConfigReady &&
-            const DeepCollectionEquality().equals(other.config, config));
+            (identical(other.config, config) || other.config == config));
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-        runtimeType, const DeepCollectionEquality().hash(config));
+    return Object.hash(runtimeType, config);
   }
 
   @override
@@ -321,10 +320,10 @@ class _$PrayerConfigReadyCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   $Res call({
-    Object? config = freezed,
+    Object? config = null,
   }) {
     return _then(PrayerConfigReady(
-      freezed == config
+      null == config
           ? _self.config
           : config // ignore: cast_nullable_to_non_nullable
               as PrayerConfig,
