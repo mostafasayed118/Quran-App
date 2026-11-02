@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/domain/app_locale.dart';
 import '../../../core/domain/reminders.dart';
+import '../../../core/l10n/app_locale_controller.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/arabic_numbers.dart';
@@ -14,11 +18,15 @@ import 'settings_state.dart';
 import 'licenses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, this.backupSection});
+  const SettingsScreen({super.key, this.backupSection, this.locale});
 
   /// Backup & restore surface, composed by the app shell (router) so this
   /// feature stays free of cross-feature imports (architecture guard).
   final Widget? backupSection;
+
+  /// The language switch, wired by the composition root. Null keeps the row
+  /// out (a host that does not opt in, e.g. a focused widget test).
+  final AppLocaleController? locale;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +54,7 @@ class SettingsScreen extends StatelessWidget {
               wirdTimeHm: wirdTimeHm,
               permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
               backupSection: backupSection,
+              locale: locale,
             ),
         },
       ),
@@ -64,6 +73,7 @@ class _SettingsList extends StatelessWidget {
     required this.wirdTimeHm,
     required this.permissionDenied,
     required this.backupSection,
+    required this.locale,
   });
 
   final bool prayerEnabled;
@@ -73,14 +83,28 @@ class _SettingsList extends StatelessWidget {
   final String wirdTimeHm;
   final bool permissionDenied;
   final Widget? backupSection;
+  final AppLocaleController? locale;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<SettingsCubit>();
+    final language = locale;
     return ListView(
       padding: EdgeInsets.only(bottom: appBottomInset(context)),
       children: [
+        if (language != null) ...[
+          ListenableBuilder(
+            listenable: language,
+            builder: (context, _) => ListTile(
+              leading: const Icon(Icons.language),
+              title: Text(loc.language),
+              subtitle: Text(_languageLabel(loc, language.language)),
+              onTap: () => unawaited(_pickLanguage(context, loc, language)),
+            ),
+          ),
+          const Divider(height: 1),
+        ],
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),
           title: Text(loc.settingsPrayerReminder),
@@ -204,3 +228,45 @@ TimeOfDay? _parseHm(String hm) {
 /// The clock value the shared formatter renders (the date part is unused).
 DateTime _asDateTime(TimeOfDay time) =>
     DateTime(2000, 1, 1, time.hour, time.minute);
+
+/// The label for the current language, in the current language.
+String _languageLabel(AppLocalizations loc, AppLanguage language) =>
+    language == AppLanguage.arabic ? loc.languageArabic : loc.languageEnglish;
+
+/// Offers the shipped languages; the controller applies and persists the pick.
+Future<void> _pickLanguage(
+  BuildContext context,
+  AppLocalizations loc,
+  AppLocaleController controller,
+) async {
+  final selected = await showDialog<AppLanguage>(
+    context: context,
+    builder: (dialogContext) => SimpleDialog(
+      title: Text(loc.language),
+      children: [
+        for (final language in AppLanguage.values)
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(dialogContext).pop(language),
+            child: Row(
+              children: [
+                Icon(
+                  controller.language == language
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  language == AppLanguage.arabic
+                      ? loc.languageArabic
+                      : loc.languageEnglish,
+                ),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
+  if (selected == null) return;
+  await controller.setLanguage(selected);
+}

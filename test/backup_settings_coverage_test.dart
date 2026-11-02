@@ -4,10 +4,12 @@ import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
+import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
+import 'package:quran_yahdi/features/settings/data/app_locale_repository.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 
 /// Inventory pin (Class B): **every user preference the app persists must be
@@ -18,6 +20,13 @@ import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 /// backup whitelist, so an export/import reset it. Adding a preference means
 /// adding it here *and* to `kBackupSettingsWhitelist` in the same commit.
 void main() {
+  /// Keys that are deliberately per-device: a restore onto another phone must
+  /// not flip the reading language or re-open the setup flow.
+  const deviceScopedKeys = <String>{
+    AppLocaleRepository.key,
+    OnboardingRepository.completedKey,
+  };
+
   /// Keys that represent a user choice and must survive export → import.
   const userPreferenceKeys = <String>{
     // Reminders (notifications/reminder_settings.dart).
@@ -43,8 +52,10 @@ void main() {
   };
 
   test('every user preference key is in the backup whitelist', () {
-    final missing =
-        userPreferenceKeys.difference(kBackupSettingsWhitelist).toList();
+    final missing = userPreferenceKeys
+        .difference(deviceScopedKeys)
+        .difference(kBackupSettingsWhitelist)
+        .toList();
     expect(
       missing,
       isEmpty,
@@ -53,7 +64,16 @@ void main() {
   });
 
   test('the whitelist holds only user preferences', () {
-    expect(kBackupSettingsWhitelist, userPreferenceKeys);
+    expect(
+      kBackupSettingsWhitelist,
+      userPreferenceKeys.difference(deviceScopedKeys),
+    );
+  });
+
+  test('device-scoped keys never travel in a backup', () {
+    for (final key in deviceScopedKeys) {
+      expect(kBackupSettingsWhitelist, isNot(contains(key)));
+    }
   });
 
   test('entities and app-managed keys stay out of the whitelist', () {

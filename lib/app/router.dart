@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
+import '../core/l10n/app_locale_controller.dart';
 import '../core/domain/prayer_config.dart';
 import '../core/domain/pre_adhan_canceller.dart';
 import '../core/domain/prayer_times.dart';
@@ -391,7 +392,10 @@ abstract final class AppRouter {
             ),
             identity: AppRoutes.settings,
             start: (cubit) => cubit.start(),
-            child: const SettingsScreen(backupSection: BackupSection()),
+            child: SettingsScreen(
+              backupSection: const BackupSection(),
+              locale: getIt<AppLocaleController>(),
+            ),
           ),
         ),
       ),
