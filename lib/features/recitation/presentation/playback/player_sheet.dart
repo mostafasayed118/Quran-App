@@ -9,6 +9,29 @@ import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'playback_state.dart';
 
+/// Whether the player sheet must rebuild for [current].
+///
+/// While the user drags the seek bar the on-screen position is local
+/// (`_dragging`), so a 1 Hz position tick changes nothing visible — and
+/// rebuilding the whole sheet per tick is exactly the cost this avoids. Any
+/// other change (track, play/pause, duration, failure) rebuilds.
+bool playerSheetShouldRebuild(
+  PlaybackState previous,
+  PlaybackState current, {
+  required bool dragging,
+}) {
+  if (!dragging) return true;
+  return switch ((previous, current)) {
+    (final PlaybackPlaying a, final PlaybackPlaying b) =>
+      a.copyWith(position: Duration.zero) !=
+          b.copyWith(position: Duration.zero),
+    (final PlaybackPaused a, final PlaybackPaused b) =>
+      a.copyWith(position: Duration.zero) !=
+          b.copyWith(position: Duration.zero),
+    _ => true,
+  };
+}
+
 /// Tracks a seek position while the thumb is held, otherwise mirrors the
 /// stream.
 class _Track {
@@ -109,6 +132,11 @@ class _PlayerSheetState extends State<_PlayerSheet> {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return BlocBuilder<PlaybackCubit, PlaybackState>(
+      buildWhen: (previous, current) => playerSheetShouldRebuild(
+        previous,
+        current,
+        dragging: _dragging != null,
+      ),
       builder: (context, state) {
         final track = _trackOf(context, state);
         if (track == null) {
