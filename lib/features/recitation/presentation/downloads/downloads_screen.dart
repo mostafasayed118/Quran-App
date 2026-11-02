@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
@@ -24,22 +25,27 @@ class DownloadsScreen extends StatefulWidget {
 }
 
 class _DownloadsScreenState extends State<DownloadsScreen> {
-  late Future<List<InstalledDownload>> _installed;
+  late Future<_DownloadsView> _data;
 
   @override
   void initState() {
     super.initState();
-    _installed = _read();
+    _data = _read();
   }
 
-  Future<List<InstalledDownload>> _read() =>
-      context.read<DownloadsCubit>().installed();
+  Future<_DownloadsView> _read() => _load(context.read<DownloadsCubit>());
+
+  static Future<_DownloadsView> _load(DownloadsCubit cubit) async {
+    final items = await cubit.installed();
+    final summary = await cubit.summary();
+    return _DownloadsView(items: items, summary: summary);
+  }
 
   /// Re-reads after a delete or a retry. The builder renders the new future's
   /// loading arm, so the list never shows a stale row mid-refresh.
   void _reload() {
     setState(() {
-      _installed = _read();
+      _data = _read();
     });
   }
 
@@ -63,34 +69,134 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     _reload();
   }
 
+  /// Deletes every installed download. A failure replaces the future, so the
+  /// builder shows its error pane with the retry — the rows removed before the
+  /// failure are already gone, and the retry re-reads what is left.
+  Future<void> _deleteAll() async {
+    final loc = AppLocalizations.of(context);
+    final cubit = context.read<DownloadsCubit>();
+    final confirmed = await confirmDeleteDialog(
+      context,
+      title: loc.downloadsDeleteAll,
+      body: loc.downloadsDeleteAllBody,
+    );
+    if (!confirmed || !mounted) return;
+    setState(() {
+      _data = _removeAllThenRead(cubit);
+    });
+  }
+
+  static Future<_DownloadsView> _removeAllThenRead(DownloadsCubit cubit) async {
+    await cubit.removeAll();
+    return _load(cubit);
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.downloadsTitle)),
-      body: FutureBuilder<List<InstalledDownload>>(
-        future: _installed,
+      body: FutureBuilder<_DownloadsView>(
+        future: _data,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const LoadingView();
           }
           if (snapshot.hasError) return errorPane(loc, onRetry: _reload);
-          final items = snapshot.data ?? const <InstalledDownload>[];
-          if (items.isEmpty) {
+          final view = snapshot.data;
+          if (view == null || view.items.isEmpty) {
             return EmptyState(
               loc.downloadsEmpty,
               icon: Icons.download_done_outlined,
             );
           }
-          return ListView.builder(
-            padding: EdgeInsets.only(bottom: appBottomInset(context)),
-            itemCount: items.length,
-            itemBuilder: (context, i) => _DownloadRow(
-              item: items[i],
-              onDelete: () => _delete(items[i]),
-            ),
+          return Column(
+            children: [
+              // The header is a Card, never a ListTile: the list rows own that
+              // type. It appears only from two rows up, where a total and a
+              // "delete all" are worth the space.
+              if (view.summary.count >= 2)
+                _SummaryHeader(
+                  summary: view.summary,
+                  onDeleteAll: _deleteAll,
+                ),
+              Expanded(
+                child: ListView.builder(
+                  padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                  itemCount: view.items.length,
+                  itemBuilder: (context, i) => _DownloadRow(
+                    item: view.items[i],
+                    onDelete: () => _delete(view.items[i]),
+                  ),
+                ),
+              ),
+            ],
           );
         },
+      ),
+    );
+  }
+}
+
+/// One load of the screen: the rows and the aggregate the header shows.
+class _DownloadsView {
+  const _DownloadsView({required this.items, required this.summary});
+
+  final List<InstalledDownload> items;
+  final DownloadsSummary summary;
+}
+
+/// The storage header above the list: total size, file count and the
+/// delete-all action.
+class _SummaryHeader extends StatelessWidget {
+  const _SummaryHeader({required this.summary, required this.onDeleteAll});
+
+  final DownloadsSummary summary;
+  final VoidCallback onDeleteAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    return Card(
+      margin: const EdgeInsetsDirectional.fromSTEB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
+      child: Padding(
+        padding: const EdgeInsetsDirectional.fromSTEB(14, 6, 6, 6),
+        child: Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            Icon(Icons.sd_storage_outlined, color: colors.primary),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.downloadsTotal(
+                      formatMegabytes(summary.bytes).toArabicIndicDigits,
+                    ),
+                    style: AppTheme.cardTitle,
+                  ),
+                  Text(
+                    loc.downloadsCount(summary.count.toArabicIndic),
+                    style: AppTheme.caption
+                        .copyWith(color: colors.onSurfaceVariant),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: onDeleteAll,
+              child: Text(loc.downloadsDeleteAll),
+            ),
+          ],
+        ),
       ),
     );
   }

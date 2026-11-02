@@ -1616,6 +1616,30 @@ abstract class AppLocalizations {
   /// **'سيُحذف هذا الملف من جهازك.'**
   String get downloadsDeleteBody;
 
+  /// No description provided for @downloadsTotal.
+  ///
+  /// In ar, this message translates to:
+  /// **'المساحة المستخدمة: {size} م.ب'**
+  String downloadsTotal(String size);
+
+  /// No description provided for @downloadsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} سورة منزّلة'**
+  String downloadsCount(String count);
+
+  /// No description provided for @downloadsDeleteAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف الكل'**
+  String get downloadsDeleteAll;
+
+  /// No description provided for @downloadsDeleteAllBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستُحذف كل التلاوات المنزّلة من جهازك.'**
+  String get downloadsDeleteAllBody;
+
   /// No description provided for @licensesQuranUthmani.
   ///
   /// In ar, this message translates to:

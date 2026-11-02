@@ -877,6 +877,23 @@ class AppLocalizationsEn extends AppLocalizations {
       'This file will be removed from your device.';
 
   @override
+  String downloadsTotal(String size) {
+    return 'Storage used: $size MB';
+  }
+
+  @override
+  String downloadsCount(String count) {
+    return '$count surahs downloaded';
+  }
+
+  @override
+  String get downloadsDeleteAll => 'Delete all';
+
+  @override
+  String get downloadsDeleteAllBody =>
+      'Every downloaded recitation will be removed from your device.';
+
+  @override
   String get licensesQuranUthmani =>
       'Uthmani Quran text (Unicode) — Tanzil Project';
 

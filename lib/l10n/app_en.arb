@@ -586,6 +586,24 @@
   "downloadsTitle": "Downloads",
   "downloadsEmpty": "No downloaded recitations yet",
   "downloadsDeleteBody": "This file will be removed from your device.",
+  "downloadsTotal": "Storage used: {size} MB",
+  "@downloadsTotal": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsCount": "{count} surahs downloaded",
+  "@downloadsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadsDeleteAll": "Delete all",
+  "downloadsDeleteAllBody": "Every downloaded recitation will be removed from your device.",
   "licensesQuranUthmani": "Uthmani Quran text (Unicode) — Tanzil Project",
   "licensesTanzilTerms": "Attribution and terms",
   "prayerSettings": "Prayer settings",

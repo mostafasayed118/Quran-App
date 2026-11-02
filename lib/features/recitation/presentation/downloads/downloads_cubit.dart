@@ -42,6 +42,21 @@ class InstalledDownload {
   final int bytes;
 }
 
+/// How much space the installed downloads take, and in how many files.
+///
+/// Another read-side projection (see [InstalledDownload]) built on every
+/// read: the registry is the owner, the cubit holds no copy.
+class DownloadsSummary {
+  /// Creates an aggregate of [count] files totalling [bytes].
+  const DownloadsSummary({required this.count, required this.bytes});
+
+  /// Number of installed files.
+  final int count;
+
+  /// Total size of the installed files, in bytes.
+  final int bytes;
+}
+
 /// The downloads screen: the per-surah download queue and the done rows.
 class DownloadsCubit extends Cubit<DownloadsState> {
   /// Creates the cubit with the downloader and the reciter catalog.
@@ -143,6 +158,21 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     return items;
   }
 
+  /// The count and total size of the installed downloads.
+  ///
+  /// Reads the registry directly instead of going through [installed]: the
+  /// header needs only the numbers, not the resolved display names. A failure
+  /// propagates so the screen can render its error pane.
+  Future<DownloadsSummary> summary() async {
+    await _ensureReconciled();
+    final rows = await _downloader.listDone();
+    var bytes = 0;
+    for (final row in rows) {
+      bytes += row.bytes;
+    }
+    return DownloadsSummary(count: rows.length, bytes: bytes);
+  }
+
   /// Removes an installed download through the existing
   /// [AudioDownloader.removeDownload] (file + DB row) and drops its entry
   /// from the state so rows re-render — the delete affordance's refresh path
@@ -165,6 +195,21 @@ class DownloadsCubit extends Cubit<DownloadsState> {
           entry.key: entry.value,
     }));
     return true;
+  }
+
+  /// Removes every installed download, one [removeDone] per row.
+  ///
+  /// Stops at the first row that could not be removed and throws, so the
+  /// screen shows its error pane. The rows removed before the failure stay
+  /// removed, so a retry only touches what is left.
+  Future<void> removeAll() async {
+    for (final item in await installed()) {
+      if (!await removeDone(item.rowId, item.surahNumber)) {
+        throw StateError(
+          'download removal failed for ${item.rowId}-${item.surahNumber}',
+        );
+      }
+    }
   }
 
   /// Queues the download of one surah for one reciter.

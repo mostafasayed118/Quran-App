@@ -872,6 +872,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadsDeleteBody => 'سيُحذف هذا الملف من جهازك.';
 
   @override
+  String downloadsTotal(String size) {
+    return 'المساحة المستخدمة: $size م.ب';
+  }
+
+  @override
+  String downloadsCount(String count) {
+    return '$count سورة منزّلة';
+  }
+
+  @override
+  String get downloadsDeleteAll => 'حذف الكل';
+
+  @override
+  String get downloadsDeleteAllBody => 'ستُحذف كل التلاوات المنزّلة من جهازك.';
+
+  @override
   String get licensesQuranUthmani =>
       'نص القرآن العثماني (يونيكود) — مشروع تَنزيل';
 
