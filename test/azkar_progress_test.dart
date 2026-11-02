@@ -81,10 +81,12 @@ class _Source implements AzkarSavedStateSource {
   }
 }
 
-AzkarCubit _cubit({AzkarSavedStateSource? source}) => AzkarCubit(
+AzkarCubit _cubit(
+        {AzkarSavedStateSource? source, DateTime Function()? clock}) =>
+    AzkarCubit(
       repository: AzkarRepository(loader: () async => _catalog()),
       savedState: source,
-      clock: () => _now,
+      clock: clock ?? () => _now,
     );
 
 void main() {
@@ -141,6 +143,38 @@ void main() {
     cubit.open(browsing.collections.first);
 
     expect((cubit.state as AzkarReciting).remaining, [3, 2]);
+  });
+
+  test('a session that crosses midnight does not carry yesterday counters',
+      () async {
+    var now = DateTime(2026, 11, 2, 23, 55);
+    final source = _Source();
+    final cubit = _cubit(source: source, clock: () => now);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+    cubit.tapItem(0);
+    await Future<void>.delayed(Duration.zero);
+    expect(source.stored.remaining['morning'], [2, 2]);
+
+    now = DateTime(2026, 11, 3, 0, 5);
+    cubit.back();
+    await Future<void>.delayed(Duration.zero);
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+    cubit.tapItem(1);
+    await Future<void>.delayed(Duration.zero);
+
+    expect(source.stored.day, '2026-11-03');
+    expect(source.stored.remaining.keys, ['morning']);
+    cubit.back();
+    await Future<void>.delayed(Duration.zero);
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+    expect(
+      (cubit.state as AzkarReciting).remaining,
+      [3, 1],
+      reason: 'yesterday morning counters are not relabelled as today',
+    );
   });
 
   test('every tap persists the counters of the open collection', () async {

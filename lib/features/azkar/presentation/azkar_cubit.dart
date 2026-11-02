@@ -194,7 +194,7 @@ class AzkarCubit extends Cubit<AzkarState> {
   }
 
   List<int> _remainingFor(AzkarCollection collection) {
-    final saved = _saved.remaining[collection.id];
+    final saved = _liveRemaining[collection.id];
     return [
       for (var i = 0; i < collection.items.length; i++)
         if (saved != null && i < saved.length)
@@ -202,6 +202,16 @@ class AzkarCubit extends Cubit<AzkarState> {
         else
           collection.items[i].count,
     ];
+  }
+
+  /// The counters that still belong to today.
+  ///
+  /// Morning and evening azkar are recited daily, so a set stamped with an
+  /// earlier day is dropped — even while the screen stays open past midnight.
+  /// An unstamped set (no storage source) is kept: it only lives in memory.
+  Map<String, List<int>> get _liveRemaining {
+    if (_saved.day.isEmpty || _saved.day == _today) return _saved.remaining;
+    return const <String, List<int>>{};
   }
 
   List<AzkarCollection> _favoritesFirst(List<AzkarCollection> collections) {
@@ -240,10 +250,12 @@ class AzkarCubit extends Cubit<AzkarState> {
     final source = _savedState;
     if (source == null) return;
     final day = _today;
+    // A screen left open past midnight must not relabel yesterday's counters
+    // as today's: the whole set restarts with this write.
     _saved = AzkarSavedState(
       day: day,
       remaining: {
-        ..._saved.remaining,
+        ..._liveRemaining,
         collectionId: List<int>.unmodifiable(remaining),
       },
       favorites: _saved.favorites,
