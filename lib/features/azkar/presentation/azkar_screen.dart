@@ -15,6 +15,20 @@ import '../data/azkar_repository.dart';
 import 'azkar_cubit.dart';
 import 'azkar_state.dart';
 
+/// Whether the azkar scaffold must rebuild for [current].
+///
+/// A counter tap (or a restart) emits the same reciting collection with new
+/// `remaining` values; the rows own that (each card selects its own counter),
+/// so rebuilding the whole scaffold per tap is pure cost. Every other
+/// transition — a new session, browsing, a search result, a failure — rebuilds.
+bool azkarScreenShouldRebuild(AzkarState previous, AzkarState current) {
+  if (previous.runtimeType != current.runtimeType) return true;
+  if (previous is AzkarReciting && current is AzkarReciting) {
+    return !identical(previous.collection, current.collection);
+  }
+  return true;
+}
+
 class AzkarScreen extends StatelessWidget {
   const AzkarScreen({super.key});
 
@@ -22,6 +36,7 @@ class AzkarScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return BlocBuilder<AzkarCubit, AzkarState>(
+      buildWhen: azkarScreenShouldRebuild,
       builder: (context, state) {
         final reciting = state is AzkarReciting;
         return PopScope(
@@ -61,7 +76,8 @@ class AzkarScreen extends StatelessWidget {
                   searchResults: searchResults,
                   searchHasMore: searchHasMore,
                 ),
-              AzkarReciting() => const _RecitingList(),
+              AzkarReciting(:final collection) =>
+                _RecitingList(collection: collection),
             },
           ),
         );
@@ -292,24 +308,31 @@ class _CollectionTile extends StatelessWidget {
 }
 
 class _RecitingList extends StatelessWidget {
-  const _RecitingList();
+  const _RecitingList({required this.collection});
+
+  /// The open session's collection — stable while counting, so the list itself
+  /// is built once and each row subscribes to its own counter.
+  final AzkarCollection collection;
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AzkarCubit, AzkarState>(
-      builder: (context, state) {
-        final reciting = state as AzkarReciting;
-        return ListView.builder(
-          padding: appScrollPadding(
-            context,
-            const EdgeInsets.all(AppSpacing.md),
-          ),
-          itemCount: reciting.collection.items.length,
-          itemBuilder: (context, i) {
-            final item = reciting.collection.items[i];
-            final remaining = reciting.remaining[i];
-            return _RecitingCard(item: item, remaining: remaining, index: i);
-          },
+    return ListView.builder(
+      padding: appScrollPadding(
+        context,
+        const EdgeInsets.all(AppSpacing.md),
+      ),
+      itemCount: collection.items.length,
+      itemBuilder: (context, i) {
+        final item = collection.items[i];
+        // Per-row selector: a tap re-emits the whole state, but only the row
+        // whose counter changed rebuilds.
+        return BlocSelector<AzkarCubit, AzkarState, int>(
+          selector: (state) =>
+              state is AzkarReciting && i < state.remaining.length
+                  ? state.remaining[i]
+                  : item.count,
+          builder: (context, remaining) =>
+              _RecitingCard(item: item, remaining: remaining, index: i),
         );
       },
     );
