@@ -49,6 +49,16 @@ class _Prayer implements PrayerTimesPort {
       PrayerChoice(PrayerName.fajr, whenLocal.add(const Duration(hours: 1)));
 }
 
+class _PrayerEmptyTomorrow extends _Prayer {
+  @override
+  List<PrayerChoice> today(CityCoordinates c, DateTime day) =>
+      day.day == 1 ? super.today(c, day) : const [];
+
+  @override
+  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
+      PrayerChoice(PrayerName.dhuhr, DateTime(2026, 11, 2, 12));
+}
+
 class _Scheduler implements ReminderSchedulerPort {
   List<ScheduledReminder>? plan;
 
@@ -110,6 +120,26 @@ void main() {
     final plan = scheduler.plan;
     expect(plan, isNotNull);
     final prayer = plan!.singleWhere((r) => r.id == prayerReminderId);
+    expect(prayer.fireAt, DateTime(2026, 11, 2, 12));
+  });
+
+  test('a partial future day falls back to the next-prayer contract', () async {
+    final scheduler = _Scheduler();
+    final settings = ReminderSettings(newTestDb());
+    const config = PrayerConfig(
+      enabledPrayers: {PrayerName.dhuhr},
+    );
+
+    await scheduleReminders(
+      city: const _City(),
+      prayer: _PrayerEmptyTomorrow(),
+      settings: settings,
+      scheduler: scheduler,
+      now: DateTime(2026, 11, 1, 20),
+      config: config,
+    );
+
+    final prayer = scheduler.plan!.singleWhere((r) => r.id == prayerReminderId);
     expect(prayer.fireAt, DateTime(2026, 11, 2, 12));
   });
 

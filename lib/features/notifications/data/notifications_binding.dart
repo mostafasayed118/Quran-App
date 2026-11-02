@@ -333,9 +333,12 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     try {
       await _plugin.cancel(id: preAdhanReminderId);
     } on Object {
-      // Best-effort, like every other reminder write.
+      // Best-effort, like every other reminder write; keep the fingerprint so
+      // a later re-plan retries the cancel.
+      return;
     }
-    _appliedPlan = null;
+    final hadPreAdhan = _appliedPlanIds.contains(preAdhanReminderId);
+    if (hadPreAdhan) _appliedPlan = null;
     _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
   }
 

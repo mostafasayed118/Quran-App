@@ -72,6 +72,22 @@ void main() {
     );
   });
 
+  test('a no-op pre-adhan cancel keeps an identical plan deduped', () async {
+    final binding = NotificationsBinding();
+    await binding.init();
+    final plan = [
+      _reminder(id: prayerReminderId, title: 'Fajr'),
+      _reminder(id: azkarReminderId, title: 'Azkar'),
+    ];
+    await binding.scheduleAll(plan);
+    calls.clear();
+
+    await binding.cancelPreAdhan();
+    await binding.scheduleAll(plan);
+
+    expect(_zonedIds(calls), isEmpty);
+  });
+
   test('a pre-adhan cancellation requested before init is queued', () async {
     final binding = NotificationsBinding();
     await binding.cancelPreAdhan();
@@ -109,3 +125,8 @@ List<int> _cancelIds(List<MethodCall> calls) =>
       if (arguments is int) return arguments;
       return (arguments as Map<Object?, Object?>)['id'] as int;
     }).toList();
+
+List<int> _zonedIds(List<MethodCall> calls) => calls
+    .where((call) => call.method == 'zonedSchedule')
+    .map((call) => (call.arguments as Map<Object?, Object?>)['id'] as int)
+    .toList();

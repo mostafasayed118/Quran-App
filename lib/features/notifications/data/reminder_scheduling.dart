@@ -45,9 +45,9 @@ Future<void> scheduleReminders({
         nextEnabled = choice;
         break;
       }
-      // Keep the historical seam for sources that only implement nextPrayer
-      // for the day boundary (the frozen fake does): if the tomorrow list
-      // yields nothing, use the port's next prayer when it is enabled.
+      // A source that returns no rows for a future day still has the
+      // nextPrayer contract; use it when that prayer is enabled. This is a
+      // defensive path for partial/malformed day data, not the normal one.
       if (nextEnabled == null) {
         final fallback = prayer.nextPrayer(selected.coordinates, nowLocal);
         if (config.enabledPrayers.contains(fallback.name) &&
