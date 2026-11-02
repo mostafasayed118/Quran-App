@@ -4,6 +4,7 @@ import 'dart:developer' as dev;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/azkar_repository.dart';
+import '../data/azkar_saved_state.dart';
 import 'azkar_state.dart';
 
 /// The azkar screen: the collection list, the search results and the
@@ -11,8 +12,14 @@ import 'azkar_state.dart';
 class AzkarCubit extends Cubit<AzkarState> {
   /// Creates the cubit; the constructor is side-effect free and does no
   /// work — [start] performs the first load.
-  AzkarCubit({required AzkarRepository repository})
-      : _repository = repository,
+  ///
+  /// [savedState] is optional: without it the counters live in memory for the
+  /// session (the v1.0 behaviour), so a storage failure never blocks reciting.
+  AzkarCubit({
+    required AzkarRepository repository,
+    AzkarSavedStateSource? savedState,
+  })  : _repository = repository,
+        _savedState = savedState,
         super(const AzkarState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -20,26 +27,47 @@ class AzkarCubit extends Cubit<AzkarState> {
   Future<void> start() => load();
 
   final AzkarRepository _repository;
+  final AzkarSavedStateSource? _savedState;
 
-  List<AzkarCollection> _collections = const [];
+  List<AzkarCollection> _catalog = const [];
   int _searchSeq = 0;
+  AzkarSavedState _saved = const AzkarSavedState();
 
-  /// Loads the collections and emits the browsing state.
+  /// Loads the collections, emits the browsing state, then hydrates the saved
+  /// counters and favorites.
   ///
+  /// The catalog emit comes first on purpose: the screen must not wait for a
+  /// storage read to paint (the same rule the boot path follows for plugins).
   /// A failure emits the failed state (the error is logged, never raised as
   /// an unhandled async error).
   Future<void> load() async {
     try {
       final collections = await _repository.collections();
       if (isClosed) return;
-      _collections = collections;
+      _catalog = collections;
       _searchSeq++;
-      emit(AzkarState.browsing(collections: collections));
+      emit(_browsing());
     } on Object catch (error, stackTrace) {
       dev.log('azkar load failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const AzkarState.failed());
+      return;
+    }
+    await _hydrateSavedState();
+  }
+
+  /// Merges the stored counters and pins into the browsing state.
+  Future<void> _hydrateSavedState() async {
+    final saved = await _readSavedState();
+    if (isClosed) return;
+    _saved = saved;
+    final state = this.state;
+    if (state is AzkarBrowsing) {
+      emit(state.copyWith(
+        collections: _favoritesFirst(_catalog),
+        favorites: saved.favorites,
+      ));
     }
   }
 
@@ -49,7 +77,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     final query = raw.trim();
     final seq = ++_searchSeq;
     if (query.isEmpty) {
-      emit(AzkarState.browsing(collections: _collections));
+      emit(_browsing());
       return;
     }
     unawaited(_search(query, seq));
@@ -59,8 +87,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       final results = await _repository.search(query);
       if (isClosed || seq != _searchSeq) return;
-      emit(AzkarState.browsing(
-        collections: _collections,
+      emit(_browsing(
         query: query,
         searchResults: results.hits,
         searchHasMore: results.hasMore,
@@ -69,19 +96,18 @@ class AzkarCubit extends Cubit<AzkarState> {
       dev.log('azkar search failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _searchSeq) return;
-      emit(AzkarState.browsing(collections: _collections, query: query));
+      emit(_browsing(query: query));
     }
   }
 
-  /// Opens a collection in the reciting view (every counter starts at full).
+  /// Opens a collection in the reciting view, resuming the saved counters
+  /// when there are any (every item starts full otherwise).
   void open(AzkarCollection collection) {
     if (isClosed) return;
     _searchSeq++;
     emit(AzkarState.reciting(
       collection: collection,
-      remaining: [
-        for (final item in collection.items) item.count,
-      ],
+      remaining: _remainingFor(collection),
     ));
   }
 
@@ -94,15 +120,122 @@ class AzkarCubit extends Cubit<AzkarState> {
     final item = state.collection.items[index];
     final next = (state.remaining[index] - 1).clamp(0, item.count);
     final remaining = [...state.remaining]..[index] = next;
-    emit(AzkarState.reciting(
-      collection: state.collection,
-      remaining: remaining,
-    ));
+    emit(state.copyWith(remaining: remaining));
+    unawaited(_persistRemaining(state.collection.id, remaining));
+  }
+
+  /// Resets every counter of the open collection back to its full count.
+  void restart() {
+    if (isClosed) return;
+    final state = this.state;
+    if (state is! AzkarReciting) return;
+    final remaining = [
+      for (final item in state.collection.items) item.count,
+    ];
+    emit(state.copyWith(remaining: remaining));
+    unawaited(_persistRemaining(state.collection.id, remaining));
+  }
+
+  /// Pins or unpins [collectionId]; pinned collections sort first.
+  void toggleFavorite(String collectionId) {
+    if (isClosed) return;
+    final favorites = <String>{..._saved.favorites};
+    if (!favorites.remove(collectionId)) favorites.add(collectionId);
+    _saved = AzkarSavedState(
+      remaining: _saved.remaining,
+      favorites: favorites,
+    );
+    final state = this.state;
+    if (state is AzkarBrowsing) {
+      emit(state.copyWith(
+        collections: _favoritesFirst(_catalog),
+        favorites: favorites,
+      ));
+    }
+    unawaited(_persistFavorites(favorites));
   }
 
   /// Leaves the reciting view and returns to the collection list.
   void back() {
     if (isClosed) return;
     unawaited(load());
+  }
+
+  AzkarState _browsing({
+    String query = '',
+    List<AzkarSearchHit> searchResults = const [],
+    bool searchHasMore = false,
+  }) {
+    return AzkarState.browsing(
+      collections: _favoritesFirst(_catalog),
+      favorites: _saved.favorites,
+      query: query,
+      searchResults: searchResults,
+      searchHasMore: searchHasMore,
+    );
+  }
+
+  List<int> _remainingFor(AzkarCollection collection) {
+    final saved = _saved.remaining[collection.id];
+    return [
+      for (var i = 0; i < collection.items.length; i++)
+        if (saved != null && i < saved.length)
+          saved[i].clamp(0, collection.items[i].count)
+        else
+          collection.items[i].count,
+    ];
+  }
+
+  List<AzkarCollection> _favoritesFirst(List<AzkarCollection> collections) {
+    final favorites = _saved.favorites;
+    if (favorites.isEmpty) return collections;
+    return [
+      for (final collection in collections)
+        if (favorites.contains(collection.id)) collection,
+      for (final collection in collections)
+        if (!favorites.contains(collection.id)) collection,
+    ];
+  }
+
+  Future<AzkarSavedState> _readSavedState() async {
+    final source = _savedState;
+    if (source == null) return const AzkarSavedState();
+    try {
+      return await source.load();
+    } on Object catch (error, stackTrace) {
+      dev.log('azkar saved state read failed',
+          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      return const AzkarSavedState();
+    }
+  }
+
+  Future<void> _persistRemaining(
+      String collectionId, List<int> remaining) async {
+    final source = _savedState;
+    if (source == null) return;
+    _saved = AzkarSavedState(
+      remaining: {
+        ..._saved.remaining,
+        collectionId: List<int>.unmodifiable(remaining),
+      },
+      favorites: _saved.favorites,
+    );
+    try {
+      await source.saveRemaining(collectionId, remaining);
+    } on Object catch (error, stackTrace) {
+      dev.log('azkar counter write failed',
+          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<void> _persistFavorites(Set<String> favorites) async {
+    final source = _savedState;
+    if (source == null) return;
+    try {
+      await source.saveFavorites(favorites);
+    } on Object catch (error, stackTrace) {
+      dev.log('azkar favorites write failed',
+          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+    }
   }
 }

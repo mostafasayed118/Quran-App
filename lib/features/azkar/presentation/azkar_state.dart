@@ -14,6 +14,7 @@ sealed class AzkarState with _$AzkarState {
 
   const factory AzkarState.browsing({
     @Default(<AzkarCollection>[]) List<AzkarCollection> collections,
+    @Default(<String>{}) Set<String> favorites,
     @Default('') String query,
     @Default(<AzkarSearchHit>[]) List<AzkarSearchHit> searchResults,
     @Default(false) bool searchHasMore,

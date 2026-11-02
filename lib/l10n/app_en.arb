@@ -142,6 +142,9 @@
     }
   },
   "azkarDone": "Done",
+  "azkarRestart": "Start over",
+  "azkarFavoriteAdd": "Add to favourites",
+  "azkarFavoriteRemove": "Remove from favourites",
   "tasbihReset": "Reset",
   "tasbihTarget": "Target",
   "tasbihTargetSet": "Target set — count restarted",

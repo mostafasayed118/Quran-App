@@ -149,6 +149,9 @@
     }
   },
   "azkarDone": "تم بحمد الله",
+  "azkarRestart": "إعادة العد",
+  "azkarFavoriteAdd": "إضافة إلى المفضلة",
+  "azkarFavoriteRemove": "إزالة من المفضلة",
   "tasbihReset": "تصفير",
   "tasbihTarget": "الهدف",
   "tasbihTargetSet": "تم ضبط الهدف — بدأ العد من جديد",

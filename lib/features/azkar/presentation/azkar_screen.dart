@@ -35,18 +35,28 @@ class AzkarScreen extends StatelessWidget {
             appBar: AppBar(
               title: const _AzkarTitle(),
               leading: const _AzkarBackButton(),
+              actions: [
+                if (reciting)
+                  IconButton(
+                    tooltip: loc.azkarRestart,
+                    icon: const Icon(Icons.restart_alt),
+                    onPressed: context.read<AzkarCubit>().restart,
+                  ),
+              ],
             ),
             body: switch (state) {
               AzkarLoading() => const LoadingView(),
               AzkarFailed() => errorPane(loc),
               AzkarBrowsing(
                 :final collections,
+                :final favorites,
                 :final query,
                 :final searchResults,
                 :final searchHasMore,
               ) =>
                 _BrowsingView(
                   collections: collections,
+                  favorites: favorites,
                   query: query,
                   searchResults: searchResults,
                   searchHasMore: searchHasMore,
@@ -103,12 +113,14 @@ class _AzkarBackButton extends StatelessWidget {
 class _BrowsingView extends StatelessWidget {
   const _BrowsingView({
     required this.collections,
+    required this.favorites,
     required this.query,
     required this.searchResults,
     required this.searchHasMore,
   });
 
   final List<AzkarCollection> collections;
+  final Set<String> favorites;
   final String query;
   final List<AzkarSearchHit> searchResults;
   final bool searchHasMore;
@@ -136,8 +148,10 @@ class _BrowsingView extends StatelessWidget {
                         const EdgeInsets.all(AppSpacing.md),
                       ),
                       itemCount: collections.length,
-                      itemBuilder: (context, i) =>
-                          _CollectionTile(collection: collections[i]),
+                      itemBuilder: (context, i) => _CollectionTile(
+                        collection: collections[i],
+                        favorite: favorites.contains(collections[i].id),
+                      ),
                     ))
               : _SearchResultsList(
                   results: searchResults,
@@ -230,13 +244,15 @@ class _SearchHitTile extends StatelessWidget {
 }
 
 class _CollectionTile extends StatelessWidget {
-  const _CollectionTile({required this.collection});
+  const _CollectionTile({required this.collection, required this.favorite});
 
   final AzkarCollection collection;
+  final bool favorite;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
     return Card(
       child: ListTile(
         title: Text(
@@ -247,12 +263,27 @@ class _CollectionTile extends StatelessWidget {
           ),
         ),
         subtitle: Text(collection.nameEn),
-        trailing: Text(
-          loc.azkarItemsCount(collection.items.length.toArabicIndic),
-          style: TextStyle(
-            fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              loc.azkarItemsCount(collection.items.length.toArabicIndic),
+              style: TextStyle(
+                fontSize: 12,
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+            IconButton(
+              tooltip:
+                  favorite ? loc.azkarFavoriteRemove : loc.azkarFavoriteAdd,
+              icon: Icon(
+                favorite ? Icons.star : Icons.star_border,
+                color: favorite ? colors.secondary : colors.onSurfaceVariant,
+              ),
+              onPressed: () =>
+                  context.read<AzkarCubit>().toggleFavorite(collection.id),
+            ),
+          ],
         ),
         onTap: () => context.read<AzkarCubit>().open(collection),
       ),

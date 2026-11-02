@@ -14,6 +14,8 @@ import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
+import 'package:quran_yahdi/features/azkar/data/azkar_saved_state.dart';
+import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_service.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
@@ -179,6 +181,10 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<CitySource>(() => getIt<CityRepository>());
   getIt.registerLazySingleton<AzkarRepository>(
       () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
+  getIt.registerLazySingleton<AzkarSavedStateRepository>(
+      () => AzkarSavedStateRepository(db));
+  getIt.registerLazySingleton<AzkarSavedStateSource>(
+      () => getIt<AzkarSavedStateRepository>());
   getIt.registerLazySingleton<DuaRepository>(
       () => DuaRepository(loader: duasLoader ?? _emptyRowsLoader));
   getIt.registerLazySingleton<RuqyahRepository>(

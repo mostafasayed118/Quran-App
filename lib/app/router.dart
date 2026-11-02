@@ -12,6 +12,7 @@ import '../core/domain/reminders.dart';
 import '../core/utils/app_routes.dart';
 import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
+import '../features/azkar/data/azkar_saved_state.dart';
 import '../features/azkar/presentation/azkar_cubit.dart';
 import '../features/azkar/presentation/azkar_screen.dart';
 import '../features/asma/data/asma_repository.dart';
@@ -171,6 +172,7 @@ abstract final class AppRouter {
             builder: (_, __) => RouteCubitScope<AzkarCubit>(
               create: () => AzkarCubit(
                 repository: getIt<AzkarRepository>(),
+                savedState: getIt<AzkarSavedStateSource>(),
               ),
               identity: AppRoutes.azkar,
               start: (cubit) => cubit.start(),

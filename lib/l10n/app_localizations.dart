@@ -488,6 +488,24 @@ abstract class AppLocalizations {
   /// **'تم بحمد الله'**
   String get azkarDone;
 
+  /// No description provided for @azkarRestart.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة العد'**
+  String get azkarRestart;
+
+  /// No description provided for @azkarFavoriteAdd.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة إلى المفضلة'**
+  String get azkarFavoriteAdd;
+
+  /// No description provided for @azkarFavoriteRemove.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزالة من المفضلة'**
+  String get azkarFavoriteRemove;
+
   /// No description provided for @tasbihReset.
   ///
   /// In ar, this message translates to:

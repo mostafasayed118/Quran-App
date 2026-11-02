@@ -155,8 +155,12 @@ extension AzkarStatePatterns on AzkarState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(List<AzkarCollection> collections, String query,
-            List<AzkarSearchHit> searchResults, bool searchHasMore)?
+    TResult Function(
+            List<AzkarCollection> collections,
+            Set<String> favorites,
+            String query,
+            List<AzkarSearchHit> searchResults,
+            bool searchHasMore)?
         browsing,
     TResult Function(AzkarCollection collection, List<int> remaining)? reciting,
     required TResult orElse(),
@@ -168,8 +172,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed() when failed != null:
         return failed();
       case AzkarBrowsing() when browsing != null:
-        return browsing(_that.collections, _that.query, _that.searchResults,
-            _that.searchHasMore);
+        return browsing(_that.collections, _that.favorites, _that.query,
+            _that.searchResults, _that.searchHasMore);
       case AzkarReciting() when reciting != null:
         return reciting(_that.collection, _that.remaining);
       case _:
@@ -194,8 +198,12 @@ extension AzkarStatePatterns on AzkarState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(List<AzkarCollection> collections, String query,
-            List<AzkarSearchHit> searchResults, bool searchHasMore)
+    required TResult Function(
+            List<AzkarCollection> collections,
+            Set<String> favorites,
+            String query,
+            List<AzkarSearchHit> searchResults,
+            bool searchHasMore)
         browsing,
     required TResult Function(AzkarCollection collection, List<int> remaining)
         reciting,
@@ -207,8 +215,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed():
         return failed();
       case AzkarBrowsing():
-        return browsing(_that.collections, _that.query, _that.searchResults,
-            _that.searchHasMore);
+        return browsing(_that.collections, _that.favorites, _that.query,
+            _that.searchResults, _that.searchHasMore);
       case AzkarReciting():
         return reciting(_that.collection, _that.remaining);
     }
@@ -230,8 +238,12 @@ extension AzkarStatePatterns on AzkarState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(List<AzkarCollection> collections, String query,
-            List<AzkarSearchHit> searchResults, bool searchHasMore)?
+    TResult? Function(
+            List<AzkarCollection> collections,
+            Set<String> favorites,
+            String query,
+            List<AzkarSearchHit> searchResults,
+            bool searchHasMore)?
         browsing,
     TResult? Function(AzkarCollection collection, List<int> remaining)?
         reciting,
@@ -243,8 +255,8 @@ extension AzkarStatePatterns on AzkarState {
       case AzkarFailed() when failed != null:
         return failed();
       case AzkarBrowsing() when browsing != null:
-        return browsing(_that.collections, _that.query, _that.searchResults,
-            _that.searchHasMore);
+        return browsing(_that.collections, _that.favorites, _that.query,
+            _that.searchResults, _that.searchHasMore);
       case AzkarReciting() when reciting != null:
         return reciting(_that.collection, _that.remaining);
       case _:
@@ -298,10 +310,12 @@ class AzkarFailed implements AzkarState {
 class AzkarBrowsing implements AzkarState {
   const AzkarBrowsing(
       {List<AzkarCollection> collections = const <AzkarCollection>[],
+      Set<String> favorites = const <String>{},
       this.query = '',
       List<AzkarSearchHit> searchResults = const <AzkarSearchHit>[],
       this.searchHasMore = false})
       : _collections = collections,
+        _favorites = favorites,
         _searchResults = searchResults;
 
   final List<AzkarCollection> _collections;
@@ -310,6 +324,14 @@ class AzkarBrowsing implements AzkarState {
     if (_collections is EqualUnmodifiableListView) return _collections;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_collections);
+  }
+
+  final Set<String> _favorites;
+  @JsonKey()
+  Set<String> get favorites {
+    if (_favorites is EqualUnmodifiableSetView) return _favorites;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_favorites);
   }
 
   @JsonKey()
@@ -339,6 +361,8 @@ class AzkarBrowsing implements AzkarState {
             other is AzkarBrowsing &&
             const DeepCollectionEquality()
                 .equals(other.collections, _collections) &&
+            const DeepCollectionEquality()
+                .equals(other.favorites, _favorites) &&
             (identical(other.query, query) || other.query == query) &&
             const DeepCollectionEquality()
                 .equals(other.searchResults, _searchResults) &&
@@ -351,6 +375,7 @@ class AzkarBrowsing implements AzkarState {
     return Object.hash(
         runtimeType,
         const DeepCollectionEquality().hash(_collections),
+        const DeepCollectionEquality().hash(_favorites),
         query,
         const DeepCollectionEquality().hash(_searchResults),
         searchHasMore);
@@ -358,7 +383,7 @@ class AzkarBrowsing implements AzkarState {
 
   @override
   String toString() {
-    return 'AzkarState.browsing(collections: $collections, query: $query, searchResults: $searchResults, searchHasMore: $searchHasMore)';
+    return 'AzkarState.browsing(collections: $collections, favorites: $favorites, query: $query, searchResults: $searchResults, searchHasMore: $searchHasMore)';
   }
 }
 
@@ -371,6 +396,7 @@ abstract mixin class $AzkarBrowsingCopyWith<$Res>
   @useResult
   $Res call(
       {List<AzkarCollection> collections,
+      Set<String> favorites,
       String query,
       List<AzkarSearchHit> searchResults,
       bool searchHasMore});
@@ -389,6 +415,7 @@ class _$AzkarBrowsingCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? collections = null,
+    Object? favorites = null,
     Object? query = null,
     Object? searchResults = null,
     Object? searchHasMore = null,
@@ -398,6 +425,10 @@ class _$AzkarBrowsingCopyWithImpl<$Res>
           ? _self._collections
           : collections // ignore: cast_nullable_to_non_nullable
               as List<AzkarCollection>,
+      favorites: null == favorites
+          ? _self._favorites
+          : favorites // ignore: cast_nullable_to_non_nullable
+              as Set<String>,
       query: null == query
           ? _self.query
           : query // ignore: cast_nullable_to_non_nullable

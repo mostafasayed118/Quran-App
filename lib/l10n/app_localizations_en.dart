@@ -229,6 +229,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get azkarDone => 'Done';
 
   @override
+  String get azkarRestart => 'Start over';
+
+  @override
+  String get azkarFavoriteAdd => 'Add to favourites';
+
+  @override
+  String get azkarFavoriteRemove => 'Remove from favourites';
+
+  @override
   String get tasbihReset => 'Reset';
 
   @override

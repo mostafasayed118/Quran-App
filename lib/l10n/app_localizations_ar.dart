@@ -228,6 +228,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get azkarDone => 'تم بحمد الله';
 
   @override
+  String get azkarRestart => 'إعادة العد';
+
+  @override
+  String get azkarFavoriteAdd => 'إضافة إلى المفضلة';
+
+  @override
+  String get azkarFavoriteRemove => 'إزالة من المفضلة';
+
+  @override
   String get tasbihReset => 'تصفير';
 
   @override
