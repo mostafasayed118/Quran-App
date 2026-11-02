@@ -6,8 +6,8 @@ import 'azkar_saved_state.dart';
 /// Stores [AzkarSavedState] in the settings table.
 ///
 /// Two keys keep a counter write from rewriting the favorites list: the
-/// progress row is one JSON object keyed by collection id, the favorites row is
-/// one JSON array.
+/// progress row is one JSON object (`day` + `counts` keyed by collection id),
+/// the favorites row is one JSON array.
 class AzkarSavedStateRepository implements AzkarSavedStateSource {
   /// Creates the repository over [db].
   AzkarSavedStateRepository(this._db);
@@ -28,20 +28,33 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
     final byKey = {
       for (final row in rows) row.key: row.value,
     };
+    final progress = _decodeProgress(byKey[progressKey]);
     return AzkarSavedState(
-      remaining: _decodeProgress(byKey[progressKey]),
+      day: progress.day,
+      remaining: progress.counts,
       favorites: _decodeFavorites(byKey[favoritesKey]),
     );
   }
 
   @override
-  Future<void> saveRemaining(String collectionId, List<int> remaining) async {
+  Future<void> saveRemaining(
+    String collectionId,
+    List<int> remaining,
+    String day,
+  ) async {
     final row = await (_db.select(_db.settingsTable)
           ..where((setting) => setting.key.equals(progressKey)))
         .getSingleOrNull();
-    final progress = _decodeProgress(row?.value);
-    progress[collectionId] = List<int>.unmodifiable(remaining);
-    await _write(progressKey, jsonEncode(progress));
+    final stored = _decodeProgress(row?.value);
+    // A new day starts a fresh set: yesterday's counters must not ride along.
+    final counts = stored.day == day
+        ? <String, List<int>>{...stored.counts}
+        : <String, List<int>>{};
+    counts[collectionId] = List<int>.unmodifiable(remaining);
+    await _write(
+      progressKey,
+      jsonEncode({'day': day, 'counts': counts}),
+    );
   }
 
   @override
@@ -54,22 +67,29 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
         );
   }
 
-  static Map<String, List<int>> _decodeProgress(String? raw) {
-    if (raw == null || raw.isEmpty) return <String, List<int>>{};
+  static ({String day, Map<String, List<int>> counts}) _decodeProgress(
+    String? raw,
+  ) {
+    const empty = (day: '', counts: <String, List<int>>{});
+    if (raw == null || raw.isEmpty) return empty;
     try {
-      final json = jsonDecode(raw) as Map<String, dynamic>;
-      final progress = <String, List<int>>{};
-      for (final entry in json.entries) {
-        final counts = entry.value;
-        if (counts is! List) continue;
-        progress[entry.key] = <int>[
-          for (final count in counts)
-            if (count is num) count.toInt(),
+      final json = jsonDecode(raw);
+      if (json is! Map<String, dynamic>) return empty;
+      final day = json['day'];
+      final counts = json['counts'];
+      if (counts is! Map<String, dynamic>) return empty;
+      final decoded = <String, List<int>>{};
+      for (final entry in counts.entries) {
+        final values = entry.value;
+        if (values is! List) continue;
+        decoded[entry.key] = <int>[
+          for (final value in values)
+            if (value is num) value.toInt(),
         ];
       }
-      return progress;
+      return (day: day is String ? day : '', counts: decoded);
     } on Object {
-      return <String, List<int>>{};
+      return empty;
     }
   }
 

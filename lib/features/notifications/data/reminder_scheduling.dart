@@ -12,7 +12,11 @@ import 'reminder_planner.dart';
 /// cubit: reads the persisted city + reminder settings, composes the plan with
 /// the app's pinned AR strings and hands it to the scheduler. Best-effort by
 /// design — never throws (W7b v1).
-Future<void> scheduleReminders({
+///
+/// Returns the plan the scheduler received (empty when the read or the
+/// schedule failed), so the caller can tell whether an optional reminder made
+/// it into the new plan.
+Future<List<ScheduledReminder>> scheduleReminders({
   required CitySource city,
   required PrayerTimesPort prayer,
   required ReminderSettingsPort settings,
@@ -77,7 +81,9 @@ Future<void> scheduleReminders({
       ),
     );
     await scheduler.scheduleAll(plan);
+    return plan;
   } on Object {
     // A failed (re)schedule must never break boot or a screen (W7b v1).
+    return const <ScheduledReminder>[];
   }
 }

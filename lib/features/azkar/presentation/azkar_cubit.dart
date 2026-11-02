@@ -15,11 +15,14 @@ class AzkarCubit extends Cubit<AzkarState> {
   ///
   /// [savedState] is optional: without it the counters live in memory for the
   /// session (the v1.0 behaviour), so a storage failure never blocks reciting.
+  /// [clock] is the day seam for the once-a-day counter reset.
   AzkarCubit({
     required AzkarRepository repository,
     AzkarSavedStateSource? savedState,
+    DateTime Function()? clock,
   })  : _repository = repository,
         _savedState = savedState,
+        _clock = clock ?? DateTime.now,
         super(const AzkarState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -28,10 +31,18 @@ class AzkarCubit extends Cubit<AzkarState> {
 
   final AzkarRepository _repository;
   final AzkarSavedStateSource? _savedState;
+  final DateTime Function() _clock;
 
   List<AzkarCollection> _catalog = const [];
   int _searchSeq = 0;
   AzkarSavedState _saved = const AzkarSavedState();
+
+  /// Whether the stored state was merged already.
+  ///
+  /// The read happens once per cubit: after that [_saved] is the source of
+  /// truth, so a reload cannot resurrect a counter that a tap already
+  /// decremented while its write was still in flight.
+  bool _hydrated = false;
 
   /// Loads the collections, emits the browsing state, then hydrates the saved
   /// counters and favorites.
@@ -54,19 +65,25 @@ class AzkarCubit extends Cubit<AzkarState> {
       emit(const AzkarState.failed());
       return;
     }
-    await _hydrateSavedState();
+    if (!_hydrated) await _hydrateSavedState();
   }
 
-  /// Merges the stored counters and pins into the browsing state.
+  /// Merges the stored counters and pins into the browsing state, once.
+  ///
+  /// Counters from an earlier day are dropped: morning and evening azkar are
+  /// recited daily, so yesterday's finished session must not open at zeros.
   Future<void> _hydrateSavedState() async {
     final saved = await _readSavedState();
     if (isClosed) return;
-    _saved = saved;
+    _hydrated = true;
+    _saved = saved.day == _today
+        ? saved
+        : AzkarSavedState(favorites: saved.favorites);
     final state = this.state;
     if (state is AzkarBrowsing) {
       emit(state.copyWith(
         collections: _favoritesFirst(_catalog),
-        favorites: saved.favorites,
+        favorites: _saved.favorites,
       ));
     }
   }
@@ -142,6 +159,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     final favorites = <String>{..._saved.favorites};
     if (!favorites.remove(collectionId)) favorites.add(collectionId);
     _saved = AzkarSavedState(
+      day: _saved.day,
       remaining: _saved.remaining,
       favorites: favorites,
     );
@@ -209,11 +227,21 @@ class AzkarCubit extends Cubit<AzkarState> {
     }
   }
 
+  /// The local day stamp written with the counters.
+  String get _today {
+    final now = _clock();
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    return '${now.year}-$month-$day';
+  }
+
   Future<void> _persistRemaining(
       String collectionId, List<int> remaining) async {
     final source = _savedState;
     if (source == null) return;
+    final day = _today;
     _saved = AzkarSavedState(
+      day: day,
       remaining: {
         ..._saved.remaining,
         collectionId: List<int>.unmodifiable(remaining),
@@ -221,7 +249,7 @@ class AzkarCubit extends Cubit<AzkarState> {
       favorites: _saved.favorites,
     );
     try {
-      await source.saveRemaining(collectionId, remaining);
+      await source.saveRemaining(collectionId, remaining, day);
     } on Object catch (error, stackTrace) {
       dev.log('azkar counter write failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);

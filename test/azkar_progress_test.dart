@@ -4,6 +4,9 @@ import 'package:quran_yahdi/features/azkar/data/azkar_saved_state.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_cubit.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_state.dart';
 
+const String _today = '2026-11-02';
+final DateTime _now = DateTime(2026, 11, 2, 9);
+
 Map<String, dynamic> _catalog() => {
       'collections': [
         {
@@ -27,7 +30,15 @@ Map<String, dynamic> _catalog() => {
     };
 
 class _Source implements AzkarSavedStateSource {
+  _Source({this.alwaysReturnsInitialLoad = false});
+
   AzkarSavedState stored = const AzkarSavedState();
+
+  /// Simulates a read that lands before an in-flight write: the load returns
+  /// whatever the first read saw.
+  final bool alwaysReturnsInitialLoad;
+  late final AzkarSavedState _firstLoad = stored;
+
   bool throwOnLoad = false;
   bool throwOnSave = false;
   int remainingWrites = 0;
@@ -36,15 +47,24 @@ class _Source implements AzkarSavedStateSource {
   @override
   Future<AzkarSavedState> load() async {
     if (throwOnLoad) throw StateError('load');
-    return stored;
+    return alwaysReturnsInitialLoad ? _firstLoad : stored;
   }
 
   @override
-  Future<void> saveRemaining(String collectionId, List<int> remaining) async {
+  Future<void> saveRemaining(
+    String collectionId,
+    List<int> remaining,
+    String day,
+  ) async {
     if (throwOnSave) throw StateError('save');
     remainingWrites++;
+    final counts = stored.day == day
+        ? <String, List<int>>{...stored.remaining}
+        : <String, List<int>>{};
+    counts[collectionId] = remaining;
     stored = AzkarSavedState(
-      remaining: {...stored.remaining, collectionId: remaining},
+      day: day,
+      remaining: counts,
       favorites: stored.favorites,
     );
   }
@@ -54,6 +74,7 @@ class _Source implements AzkarSavedStateSource {
     if (throwOnSave) throw StateError('save');
     favoriteWrites++;
     stored = AzkarSavedState(
+      day: stored.day,
       remaining: stored.remaining,
       favorites: favorites,
     );
@@ -63,12 +84,14 @@ class _Source implements AzkarSavedStateSource {
 AzkarCubit _cubit({AzkarSavedStateSource? source}) => AzkarCubit(
       repository: AzkarRepository(loader: () async => _catalog()),
       savedState: source,
+      clock: () => _now,
     );
 
 void main() {
   test('saved counters resume, clamped to each item count', () async {
     final source = _Source()
       ..stored = const AzkarSavedState(
+        day: _today,
         remaining: {
           'morning': [9, 1],
         },
@@ -77,8 +100,7 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    final browsing = cubit.state as AzkarBrowsing;
-    cubit.open(browsing.collections.first);
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
 
     expect((cubit.state as AzkarReciting).remaining, [3, 1]);
   });
@@ -87,6 +109,7 @@ void main() {
       () async {
     final source = _Source()
       ..stored = const AzkarSavedState(
+        day: _today,
         remaining: {
           'morning': [1],
         },
@@ -100,6 +123,26 @@ void main() {
     expect((cubit.state as AzkarReciting).remaining, [1, 2]);
   });
 
+  test('counters stored on an earlier day open at full again', () async {
+    final source = _Source()
+      ..stored = const AzkarSavedState(
+        day: '2026-11-01',
+        remaining: {
+          'morning': [0, 0],
+        },
+        favorites: {'morning'},
+      );
+    final cubit = _cubit(source: source);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    final browsing = cubit.state as AzkarBrowsing;
+    expect(browsing.favorites, {'morning'}, reason: 'pins are not daily');
+    cubit.open(browsing.collections.first);
+
+    expect((cubit.state as AzkarReciting).remaining, [3, 2]);
+  });
+
   test('every tap persists the counters of the open collection', () async {
     final source = _Source();
     final cubit = _cubit(source: source);
@@ -111,13 +154,30 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect((cubit.state as AzkarReciting).remaining, [2, 2]);
+    expect(source.stored.day, _today);
     expect(source.stored.remaining['morning'], [2, 2]);
     expect(source.remainingWrites, 1);
+  });
+
+  test('a tap followed by back is not resurrected by a stale read', () async {
+    final source = _Source(alwaysReturnsInitialLoad: true);
+    final cubit = _cubit(source: source);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+    cubit.tapItem(0);
+    cubit.back();
+    await Future<void>.delayed(Duration.zero);
+
+    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+    expect((cubit.state as AzkarReciting).remaining, [2, 2]);
   });
 
   test('restart resets every counter to full and persists it', () async {
     final source = _Source()
       ..stored = const AzkarSavedState(
+        day: _today,
         remaining: {
           'morning': [0, 1],
         },

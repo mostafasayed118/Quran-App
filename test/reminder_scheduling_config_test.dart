@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
@@ -59,14 +61,40 @@ class _PrayerEmptyTomorrow extends _Prayer {
       PrayerChoice(PrayerName.dhuhr, DateTime(2026, 11, 2, 12));
 }
 
+/// Fajr exactly [fajr] today, every other prayer far in the future so Fajr is
+/// the chosen reminder regardless of the wall clock.
+class _PrayerAt implements PrayerTimesPort {
+  const _PrayerAt(this.fajr);
+
+  final DateTime fajr;
+
+  @override
+  List<PrayerChoice> today(CityCoordinates c, DateTime day) => [
+        PrayerChoice(PrayerName.fajr, fajr),
+        PrayerChoice(
+            PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 23, 59)),
+      ];
+
+  @override
+  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
+      PrayerChoice(PrayerName.dhuhr, fajr.add(const Duration(hours: 6)));
+}
+
 class _Scheduler implements ReminderSchedulerPort {
   List<ScheduledReminder>? plan;
+  int calls = 0;
+
+  /// Optional gate the test uses to hold one schedule in flight.
+  Future<void> Function()? onCall;
 
   @override
   Future<bool> ensurePermissions() async => true;
 
   @override
   Future<void> scheduleAll(List<ScheduledReminder> reminders) async {
+    calls++;
+    final gate = onCall;
+    if (gate != null) await gate();
     plan = reminders;
   }
 }
@@ -180,5 +208,65 @@ void main() {
     final soon = scheduler.plan!
         .singleWhere((reminder) => reminder.id == preAdhanReminderId);
     expect(soon.fireAt, DateTime(2026, 11, 2, 11, 50));
+  });
+
+  test('a plan that omits the optional alarm still clears it', () async {
+    // Same branch as the zero-lead case but reached with a positive lead: the
+    // chosen prayer is close enough that its pre-adhan instant has passed, so
+    // the planner drops id 4 while the stored setting still enables it. After
+    // a restart the binding has no memory of the previous plan, so the clear
+    // has to come from the plan itself.
+    final canceller = _Canceller();
+    final settings = ReminderSettings(
+      newTestDb(),
+      prayerConfig: _Config(
+        const PrayerConfig(
+            enabledPrayers: {PrayerName.fajr}, preAdhanMinutes: 15),
+      ),
+      preAdhanCanceller: canceller,
+    );
+    final scheduler = _Scheduler();
+    final now = DateTime.now();
+
+    await settings.reschedule(
+      city: const _City(),
+      prayer: _PrayerAt(now.add(const Duration(minutes: 5))),
+      scheduler: scheduler,
+    );
+
+    expect(scheduler.plan?.any((r) => r.id == preAdhanReminderId), isFalse);
+    expect(canceller.calls, 1);
+  });
+
+  test('overlapping reschedules serialize instead of interleaving', () async {
+    final entered = Completer<void>();
+    final release = Completer<void>();
+    final scheduler = _Scheduler();
+    scheduler.onCall = () async {
+      if (scheduler.calls == 1) {
+        entered.complete();
+        await release.future;
+      }
+    };
+    final settings = ReminderSettings(newTestDb());
+
+    final first = settings.reschedule(
+      city: const _City(),
+      prayer: _Prayer(),
+      scheduler: scheduler,
+    );
+    await entered.future;
+    final second = settings.reschedule(
+      city: const _City(),
+      prayer: _Prayer(),
+      scheduler: scheduler,
+    );
+    await Future<void>.delayed(Duration.zero);
+
+    expect(scheduler.calls, 1,
+        reason: 'the second replan waits for the first to finish');
+    release.complete();
+    await Future.wait([first, second]);
+    expect(scheduler.calls, 2);
   });
 }

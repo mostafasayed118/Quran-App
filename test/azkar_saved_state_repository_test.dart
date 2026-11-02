@@ -4,6 +4,8 @@ import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dar
 
 import 'support/test_db.dart';
 
+const String _day = '2026-11-02';
+
 void main() {
   test('counters and favorites round-trip through the settings table',
       () async {
@@ -13,10 +15,11 @@ void main() {
     expect((await repo.load()).remaining, isEmpty);
     expect((await repo.load()).favorites, isEmpty);
 
-    await repo.saveRemaining('morning', const [0, 2, 3]);
+    await repo.saveRemaining('morning', const [0, 2, 3], _day);
     await repo.saveFavorites({'morning', 'evening'});
 
     final reloaded = await AzkarSavedStateRepository(db).load();
+    expect(reloaded.day, _day);
     expect(reloaded.remaining['morning'], [0, 2, 3]);
     expect(reloaded.favorites, {'morning', 'evening'});
   });
@@ -25,13 +28,25 @@ void main() {
     final db = newTestDb();
     final repo = AzkarSavedStateRepository(db);
 
-    await repo.saveRemaining('morning', const [1, 1]);
-    await repo.saveRemaining('evening', const [2, 0]);
-    await repo.saveRemaining('morning', const [0, 0]);
+    await repo.saveRemaining('morning', const [1, 1], _day);
+    await repo.saveRemaining('evening', const [2, 0], _day);
+    await repo.saveRemaining('morning', const [0, 0], _day);
 
     final loaded = await repo.load();
     expect(loaded.remaining['morning'], [0, 0]);
     expect(loaded.remaining['evening'], [2, 0]);
+  });
+
+  test('a write on a new day replaces the previous day counters', () async {
+    final db = newTestDb();
+    final repo = AzkarSavedStateRepository(db);
+
+    await repo.saveRemaining('morning', const [0, 0], '2026-11-01');
+    await repo.saveRemaining('evening', const [1], '2026-11-02');
+
+    final loaded = await repo.load();
+    expect(loaded.day, '2026-11-02');
+    expect(loaded.remaining.keys, ['evening']);
   });
 
   test('malformed rows degrade to an empty state', () async {
@@ -51,6 +66,7 @@ void main() {
     final repo = AzkarSavedStateRepository(db);
 
     final loaded = await repo.load();
+    expect(loaded.day, isEmpty);
     expect(loaded.remaining, isEmpty);
     expect(loaded.favorites, isEmpty);
   });
@@ -60,7 +76,7 @@ void main() {
     await db.into(db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: AzkarSavedStateRepository.progressKey,
-            value: '{"morning":[1,"x",2]}',
+            value: '{"day":"$_day","counts":{"morning":[1,"x",2]}}',
           ),
         );
     await db.into(db.settingsTable).insertOnConflictUpdate(
@@ -76,19 +92,22 @@ void main() {
     expect(loaded.favorites, {'morning'});
   });
 
-  test('a progress row with a non-list value is ignored, not thrown', () async {
+  test('a progress row with a non-map payload is ignored, not thrown',
+      () async {
     final db = newTestDb();
     await db.into(db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: AzkarSavedStateRepository.progressKey,
-            value: '{"morning":"three"}',
+            value: '{"day":"$_day","counts":"three"}',
           ),
         );
 
-    expect((await AzkarSavedStateRepository(db).load()).remaining, isEmpty);
+    final loaded = await AzkarSavedStateRepository(db).load();
+    expect(loaded.remaining, isEmpty);
+    expect(loaded.day, isEmpty);
   });
 
-  test('values survive a schema-typed settings write', () async {
+  test('an unrelated settings row is left untouched', () async {
     final db = newTestDb();
     await db.into(db.settingsTable).insertOnConflictUpdate(
           SettingsTableCompanion.insert(
@@ -97,7 +116,7 @@ void main() {
           ),
         );
     final repo = AzkarSavedStateRepository(db);
-    await repo.saveRemaining('morning', const [3]);
+    await repo.saveRemaining('morning', const [3], _day);
 
     final row = await (db.select(db.settingsTable)
           ..where((s) => s.key.equals('unrelated')))

@@ -5,6 +5,7 @@ import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 
+import 'reminder_planner.dart' show preAdhanReminderId;
 import 'reminder_scheduling.dart';
 
 /// The reminder settings keys (A1 supersedes the earlier two-key ruling:
@@ -123,8 +124,33 @@ class ReminderSettings
   /// The port contract is "never throws": a failed prayer-toggle read
   /// degrades to the historical enabled behaviour instead of failing the
   /// re-plan.
+  ///
+  /// Calls are serialized: the callers fire replans unawaited, and an older
+  /// snapshot (say the tap that turned the early reminder off) must never
+  /// reach the scheduler after a newer one. The config is read inside the
+  /// queued run, so the last caller always plans with the newest settings.
   @override
   Future<void> reschedule({
+    required CitySource city,
+    required PrayerTimesPort prayer,
+    required ReminderSchedulerPort scheduler,
+  }) {
+    final previous = _rescheduleQueue;
+    final run = () async {
+      if (previous != null) {
+        try {
+          await previous;
+        } on Object {
+          // Every run swallows its own failures; keep the chain alive.
+        }
+      }
+      await _rescheduleNow(city: city, prayer: prayer, scheduler: scheduler);
+    }();
+    _rescheduleQueue = run;
+    return run;
+  }
+
+  Future<void> _rescheduleNow({
     required CitySource city,
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
@@ -136,17 +162,7 @@ class ReminderSettings
       // Fall through with the default.
     }
     final config = _prayerConfig?.current ?? PrayerConfig.egyptian;
-    // The optional id 4 is not in the fixed trio; clear it whenever the new
-    // config cannot schedule it (master switch off, all prayers off, or a
-    // zero lead time). This also covers a restart, where the in-memory
-    // last-plan ids are empty.
-    final needsPreAdhanCancel = !enabled ||
-        config.preAdhanMinutes == 0 ||
-        config.enabledPrayers.isEmpty;
-    if (needsPreAdhanCancel) {
-      await _preAdhanCanceller?.cancelPreAdhan();
-    }
-    await scheduleReminders(
+    final plan = await scheduleReminders(
       city: city,
       prayer: prayer,
       settings: this,
@@ -154,5 +170,15 @@ class ReminderSettings
       prayerEnabled: enabled,
       config: config,
     );
+    // The optional id 4 is not one of the fixed planner ids, so a plan that
+    // omits it (master switch off, no enabled prayer, a zero lead time, or a
+    // lead time that already passed) must clear it explicitly — including
+    // after a restart, when the binding has no memory of the last plan.
+    if (!plan.any((reminder) => reminder.id == preAdhanReminderId)) {
+      await _preAdhanCanceller?.cancelPreAdhan();
+    }
   }
+
+  /// The tail of the reschedule chain (see [reschedule]).
+  Future<void>? _rescheduleQueue;
 }
