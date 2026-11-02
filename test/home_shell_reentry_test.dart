@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:quran_yahdi/app/route_observer.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/core/utils/app_routes.dart';
@@ -91,22 +92,78 @@ _Harness _buildHarness() {
   return _Harness(cubit: cubit, loads: counting, router: router);
 }
 
+/// The production shape: Home and the three tile destinations inside a
+/// `ShellRoute`, the reader as a root-level route above it, and the app's
+/// route observer on the router (go_router injects it into the shell's
+/// Navigator too).
+_Harness _buildShellHarness() {
+  final db = newTestDb();
+  final counting = _CountingLastRead(LastReadRepository(db));
+  final cubit = HomeCubit(
+    lastRead: counting,
+    ayahs: AyahRepository(db),
+    prayer: FakePrayerTimeService(),
+    city: CityRepository(db: db, loader: () async => [cairoCity.toJson()]),
+  );
+  addTearDown(cubit.close);
+
+  final router = GoRouter(
+    initialLocation: AppRoutes.home,
+    observers: [appRouteObserver],
+    routes: [
+      ShellRoute(
+        builder: (_, __, child) => Scaffold(body: child),
+        routes: [
+          GoRoute(
+            path: AppRoutes.home,
+            builder: (_, __) => BlocProvider<HomeCubit>.value(
+              value: cubit,
+              child: const HomeScreen(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.quran,
+            builder: (_, __) => const Scaffold(body: Text('QURAN-STUB')),
+          ),
+          GoRoute(
+            path: AppRoutes.prayerTimes,
+            builder: (_, __) => const Scaffold(body: Text('PRAYER-STUB')),
+          ),
+          GoRoute(
+            path: AppRoutes.azkar,
+            builder: (_, __) => const Scaffold(body: Text('AZKAR-STUB')),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.reader,
+        builder: (_, __) => const Scaffold(body: Text('READER-STUB')),
+      ),
+    ],
+  );
+  addTearDown(router.dispose);
+
+  return _Harness(cubit: cubit, loads: counting, router: router);
+}
+
+Widget _app(GoRouter router) => MaterialApp.router(
+      routerConfig: router,
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: AppTheme.light,
+    );
+
 Future<int> _pumpHome(WidgetTester tester, _Harness harness) async {
   await harness.cubit.start();
   final afterStart = harness.reloads;
 
-  await tester.pumpWidget(MaterialApp.router(
-    routerConfig: harness.router,
-    locale: const Locale('ar'),
-    supportedLocales: const [Locale('ar'), Locale('en')],
-    localizationsDelegates: const [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    theme: AppTheme.light,
-  ));
+  await tester.pumpWidget(_app(harness.router));
   await _pumpRounds(tester);
   return afterStart;
 }
@@ -162,5 +219,45 @@ void main() {
     // Left alone on Home, no further location event may reload it.
     await _pumpRounds(tester, rounds: 16);
     expect(harness.reloads, afterStart + 2);
+  });
+
+  testWidgets('inside the shell, the reader round trip still reloads once',
+      (tester) async {
+    final harness = _buildShellHarness();
+    final afterStart = await _pumpHome(tester, harness);
+    expect(harness.reloads, afterStart);
+
+    unawaited(harness.router.push(AppRoutes.reader));
+    await _pumpRounds(tester);
+    expect(find.text('READER-STUB'), findsOneWidget);
+
+    harness.router.pop();
+    await _pumpRounds(tester);
+    expect(harness.reloads, afterStart + 1,
+        reason: 'a reader return crosses navigators, so only the location '
+            'listener fires');
+  });
+
+  testWidgets('a shell-owned tile round trip reloads twice', (tester) async {
+    final harness = _buildShellHarness();
+    final afterStart = await _pumpHome(tester, harness);
+
+    unawaited(harness.router.push(AppRoutes.quran));
+    await _pumpRounds(tester);
+    expect(find.text('QURAN-STUB'), findsOneWidget);
+    expect(harness.reloads, afterStart,
+        reason: 'the inner page sitting on Home must not reload it');
+
+    harness.router.pop();
+    await _pumpRounds(tester);
+    expect(find.text('QURAN-STUB'), findsNothing);
+
+    // Measured, accepted duplication: a shell-child push lands in the shell's
+    // own navigator, so the route observer delivers `didPopNext` AND the
+    // location changes back to /home — two `reload()` calls for one return.
+    // User-invisible: `reload()` emits no loading state and the cubit's
+    // sequence token lets only the newest load emit.
+    expect(harness.reloads, afterStart + 2,
+        reason: 'inner push: didPopNext + location event = 2 reloads');
   });
 }
