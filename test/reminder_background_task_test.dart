@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/app/reminder_background_task.dart';
@@ -26,5 +28,28 @@ void main() {
     expect(reminderRefreshUniqueName, 'quran_yahdi_reminder_refresh');
     expect(reminderRefreshTask, 'reminderRefresh');
     expect(reminderRefreshFrequency, const Duration(minutes: 30));
+  });
+
+  test('the stamp keeps a bounded history', () async {
+    final file =
+        File('${Directory.systemTemp.path}/reminder_refresh_stamp.txt');
+    if (file.existsSync()) file.deleteSync();
+    addTearDown(() {
+      if (file.existsSync()) file.deleteSync();
+    });
+
+    for (var run = 0; run < stampHistory + 5; run++) {
+      await stampReminderRefresh('run$run');
+    }
+
+    final lines = await file.readAsLines();
+    expect(file.existsSync(), isTrue);
+    expect(
+      lines,
+      hasLength(stampHistory),
+      reason: 'a task every half hour must not grow an unbounded file',
+    );
+    expect(lines.last, contains('run${stampHistory + 4}'));
+    expect(lines.first, isNot(contains('run0')));
   });
 }

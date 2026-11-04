@@ -1,4 +1,5 @@
 import 'dart:developer' as dev;
+import 'dart:io';
 import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:flutter/widgets.dart';
@@ -21,6 +22,9 @@ const String reminderRefreshUniqueName = 'quran_yahdi_reminder_refresh';
 /// running right after a boot that lasted longer than half an hour — the case
 /// where the platform's own restore would otherwise replay stale instants.
 const Duration reminderRefreshFrequency = Duration(minutes: 30);
+
+/// How many stamp lines the device check keeps (see [stampReminderRefresh]).
+const int stampHistory = 40;
 
 /// Entry point invoked by the OS in a background isolate.
 ///
@@ -56,7 +60,38 @@ Future<bool> runReminderRefreshTask(Future<void> Function() body) async {
       error: error.runtimeType,
       stackTrace: stackTrace,
     );
+    await stampReminderRefresh('failed:${error.runtimeType}');
     return false;
+  }
+}
+
+/// Durable record of a background run, for the on-device check.
+///
+/// `adb shell run-as <pkg> cat cache/reminder_refresh_stamp.txt` answers "did
+/// the isolate ever run?" — a background isolate prints nothing and a silent
+/// failure looks exactly like a task that never started. Uses the temp dir on
+/// purpose: it needs no plugin, so the stamp cannot fail for the same reason
+/// the refresh did.
+///
+/// Keeps the last [stampHistory] lines: the task runs every half hour, so an
+/// append-only file would grow without bound on a phone that is never updated.
+Future<void> stampReminderRefresh(String outcome) async {
+  try {
+    final file =
+        File('${Directory.systemTemp.path}/reminder_refresh_stamp.txt');
+    final kept = <String>[];
+    if (file.existsSync()) {
+      final lines = await file.readAsLines();
+      if (lines.length >= stampHistory) {
+        kept.addAll(lines.sublist(lines.length - stampHistory + 1));
+      } else {
+        kept.addAll(lines);
+      }
+    }
+    kept.add('${DateTime.now().toIso8601String()} $outcome');
+    await file.writeAsString('${kept.join('\n')}\n', flush: true);
+  } on Object {
+    // Diagnostics only: losing the stamp must never fail the refresh.
   }
 }
 
@@ -68,6 +103,8 @@ Future<bool> runReminderRefreshTask(Future<void> Function() body) async {
 /// handing it a plan — the plugin is the only writer of the alarms, and a plan
 /// queued against an uninitialized binding would be lost with the isolate.
 Future<void> refreshRemindersForBackground() async {
+  // First thing, before any plugin: proves the isolate actually started.
+  await stampReminderRefresh('start');
   dev.log('reminder refresh task started', name: 'quran_yahdi/background');
   WidgetsFlutterBinding.ensureInitialized();
   // Plugins that register Dart-side handlers in a secondary isolate need this;
@@ -83,4 +120,5 @@ Future<void> refreshRemindersForBackground() async {
   await getIt<AppLocaleController>().load();
   await getIt<NotificationsBinding>().init();
   await runBootReminderSchedule();
+  await stampReminderRefresh('ok');
 }

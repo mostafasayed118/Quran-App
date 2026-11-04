@@ -120,6 +120,10 @@ Future<void> _registerBackgroundReminders() async {
       reminderRefreshUniqueName,
       reminderRefreshTask,
       frequency: reminderRefreshFrequency,
+      // The first run lands right after the task is first registered, so the
+      // background path proves itself on a fresh install instead of waiting a
+      // full period — and a device check does not have to sit for 30 minutes.
+      initialDelay: const Duration(seconds: 15),
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
   } on Object catch (error, stackTrace) {
