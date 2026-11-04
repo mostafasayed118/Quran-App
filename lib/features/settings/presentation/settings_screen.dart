@@ -470,4 +470,7 @@ Future<void> _pickLanguage(
   );
   if (selected == null) return;
   await controller.setLanguage(selected);
+  // The reminder copy is localized at schedule time: re-plan so a pending
+  // notification does not keep yesterday's language in the shade.
+  if (context.mounted) await context.read<SettingsCubit>().refreshReminders();
 }

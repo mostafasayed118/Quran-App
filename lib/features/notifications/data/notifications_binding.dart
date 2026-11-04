@@ -399,16 +399,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
   }
 
-  /// Cancels the previous reminder alarms and schedules [reminders].
-  ///
-  /// The clear is TARGETED: only the ids the planner owns are cancelled.
-  /// A blanket `cancelAll()` would also wipe every other notification the
-  /// app posted — most visibly the playback notification owned by
-  /// `just_audio_background` — and this path runs at boot, on the prayer
-  /// screen load, on a city change and on a settings save.
-  ///
-  /// The plan fingerprint skips the platform round-trip when the new plan
-  /// The details to post [reminder] with.
+  /// The notification details to post [reminder] with.
   ///
   /// One Android channel per reciter is deliberate: the OS freezes a channel's
   /// sound at creation, so a single shared channel would leave every existing
@@ -450,6 +441,15 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     );
   }
 
+  /// Cancels the previous reminder alarms and schedules [reminders].
+  ///
+  /// The clear is TARGETED: only the ids the planner owns are cancelled.
+  /// A blanket `cancelAll()` would also wipe every other notification the
+  /// app posted — most visibly the playback notification owned by
+  /// `just_audio_background` — and this path runs at boot, on the prayer
+  /// screen load, on a city change and on a settings save.
+  ///
+  /// The plan fingerprint skips the platform round-trip when the new plan
   /// schedules exactly the same alarms as the applied one.
   Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
@@ -499,15 +499,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     }
   }
 
-  /// A deterministic fingerprint of a reminder plan: the reminders sorted by
-  /// id, each with its fire instant and its visible copy.
-  ///
-  /// Two plans with the same fingerprint schedule exactly the same alarms, so
-  /// the second one can skip the platform round-trip. The copy is part of the
-  /// fingerprint on purpose: a renamed reciter changes what the shade shows
-  /// and must therefore re-register the alarm.
-  /// The identity of a plan, for "is this the same schedule we already
-  /// applied?".
+  /// A deterministic fingerprint of a reminder plan.
   ///
   /// Every field that changes what the platform must do belongs here — the
   /// adhan included: a plan that differs only in the chosen reciter must still

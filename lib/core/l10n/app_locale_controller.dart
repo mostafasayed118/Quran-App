@@ -4,6 +4,7 @@ import 'dart:ui' show Locale;
 import 'package:flutter/foundation.dart';
 
 import '../domain/app_locale.dart';
+import 'platform_localizations.dart';
 
 /// The locales the app advertises to the OS and to `MaterialApp`.
 ///
@@ -44,6 +45,7 @@ class AppLocaleController extends ChangeNotifier {
       _language = AppLanguage.arabic;
     }
     _loaded = true;
+    _publish();
     notifyListeners();
   }
 
@@ -51,6 +53,7 @@ class AppLocaleController extends ChangeNotifier {
   Future<void> setLanguage(AppLanguage language) async {
     if (language == _language) return;
     _language = language;
+    _publish();
     notifyListeners();
     try {
       await _source.save(language);
@@ -59,4 +62,8 @@ class AppLocaleController extends ChangeNotifier {
           name: 'quran_yahdi/locale', error: error, stackTrace: stackTrace);
     }
   }
+
+  /// Keeps the outside-the-tree surfaces (notification copy, channel name) in
+  /// step with the widget tree.
+  void _publish() => platformLanguage = _language;
 }

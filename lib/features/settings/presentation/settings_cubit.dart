@@ -230,6 +230,13 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
+  /// Re-composes the pending reminders without changing a setting.
+  ///
+  /// The notification copy is localized when the alarm is SCHEDULED, so a
+  /// language switch has to re-plan for the shade to follow; the scheduler
+  /// fingerprint skips the platform round-trip when nothing else changed.
+  Future<void> refreshReminders() => _rescheduleBestEffort();
+
   /// Re-planning is best-effort: the setting is already persisted and shown;
   /// the next boot/settings load retries the schedule.
   Future<void> _rescheduleBestEffort() async {
