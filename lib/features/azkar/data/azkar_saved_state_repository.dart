@@ -20,6 +20,14 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
 
   final AppDatabase _db;
 
+  /// Tail of the progress write chain.
+  ///
+  /// A save is a read-modify-write over ONE JSON row: two overlapping saves
+  /// (a tap, back, tap another collection) can both read the same row before
+  /// either writes, and the second would drop the first collection's update.
+  /// Writes are chained so each merge sees the previous result.
+  Future<void> _writeQueue = Future<void>.value();
+
   @override
   Future<AzkarSavedState> load() async {
     final rows = await (_db.select(_db.settingsTable)
@@ -41,20 +49,30 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
     String collectionId,
     List<int> remaining,
     String day,
-  ) async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(progressKey)))
-        .getSingleOrNull();
-    final stored = _decodeProgress(row?.value);
-    // A new day starts a fresh set: yesterday's counters must not ride along.
-    final counts = stored.day == day
-        ? <String, List<int>>{...stored.counts}
-        : <String, List<int>>{};
-    counts[collectionId] = List<int>.unmodifiable(remaining);
-    await _write(
-      progressKey,
-      jsonEncode({'day': day, 'counts': counts}),
-    );
+  ) {
+    final previous = _writeQueue;
+    final run = () async {
+      try {
+        await previous;
+      } on Object {
+        // A failed earlier write must not block this one.
+      }
+      final row = await (_db.select(_db.settingsTable)
+            ..where((setting) => setting.key.equals(progressKey)))
+          .getSingleOrNull();
+      final stored = _decodeProgress(row?.value);
+      // A new day starts a fresh set: yesterday's counters must not ride along.
+      final counts = stored.day == day
+          ? <String, List<int>>{...stored.counts}
+          : <String, List<int>>{};
+      counts[collectionId] = List<int>.unmodifiable(remaining);
+      await _write(
+        progressKey,
+        jsonEncode({'day': day, 'counts': counts}),
+      );
+    }();
+    _writeQueue = run;
+    return run;
   }
 
   @override

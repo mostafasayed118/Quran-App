@@ -119,8 +119,27 @@ class AzkarCubit extends Cubit<AzkarState> {
 
   /// Opens a collection in the reciting view, resuming the saved counters
   /// when there are any (every item starts full otherwise).
+  ///
+  /// The tiles are tappable while the stored state is still being read, so an
+  /// open that arrives before hydration waits for it: starting from the empty
+  /// cache would show full counters and then persist those over saved
+  /// progress. Once hydrated the open is synchronous.
   void open(AzkarCollection collection) {
     if (isClosed) return;
+    if (_hydrated) {
+      _emitReciting(collection);
+      return;
+    }
+    unawaited(_hydrateThenOpen(collection));
+  }
+
+  Future<void> _hydrateThenOpen(AzkarCollection collection) async {
+    await _hydrateSavedState();
+    if (isClosed) return;
+    _emitReciting(collection);
+  }
+
+  void _emitReciting(AzkarCollection collection) {
     _searchSeq++;
     emit(AzkarState.reciting(
       collection: collection,
