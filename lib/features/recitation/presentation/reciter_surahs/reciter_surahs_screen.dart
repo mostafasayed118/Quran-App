@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -84,17 +85,13 @@ class ReciterSurahsScreen extends StatelessWidget {
   }
 
   Future<void> _setDefault(BuildContext context) async {
-    await context.read<ReciterSurahsCubit>().setAsDefault();
-    if (!context.mounted) return;
-    final colors = Theme.of(context).colorScheme;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          AppLocalizations.of(context).defaultReciterSet,
-          style: TextStyle(color: colors.onPrimary),
-        ),
-        backgroundColor: colors.primary,
-      ),
+    final loc = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final saved = await context.read<ReciterSurahsCubit>().setAsDefault();
+    AppToast.showOn(
+      messenger,
+      saved ? loc.defaultReciterSet : loc.genericError,
+      tone: saved ? ToastTone.success : ToastTone.error,
     );
   }
 }
@@ -155,14 +152,14 @@ class _SurahDownloadRow extends StatelessWidget {
       title: loc.libraryDelete,
       body: name,
     );
-    if (confirmed) {
-      final removed = await cubit.removeDone(reciter.id, surahNumber);
-      if (!removed && context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(loc.genericError)),
-        );
-      }
-    }
+    if (!confirmed || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final removed = await cubit.removeDone(reciter.id, surahNumber);
+    AppToast.showOn(
+      messenger,
+      removed ? loc.downloadDeleted : loc.genericError,
+      tone: removed ? ToastTone.success : ToastTone.error,
+    );
   }
 
   Widget _buildLeading(BuildContext context, ColorScheme colors) {

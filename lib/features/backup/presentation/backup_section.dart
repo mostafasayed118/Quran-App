@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
@@ -26,13 +27,17 @@ class BackupSection extends StatelessWidget {
       listener: (context, state) {
         switch (state) {
           case BackupExported():
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(loc.backupExportSuccess)),
+            AppToast.show(
+              context,
+              loc.backupExportSuccess,
+              tone: ToastTone.success,
             );
             cubit.acknowledge();
           case BackupImported():
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(loc.backupImportSuccess)),
+            AppToast.show(
+              context,
+              loc.backupImportSuccess,
+              tone: ToastTone.success,
             );
             cubit.acknowledge();
           case BackupPreviewReady(:final summary):

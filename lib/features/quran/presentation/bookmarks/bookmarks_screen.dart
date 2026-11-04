@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -103,7 +104,13 @@ class _BookmarkList extends StatelessWidget {
       body: loc.bookmarkRemoveBody,
     );
     if (!context.mounted || !confirmed) return;
-    await cubit.remove(ayahId);
+    final removed = await cubit.remove(ayahId);
+    if (!context.mounted) return;
+    AppToast.show(
+      context,
+      removed ? loc.bookmarkRemoved : loc.genericError,
+      tone: removed ? ToastTone.success : ToastTone.error,
+    );
   }
 
   Widget _tail(BuildContext context, AppLocalizations loc) {

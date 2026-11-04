@@ -53,15 +53,26 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   /// Removes the bookmark of [ayahId]; a row that is already unbookmarked
   /// stays removed (the reader star keeps the toggle).
-  Future<void> remove(int ayahId) async {
-    await _repo.deleteBookmark(ayahId);
-    if (isClosed) return;
+  ///
+  /// Returns whether the delete landed. The screen confirms it, and an
+  /// unhandled repository error would otherwise leave the row on screen with
+  /// no explanation.
+  Future<bool> remove(int ayahId) async {
+    try {
+      await _repo.deleteBookmark(ayahId);
+    } on Object catch (error, stackTrace) {
+      dev.log('delete bookmark failed',
+          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      return false;
+    }
+    if (isClosed) return false;
     _first = [
       for (final entry in _first)
         if (entry.ayah.id != ayahId) entry
     ];
     _older.removeWhere((entry) => entry.ayah.id == ayahId);
     _emit();
+    return true;
   }
 
   /// Appends the next older page; a no-op while there is none.

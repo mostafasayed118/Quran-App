@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -61,12 +62,11 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final removed = await cubit.removeDone(item.rowId, item.surahNumber);
     if (!mounted) return;
     if (!removed) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(loc.genericError)),
-      );
+      AppToast.show(context, loc.genericError, tone: ToastTone.error);
       return;
     }
     _reload();
+    AppToast.show(context, loc.downloadDeleted, tone: ToastTone.success);
   }
 
   /// Deletes every installed download. A failure replaces the future, so the
@@ -81,9 +81,23 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       body: loc.downloadsDeleteAllBody,
     );
     if (!confirmed || !mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final future = _removeAllThenRead(cubit);
     setState(() {
-      _data = _removeAllThenRead(cubit);
+      _data = future;
     });
+    try {
+      await future;
+    } on Object {
+      // The builder renders this future's error pane; a toast would only
+      // repeat what the pane already says.
+      return;
+    }
+    AppToast.showOn(
+      messenger,
+      loc.downloadsDeletedAll,
+      tone: ToastTone.success,
+    );
   }
 
   static Future<_DownloadsView> _removeAllThenRead(DownloadsCubit cubit) async {

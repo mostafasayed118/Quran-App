@@ -73,16 +73,19 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
 
   /// Makes this reciter the default one (the moshaf selection).
   ///
-  /// A storage failure is logged, never surfaced: the screen discards the
-  /// returned future, so the failure must not become an unhandled error.
-  Future<void> setAsDefault() async {
+  /// A storage failure is logged, never thrown: the screen owns the copy and
+  /// would otherwise have to show a success message for a write that failed.
+  /// Returns whether the selection landed.
+  Future<bool> setAsDefault() async {
     try {
       await _reciters.selectMoshaf(_rowId);
+      return true;
     } on Object catch (error, stackTrace) {
       dev.log('select moshaf failed',
           name: 'quran_yahdi/reciter_surahs',
           error: error,
           stackTrace: stackTrace);
+      return false;
     }
   }
 }

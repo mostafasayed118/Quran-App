@@ -241,6 +241,28 @@ abstract final class AppTheme {
         // `space` is left at the Material default: untouched screens
         // (settings, licenses) use a bare `Divider()` for section spacing.
       ),
+      // The safety net behind `AppToast`: a raw SnackBar (or one a future
+      // screen writes without the helper) still reads as this app — paper
+      // surface, hairline, soft elevation — instead of Material's dark
+      // inverse bar.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: colorScheme.surface,
+        contentTextStyle: TextStyle(
+          fontFamily: QuranFonts.ui,
+          fontSize: 14,
+          height: 1.6,
+          color: colorScheme.onSurface,
+        ),
+        actionTextColor: isLight ? AppColors.goldText : AppColors.gold,
+        elevation: 3,
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadius.mdAll,
+          side: BorderSide(
+            color: isLight ? AppColors.hairline : AppColors.darkHairline,
+          ),
+        ),
+      ),
     );
   }
 }

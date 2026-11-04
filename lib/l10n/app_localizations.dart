@@ -302,6 +302,18 @@ abstract class AppLocalizations {
   /// **'أزل الحفظ'**
   String get bookmarkRemove;
 
+  /// No description provided for @bookmarkSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حفظ الآية'**
+  String get bookmarkSaved;
+
+  /// No description provided for @bookmarkRemoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم إزالة الحفظ'**
+  String get bookmarkRemoved;
+
   /// No description provided for @shareAyah.
   ///
   /// In ar, this message translates to:
@@ -1639,6 +1651,18 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'ستُحذف كل التلاوات المنزّلة من جهازك.'**
   String get downloadsDeleteAllBody;
+
+  /// No description provided for @downloadDeleted.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف التنزيل'**
+  String get downloadDeleted;
+
+  /// No description provided for @downloadsDeletedAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم حذف كل التنزيلات'**
+  String get downloadsDeletedAll;
 
   /// No description provided for @licensesQuranUthmani.
   ///

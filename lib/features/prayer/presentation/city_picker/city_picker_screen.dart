@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -104,13 +105,13 @@ class _MyLocationTile extends StatelessWidget {
     if (city != null) {
       navigator.pop(true);
     } else {
-      messenger.showSnackBar(SnackBar(
-        content: Text(loc.locationUnavailable),
-        action: SnackBarAction(
-          label: loc.locationSettings,
-          onPressed: () => cubit.openLocationSettings(),
-        ),
-      ));
+      AppToast.showOn(
+        messenger,
+        loc.locationUnavailable,
+        tone: ToastTone.error,
+        actionLabel: loc.locationSettings,
+        onAction: cubit.openLocationSettings,
+      );
     }
   }
 }
@@ -169,9 +170,7 @@ class _ResultTile extends StatelessWidget {
           Navigator.of(context).pop(true);
           return;
         }
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(loc.genericError)),
-        );
+        AppToast.show(context, loc.genericError, tone: ToastTone.error);
       },
     );
   }

@@ -118,6 +118,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkRemove => 'Remove bookmark';
 
   @override
+  String get bookmarkSaved => 'Verse saved';
+
+  @override
+  String get bookmarkRemoved => 'Bookmark removed';
+
+  @override
   String get shareAyah => 'Share verse';
 
   @override
@@ -892,6 +898,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get downloadsDeleteAllBody =>
       'Every downloaded recitation will be removed from your device.';
+
+  @override
+  String get downloadDeleted => 'Download deleted';
+
+  @override
+  String get downloadsDeletedAll => 'All downloads deleted';
 
   @override
   String get licensesQuranUthmani =>

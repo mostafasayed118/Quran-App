@@ -8,6 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -33,9 +34,7 @@ class TrackerScreen extends StatelessWidget {
             current is TrackerReady &&
             current.actionFailed,
         listener: (context, state) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(loc.genericError)),
-          );
+          AppToast.show(context, loc.genericError, tone: ToastTone.error);
           context.read<TrackerCubit>().acknowledgeActionFailure();
         },
         child: BlocBuilder<TrackerCubit, TrackerState>(

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'tasbih_cubit.dart';
 import 'tasbih_state.dart';
@@ -169,8 +170,10 @@ class _TargetChips extends StatelessWidget {
             selected: ready.target == target,
             onSelected: (_) {
               context.read<TasbihCubit>().selectTarget(target);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(loc.tasbihTargetSet)),
+              AppToast.show(
+                context,
+                loc.tasbihTargetSet,
+                tone: ToastTone.info,
               );
             },
           ),

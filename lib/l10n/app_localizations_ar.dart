@@ -117,6 +117,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarkRemove => 'أزل الحفظ';
 
   @override
+  String get bookmarkSaved => 'تم حفظ الآية';
+
+  @override
+  String get bookmarkRemoved => 'تم إزالة الحفظ';
+
+  @override
   String get shareAyah => 'مشاركة الآية';
 
   @override
@@ -886,6 +892,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get downloadsDeleteAllBody => 'ستُحذف كل التلاوات المنزّلة من جهازك.';
+
+  @override
+  String get downloadDeleted => 'تم حذف التنزيل';
+
+  @override
+  String get downloadsDeletedAll => 'تم حذف كل التنزيلات';
 
   @override
   String get licensesQuranUthmani =>
