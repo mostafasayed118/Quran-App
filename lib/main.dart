@@ -4,11 +4,13 @@ import 'dart:developer' as dev;
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
 import 'app/di/injector.dart';
 import 'app/onboarding_gate.dart';
+import 'app/reminder_background_task.dart';
 import 'app/router.dart';
 import 'core/domain/adhan_player.dart';
 import 'core/l10n/app_locale_controller.dart';
@@ -100,7 +102,34 @@ Future<void> _initPlugins(String audioChannelName) async {
   unawaited(_openDeepLinkLaunchTarget());
   _listenForDeepLinks();
   unawaited(runBootReminderSchedule());
+  unawaited(_registerBackgroundReminders());
   unawaited(_warmReciterCatalog());
+}
+
+/// Registers the periodic background re-plan (WorkManager).
+///
+/// Behind the first frame and best-effort: a platform without WorkManager, a
+/// test host or a refused registration must never affect boot. The schedule is
+/// already applied by [runBootReminderSchedule]; this keeps the rolling window
+/// fresh (and recovers the alarms right after a long boot) while the app stays
+/// closed. Registration is idempotent — the platform keeps the existing task.
+Future<void> _registerBackgroundReminders() async {
+  try {
+    await Workmanager().initialize(reminderTaskDispatcher);
+    await Workmanager().registerPeriodicTask(
+      reminderRefreshUniqueName,
+      reminderRefreshTask,
+      frequency: reminderRefreshFrequency,
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+    );
+  } on Object catch (error, stackTrace) {
+    dev.log(
+      'background reminder registration failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
+  }
 }
 
 /// First-run warm-up for the audio catalog.
