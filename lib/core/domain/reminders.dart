@@ -44,11 +44,12 @@ class ScheduledReminder {
   final String? adhanId;
 
   /// Whether the OS must keep repeating this reminder daily at the same clock
-  /// time, and restore it after a reboot.
+  /// time.
   ///
   /// Only the fixed-time reminders (azkar, wird) set this: their fire time does
-  /// not move, so a daily repeat is exactly right and needs no app start to stay
-  /// alive. A prayer reminder must never set it — prayer times move every day.
+  /// not move, so a daily repeat is exactly right and the platform re-arms the
+  /// next occurrence on its own — no app start needed. A prayer reminder must
+  /// never set it: prayer times move every day.
   final bool repeatsDaily;
 }
 

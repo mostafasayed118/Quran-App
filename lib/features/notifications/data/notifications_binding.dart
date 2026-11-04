@@ -109,6 +109,13 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// (e.g. the pre-adhan id when the user turns it off) is still cleared.
   Set<int> _appliedPlanIds = const <int>{};
 
+  /// The exact-alarm grant the applied plan was scheduled with.
+  ///
+  /// The grant changes the schedule MODE (exact vs inexact), not the plan, so
+  /// it has to be part of the "already applied" test: granting the permission
+  /// again must upgrade the alarms instead of being deduped away.
+  bool? _appliedExact;
+
   /// The tail of the apply chain. A plan change reaches the binding from
   /// several callers (boot, settings, the prayer screen); the applies must
   /// never interleave, or a slower earlier plan would overwrite a newer one
@@ -460,12 +467,16 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
     if (details == null) return;
-    final fingerprint = planFingerprint(reminders);
-    if (fingerprint == _appliedPlan) return;
     try {
+      // The exact-alarm grant is part of "already applied": it decides the
+      // schedule MODE, not the plan, so a fingerprint match alone must not skip
+      // the re-apply — that is how a newly granted permission upgrades the
+      // alarms from inexact to exact.
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       final exact = await android?.canScheduleExactNotifications() ?? false;
+      final fingerprint = planFingerprint(reminders);
+      if (fingerprint == _appliedPlan && exact == _appliedExact) return;
       final mode = exact
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexactAllowWhileIdle;
@@ -502,6 +513,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
         );
       }
       _appliedPlan = fingerprint;
+      _appliedExact = exact;
     } on Object {
       // Best-effort v1: a failed schedule surfaces only in the device smoke.
     }

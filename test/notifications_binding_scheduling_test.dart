@@ -99,7 +99,12 @@ void main() {
     final before = calls.length;
     await binding.scheduleAll([_reminder(id: 1, title: 'Azkar')]);
 
-    expect(calls.length, before);
+    expect(
+      _methods(calls.sublist(before)),
+      ['canScheduleExactNotifications'],
+      reason: 'the mode probe runs on every apply (the exact-alarm grant can '
+          'change), but no alarm is cancelled or scheduled again',
+    );
   });
 
   test('the plan fingerprint is order-insensitive', () async {
@@ -112,7 +117,11 @@ void main() {
     final before = calls.length;
     await binding.scheduleAll([second, first]);
 
-    expect(calls.length, before);
+    expect(
+      _methods(calls.sublist(before)),
+      ['canScheduleExactNotifications'],
+      reason: 'same plan in another order = same alarms, so no re-schedule',
+    );
   });
 
   test('a title change re-registers the plan', () async {
@@ -168,6 +177,27 @@ void main() {
     await binding.scheduleAll([_reminder(id: 1)]);
 
     expect(_scheduleModes(calls), ['inexactAllowWhileIdle']);
+  });
+
+  test('granting exact alarms upgrades an already-applied plan', () async {
+    exact = false;
+    final binding = NotificationsBinding();
+    await binding.init();
+    final plan = [_reminder(id: 1)];
+    await binding.scheduleAll(plan);
+
+    expect(_scheduleModes(calls), ['inexactAllowWhileIdle']);
+
+    calls.clear();
+    exact = true;
+    await binding.scheduleAll(plan);
+
+    expect(
+      _scheduleModes(calls),
+      ['exactAllowWhileIdle'],
+      reason: 'the grant changes the schedule MODE, not the plan, so the '
+          'fingerprint alone must not dedupe the re-apply away',
+    );
   });
 
   test('a permission queued before init is applied before the plan', () async {
