@@ -1264,7 +1264,7 @@ shows these rows have moved:
 | SEC-07 | Same `applicationId` for debug/release | **fixed** | debug buildType adds `applicationIdSuffix = ".debug"` + `versionNameSuffix = "-debug"` |
 | REL-03 | Licensing open | **still open** | seven `OPEN-FOR-OWNER` rows in `docs/store/licensing-matrix.md` |
 | REL-04 | Only the upload-cert fingerprint is pinned | **still open** | `web/public/.well-known/assetlinks.json` has one fingerprint |
-| REL-05 | No R8 / shrink / symbol archive | **still open** | no `minifyEnabled` / `shrinkResources` in `build.gradle` |
+| REL-05 | No R8 / shrink / symbol archive | **mostly fixed — `mapping.txt` archival still open** | `android/app/build.gradle:91-93` sets `minifyEnabled true` + `shrinkResources true` + `proguardFiles`, and `:58-62` sets `ndk { debugSymbolLevel 'SYMBOL_TABLE' }`; `.github/workflows/ci.yml` still does not archive `mapping.txt` with the artifact |
 | REL-06 | No adaptive/monochrome icon; v31 splash omitted background | **still open** | no `mipmap-anydpi-v26` directory |
 | REL-08 | No crash channel / staged rollout / rollback doc | **still open** | no crash SDK; the runbook requires an owner decision first |
 

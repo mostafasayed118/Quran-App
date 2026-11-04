@@ -14,6 +14,7 @@ import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/lifecycle_ticker.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/service_tile.dart';
@@ -379,44 +380,26 @@ class _NextPrayerCard extends StatelessWidget {
   }
 }
 
-/// Counts down to [target] once a second.
+/// Counts down to [target] once a second, and only while the app is resumed.
 ///
 /// Kept as its own widget so the tick rebuilds one text line instead of the
-/// whole dashboard. The timer is cancelled with the widget; the parent cubit
-/// reloads the card when the prayer actually passes.
-class _LiveCountdown extends StatefulWidget {
+/// whole dashboard. The timer lives behind `LifecycleTicker`, so a dashboard
+/// left open behind another app stops waking the CPU every second; the parent
+/// cubit reloads the card when the prayer actually passes.
+class _LiveCountdown extends StatelessWidget {
   const _LiveCountdown({required this.target});
 
   final DateTime target;
 
   @override
-  State<_LiveCountdown> createState() => _LiveCountdownState();
-}
-
-class _LiveCountdownState extends State<_LiveCountdown> {
-  Timer? _ticker;
-
-  @override
-  void initState() {
-    super.initState();
-    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _ticker?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    return Text(
-      formatDurationHms(widget.target.difference(DateTime.now())),
-      style: AppTheme.heroValue.copyWith(color: colors.onPrimaryContainer),
-      maxLines: 2,
+    return LifecycleTicker(
+      builder: (context, _) => Text(
+        formatDurationHms(target.difference(DateTime.now())),
+        style: AppTheme.heroValue.copyWith(color: colors.onPrimaryContainer),
+        maxLines: 2,
+      ),
     );
   }
 }

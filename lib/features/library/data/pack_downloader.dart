@@ -302,9 +302,16 @@ class PackDownloader {
   }
 
   /// Fetches [start] while following at most [kMaxPackRedirectHops] redirects
-  /// manually. Every hop must stay on HTTPS and [kTrustedPackHosts]; Dio is not
-  /// allowed to follow a redirect it cannot re-validate.
+  /// manually. The seed itself and every redirect target must stay on HTTPS
+  /// and [kTrustedPackHosts]; Dio is not allowed to follow a redirect it
+  /// cannot re-validate.
   Future<Response<ResponseBody>> _fetchTrustedPack(Uri start) async {
+    if (!isTrustedPackUri(start)) {
+      throw PackFailure(
+        'pack source to untrusted destination '
+        '${start.scheme}://${start.host}',
+      );
+    }
     var current = start;
     for (var hop = 0; hop <= kMaxPackRedirectHops; hop++) {
       final res = await _dio.get<ResponseBody>(

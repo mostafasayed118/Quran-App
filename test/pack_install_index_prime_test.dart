@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -11,25 +12,52 @@ import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 
 import 'support/test_db.dart';
 
+/// One canned CDN response: a status code and a JSON body.
+typedef _Reply = ({int status, String body});
+
+/// Serves the scripted [handler] for every request. Same fake-adapter idiom as
+/// `pack_redirect_guard_test.dart`; the pack seed must be a trusted
+/// `https://cdn.jsdelivr.net` URL now.
+class _FakeCdn implements HttpClientAdapter {
+  Future<_Reply> Function(RequestOptions request)? handler;
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    final scripted = handler;
+    if (scripted == null)
+      throw StateError('unexpected request: ${options.uri}');
+    final reply = await scripted(options);
+    final bytes = Uint8List.fromList(utf8.encode(reply.body));
+    return ResponseBody(
+      Stream<Uint8List>.value(bytes),
+      reply.status,
+      headers: <String, List<String>>{
+        Headers.contentLengthHeader: ['${bytes.length}'],
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 /// Install-path memory contract: a per-surah-hash-pinned tafsir install must
 /// build its ayah index from the loop bodies (zero extra decodes), while an
 /// unpinned tafsir keeps exactly ONE wrapper sniff as its validation gate.
 void main() {
   late AppDatabase db;
   late Directory tempRoot;
-  late HttpServer server;
-  var serverBound = false;
+  late _FakeCdn adapter;
 
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_install_prime');
-    serverBound = false;
+    adapter = _FakeCdn();
   });
 
   tearDown(() async {
-    if (serverBound) {
-      await server.close(force: true);
-    }
     await tempRoot.delete(recursive: true);
   });
 
@@ -39,23 +67,17 @@ void main() {
     List<String> bodies,
     Future<dynamic> Function(String path) decoder,
   ) async {
-    server = await HttpServer.bind('127.0.0.1', 0);
-    serverBound = true;
-    server.listen((req) async {
+    adapter.handler = (req) async {
       final match = RegExp(r'/([0-9]+)\.json$').firstMatch(req.uri.path);
       final n = int.tryParse(match?.group(1) ?? '');
       if (n == null || n < 1 || n > bodies.length) {
-        req.response.statusCode = 404;
-        await req.response.close();
-        return;
+        return (status: 404, body: '');
       }
-      req.response.headers.contentType = ContentType.json;
-      req.response.write(bodies[n - 1]);
-      await req.response.close();
-    });
+      return (status: 200, body: bodies[n - 1]);
+    };
     return PackDownloader(
       db,
-      dio: Dio(),
+      dio: Dio()..httpClientAdapter = adapter,
       libraryRootResolver: () async => tempRoot,
       fileDecoder: decoder,
     );
@@ -71,7 +93,7 @@ void main() {
         language: 'ar',
         titleAr: 'تفسير',
         titleEn: 'Tafsir',
-        urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/{n}.json',
+        urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/{n}.json',
         fileCount: fileCount,
         approxSizeMb: 0.001,
         version: 'v1',

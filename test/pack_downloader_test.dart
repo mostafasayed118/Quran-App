@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,32 +11,69 @@ import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 
 import 'support/test_db.dart';
 
+/// One canned CDN response: a status code and a JSON body.
+typedef _Reply = ({int status, String body});
+
+_Reply _ok(String body) => (status: 200, body: body);
+_Reply _status(int status) => (status: status, body: '');
+
+/// Serves the scripted [handler] for every request and records the dispatched
+/// URIs. Same fake-adapter idiom as `pack_redirect_guard_test.dart`.
+///
+/// The downloader now refuses a seed outside `https://cdn.jsdelivr.net`, so the
+/// transport is faked instead of bound to a loopback HTTP server.
+class _FakeCdn implements HttpClientAdapter {
+  Future<_Reply> Function(RequestOptions request)? handler;
+  final List<String> requested = <String>[];
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    requested.add(options.uri.toString());
+    final scripted = handler;
+    if (scripted == null)
+      throw StateError('unexpected request: ${options.uri}');
+    final reply = await scripted(options);
+    final bytes = Uint8List.fromList(utf8.encode(reply.body));
+    return ResponseBody(
+      Stream<Uint8List>.value(bytes),
+      reply.status,
+      headers: <String, List<String>>{
+        Headers.contentLengthHeader: ['${bytes.length}'],
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
 void main() {
   late AppDatabase db;
   late Directory tempRoot;
-  late HttpServer server;
-  var serverBound = false;
+  late _FakeCdn adapter;
   late PackDownloader downloader;
 
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_library_test');
+    adapter = _FakeCdn();
   });
 
   tearDown(() async {
-    if (serverBound) {
-      await server.close(force: true);
-    }
     await tempRoot.delete(recursive: true);
   });
 
-  Future<void> serve(Future<void> Function(HttpRequest request) handler) async {
-    server = await HttpServer.bind('127.0.0.1', 0);
-    serverBound = true;
-    server.listen(handler);
+  /// Pins the CDN script for this test and builds the downloader on top of it.
+  /// A test that never fetches calls [serve] with no handler.
+  Future<void> serve([
+    Future<_Reply> Function(RequestOptions request)? handler,
+  ]) async {
+    adapter.handler = handler;
     downloader = PackDownloader(
       db,
-      dio: Dio(),
+      dio: Dio()..httpClientAdapter = adapter,
       libraryRootResolver: () async => tempRoot,
     );
   }
@@ -51,19 +89,15 @@ void main() {
         titleAr: 'حزمة',
         titleEn: 'Pack',
         sourceUrl:
-            url ?? 'http://127.0.0.1:${server.port}/translation/$id.min.json',
+            url ?? 'https://cdn.jsdelivr.net/library/translation/$id.min.json',
         approxSizeMb: 0.001,
         version: '1',
       );
 
   test('single-file install streams the file, promotes, writes the row',
       () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response
-          .write('{"quran":[{"chapter":1,"verse":1,"text":"بسم الله"}]}');
-      await req.response.close();
-    });
+    await serve((_) async =>
+        _ok('{"quran":[{"chapter":1,"verse":1,"text":"بسم الله"}]}'));
     final pack = translationPack();
     final file = await downloader.install(pack);
 
@@ -82,10 +116,7 @@ void main() {
   });
 
   test('404 installs no row and leaves no partial file', () async {
-    await serve((req) async {
-      req.response.statusCode = 404;
-      await req.response.close();
-    });
+    await serve((_) async => _status(404));
     final pack = translationPack();
 
     await expectLater(downloader.install(pack), throwsA(isA<DioException>()));
@@ -97,14 +128,12 @@ void main() {
 
   test('corrupt JSON body fails the integrity sniff, deletes the partial',
       () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response.write('not json at all {');
-      await req.response.close();
-    });
+    await serve((_) async => _ok('not json at all {'));
     final pack = translationPack();
 
     await expectLater(downloader.install(pack), throwsA(isA<PackFailure>()));
+    expect(adapter.requested, isNotEmpty,
+        reason: 'the body must be fetched before it can fail the sniff');
 
     expect(await downloader.installedPacks(), isEmpty);
     expect(Directory('${tempRoot.path}/library').existsSync(), isTrue);
@@ -114,14 +143,12 @@ void main() {
 
   test('valid JSON with the wrong shape fails as PackFailure, not TypeError',
       () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response.write('[]');
-      await req.response.close();
-    });
+    await serve((_) async => _ok('[]'));
 
     await expectLater(downloader.install(translationPack(id: 'tshape')),
         throwsA(isA<PackFailure>()));
+    expect(adapter.requested, isNotEmpty,
+        reason: 'the body must be fetched before it can fail the sniff');
 
     expect(await downloader.installedPacks(), isEmpty);
     final leftovers = Directory('${tempRoot.path}/library').listSync();
@@ -134,21 +161,17 @@ void main() {
     await serve((req) async {
       requestLines.add(req.uri.path);
       if (RegExp(r'/tafsir/tp3/[0-9]+\.json$').hasMatch(req.uri.path)) {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(surahArrayFixture);
-        await req.response.close();
-      } else {
-        req.response.statusCode = 404;
-        await req.response.close();
+        return _ok(surahArrayFixture);
       }
+      return _status(404);
     });
-    final pack = LibraryPackInfo(
+    const pack = LibraryPackInfo(
       id: 'tp3',
       kind: LibraryPackKind.tafsir,
       language: 'ar',
       titleAr: 'تفسير',
       titleEn: 'Tafsir',
-      urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/tp3/{n}.json',
+      urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/tp3/{n}.json',
       fileCount: 3,
       approxSizeMb: 0.001,
       version: 'v1.2.2',
@@ -173,30 +196,25 @@ void main() {
 
   test('tafsir loop failure deletes the part and installs no row', () async {
     var served = 0;
-    await serve((req) async {
+    await serve((_) async {
       served++;
-      if (served == 1) {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(surahArrayFixture);
-        await req.response.close();
-      } else {
-        req.response.statusCode = 500;
-        await req.response.close();
-      }
+      return served == 1 ? _ok(surahArrayFixture) : _status(500);
     });
-    final pack = LibraryPackInfo(
+    const pack = LibraryPackInfo(
       id: 'tp4',
       kind: LibraryPackKind.tafsir,
       language: 'ar',
       titleAr: 'تفسير',
       titleEn: 'Tafsir',
-      urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/tp4/{n}.json',
+      urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/tp4/{n}.json',
       fileCount: 2,
       approxSizeMb: 0.001,
       version: 'v1.2.2',
     );
 
     await expectLater(downloader.install(pack), throwsA(anything));
+    expect(served, greaterThanOrEqualTo(2),
+        reason: 'the failing surah must be requested, not skipped');
 
     expect(await downloader.installedPacks(), isEmpty);
     final leftovers = Directory('${tempRoot.path}/library').listSync();
@@ -222,7 +240,7 @@ void main() {
     if (!fixture.existsSync()) {
       markTestSkipped('fixtures dir does not resolve from this runner');
     }
-    await serve((_) async {});
+    await serve();
     final libraryDir = Directory('${tempRoot.path}/library');
     await libraryDir.create(recursive: true);
     await fixture.copy('${libraryDir.path}/tp1.json');
@@ -238,7 +256,7 @@ void main() {
     if (!fixture.existsSync()) {
       markTestSkipped('fixtures dir does not resolve from this runner');
     }
-    await serve((_) async {});
+    await serve();
     final libraryDir = Directory('${tempRoot.path}/library');
     await libraryDir.create(recursive: true);
     await fixture.copy('${libraryDir.path}/wm1.json');
@@ -251,7 +269,7 @@ void main() {
   });
 
   test('hadithPage tolerates malformed entries instead of throwing', () async {
-    await serve((_) async {});
+    await serve();
     final libraryDir = Directory('${tempRoot.path}/library')
       ..createSync(recursive: true);
     File('${libraryDir.path}/hm-bad.json').writeAsStringSync(
@@ -265,7 +283,7 @@ void main() {
   });
 
   test('uninstall refuses unsafe pack ids (path traversal defense)', () async {
-    await serve((_) async {});
+    await serve();
     final outside = File('${tempRoot.path}/outside.json')
       ..writeAsStringSync('keep');
 
@@ -280,7 +298,7 @@ void main() {
     if (!fixture.existsSync()) {
       markTestSkipped('fixtures dir does not resolve from this runner');
     }
-    await serve((_) async {});
+    await serve();
     final libraryDir = Directory('${tempRoot.path}/library');
     await libraryDir.create(recursive: true);
     await fixture.copy('${libraryDir.path}/hm1.json');
@@ -303,7 +321,7 @@ void main() {
     if (!fixture.existsSync()) {
       markTestSkipped('fixtures dir does not resolve from this runner');
     }
-    await serve((_) async {});
+    await serve();
     final libraryDir = Directory('${tempRoot.path}/library');
     await libraryDir.create(recursive: true);
     await fixture.copy('${libraryDir.path}/tp1.json');
@@ -327,12 +345,8 @@ void main() {
   });
 
   test('install primes the read cache (no re-read after install)', () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response
-          .write('{"quran":[{"chapter":1,"verse":1,"text":"INSTALLED"}]}');
-      await req.response.close();
-    });
+    await serve((_) async =>
+        _ok('{"quran":[{"chapter":1,"verse":1,"text":"INSTALLED"}]}'));
     final file = await downloader.install(translationPack(id: 'tpc'));
     file.writeAsStringSync(
         '{"quran":[{"chapter":1,"verse":1,"text":"MUTATED"}]}');
@@ -340,26 +354,22 @@ void main() {
   });
 
   test('oversized single-file stream is aborted before promotion', () async {
-    await serve((req) async {
+    await serve((_) async {
       final filler = 'a' * (200 * 1024);
-      req.response.headers.contentType = ContentType.json;
-      req.response
-          .write('{"quran":[{"chapter":1,"verse":1,"text":"$filler"}]}');
-      await req.response.close();
+      return _ok('{"quran":[{"chapter":1,"verse":1,"text":"$filler"}]}');
     });
     await expectLater(downloader.install(translationPack(id: 'tover')),
         throwsA(isA<PackFailure>()));
+    expect(adapter.requested, isNotEmpty,
+        reason: 'the oversized stream must be fetched before the cap fires');
     expect(await downloader.installedPacks(), isEmpty);
     final leftovers = Directory('${tempRoot.path}/library').listSync();
     expect(leftovers, isEmpty);
   });
 
   test('uninstall removes both the file and the registry row', () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response.write('{"quran":[{"chapter":1,"verse":1,"text":"text"}]}');
-      await req.response.close();
-    });
+    await serve(
+        (_) async => _ok('{"quran":[{"chapter":1,"verse":1,"text":"text"}]}'));
     await downloader.install(translationPack(id: 'tp9'));
     expect(await downloader.isInstalledAny('tp9'), isTrue);
 
@@ -372,11 +382,8 @@ void main() {
 
   test('decoded cache is bounded: a third pack evicts the least recently used',
       () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
-      req.response.write('{"quran":[{"chapter":1,"verse":1,"text":"CACHED"}]}');
-      await req.response.close();
-    });
+    await serve((_) async =>
+        _ok('{"quran":[{"chapter":1,"verse":1,"text":"CACHED"}]}'));
     final libraryDir = Directory('${tempRoot.path}/library');
     await libraryDir.create(recursive: true);
     await downloader.install(translationPack(id: 'lru-a'));
@@ -397,7 +404,7 @@ void main() {
 
   test('cold reads decode via the injected fileDecoder; warm reads do not',
       () async {
-    await serve((_) async {});
+    await serve();
     final decodedPaths = <String>[];
     final seam = PackDownloader(
       db,
@@ -421,25 +428,25 @@ void main() {
   });
 
   test('oversized tafsir surah body aborts before promotion', () async {
-    await serve((req) async {
-      req.response.headers.contentType = ContentType.json;
+    await serve((_) async {
       final filler = 'a' * (200 * 1024);
-      req.response.write('[{"text":"$filler","ayah":1,"surah":1}]');
-      await req.response.close();
+      return _ok('[{"text":"$filler","ayah":1,"surah":1}]');
     });
-    final pack = LibraryPackInfo(
+    const pack = LibraryPackInfo(
       id: 'tpover',
       kind: LibraryPackKind.tafsir,
       language: 'ar',
       titleAr: 'تفسير',
       titleEn: 'Tafsir',
-      urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/tpover/{n}.json',
+      urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/tpover/{n}.json',
       fileCount: 2,
       approxSizeMb: 0.001,
       version: 'v1.2.2',
     );
 
     await expectLater(downloader.install(pack), throwsA(isA<PackFailure>()));
+    expect(adapter.requested, isNotEmpty,
+        reason: 'the oversized surah must be fetched before the cap fires');
 
     expect(await downloader.installedPacks(), isEmpty);
     final leftovers = Directory('${tempRoot.path}/library').listSync();

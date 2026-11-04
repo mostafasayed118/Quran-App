@@ -15,6 +15,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
+import '../../../core/utils/hour_minute.dart';
 import '../../../core/utils/insets.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/error_pane.dart';
@@ -402,15 +403,11 @@ class _ReminderTimeTile extends StatelessWidget {
   }
 }
 
-/// Parses the stored 'HH:mm' value; null when it is missing or malformed.
+/// The stored 'H:mm' value as a clock time; null when it is missing or malformed.
 TimeOfDay? _parseHm(String hm) {
-  final parts = hm.split(':');
-  if (parts.length != 2) return null;
-  final hour = int.tryParse(parts[0]);
-  final minute = int.tryParse(parts[1]);
-  if (hour == null || minute == null) return null;
-  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
-  return TimeOfDay(hour: hour, minute: minute);
+  final hm24 = parseHourMinute(hm);
+  if (hm24 == null) return null;
+  return TimeOfDay(hour: hm24.$1, minute: hm24.$2);
 }
 
 /// The clock value the shared formatter renders (the date part is unused).

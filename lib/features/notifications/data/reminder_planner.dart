@@ -2,6 +2,7 @@ import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/utils/date_only.dart';
+import 'package:quran_yahdi/core/utils/hour_minute.dart';
 
 // Compat: existing importers of this file keep resolving the fallback times.
 export 'package:quran_yahdi/core/domain/reminders.dart'
@@ -151,23 +152,9 @@ bool shouldRequestBootPermission({
 /// Today at the 'H:mm' settings time when still ahead, else tomorrow at it;
 /// [fallback] covers unset or malformed values (azkar and wird share it).
 DateTime _nextFireAt(DateTime now, String? hm, (int, int) fallback) {
-  final time = _parseHm(hm) ?? fallback;
+  final time = parseHourMinute(hm) ?? fallback;
   final day = dateOnly(now);
   final fireAt = DateTime(day.year, day.month, day.day, time.$1, time.$2);
   if (fireAt.isAfter(now)) return fireAt;
   return DateTime(day.year, day.month, day.day + 1, time.$1, time.$2);
-}
-
-/// Parses 'H:mm'/'HH:mm' 24-hour input; null on anything malformed.
-(int, int)? _parseHm(String? hm) {
-  if (hm == null) return null;
-  final match = RegExp(r'^(\d{1,2}):(\d{2})$').firstMatch(hm.trim());
-  if (match == null) return null;
-  final hourText = match.group(1);
-  final minuteText = match.group(2);
-  if (hourText == null || minuteText == null) return null;
-  final hour = int.parse(hourText);
-  final minute = int.parse(minuteText);
-  if (hour > 23 || minute > 59) return null;
-  return (hour, minute);
 }

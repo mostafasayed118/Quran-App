@@ -28,7 +28,7 @@ class JuzIndexScreen extends StatelessWidget {
           JuzIndexLoading() => const LoadingView(),
           JuzIndexFailed() => errorPane(loc, onRetry: cubit.start),
           JuzIndexReady(:final juz) when juz.isEmpty =>
-            EmptyState(loc.genericError),
+            EmptyState(loc.noResults),
           JuzIndexReady(:final juz) => ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               itemCount: juz.length,

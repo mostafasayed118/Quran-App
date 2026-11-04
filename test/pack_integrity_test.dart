@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
@@ -10,6 +11,41 @@ import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 
 import 'support/test_db.dart';
+
+/// One canned CDN response: a status code and a JSON body.
+typedef _Reply = ({int status, String body});
+
+_Reply _ok(String body) => (status: 200, body: body);
+
+/// Serves the scripted [handler] for every request and records the dispatched
+/// URIs. Same fake-adapter idiom as `pack_redirect_guard_test.dart`; the pack
+/// seed must be a trusted `https://cdn.jsdelivr.net` URL now.
+class _FakeCdn implements HttpClientAdapter {
+  Future<_Reply> Function(RequestOptions request)? handler;
+  final List<String> requested = <String>[];
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    requested.add(options.uri.toString());
+    final scripted = handler;
+    if (scripted == null)
+      throw StateError('unexpected request: ${options.uri}');
+    final reply = await scripted(options);
+    final bytes = Uint8List.fromList(utf8.encode(reply.body));
+    return ResponseBody(
+      Stream<Uint8List>.value(bytes),
+      reply.status,
+      headers: <String, List<String>>{
+        Headers.contentLengthHeader: ['${bytes.length}'],
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
 
 Map<String, dynamic> singleEntry({Object? sha256}) => {
       'id': 'tpin',
@@ -86,30 +122,26 @@ void main() {
   group('PackDownloader sha256 gate', () {
     late AppDatabase db;
     late Directory tempRoot;
-    late HttpServer server;
-    var serverBound = false;
+    late _FakeCdn adapter;
     late PackDownloader downloader;
 
     setUp(() async {
       db = newTestDb();
       tempRoot = await Directory.systemTemp.createTemp('qy_pack_integrity');
+      adapter = _FakeCdn();
     });
 
     tearDown(() async {
-      if (serverBound) {
-        await server.close(force: true);
-      }
       await tempRoot.delete(recursive: true);
     });
 
-    Future<void> serve(
-        Future<void> Function(HttpRequest request) handler) async {
-      server = await HttpServer.bind('127.0.0.1', 0);
-      serverBound = true;
-      server.listen(handler);
+    Future<void> serve([
+      Future<_Reply> Function(RequestOptions request)? handler,
+    ]) async {
+      adapter.handler = handler;
       downloader = PackDownloader(
         db,
-        dio: Dio(),
+        dio: Dio()..httpClientAdapter = adapter,
         libraryRootResolver: () async => tempRoot,
       );
     }
@@ -124,36 +156,32 @@ void main() {
           language: 'ar',
           titleAr: 'حزمة',
           titleEn: 'Pack',
-          sourceUrl: 'http://127.0.0.1:${server.port}/hip.min.json',
+          sourceUrl: 'https://cdn.jsdelivr.net/library/hip.min.json',
           approxSizeMb: 0.001,
           version: '1',
           sha256: sha256Hex,
         );
 
     test('single-file install succeeds when the sha256 matches', () async {
-      await serve((req) async {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(body);
-        await req.response.close();
-      });
+      await serve((_) async => _ok(body));
       final file = await downloader.install(pack(sha256Hex: shaOf(body)));
 
       expect(file.existsSync(), isTrue);
       expect(await downloader.installedPacks(), hasLength(1));
+      expect(adapter.requested, hasLength(1));
     });
 
     test('single-file hash mismatch: PackFailure, no partial, no row',
         () async {
-      await serve((req) async {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(body);
-        await req.response.close();
-      });
+      await serve((_) async => _ok(body));
       final wrong =
           shaOf('{"quran":[{"chapter":1,"verse":1,"text":"tampered"}]}');
 
       await expectLater(downloader.install(pack(sha256Hex: wrong)),
           throwsA(isA<PackFailure>()));
+      expect(adapter.requested, isNotEmpty,
+          reason:
+              'the body must be fetched before the hash gate can reject it');
 
       expect(await downloader.installedPacks(), isEmpty);
       final leftovers = Directory('${tempRoot.path}/library').listSync();
@@ -168,7 +196,7 @@ void main() {
           language: 'ar',
           titleAr: 'تفسير',
           titleEn: 'Tafsir',
-          urlTemplate: 'http://127.0.0.1:${server.port}/tafsir/{n}.json',
+          urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/{n}.json',
           fileCount: 2,
           approxSizeMb: 0.001,
           version: 'v1',
@@ -176,29 +204,24 @@ void main() {
         );
 
     test('tafsir install succeeds when every surah hash matches', () async {
-      await serve((req) async {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(surahBody);
-        await req.response.close();
-      });
+      await serve((_) async => _ok(surahBody));
       final file = await downloader
           .install(tafsirPack(perSurah: [shaOf(surahBody), shaOf(surahBody)]));
 
       expect(file.existsSync(), isTrue);
       expect(await downloader.installedPacks(), hasLength(1));
+      expect(adapter.requested, hasLength(2));
     });
 
     test('one bad surah hash aborts the install and cleans partials', () async {
-      await serve((req) async {
-        req.response.headers.contentType = ContentType.json;
-        req.response.write(surahBody);
-        await req.response.close();
-      });
+      await serve((_) async => _ok(surahBody));
 
       await expectLater(
           downloader
               .install(tafsirPack(perSurah: [shaOf(surahBody), 'f' * 64])),
           throwsA(isA<PackFailure>()));
+      expect(adapter.requested, isNotEmpty,
+          reason: 'the surah bodies must be fetched before the hash gate runs');
 
       expect(await downloader.installedPacks(), isEmpty);
       final leftovers = Directory('${tempRoot.path}/library').listSync();
