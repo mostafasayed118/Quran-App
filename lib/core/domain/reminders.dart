@@ -13,6 +13,7 @@ class ScheduledReminder {
     required this.title,
     this.body,
     this.payload,
+    this.adhanId,
   });
 
   /// The platform alarm id — stable per reminder, so a re-plan replaces the
@@ -32,6 +33,14 @@ class ScheduledReminder {
 
   /// Tap-routing tag (planner payload constants); null = plain tap.
   final String? payload;
+
+  /// The adhan to sound, or null for the OS default.
+  ///
+  /// Resolved at PLAN time, not at post time: the planner emits a single
+  /// reminder for the *next* prayer (`reminder_planner.dart`), so the binding
+  /// has no way to tell whether that reminder is Fajr. Stamping the resolved
+  /// choice here is what makes a Fajr override possible at all.
+  final String? adhanId;
 }
 
 /// Fallback azkar time when `azkar_reminder_time` is unset or malformed.

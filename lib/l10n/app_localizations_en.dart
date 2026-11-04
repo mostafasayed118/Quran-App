@@ -1080,4 +1080,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reciterPacksEmpty =>
       'No pack published yet — the first one ships once a human reviewer signs it.';
+
+  @override
+  String get adhanTitle => 'Adhan sound';
+
+  @override
+  String get adhanDefaultSection => 'Default adhan';
+
+  @override
+  String get adhanFajrSection => 'Fajr adhan';
+
+  @override
+  String get adhanSameAsDefault => 'Same as default';
+
+  @override
+  String get adhanPreview => 'Preview';
+
+  @override
+  String get adhanStopPreview => 'Stop';
+
+  @override
+  String get adhanPlayAction => 'Play adhan';
 }

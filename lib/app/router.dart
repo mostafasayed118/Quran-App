@@ -1,6 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/domain/adhan_player.dart';
+import '../core/domain/adhan_preferences.dart';
 import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
@@ -67,6 +69,8 @@ import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
 import '../features/quran/presentation/search/quran_search_screen.dart';
+import '../features/settings/presentation/adhan_picker_cubit.dart';
+import '../features/settings/presentation/adhan_picker_screen.dart';
 import '../features/settings/presentation/principles_screen.dart';
 import '../features/settings/presentation/settings_cubit.dart';
 import '../features/settings/presentation/settings_screen.dart';
@@ -395,6 +399,7 @@ abstract final class AppRouter {
               city: getIt<CitySource>(),
               prayer: getIt<PrayerTimesPort>(),
               scheduler: getIt<ReminderSchedulerPort>(),
+              adhanPrefs: getIt<AdhanPreferences>(),
             ),
             identity: AppRoutes.settings,
             start: (cubit) => cubit.start(),
@@ -403,6 +408,25 @@ abstract final class AppRouter {
               locale: getIt<AppLocaleController>(),
             ),
           ),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.adhanPicker,
+        builder: (_, __) => RouteCubitScope<AdhanPickerCubit>(
+          create: () => AdhanPickerCubit(
+            prefs: getIt<AdhanPreferences>(),
+            player: getIt<AdhanPlayer>(),
+            // The picker only needs "the schedule changed", not the city and
+            // prayer machinery behind it.
+            reschedule: () => getIt<ReminderSettingsPort>().reschedule(
+              city: getIt<CitySource>(),
+              prayer: getIt<PrayerTimesPort>(),
+              scheduler: getIt<ReminderSchedulerPort>(),
+            ),
+          ),
+          identity: AppRoutes.adhanPicker,
+          start: (cubit) => cubit.start(),
+          child: const AdhanPickerScreen(),
         ),
       ),
       GoRoute(

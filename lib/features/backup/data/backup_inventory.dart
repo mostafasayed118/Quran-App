@@ -69,6 +69,10 @@ const String backupKeyLastReadAyahId = 'last_read_ayah_id';
 /// `lib/features/recitation/data/reciter_repository.dart`.
 const String backupKeySelectedMoshafRow = 'selected_moshaf_row';
 
+/// `lib/core/domain/adhan_preferences.dart`.
+const String backupKeyAdhanId = 'adhan_id';
+const String backupKeyAdhanFajrId = 'adhan_fajr_id';
+
 /// `lib/features/tasbih/data/tasbih_repository.dart`.
 const String backupKeyTasbihState = 'tasbih_state';
 
@@ -94,6 +98,8 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyAzkarFavorites,
   backupKeySelectedCity,
   backupKeySelectedMoshafRow,
+  backupKeyAdhanId,
+  backupKeyAdhanFajrId,
 };
 
 /// Keys whose change needs a reminder re-plan after apply — mirrors the boot
@@ -110,4 +116,6 @@ const Set<String> kBackupReminderRelevantKeys = {
   backupKeyPrayerEnabledPrayers,
   backupKeyPrayerPreAdhanMinutes,
   backupKeySelectedCity,
+  backupKeyAdhanId,
+  backupKeyAdhanFajrId,
 };

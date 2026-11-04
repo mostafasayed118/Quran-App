@@ -1071,4 +1071,25 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reciterPacksEmpty =>
       'لا توجد حزمة منشورة بعد — تُنشر أول حزمة بعد توقيع مراجع بشري.';
+
+  @override
+  String get adhanTitle => 'صوت الأذان';
+
+  @override
+  String get adhanDefaultSection => 'الأذان الافتراضي';
+
+  @override
+  String get adhanFajrSection => 'أذان الفجر';
+
+  @override
+  String get adhanSameAsDefault => 'مثل الافتراضي';
+
+  @override
+  String get adhanPreview => 'استماع';
+
+  @override
+  String get adhanStopPreview => 'إيقاف';
+
+  @override
+  String get adhanPlayAction => 'تشغيل الأذان';
 }

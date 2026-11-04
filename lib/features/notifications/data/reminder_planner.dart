@@ -1,3 +1,4 @@
+import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
@@ -76,6 +77,8 @@ List<ScheduledReminder> planReminders({
   bool wirdEnabled = false,
   String? wirdTimeHm,
   required ReminderTexts texts,
+  String? adhanId,
+  String? fajrAdhanId,
 }) {
   final byId = <int, ScheduledReminder>{};
 
@@ -100,6 +103,15 @@ List<ScheduledReminder> planReminders({
         fireAt: chosen.time,
         title: texts.prayerTitle(chosen.name),
         payload: prayerReminderPayload,
+        // Null when no adhan is configured: that keeps today's behaviour
+        // (legacy channel, OS default sound).
+        adhanId: adhanId == null
+            ? null
+            : adhanIdForPrayer(
+                prayer: chosen.name,
+                globalId: adhanId,
+                fajrId: fajrAdhanId,
+              ),
       );
       final soonTitle = texts.prayerSoonTitle;
       if (preAdhanMinutes > 0 && soonTitle != null) {

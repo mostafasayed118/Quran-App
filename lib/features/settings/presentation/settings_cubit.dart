@@ -1,6 +1,8 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
@@ -29,11 +31,13 @@ class SettingsCubit extends Cubit<SettingsState> {
     required CitySource city,
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
+    AdhanPreferences? adhanPrefs,
   })  : _settings = settings,
         _prayerSettings = prayerSettings,
         _city = city,
         _prayer = prayer,
         _scheduler = scheduler,
+        _adhanPrefs = adhanPrefs,
         super(const SettingsState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -45,6 +49,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   final CitySource _city;
   final PrayerTimesPort _prayer;
   final ReminderSchedulerPort _scheduler;
+
+  /// Optional for the same reason as [PrayerReminderSettingsPort]: existing
+  /// constructions and fakes that predate the adhan picker keep compiling, and
+  /// a missing port falls back to the catalog default.
+  final AdhanPreferences? _adhanPrefs;
 
   Future<void> _mutations = Future<void>.value();
 
@@ -67,6 +76,7 @@ class SettingsCubit extends Cubit<SettingsState> {
       final time = await _settings.azkarTimeHm() ?? defaultAzkarTimeHm;
       final wirdEnabled = await _settings.wirdEnabled();
       final wirdTime = await _settings.wirdTimeHm() ?? defaultWirdTimeHm;
+      final adhanId = await _adhanPrefs?.adhanId() ?? kDefaultAdhanId;
       if (isClosed) return;
       emit(SettingsState.ready(
         prayerEnabled: prayerEnabled,
@@ -76,6 +86,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         wirdTimeHm: wirdTime,
         azkarPermissionDenied: false,
         wirdPermissionDenied: false,
+        adhanId: adhanId,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('settings load failed',

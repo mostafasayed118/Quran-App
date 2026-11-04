@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
@@ -59,6 +60,11 @@ void main() {
     expect(backupKeyTasbihState, tasbihStateKey);
   });
 
+  test('adhan literals match core/domain/adhan_preferences.dart', () {
+    expect(backupKeyAdhanId, adhanIdKey);
+    expect(backupKeyAdhanFajrId, adhanFajrIdKey);
+  });
+
   test('the whitelist is exactly the declared user settings keys', () {
     expect(kBackupSettingsWhitelist, {
       azkarReminderEnabledKey,
@@ -75,6 +81,8 @@ void main() {
       AzkarSavedStateRepository.favoritesKey,
       selectedCityKey,
       selectedMoshafKey,
+      adhanIdKey,
+      adhanFajrIdKey,
     });
     // Entities and app-managed keys never ride the settings whitelist.
     expect(kBackupSettingsWhitelist, isNot(contains(lastReadAyahIdKey)));
@@ -93,6 +101,8 @@ void main() {
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
       selectedCityKey,
+      adhanIdKey,
+      adhanFajrIdKey,
     });
     // Not planner inputs: the reader's font scale and the azkar counters.
     expect(kBackupReminderRelevantKeys,

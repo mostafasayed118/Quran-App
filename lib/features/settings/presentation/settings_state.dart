@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/domain/reminders.dart';
 
 part 'settings_state.freezed.dart';
@@ -18,6 +19,7 @@ sealed class SettingsState with _$SettingsState {
     @Default(defaultWirdTimeHm) String wirdTimeHm,
     @Default(false) bool azkarPermissionDenied,
     @Default(false) bool wirdPermissionDenied,
+    @Default(kDefaultAdhanId) String adhanId,
   }) = SettingsReady;
 }
 

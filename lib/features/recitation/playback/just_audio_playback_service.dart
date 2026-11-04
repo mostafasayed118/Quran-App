@@ -6,6 +6,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:meta/meta.dart';
 
+import '../../../core/domain/media_playback_control.dart';
 import '../../../core/l10n/platform_localizations.dart';
 import 'playback_service.dart';
 
@@ -39,7 +40,8 @@ class JustAudioPlaybackService
         PlaybackService,
         DisposablePlaybackService,
         CompletingPlaybackService,
-        SeekablePlaybackService {
+        SeekablePlaybackService,
+        MediaPlaybackControl {
   JustAudioPlaybackService([AudioPlayer? player])
       : _player = player ?? AudioPlayer();
 
@@ -130,6 +132,51 @@ class JustAudioPlaybackService
 
   @override
   Future<void> stop() => _player.stop();
+
+  /// Stops recitation so the adhan is not mixed with it.
+  ///
+  /// Separate from [stop] on purpose: this is the adhan player's seam
+  /// (`MediaPlaybackControl`), and it must never throw into the adhan path.
+  @override
+  Future<void> stopForAdhan() async {
+    try {
+      await _player.stop();
+    } on Object catch (error, stackTrace) {
+      dev.log(
+        'stopForAdhan failed',
+        name: 'quran_yahdi/playback',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Plays a bundled adhan through the SAME player recitation uses.
+  ///
+  /// One player is not a preference: `just_audio_background` allows exactly
+  /// one per process, so a second one would throw the moment the user had ever
+  /// played a surah.
+  @override
+  Future<void> playAdhan(
+    String assetPath, {
+    required String id,
+    required String title,
+  }) async {
+    // The tag is mandatory: `JustAudioBackground.init` swapped in a
+    // background-aware platform, and an untagged source throws.
+    await _player.setAudioSource(
+      AudioSource.asset(assetPath, tag: MediaItem(id: id, title: title)),
+    );
+    issuePlayRequest(
+      () => _player.play(),
+      operation: 'adhan play request failed',
+    );
+  }
+
+  @override
+  Stream<void> get adhanCompleted => _player.processingStateStream
+      .where((state) => state == ProcessingState.completed)
+      .map((_) {});
 
   /// Releases the ExoPlayer instance, the audio focus and the platform
   /// media session. Without it the player is held for the whole process

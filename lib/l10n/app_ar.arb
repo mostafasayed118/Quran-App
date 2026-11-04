@@ -697,5 +697,12 @@
       "prayer": { "type": "String" },
       "minutes": { "type": "String" }
     }
-  }
+  },
+  "adhanTitle": "صوت الأذان",
+  "adhanDefaultSection": "الأذان الافتراضي",
+  "adhanFajrSection": "أذان الفجر",
+  "adhanSameAsDefault": "مثل الافتراضي",
+  "adhanPreview": "استماع",
+  "adhanStopPreview": "إيقاف",
+  "adhanPlayAction": "تشغيل الأذان"
 }

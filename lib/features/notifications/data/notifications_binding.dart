@@ -1,6 +1,8 @@
 import 'dart:ui' show Locale, VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:meta/meta.dart';
+import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
@@ -47,12 +49,30 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
   static const String channelId = 'quran_yahdi_reminders';
+
+  /// Prefix of the "play the adhan" action id; the track id follows the colon.
+  ///
+  /// The track id rides on the action id because an action response carries
+  /// only its own id back — the notification payload is already the routing
+  /// tag ("prayer").
+  static const String adhanPlayActionPrefix = 'adhan_play:';
+
   static const String defaultIcon = '@mipmap/ic_launcher';
 
   final FlutterLocalNotificationsPlugin _plugin;
 
   bool _ready = false;
   NotificationDetails? _details;
+
+  /// Channel identity cached from `init` so a per-reciter channel can be built
+  /// while posting, with no BuildContext in scope.
+  String _channelName = '';
+  String? _channelDescription;
+
+  /// Label for the "play the adhan" action, cached from `init`.
+  String _playAdhanLabel = '';
+
+  void Function(String trackId)? _onPlayAdhan;
   VoidCallback? _onTap;
   void Function(String payload)? _onTapPayload;
 
@@ -113,9 +133,11 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   Future<void> init({
     VoidCallback? onTap,
     void Function(String payload)? onTapPayload,
+    void Function(String trackId)? onPlayAdhan,
   }) async {
     if (_ready) return;
     _onTap = onTap;
+    _onPlayAdhan = onPlayAdhan;
     _onTapPayload = onTapPayload;
     _initFailed = false;
     try {
@@ -140,6 +162,11 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
           priority: Priority.high,
         ),
       );
+      // Cached so a per-reciter channel can be built at post time without a
+      // BuildContext.
+      _channelName = loc.appName;
+      _channelDescription = loc.reminderChannelDescription;
+      _playAdhanLabel = loc.adhanPlayAction;
       _ready = true;
     } on Object {
       _ready = false;
@@ -182,6 +209,19 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// `onTapPayload`; everything else keeps the default-launch callback.
   /// A payloaded tap with no payload callback falls back to the default too.
   void onNotificationTap(NotificationResponse response) {
+    // An action button wins over the tap payload: "play the adhan" is an
+    // explicit verb, not navigation.
+    final actionId = response.actionId;
+    final onPlayAdhan = _onPlayAdhan;
+    if (actionId != null &&
+        actionId.startsWith(adhanPlayActionPrefix) &&
+        onPlayAdhan != null) {
+      final trackId = actionId.substring(adhanPlayActionPrefix.length);
+      if (trackId.isNotEmpty) {
+        onPlayAdhan(trackId);
+        return;
+      }
+    }
     final payload = response.payload;
     final onTapPayload = _onTapPayload;
     if (payload != null && payload.isNotEmpty && onTapPayload != null) {
@@ -189,6 +229,23 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       return;
     }
     _onTap?.call();
+  }
+
+  /// The action id of the notification that cold-started the app, when it was
+  /// an "play adhan" action; null otherwise. Never throws.
+  Future<String?> launchAdhanActionId() async {
+    try {
+      final details = await _plugin.getNotificationAppLaunchDetails();
+      if (details == null || !details.didNotificationLaunchApp) return null;
+      final actionId = details.notificationResponse?.actionId;
+      if (actionId == null || !actionId.startsWith(adhanPlayActionPrefix)) {
+        return null;
+      }
+      final trackId = actionId.substring(adhanPlayActionPrefix.length);
+      return trackId.isEmpty ? null : trackId;
+    } on Object {
+      return null;
+    }
   }
 
   /// Cold-start payload: the tapped notification's tag when the app was
@@ -351,11 +408,53 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// screen load, on a city change and on a settings save.
   ///
   /// The plan fingerprint skips the platform round-trip when the new plan
+  /// The details to post [reminder] with.
+  ///
+  /// One Android channel per reciter is deliberate: the OS freezes a channel's
+  /// sound at creation, so a single shared channel would leave every existing
+  /// user permanently stuck on the first adhan they ever heard. Selecting an
+  /// adhan selects a channel and no channel is ever mutated. The channel is
+  /// created implicitly on first post, so at most `kAdhanCatalog.length`
+  /// channels can ever exist.
+  ///
+  /// [fallback] is today's shared channel, used by azkar, wird and the
+  /// pre-adhan heads-up — only the prayer reminder carries an adhan.
+  NotificationDetails _detailsFor(
+    ScheduledReminder reminder,
+    NotificationDetails fallback,
+  ) {
+    final id = reminder.adhanId;
+    if (id == null) return fallback;
+    final track = adhanById(id);
+    return NotificationDetails(
+      android: AndroidNotificationDetails(
+        adhanChannelId(track),
+        _channelName,
+        channelDescription: _channelDescription,
+        importance: Importance.high,
+        priority: Priority.high,
+        sound: RawResourceAndroidNotificationSound(track.clipResource),
+        actions: <AndroidNotificationAction>[
+          // The track id rides on the action id: the notification payload is
+          // already the routing tag ("prayer"), and an action response carries
+          // only its own id back.
+          AndroidNotificationAction(
+            '$adhanPlayActionPrefix${track.id}',
+            _playAdhanLabel,
+            // Must bring the app up: at prayer time it is usually not running,
+            // and an action that never reaches Dart is a silent no-op.
+            showsUserInterface: true,
+          ),
+        ],
+      ),
+    );
+  }
+
   /// schedules exactly the same alarms as the applied one.
   Future<void> _applyPlan(List<ScheduledReminder> reminders) async {
     final details = _details;
     if (details == null) return;
-    final fingerprint = _planFingerprint(reminders);
+    final fingerprint = planFingerprint(reminders);
     if (fingerprint == _appliedPlan) return;
     try {
       final android = _plugin.resolvePlatformSpecificImplementation<
@@ -390,7 +489,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
           body: reminder.body,
           payload: reminder.payload,
           scheduledDate: tz.TZDateTime.from(reminder.fireAt.toUtc(), tz.UTC),
-          notificationDetails: details,
+          notificationDetails: _detailsFor(reminder, details),
           androidScheduleMode: mode,
         );
       }
@@ -407,7 +506,15 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// the second one can skip the platform round-trip. The copy is part of the
   /// fingerprint on purpose: a renamed reciter changes what the shade shows
   /// and must therefore re-register the alarm.
-  static String _planFingerprint(List<ScheduledReminder> reminders) {
+  /// The identity of a plan, for "is this the same schedule we already
+  /// applied?".
+  ///
+  /// Every field that changes what the platform must do belongs here — the
+  /// adhan included: a plan that differs only in the chosen reciter must still
+  /// be re-posted, or the user keeps hearing the previous sound until some
+  /// unrelated change forces a re-schedule.
+  @visibleForTesting
+  static String planFingerprint(List<ScheduledReminder> reminders) {
     final sorted = [...reminders]..sort((a, b) => a.id.compareTo(b.id));
     // Length-prefixed fields: no separator can appear in the content, so the
     // flat encoding is unambiguous.
@@ -419,6 +526,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
         r.title,
         r.body ?? '',
         r.payload ?? '',
+        r.adhanId ?? '',
       ]) {
         fields.add('${value.length}:$value');
       }

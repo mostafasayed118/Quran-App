@@ -10,6 +10,7 @@ import 'app/bootstrap.dart';
 import 'app/di/injector.dart';
 import 'app/onboarding_gate.dart';
 import 'app/router.dart';
+import 'core/domain/adhan_player.dart';
 import 'core/l10n/app_locale_controller.dart';
 import 'core/l10n/platform_localizations.dart';
 import 'core/utils/app_routes.dart';
@@ -86,12 +87,16 @@ Future<void> _initPlugins(String audioChannelName) async {
         onTap: () => AppRouter.router.go(AppRoutes.home),
         onTapPayload: (payload) =>
             AppRouter.router.go(reminderRouteFor(payload) ?? AppRoutes.home),
+        // The notification's "play adhan" action. The media session supplies
+        // the stop control, so this never needs to open the app.
+        onPlayAdhan: (trackId) => getIt<AdhanPlayer>().play(trackId),
       ),
       timeout: _bootNotificationsInitTimeout,
     ),
   ]);
   unawaited(_requestBootNotificationGrace());
   unawaited(_openReminderLaunchTarget());
+  unawaited(_playAdhanLaunchTarget());
   unawaited(_openDeepLinkLaunchTarget());
   _listenForDeepLinks();
   unawaited(runBootReminderSchedule());
@@ -137,6 +142,22 @@ Future<void> _openReminderLaunchTarget() async {
         .addPostFrameCallback((_) => AppRouter.router.go(route));
   } on Object catch (error, stackTrace) {
     dev.log('reminder launch routing failed',
+        name: 'quran_yahdi/boot',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
+  }
+}
+
+/// Cold-start "play adhan" action: the app was launched by the notification's
+/// action button, so start the adhan once the plugins are up. Best-effort — a
+/// failure never breaks boot.
+Future<void> _playAdhanLaunchTarget() async {
+  try {
+    final trackId = await getIt<NotificationsBinding>().launchAdhanActionId();
+    if (trackId == null) return;
+    await getIt<AdhanPlayer>().play(trackId);
+  } on Object catch (error, stackTrace) {
+    dev.log('adhan launch target failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);

@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/domain/app_locale.dart';
 import '../../../core/domain/reminder_diagnostics.dart';
 import '../../../core/domain/reminders.dart';
@@ -64,6 +65,7 @@ class SettingsScreen extends StatelessWidget {
             :final wirdTimeHm,
             :final azkarPermissionDenied,
             :final wirdPermissionDenied,
+            :final adhanId,
           ) =>
             _SettingsList(
               prayerEnabled: prayerEnabled,
@@ -72,6 +74,7 @@ class SettingsScreen extends StatelessWidget {
               wirdEnabled: wirdEnabled,
               wirdTimeHm: wirdTimeHm,
               permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
+              adhanNameAr: adhanById(adhanId).nameAr,
               backupSection: backupSection,
               locale: locale,
               reminderDiagnostics: reminderDiagnostics,
@@ -92,6 +95,7 @@ class _SettingsList extends StatelessWidget {
     required this.wirdEnabled,
     required this.wirdTimeHm,
     required this.permissionDenied,
+    required this.adhanNameAr,
     required this.backupSection,
     required this.locale,
     required this.reminderDiagnostics,
@@ -103,6 +107,7 @@ class _SettingsList extends StatelessWidget {
   final bool wirdEnabled;
   final String wirdTimeHm;
   final bool permissionDenied;
+  final String adhanNameAr;
   final Widget? backupSection;
   final AppLocaleController? locale;
   final ReminderDiagnostics? reminderDiagnostics;
@@ -132,6 +137,17 @@ class _SettingsList extends StatelessWidget {
           title: Text(loc.settingsPrayerReminder),
           value: prayerEnabled,
           onChanged: (value) => cubit.setPrayerEnabled(value),
+        ),
+        ListTile(
+          leading: const Icon(Icons.music_note_outlined),
+          title: Text(loc.adhanTitle),
+          subtitle: Text(adhanNameAr),
+          onTap: () async {
+            await context.push(AppRoutes.adhanPicker);
+            // The picker owns the write, so re-read on return; otherwise the
+            // subtitle would keep showing the reciter the user just replaced.
+            await cubit.load();
+          },
         ),
         SwitchListTile(
           secondary: const Icon(Icons.notifications_outlined),

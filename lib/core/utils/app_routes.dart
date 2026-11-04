@@ -32,6 +32,7 @@ abstract final class AppRoutes {
   static const asma = '/asma';
   static const settings = '/settings';
   static const principles = '/settings/principles';
+  static const adhanPicker = '/settings/adhan';
   static const onboarding = '/onboarding';
   static const bookmarks = '/bookmarks';
 }

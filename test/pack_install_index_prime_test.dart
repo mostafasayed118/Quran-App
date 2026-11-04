@@ -25,8 +25,9 @@ class _FakeCdn implements HttpClientAdapter {
   Future<ResponseBody> fetch(RequestOptions options,
       Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
     final scripted = handler;
-    if (scripted == null)
+    if (scripted == null) {
       throw StateError('unexpected request: ${options.uri}');
+    }
     final reply = await scripted(options);
     final bytes = Uint8List.fromList(utf8.encode(reply.body));
     return ResponseBody(

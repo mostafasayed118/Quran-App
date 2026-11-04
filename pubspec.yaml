@@ -72,6 +72,11 @@ flutter:
     - assets/data/
     - assets/licenses/
     - assets/quran/uthmani/
+    # Adhan audio: full tracks and their notification clips are separate
+    # directories on purpose - Flutter asset directory entries are NOT
+    # recursive, so the clips/ entry is required.
+    - assets/audio/adhan/
+    - assets/audio/adhan/clips/
     - assets/fonts/Cairo-OFL.txt
 
   fonts:

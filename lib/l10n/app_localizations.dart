@@ -1969,6 +1969,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'لا توجد حزمة منشورة بعد — تُنشر أول حزمة بعد توقيع مراجع بشري.'**
   String get reciterPacksEmpty;
+
+  /// No description provided for @adhanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'صوت الأذان'**
+  String get adhanTitle;
+
+  /// No description provided for @adhanDefaultSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأذان الافتراضي'**
+  String get adhanDefaultSection;
+
+  /// No description provided for @adhanFajrSection.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذان الفجر'**
+  String get adhanFajrSection;
+
+  /// No description provided for @adhanSameAsDefault.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثل الافتراضي'**
+  String get adhanSameAsDefault;
+
+  /// No description provided for @adhanPreview.
+  ///
+  /// In ar, this message translates to:
+  /// **'استماع'**
+  String get adhanPreview;
+
+  /// No description provided for @adhanStopPreview.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get adhanStopPreview;
+
+  /// No description provided for @adhanPlayAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'تشغيل الأذان'**
+  String get adhanPlayAction;
 }
 
 class _AppLocalizationsDelegate

@@ -153,7 +153,8 @@ extension SettingsStatePatterns on SettingsState {
             bool wirdEnabled,
             String wirdTimeHm,
             bool azkarPermissionDenied,
-            bool wirdPermissionDenied)?
+            bool wirdPermissionDenied,
+            String adhanId)?
         ready,
     required TResult orElse(),
   }) {
@@ -171,7 +172,8 @@ extension SettingsStatePatterns on SettingsState {
             _that.wirdEnabled,
             _that.wirdTimeHm,
             _that.azkarPermissionDenied,
-            _that.wirdPermissionDenied);
+            _that.wirdPermissionDenied,
+            _that.adhanId);
       case _:
         return orElse();
     }
@@ -201,7 +203,8 @@ extension SettingsStatePatterns on SettingsState {
             bool wirdEnabled,
             String wirdTimeHm,
             bool azkarPermissionDenied,
-            bool wirdPermissionDenied)
+            bool wirdPermissionDenied,
+            String adhanId)
         ready,
   }) {
     final _that = this;
@@ -218,7 +221,8 @@ extension SettingsStatePatterns on SettingsState {
             _that.wirdEnabled,
             _that.wirdTimeHm,
             _that.azkarPermissionDenied,
-            _that.wirdPermissionDenied);
+            _that.wirdPermissionDenied,
+            _that.adhanId);
     }
   }
 
@@ -245,7 +249,8 @@ extension SettingsStatePatterns on SettingsState {
             bool wirdEnabled,
             String wirdTimeHm,
             bool azkarPermissionDenied,
-            bool wirdPermissionDenied)?
+            bool wirdPermissionDenied,
+            String adhanId)?
         ready,
   }) {
     final _that = this;
@@ -262,7 +267,8 @@ extension SettingsStatePatterns on SettingsState {
             _that.wirdEnabled,
             _that.wirdTimeHm,
             _that.azkarPermissionDenied,
-            _that.wirdPermissionDenied);
+            _that.wirdPermissionDenied,
+            _that.adhanId);
       case _:
         return null;
     }
@@ -319,7 +325,8 @@ class SettingsReady implements SettingsState {
       this.wirdEnabled = false,
       this.wirdTimeHm = defaultWirdTimeHm,
       this.azkarPermissionDenied = false,
-      this.wirdPermissionDenied = false});
+      this.wirdPermissionDenied = false,
+      this.adhanId = kDefaultAdhanId});
 
   @JsonKey()
   final bool prayerEnabled;
@@ -335,6 +342,8 @@ class SettingsReady implements SettingsState {
   final bool azkarPermissionDenied;
   @JsonKey()
   final bool wirdPermissionDenied;
+  @JsonKey()
+  final String adhanId;
 
   /// Create a copy of SettingsState
   /// with the given fields replaced by the non-null parameter values.
@@ -361,18 +370,27 @@ class SettingsReady implements SettingsState {
             (identical(other.azkarPermissionDenied, azkarPermissionDenied) ||
                 other.azkarPermissionDenied == azkarPermissionDenied) &&
             (identical(other.wirdPermissionDenied, wirdPermissionDenied) ||
-                other.wirdPermissionDenied == wirdPermissionDenied));
+                other.wirdPermissionDenied == wirdPermissionDenied) &&
+            (identical(other.adhanId, adhanId) || other.adhanId == adhanId));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, prayerEnabled, azkarEnabled, azkarTimeHm,
-        wirdEnabled, wirdTimeHm, azkarPermissionDenied, wirdPermissionDenied);
+    return Object.hash(
+        runtimeType,
+        prayerEnabled,
+        azkarEnabled,
+        azkarTimeHm,
+        wirdEnabled,
+        wirdTimeHm,
+        azkarPermissionDenied,
+        wirdPermissionDenied,
+        adhanId);
   }
 
   @override
   String toString() {
-    return 'SettingsState.ready(prayerEnabled: $prayerEnabled, azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, wirdEnabled: $wirdEnabled, wirdTimeHm: $wirdTimeHm, azkarPermissionDenied: $azkarPermissionDenied, wirdPermissionDenied: $wirdPermissionDenied)';
+    return 'SettingsState.ready(prayerEnabled: $prayerEnabled, azkarEnabled: $azkarEnabled, azkarTimeHm: $azkarTimeHm, wirdEnabled: $wirdEnabled, wirdTimeHm: $wirdTimeHm, azkarPermissionDenied: $azkarPermissionDenied, wirdPermissionDenied: $wirdPermissionDenied, adhanId: $adhanId)';
   }
 }
 
@@ -390,7 +408,8 @@ abstract mixin class $SettingsReadyCopyWith<$Res>
       bool wirdEnabled,
       String wirdTimeHm,
       bool azkarPermissionDenied,
-      bool wirdPermissionDenied});
+      bool wirdPermissionDenied,
+      String adhanId});
 }
 
 /// @nodoc
@@ -412,6 +431,7 @@ class _$SettingsReadyCopyWithImpl<$Res>
     Object? wirdTimeHm = null,
     Object? azkarPermissionDenied = null,
     Object? wirdPermissionDenied = null,
+    Object? adhanId = null,
   }) {
     return _then(SettingsReady(
       prayerEnabled: null == prayerEnabled
@@ -442,6 +462,10 @@ class _$SettingsReadyCopyWithImpl<$Res>
           ? _self.wirdPermissionDenied
           : wirdPermissionDenied // ignore: cast_nullable_to_non_nullable
               as bool,
+      adhanId: null == adhanId
+          ? _self.adhanId
+          : adhanId // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }

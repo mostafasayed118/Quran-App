@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
@@ -49,6 +50,9 @@ void main() {
     // recitation/reciter_repository.dart).
     selectedCityKey,
     selectedMoshafKey,
+    // Adhan selection (core/domain/adhan_preferences.dart).
+    adhanIdKey,
+    adhanFajrIdKey,
   };
 
   test('every user preference key is in the backup whitelist', () {
@@ -94,6 +98,10 @@ void main() {
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
       selectedCityKey,
+      // The adhan choice decides which notification channel the next plan
+      // posts on, so a restore that changes it needs a re-plan.
+      adhanIdKey,
+      adhanFajrIdKey,
     };
     expect(kBackupReminderRelevantKeys, reminderInputs);
   });

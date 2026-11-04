@@ -676,5 +676,12 @@
       "prayer": { "type": "String" },
       "minutes": { "type": "String" }
     }
-  }
+  },
+  "adhanTitle": "Adhan sound",
+  "adhanDefaultSection": "Default adhan",
+  "adhanFajrSection": "Fajr adhan",
+  "adhanSameAsDefault": "Same as default",
+  "adhanPreview": "Preview",
+  "adhanStopPreview": "Stop",
+  "adhanPlayAction": "Play adhan"
 }

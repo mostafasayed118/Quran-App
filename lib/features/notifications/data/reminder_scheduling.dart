@@ -1,3 +1,4 @@
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
@@ -24,6 +25,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
   bool prayerEnabled = true,
   PrayerConfig config = PrayerConfig.egyptian,
   DateTime? now,
+  AdhanPreferences? adhanPrefs,
 }) async {
   try {
     final selected = await city.selectedCity();
@@ -61,6 +63,10 @@ Future<List<ScheduledReminder>> scheduleReminders({
       }
     }
     final loc = platformLocalizations();
+    // Read inside the existing try: a failed preference read must degrade to
+    // "no adhan" (the OS default sound), never fail the whole re-plan.
+    final adhanId = await adhanPrefs?.adhanId();
+    final fajrAdhanId = await adhanPrefs?.fajrAdhanId();
     final plan = planReminders(
       now: nowLocal,
       todayPrayers: todayPrayers,
@@ -72,6 +78,8 @@ Future<List<ScheduledReminder>> scheduleReminders({
       azkarTimeHm: await settings.azkarTimeHm(),
       wirdEnabled: await settings.wirdEnabled(),
       wirdTimeHm: await settings.wirdTimeHm(),
+      adhanId: adhanId,
+      fajrAdhanId: fajrAdhanId,
       texts: ReminderTexts(
         prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
         prayerSoonTitle: (name, minutes) =>

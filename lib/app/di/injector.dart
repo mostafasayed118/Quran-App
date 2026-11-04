@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:drift/drift.dart' show LazyDatabase;
@@ -7,6 +8,11 @@ import 'package:quran_yahdi/app/onboarding_gate.dart';
 import 'package:quran_yahdi/app/router.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/connection.dart';
+import 'package:quran_yahdi/core/domain/adhan_player.dart';
+import 'package:quran_yahdi/core/domain/media_playback_control.dart';
+import 'package:quran_yahdi/features/notifications/data/just_audio_adhan_player.dart';
+import 'package:quran_yahdi/features/recitation/playback/background_init_guard.dart';
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 import 'package:quran_yahdi/core/domain/app_locale.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -28,6 +34,7 @@ import 'package:quran_yahdi/features/hijri/data/hijri_service.dart';
 import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
+import 'package:quran_yahdi/features/notifications/data/adhan_preferences_impl.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_diagnostics_channel.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
@@ -153,10 +160,12 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<HeadingService>(() => HeadingService());
   getIt.registerLazySingleton<CompassCalibration>(() => CompassCalibration());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
+  getIt.registerLazySingleton<AdhanPreferences>(() => AdhanPreferencesImpl(db));
   getIt.registerLazySingleton<ReminderSettings>(() => ReminderSettings(
         db,
         prayerConfig: getIt<PrayerConfigSource>(),
         preAdhanCanceller: getIt<NotificationsBinding>(),
+        adhanPrefs: getIt<AdhanPreferences>(),
       ));
   getIt.registerLazySingleton<ReminderSettingsPort>(
       () => getIt<ReminderSettings>());
@@ -237,8 +246,28 @@ Future<void> configureDependencies({
           libraryRootResolver: libraryRootResolver,
         ));
   }
-  getIt
-      .registerLazySingleton<PlaybackService>(() => JustAudioPlaybackService());
+  getIt.registerLazySingleton<JustAudioPlaybackService>(
+      () => JustAudioPlaybackService());
+  getIt.registerLazySingleton<PlaybackService>(
+      () => getIt<JustAudioPlaybackService>());
+  // The adhan player's "stop the Quran first" seam. A separate registration
+  // rather than a cast, so swapping the playback implementation cannot fail at
+  // runtime.
+  getIt.registerLazySingleton<MediaPlaybackControl>(
+      () => getIt<JustAudioPlaybackService>());
+  getIt.registerLazySingleton<AdhanPlayer>(
+    () => JustAudioAdhanPlayer(
+      // Resolves when the boot-time audio init settles (or its fail-open
+      // timeout fires), so an early play request waits instead of dropping.
+      ready: () => BackgroundInitGuard.ready,
+      control: getIt<MediaPlaybackControl>(),
+    ),
+    dispose: (player) {
+      // Narrow to the implementation: the port deliberately exposes no
+      // lifecycle method, and this is the only owner of the singleton.
+      if (player is JustAudioAdhanPlayer) unawaited(player.dispose());
+    },
+  );
   // Registered unconditionally: the reader and reciter routes read these
   // cubits directly. A degraded boot without a writable audio root must still
   // reach the reader; only starting a download then fails (AudioDownloader

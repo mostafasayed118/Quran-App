@@ -1,4 +1,5 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
@@ -24,12 +25,20 @@ class ReminderSettings
     this._db, {
     PrayerConfigSource? prayerConfig,
     PreAdhanCanceller? preAdhanCanceller,
+    AdhanPreferences? adhanPrefs,
   })  : _prayerConfig = prayerConfig,
-        _preAdhanCanceller = preAdhanCanceller;
+        _preAdhanCanceller = preAdhanCanceller,
+        _adhanPrefs = adhanPrefs;
 
   final AppDatabase _db;
   final PrayerConfigSource? _prayerConfig;
   final PreAdhanCanceller? _preAdhanCanceller;
+
+  /// Optional for the same reason as `PrayerReminderSettingsPort`: existing
+  /// constructions and test fakes predate the adhan picker and must keep
+  /// compiling. Absent, every plan carries no adhan and the OS default sound
+  /// plays — exactly the pre-feature behaviour.
+  final AdhanPreferences? _adhanPrefs;
 
   @override
   Future<bool> azkarEnabled() async {
@@ -168,6 +177,7 @@ class ReminderSettings
       settings: this,
       scheduler: scheduler,
       prayerEnabled: enabled,
+      adhanPrefs: _adhanPrefs,
       config: config,
     );
     // The optional id 4 is not one of the fixed planner ids, so a plan that
