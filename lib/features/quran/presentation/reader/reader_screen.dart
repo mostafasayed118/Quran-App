@@ -13,6 +13,7 @@ import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -245,7 +246,8 @@ class _VersesListState extends State<_VersesList> {
             surahName: state.surahName,
             bookmarked: bookmarked,
             fontScale: state.fontScale,
-            onToggle: () => cubit.toggleBookmark(ayah.id),
+            onToggle: () =>
+                toggleAyahBookmark(context, cubit, ayah.id, bookmarked),
           ),
         );
       },
@@ -395,7 +397,32 @@ Future<void> copyAyahText(BuildContext context, Verse ayah) async {
   final loc = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   await Clipboard.setData(ClipboardData(text: ayah.copyText));
-  messenger.showSnackBar(SnackBar(content: Text(loc.ayahCopied)));
+  AppToast.showOn(messenger, loc.ayahCopied, tone: ToastTone.success);
+}
+
+/// Toggles the bookmark of [ayahId] and confirms what changed.
+///
+/// [bookmarked] is the state *before* the tap, so the copy names the change
+/// that just happened. A failed write is surfaced instead of swallowed: the
+/// star would otherwise stay unchanged with no explanation.
+Future<void> toggleAyahBookmark(
+  BuildContext context,
+  ReaderCubit cubit,
+  int ayahId,
+  bool bookmarked,
+) async {
+  final loc = AppLocalizations.of(context);
+  final messenger = ScaffoldMessenger.of(context);
+  final saved = await cubit.toggleBookmark(ayahId);
+  if (!saved) {
+    AppToast.showOn(messenger, loc.genericError, tone: ToastTone.error);
+    return;
+  }
+  AppToast.showOn(
+    messenger,
+    bookmarked ? loc.bookmarkRemoved : loc.bookmarkSaved,
+    tone: ToastTone.success,
+  );
 }
 
 /// Copies the verse as real Arabic.
@@ -562,32 +589,10 @@ Future<void> _openPageJump(
   ReaderCubit cubit,
   AppLocalizations loc,
 ) async {
-  final controller = TextEditingController();
   final page = await showDialog<int>(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: Text(loc.pageJump),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(hintText: loc.pageJumpHint),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: Text(loc.cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(dialogContext).pop(
-            int.tryParse(controller.text.toWesternDigits),
-          ),
-          child: Text(loc.pageJumpGo),
-        ),
-      ],
-    ),
+    builder: (_) => _PageJumpDialog(loc: loc),
   );
-  controller.dispose();
   if (!context.mounted || page == null) return;
   if (page < 1 || page > 604) {
     _showInvalidPage(context, loc);
@@ -605,9 +610,57 @@ Future<void> _openPageJump(
 }
 
 void _showInvalidPage(BuildContext context, AppLocalizations loc) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text(loc.pageJumpInvalid)),
-  );
+  AppToast.show(context, loc.pageJumpInvalid, tone: ToastTone.error);
+}
+
+/// The page-number dialog.
+///
+/// It owns the controller so the controller lives exactly as long as the route.
+/// Disposing it when `showDialog`'s future completes is a frame too early: the
+/// exit transition still rebuilds the field, which then uses a disposed
+/// controller.
+class _PageJumpDialog extends StatefulWidget {
+  const _PageJumpDialog({required this.loc});
+
+  final AppLocalizations loc;
+
+  @override
+  State<_PageJumpDialog> createState() => _PageJumpDialogState();
+}
+
+class _PageJumpDialogState extends State<_PageJumpDialog> {
+  final _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    Navigator.of(context).pop(int.tryParse(_controller.text.toWesternDigits));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = widget.loc;
+    return AlertDialog(
+      title: Text(loc.pageJump),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(hintText: loc.pageJumpHint),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(loc.cancel),
+        ),
+        FilledButton(onPressed: _submit, child: Text(loc.pageJumpGo)),
+      ],
+    );
+  }
 }
 
 void _showFontSheet(

@@ -209,12 +209,17 @@ class ReaderCubit extends Cubit<ReaderState> {
   }
 
   /// Toggles the bookmark of [ayahId]; the stream re-emits the new set.
-  Future<void> toggleBookmark(int ayahId) async {
+  ///
+  /// Returns whether the write landed, so the reader can confirm the change or
+  /// report the failure instead of leaving a star that silently did nothing.
+  Future<bool> toggleBookmark(int ayahId) async {
     try {
       await _ayahRepository.toggleBookmark(ayahId);
+      return true;
     } on Object catch (error, stackTrace) {
       dev.log('toggle bookmark failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      return false;
     }
   }
 
