@@ -1151,3 +1151,9 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Memmy plugin:** the injected packet now puts `<current_user_request>` **before** `<memmy_memory_context>`. A checkpoint's intent is the first user message, so leading with the memory block made every Entire summary start from recalled context (`recap` showed "top Unknown"). Backup `memmy-memory.js.bak-20261104-notif`, `node --check` passes; applies to sessions started after the edit.
 - **Push:** `f67e401..5fb9ea6` → `main` (explicit SHA); `git ls-remote` == local HEAD == `5fb9ea66c3639de7aa920ec4e87c5ff7b5999466`; unpushed 0; checkpoint queue empty (15 refs synced).
 - **Not done, deliberately:** no branch-based trail for future waves (that is an owner decision against the trunk-only rule), and no cloud `entire dispatch` was generated.
+
+### Policy — waves run on `wave/<name>` and merge after review (owner decision, this repo only) — 2026-11-04
+- **Owner GO:** «نسمح بفرع للموجة (مثلاً wave/<name>) يترّح بعد الـreview — يخالف القاعدة الحالية … في المشروع ده بس», answering the review's open question.
+- **`AGENTS.md` §4/§5 amended:** one branch per wave (`wave/<kebab-name>`) cut from `main`; tasks inside the wave still commit onto that branch (**never** branch-per-task); flow = executor commits (NO PUSH) → PM gates at the tip → owner GO → push the branch → the wave links to its Entire trail → findings closed or explicitly accepted → merge to `main` (fast-forward when possible) → push `main` → delete the branch and close the trail. `main` now accepts reviewed wave merges, docs/ledger-only commits and owner-scoped hot-fixes; force-push/rebase stay forbidden. Footer updated.
+- **Scope:** this repository only; the adawy monorepo's own rules are untouched.
+- **Not yet exercised:** the first wave to use it links to trail #3 (intent-only today; it becomes change-scoped once a `wave/` branch is linked).

@@ -69,7 +69,7 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 
 ## 4) Campaign protocol — Mode B essentials
 
-- Waves run on trunk `main` (+ optional git worktrees for isolation) — **never branch-per-task**.
+- Waves run on **one branch per wave** — `wave/<kebab-name>`, cut from `main` (a git worktree is optional). Tasks inside the wave still commit straight onto that branch: **never a branch per task**.
 - Executor briefs: English, self-contained, with a **verbatim start gate** (HEAD pin · expected porcelain set · unpushed count · toolchain), a STOP list, gates (`analyze` 0 + full tests with exact frozen counts), explicit-pathspec commits, and **NO PUSH**.
 - The ledger `docs/campaign-ledger.md` is **append-only**; the PM writes close-outs; executors never touch `docs/`.
 - Report format: start-gate output verbatim · per-commit SHA/stat · gate tails · confirmation bullets · STOPs/deviations/disclosures · final porcelain + unpushed count.
@@ -79,7 +79,11 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 
 ## 5) Branches
 
-- Campaign sessions: trunk only. Pairing sessions / experiments: optional short `<type>/short-description` branch.
+- **Campaign waves: one branch per wave**, `wave/<kebab-name>` cut from `main`. Tasks inside the wave commit straight onto that branch — a branch per task is still forbidden.
+- **Wave flow:** executor commits on the branch (NO PUSH) → PM runs the gates at the tip → owner GO → PM pushes the branch → the wave is linked to its Entire trail for review → findings closed or explicitly accepted → merge to `main` (fast-forward when possible) → push `main` → delete the branch (local + remote) and close the trail.
+- **`main` accepts:** reviewed wave merges, docs/ledger-only commits, and hot-fixes the owner explicitly scopes. Never force-push or rebase `main`.
+- Pairing sessions / experiments: optional short `<type>/short-description` branch.
+- Rationale (owner decision 2026-11-04, this repository only): a change-scoped trail needs a branch to review, and reviewing after the merge is too late. The trunk-only rule was replaced here; the adawy monorepo's own rules are unaffected.
 
 ## 6) Reading lists (filtered for this project)
 
@@ -106,4 +110,4 @@ The `skills.sh` list in `INSTRUCTIONS.md` (Section H) is a Claude-Code-plugin ar
 getx · riverpod (comparison only) · stacked · firebase/flutterfire · flutter-after-layout (use `addPostFrameCallback`) · kt.dart · bolt · flutterfire_desktop — all excluded.
 
 ---
-*Last updated: 2026-11-04 — layout section corrected against source (17 features, `settings/` does have `data/`, nested `presentation/` documented, `onboarding` added to the error-handling exceptions) by the 2026-11-04 code-quality audit's doc truth pass. Prior: 2026-10-28, adapted for `quran_yahdi`; owner-ratified (recorded in `docs/campaign-ledger.md`).*
+*Last updated: 2026-11-04 — **branching policy changed (owner decision): waves now run on `wave/<name>` and merge after review** (§4/§5); this repository only. Prior: layout section corrected against source (17 features, `settings/` does have `data/`, nested `presentation/` documented, `onboarding` added to the error-handling exceptions) by the 2026-11-04 code-quality audit's doc truth pass. Prior: 2026-10-28, adapted for `quran_yahdi`; owner-ratified (recorded in `docs/campaign-ledger.md`).*
