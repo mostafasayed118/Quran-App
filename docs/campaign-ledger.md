@@ -1157,3 +1157,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **`AGENTS.md` §4/§5 amended:** one branch per wave (`wave/<kebab-name>`) cut from `main`; tasks inside the wave still commit onto that branch (**never** branch-per-task); flow = executor commits (NO PUSH) → PM gates at the tip → owner GO → push the branch → the wave links to its Entire trail → findings closed or explicitly accepted → merge to `main` (fast-forward when possible) → push `main` → delete the branch and close the trail. `main` now accepts reviewed wave merges, docs/ledger-only commits and owner-scoped hot-fixes; force-push/rebase stay forbidden. Footer updated.
 - **Scope:** this repository only; the adawy monorepo's own rules are untouched.
 - **Not yet exercised:** the first wave to use it links to trail #3 (intent-only today; it becomes change-scoped once a `wave/` branch is linked).
+
+### Appearance toggle — system / light / dark — `0ef679b` — 2026-11-04 — ON MAIN, UNPUSHED
+- **Owner ask + GO:** «عايزك تعملي togele theme and localzaton en/ar» → the EN/AR switch already ships (B2), so the scope was narrowed → «صفوف في الإعدادات» for the theme and «فوري» for the language → design approved («موافق»).
+- **Shipped:** `AppThemeMode` (system/light/dark) with a tolerant `fromCode` (unknown → system), an `AppThemeSource` port, `AppThemeRepository` (settings key `app_theme_mode`, **no schema change or migration**), and `AppThemeController` (notify-first/persist-second, fail-open on read and write). The app root listens to the **merged** locale+theme controllers and passes `themeMode`; `main.dart` loads the stored choice behind the first frame; Settings gains an **Appearance** row above the reminder switches with a three-option dialog mirroring the language row; four AR/EN strings added and the l10n files regenerated.
+- **Language:** already complete (controller + settings row + instant switch) — nothing changed there.
+- **Backup:** `app_theme_mode` is **device-scoped** (joins `AppLocaleRepository.key` and the onboarding flag in `deviceScopedKeys`), so a restore onto another phone does not flip its look.
+- **Frozen tests:** none edited. `const SettingsScreen()` still compiles (the controller is optional) and the row stays out without it — the existing settings pins are untouched.
+- **Gates:** format 0 · analyze 0 · full suite **1257/1257** (7 controller tests + 4 row tests).
+- **Not done (owner choice):** no quick AppBar toggle; settings rows only.
