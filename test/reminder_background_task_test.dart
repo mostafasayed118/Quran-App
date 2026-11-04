@@ -27,7 +27,7 @@ void main() {
     // the periodic task on every installed device instead of updating it.
     expect(reminderRefreshUniqueName, 'quran_yahdi_reminder_refresh');
     expect(reminderRefreshTask, 'reminderRefresh');
-    expect(reminderRefreshFrequency, const Duration(minutes: 30));
+    expect(reminderRefreshFrequency, const Duration(minutes: 15));
   });
 
   test('the stamp keeps a bounded history', () async {

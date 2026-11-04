@@ -6,9 +6,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
-    <!-- Restores the persisted reminder alarms after a reboot: the plugin
-         re-arms every notification it was asked to schedule (the whole rolling
-         window), not only the daily ones. -->
+    <!-- No plugin boot receiver on purpose: it re-arms the STORED instants, so
+         a phone that was off across a few alarms fires them all at boot. The
+         background re-plan (lib/app/reminder_background_task.dart) rebuilds the
+         window from the DB instead, and WorkManager's own boot receiver is
+         declared by its library. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="@string/app_name"
@@ -89,24 +91,6 @@
         <receiver
             android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
-        <!-- Restores EVERY persisted reminder (prayer, pre-adhan, azkar, wird)
-             after a reboot, an app update or a quick-boot: the plugin stores
-             each scheduled notification and re-arms its instant. This is what
-             keeps a reminder app alive across Play updates, which the system
-             silently cancels. Trade-off, recorded in the ledger: an alarm whose
-             instant passed while the device was off fires immediately on boot,
-             so a phone that was off across several alarms gets that catch-up
-             once (bounded by the planner's window). -->
-        <receiver
-            android:exported="false"
-            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
-                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
-            </intent-filter>
-        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

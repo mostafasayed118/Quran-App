@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:flutter/widgets.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../core/l10n/app_locale_controller.dart';
@@ -18,10 +19,12 @@ const String reminderRefreshUniqueName = 'quran_yahdi_reminder_refresh';
 
 /// How often the background isolate re-composes the rolling plan.
 ///
-/// WorkManager's floor is 15 minutes. 30 keeps the wakeups moderate while still
-/// running right after a boot that lasted longer than half an hour — the case
-/// where the platform's own restore would otherwise replay stale instants.
-const Duration reminderRefreshFrequency = Duration(minutes: 30);
+/// WorkManager's floor. The worker is the only thing that recovers the alarms
+/// after a boot (the plugin's restore is deliberately not declared), so the
+/// period IS the worst-case gap between power-on and a live schedule — 15
+/// minutes keeps that tight. The run itself is read-only and the plan
+/// fingerprint skips the platform writes when nothing moved.
+const Duration reminderRefreshFrequency = Duration(minutes: 15);
 
 /// How many stamp lines the device check keeps (see [stampReminderRefresh]).
 const int stampHistory = 40;
@@ -67,18 +70,18 @@ Future<bool> runReminderRefreshTask(Future<void> Function() body) async {
 
 /// Durable record of a background run, for the on-device check.
 ///
-/// `adb shell run-as <pkg> cat cache/reminder_refresh_stamp.txt` answers "did
+/// `adb shell run-as <pkg> cat files/reminder_refresh_stamp.txt` answers "did
 /// the isolate ever run?" — a background isolate prints nothing and a silent
-/// failure looks exactly like a task that never started. Uses the temp dir on
-/// purpose: it needs no plugin, so the stamp cannot fail for the same reason
-/// the refresh did.
+/// failure looks exactly like a task that never started. The app-support dir
+/// comes from a plugin, so the temp dir is the fallback (and the only option
+/// before the object graph exists).
 ///
-/// Keeps the last [stampHistory] lines: the task runs every half hour, so an
+/// Keeps the last [stampHistory] lines: the task runs every quarter hour, so an
 /// append-only file would grow without bound on a phone that is never updated.
 Future<void> stampReminderRefresh(String outcome) async {
+  final file = await _stampFile();
+  if (file == null) return;
   try {
-    final file =
-        File('${Directory.systemTemp.path}/reminder_refresh_stamp.txt');
     final kept = <String>[];
     if (file.existsSync()) {
       final lines = await file.readAsLines();
@@ -103,10 +106,12 @@ Future<void> stampReminderRefresh(String outcome) async {
 /// handing it a plan — the plugin is the only writer of the alarms, and a plan
 /// queued against an uninitialized binding would be lost with the isolate.
 Future<void> refreshRemindersForBackground() async {
-  // First thing, before any plugin: proves the isolate actually started.
+  // The binding must exist before the stamp: the app-support path is a plugin
+  // call, and without a binding it would fail silently.
+  WidgetsFlutterBinding.ensureInitialized();
+  // Proves the isolate actually started.
   await stampReminderRefresh('start');
   dev.log('reminder refresh task started', name: 'quran_yahdi/background');
-  WidgetsFlutterBinding.ensureInitialized();
   // Plugins that register Dart-side handlers in a secondary isolate need this;
   // it is a no-op when the platform already registered them.
   try {
@@ -121,4 +126,19 @@ Future<void> refreshRemindersForBackground() async {
   await getIt<NotificationsBinding>().init();
   await runBootReminderSchedule();
   await stampReminderRefresh('ok');
+}
+
+/// The stamp file, or null when neither directory is usable.
+Future<File?> _stampFile() async {
+  try {
+    final dir = await getApplicationSupportDirectory();
+    return File('${dir.path}/reminder_refresh_stamp.txt');
+  } on Object {
+    // Not every host registers path_provider in a secondary isolate.
+  }
+  try {
+    return File('${Directory.systemTemp.path}/reminder_refresh_stamp.txt');
+  } on Object {
+    return null;
+  }
 }

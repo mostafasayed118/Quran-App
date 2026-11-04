@@ -66,8 +66,9 @@ Future<List<Map<String, dynamic>>> defaultLibraryCatalogLoader() async {
 /// W7b boot glue: recompose the reminder plan once per app start (and on a
 /// resume that crosses midnight or a time-zone change). The plan pre-registers
 /// a rolling [reminderHorizonDays] window, so the alarms keep firing while the
-/// app stays closed, and the plugin's boot receiver re-arms the persisted
-/// alarms after a reboot or an app update. The shared helper is guarded and
+/// app stays closed, and the same helper runs from the WorkManager task after a
+/// reboot or an app update (the plugin's own boot restore is deliberately not
+/// declared: it replays stored instants). The shared helper is guarded and
 /// never throws, and it honours the persisted prayer-reminder toggle.
 Future<void> runBootReminderSchedule() async {
   // Read the saved method before composing reminders so the plan follows the
