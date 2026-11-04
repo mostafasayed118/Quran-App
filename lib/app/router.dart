@@ -7,6 +7,7 @@ import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
 import '../core/l10n/app_locale_controller.dart';
+import '../core/theme/app_theme_controller.dart';
 import '../core/domain/prayer_config.dart';
 import '../core/domain/pre_adhan_canceller.dart';
 import '../core/domain/prayer_times.dart';
@@ -406,6 +407,7 @@ abstract final class AppRouter {
             child: SettingsScreen(
               backupSection: const BackupSection(),
               locale: getIt<AppLocaleController>(),
+              theme: getIt<AppThemeController>(),
             ),
           ),
         ),

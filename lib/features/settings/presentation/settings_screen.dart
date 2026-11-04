@@ -9,11 +9,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/domain/app_locale.dart';
+import '../../../core/domain/app_theme.dart';
 import '../../../core/domain/reminder_diagnostics.dart';
 import '../../../core/domain/reminders.dart';
 import '../../../core/l10n/app_locale_controller.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_theme_controller.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/hour_minute.dart';
@@ -31,6 +33,7 @@ class SettingsScreen extends StatelessWidget {
     super.key,
     this.backupSection,
     this.locale,
+    this.theme,
     this.reminderDiagnostics,
   });
 
@@ -41,6 +44,9 @@ class SettingsScreen extends StatelessWidget {
   /// The language switch, wired by the composition root. Null keeps the row
   /// out (a host that does not opt in, e.g. a focused widget test).
   final AppLocaleController? locale;
+
+  /// The appearance switch, wired the same way. Null keeps its row out.
+  final AppThemeController? theme;
 
   /// Reminder-health readout seam, resolved from the service locator when a
   /// host does not pass one. Optional twice over on purpose: the frozen
@@ -77,6 +83,7 @@ class SettingsScreen extends StatelessWidget {
               adhanNameAr: adhanById(adhanId).nameAr,
               backupSection: backupSection,
               locale: locale,
+              theme: theme,
               reminderDiagnostics: reminderDiagnostics,
             ),
         },
@@ -98,6 +105,7 @@ class _SettingsList extends StatelessWidget {
     required this.adhanNameAr,
     required this.backupSection,
     required this.locale,
+    required this.theme,
     required this.reminderDiagnostics,
   });
 
@@ -110,6 +118,7 @@ class _SettingsList extends StatelessWidget {
   final String adhanNameAr;
   final Widget? backupSection;
   final AppLocaleController? locale;
+  final AppThemeController? theme;
   final ReminderDiagnostics? reminderDiagnostics;
 
   @override
@@ -117,6 +126,7 @@ class _SettingsList extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<SettingsCubit>();
     final language = locale;
+    final appearance = theme;
     return ListView(
       padding: EdgeInsets.only(bottom: appBottomInset(context)),
       children: [
@@ -128,6 +138,18 @@ class _SettingsList extends StatelessWidget {
               title: Text(loc.language),
               subtitle: Text(_languageLabel(loc, language.language)),
               onTap: () => unawaited(_pickLanguage(context, loc, language)),
+            ),
+          ),
+          const Divider(height: 1),
+        ],
+        if (appearance != null) ...[
+          ListenableBuilder(
+            listenable: appearance,
+            builder: (context, _) => ListTile(
+              leading: const Icon(Icons.brightness_6_outlined),
+              title: Text(loc.settingsTheme),
+              subtitle: Text(_themeLabel(loc, appearance.mode)),
+              onTap: () => unawaited(_pickTheme(context, loc, appearance)),
             ),
           ),
           const Divider(height: 1),
@@ -433,6 +455,48 @@ DateTime _asDateTime(TimeOfDay time) =>
 /// The label for the current language, in the current language.
 String _languageLabel(AppLocalizations loc, AppLanguage language) =>
     language == AppLanguage.arabic ? loc.languageArabic : loc.languageEnglish;
+
+/// The label for the current appearance, in the current language.
+String _themeLabel(AppLocalizations loc, AppThemeMode mode) => switch (mode) {
+      AppThemeMode.system => loc.themeSystem,
+      AppThemeMode.light => loc.themeLight,
+      AppThemeMode.dark => loc.themeDark,
+    };
+
+/// Offers the three appearance modes; the controller applies and persists the
+/// pick, and the app root repaints immediately.
+Future<void> _pickTheme(
+  BuildContext context,
+  AppLocalizations loc,
+  AppThemeController controller,
+) async {
+  final selected = await showDialog<AppThemeMode>(
+    context: context,
+    builder: (dialogContext) => SimpleDialog(
+      title: Text(loc.settingsTheme),
+      children: [
+        for (final mode in AppThemeMode.values)
+          SimpleDialogOption(
+            onPressed: () => Navigator.of(dialogContext).pop(mode),
+            child: Row(
+              children: [
+                Icon(
+                  controller.mode == mode
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(_themeLabel(loc, mode)),
+              ],
+            ),
+          ),
+      ],
+    ),
+  );
+  if (selected == null) return;
+  await controller.setMode(selected);
+}
 
 /// Offers the shipped languages; the controller applies and persists the pick.
 Future<void> _pickLanguage(

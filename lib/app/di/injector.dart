@@ -15,6 +15,7 @@ import 'package:quran_yahdi/features/recitation/playback/background_init_guard.d
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 import 'package:quran_yahdi/core/domain/app_locale.dart';
+import 'package:quran_yahdi/core/domain/app_theme.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
@@ -23,6 +24,7 @@ import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/app_locale_controller.dart';
+import 'package:quran_yahdi/core/theme/app_theme_controller.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state.dart';
@@ -67,6 +69,7 @@ import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/features/settings/data/app_locale_repository.dart';
+import 'package:quran_yahdi/features/settings/data/app_theme_repository.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 import 'package:quran_yahdi/features/tracker/data/khatma_repository.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
@@ -224,6 +227,13 @@ Future<void> configureDependencies({
   // row; the app entry point calls load() behind the first frame.
   getIt.registerLazySingleton<AppLocaleController>(
       () => AppLocaleController(getIt<AppLocaleSource>()));
+  getIt.registerLazySingleton<AppThemeRepository>(() => AppThemeRepository(db));
+  getIt
+      .registerLazySingleton<AppThemeSource>(() => getIt<AppThemeRepository>());
+  // Same shape for the appearance: the root rebuilds `MaterialApp.themeMode`
+  // and the settings row shows the current choice.
+  getIt.registerLazySingleton<AppThemeController>(
+      () => AppThemeController(getIt<AppThemeSource>()));
   getIt.registerLazySingleton<AzkarRepository>(
       () => AzkarRepository(loader: azkarLoader ?? _emptyAzkarLoader));
   getIt.registerLazySingleton<AzkarSavedStateRepository>(

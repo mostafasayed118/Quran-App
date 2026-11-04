@@ -11,6 +11,7 @@ import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/settings/data/app_locale_repository.dart';
+import 'package:quran_yahdi/features/settings/data/app_theme_repository.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 
 /// Inventory pin (Class B): **every user preference the app persists must be
@@ -25,6 +26,7 @@ void main() {
   /// not flip the reading language or re-open the setup flow.
   const deviceScopedKeys = <String>{
     AppLocaleRepository.key,
+    AppThemeRepository.key,
     OnboardingRepository.completedKey,
   };
 

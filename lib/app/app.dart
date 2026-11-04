@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import '../core/domain/reminder_diagnostics.dart';
 import '../core/domain/reminders.dart';
 import '../core/l10n/app_locale_controller.dart';
+import '../core/theme/app_theme_controller.dart';
 import '../core/theme/app_system_ui.dart';
 import '../core/theme/app_theme.dart';
 import '../features/library/data/pack_downloader.dart';
@@ -29,6 +30,10 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   /// The language switch (D1 v1.1): the settings row flips it and the root
   /// rebuilds, so `Directionality` follows (ar → RTL, en → LTR).
   late final AppLocaleController _locale = getIt<AppLocaleController>();
+
+  /// The appearance switch: the settings row flips it and the root rebuilds
+  /// `MaterialApp.themeMode` (system until the stored choice lands).
+  late final AppThemeController _theme = getIt<AppThemeController>();
 
   /// The day/zone the current plan belongs to, plus the last observed
   /// exact-alarm grant (a grant change alters the schedule MODE).
@@ -124,12 +129,12 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: _locale,
+      listenable: Listenable.merge(<Listenable>[_locale, _theme]),
       builder: (context, _) => MaterialApp.router(
         onGenerateTitle: (context) => AppLocalizations.of(context).appName,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
+        themeMode: _theme.themeMode,
         locale: _locale.locale,
         // Arabic stays the default (AppLanguage.arabic); English is opt-in from
         // the settings row, and the EN ARB is a full mirror of the AR template.

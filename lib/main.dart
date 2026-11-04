@@ -14,6 +14,7 @@ import 'app/reminder_background_task.dart';
 import 'app/router.dart';
 import 'core/domain/adhan_player.dart';
 import 'core/l10n/app_locale_controller.dart';
+import 'core/theme/app_theme_controller.dart';
 import 'core/l10n/platform_localizations.dart';
 import 'core/utils/app_routes.dart';
 import 'core/utils/boot_fail_open.dart';
@@ -56,6 +57,8 @@ Future<void> main() async {
   // Same for the language: the stored choice is read behind the first frame
   // and the root rebuilds when it lands (Arabic until then).
   unawaited(getIt<AppLocaleController>().load());
+  // Appearance follows the same pattern: system until the stored choice lands.
+  unawaited(getIt<AppThemeController>().load());
   // The first frame never waits for a plugin: the audio and notifications
   // plugins initialize behind the running app, and the app tolerates a
   // not-yet-initialized notifications binding (every call is a no-op until
