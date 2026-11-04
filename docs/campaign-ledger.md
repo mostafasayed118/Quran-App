@@ -1129,3 +1129,17 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - `cmd jobscheduler run -f -n androidx.work.systemjobscheduler <pkg> <id>` starts **and finishes the job in ~20 ms** (`app called jobFinished`) without reaching the work spec, so it is not a usable trigger for this build.
 - **The worker itself has not executed yet.** To make the next check independent of the console (a background isolate prints nothing), the task now writes a bounded stamp at start/ok/failed (`cache/reminder_refresh_stamp.txt`, last 40 lines, read with `adb shell run-as <pkg> cat …`), and the periodic registration carries a 15 s `initialDelay` so a fresh install exercises the path without waiting a period.
 - The device disconnected during the reinstall. **Phase 2 stays blocked** until the worker is observed end to end (stamp `start` + `ok`, then alarms rebuilt in `dumpsys alarm`).
+
+#### Phase 2 — the plugin restore removed; the worker owns recovery — `a326b98`
+- **Owner GO:** «اشتغل» (second half), executed only after the worker was proven on the device.
+- **Why the restore had to go:** the plugin persists every `zonedSchedule` and its receiver re-arms the stored instants at boot, so a phone that was off across a few alarms plays them all at power-on. There is no API to prune the stored set, so the receiver itself had to go.
+- **Changes:** `ScheduledNotificationBootReceiver` removed from the manifest; the frequency dropped to **15 minutes** (WorkManager's floor) because the period is now the worst-case gap between power-on and a live schedule; the stamp prefers the app-support dir (it needs the binding) and keeps the last 40 lines.
+- **Device evidence (emulator, API 36, package `…quranyahdi.debug`), in order:**
+  - worker `SUCCESS` at **20:01:17** with the app open (the 15 s `initialDelay` on first registration), stamp `start` + `ok`;
+  - **90** alarm lines for the app before the reboot;
+  - `adb reboot` at ~20:06 → **0 alarms** after boot (the plugin restore is gone, exactly as designed);
+  - worker ran again at **20:16:43 with the app never opened** (stamp `ok`) → **90 alarms rebuilt**.
+  - Recovery landed ~10 minutes after boot (the job's post-boot minimum latency), i.e. inside one period.
+- **Consequence recorded:** a reboot leaves the app with no alarms until the next worker run (≤15 min). That is the deliberate trade for losing the catch-up burst.
+- **Device-found defect, NOT fixed here (outside this wave):** selecting a city from onboarding pushes `/prayer-times/city`, but `OnboardingGate.decide` redirects **every** non-onboarding route while the flag is unset, so the picker ends up as the only page and its `Navigator.pop(true)` trips go_router's "popped the last page off the stack" assertion (debug) and no-ops (release). The city still persists — the home card showed Cairo afterwards. Repro: fresh install → onboarding → «اختر مدينتك» → pick any city. The fix is a route the gate allows while the flow is open (e.g. `/onboarding/city`) or a modal picker.
+- **State at close-out:** `a326b98` is the only unpushed commit (the parallel session pushed `f67e401`, which carried the earlier 13).
