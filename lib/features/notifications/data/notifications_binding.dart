@@ -1,18 +1,13 @@
-import 'dart:ui' show Locale, VoidCallback;
+import 'dart:ui' show VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:meta/meta.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
-    show
-        azkarReminderId,
-        prayerReminderId,
-        preAdhanReminderId,
-        shouldRequestBootPermission,
-        wirdReminderId;
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+    show preAdhanReminderId, reminderAlarmIds, shouldRequestBootPermission;
 import 'package:timezone/timezone.dart' as tz;
 
 /// The ONE file that touches the flutter_local_notifications plugin (W7b
@@ -141,7 +136,7 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
     _onTapPayload = onTapPayload;
     _initFailed = false;
     try {
-      final loc = lookupAppLocalizations(const Locale('ar'));
+      final loc = platformLocalizations();
       await _plugin.initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings(defaultIcon),
@@ -160,6 +155,13 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
           channelDescription: loc.reminderChannelDescription,
           importance: Importance.high,
           priority: Priority.high,
+        ),
+        // iOS shows the alert with the system sound; the custom adhan clips are
+        // Android raw resources, so iOS keeps the default sound (no .caf asset
+        // is cleared for shipping yet).
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
         ),
       );
       // Cached so a per-reciter channel can be built at post time without a
@@ -438,6 +440,10 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
           ),
         ],
       ),
+      iOS: const DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: true,
+      ),
     );
   }
 
@@ -466,16 +472,13 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       // The alarms are about to be cleared. From this point the old
       // fingerprint is a lie even if a later zonedSchedule throws.
       _appliedPlan = null;
-      // All three fixed planner ids go up front, plus any id a previous plan
-      // wrote (the optional pre-adhan id), so a reminder that is no longer
-      // part of the new plan is still removed (replace-all semantics).
-      final ids = <int>{
-        prayerReminderId,
-        azkarReminderId,
-        wirdReminderId,
-        ..._appliedPlanIds,
-      };
-      for (final id in ids) {
+      // Clear EVERY id the planner can write, not just the ones this plan
+      // contains: a reminder the user turned off in an earlier session has to
+      // stop, and the binding keeps no memory of that session. The set is
+      // fixed and small (the rolling window), so this stays a targeted cancel
+      // — a blanket `cancelAll()` would wipe the playback notification owned
+      // by `just_audio_background`.
+      for (final id in reminderAlarmIds()) {
         await _plugin.cancel(id: id);
       }
       _appliedPlanIds = <int>{
@@ -491,6 +494,11 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
           scheduledDate: tz.TZDateTime.from(reminder.fireAt.toUtc(), tz.UTC),
           notificationDetails: _detailsFor(reminder, details),
           androidScheduleMode: mode,
+          // Azkar and wird fire at a fixed clock time, so the OS can repeat
+          // them forever and restore them after a reboot with no app start.
+          // Prayer reminders stay one-shot: their time moves every day.
+          matchDateTimeComponents:
+              reminder.repeatsDaily ? DateTimeComponents.time : null,
         );
       }
       _appliedPlan = fingerprint;
@@ -519,6 +527,9 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
         r.body ?? '',
         r.payload ?? '',
         r.adhanId ?? '',
+        // A plan that only flips the daily repeat changes what the platform
+        // stores, so it must re-post.
+        r.repeatsDaily ? 'daily' : 'once',
       ]) {
         fields.add('${value.length}:$value');
       }

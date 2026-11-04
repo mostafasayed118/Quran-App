@@ -5,7 +5,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
-    show azkarReminderId, prayerReminderId, preAdhanReminderId, wirdReminderId;
+    show
+        azkarReminderId,
+        prayerReminderId,
+        preAdhanReminderId,
+        reminderAlarmIds;
 
 const MethodChannel _channel = MethodChannel(
   'dexterous.com/flutter/local_notifications',
@@ -52,7 +56,7 @@ void main() {
     ]);
     expect(
       _cancelIds(calls),
-      unorderedEquals([prayerReminderId, azkarReminderId, wirdReminderId]),
+      unorderedEquals(reminderAlarmIds()),
     );
 
     calls.clear();
@@ -63,13 +67,9 @@ void main() {
 
     expect(
       _cancelIds(calls),
-      unorderedEquals([
-        prayerReminderId,
-        azkarReminderId,
-        wirdReminderId,
-        preAdhanReminderId,
-      ]),
+      unorderedEquals(reminderAlarmIds()),
     );
+    expect(_cancelIds(calls), contains(preAdhanReminderId));
   });
 
   test('a no-op pre-adhan cancel keeps an identical plan deduped', () async {

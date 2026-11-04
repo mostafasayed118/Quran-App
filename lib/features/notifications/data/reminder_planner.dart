@@ -18,6 +18,73 @@ const int wirdReminderId = 3;
 /// sets a pre-adhan lead time. Kept above the frozen 1/2/3 ids.
 const int preAdhanReminderId = 4;
 
+/// How many days of prayer alarms one plan pre-registers, today included.
+///
+/// The app re-plans on boot, on every prayer-tab load, on a settings or city
+/// change and on a day change while it is alive. One alarm per prayer is not
+/// enough: a week is what keeps the reminders ringing for a user who does not
+/// open the app every day, and it stays far below Android's per-app alarm cap.
+const int reminderHorizonDays = 7;
+
+/// The five reminded prayers, in calendar order.
+///
+/// Sunrise is a time marker, never a reminder, so it has no alarm slot.
+const List<PrayerName> _remindedPrayers = <PrayerName>[
+  PrayerName.fajr,
+  PrayerName.dhuhr,
+  PrayerName.asr,
+  PrayerName.maghrib,
+  PrayerName.isha,
+];
+
+/// Reserved id blocks for the rolling horizon (the frozen 1-4 stay untouched).
+const int _horizonPrayerBase = 1000;
+const int _horizonPreAdhanBase = 2000;
+
+/// The day's slot inside the horizon window.
+///
+/// Slots are reused as the window rolls, which is what makes the id set
+/// bounded: [reminderAlarmIds] can clear EVERY alarm the planner can ever
+/// write without remembering the previous plan (the app may have been killed
+/// since the last one).
+int _horizonSlot(DateTime day) =>
+    DateTime.utc(day.year, day.month, day.day).millisecondsSinceEpoch ~/
+    Duration.millisecondsPerDay %
+    reminderHorizonDays;
+
+/// The alarm id of [name] on [day] inside the rolling horizon.
+int prayerAlarmId(DateTime day, PrayerName name) {
+  assert(name != PrayerName.sunrise, 'sunrise is a marker, never a reminder');
+  return _horizonPrayerBase +
+      _horizonSlot(day) * 10 +
+      _remindedPrayers.indexOf(name);
+}
+
+/// The pre-adhan alarm id of [name] on [day] inside the rolling horizon.
+int preAdhanAlarmId(DateTime day, PrayerName name) {
+  assert(name != PrayerName.sunrise, 'sunrise is a marker, never a reminder');
+  return _horizonPreAdhanBase +
+      _horizonSlot(day) * 10 +
+      _remindedPrayers.indexOf(name);
+}
+
+/// Every alarm id this planner can write.
+///
+/// A plan change clears all of them before scheduling: the binding keeps no
+/// memory across a process death, so a reminder the user turned off in an
+/// earlier session would otherwise keep firing for the rest of the window.
+Set<int> reminderAlarmIds() => <int>{
+      prayerReminderId,
+      azkarReminderId,
+      wirdReminderId,
+      preAdhanReminderId,
+      for (var slot = 0; slot < reminderHorizonDays; slot++)
+        for (var i = 0; i < _remindedPrayers.length; i++) ...<int>[
+          _horizonPrayerBase + slot * 10 + i,
+          _horizonPreAdhanBase + slot * 10 + i,
+        ],
+    };
+
 /// Tap payloads: cold/warm notification taps carry these tags so the app
 /// layer can route to the reminder's own screen (W7b non-goal closed).
 const String prayerReminderPayload = 'prayer';
@@ -65,6 +132,10 @@ class ReminderTexts {
 /// azkar and wird at their settings times (today if still ahead, else
 /// tomorrow). Missed-while-dead reminders are accepted v1 and are not
 /// back-filled; the app re-plans on every open and on every city change.
+///
+/// This is the SEED of the plan. [planPrayerHorizon] adds the rest of the
+/// window on top of it (one alarm per prayer is not enough when the app stays
+/// closed for a day).
 List<ScheduledReminder> planReminders({
   required DateTime now,
   required List<PrayerChoice> todayPrayers,
@@ -135,6 +206,7 @@ List<ScheduledReminder> planReminders({
       title: texts.azkarTitle,
       body: texts.azkarBody,
       payload: azkarReminderPayload,
+      repeatsDaily: true,
     );
   }
 
@@ -146,10 +218,68 @@ List<ScheduledReminder> planReminders({
       title: wirdTitle,
       body: texts.wirdBody,
       payload: wirdReminderPayload,
+      repeatsDaily: true,
     );
   }
 
   return List.unmodifiable(byId.values);
+}
+
+/// The prayer reminders BEYOND the single next prayer [planReminders] emits.
+///
+/// [days] is today and the following days (`days[0]` is today). Every enabled
+/// prayer still ahead is scheduled with a horizon id, so the alarms keep firing
+/// while the app stays closed. [skipAt] is the instant the seed reminder
+/// already covers — scheduling it twice would notify twice.
+List<ScheduledReminder> planPrayerHorizon({
+  required DateTime now,
+  required List<List<PrayerChoice>> days,
+  DateTime? skipAt,
+  Set<PrayerName> enabledPrayers = PrayerConfig.defaultEnabledPrayers,
+  int preAdhanMinutes = 0,
+  required ReminderTexts texts,
+  String? adhanId,
+  String? fajrAdhanId,
+}) {
+  final out = <ScheduledReminder>[];
+  for (final dayPrayers in days) {
+    for (final choice in dayPrayers) {
+      if (choice.name == PrayerName.sunrise) continue;
+      if (!enabledPrayers.contains(choice.name)) continue;
+      if (!choice.time.isAfter(now)) continue;
+      if (skipAt != null && choice.time.isAtSameMomentAs(skipAt)) continue;
+      out.add(
+        ScheduledReminder(
+          id: prayerAlarmId(choice.time, choice.name),
+          fireAt: choice.time,
+          title: texts.prayerTitle(choice.name),
+          payload: prayerReminderPayload,
+          adhanId: adhanId == null
+              ? null
+              : adhanIdForPrayer(
+                  prayer: choice.name,
+                  globalId: adhanId,
+                  fajrId: fajrAdhanId,
+                ),
+        ),
+      );
+      final soonTitle = texts.prayerSoonTitle;
+      if (preAdhanMinutes > 0 && soonTitle != null) {
+        final fireAt = choice.time.subtract(Duration(minutes: preAdhanMinutes));
+        if (fireAt.isAfter(now)) {
+          out.add(
+            ScheduledReminder(
+              id: preAdhanAlarmId(choice.time, choice.name),
+              fireAt: fireAt,
+              title: soonTitle(choice.name, preAdhanMinutes),
+              payload: prayerReminderPayload,
+            ),
+          );
+        }
+      }
+    }
+  }
+  return List.unmodifiable(out);
 }
 
 /// First-boot POST_NOTIFICATIONS grace (UX-FIX 2): ask only for a user who

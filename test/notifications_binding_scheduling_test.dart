@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
+    show reminderAlarmIds;
 
 const MethodChannel _channel = MethodChannel(
   'dexterous.com/flutter/local_notifications',
@@ -76,15 +78,16 @@ void main() {
 
     await binding.init();
 
-    expect(_methods(calls), [
-      'initialize',
-      'canScheduleExactNotifications',
-      'cancel',
-      'cancel',
-      'cancel',
-      'zonedSchedule',
-      'zonedSchedule',
-    ]);
+    final methods = _methods(calls);
+    expect(methods.take(2).toList(),
+        ['initialize', 'canScheduleExactNotifications']);
+    expect(
+      methods.sublist(2, methods.length - 2),
+      everyElement('cancel'),
+      reason: 'every planner id is cleared before the plan lands',
+    );
+    expect(methods.sublist(methods.length - 2),
+        ['zonedSchedule', 'zonedSchedule']);
     expect(_zonedIds(calls), [1, 3]);
   });
 
@@ -183,10 +186,10 @@ void main() {
           'requestNotificationsPermission',
           'requestExactAlarmsPermission',
           'cancel',
-          'cancel',
-          'cancel',
-          'zonedSchedule',
         ]));
+    // Every planner id is cleared before the plan lands, and the plan lands.
+    expect(methods.lastIndexOf('cancel'),
+        lessThan(methods.indexOf('zonedSchedule')));
   });
 
   test('a failed init drops the queued plan and permission', () async {
@@ -217,8 +220,11 @@ void main() {
     throwOn = null;
     await binding.scheduleAll(plan);
 
-    // Two applies, each clearing the three planner ids:
-    expect(_methods(calls).where((method) => method == 'cancel'), hasLength(6));
+    // Two applies, each clearing the whole planner id universe:
+    expect(
+      _methods(calls).where((method) => method == 'cancel'),
+      hasLength(reminderAlarmIds().length * 2),
+    );
     expect(_zoned(calls), hasLength(2));
   });
 

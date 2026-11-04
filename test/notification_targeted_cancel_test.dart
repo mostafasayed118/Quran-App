@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
-    show azkarReminderId, prayerReminderId, wirdReminderId;
+    show azkarReminderId, prayerReminderId, reminderAlarmIds, wirdReminderId;
 
 const MethodChannel _channel = MethodChannel(
   'dexterous.com/flutter/local_notifications',
@@ -63,7 +63,40 @@ void main() {
     );
     expect(
       _cancelIds(calls),
-      unorderedEquals([prayerReminderId, azkarReminderId, wirdReminderId]),
+      unorderedEquals(reminderAlarmIds()),
+      reason: 'the clear covers the whole planner id universe (the binding '
+          'keeps no memory across a process death), and nothing else',
+    );
+  });
+
+  test('azkar and wird register a daily repeat; prayers stay one-shot',
+      () async {
+    final binding = NotificationsBinding();
+    await binding.init();
+
+    await binding.scheduleAll([
+      _reminder(id: prayerReminderId, title: 'Fajr'),
+      ScheduledReminder(
+        id: azkarReminderId,
+        fireAt: DateTime.utc(2030, 1, 1, 6, 30),
+        title: 'Azkar',
+        repeatsDaily: true,
+      ),
+    ]);
+
+    final byId = <int, Map<Object?, Object?>>{
+      for (final call in calls.where((call) => call.method == 'zonedSchedule'))
+        _arguments(call)['id'] as int: _arguments(call),
+    };
+    expect(
+      byId[prayerReminderId]!['matchDateTimeComponents'],
+      isNull,
+      reason: 'a prayer time moves every day: repeating it would drift',
+    );
+    expect(
+      byId[azkarReminderId]!['matchDateTimeComponents'],
+      DateTimeComponents.time.index,
+      reason: 'the OS keeps the daily alarm and restores it after a reboot',
     );
   });
 

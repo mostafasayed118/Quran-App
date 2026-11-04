@@ -14,6 +14,7 @@ class ScheduledReminder {
     this.body,
     this.payload,
     this.adhanId,
+    this.repeatsDaily = false,
   });
 
   /// The platform alarm id — stable per reminder, so a re-plan replaces the
@@ -36,11 +37,19 @@ class ScheduledReminder {
 
   /// The adhan to sound, or null for the OS default.
   ///
-  /// Resolved at PLAN time, not at post time: the planner emits a single
-  /// reminder for the *next* prayer (`reminder_planner.dart`), so the binding
-  /// has no way to tell whether that reminder is Fajr. Stamping the resolved
-  /// choice here is what makes a Fajr override possible at all.
+  /// Resolved at PLAN time, not at post time: the binding only sees a planned
+  /// reminder (id, instant, copy), so it cannot tell which prayer an alarm
+  /// belongs to — and the Fajr override depends on exactly that. The planner
+  /// stamps the resolved choice on every prayer reminder it emits.
   final String? adhanId;
+
+  /// Whether the OS must keep repeating this reminder daily at the same clock
+  /// time, and restore it after a reboot.
+  ///
+  /// Only the fixed-time reminders (azkar, wird) set this: their fire time does
+  /// not move, so a daily repeat is exactly right and needs no app start to stay
+  /// alive. A prayer reminder must never set it — prayer times move every day.
+  final bool repeatsDaily;
 }
 
 /// Fallback azkar time when `azkar_reminder_time` is unset or malformed.

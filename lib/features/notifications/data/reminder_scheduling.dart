@@ -67,7 +67,14 @@ Future<List<ScheduledReminder>> scheduleReminders({
     // "no adhan" (the OS default sound), never fail the whole re-plan.
     final adhanId = await adhanPrefs?.adhanId();
     final fajrAdhanId = await adhanPrefs?.fajrAdhanId();
-    final plan = planReminders(
+    final texts = ReminderTexts(
+      prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
+      prayerSoonTitle: (name, minutes) =>
+          loc.reminderAdhanSoon(name.label(loc), minutes.toArabicIndic),
+      azkarTitle: loc.reminderAzkar,
+      wirdTitle: loc.reminderWird,
+    );
+    final seed = planReminders(
       now: nowLocal,
       todayPrayers: todayPrayers,
       nextPrayer: nextEnabled,
@@ -80,14 +87,34 @@ Future<List<ScheduledReminder>> scheduleReminders({
       wirdTimeHm: await settings.wirdTimeHm(),
       adhanId: adhanId,
       fajrAdhanId: fajrAdhanId,
-      texts: ReminderTexts(
-        prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
-        prayerSoonTitle: (name, minutes) =>
-            loc.reminderAdhanSoon(name.label(loc), minutes.toArabicIndic),
-        azkarTitle: loc.reminderAzkar,
-        wirdTitle: loc.reminderWird,
-      ),
+      texts: texts,
     );
+    // The rest of the window: every enabled prayer still ahead, so the alarms
+    // keep coming without the app being opened again.
+    DateTime? seedPrayerAt;
+    for (final reminder in seed) {
+      if (reminder.id == prayerReminderId) seedPrayerAt = reminder.fireAt;
+    }
+    final horizonDays = <List<PrayerChoice>>[
+      todayPrayers,
+      if (selected != null)
+        for (var offset = 1; offset < reminderHorizonDays; offset++)
+          prayer.today(
+            selected.coordinates,
+            DateTime(nowLocal.year, nowLocal.month, nowLocal.day + offset),
+          ),
+    ];
+    final horizon = planPrayerHorizon(
+      now: nowLocal,
+      days: horizonDays,
+      skipAt: seedPrayerAt,
+      enabledPrayers: config.enabledPrayers,
+      preAdhanMinutes: config.preAdhanMinutes,
+      adhanId: adhanId,
+      fajrAdhanId: fajrAdhanId,
+      texts: texts,
+    );
+    final plan = <ScheduledReminder>[...seed, ...horizon];
     await scheduler.scheduleAll(plan);
     return plan;
   } on Object {
