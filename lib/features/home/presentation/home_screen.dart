@@ -532,6 +532,7 @@ const List<_Service> _worshipServices = [
   ),
   (icon: Icons.volunteer_activism, label: _locDuas, route: AppRoutes.duas),
   (icon: Icons.mosque, label: _locWorship, route: AppRoutes.worship),
+  (icon: Icons.nightlight_round, label: _locRamadan, route: AppRoutes.ramadan),
 ];
 
 const List<_Service> _moreServices = [
@@ -551,6 +552,7 @@ String _locAzkar(AppLocalizations loc) => loc.azkar;
 String _locTasbih(AppLocalizations loc) => loc.tasbih;
 String _locDuas(AppLocalizations loc) => loc.duasAndRuqyah;
 String _locWorship(AppLocalizations loc) => loc.worshipTracker;
+String _locRamadan(AppLocalizations loc) => loc.ramadanTitle;
 String _locZakat(AppLocalizations loc) => loc.zakat;
 String _locHijri(AppLocalizations loc) => loc.hijriCalendar;
 String _locAsma(AppLocalizations loc) => loc.asmaUlHusna;

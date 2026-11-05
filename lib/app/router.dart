@@ -12,6 +12,7 @@ import '../core/domain/prayer_config.dart';
 import '../core/domain/pre_adhan_canceller.dart';
 import '../core/domain/prayer_times.dart';
 import '../core/domain/quran_limits.dart';
+import '../core/domain/ramadan_calendar.dart';
 import '../core/domain/reminders.dart';
 import '../core/utils/app_routes.dart';
 import '../core/widgets/placeholder_screen.dart';
@@ -72,6 +73,11 @@ import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
 import '../features/quran/presentation/search/quran_search_screen.dart';
+import '../features/ramadan/data/qada_source.dart';
+import '../features/ramadan/presentation/qada_cubit.dart';
+import '../features/ramadan/presentation/qada_screen.dart';
+import '../features/ramadan/presentation/ramadan_cubit.dart';
+import '../features/ramadan/presentation/ramadan_screen.dart';
 import '../features/settings/presentation/adhan_picker_cubit.dart';
 import '../features/settings/presentation/adhan_picker_screen.dart';
 import '../features/settings/presentation/principles_screen.dart';
@@ -360,6 +366,28 @@ abstract final class AppRouter {
           identity: AppRoutes.worship,
           start: (cubit) => cubit.start(),
           child: const TrackerScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.ramadan,
+        builder: (_, __) => RouteCubitScope<RamadanCubit>(
+          create: () => RamadanCubit(
+            city: getIt<CitySource>(),
+            prayer: getIt<PrayerTimesPort>(),
+            calendar: getIt<RamadanCalendar>(),
+          ),
+          identity: AppRoutes.ramadan,
+          start: (cubit) => cubit.start(),
+          child: const RamadanScreen(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.qada,
+        builder: (_, __) => RouteCubitScope<QadaCubit>(
+          create: () => QadaCubit(source: getIt<QadaSource>()),
+          identity: AppRoutes.qada,
+          start: (cubit) => cubit.start(),
+          child: const QadaScreen(),
         ),
       ),
       GoRoute(

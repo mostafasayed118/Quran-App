@@ -21,6 +21,7 @@ import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/domain/ramadan_calendar.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
@@ -66,6 +67,8 @@ import 'package:quran_yahdi/features/quran/data/quran_search_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/surah_source.dart';
 import 'package:quran_yahdi/features/quran/data/uthmani_text_source.dart';
+import 'package:quran_yahdi/features/ramadan/data/qada_repository.dart';
+import 'package:quran_yahdi/features/ramadan/data/qada_source.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/just_audio_playback_service.dart';
@@ -206,6 +209,9 @@ Future<void> configureDependencies({
       () => HijriOffsetRepository(db));
   getIt.registerLazySingleton<HijriOffsetSource>(
       () => getIt<HijriOffsetRepository>());
+  getIt.registerLazySingleton<RamadanCalendar>(() => getIt<HijriService>());
+  getIt.registerLazySingleton<QadaRepository>(() => QadaRepository(db));
+  getIt.registerLazySingleton<QadaSource>(() => getIt<QadaRepository>());
   // Restore reschedules reminders through the same guarded path as boot
   // (`runBootReminderSchedule` composition; no feature import lands on backup).
   // The prayer configuration is re-read first: an import may have replaced the

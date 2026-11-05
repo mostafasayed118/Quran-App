@@ -22,6 +22,48 @@
   },
   "hijriOffsetMinus": "يوم أقل",
   "hijriOffsetPlus": "يوم أكثر",
+  "ramadanTitle": "رمضان",
+  "ramadanToday": "اليوم {day} رمضان",
+  "@ramadanToday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ramadanStartsOn": "يبدأ رمضان في {date}",
+  "@ramadanStartsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ramadanImsak": "الإمساك",
+  "ramadanIftar": "الإفطار",
+  "ramadanDayColumn": "اليوم",
+  "ramadanImsakNote": "الإمساك قبل الفجر بعشر دقائق.",
+  "qadaTitle": "قضاء الصيام",
+  "qadaAdd": "إضافة يوم",
+  "qadaPickDate": "اختر اليوم الفائت",
+  "qadaCount": "{count} يوم مسجّل",
+  "@qadaCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "qadaEmpty": "لا توجد أيام مسجلة",
+  "qadaDeleteTitle": "حذف اليوم؟",
+  "qadaDeleteBody": "سيُحذف {date} من القضاء.",
+  "@qadaDeleteBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "asmaUlHusna": "أسماء الله الحسنى",
   "settings": "الإعدادات",
   "language": "اللغة",

@@ -188,6 +188,90 @@ abstract class AppLocalizations {
   /// **'يوم أكثر'**
   String get hijriOffsetPlus;
 
+  /// No description provided for @ramadanTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'رمضان'**
+  String get ramadanTitle;
+
+  /// No description provided for @ramadanToday.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم {day} رمضان'**
+  String ramadanToday(String day);
+
+  /// No description provided for @ramadanStartsOn.
+  ///
+  /// In ar, this message translates to:
+  /// **'يبدأ رمضان في {date}'**
+  String ramadanStartsOn(String date);
+
+  /// No description provided for @ramadanImsak.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإمساك'**
+  String get ramadanImsak;
+
+  /// No description provided for @ramadanIftar.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإفطار'**
+  String get ramadanIftar;
+
+  /// No description provided for @ramadanDayColumn.
+  ///
+  /// In ar, this message translates to:
+  /// **'اليوم'**
+  String get ramadanDayColumn;
+
+  /// No description provided for @ramadanImsakNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإمساك قبل الفجر بعشر دقائق.'**
+  String get ramadanImsakNote;
+
+  /// No description provided for @qadaTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'قضاء الصيام'**
+  String get qadaTitle;
+
+  /// No description provided for @qadaAdd.
+  ///
+  /// In ar, this message translates to:
+  /// **'إضافة يوم'**
+  String get qadaAdd;
+
+  /// No description provided for @qadaPickDate.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر اليوم الفائت'**
+  String get qadaPickDate;
+
+  /// No description provided for @qadaCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} يوم مسجّل'**
+  String qadaCount(String count);
+
+  /// No description provided for @qadaEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أيام مسجلة'**
+  String get qadaEmpty;
+
+  /// No description provided for @qadaDeleteTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف اليوم؟'**
+  String get qadaDeleteTitle;
+
+  /// No description provided for @qadaDeleteBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'سيُحذف {date} من القضاء.'**
+  String qadaDeleteBody(String date);
+
   /// No description provided for @asmaUlHusna.
   ///
   /// In ar, this message translates to:

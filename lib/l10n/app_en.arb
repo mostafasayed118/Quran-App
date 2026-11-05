@@ -22,6 +22,48 @@
   },
   "hijriOffsetMinus": "One day earlier",
   "hijriOffsetPlus": "One day later",
+  "ramadanTitle": "Ramadan",
+  "ramadanToday": "Today, Ramadan {day}",
+  "@ramadanToday": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ramadanStartsOn": "Ramadan starts on {date}",
+  "@ramadanStartsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ramadanImsak": "Imsak",
+  "ramadanIftar": "Iftar",
+  "ramadanDayColumn": "Day",
+  "ramadanImsakNote": "Imsak is ten minutes before Fajr.",
+  "qadaTitle": "Missed fasts",
+  "qadaAdd": "Add a day",
+  "qadaPickDate": "Pick the missed day",
+  "qadaCount": "{count} recorded days",
+  "@qadaCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "qadaEmpty": "No missed days recorded",
+  "qadaDeleteTitle": "Delete this day?",
+  "qadaDeleteBody": "{date} will be removed from the recorded days.",
+  "@qadaDeleteBody": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "asmaUlHusna": "99 Names of Allah",
   "settings": "Settings",
   "language": "Language",

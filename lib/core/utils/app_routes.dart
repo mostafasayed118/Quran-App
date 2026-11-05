@@ -27,6 +27,8 @@ abstract final class AppRoutes {
   static const tasbih = '/tasbih';
   static const duas = '/duas';
   static const worship = '/worship';
+  static const ramadan = '/ramadan';
+  static const qada = '/qada';
   static const zakat = '/zakat';
   static const hijri = '/hijri';
   static const asma = '/asma';

@@ -56,6 +56,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hijriOffsetPlus => 'One day later';
 
   @override
+  String get ramadanTitle => 'Ramadan';
+
+  @override
+  String ramadanToday(String day) {
+    return 'Today, Ramadan $day';
+  }
+
+  @override
+  String ramadanStartsOn(String date) {
+    return 'Ramadan starts on $date';
+  }
+
+  @override
+  String get ramadanImsak => 'Imsak';
+
+  @override
+  String get ramadanIftar => 'Iftar';
+
+  @override
+  String get ramadanDayColumn => 'Day';
+
+  @override
+  String get ramadanImsakNote => 'Imsak is ten minutes before Fajr.';
+
+  @override
+  String get qadaTitle => 'Missed fasts';
+
+  @override
+  String get qadaAdd => 'Add a day';
+
+  @override
+  String get qadaPickDate => 'Pick the missed day';
+
+  @override
+  String qadaCount(String count) {
+    return '$count recorded days';
+  }
+
+  @override
+  String get qadaEmpty => 'No missed days recorded';
+
+  @override
+  String get qadaDeleteTitle => 'Delete this day?';
+
+  @override
+  String qadaDeleteBody(String date) {
+    return '$date will be removed from the recorded days.';
+  }
+
+  @override
   String get asmaUlHusna => '99 Names of Allah';
 
   @override

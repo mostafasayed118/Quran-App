@@ -1,12 +1,14 @@
 import 'package:hijri/hijri_calendar.dart';
 
+import '../../../core/domain/ramadan_calendar.dart';
+
 /// Thin wrapper over the hijri package (`HijriCalendar`, 3.0.1 — Umm
 /// al-Qura tables, pure Dart, no flutter binding).
 ///
 /// [offsetDays] is the user's local correction: +1 means "the Hijri date is
 /// one day later than the Umm al-Qura table". It shifts the conversion in
 /// both directions and leaves the month length and the month name pure.
-class HijriService {
+class HijriService implements RamadanCalendar {
   /// Creates the service; [offsetDays] is clamped to [-2, 2].
   HijriService({int offsetDays = 0}) : _offsetDays = _clamp(offsetDays) {
     HijriCalendar.setLocal('ar');
@@ -34,11 +36,23 @@ class HijriService {
         -_offsetDays,
       );
 
+  @override
+  ({int year, int month, int day}) hijriDate(DateTime date) {
+    final hijri = fromGregorian(date);
+    return (year: hijri.hYear, month: hijri.hMonth, day: hijri.hDay);
+  }
+
+  @override
+  DateTime gregorianDate(int year, int month, int day) =>
+      toGregorian(year, month, day);
+
   /// Number of days in the given Hijri month (calendar-pure).
+  @override
   int daysInMonth(int hijriYear, int hijriMonth) =>
       HijriCalendar().getDaysInMonth(hijriYear, hijriMonth);
 
   /// Arabic name of the given Hijri month (calendar-pure).
+  @override
   String monthName(int hijriYear, int hijriMonth) {
     // Mid-month gregorian anchor is stable within the month.
     final anchor = HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, 15);

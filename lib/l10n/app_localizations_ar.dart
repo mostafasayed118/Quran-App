@@ -56,6 +56,56 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hijriOffsetPlus => 'يوم أكثر';
 
   @override
+  String get ramadanTitle => 'رمضان';
+
+  @override
+  String ramadanToday(String day) {
+    return 'اليوم $day رمضان';
+  }
+
+  @override
+  String ramadanStartsOn(String date) {
+    return 'يبدأ رمضان في $date';
+  }
+
+  @override
+  String get ramadanImsak => 'الإمساك';
+
+  @override
+  String get ramadanIftar => 'الإفطار';
+
+  @override
+  String get ramadanDayColumn => 'اليوم';
+
+  @override
+  String get ramadanImsakNote => 'الإمساك قبل الفجر بعشر دقائق.';
+
+  @override
+  String get qadaTitle => 'قضاء الصيام';
+
+  @override
+  String get qadaAdd => 'إضافة يوم';
+
+  @override
+  String get qadaPickDate => 'اختر اليوم الفائت';
+
+  @override
+  String qadaCount(String count) {
+    return '$count يوم مسجّل';
+  }
+
+  @override
+  String get qadaEmpty => 'لا توجد أيام مسجلة';
+
+  @override
+  String get qadaDeleteTitle => 'حذف اليوم؟';
+
+  @override
+  String qadaDeleteBody(String date) {
+    return 'سيُحذف $date من القضاء.';
+  }
+
+  @override
   String get asmaUlHusna => 'أسماء الله الحسنى';
 
   @override
