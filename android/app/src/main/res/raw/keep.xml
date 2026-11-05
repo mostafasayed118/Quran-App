@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The adhan clips are referenced from Dart by name
+  (RawResourceAndroidNotificationSound('<id>_clip')), so the resource shrinker
+  cannot see them and removes every res/raw entry from a release build. Keep
+  them explicitly; without this file a release build throws when it tries to
+  schedule a prayer reminder with a selected adhan.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/*_clip" />
