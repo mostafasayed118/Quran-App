@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -46,7 +46,7 @@ void main() {
   test('empty catalog: one fetch, then the default reciter resolves', () async {
     final repo = ReciterRepository(
       db,
-      client: http.Client(),
+      client: Dio(),
       apiEndpointOverride: endpoint,
     );
 
@@ -58,7 +58,7 @@ void main() {
   test('warm catalog: no network call', () async {
     final repo = ReciterRepository(
       db,
-      client: http.Client(),
+      client: Dio(),
       apiEndpointOverride: endpoint,
     );
 

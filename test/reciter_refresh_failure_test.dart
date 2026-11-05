@@ -1,30 +1,40 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 
 import 'support/test_db.dart';
 
-class _FailingClient extends http.BaseClient {
-  _FailingClient(this.onSend);
+/// A Dio adapter that answers every request from [onFetch].
+class _FailingAdapter implements HttpClientAdapter {
+  _FailingAdapter(this.onFetch);
 
-  final Future<http.StreamedResponse> Function(http.BaseRequest) onSend;
+  final Future<ResponseBody> Function(RequestOptions options) onFetch;
 
   @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) =>
-      onSend(request);
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) =>
+      onFetch(options);
+
+  @override
+  void close({bool force = false}) {}
 }
 
-ReciterRepository _repo(AppDatabase db, http.Client client) =>
-    ReciterRepository(
-      db,
-      client: client,
-      apiEndpointOverride: 'https://catalog.example.test/reciters',
-    );
+ReciterRepository _repo(AppDatabase db, HttpClientAdapter adapter) {
+  final dio = Dio()..httpClientAdapter = adapter;
+  return ReciterRepository(
+    db,
+    client: dio,
+    apiEndpointOverride: 'https://catalog.example.test/reciters',
+  );
+}
 
 void main() {
   late AppDatabase db;
@@ -38,7 +48,7 @@ void main() {
   test('a timeout is surfaced and leaves the catalog untouched', () async {
     final repo = _repo(
       db,
-      _FailingClient((_) async => throw TimeoutException('catalog timeout')),
+      _FailingAdapter((_) async => throw TimeoutException('catalog timeout')),
     );
 
     await expectLater(repo.refreshFromApi(), throwsA(isA<TimeoutException>()));
@@ -48,11 +58,8 @@ void main() {
   test('a 5xx response is surfaced and leaves the catalog untouched', () async {
     final repo = _repo(
       db,
-      _FailingClient(
-        (_) async => http.StreamedResponse(
-          Stream<List<int>>.value(utf8.encode('')),
-          503,
-        ),
+      _FailingAdapter(
+        (_) async => ResponseBody.fromString('', 503),
       ),
     );
 
@@ -63,7 +70,13 @@ void main() {
   test('a connection failure is surfaced, never a partial rewrite', () async {
     final repo = _repo(
       db,
-      _FailingClient((_) async => throw http.ClientException('offline')),
+      _FailingAdapter(
+        (options) async => throw DioException(
+          requestOptions: options,
+          type: DioExceptionType.connectionError,
+          message: 'offline',
+        ),
+      ),
     );
 
     await expectLater(repo.refreshFromApi(), throwsA(isA<Exception>()));

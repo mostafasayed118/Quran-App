@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:isolate';
 
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../core/db/app_database.dart';
 import '../domain/reciter_info.dart';
@@ -98,13 +100,13 @@ const selectedMoshafKey = 'selected_moshaf_row';
 class ReciterRepository implements ReciterSource, ReciterInfoSource {
   ReciterRepository(
     this._db, {
-    http.Client? client,
+    Dio? client,
     String? apiEndpointOverride,
-  })  : _client = client ?? http.Client(),
+  })  : _client = client ?? Dio(),
         _endpoint = apiEndpointOverride ?? recitersApiEndpoint;
 
   final AppDatabase _db;
-  final http.Client _client;
+  final Dio _client;
   final String _endpoint;
 
   /// Single-flight gate: a first-run boot warm-up and the reciters screen can
@@ -145,12 +147,34 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   }
 
   Future<void> _refreshFromApi() async {
-    final res =
-        await _client.get(Uri.parse(_endpoint)).timeout(_catalogTimeout);
+    final Response<String> res;
+    try {
+      res = await _client
+          .get<String>(
+            _endpoint,
+            // Keep the payload a STRING: the worker isolate owns the JSON
+            // decode. A non-2xx is returned, not thrown: the status check
+            // below owns the message, as it did with package:http.
+            options: Options(
+              responseType: ResponseType.plain,
+              validateStatus: (_) => true,
+            ),
+          )
+          .timeout(_catalogTimeout);
+    } on DioException catch (error) {
+      // Preserve the documented caller contract: a timeout is a
+      // TimeoutException, not an opaque transport wrapper.
+      final cause = error.error;
+      if (cause is TimeoutException) throw cause;
+      rethrow;
+    }
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }
-    final body = res.body;
+    final body = res.data;
+    if (body == null) {
+      throw StateError('mp3quran returned an empty body');
+    }
     // The payload holds hundreds of reciters: the JSON decode runs on a
     // worker isolate so the UI isolate never parses it. Everything that
     // follows - the host allowlist and the sanity floor - still runs here,

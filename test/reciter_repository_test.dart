@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -61,7 +61,7 @@ void main() {
         'http://127.0.0.1:${server.port}/api/v3/reciters?language=ar';
     final netRepo = ReciterRepository(
       db,
-      client: http.Client(),
+      client: Dio(),
       apiEndpointOverride: hosted,
     );
     await netRepo.refreshFromApi();
@@ -102,7 +102,7 @@ void main() {
 
     final netRepo = ReciterRepository(
       db,
-      client: http.Client(),
+      client: Dio(),
       apiEndpointOverride:
           'http://127.0.0.1:${server.port}/api/v3/reciters?language=ar',
     );
@@ -132,7 +132,7 @@ void main() {
 
     final netRepo = ReciterRepository(
       db,
-      client: http.Client(),
+      client: Dio(),
       apiEndpointOverride:
           'http://127.0.0.1:${server.port}/api/v3/reciters?language=ar',
     );
