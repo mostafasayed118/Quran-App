@@ -18,6 +18,7 @@ import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
+import 'forbidden_windows_section.dart';
 import 'prayer_times_cubit.dart';
 import 'prayer_times_state.dart';
 
@@ -180,6 +181,8 @@ class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
             remaining: state.nextTomorrowRemaining,
           ),
         ],
+        const SizedBox(height: AppSpacing.md),
+        ForbiddenWindowsSection(entries: entries),
       ],
     );
   }

@@ -1928,6 +1928,36 @@ abstract class AppLocalizations {
   /// **'تُطبَّق هذه الإعدادات على المواقيت والتذكيرات في هذا الجهاز.'**
   String get prayerConfigNote;
 
+  /// No description provided for @forbiddenWindowsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'أوقات النهي'**
+  String get forbiddenWindowsTitle;
+
+  /// No description provided for @forbiddenWindowsNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'تُنهى الصلاة في هذه الأوقات.'**
+  String get forbiddenWindowsNote;
+
+  /// No description provided for @forbiddenAfterFajr.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد الفجر حتى الشروق'**
+  String get forbiddenAfterFajr;
+
+  /// No description provided for @forbiddenZenith.
+  ///
+  /// In ar, this message translates to:
+  /// **'قبيل الظهر'**
+  String get forbiddenZenith;
+
+  /// No description provided for @forbiddenAfterAsr.
+  ///
+  /// In ar, this message translates to:
+  /// **'بعد العصر حتى المغرب'**
+  String get forbiddenAfterAsr;
+
   /// No description provided for @methodEgyptian.
   ///
   /// In ar, this message translates to:

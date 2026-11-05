@@ -1054,6 +1054,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'These settings apply to prayer times and reminders on this device.';
 
   @override
+  String get forbiddenWindowsTitle => 'Forbidden times';
+
+  @override
+  String get forbiddenWindowsNote =>
+      'Voluntary prayer is disliked in these windows.';
+
+  @override
+  String get forbiddenAfterFajr => 'After Fajr until sunrise';
+
+  @override
+  String get forbiddenZenith => 'Before Dhuhr (zenith)';
+
+  @override
+  String get forbiddenAfterAsr => 'After Asr until Maghrib';
+
+  @override
   String get methodEgyptian => 'Egyptian General Authority of Survey';
 
   @override

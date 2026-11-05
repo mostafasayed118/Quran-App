@@ -1048,6 +1048,21 @@ class AppLocalizationsAr extends AppLocalizations {
       'تُطبَّق هذه الإعدادات على المواقيت والتذكيرات في هذا الجهاز.';
 
   @override
+  String get forbiddenWindowsTitle => 'أوقات النهي';
+
+  @override
+  String get forbiddenWindowsNote => 'تُنهى الصلاة في هذه الأوقات.';
+
+  @override
+  String get forbiddenAfterFajr => 'بعد الفجر حتى الشروق';
+
+  @override
+  String get forbiddenZenith => 'قبيل الظهر';
+
+  @override
+  String get forbiddenAfterAsr => 'بعد العصر حتى المغرب';
+
+  @override
   String get methodEgyptian => 'الهيئة المصرية العامة للمساحة';
 
   @override
