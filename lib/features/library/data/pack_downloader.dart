@@ -209,8 +209,13 @@ class PackDownloader {
     try {
       switch (pack.kind) {
         case LibraryPackKind.tafsir:
-          mergedIndex = await _writeTafsir(
-              pack, sink, expectedBytes, throttle, onProgress);
+          if (pack.urlTemplate == null) {
+            await _writeSingleFile(
+                pack, sink, expectedBytes, throttle, onProgress);
+          } else {
+            mergedIndex = await _writeTafsir(
+                pack, sink, expectedBytes, throttle, onProgress);
+          }
         case LibraryPackKind.translation:
         case LibraryPackKind.hadith:
           await _writeSingleFile(
@@ -490,8 +495,9 @@ class PackDownloader {
   ) {
     switch (pack.kind) {
       case LibraryPackKind.tafsir:
-        final merged = mergedIndex;
-        if (merged != null) _reader.primeAyahIndex(pack.id, merged);
+        final index =
+            mergedIndex ?? (projection is Map<int, String> ? projection : null);
+        if (index != null) _reader.primeAyahIndex(pack.id, index);
       case LibraryPackKind.translation:
         final index = projection;
         if (index is Map<int, String>) _reader.primeAyahIndex(pack.id, index);

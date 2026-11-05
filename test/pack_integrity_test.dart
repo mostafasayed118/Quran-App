@@ -253,8 +253,15 @@ void main() {
       }
 
       final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
-      expect(tafsirs, hasLength(0));
+      expect(tafsirs, hasLength(1));
       for (final pack in tafsirs) {
+        if (pack.urlTemplate == null) {
+          final hash = pack.sha256;
+          expect(hash, isNotNull, reason: 'pack ${pack.id} needs a sha256');
+          expect(hex.hasMatch(hash!), isTrue,
+              reason: 'pack ${pack.id} has a malformed sha256');
+          continue;
+        }
         final hashes = pack.sha256PerSurah;
         expect(hashes, isNotNull,
             reason: 'pack ${pack.id} needs per-surah hashes');
@@ -267,7 +274,7 @@ void main() {
       }
 
       final singles = packs.where((p) => p.kind != LibraryPackKind.tafsir);
-      expect(singles, hasLength(3));
+      expect(singles, hasLength(2));
       for (final pack in singles) {
         final hash = pack.sha256;
         expect(hash, isNotNull, reason: 'pack ${pack.id} needs a sha256');

@@ -59,22 +59,23 @@ class LibraryPackInfo {
   /// Approximate download size in megabytes.
   final double approxSizeMb;
 
-  /// Single-file kinds only (translation/hadith): one probed CDN URL.
+  /// Single-file kinds only (translation/hadith, or a tafsir edition served
+  /// as one file): one probed CDN URL.
   final String? sourceUrl;
 
-  /// Tafsir kind only: per-surah file URL with the `{n}` placeholder
+  /// Per-surah tafsir only: per-surah file URL with the `{n}` placeholder
   /// (n = surah number 1..fileCount, plain `n.json`, not zero-padded).
   final String? urlTemplate;
 
-  /// Tafsir kind only: number of per-surah files (114 for real packs).
+  /// Per-surah tafsir only: number of per-surah files (114 for real packs).
   final int? fileCount;
 
   /// Single-file kinds only: lowercase-hex sha256 of the exact served body,
   /// verified before promotion when present. Absent = shape sniff only.
   final String? sha256;
 
-  /// Tafsir kind only: lowercase-hex sha256 per surah file in `{n}` order
-  /// (index 0 = surah 1). Verified before decode/merge when present.
+  /// Per-surah tafsir only: lowercase-hex sha256 per surah file in `{n}`
+  /// order (index 0 = surah 1). Verified before decode/merge when present.
   final List<String>? sha256PerSurah;
 
   factory LibraryPackInfo.fromJson(Map<String, dynamic> json) {
@@ -136,12 +137,14 @@ void _validatePackShape(
   }
   switch (kind) {
     case LibraryPackKind.tafsir:
-      if (urlTemplate == null ||
-          urlTemplate.isEmpty ||
-          fileCount == null ||
-          fileCount <= 0) {
+      final hasTemplate = urlTemplate != null &&
+          urlTemplate.isNotEmpty &&
+          fileCount != null &&
+          fileCount > 0;
+      final hasSingleFile = sourceUrl != null && sourceUrl.isNotEmpty;
+      if (!hasTemplate && !hasSingleFile) {
         throw const FormatException(
-            'tafsir pack requires urlTemplate and fileCount');
+            'tafsir pack requires urlTemplate/fileCount or sourceUrl');
       }
     case LibraryPackKind.translation:
     case LibraryPackKind.hadith:
@@ -189,6 +192,9 @@ LibraryPackKind kindFor(String raw) {
 String? catalogIntegrityGap(LibraryPackInfo pack) {
   switch (pack.kind) {
     case LibraryPackKind.tafsir:
+      if (pack.urlTemplate == null) {
+        return pack.sha256 == null ? 'requires a sha256 hash' : null;
+      }
       final hashes = pack.sha256PerSurah;
       if (hashes == null ||
           (pack.fileCount != null && hashes.length != pack.fileCount)) {

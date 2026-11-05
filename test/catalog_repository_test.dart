@@ -202,9 +202,14 @@ void main() {
     }
 
     final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
-    expect(tafsirs, hasLength(0));
+    expect(tafsirs, hasLength(1));
     for (final pack in tafsirs) {
-      expect(pack.urlTemplate, isNotNull);
+      if (pack.urlTemplate == null) {
+        expect(pack.sourceUrl, isNotNull);
+        expect(pack.sha256, isNotNull,
+            reason: 'single-file tafsir ${pack.id} needs a sha256');
+        continue;
+      }
       expect(pack.urlTemplate!, contains('{n}'),
           reason: 'tafsir template must carry the surah placeholder');
       expect(pack.fileCount, 114);
@@ -212,7 +217,7 @@ void main() {
 
     final translations =
         packs.where((p) => p.kind == LibraryPackKind.translation);
-    expect(translations, hasLength(2));
+    expect(translations, hasLength(1));
     final hadiths = packs.where((p) => p.kind == LibraryPackKind.hadith);
     expect(hadiths, hasLength(1));
 

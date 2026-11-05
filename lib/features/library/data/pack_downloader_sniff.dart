@@ -97,14 +97,19 @@ _SniffResult _sniffTree(dynamic decoded, LibraryPackInfo pack) {
       }
       return (error: null, projection: PackReader.buildHadithList(list));
     case LibraryPackKind.tafsir:
-      if (map['pack'] != pack.id) {
-        return const (error: _SniffError.packMismatch, projection: null);
+      if (map['pack'] == pack.id) {
+        final list = map['tafsirs'];
+        if (list is! List || list.isEmpty) {
+          return const (error: _SniffError.noTafsirs, projection: null);
+        }
+        return (error: null, projection: PackReader.buildAyahIndex(list));
       }
-      final list = map['tafsirs'];
-      if (list is! List || list.isEmpty) {
-        return const (error: _SniffError.noTafsirs, projection: null);
+      // A single-file tafsir edition keeps the quran-api shape (`quran`).
+      final list = map['quran'];
+      if (list is List && list.isNotEmpty) {
+        return (error: null, projection: PackReader.buildAyahIndex(list));
       }
-      return (error: null, projection: PackReader.buildAyahIndex(list));
+      return const (error: _SniffError.noTafsirs, projection: null);
   }
 }
 
@@ -116,5 +121,5 @@ String _sniffFailureMessage(_SniffError error, String packId) =>
       _SniffError.quran => 'pack "$packId" missing a non-empty quran list',
       _SniffError.hadiths => 'pack "$packId" missing a non-empty hadiths list',
       _SniffError.packMismatch => 'wrapper pack mismatch for "$packId"',
-      _SniffError.noTafsirs => 'wrapper for "$packId" has no tafsirs',
+      _SniffError.noTafsirs => 'pack "$packId" has no tafsirs',
     };

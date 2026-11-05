@@ -332,9 +332,15 @@ class PackReader {
     return index[_ayahKey(surah, ayah)];
   }
 
-  /// Tafsir text for an ayah from an installed tafsir wrapper.
+  /// Tafsir text for an ayah from an installed tafsir pack.
+  ///
+  /// Supports both shapes: the per-surah wrapper (`tafsirs`) and a
+  /// single-file edition (`quran`).
   Future<String?> tafsirFor(String packId, int surah, int ayah) async {
-    final index = await _load(packId, 'tafsirs', surah: surah);
+    Object? index = await _load(packId, 'tafsirs', surah: surah);
+    if (index is! Map<int, String>) {
+      index = await _load(packId, 'quran', surah: surah);
+    }
     if (index is! Map<int, String>) return null;
     return index[_ayahKey(surah, ayah)];
   }
