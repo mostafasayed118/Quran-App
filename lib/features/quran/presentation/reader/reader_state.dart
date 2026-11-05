@@ -19,7 +19,6 @@ sealed class ReaderState with _$ReaderState {
     required String surahName,
     required int initialAyah,
     required List<Verse> ayahs,
-    required List<MushafPageBlock> mushafPages,
     @Default(ReaderMode.verses) ReaderMode mode,
     @Default(<int>{}) Set<int> bookmarkedAyahIds,
     @Default(true) bool showBasmala,
@@ -32,6 +31,16 @@ sealed class ReaderState with _$ReaderState {
   const factory ReaderState.failed({
     @Default(null) int? emptySurahId,
   }) = ReaderFailed;
+}
+
+/// The mushaf pages, derived from [ReaderReady.ayahs] on demand.
+///
+/// They were a second stored field until 2026-11-05; a `copyWith(ayahs:)`
+/// could then leave the page list stale. Deriving them makes divergence
+/// impossible, and the surah-sized grouping is cheap enough for the build.
+extension ReaderReadyPages on ReaderReady {
+  /// The ayahs grouped by their mushaf page, in page order.
+  List<MushafPageBlock> get mushafPages => groupVersesByPage(ayahs);
 }
 
 /// Legacy alias for the pre-rename concrete class (frozen suite).

@@ -10,7 +10,6 @@ import '../../data/page_anchor_source.dart';
 import '../../data/reader_settings_source.dart';
 import '../../data/uthmani_text_source.dart';
 import '../../data/verse_mapping.dart';
-import 'mushaf_page_block.dart';
 import 'reader_state.dart';
 
 /// Al-Fatiha carries the basmala as its first ayah; At-Tawbah has none.
@@ -105,7 +104,6 @@ class ReaderCubit extends Cubit<ReaderState> {
         surahName: surah?.nameAr ?? '',
         initialAyah: _initialAyah,
         ayahs: verses,
-        mushafPages: groupVersesByPage(verses),
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
         fontScale: fontScale,

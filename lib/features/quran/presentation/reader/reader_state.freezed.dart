@@ -150,7 +150,6 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
-            List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -169,7 +168,6 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
-            _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -202,7 +200,6 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
-            List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -220,7 +217,6 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
-            _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -250,7 +246,6 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
-            List<MushafPageBlock> mushafPages,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -268,7 +263,6 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
-            _that.mushafPages,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -363,13 +357,11 @@ class ReaderReady implements ReaderState {
       required this.surahName,
       required this.initialAyah,
       required List<Verse> ayahs,
-      required List<MushafPageBlock> mushafPages,
       this.mode = ReaderMode.verses,
       Set<int> bookmarkedAyahIds = const <int>{},
       this.showBasmala = true,
       this.fontScale = 1.0})
       : _ayahs = ayahs,
-        _mushafPages = mushafPages,
         _bookmarkedAyahIds = bookmarkedAyahIds;
 
   final int surahId;
@@ -380,13 +372,6 @@ class ReaderReady implements ReaderState {
     if (_ayahs is EqualUnmodifiableListView) return _ayahs;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_ayahs);
-  }
-
-  final List<MushafPageBlock> _mushafPages;
-  List<MushafPageBlock> get mushafPages {
-    if (_mushafPages is EqualUnmodifiableListView) return _mushafPages;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_mushafPages);
   }
 
   @JsonKey()
@@ -423,8 +408,6 @@ class ReaderReady implements ReaderState {
             (identical(other.initialAyah, initialAyah) ||
                 other.initialAyah == initialAyah) &&
             const DeepCollectionEquality().equals(other.ayahs, _ayahs) &&
-            const DeepCollectionEquality()
-                .equals(other.mushafPages, _mushafPages) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             const DeepCollectionEquality()
                 .equals(other.bookmarkedAyahIds, _bookmarkedAyahIds) &&
@@ -442,7 +425,6 @@ class ReaderReady implements ReaderState {
         surahName,
         initialAyah,
         const DeepCollectionEquality().hash(_ayahs),
-        const DeepCollectionEquality().hash(_mushafPages),
         mode,
         const DeepCollectionEquality().hash(_bookmarkedAyahIds),
         showBasmala,
@@ -451,7 +433,7 @@ class ReaderReady implements ReaderState {
 
   @override
   String toString() {
-    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mushafPages: $mushafPages, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale)';
+    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale)';
   }
 }
 
@@ -467,7 +449,6 @@ abstract mixin class $ReaderReadyCopyWith<$Res>
       String surahName,
       int initialAyah,
       List<Verse> ayahs,
-      List<MushafPageBlock> mushafPages,
       ReaderMode mode,
       Set<int> bookmarkedAyahIds,
       bool showBasmala,
@@ -489,7 +470,6 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
     Object? surahName = null,
     Object? initialAyah = null,
     Object? ayahs = null,
-    Object? mushafPages = null,
     Object? mode = null,
     Object? bookmarkedAyahIds = null,
     Object? showBasmala = null,
@@ -512,10 +492,6 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
           ? _self._ayahs
           : ayahs // ignore: cast_nullable_to_non_nullable
               as List<Verse>,
-      mushafPages: null == mushafPages
-          ? _self._mushafPages
-          : mushafPages // ignore: cast_nullable_to_non_nullable
-              as List<MushafPageBlock>,
       mode: null == mode
           ? _self.mode
           : mode // ignore: cast_nullable_to_non_nullable
