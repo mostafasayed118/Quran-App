@@ -20,15 +20,28 @@ String normalizeArabicLetters(String input) {
 /// variants to their plain letters (see [normalizeArabicLetters]), then
 /// collapses whitespace runs to a single space and trims.
 String normalizeArabic(String input) =>
-    normalizeArabicLetters(input).replaceAll(RegExp(r'\s+'), ' ').trim();
+    normalizeArabicLetters(input).replaceAll(_whitespace, ' ').trim();
+
+final RegExp _whitespace = RegExp(r'\s+');
 
 /// Whether [text] matches [query] under [normalizeArabic], case-insensitive
 /// for Latin text. An empty (or whitespace-only) query matches everything.
 bool matchesQuery(String text, String query) {
-  final normalizedQuery = normalizeArabic(query).toLowerCase();
-  return normalizedQuery.isEmpty ||
-      normalizeArabic(text).toLowerCase().contains(normalizedQuery);
+  return matchesPrepared(
+    normalizeArabic(text).toLowerCase(),
+    prepareQuery(query),
+  );
 }
+
+/// One normalized query, ready for repeated [matchesPrepared] checks.
+///
+/// Search loops call this ONCE and reuse it for every item; calling
+/// [matchesQuery] per item would re-normalize the same query N times.
+String prepareQuery(String query) => normalizeArabic(query).toLowerCase();
+
+/// Whether an already-normalized text contains an already-prepared query.
+bool matchesPrepared(String preparedText, String preparedQuery) =>
+    preparedQuery.isEmpty || preparedText.contains(preparedQuery);
 
 bool _isArabicMark(int rune) =>
     (rune >= 0x064B && rune <= 0x065F) || rune == 0x0670 || rune == 0x0640;
