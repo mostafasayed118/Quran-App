@@ -21,6 +21,13 @@ enum ReminderIssue {
   /// The OEM battery saver may kill the app before the alarm fires — the
   /// Infinix/Tecno/Xiaomi failure this diagnostics section exists for.
   batteryRestricted,
+
+  /// The OS refused the last plan write, so none of the alarms are armed.
+  ///
+  /// This is the one issue the device permissions cannot reveal: they can all
+  /// be granted while `zonedSchedule` still throws. [ReminderApplyHealth]
+  /// carries the last attempt's outcome so the readout can say it.
+  scheduleFailed,
 }
 
 /// The issues worth showing for the given device state, in display order.
@@ -33,12 +40,26 @@ List<ReminderIssue> diagnoseReminders({
   required bool notificationsEnabled,
   required bool exactAlarmsAllowed,
   required bool? batteryOptimizationIgnored,
+  bool scheduleFailed = false,
 }) {
   return [
     if (!notificationsEnabled) ReminderIssue.notificationsOff,
     if (!exactAlarmsAllowed) ReminderIssue.exactAlarmsOff,
+    if (scheduleFailed) ReminderIssue.scheduleFailed,
     if (batteryOptimizationIgnored == false) ReminderIssue.batteryRestricted,
   ];
+}
+
+/// The last reminder-plan write's outcome, for the reliability readout.
+///
+/// Kept separate from [ReminderDiagnostics] on purpose: the diagnostics port
+/// reads the OS, while this one reports the app's own last attempt. The
+/// notifications binding owns the truth; a host without one simply omits the
+/// row.
+abstract interface class ReminderApplyHealth {
+  /// True when the most recent plan write threw (or the plugin never became
+  /// ready), so no alarm from that plan is armed.
+  bool get lastApplyFailed;
 }
 
 /// Cross-feature seam in front of the platform's reminder-health checks.

@@ -1,9 +1,11 @@
+import 'dart:developer' as dev;
 import 'dart:ui' show VoidCallback;
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:meta/meta.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
+import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
@@ -31,15 +33,19 @@ import 'package:timezone/timezone.dart' as tz;
 /// plugin's Java source), reproducing the exact absolute instant — the wall
 /// clock zone database is never needed.
 ///
-/// Failure semantics: init failure leaves reminders silently disabled
-/// (disclosed v1 behavior) and must never crash boot (device smoke enforces).
+/// Failure semantics: init failure leaves reminders disabled (disclosed v1
+/// behavior) and must never crash boot. It is no longer silent: the failure is
+/// logged under `quran_yahdi/reminders` and reported through
+/// [ReminderApplyHealth], so the settings readout can show that no alarm is
+/// armed.
 ///
 /// Init window: the plugin init runs BEHIND the first frame, so a reminder
 /// plan (or a permission request) that arrives before the plugin is ready is
 /// QUEUED, never dropped — [init] applies it as soon as the plugin is ready
 /// and discards it when the init fails. Nothing on this path waits for the
 /// plugin: a caller that awaited readiness would hang instead of queueing.
-class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
+class NotificationsBinding
+    implements ReminderSchedulerPort, PreAdhanCanceller, ReminderApplyHealth {
   NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
 
@@ -93,6 +99,16 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
   /// ever apply — it is dropped, exactly as it was before the queueing
   /// change. Cleared when an init is attempted again.
   bool _initFailed = false;
+
+  /// Whether the last plan write failed (or the plugin never became ready).
+  ///
+  /// The settings reliability card reads this through [ReminderApplyHealth]:
+  /// every OS permission can be granted while the write itself throws, and
+  /// without this flag the card would call that device healthy.
+  bool _lastApplyFailed = false;
+
+  @override
+  bool get lastApplyFailed => _lastApplyFailed;
 
   /// Whether a pre-adhan cancellation arrived before the plugin was ready.
   bool _pendingCancelPreAdhan = false;
@@ -177,9 +193,17 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       _channelDescription = loc.reminderChannelDescription;
       _playAdhanLabel = loc.adhanPlayAction;
       _ready = true;
-    } on Object {
+      _lastApplyFailed = false;
+    } on Object catch (error, stackTrace) {
       _ready = false;
       _initFailed = true;
+      _lastApplyFailed = true;
+      dev.log(
+        'notifications init failed',
+        name: 'quran_yahdi/reminders',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       // A failed init leaves the reminders disabled — drop the queued plan
       // and the queued permission request so neither survives as a stale
       // wish that will never be fulfilled.
@@ -514,8 +538,17 @@ class NotificationsBinding implements ReminderSchedulerPort, PreAdhanCanceller {
       }
       _appliedPlan = fingerprint;
       _appliedExact = exact;
-    } on Object {
-      // Best-effort v1: a failed schedule surfaces only in the device smoke.
+      _lastApplyFailed = false;
+    } on Object catch (error, stackTrace) {
+      // Best-effort: a failed schedule must not crash the caller, but it can
+      // no longer be silent — the reliability card and logcat both read it.
+      _lastApplyFailed = true;
+      dev.log(
+        'reminder plan apply failed',
+        name: 'quran_yahdi/reminders',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
     }
   }
 

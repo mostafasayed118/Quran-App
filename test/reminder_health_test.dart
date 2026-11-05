@@ -55,6 +55,19 @@ void main() {
       );
     });
 
+    test('a failed plan write is reported even when every permission is on',
+        () {
+      expect(
+        diagnoseReminders(
+          notificationsEnabled: true,
+          exactAlarmsAllowed: true,
+          batteryOptimizationIgnored: true,
+          scheduleFailed: true,
+        ),
+        [ReminderIssue.scheduleFailed],
+      );
+    });
+
     test('an unreadable battery state is not an issue', () {
       expect(
         diagnoseReminders(

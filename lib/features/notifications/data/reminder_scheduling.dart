@@ -1,11 +1,13 @@
+import 'dart:developer' as dev;
+
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/l10n/prayer_names.dart';
-import 'package:quran_yahdi/core/utils/arabic_numbers.dart';
 
 import 'reminder_planner.dart';
 
@@ -70,7 +72,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
     final texts = ReminderTexts(
       prayerTitle: (name) => loc.reminderNextPrayer(name.label(loc)),
       prayerSoonTitle: (name, minutes) =>
-          loc.reminderAdhanSoon(name.label(loc), minutes.toArabicIndic),
+          loc.reminderAdhanSoon(name.label(loc), loc.number(minutes)),
       azkarTitle: loc.reminderAzkar,
       wirdTitle: loc.reminderWird,
     );
@@ -117,8 +119,16 @@ Future<List<ScheduledReminder>> scheduleReminders({
     final plan = <ScheduledReminder>[...seed, ...horizon];
     await scheduler.scheduleAll(plan);
     return plan;
-  } on Object {
-    // A failed (re)schedule must never break boot or a screen (W7b v1).
+  } on Object catch (error, stackTrace) {
+    // A failed (re)schedule must never break boot or a screen (W7b v1), but
+    // it must be diagnosable: the binding keeps its own flag for the settings
+    // readout, and this log is the trace a device check can read.
+    dev.log(
+      'reminder schedule failed',
+      name: 'quran_yahdi/reminders',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
     return const <ScheduledReminder>[];
   }
 }

@@ -23,12 +23,22 @@ const String _exactAlarmsIssue =
     'التنبيهات الدقيقة غير مسموحة — قد تتأخر التذكيرات.';
 const String _batteryIssue =
     'تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.';
+const String _scheduleIssue =
+    'تعذّر جدولة التذكيرات — افتح التطبيق مرة أخرى ليُعيد المحاولة.';
 const String _batteryUnknown =
     'تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.';
 const String _fixAction = 'إصلاح';
 
 /// A diagnostics double: the reads answer from mutable fields, so a test can
 /// change the device state between a pump and a resume.
+/// The app-side half: whether the last plan write actually reached the OS.
+class FakeReminderApplyHealth implements ReminderApplyHealth {
+  bool failed = false;
+
+  @override
+  bool get lastApplyFailed => failed;
+}
+
 class FakeReminderDiagnostics implements ReminderDiagnostics {
   bool notifications = true;
   bool exactAlarms = true;
@@ -61,10 +71,12 @@ class FakeReminderDiagnostics implements ReminderDiagnostics {
 void main() {
   late AppDatabase db;
   late FakeReminderDiagnostics diagnostics;
+  late FakeReminderApplyHealth applyHealth;
 
   setUp(() {
     db = newTestDb();
     diagnostics = FakeReminderDiagnostics();
+    applyHealth = FakeReminderApplyHealth();
   });
 
   /// Bounded settle: drift futures advance on explicit pumps only (no
@@ -89,7 +101,10 @@ void main() {
       textScale: textScale,
       wrap: (app) =>
           BlocProvider<SettingsCubit>.value(value: cubit, child: app),
-      home: SettingsScreen(reminderDiagnostics: diagnostics),
+      home: SettingsScreen(
+        reminderDiagnostics: diagnostics,
+        reminderApplyHealth: applyHealth,
+      ),
       settle: false,
     );
     await settle(tester);
@@ -99,6 +114,16 @@ void main() {
     await pumpSettings(tester);
 
     expect(find.text(_title), findsNothing);
+    expect(find.text(_fixAction), findsNothing);
+  });
+
+  testWidgets('a failed plan write shows the schedule row without a fix button',
+      (tester) async {
+    applyHealth.failed = true;
+    await pumpSettings(tester);
+
+    expect(find.text(_title), findsOneWidget);
+    expect(find.text(_scheduleIssue), findsOneWidget);
     expect(find.text(_fixAction), findsNothing);
   });
 

@@ -23,6 +23,7 @@ import '../../../core/utils/insets.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/section_header.dart';
+import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../l10n/app_localizations.dart';
 import 'settings_cubit.dart';
 import 'settings_state.dart';
@@ -35,6 +36,7 @@ class SettingsScreen extends StatelessWidget {
     this.locale,
     this.theme,
     this.reminderDiagnostics,
+    this.reminderApplyHealth,
   });
 
   /// Backup & restore surface, composed by the app shell (router) so this
@@ -53,6 +55,10 @@ class SettingsScreen extends StatelessWidget {
   /// settings test builds `const SettingsScreen()` with nothing but a cubit
   /// provider, and a missing readout must never break that screen.
   final ReminderDiagnostics? reminderDiagnostics;
+
+  /// The last plan write's outcome (the binding owns it). Null keeps the
+  /// schedule row out, like a missing diagnostics port.
+  final ReminderApplyHealth? reminderApplyHealth;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +91,7 @@ class SettingsScreen extends StatelessWidget {
               locale: locale,
               theme: theme,
               reminderDiagnostics: reminderDiagnostics,
+              reminderApplyHealth: reminderApplyHealth,
             ),
         },
       ),
@@ -107,6 +114,7 @@ class _SettingsList extends StatelessWidget {
     required this.locale,
     required this.theme,
     required this.reminderDiagnostics,
+    required this.reminderApplyHealth,
   });
 
   final bool prayerEnabled;
@@ -120,6 +128,7 @@ class _SettingsList extends StatelessWidget {
   final AppLocaleController? locale;
   final AppThemeController? theme;
   final ReminderDiagnostics? reminderDiagnostics;
+  final ReminderApplyHealth? reminderApplyHealth;
 
   @override
   Widget build(BuildContext context) {
@@ -256,7 +265,14 @@ class _SettingsList extends StatelessWidget {
             ? GetIt.I<ReminderDiagnostics>()
             : null);
     if (diagnostics == null) return const SizedBox.shrink();
-    return _ReminderReliabilitySection(diagnostics: diagnostics);
+    final applyHealth = reminderApplyHealth ??
+        (GetIt.I.isRegistered<ReminderApplyHealth>()
+            ? GetIt.I<ReminderApplyHealth>()
+            : null);
+    return _ReminderReliabilitySection(
+      diagnostics: diagnostics,
+      applyHealth: applyHealth,
+    );
   }
 }
 
@@ -269,9 +285,13 @@ class _SettingsList extends StatelessWidget {
 /// an unreadable battery state shows the "check it yourself" instruction
 /// instead of a verdict the device never produced.
 class _ReminderReliabilitySection extends StatefulWidget {
-  const _ReminderReliabilitySection({required this.diagnostics});
+  const _ReminderReliabilitySection({
+    required this.diagnostics,
+    this.applyHealth,
+  });
 
   final ReminderDiagnostics diagnostics;
+  final ReminderApplyHealth? applyHealth;
 
   @override
   State<_ReminderReliabilitySection> createState() =>
@@ -314,6 +334,7 @@ class _ReminderReliabilitySectionState
           notificationsEnabled: notifications,
           exactAlarmsAllowed: exactAlarms,
           batteryOptimizationIgnored: battery,
+          scheduleFailed: widget.applyHealth?.lastApplyFailed ?? false,
         );
         _batteryUnknown = battery == null;
       });
@@ -380,6 +401,13 @@ class _ReminderReliabilitySectionState
           loc.reminderIssueBattery,
           widget.diagnostics.openBatteryOptimizationSettings,
         ),
+      // No system screen fixes this one: the next boot/resume retries the
+      // write, so the row is the honest report, not a dead button.
+      ReminderIssue.scheduleFailed => (
+          Icons.event_busy_outlined,
+          loc.reminderIssueScheduleFailed,
+          null,
+        ),
     };
     return ListTile(
       leading: Icon(icon),
@@ -419,12 +447,16 @@ class _ReminderTimeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return ListTile(
       enabled: enabled,
       leading: const Icon(Icons.schedule),
       title: Text(title),
       trailing: Text(
-        formatHm(_asDateTime(_parseHm(hm) ?? fallback)),
+        formatHm(
+          _asDateTime(_parseHm(hm) ?? fallback),
+          arabicIndic: loc.usesArabicIndicDigits,
+        ),
         style: AppTheme.rowTitle,
       ),
       onTap: enabled ? () => _pick(context) : null,
