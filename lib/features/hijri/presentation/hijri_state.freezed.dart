@@ -147,7 +147,7 @@ extension HijriStatePatterns on HijriState {
     TResult Function()? loading,
     TResult Function()? failed,
     TResult Function(int month, int year, String monthName, int offset,
-            List<HijriCell> cells, String todayHeader)?
+            List<HijriCell> cells, String todayHeader, int dayOffset)?
         ready,
     required TResult orElse(),
   }) {
@@ -159,7 +159,7 @@ extension HijriStatePatterns on HijriState {
         return failed();
       case HijriReady() when ready != null:
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
-            _that.cells, _that.todayHeader);
+            _that.cells, _that.todayHeader, _that.dayOffset);
       case _:
         return orElse();
     }
@@ -183,7 +183,7 @@ extension HijriStatePatterns on HijriState {
     required TResult Function() loading,
     required TResult Function() failed,
     required TResult Function(int month, int year, String monthName, int offset,
-            List<HijriCell> cells, String todayHeader)
+            List<HijriCell> cells, String todayHeader, int dayOffset)
         ready,
   }) {
     final _that = this;
@@ -194,7 +194,7 @@ extension HijriStatePatterns on HijriState {
         return failed();
       case HijriReady():
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
-            _that.cells, _that.todayHeader);
+            _that.cells, _that.todayHeader, _that.dayOffset);
     }
   }
 
@@ -215,7 +215,7 @@ extension HijriStatePatterns on HijriState {
     TResult? Function()? loading,
     TResult? Function()? failed,
     TResult? Function(int month, int year, String monthName, int offset,
-            List<HijriCell> cells, String todayHeader)?
+            List<HijriCell> cells, String todayHeader, int dayOffset)?
         ready,
   }) {
     final _that = this;
@@ -226,7 +226,7 @@ extension HijriStatePatterns on HijriState {
         return failed();
       case HijriReady() when ready != null:
         return ready(_that.month, _that.year, _that.monthName, _that.offset,
-            _that.cells, _that.todayHeader);
+            _that.cells, _that.todayHeader, _that.dayOffset);
       case _:
         return null;
     }
@@ -282,7 +282,8 @@ class HijriReady implements HijriState {
       required this.monthName,
       required this.offset,
       required List<HijriCell> cells,
-      required this.todayHeader})
+      required this.todayHeader,
+      this.dayOffset = 0})
       : _cells = cells;
 
   final int month;
@@ -297,6 +298,8 @@ class HijriReady implements HijriState {
   }
 
   final String todayHeader;
+  @JsonKey()
+  final int dayOffset;
 
   /// Create a copy of HijriState
   /// with the given fields replaced by the non-null parameter values.
@@ -317,18 +320,20 @@ class HijriReady implements HijriState {
             (identical(other.offset, offset) || other.offset == offset) &&
             const DeepCollectionEquality().equals(other.cells, _cells) &&
             (identical(other.todayHeader, todayHeader) ||
-                other.todayHeader == todayHeader));
+                other.todayHeader == todayHeader) &&
+            (identical(other.dayOffset, dayOffset) ||
+                other.dayOffset == dayOffset));
   }
 
   @override
   int get hashCode {
     return Object.hash(runtimeType, month, year, monthName, offset,
-        const DeepCollectionEquality().hash(_cells), todayHeader);
+        const DeepCollectionEquality().hash(_cells), todayHeader, dayOffset);
   }
 
   @override
   String toString() {
-    return 'HijriState.ready(month: $month, year: $year, monthName: $monthName, offset: $offset, cells: $cells, todayHeader: $todayHeader)';
+    return 'HijriState.ready(month: $month, year: $year, monthName: $monthName, offset: $offset, cells: $cells, todayHeader: $todayHeader, dayOffset: $dayOffset)';
   }
 }
 
@@ -345,7 +350,8 @@ abstract mixin class $HijriReadyCopyWith<$Res>
       String monthName,
       int offset,
       List<HijriCell> cells,
-      String todayHeader});
+      String todayHeader,
+      int dayOffset});
 }
 
 /// @nodoc
@@ -365,6 +371,7 @@ class _$HijriReadyCopyWithImpl<$Res> implements $HijriReadyCopyWith<$Res> {
     Object? offset = null,
     Object? cells = null,
     Object? todayHeader = null,
+    Object? dayOffset = null,
   }) {
     return _then(HijriReady(
       month: null == month
@@ -391,6 +398,10 @@ class _$HijriReadyCopyWithImpl<$Res> implements $HijriReadyCopyWith<$Res> {
           ? _self.todayHeader
           : todayHeader // ignore: cast_nullable_to_non_nullable
               as String,
+      dayOffset: null == dayOffset
+          ? _self.dayOffset
+          : dayOffset // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }

@@ -11,6 +11,17 @@
   "worshipTracker": "تتبع العبادات",
   "zakat": "الزكاة",
   "hijriCalendar": "التقويم الهجري",
+  "hijriOffsetTitle": "ضبط التاريخ الهجري",
+  "hijriOffsetValue": "الإزاحة: {days}",
+  "@hijriOffsetValue": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "hijriOffsetMinus": "يوم أقل",
+  "hijriOffsetPlus": "يوم أكثر",
   "asmaUlHusna": "أسماء الله الحسنى",
   "settings": "الإعدادات",
   "language": "اللغة",
@@ -62,6 +73,8 @@
   "bookmarkSaved": "تم حفظ الآية",
   "bookmarkRemoved": "تم إزالة الحفظ",
   "shareAyah": "مشاركة الآية",
+  "shareAsImage": "مشاركة كصورة",
+  "shareAsText": "مشاركة كنص",
   "noBookmarks": "لا توجد علامات مرجعية بعد",
   "pageIndicator": "صفحة {page}",
   "@pageIndicator": {
@@ -112,6 +125,20 @@
   "playTooltip": "تشغيل",
   "pauseTooltip": "إيقاف مؤقت",
   "stopTooltip": "إيقاف",
+  "repeatSurah": "تكرار السورة",
+  "playbackSpeed": "سرعة التشغيل",
+  "sleepTimer": "مؤقت النوم",
+  "sleepTimerOff": "بدون مؤقت",
+  "sleepTimerMinutes": "{minutes} دقيقة",
+  "@sleepTimerMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "previousSurah": "السورة السابقة",
+  "nextSurah": "السورة التالية",
   "listenTooltip": "استمع للسورة",
   "surahBadge": "سورة {number}",
   "@surahBadge": {
@@ -264,6 +291,16 @@
   "translationsTab": "الترجمات",
   "hadithTab": "الأحاديث",
   "setAsDefaultReciter": "تعيين كقارئ افتراضي",
+  "downloadAllSurahs": "تنزيل كل السور",
+  "downloadAllQueued": "جارٍ تنزيل {count} سورة",
+  "@downloadAllQueued": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAllNothing": "كل السور منزّلة بالفعل",
   "libraryInstall": "تنزيل",
   "libraryDelete": "حذف",
   "libraryInstalled": "مثبّت",
@@ -661,6 +698,15 @@
   "preAdhanFive": "٥ دقائق",
   "preAdhanTen": "١٠ دقائق",
   "preAdhanFifteen": "١٥ دقيقة",
+  "prayerTuning": "ضبط دقيق",
+  "prayerHighLatitude": "قاعدة خطوط العرض العالية",
+  "highLatitudeNone": "افتراضي الطريقة",
+  "highLatitudeMiddle": "منتصف الليل",
+  "highLatitudeSeventh": "سُبع الليل",
+  "highLatitudeTwilight": "زاوية الشفق",
+  "prayerAdjustmentHint": "عدّل دقائق كل صلاة لتطابق مسجدك. القيمة صفر تعني بلا تعديل.",
+  "prayerAdjustmentDecrease": "دقيقة أقل",
+  "prayerAdjustmentIncrease": "دقيقة أكثر",
   "reminderAdhanSoon": "اقتربت صلاة {prayer} — بعد {minutes} دقيقة",
   "monthlyTimetable": "جدول الشهر",
   "juzIndexTitle": "فهرس الأجزاء",
@@ -675,6 +721,7 @@
   "pageJumpInvalid": "صفحة غير موجودة",
   "pageJumpGo": "انتقال",
   "readerFontSize": "حجم الخط",
+  "readerLineSpacing": "تباعد الأسطر",
   "reminderReliabilityTitle": "موثوقية التذكيرات",
   "reminderReliabilityIntro": "قد يوقف نظام التشغيل تذكيرات الصلاة والأذكار — راجع الحالات التالية.",
   "reminderIssueNotifications": "إذن الإشعارات مغلق — فعِّله من إعدادات جهازك.",

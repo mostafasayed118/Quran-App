@@ -4,6 +4,7 @@ import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
+import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
@@ -30,10 +31,14 @@ void main() {
     expect(backupKeyPrayerMadhab, PrayerConfig.madhabKey);
     expect(backupKeyPrayerEnabledPrayers, PrayerConfig.enabledPrayersKey);
     expect(backupKeyPrayerPreAdhanMinutes, PrayerConfig.preAdhanMinutesKey);
+    expect(backupKeyPrayerAdjustments, PrayerConfig.adjustmentsKey);
+    expect(backupKeyPrayerHighLatitude, PrayerConfig.highLatitudeKey);
   });
 
   test('reader and azkar literals match their repositories', () {
     expect(backupKeyReaderFontScale, ReaderSettingsRepository.fontScaleKey);
+    expect(backupKeyReaderLineHeight, ReaderSettingsRepository.lineHeightKey);
+    expect(backupKeyHijriDayOffset, HijriOffsetRepository.key);
     expect(
       backupKeyAzkarProgress,
       AzkarSavedStateRepository.progressKey,
@@ -76,7 +81,11 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.adjustmentsKey,
+      PrayerConfig.highLatitudeKey,
       ReaderSettingsRepository.fontScaleKey,
+      ReaderSettingsRepository.lineHeightKey,
+      HijriOffsetRepository.key,
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,
       selectedCityKey,
@@ -100,6 +109,8 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.adjustmentsKey,
+      PrayerConfig.highLatitudeKey,
       selectedCityKey,
       adhanIdKey,
       adhanFajrIdKey,

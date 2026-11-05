@@ -5,13 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
-import '../../../../core/utils/deep_links.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -21,9 +19,11 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
 import '../../../recitation/presentation/playback/playback_cubit.dart';
+import '../../data/reader_layout_source.dart';
 import '../../domain/verse.dart';
 import 'reader_cubit.dart';
 import 'reader_state.dart';
+import 'verse_share_sheet.dart';
 
 class ReaderScreen extends StatelessWidget {
   const ReaderScreen({super.key});
@@ -124,7 +124,12 @@ class _ReadyView extends StatelessWidget {
           IconButton(
             tooltip: loc.readerFontSize,
             icon: const Icon(Icons.format_size),
-            onPressed: () => _showFontSheet(context, cubit, state.fontScale),
+            onPressed: () => _showFontSheet(
+              context,
+              cubit,
+              state.fontScale,
+              state.lineHeight,
+            ),
           ),
         ],
       ),
@@ -247,6 +252,7 @@ class _VersesListState extends State<_VersesList> {
             surahName: state.surahName,
             bookmarked: bookmarked,
             fontScale: state.fontScale,
+            lineHeight: state.lineHeight,
             onToggle: () =>
                 toggleAyahBookmark(context, cubit, ayah.id, bookmarked),
           ),
@@ -262,6 +268,7 @@ class _AyahCard extends StatelessWidget {
     required this.surahName,
     required this.bookmarked,
     required this.fontScale,
+    required this.lineHeight,
     required this.onToggle,
   });
 
@@ -269,6 +276,7 @@ class _AyahCard extends StatelessWidget {
   final String surahName;
   final bool bookmarked;
   final double fontScale;
+  final double lineHeight;
   final VoidCallback onToggle;
 
   @override
@@ -303,6 +311,7 @@ class _AyahCard extends StatelessWidget {
                 text,
                 style: AppTheme.hafsAyah.copyWith(
                   fontSize: AppTheme.hafsAyah.fontSize! * fontScale,
+                  height: lineHeight,
                 ),
                 textAlign: TextAlign.center,
                 textDirection: TextDirection.rtl,
@@ -383,7 +392,7 @@ class _AyahActions extends StatelessWidget {
           onPressed: onToggle,
         ),
         _CopyAyahButton(ayah: ayah),
-        _ShareAyahButton(ayah: ayah),
+        _ShareAyahButton(ayah: ayah, surahName: surahName),
       ],
     );
   }
@@ -448,9 +457,10 @@ class _CopyAyahButton extends StatelessWidget {
 }
 
 class _ShareAyahButton extends StatelessWidget {
-  const _ShareAyahButton({required this.ayah});
+  const _ShareAyahButton({required this.ayah, required this.surahName});
 
   final Verse ayah;
+  final String surahName;
 
   @override
   Widget build(BuildContext context) {
@@ -458,12 +468,11 @@ class _ShareAyahButton extends StatelessWidget {
     return IconButton(
       tooltip: loc.shareAyah,
       icon: const Icon(Icons.share_outlined),
-      onPressed: () => SharePlus.instance.share(ShareParams(
-        text: loc.shareAyahText(
-          ayah.copyText,
-          webSurahUrl(ayah.surahId, ayah.numberInSurah),
-        ),
-      )),
+      onPressed: () => showVerseShareSheet(
+        context,
+        ayah: ayah,
+        surahName: surahName,
+      ),
     );
   }
 }
@@ -555,12 +564,12 @@ class _MushafPagerState extends State<_MushafPager> {
                     style: unicode
                         ? AppTheme.hafsAyah.copyWith(
                             fontSize: 22 * widget.state.fontScale,
-                            height: 2.2,
+                            height: widget.state.lineHeight,
                           )
                         : TextStyle(
                             fontFamily: QuranFonts.quran,
                             fontSize: 22 * widget.state.fontScale,
-                            height: 2.2,
+                            height: widget.state.lineHeight,
                           ),
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.rtl,
@@ -668,8 +677,10 @@ void _showFontSheet(
   BuildContext context,
   ReaderCubit cubit,
   double initial,
+  double initialLineHeight,
 ) {
   var value = initial;
+  var lineHeight = initialLineHeight;
   unawaited(showModalBottomSheet<void>(
     context: context,
     builder: (sheetContext) => StatefulBuilder(
@@ -692,6 +703,22 @@ void _showFontSheet(
                 onChanged: (next) {
                   setSheetState(() => value = next);
                   unawaited(cubit.setFontScale(next));
+                },
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                AppLocalizations.of(context).readerLineSpacing,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              Slider(
+                value: lineHeight,
+                min: ReaderLayoutSource.minLineHeight,
+                max: ReaderLayoutSource.maxLineHeight,
+                divisions: 14,
+                label: lineHeight.toStringAsFixed(1),
+                onChanged: (next) {
+                  setSheetState(() => lineHeight = next);
+                  unawaited(cubit.setLineHeight(next));
                 },
               ),
             ],

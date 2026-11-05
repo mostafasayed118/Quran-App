@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
+import '../data/hijri_offset_source.dart';
 import '../data/hijri_service.dart';
 import 'hijri_state.dart';
 
@@ -10,15 +11,19 @@ import 'hijri_state.dart';
 class HijriCubit extends Cubit<HijriState> {
   /// Creates the cubit; the constructor is side-effect free and does no
   /// work — [start] performs the first load.
-  HijriCubit({required HijriService service})
+  HijriCubit({required HijriService service, HijriOffsetSource? offset})
       : _service = service,
+        _offset = offset,
         super(const HijriState.loading());
 
-  /// Starts the route-scoped load; the constructor intentionally does no
-  /// work. The route scope calls this once, from the widget lifecycle.
-  Future<void> start() => jumpToToday();
+  /// Loads the saved local correction, then shows today.
+  Future<void> start() async {
+    _service.offsetDays = await _loadOffsetDays();
+    await jumpToToday();
+  }
 
   final HijriService _service;
+  final HijriOffsetSource? _offset;
 
   /// Shows the given Hijri month and emits the ready state.
   ///
@@ -51,6 +56,7 @@ class HijriCubit extends Cubit<HijriState> {
         offset: offset,
         cells: cells,
         todayHeader: todayHeader,
+        dayOffset: _service.offsetDays,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('hijri load failed',
@@ -61,6 +67,39 @@ class HijriCubit extends Cubit<HijriState> {
   }
 
   String _arabic(int n) => n.toArabicIndic;
+
+  Future<int> _loadOffsetDays() async {
+    try {
+      return await _offset?.loadOffsetDays() ?? 0;
+    } on Object catch (error, stackTrace) {
+      dev.log('hijri offset read failed',
+          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      return 0;
+    }
+  }
+
+  /// Sets the local correction, persists it, and re-renders the open month.
+  Future<void> setOffset(int days) async {
+    final safe = days < HijriService.minOffsetDays
+        ? HijriService.minOffsetDays
+        : (days > HijriService.maxOffsetDays
+            ? HijriService.maxOffsetDays
+            : days);
+    if (safe == _service.offsetDays) return;
+    _service.offsetDays = safe;
+    try {
+      await _offset?.saveOffsetDays(safe);
+    } on Object catch (error, stackTrace) {
+      dev.log('hijri offset write failed',
+          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+    }
+    final current = state;
+    if (current is HijriReady) {
+      await show(current.year, current.month);
+    } else {
+      await jumpToToday();
+    }
+  }
 
   /// Shows the next month (rolls the year over from month 12).
   Future<void> next() async {

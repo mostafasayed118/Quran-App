@@ -54,6 +54,25 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   Future<void> setMadhab(PrayerMadhab madhab) =>
       _enqueue((config) => config.copyWith(madhab: madhab));
 
+  /// Sets the manual minute correction for [prayer]; zero removes the entry.
+  Future<void> setAdjustment(PrayerName prayer, int minutes) {
+    if (prayer == PrayerName.sunrise) return Future<void>.value();
+    final safe = PrayerConfig.clampAdjustment(minutes);
+    return _enqueue((config) {
+      final next = Map<PrayerName, int>.of(config.adjustments);
+      if (safe == 0) {
+        next.remove(prayer);
+      } else {
+        next[prayer] = safe;
+      }
+      return config.copyWith(adjustments: next);
+    });
+  }
+
+  /// Selects the high-latitude rule and persists it.
+  Future<void> setHighLatitude(PrayerHighLatitudeRule rule) =>
+      _enqueue((config) => config.copyWith(highLatitude: rule));
+
   /// Enables or disables the reminder for [prayer].
   Future<void> setPrayerEnabled(PrayerName prayer, bool enabled) =>
       _enqueue((config) {

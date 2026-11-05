@@ -38,6 +38,7 @@ import '../features/tracker/presentation/tracker_cubit.dart';
 import '../features/tracker/presentation/tracker_screen.dart';
 import '../features/zakat/presentation/zakat_cubit.dart';
 import '../features/zakat/presentation/zakat_screen.dart';
+import '../features/hijri/data/hijri_offset_source.dart';
 import '../features/hijri/data/hijri_service.dart';
 import '../features/library/presentation/hadith/hadith_cubit.dart';
 import '../features/library/presentation/hadith/hadith_screen.dart';
@@ -55,6 +56,7 @@ import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
 import '../features/quran/data/juz_index_source.dart';
 import '../features/quran/data/page_anchor_source.dart';
+import '../features/quran/data/reader_layout_source.dart';
 import '../features/quran/data/reader_settings_source.dart';
 import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/quran_search_source.dart';
@@ -370,7 +372,10 @@ abstract final class AppRouter {
       GoRoute(
         path: AppRoutes.hijri,
         builder: (_, __) => RouteCubitScope<HijriCubit>(
-          create: () => HijriCubit(service: getIt<HijriService>()),
+          create: () => HijriCubit(
+            service: getIt<HijriService>(),
+            offset: getIt<HijriOffsetSource>(),
+          ),
           identity: AppRoutes.hijri,
           start: (cubit) => cubit.start(),
           child: const HijriScreen(),
@@ -463,6 +468,7 @@ abstract final class AppRouter {
                 uthmani: getIt<UthmaniTextSource>(),
                 pageAnchors: getIt<PageAnchorSource>(),
                 settings: getIt<ReaderSettingsSource>(),
+                layout: getIt<ReaderLayoutSource>(),
               ),
               start: (cubit) => cubit.start(),
               child: const ReaderScreen(),

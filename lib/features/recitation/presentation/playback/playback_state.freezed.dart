@@ -155,11 +155,25 @@ extension PlaybackStatePatterns on PlaybackState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String? reciterName, int surahNumber, String surahName)?
         initial,
-    TResult Function(String reciterName, int surahNumber, String surahName,
-            Duration position, Duration duration)?
+    TResult Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)?
         playing,
-    TResult Function(String reciterName, int surahNumber, String surahName,
-            Duration position, Duration duration)?
+    TResult Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)?
         paused,
     TResult Function(PlaybackFailureKind kind)? failed,
     required TResult orElse(),
@@ -169,11 +183,25 @@ extension PlaybackStatePatterns on PlaybackState {
       case PlaybackLoading() when initial != null:
         return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying() when playing != null:
-        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return playing(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackPaused() when paused != null:
-        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return paused(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackFailed() when failed != null:
         return failed(_that.kind);
       case _:
@@ -199,11 +227,25 @@ extension PlaybackStatePatterns on PlaybackState {
     required TResult Function(
             String? reciterName, int surahNumber, String surahName)
         initial,
-    required TResult Function(String reciterName, int surahNumber,
-            String surahName, Duration position, Duration duration)
+    required TResult Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)
         playing,
-    required TResult Function(String reciterName, int surahNumber,
-            String surahName, Duration position, Duration duration)
+    required TResult Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)
         paused,
     required TResult Function(PlaybackFailureKind kind) failed,
   }) {
@@ -212,11 +254,25 @@ extension PlaybackStatePatterns on PlaybackState {
       case PlaybackLoading():
         return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying():
-        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return playing(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackPaused():
-        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return paused(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackFailed():
         return failed(_that.kind);
     }
@@ -238,11 +294,25 @@ extension PlaybackStatePatterns on PlaybackState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String? reciterName, int surahNumber, String surahName)?
         initial,
-    TResult? Function(String reciterName, int surahNumber, String surahName,
-            Duration position, Duration duration)?
+    TResult? Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)?
         playing,
-    TResult? Function(String reciterName, int surahNumber, String surahName,
-            Duration position, Duration duration)?
+    TResult? Function(
+            String reciterName,
+            int surahNumber,
+            String surahName,
+            Duration position,
+            Duration duration,
+            double speed,
+            PlaybackRepeatMode repeatMode,
+            Duration? sleepTimer)?
         paused,
     TResult? Function(PlaybackFailureKind kind)? failed,
   }) {
@@ -251,11 +321,25 @@ extension PlaybackStatePatterns on PlaybackState {
       case PlaybackLoading() when initial != null:
         return initial(_that.reciterName, _that.surahNumber, _that.surahName);
       case PlaybackPlaying() when playing != null:
-        return playing(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return playing(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackPaused() when paused != null:
-        return paused(_that.reciterName, _that.surahNumber, _that.surahName,
-            _that.position, _that.duration);
+        return paused(
+            _that.reciterName,
+            _that.surahNumber,
+            _that.surahName,
+            _that.position,
+            _that.duration,
+            _that.speed,
+            _that.repeatMode,
+            _that.sleepTimer);
       case PlaybackFailed() when failed != null:
         return failed(_that.kind);
       case _:
@@ -358,7 +442,10 @@ class PlaybackPlaying implements PlaybackState {
       required this.surahNumber,
       this.surahName = '',
       this.position = Duration.zero,
-      this.duration = Duration.zero});
+      this.duration = Duration.zero,
+      this.speed = 1.0,
+      this.repeatMode = PlaybackRepeatMode.off,
+      this.sleepTimer = null});
 
   final String reciterName;
   final int surahNumber;
@@ -368,6 +455,12 @@ class PlaybackPlaying implements PlaybackState {
   final Duration position;
   @JsonKey()
   final Duration duration;
+  @JsonKey()
+  final double speed;
+  @JsonKey()
+  final PlaybackRepeatMode repeatMode;
+  @JsonKey()
+  final Duration? sleepTimer;
 
   /// Create a copy of PlaybackState
   /// with the given fields replaced by the non-null parameter values.
@@ -390,18 +483,23 @@ class PlaybackPlaying implements PlaybackState {
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.duration, duration) ||
-                other.duration == duration));
+                other.duration == duration) &&
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.repeatMode, repeatMode) ||
+                other.repeatMode == repeatMode) &&
+            (identical(other.sleepTimer, sleepTimer) ||
+                other.sleepTimer == sleepTimer));
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-        runtimeType, reciterName, surahNumber, surahName, position, duration);
+    return Object.hash(runtimeType, reciterName, surahNumber, surahName,
+        position, duration, speed, repeatMode, sleepTimer);
   }
 
   @override
   String toString() {
-    return 'PlaybackState.playing(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration)';
+    return 'PlaybackState.playing(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration, speed: $speed, repeatMode: $repeatMode, sleepTimer: $sleepTimer)';
   }
 }
 
@@ -417,7 +515,10 @@ abstract mixin class $PlaybackPlayingCopyWith<$Res>
       int surahNumber,
       String surahName,
       Duration position,
-      Duration duration});
+      Duration duration,
+      double speed,
+      PlaybackRepeatMode repeatMode,
+      Duration? sleepTimer});
 }
 
 /// @nodoc
@@ -437,6 +538,9 @@ class _$PlaybackPlayingCopyWithImpl<$Res>
     Object? surahName = null,
     Object? position = null,
     Object? duration = null,
+    Object? speed = null,
+    Object? repeatMode = null,
+    Object? sleepTimer = freezed,
   }) {
     return _then(PlaybackPlaying(
       reciterName: null == reciterName
@@ -459,6 +563,18 @@ class _$PlaybackPlayingCopyWithImpl<$Res>
           ? _self.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration,
+      speed: null == speed
+          ? _self.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as double,
+      repeatMode: null == repeatMode
+          ? _self.repeatMode
+          : repeatMode // ignore: cast_nullable_to_non_nullable
+              as PlaybackRepeatMode,
+      sleepTimer: freezed == sleepTimer
+          ? _self.sleepTimer
+          : sleepTimer // ignore: cast_nullable_to_non_nullable
+              as Duration?,
     ));
   }
 }
@@ -471,7 +587,10 @@ class PlaybackPaused implements PlaybackState {
       required this.surahNumber,
       this.surahName = '',
       this.position = Duration.zero,
-      this.duration = Duration.zero});
+      this.duration = Duration.zero,
+      this.speed = 1.0,
+      this.repeatMode = PlaybackRepeatMode.off,
+      this.sleepTimer = null});
 
   final String reciterName;
   final int surahNumber;
@@ -481,6 +600,12 @@ class PlaybackPaused implements PlaybackState {
   final Duration position;
   @JsonKey()
   final Duration duration;
+  @JsonKey()
+  final double speed;
+  @JsonKey()
+  final PlaybackRepeatMode repeatMode;
+  @JsonKey()
+  final Duration? sleepTimer;
 
   /// Create a copy of PlaybackState
   /// with the given fields replaced by the non-null parameter values.
@@ -503,18 +628,23 @@ class PlaybackPaused implements PlaybackState {
             (identical(other.position, position) ||
                 other.position == position) &&
             (identical(other.duration, duration) ||
-                other.duration == duration));
+                other.duration == duration) &&
+            (identical(other.speed, speed) || other.speed == speed) &&
+            (identical(other.repeatMode, repeatMode) ||
+                other.repeatMode == repeatMode) &&
+            (identical(other.sleepTimer, sleepTimer) ||
+                other.sleepTimer == sleepTimer));
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-        runtimeType, reciterName, surahNumber, surahName, position, duration);
+    return Object.hash(runtimeType, reciterName, surahNumber, surahName,
+        position, duration, speed, repeatMode, sleepTimer);
   }
 
   @override
   String toString() {
-    return 'PlaybackState.paused(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration)';
+    return 'PlaybackState.paused(reciterName: $reciterName, surahNumber: $surahNumber, surahName: $surahName, position: $position, duration: $duration, speed: $speed, repeatMode: $repeatMode, sleepTimer: $sleepTimer)';
   }
 }
 
@@ -530,7 +660,10 @@ abstract mixin class $PlaybackPausedCopyWith<$Res>
       int surahNumber,
       String surahName,
       Duration position,
-      Duration duration});
+      Duration duration,
+      double speed,
+      PlaybackRepeatMode repeatMode,
+      Duration? sleepTimer});
 }
 
 /// @nodoc
@@ -550,6 +683,9 @@ class _$PlaybackPausedCopyWithImpl<$Res>
     Object? surahName = null,
     Object? position = null,
     Object? duration = null,
+    Object? speed = null,
+    Object? repeatMode = null,
+    Object? sleepTimer = freezed,
   }) {
     return _then(PlaybackPaused(
       reciterName: null == reciterName
@@ -572,6 +708,18 @@ class _$PlaybackPausedCopyWithImpl<$Res>
           ? _self.duration
           : duration // ignore: cast_nullable_to_non_nullable
               as Duration,
+      speed: null == speed
+          ? _self.speed
+          : speed // ignore: cast_nullable_to_non_nullable
+              as double,
+      repeatMode: null == repeatMode
+          ? _self.repeatMode
+          : repeatMode // ignore: cast_nullable_to_non_nullable
+              as PlaybackRepeatMode,
+      sleepTimer: freezed == sleepTimer
+          ? _self.sleepTimer
+          : sleepTimer // ignore: cast_nullable_to_non_nullable
+              as Duration?,
     ));
   }
 }

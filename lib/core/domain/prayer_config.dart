@@ -48,10 +48,31 @@ enum PrayerMadhab {
   hanafi,
 }
 
+/// How the app resolves Fajr/Isha when the sun does not reach the twilight
+/// angle at the user's latitude.
+///
+/// [none] keeps the method's own default, which is what every build before
+/// this setting shipped. The other values map 1:1 to `adhan`'s
+/// `HighLatitudeRule`.
+enum PrayerHighLatitudeRule {
+  /// Use the calculation method's default (no explicit override).
+  none,
+
+  /// Fajr is never earlier than the middle of the night.
+  middleOfTheNight,
+
+  /// Fajr is never earlier than the last seventh of the night.
+  seventhOfTheNight,
+
+  /// Uses the method's twilight angle as the night fraction.
+  twilightAngle,
+}
+
 /// The user's prayer calculation preferences.
 ///
 /// The defaults reproduce the shipped behaviour exactly: Egyptian method,
-/// Shafi Asr.
+/// Shafi Asr, no per-prayer adjustment and the method's own high-latitude
+/// rule.
 class PrayerConfig {
   /// Creates a configuration; every field is optional so the default is the
   /// historical behaviour.
@@ -60,6 +81,8 @@ class PrayerConfig {
     this.madhab = PrayerMadhab.shafi,
     this.enabledPrayers = defaultEnabledPrayers,
     this.preAdhanMinutes = 0,
+    this.adjustments = const <PrayerName, int>{},
+    this.highLatitude = PrayerHighLatitudeRule.none,
   });
 
   /// The historical default (Egyptian, Shafi, all five prayers, no pre-adhan).
@@ -76,6 +99,16 @@ class PrayerConfig {
 
   /// Persisted key for [preAdhanMinutes].
   static const preAdhanMinutesKey = 'prayer_pre_adhan_minutes';
+
+  /// Persisted key for [adjustments].
+  static const adjustmentsKey = 'prayer_adjustments';
+
+  /// Persisted key for [highLatitude].
+  static const highLatitudeKey = 'prayer_high_latitude';
+
+  /// The widest manual correction a mosque-alignment convention needs.
+  static const int minAdjustmentMinutes = -30;
+  static const int maxAdjustmentMinutes = 30;
 
   /// The five prayers a reminder can target; sunrise is never included.
   static const defaultEnabledPrayers = <PrayerName>{
@@ -102,18 +135,35 @@ class PrayerConfig {
   /// 0 disables the early reminder; stored values are clamped to 0..60.
   final int preAdhanMinutes;
 
+  /// Per-prayer minute corrections applied after the calculation.
+  ///
+  /// Missing entries mean zero. Sunrise is never stored. Callers must treat
+  /// this as immutable; the cubit replaces the map.
+  final Map<PrayerName, int> adjustments;
+
+  /// The high-latitude rule; [PrayerHighLatitudeRule.none] keeps the
+  /// calculation method's default.
+  final PrayerHighLatitudeRule highLatitude;
+
+  /// The correction for [prayer], or zero when unset.
+  int adjustmentFor(PrayerName prayer) => adjustments[prayer] ?? 0;
+
   /// A copy with the given fields replaced.
   PrayerConfig copyWith({
     PrayerCalculationMethod? method,
     PrayerMadhab? madhab,
     Set<PrayerName>? enabledPrayers,
     int? preAdhanMinutes,
+    Map<PrayerName, int>? adjustments,
+    PrayerHighLatitudeRule? highLatitude,
   }) {
     return PrayerConfig(
       method: method ?? this.method,
       madhab: madhab ?? this.madhab,
       enabledPrayers: enabledPrayers ?? this.enabledPrayers,
       preAdhanMinutes: preAdhanMinutes ?? this.preAdhanMinutes,
+      adjustments: adjustments ?? this.adjustments,
+      highLatitude: highLatitude ?? this.highLatitude,
     );
   }
 
@@ -124,6 +174,12 @@ class PrayerConfig {
         enabledPrayersKey:
             enabledPrayers.map((prayer) => prayer.name).join(','),
         preAdhanMinutesKey: '$preAdhanMinutes',
+        adjustmentsKey: adjustments.entries
+            .where(
+                (entry) => entry.key != PrayerName.sunrise && entry.value != 0)
+            .map((entry) => '${entry.key.name}:${entry.value}')
+            .join(','),
+        highLatitudeKey: highLatitude.name,
       };
 
   /// Decodes a persisted map; unknown or missing values fall back to the
@@ -136,6 +192,8 @@ class PrayerConfig {
           ? _prayersFromCsv(json[enabledPrayersKey])
           : defaultEnabledPrayers,
       preAdhanMinutes: _minutesFromString(json[preAdhanMinutesKey]),
+      adjustments: _adjustmentsFromCsv(json[adjustmentsKey]),
+      highLatitude: highLatitudeFromName(json[highLatitudeKey]),
     );
   }
 
@@ -155,6 +213,15 @@ class PrayerConfig {
     return PrayerMadhab.shafi;
   }
 
+  /// Resolves a persisted high-latitude name; unknown names fall back to
+  /// [PrayerHighLatitudeRule.none].
+  static PrayerHighLatitudeRule highLatitudeFromName(String? name) {
+    for (final rule in PrayerHighLatitudeRule.values) {
+      if (rule.name == name) return rule;
+    }
+    return PrayerHighLatitudeRule.none;
+  }
+
   static Set<PrayerName> _prayersFromCsv(String? csv) {
     if (csv == null || csv.trim().isEmpty) return <PrayerName>{};
     final names = csv.split(',').map((name) => name.trim());
@@ -166,11 +233,39 @@ class PrayerConfig {
     };
   }
 
+  static Map<PrayerName, int> _adjustmentsFromCsv(String? csv) {
+    if (csv == null || csv.trim().isEmpty) return const <PrayerName, int>{};
+    final result = <PrayerName, int>{};
+    for (final pair in csv.split(',')) {
+      final parts = pair.split(':');
+      if (parts.length != 2) continue;
+      final name = parts[0].trim();
+      final parsed = int.tryParse(parts[1].trim());
+      if (parsed == null) continue;
+      final safe = _clampAdjustment(parsed);
+      if (safe == 0) continue;
+      for (final prayer in PrayerName.values) {
+        if (prayer.name == name && prayer != PrayerName.sunrise) {
+          result[prayer] = safe;
+        }
+      }
+    }
+    return result;
+  }
+
   static int _minutesFromString(String? value) {
     final minutes = int.tryParse(value ?? '') ?? 0;
     if (minutes < 0) return 0;
     if (minutes > 60) return 60;
     return minutes;
+  }
+
+  static int clampAdjustment(int value) => _clampAdjustment(value);
+
+  static int _clampAdjustment(int value) {
+    if (value < minAdjustmentMinutes) return minAdjustmentMinutes;
+    if (value > maxAdjustmentMinutes) return maxAdjustmentMinutes;
+    return value;
   }
 
   @override
@@ -179,18 +274,36 @@ class PrayerConfig {
       other.method == method &&
       other.madhab == madhab &&
       other.preAdhanMinutes == preAdhanMinutes &&
-      _samePrayers(other.enabledPrayers, enabledPrayers);
+      other.highLatitude == highLatitude &&
+      _samePrayers(other.enabledPrayers, enabledPrayers) &&
+      _sameAdjustments(other.adjustments, adjustments);
 
   @override
   int get hashCode => Object.hash(
         method,
         madhab,
         preAdhanMinutes,
+        highLatitude,
         Object.hashAllUnordered(enabledPrayers),
+        Object.hashAllUnordered(
+          adjustments.entries
+              .map((entry) => Object.hash(entry.key, entry.value)),
+        ),
       );
 
   static bool _samePrayers(Set<PrayerName> a, Set<PrayerName> b) =>
       a.length == b.length && a.containsAll(b);
+
+  static bool _sameAdjustments(
+    Map<PrayerName, int> a,
+    Map<PrayerName, int> b,
+  ) {
+    if (a.length != b.length) return false;
+    for (final entry in a.entries) {
+      if (b[entry.key] != entry.value) return false;
+    }
+    return true;
+  }
 }
 
 /// Cross-feature seam: read the current preferences synchronously (the

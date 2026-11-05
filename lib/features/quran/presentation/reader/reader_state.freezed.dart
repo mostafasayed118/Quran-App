@@ -153,7 +153,8 @@ extension ReaderStatePatterns on ReaderState {
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
-            double fontScale)?
+            double fontScale,
+            double lineHeight)?
         ready,
     TResult Function(int? emptySurahId)? failed,
     required TResult orElse(),
@@ -171,7 +172,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
-            _that.fontScale);
+            _that.fontScale,
+            _that.lineHeight);
       case ReaderFailed() when failed != null:
         return failed(_that.emptySurahId);
       case _:
@@ -203,7 +205,8 @@ extension ReaderStatePatterns on ReaderState {
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
-            double fontScale)
+            double fontScale,
+            double lineHeight)
         ready,
     required TResult Function(int? emptySurahId) failed,
   }) {
@@ -220,7 +223,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
-            _that.fontScale);
+            _that.fontScale,
+            _that.lineHeight);
       case ReaderFailed():
         return failed(_that.emptySurahId);
     }
@@ -249,7 +253,8 @@ extension ReaderStatePatterns on ReaderState {
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
-            double fontScale)?
+            double fontScale,
+            double lineHeight)?
         ready,
     TResult? Function(int? emptySurahId)? failed,
   }) {
@@ -266,7 +271,8 @@ extension ReaderStatePatterns on ReaderState {
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
-            _that.fontScale);
+            _that.fontScale,
+            _that.lineHeight);
       case ReaderFailed() when failed != null:
         return failed(_that.emptySurahId);
       case _:
@@ -360,7 +366,8 @@ class ReaderReady implements ReaderState {
       this.mode = ReaderMode.verses,
       Set<int> bookmarkedAyahIds = const <int>{},
       this.showBasmala = true,
-      this.fontScale = 1.0})
+      this.fontScale = 1.0,
+      this.lineHeight = 2.2})
       : _ayahs = ayahs,
         _bookmarkedAyahIds = bookmarkedAyahIds;
 
@@ -389,6 +396,8 @@ class ReaderReady implements ReaderState {
   final bool showBasmala;
   @JsonKey()
   final double fontScale;
+  @JsonKey()
+  final double lineHeight;
 
   /// Create a copy of ReaderState
   /// with the given fields replaced by the non-null parameter values.
@@ -414,7 +423,9 @@ class ReaderReady implements ReaderState {
             (identical(other.showBasmala, showBasmala) ||
                 other.showBasmala == showBasmala) &&
             (identical(other.fontScale, fontScale) ||
-                other.fontScale == fontScale));
+                other.fontScale == fontScale) &&
+            (identical(other.lineHeight, lineHeight) ||
+                other.lineHeight == lineHeight));
   }
 
   @override
@@ -428,12 +439,13 @@ class ReaderReady implements ReaderState {
         mode,
         const DeepCollectionEquality().hash(_bookmarkedAyahIds),
         showBasmala,
-        fontScale);
+        fontScale,
+        lineHeight);
   }
 
   @override
   String toString() {
-    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale)';
+    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale, lineHeight: $lineHeight)';
   }
 }
 
@@ -452,7 +464,8 @@ abstract mixin class $ReaderReadyCopyWith<$Res>
       ReaderMode mode,
       Set<int> bookmarkedAyahIds,
       bool showBasmala,
-      double fontScale});
+      double fontScale,
+      double lineHeight});
 }
 
 /// @nodoc
@@ -474,6 +487,7 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
     Object? bookmarkedAyahIds = null,
     Object? showBasmala = null,
     Object? fontScale = null,
+    Object? lineHeight = null,
   }) {
     return _then(ReaderReady(
       surahId: null == surahId
@@ -507,6 +521,10 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
       fontScale: null == fontScale
           ? _self.fontScale
           : fontScale // ignore: cast_nullable_to_non_nullable
+              as double,
+      lineHeight: null == lineHeight
+          ? _self.lineHeight
+          : lineHeight // ignore: cast_nullable_to_non_nullable
               as double,
     ));
   }

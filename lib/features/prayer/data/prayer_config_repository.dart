@@ -32,6 +32,8 @@ class PrayerConfigRepository implements PrayerConfigSource {
                     PrayerConfig.madhabKey,
                     PrayerConfig.enabledPrayersKey,
                     PrayerConfig.preAdhanMinutesKey,
+                    PrayerConfig.adjustmentsKey,
+                    PrayerConfig.highLatitudeKey,
                   ],
                 )))
           .get();
@@ -77,6 +79,18 @@ class PrayerConfigRepository implements PrayerConfigSource {
             SettingsTableCompanion.insert(
               key: PrayerConfig.preAdhanMinutesKey,
               value: '${config.preAdhanMinutes}',
+            ),
+          );
+      await _db.into(_db.settingsTable).insertOnConflictUpdate(
+            SettingsTableCompanion.insert(
+              key: PrayerConfig.adjustmentsKey,
+              value: config.toJson()[PrayerConfig.adjustmentsKey] ?? '',
+            ),
+          );
+      await _db.into(_db.settingsTable).insertOnConflictUpdate(
+            SettingsTableCompanion.insert(
+              key: PrayerConfig.highLatitudeKey,
+              value: config.highLatitude.name,
             ),
           );
     });

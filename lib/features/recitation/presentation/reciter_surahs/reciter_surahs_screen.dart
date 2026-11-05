@@ -48,6 +48,16 @@ class ReciterSurahsScreen extends StatelessWidget {
           },
         ),
         actions: [
+          BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
+            builder: (context, state) => switch (state) {
+              ReciterSurahsReady(:final row, :final surahNumbers) => IconButton(
+                  tooltip: loc.downloadAllSurahs,
+                  icon: const Icon(Icons.download_for_offline_outlined),
+                  onPressed: () => _downloadAll(context, row.id, surahNumbers),
+                ),
+              _ => const SizedBox.shrink(),
+            },
+          ),
           IconButton(
             tooltip: loc.setAsDefaultReciter,
             icon: const Icon(Icons.star_border),
@@ -81,6 +91,25 @@ class ReciterSurahsScreen extends StatelessWidget {
         },
       ),
       bottomSheet: const MiniPlayerBar(),
+    );
+  }
+
+  Future<void> _downloadAll(
+    BuildContext context,
+    String rowId,
+    List<int> surahNumbers,
+  ) async {
+    final loc = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final count =
+        await context.read<DownloadsCubit>().enqueueAll(rowId, surahNumbers);
+    if (!context.mounted) return;
+    AppToast.showOn(
+      messenger,
+      count == 0
+          ? loc.downloadAllNothing
+          : loc.downloadAllQueued(loc.number(count)),
+      tone: count == 0 ? ToastTone.info : ToastTone.success,
     );
   }
 

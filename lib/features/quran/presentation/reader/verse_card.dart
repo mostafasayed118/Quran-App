@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/deep_links.dart';
+import '../../../../l10n/app_localizations.dart';
+import '../../domain/verse.dart';
+
+/// The shareable ayah card.
+///
+/// Fixed palette on purpose: the image must look the same regardless of the
+/// phone's light/dark theme. Width is logical pixels; the capture runs at a
+/// 2× pixel ratio, so the exported PNG is 720 px wide for the default 360.
+class VerseCard extends StatelessWidget {
+  /// Creates the card for [ayah].
+  const VerseCard({
+    super.key,
+    required this.ayah,
+    required this.surahName,
+    this.width = 360,
+  });
+
+  /// The verse to render.
+  final Verse ayah;
+
+  /// The surah name shown above the verse.
+  final String surahName;
+
+  /// Logical width of the card.
+  final double width;
+
+  static const _backgroundTop = Color(0xFF0B2E24);
+  static const _backgroundBottom = Color(0xFF144233);
+  static const _textColor = Color(0xFFF4E6C3);
+  static const _gold = Color(0xFFD9B45B);
+  static const _muted = Color(0xFFB9C9C0);
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final text = ayah.textUnicode ?? stripAyahEndMarker(ayah.textUthmani);
+    final fontSize = text.length > 400 ? 18.0 : 22.0;
+    final host = Uri.parse(
+      webSurahUrl(ayah.surahId, ayah.numberInSurah),
+    ).host;
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        width: width,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [_backgroundTop, _backgroundBottom],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: _gold.withValues(alpha: 0.35)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    loc.appName,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _gold,
+                      fontFamily: QuranFonts.ui,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    surahName,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _textColor,
+                      fontFamily: QuranFonts.ui,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Text(
+              text,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                color: _textColor,
+                fontFamily: QuranFonts.quran,
+                fontSize: fontSize,
+                height: 2,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              loc.ornateBrackets(loc.number(ayah.numberInSurah)),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: _gold,
+                fontFamily: QuranFonts.meQuran,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Container(height: 1, color: _gold.withValues(alpha: 0.25)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                const Text(
+                  'quran yahdi',
+                  style: TextStyle(
+                    color: _muted,
+                    fontFamily: QuranFonts.ui,
+                    fontSize: 10,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                const Spacer(),
+                Flexible(
+                  child: Text(
+                    host,
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _muted,
+                      fontFamily: QuranFonts.ui,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/prayer_config.dart';
 import '../../../../core/domain/prayer_name.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
@@ -109,6 +110,54 @@ class _Ready extends StatelessWidget {
                 onTap: () => cubit.setPreAdhanMinutes(15),
               ),
             ],
+          ),
+        ),
+        const Divider(height: AppSpacing.xl),
+        _SectionLabel(loc.prayerTuning),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Text(
+            loc.prayerHighLatitude,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.sm,
+          ),
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [
+              for (final rule in PrayerHighLatitudeRule.values)
+                ChoiceChip(
+                  label: Text(_highLatitudeLabel(loc, rule)),
+                  selected: config.highLatitude == rule,
+                  onSelected: (_) => cubit.setHighLatitude(rule),
+                ),
+            ],
+          ),
+        ),
+        for (final prayer in PrayerName.values)
+          if (prayer != PrayerName.sunrise)
+            _AdjustmentRow(
+              label: prayer.label(loc),
+              minutes: config.adjustmentFor(prayer),
+              onChanged: (value) => cubit.setAdjustment(prayer, value),
+            ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            0,
+          ),
+          child: Text(
+            loc.prayerAdjustmentHint,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
           ),
         ),
         ListTile(
@@ -223,4 +272,60 @@ String _madhabLabel(AppLocalizations loc, PrayerMadhab madhab) {
     PrayerMadhab.shafi => loc.madhabShafi,
     PrayerMadhab.hanafi => loc.madhabHanafi,
   };
+}
+
+String _highLatitudeLabel(
+  AppLocalizations loc,
+  PrayerHighLatitudeRule rule,
+) {
+  return switch (rule) {
+    PrayerHighLatitudeRule.none => loc.highLatitudeNone,
+    PrayerHighLatitudeRule.middleOfTheNight => loc.highLatitudeMiddle,
+    PrayerHighLatitudeRule.seventhOfTheNight => loc.highLatitudeSeventh,
+    PrayerHighLatitudeRule.twilightAngle => loc.highLatitudeTwilight,
+  };
+}
+
+class _AdjustmentRow extends StatelessWidget {
+  const _AdjustmentRow({
+    required this.label,
+    required this.minutes,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int minutes;
+  final ValueChanged<int> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final value = minutes > 0 ? '+${loc.number(minutes)}' : loc.number(minutes);
+    return ListTile(
+      title: Text(label),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            tooltip: loc.prayerAdjustmentDecrease,
+            onPressed: minutes <= PrayerConfig.minAdjustmentMinutes
+                ? null
+                : () => onChanged(minutes - 1),
+            icon: const Icon(Icons.remove),
+          ),
+          SizedBox(
+            width: 48,
+            child: Text(value, textAlign: TextAlign.center),
+          ),
+          IconButton(
+            tooltip: loc.prayerAdjustmentIncrease,
+            onPressed: minutes >= PrayerConfig.maxAdjustmentMinutes
+                ? null
+                : () => onChanged(minutes + 1),
+            icon: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    );
+  }
 }

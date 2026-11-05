@@ -33,6 +33,8 @@ import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dar
 import 'package:quran_yahdi/features/backup/data/backup_service.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
+import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
+import 'package:quran_yahdi/features/hijri/data/hijri_offset_source.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_service.dart';
 import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
@@ -56,6 +58,7 @@ import 'package:quran_yahdi/features/quran/data/juz_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/data/page_anchor_repository.dart';
 import 'package:quran_yahdi/features/quran/data/page_anchor_source.dart';
+import 'package:quran_yahdi/features/quran/data/reader_layout_source.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_source.dart';
 import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
@@ -150,6 +153,8 @@ Future<void> configureDependencies({
       () => ReaderSettingsRepository(db));
   getIt.registerLazySingleton<ReaderSettingsSource>(
       () => getIt<ReaderSettingsRepository>());
+  getIt.registerLazySingleton<ReaderLayoutSource>(
+      () => getIt<ReaderSettingsRepository>());
   getIt.registerLazySingleton<LastReadRepository>(() => LastReadRepository(db));
   getIt
       .registerLazySingleton<LastReadMarker>(() => getIt<LastReadRepository>());
@@ -197,6 +202,10 @@ Future<void> configureDependencies({
       () => PrayerLogRepository(db));
   getIt.registerLazySingleton<KhatmaRepository>(() => KhatmaRepository(db));
   getIt.registerLazySingleton<HijriService>(() => HijriService());
+  getIt.registerLazySingleton<HijriOffsetRepository>(
+      () => HijriOffsetRepository(db));
+  getIt.registerLazySingleton<HijriOffsetSource>(
+      () => getIt<HijriOffsetRepository>());
   // Restore reschedules reminders through the same guarded path as boot
   // (`runBootReminderSchedule` composition; no feature import lands on backup).
   // The prayer configuration is re-read first: an import may have replaced the

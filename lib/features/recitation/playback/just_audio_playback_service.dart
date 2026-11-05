@@ -41,6 +41,7 @@ class JustAudioPlaybackService
         DisposablePlaybackService,
         CompletingPlaybackService,
         SeekablePlaybackService,
+        TunablePlaybackService,
         MediaPlaybackControl {
   JustAudioPlaybackService([AudioPlayer? player])
       : _player = player ?? AudioPlayer();
@@ -121,6 +122,13 @@ class JustAudioPlaybackService
 
   @override
   Future<void> seek(Duration position) => _player.seek(position);
+
+  @override
+  Future<void> setSpeed(double speed) => _player.setSpeed(speed);
+
+  @override
+  Future<void> setLoopMode(bool loop) =>
+      _player.setLoopMode(loop ? LoopMode.one : LoopMode.off);
 
   @override
   Future<void> resume() async {

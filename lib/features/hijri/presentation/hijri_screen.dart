@@ -8,6 +8,7 @@ import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../data/hijri_service.dart';
 import 'hijri_cubit.dart';
 import 'hijri_state.dart';
 
@@ -28,7 +29,8 @@ class HijriScreen extends StatelessWidget {
             :final year,
             :final offset,
             :final cells,
-            :final todayHeader
+            :final todayHeader,
+            :final dayOffset,
           ) =>
             ListView(
               padding: appScrollPadding(
@@ -37,6 +39,7 @@ class HijriScreen extends StatelessWidget {
               ),
               children: [
                 _TodayCard(todayHeader: loc.digits(todayHeader)),
+                _OffsetCard(dayOffset: dayOffset),
                 _MonthNavBar(monthName: monthName, year: year),
                 _MonthGrid(offset: offset, cells: cells),
               ],
@@ -62,6 +65,60 @@ class _TodayCard extends StatelessWidget {
             Text(
               todayHeader,
               style: AppTheme.rowTitle,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _OffsetCard extends StatelessWidget {
+  const _OffsetCard({required this.dayOffset});
+
+  final int dayOffset;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final cubit = context.read<HijriCubit>();
+    final value = dayOffset > 0
+        ? '+${loc.digits('$dayOffset')}'
+        : loc.digits('$dayOffset');
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+        child: Row(
+          textDirection: TextDirection.rtl,
+          children: [
+            IconButton(
+              tooltip: loc.hijriOffsetMinus,
+              onPressed: dayOffset <= HijriService.minOffsetDays
+                  ? null
+                  : () => cubit.setOffset(dayOffset - 1),
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    loc.hijriOffsetTitle,
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                  Text(
+                    loc.hijriOffsetValue(value),
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ],
+              ),
+            ),
+            IconButton(
+              tooltip: loc.hijriOffsetPlus,
+              onPressed: dayOffset >= HijriService.maxOffsetDays
+                  ? null
+                  : () => cubit.setOffset(dayOffset + 1),
+              icon: const Icon(Icons.add_circle_outline),
             ),
           ],
         ),

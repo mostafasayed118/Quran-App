@@ -52,9 +52,15 @@ const String backupKeyPrayerCalcMethod = 'prayer_calc_method';
 const String backupKeyPrayerMadhab = 'prayer_madhab';
 const String backupKeyPrayerEnabledPrayers = 'prayer_enabled_prayers';
 const String backupKeyPrayerPreAdhanMinutes = 'prayer_pre_adhan_minutes';
+const String backupKeyPrayerAdjustments = 'prayer_adjustments';
+const String backupKeyPrayerHighLatitude = 'prayer_high_latitude';
 
 /// `lib/features/quran/data/reader_settings_repository.dart`.
 const String backupKeyReaderFontScale = 'reader_font_scale';
+const String backupKeyReaderLineHeight = 'reader_line_height';
+
+/// `lib/features/hijri/data/hijri_offset_repository.dart`.
+const String backupKeyHijriDayOffset = 'hijri_day_offset';
 
 /// `lib/features/azkar/data/azkar_saved_state_repository.dart`.
 const String backupKeyAzkarProgress = 'azkar_progress_v1';
@@ -93,7 +99,11 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyPrayerMadhab,
   backupKeyPrayerEnabledPrayers,
   backupKeyPrayerPreAdhanMinutes,
+  backupKeyPrayerAdjustments,
+  backupKeyPrayerHighLatitude,
   backupKeyReaderFontScale,
+  backupKeyReaderLineHeight,
+  backupKeyHijriDayOffset,
   backupKeyAzkarProgress,
   backupKeyAzkarFavorites,
   backupKeySelectedCity,
@@ -115,6 +125,8 @@ const Set<String> kBackupReminderRelevantKeys = {
   backupKeyPrayerMadhab,
   backupKeyPrayerEnabledPrayers,
   backupKeyPrayerPreAdhanMinutes,
+  backupKeyPrayerAdjustments,
+  backupKeyPrayerHighLatitude,
   backupKeySelectedCity,
   backupKeyAdhanId,
   backupKeyAdhanFajrId,

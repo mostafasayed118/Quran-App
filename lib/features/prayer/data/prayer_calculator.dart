@@ -24,6 +24,21 @@ CalculationParameters parametersFor(PrayerConfig config) {
   final parameters = method.getParameters();
   parameters.madhab =
       config.madhab == PrayerMadhab.hanafi ? Madhab.hanafi : Madhab.shafi;
+  final adjustments = parameters.adjustments;
+  adjustments.fajr = config.adjustmentFor(PrayerName.fajr);
+  adjustments.dhuhr = config.adjustmentFor(PrayerName.dhuhr);
+  adjustments.asr = config.adjustmentFor(PrayerName.asr);
+  adjustments.maghrib = config.adjustmentFor(PrayerName.maghrib);
+  adjustments.isha = config.adjustmentFor(PrayerName.isha);
+  final highLatitude = switch (config.highLatitude) {
+    PrayerHighLatitudeRule.none => null,
+    PrayerHighLatitudeRule.middleOfTheNight =>
+      HighLatitudeRule.middle_of_the_night,
+    PrayerHighLatitudeRule.seventhOfTheNight =>
+      HighLatitudeRule.seventh_of_the_night,
+    PrayerHighLatitudeRule.twilightAngle => HighLatitudeRule.twilight_angle,
+  };
+  if (highLatitude != null) parameters.highLatitudeRule = highLatitude;
   return parameters;
 }
 

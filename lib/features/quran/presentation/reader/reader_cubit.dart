@@ -7,6 +7,7 @@ import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
 import '../../data/ayah_source.dart';
 import '../../data/last_read_source.dart';
 import '../../data/page_anchor_source.dart';
+import '../../data/reader_layout_source.dart';
 import '../../data/reader_settings_source.dart';
 import '../../data/uthmani_text_source.dart';
 import '../../data/verse_mapping.dart';
@@ -32,12 +33,14 @@ class ReaderCubit extends Cubit<ReaderState> {
     UthmaniTextSource? uthmani,
     PageAnchorSource? pageAnchors,
     ReaderSettingsSource? settings,
+    ReaderLayoutSource? layout,
   })  : _ayahRepository = ayahRepository,
         _lastReadRepository = lastReadRepository,
         _wirdProgress = wirdProgress,
         _uthmani = uthmani,
         _pageAnchors = pageAnchors,
         _settings = settings,
+        _layout = layout,
         _surahId = surahId,
         _initialAyah = initialAyah,
         super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
@@ -64,6 +67,7 @@ class ReaderCubit extends Cubit<ReaderState> {
   final UthmaniTextSource? _uthmani;
   final PageAnchorSource? _pageAnchors;
   final ReaderSettingsSource? _settings;
+  final ReaderLayoutSource? _layout;
   final int _surahId;
   final int _initialAyah;
   StreamSubscription<Set<int>>? _bookmarksSub;
@@ -94,7 +98,8 @@ class ReaderCubit extends Cubit<ReaderState> {
       // verses keep glyph text and the reader turns selection off.
       final unicode =
           await _uthmani?.forSurah(_surahId) ?? const <int, String>{};
-      final fontScale = await _loadFontScale();
+      final (fontScale, lineHeight) =
+          await (_loadFontScale(), _loadLineHeight()).wait;
       if (isClosed) return;
       final verses = ayahs
           .map((a) => a.toVerse().withUnicode(unicode[a.numberInSurah]))
@@ -107,6 +112,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
         fontScale: fontScale,
+        lineHeight: lineHeight,
       ));
     } on Object catch (error, stackTrace) {
       dev.log('reader load failed',
@@ -188,6 +194,37 @@ class ReaderCubit extends Cubit<ReaderState> {
       await _settings?.saveFontScale(safe);
     } on Object catch (error, stackTrace) {
       dev.log('reader font scale write failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+    }
+  }
+
+  Future<double> _loadLineHeight() async {
+    try {
+      return await _layout?.loadLineHeight() ??
+          ReaderLayoutSource.defaultLineHeight;
+    } on Object catch (error, stackTrace) {
+      dev.log('reader line height read failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      return ReaderLayoutSource.defaultLineHeight;
+    }
+  }
+
+  /// Sets the reader line height (1.6–3.0); a failed write keeps the
+  /// on-screen value and only logs.
+  Future<void> setLineHeight(double lineHeight) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = lineHeight < ReaderLayoutSource.minLineHeight
+        ? ReaderLayoutSource.minLineHeight
+        : (lineHeight > ReaderLayoutSource.maxLineHeight
+            ? ReaderLayoutSource.maxLineHeight
+            : lineHeight);
+    if (safe == current.lineHeight) return;
+    emit(current.copyWith(lineHeight: safe));
+    try {
+      await _layout?.saveLineHeight(safe);
+    } on Object catch (error, stackTrace) {
+      dev.log('reader line height write failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }

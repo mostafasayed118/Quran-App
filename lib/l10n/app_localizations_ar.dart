@@ -42,6 +42,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hijriCalendar => 'التقويم الهجري';
 
   @override
+  String get hijriOffsetTitle => 'ضبط التاريخ الهجري';
+
+  @override
+  String hijriOffsetValue(String days) {
+    return 'الإزاحة: $days';
+  }
+
+  @override
+  String get hijriOffsetMinus => 'يوم أقل';
+
+  @override
+  String get hijriOffsetPlus => 'يوم أكثر';
+
+  @override
   String get asmaUlHusna => 'أسماء الله الحسنى';
 
   @override
@@ -138,6 +152,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get shareAyah => 'مشاركة الآية';
 
   @override
+  String get shareAsImage => 'مشاركة كصورة';
+
+  @override
+  String get shareAsText => 'مشاركة كنص';
+
+  @override
   String get noBookmarks => 'لا توجد علامات مرجعية بعد';
 
   @override
@@ -191,6 +211,29 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get stopTooltip => 'إيقاف';
+
+  @override
+  String get repeatSurah => 'تكرار السورة';
+
+  @override
+  String get playbackSpeed => 'سرعة التشغيل';
+
+  @override
+  String get sleepTimer => 'مؤقت النوم';
+
+  @override
+  String get sleepTimerOff => 'بدون مؤقت';
+
+  @override
+  String sleepTimerMinutes(String minutes) {
+    return '$minutes دقيقة';
+  }
+
+  @override
+  String get previousSurah => 'السورة السابقة';
+
+  @override
+  String get nextSurah => 'السورة التالية';
 
   @override
   String get listenTooltip => 'استمع للسورة';
@@ -423,6 +466,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get setAsDefaultReciter => 'تعيين كقارئ افتراضي';
+
+  @override
+  String get downloadAllSurahs => 'تنزيل كل السور';
+
+  @override
+  String downloadAllQueued(String count) {
+    return 'جارٍ تنزيل $count سورة';
+  }
+
+  @override
+  String get downloadAllNothing => 'كل السور منزّلة بالفعل';
 
   @override
   String get libraryInstall => 'تنزيل';
@@ -999,6 +1053,34 @@ class AppLocalizationsAr extends AppLocalizations {
   String get preAdhanFifteen => '١٥ دقيقة';
 
   @override
+  String get prayerTuning => 'ضبط دقيق';
+
+  @override
+  String get prayerHighLatitude => 'قاعدة خطوط العرض العالية';
+
+  @override
+  String get highLatitudeNone => 'افتراضي الطريقة';
+
+  @override
+  String get highLatitudeMiddle => 'منتصف الليل';
+
+  @override
+  String get highLatitudeSeventh => 'سُبع الليل';
+
+  @override
+  String get highLatitudeTwilight => 'زاوية الشفق';
+
+  @override
+  String get prayerAdjustmentHint =>
+      'عدّل دقائق كل صلاة لتطابق مسجدك. القيمة صفر تعني بلا تعديل.';
+
+  @override
+  String get prayerAdjustmentDecrease => 'دقيقة أقل';
+
+  @override
+  String get prayerAdjustmentIncrease => 'دقيقة أكثر';
+
+  @override
   String reminderAdhanSoon(String prayer, String minutes) {
     return 'اقتربت صلاة $prayer — بعد $minutes دقيقة';
   }
@@ -1028,6 +1110,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get readerFontSize => 'حجم الخط';
+
+  @override
+  String get readerLineSpacing => 'تباعد الأسطر';
 
   @override
   String get reminderReliabilityTitle => 'موثوقية التذكيرات';

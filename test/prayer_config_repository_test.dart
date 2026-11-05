@@ -83,6 +83,21 @@ void main() {
     expect((await repo.load()).preAdhanMinutes, 0);
   });
 
+  test('adjustments and the high-latitude rule round-trip through the table',
+      () async {
+    final db = newTestDb();
+    final repo = PrayerConfigRepository(db);
+    const config = PrayerConfig(
+      adjustments: {PrayerName.fajr: 6, PrayerName.isha: -2},
+      highLatitude: PrayerHighLatitudeRule.twilightAngle,
+    );
+
+    await repo.save(config);
+
+    final reloaded = PrayerConfigRepository(db);
+    expect(await reloaded.load(), config);
+  });
+
   test('changes emits after a successful save', () async {
     final db = newTestDb();
     final repo = PrayerConfigRepository(db);

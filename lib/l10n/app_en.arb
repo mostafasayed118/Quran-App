@@ -11,6 +11,17 @@
   "worshipTracker": "Worship Tracker",
   "zakat": "Zakat",
   "hijriCalendar": "Hijri Calendar",
+  "hijriOffsetTitle": "Hijri date adjustment",
+  "hijriOffsetValue": "Offset: {days}",
+  "@hijriOffsetValue": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "hijriOffsetMinus": "One day earlier",
+  "hijriOffsetPlus": "One day later",
   "asmaUlHusna": "99 Names of Allah",
   "settings": "Settings",
   "language": "Language",
@@ -55,6 +66,8 @@
   "bookmarkSaved": "Verse saved",
   "bookmarkRemoved": "Bookmark removed",
   "shareAyah": "Share verse",
+  "shareAsImage": "Share as image",
+  "shareAsText": "Share as text",
   "noBookmarks": "No bookmarks yet",
   "pageIndicator": "Page {page}",
   "@pageIndicator": {
@@ -105,6 +118,20 @@
   "playTooltip": "Play",
   "pauseTooltip": "Pause",
   "stopTooltip": "Stop",
+  "repeatSurah": "Repeat surah",
+  "playbackSpeed": "Playback speed",
+  "sleepTimer": "Sleep timer",
+  "sleepTimerOff": "No timer",
+  "sleepTimerMinutes": "{minutes} min",
+  "@sleepTimerMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "previousSurah": "Previous surah",
+  "nextSurah": "Next surah",
   "listenTooltip": "Listen to surah",
   "surahBadge": "Surah {number}",
   "@surahBadge": {
@@ -243,6 +270,16 @@
   "translationsTab": "Translations",
   "hadithTab": "Hadith",
   "setAsDefaultReciter": "Set as default reciter",
+  "downloadAllSurahs": "Download all surahs",
+  "downloadAllQueued": "Downloading {count} surahs",
+  "@downloadAllQueued": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadAllNothing": "All surahs are already downloaded",
   "libraryInstall": "Install",
   "libraryDelete": "Delete",
   "libraryInstalled": "Installed",
@@ -640,6 +677,15 @@
   "preAdhanFive": "5 min",
   "preAdhanTen": "10 min",
   "preAdhanFifteen": "15 min",
+  "prayerTuning": "Fine tuning",
+  "prayerHighLatitude": "High-latitude rule",
+  "highLatitudeNone": "Method default",
+  "highLatitudeMiddle": "Middle of the night",
+  "highLatitudeSeventh": "Seventh of the night",
+  "highLatitudeTwilight": "Twilight angle",
+  "prayerAdjustmentHint": "Adjust each prayer to match your mosque. Zero means no adjustment.",
+  "prayerAdjustmentDecrease": "One minute less",
+  "prayerAdjustmentIncrease": "One minute more",
   "reminderAdhanSoon": "{prayer} is in {minutes} minutes",
   "monthlyTimetable": "Monthly timetable",
   "juzIndexTitle": "Juz index",
@@ -654,6 +700,7 @@
   "pageJumpInvalid": "Page not found",
   "pageJumpGo": "Go",
   "readerFontSize": "Font size",
+  "readerLineSpacing": "Line spacing",
   "reminderReliabilityTitle": "Reminder reliability",
   "reminderReliabilityIntro": "Your system may block prayer and azkar reminders — review the items below.",
   "reminderIssueNotifications": "Notification permission is off — enable it in your device settings.",

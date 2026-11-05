@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/domain/quran_limits.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -37,6 +38,7 @@ bool playerSheetShouldRebuild(
 class _Track {
   const _Track({
     required this.reciterName,
+    required this.surahNumber,
     required this.surahLabel,
     required this.position,
     required this.duration,
@@ -44,6 +46,7 @@ class _Track {
   });
 
   final String reciterName;
+  final int surahNumber;
   final String surahLabel;
   final Duration position;
   final Duration duration;
@@ -101,6 +104,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
       ) =>
         _Track(
           reciterName: reciterName,
+          surahNumber: surahNumber,
           surahLabel: surahName.isEmpty
               ? loc.surahBadge(loc.number(surahNumber))
               : surahName,
@@ -117,12 +121,29 @@ class _PlayerSheetState extends State<_PlayerSheet> {
       ) =>
         _Track(
           reciterName: reciterName,
+          surahNumber: surahNumber,
           surahLabel: surahName.isEmpty
               ? loc.surahBadge(loc.number(surahNumber))
               : surahName,
           position: position,
           duration: duration,
           playing: false,
+        ),
+      PlaybackLoading(
+        :final reciterName,
+        :final surahNumber,
+        :final surahName,
+      )
+          when reciterName != null =>
+        _Track(
+          reciterName: reciterName,
+          surahNumber: surahNumber,
+          surahLabel: surahName.isEmpty
+              ? loc.surahBadge(loc.number(surahNumber))
+              : surahName,
+          position: Duration.zero,
+          duration: Duration.zero,
+          playing: true,
         ),
       _ => null,
     };
@@ -149,6 +170,26 @@ class _PlayerSheetState extends State<_PlayerSheet> {
           return const SizedBox.shrink();
         }
         final maxMs = track.duration.inMilliseconds.toDouble();
+        final cubit = context.read<PlaybackCubit>();
+        final controls = switch (state) {
+          PlaybackPlaying(
+            :final speed,
+            :final repeatMode,
+            :final sleepTimer,
+          ) =>
+            (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
+          PlaybackPaused(
+            :final speed,
+            :final repeatMode,
+            :final sleepTimer,
+          ) =>
+            (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
+          _ => (
+              speed: 1.0,
+              repeatMode: PlaybackRepeatMode.off,
+              sleepTimer: null,
+            ),
+        };
         final value = (_dragging ?? track.position.inMilliseconds.toDouble())
             .clamp(0.0, maxMs > 0 ? maxMs : 0.0);
         return Padding(
@@ -214,13 +255,68 @@ class _PlayerSheetState extends State<_PlayerSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  IconButton(
+                    tooltip: loc.repeatSurah,
+                    isSelected: controls.repeatMode == PlaybackRepeatMode.one,
+                    icon: const Icon(Icons.repeat_one),
+                    onPressed: cubit.toggleRepeat,
+                  ),
+                  Tooltip(
+                    message: loc.playbackSpeed,
+                    child: ActionChip(
+                      onPressed: cubit.cycleSpeed,
+                      label: Text(loc.digits(_speedLabel(controls.speed))),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  TextButton.icon(
+                    onPressed: () => _showSleepMenu(
+                      context,
+                      cubit,
+                      controls.sleepTimer,
+                    ),
+                    icon: Icon(
+                      controls.sleepTimer == null
+                          ? Icons.bedtime_outlined
+                          : Icons.bedtime,
+                    ),
+                    label: Text(
+                      controls.sleepTimer == null
+                          ? loc.sleepTimer
+                          : loc.sleepTimerMinutes(
+                              loc.number(controls.sleepTimer!.inMinutes),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    tooltip: loc.previousSurah,
+                    onPressed:
+                        track.surahNumber > 1 ? cubit.previousSurah : null,
+                    icon: const Icon(Icons.skip_previous),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   IconButton.filledTonal(
                     iconSize: 34,
                     tooltip: track.playing ? loc.pauseTooltip : loc.playTooltip,
                     icon: Icon(
                       track.playing ? Icons.pause : Icons.play_arrow,
                     ),
-                    onPressed: () => context.read<PlaybackCubit>().toggle(),
+                    onPressed: cubit.toggle,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  IconButton(
+                    tooltip: loc.nextSurah,
+                    onPressed:
+                        track.surahNumber > 0 && track.surahNumber < kSurahCount
+                            ? cubit.nextSurah
+                            : null,
+                    icon: const Icon(Icons.skip_next),
                   ),
                   const SizedBox(width: AppSpacing.lg),
                   IconButton(
@@ -229,8 +325,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                     // The state-driven branch above closes the sheet once the
                     // cubit reaches its initial state; popping here as well
                     // could close the underlying route on a double pop.
-                    onPressed: () =>
-                        context.read<PlaybackCubit>().stopAndReset(),
+                    onPressed: cubit.stopAndReset,
                   ),
                 ],
               ),
@@ -240,4 +335,53 @@ class _PlayerSheetState extends State<_PlayerSheet> {
       },
     );
   }
+}
+
+String _speedLabel(double speed) {
+  final text =
+      speed == speed.roundToDouble() ? speed.toStringAsFixed(0) : '$speed';
+  return '$text×';
+}
+
+Future<void> _showSleepMenu(
+  BuildContext context,
+  PlaybackCubit cubit,
+  Duration? current,
+) {
+  final loc = AppLocalizations.of(context);
+  return showModalBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    useSafeArea: true,
+    builder: (sheetContext) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Text(
+            loc.sleepTimer,
+            style: Theme.of(sheetContext).textTheme.titleMedium,
+          ),
+        ),
+        for (final minutes in const [15, 30, 45, 60])
+          ListTile(
+            title: Text(loc.sleepTimerMinutes(loc.number(minutes))),
+            trailing:
+                current?.inMinutes == minutes ? const Icon(Icons.check) : null,
+            onTap: () {
+              Navigator.of(sheetContext).pop();
+              cubit.startSleepTimer(Duration(minutes: minutes));
+            },
+          ),
+        ListTile(
+          title: Text(loc.sleepTimerOff),
+          trailing: current == null ? const Icon(Icons.check) : null,
+          onTap: () {
+            Navigator.of(sheetContext).pop();
+            cubit.cancelSleepTimer();
+          },
+        ),
+      ],
+    ),
+  );
 }

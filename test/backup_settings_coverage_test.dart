@@ -4,6 +4,7 @@ import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
+import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
@@ -43,8 +44,13 @@ void main() {
     PrayerConfig.madhabKey,
     PrayerConfig.enabledPrayersKey,
     PrayerConfig.preAdhanMinutesKey,
+    PrayerConfig.adjustmentsKey,
+    PrayerConfig.highLatitudeKey,
     // Reader display (quran/reader_settings_repository.dart).
     ReaderSettingsRepository.fontScaleKey,
+    ReaderSettingsRepository.lineHeightKey,
+    // Hijri local correction (hijri/hijri_offset_repository.dart).
+    HijriOffsetRepository.key,
     // Azkar session state (azkar/azkar_saved_state_repository.dart).
     AzkarSavedStateRepository.progressKey,
     AzkarSavedStateRepository.favoritesKey,
@@ -99,6 +105,8 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.adjustmentsKey,
+      PrayerConfig.highLatitudeKey,
       selectedCityKey,
       // The adhan choice decides which notification channel the next plan
       // posts on, so a restore that changes it needs a re-plan.
@@ -111,6 +119,8 @@ void main() {
   test('display-only and session-only keys never trigger a re-plan', () {
     for (final key in const [
       ReaderSettingsRepository.fontScaleKey,
+      ReaderSettingsRepository.lineHeightKey,
+      HijriOffsetRepository.key,
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,
       selectedMoshafKey,

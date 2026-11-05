@@ -29,5 +29,6 @@ sealed class HijriState with _$HijriState {
     required int offset,
     required List<HijriCell> cells,
     required String todayHeader,
+    @Default(0) int dayOffset,
   }) = HijriReady;
 }

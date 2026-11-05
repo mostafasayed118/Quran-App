@@ -4,6 +4,15 @@ part 'playback_state.freezed.dart';
 
 enum PlaybackFailureKind { network, noReciters, backgroundUnavailable }
 
+/// What the player does when the current surah ends.
+enum PlaybackRepeatMode {
+  /// Advance to the next surah (the historical behaviour).
+  off,
+
+  /// Replay the current surah.
+  one,
+}
+
 @freezed
 sealed class PlaybackState with _$PlaybackState {
   /// The player is NOT ready: nothing was picked yet (the idle state) or a
@@ -39,6 +48,9 @@ sealed class PlaybackState with _$PlaybackState {
     @Default('') String surahName,
     @Default(Duration.zero) Duration position,
     @Default(Duration.zero) Duration duration,
+    @Default(1.0) double speed,
+    @Default(PlaybackRepeatMode.off) PlaybackRepeatMode repeatMode,
+    @Default(null) Duration? sleepTimer,
   }) = PlaybackPlaying;
 
   const factory PlaybackState.paused({
@@ -47,6 +59,9 @@ sealed class PlaybackState with _$PlaybackState {
     @Default('') String surahName,
     @Default(Duration.zero) Duration position,
     @Default(Duration.zero) Duration duration,
+    @Default(1.0) double speed,
+    @Default(PlaybackRepeatMode.off) PlaybackRepeatMode repeatMode,
+    @Default(null) Duration? sleepTimer,
   }) = PlaybackPaused;
 
   const factory PlaybackState.failed({

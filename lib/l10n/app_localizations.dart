@@ -164,6 +164,30 @@ abstract class AppLocalizations {
   /// **'التقويم الهجري'**
   String get hijriCalendar;
 
+  /// No description provided for @hijriOffsetTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضبط التاريخ الهجري'**
+  String get hijriOffsetTitle;
+
+  /// No description provided for @hijriOffsetValue.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإزاحة: {days}'**
+  String hijriOffsetValue(String days);
+
+  /// No description provided for @hijriOffsetMinus.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوم أقل'**
+  String get hijriOffsetMinus;
+
+  /// No description provided for @hijriOffsetPlus.
+  ///
+  /// In ar, this message translates to:
+  /// **'يوم أكثر'**
+  String get hijriOffsetPlus;
+
   /// No description provided for @asmaUlHusna.
   ///
   /// In ar, this message translates to:
@@ -344,6 +368,18 @@ abstract class AppLocalizations {
   /// **'مشاركة الآية'**
   String get shareAyah;
 
+  /// No description provided for @shareAsImage.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كصورة'**
+  String get shareAsImage;
+
+  /// No description provided for @shareAsText.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة كنص'**
+  String get shareAsText;
+
   /// No description provided for @noBookmarks.
   ///
   /// In ar, this message translates to:
@@ -433,6 +469,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'إيقاف'**
   String get stopTooltip;
+
+  /// No description provided for @repeatSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'تكرار السورة'**
+  String get repeatSurah;
+
+  /// No description provided for @playbackSpeed.
+  ///
+  /// In ar, this message translates to:
+  /// **'سرعة التشغيل'**
+  String get playbackSpeed;
+
+  /// No description provided for @sleepTimer.
+  ///
+  /// In ar, this message translates to:
+  /// **'مؤقت النوم'**
+  String get sleepTimer;
+
+  /// No description provided for @sleepTimerOff.
+  ///
+  /// In ar, this message translates to:
+  /// **'بدون مؤقت'**
+  String get sleepTimerOff;
+
+  /// No description provided for @sleepTimerMinutes.
+  ///
+  /// In ar, this message translates to:
+  /// **'{minutes} دقيقة'**
+  String sleepTimerMinutes(String minutes);
+
+  /// No description provided for @previousSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السورة السابقة'**
+  String get previousSurah;
+
+  /// No description provided for @nextSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'السورة التالية'**
+  String get nextSurah;
 
   /// No description provided for @listenTooltip.
   ///
@@ -847,6 +925,24 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعيين كقارئ افتراضي'**
   String get setAsDefaultReciter;
+
+  /// No description provided for @downloadAllSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'تنزيل كل السور'**
+  String get downloadAllSurahs;
+
+  /// No description provided for @downloadAllQueued.
+  ///
+  /// In ar, this message translates to:
+  /// **'جارٍ تنزيل {count} سورة'**
+  String downloadAllQueued(String count);
+
+  /// No description provided for @downloadAllNothing.
+  ///
+  /// In ar, this message translates to:
+  /// **'كل السور منزّلة بالفعل'**
+  String get downloadAllNothing;
 
   /// No description provided for @libraryInstall.
   ///
@@ -1856,6 +1952,60 @@ abstract class AppLocalizations {
   /// **'١٥ دقيقة'**
   String get preAdhanFifteen;
 
+  /// No description provided for @prayerTuning.
+  ///
+  /// In ar, this message translates to:
+  /// **'ضبط دقيق'**
+  String get prayerTuning;
+
+  /// No description provided for @prayerHighLatitude.
+  ///
+  /// In ar, this message translates to:
+  /// **'قاعدة خطوط العرض العالية'**
+  String get prayerHighLatitude;
+
+  /// No description provided for @highLatitudeNone.
+  ///
+  /// In ar, this message translates to:
+  /// **'افتراضي الطريقة'**
+  String get highLatitudeNone;
+
+  /// No description provided for @highLatitudeMiddle.
+  ///
+  /// In ar, this message translates to:
+  /// **'منتصف الليل'**
+  String get highLatitudeMiddle;
+
+  /// No description provided for @highLatitudeSeventh.
+  ///
+  /// In ar, this message translates to:
+  /// **'سُبع الليل'**
+  String get highLatitudeSeventh;
+
+  /// No description provided for @highLatitudeTwilight.
+  ///
+  /// In ar, this message translates to:
+  /// **'زاوية الشفق'**
+  String get highLatitudeTwilight;
+
+  /// No description provided for @prayerAdjustmentHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'عدّل دقائق كل صلاة لتطابق مسجدك. القيمة صفر تعني بلا تعديل.'**
+  String get prayerAdjustmentHint;
+
+  /// No description provided for @prayerAdjustmentDecrease.
+  ///
+  /// In ar, this message translates to:
+  /// **'دقيقة أقل'**
+  String get prayerAdjustmentDecrease;
+
+  /// No description provided for @prayerAdjustmentIncrease.
+  ///
+  /// In ar, this message translates to:
+  /// **'دقيقة أكثر'**
+  String get prayerAdjustmentIncrease;
+
   /// No description provided for @reminderAdhanSoon.
   ///
   /// In ar, this message translates to:
@@ -1909,6 +2059,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حجم الخط'**
   String get readerFontSize;
+
+  /// No description provided for @readerLineSpacing.
+  ///
+  /// In ar, this message translates to:
+  /// **'تباعد الأسطر'**
+  String get readerLineSpacing;
 
   /// No description provided for @reminderReliabilityTitle.
   ///

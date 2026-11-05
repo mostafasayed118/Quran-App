@@ -67,3 +67,16 @@ abstract interface class CompletingPlaybackService {
   /// Emits one event each time the current track completes.
   Stream<void> completionStream();
 }
+
+/// Optional capability: speed and loop control.
+///
+/// Kept separate from [PlaybackService] for the same reason as
+/// [DisposablePlaybackService]: the frozen test doubles implement the plain
+/// seam, and adding a member there would break them.
+abstract interface class TunablePlaybackService {
+  /// Sets the playback speed; 1.0 is normal.
+  Future<void> setSpeed(double speed);
+
+  /// Loops the loaded track when [loop] is true.
+  Future<void> setLoopMode(bool loop);
+}

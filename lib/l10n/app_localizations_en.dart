@@ -42,6 +42,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hijriCalendar => 'Hijri Calendar';
 
   @override
+  String get hijriOffsetTitle => 'Hijri date adjustment';
+
+  @override
+  String hijriOffsetValue(String days) {
+    return 'Offset: $days';
+  }
+
+  @override
+  String get hijriOffsetMinus => 'One day earlier';
+
+  @override
+  String get hijriOffsetPlus => 'One day later';
+
+  @override
   String get asmaUlHusna => '99 Names of Allah';
 
   @override
@@ -139,6 +153,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shareAyah => 'Share verse';
 
   @override
+  String get shareAsImage => 'Share as image';
+
+  @override
+  String get shareAsText => 'Share as text';
+
+  @override
   String get noBookmarks => 'No bookmarks yet';
 
   @override
@@ -192,6 +212,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get stopTooltip => 'Stop';
+
+  @override
+  String get repeatSurah => 'Repeat surah';
+
+  @override
+  String get playbackSpeed => 'Playback speed';
+
+  @override
+  String get sleepTimer => 'Sleep timer';
+
+  @override
+  String get sleepTimerOff => 'No timer';
+
+  @override
+  String sleepTimerMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get previousSurah => 'Previous surah';
+
+  @override
+  String get nextSurah => 'Next surah';
 
   @override
   String get listenTooltip => 'Listen to surah';
@@ -425,6 +468,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setAsDefaultReciter => 'Set as default reciter';
+
+  @override
+  String get downloadAllSurahs => 'Download all surahs';
+
+  @override
+  String downloadAllQueued(String count) {
+    return 'Downloading $count surahs';
+  }
+
+  @override
+  String get downloadAllNothing => 'All surahs are already downloaded';
 
   @override
   String get libraryInstall => 'Install';
@@ -1005,6 +1059,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preAdhanFifteen => '15 min';
 
   @override
+  String get prayerTuning => 'Fine tuning';
+
+  @override
+  String get prayerHighLatitude => 'High-latitude rule';
+
+  @override
+  String get highLatitudeNone => 'Method default';
+
+  @override
+  String get highLatitudeMiddle => 'Middle of the night';
+
+  @override
+  String get highLatitudeSeventh => 'Seventh of the night';
+
+  @override
+  String get highLatitudeTwilight => 'Twilight angle';
+
+  @override
+  String get prayerAdjustmentHint =>
+      'Adjust each prayer to match your mosque. Zero means no adjustment.';
+
+  @override
+  String get prayerAdjustmentDecrease => 'One minute less';
+
+  @override
+  String get prayerAdjustmentIncrease => 'One minute more';
+
+  @override
   String reminderAdhanSoon(String prayer, String minutes) {
     return '$prayer is in $minutes minutes';
   }
@@ -1034,6 +1116,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readerFontSize => 'Font size';
+
+  @override
+  String get readerLineSpacing => 'Line spacing';
 
   @override
   String get reminderReliabilityTitle => 'Reminder reliability';

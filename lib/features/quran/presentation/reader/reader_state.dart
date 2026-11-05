@@ -23,6 +23,7 @@ sealed class ReaderState with _$ReaderState {
     @Default(<int>{}) Set<int> bookmarkedAyahIds,
     @Default(true) bool showBasmala,
     @Default(1.0) double fontScale,
+    @Default(2.2) double lineHeight,
   }) = ReaderReady;
 
   /// The load failed. [emptySurahId] is set when the surah itself has no

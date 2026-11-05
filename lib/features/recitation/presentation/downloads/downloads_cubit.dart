@@ -241,6 +241,40 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     await _drain();
   }
 
+  /// Queues every surah in [surahNumbers] that is not already queued,
+  /// downloading or done.
+  ///
+  /// Returns the number of rows newly queued. The drain starts in the
+  /// background so the caller can confirm immediately; a zero result means
+  /// the whole set is already present or in flight.
+  Future<int> enqueueAll(String rowId, Iterable<int> surahNumbers) async {
+    await _ensureReconciled();
+    final queued = <String, DownloadItem>{};
+    for (final surahNumber in surahNumbers) {
+      final key = _key(rowId, surahNumber);
+      final current = state.items[key];
+      if (current != null &&
+          (current.status == DownloadStatus.queued ||
+              current.status == DownloadStatus.downloading ||
+              current.status == DownloadStatus.done)) {
+        continue;
+      }
+      if (_queue.any((task) => task.$1 == rowId && task.$2 == surahNumber)) {
+        continue;
+      }
+      final active = _active;
+      if (active != null && active.$1 == rowId && active.$2 == surahNumber) {
+        continue;
+      }
+      _queue.add((rowId, surahNumber));
+      queued[key] = const DownloadItem(status: DownloadStatus.queued);
+    }
+    if (queued.isEmpty) return 0;
+    emit(state.copyWith(items: {...state.items, ...queued}));
+    unawaited(_drain());
+    return queued.length;
+  }
+
   Future<void> _drain() async {
     if (_draining) return;
     _draining = true;
