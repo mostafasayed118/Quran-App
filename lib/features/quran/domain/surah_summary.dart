@@ -24,7 +24,7 @@ class SurahSummary {
   /// Whether this surah was revealed in Makkah.
   ///
   /// [revelationType] is normalized to `makkah`/`madinah` at the mapping
-  /// boundary, so an unknown DB value cannot reach the UI as a silent
-  /// "Madinah" label.
+  /// boundary; an unknown value is logged and falls back to `madinah`, so the
+  /// fallback is diagnosable but still rendered.
   bool get isMakkah => revelationType == 'makkah';
 }

@@ -307,11 +307,22 @@ class _ReminderReliabilitySectionState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    widget.applyHealth?.addListener(_onApplyHealthChanged);
+    unawaited(_read());
+  }
+
+  @override
+  void didUpdateWidget(covariant _ReminderReliabilitySection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (identical(oldWidget.applyHealth, widget.applyHealth)) return;
+    oldWidget.applyHealth?.removeListener(_onApplyHealthChanged);
+    widget.applyHealth?.addListener(_onApplyHealthChanged);
     unawaited(_read());
   }
 
   @override
   void dispose() {
+    widget.applyHealth?.removeListener(_onApplyHealthChanged);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -319,6 +330,13 @@ class _ReminderReliabilitySectionState
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) unawaited(_read());
+  }
+
+  /// A schedule can fail while this screen is mounted (the user changed a
+  /// reminder time); re-read on the binding's notification instead of waiting
+  /// for the next resume.
+  void _onApplyHealthChanged() {
+    if (mounted) unawaited(_read());
   }
 
   /// Advisory readout: an unreadable state keeps the last verdict instead of

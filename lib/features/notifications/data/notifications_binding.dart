@@ -1,8 +1,7 @@
 import 'dart:developer' as dev;
-import 'dart:ui' show VoidCallback;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:meta/meta.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
@@ -44,7 +43,7 @@ import 'package:timezone/timezone.dart' as tz;
 /// QUEUED, never dropped — [init] applies it as soon as the plugin is ready
 /// and discards it when the init fails. Nothing on this path waits for the
 /// plugin: a caller that awaited readiness would hang instead of queueing.
-class NotificationsBinding
+class NotificationsBinding extends ChangeNotifier
     implements ReminderSchedulerPort, PreAdhanCanceller, ReminderApplyHealth {
   NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
       : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
@@ -109,6 +108,14 @@ class NotificationsBinding
 
   @override
   bool get lastApplyFailed => _lastApplyFailed;
+
+  /// Sets the flag and notifies the reliability card when it actually moves,
+  /// so a failure during a mounted settings screen appears without a resume.
+  void _setApplyFailed(bool value) {
+    if (_lastApplyFailed == value) return;
+    _lastApplyFailed = value;
+    notifyListeners();
+  }
 
   /// Whether a pre-adhan cancellation arrived before the plugin was ready.
   bool _pendingCancelPreAdhan = false;
@@ -193,11 +200,11 @@ class NotificationsBinding
       _channelDescription = loc.reminderChannelDescription;
       _playAdhanLabel = loc.adhanPlayAction;
       _ready = true;
-      _lastApplyFailed = false;
+      _setApplyFailed(false);
     } on Object catch (error, stackTrace) {
       _ready = false;
       _initFailed = true;
-      _lastApplyFailed = true;
+      _setApplyFailed(true);
       dev.log(
         'notifications init failed',
         name: 'quran_yahdi/reminders',
@@ -538,11 +545,11 @@ class NotificationsBinding
       }
       _appliedPlan = fingerprint;
       _appliedExact = exact;
-      _lastApplyFailed = false;
+      _setApplyFailed(false);
     } on Object catch (error, stackTrace) {
       // Best-effort: a failed schedule must not crash the caller, but it can
       // no longer be silent — the reliability card and logcat both read it.
-      _lastApplyFailed = true;
+      _setApplyFailed(true);
       dev.log(
         'reminder plan apply failed',
         name: 'quran_yahdi/reminders',

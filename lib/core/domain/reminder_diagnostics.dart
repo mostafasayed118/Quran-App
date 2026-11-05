@@ -8,6 +8,8 @@
 /// class never reaches into another feature's `data/`).
 library;
 
+import 'package:flutter/foundation.dart';
+
 /// One reason a scheduled reminder may never reach the user.
 enum ReminderIssue {
   /// POST_NOTIFICATIONS is off (Android 13+, or alerts were disabled): the
@@ -56,7 +58,7 @@ List<ReminderIssue> diagnoseReminders({
 /// reads the OS, while this one reports the app's own last attempt. The
 /// notifications binding owns the truth; a host without one simply omits the
 /// row.
-abstract interface class ReminderApplyHealth {
+abstract interface class ReminderApplyHealth implements Listenable {
   /// True when the most recent plan write threw (or the plugin never became
   /// ready), so no alarm from that plan is armed.
   bool get lastApplyFailed;

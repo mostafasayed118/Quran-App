@@ -27,12 +27,31 @@ class _FailingAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-ReciterRepository _repo(AppDatabase db, HttpClientAdapter adapter) {
+/// Never answers, so the repository's own `.timeout` is the thing under test.
+class _HangingAdapter implements HttpClientAdapter {
+  @override
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) =>
+      Completer<ResponseBody>().future;
+
+  @override
+  void close({bool force = false}) {}
+}
+
+ReciterRepository _repo(
+  AppDatabase db,
+  HttpClientAdapter adapter, {
+  Duration? timeout,
+}) {
   final dio = Dio()..httpClientAdapter = adapter;
   return ReciterRepository(
     db,
     client: dio,
     apiEndpointOverride: 'https://catalog.example.test/reciters',
+    catalogTimeout: timeout,
   );
 }
 
@@ -48,7 +67,8 @@ void main() {
   test('a timeout is surfaced and leaves the catalog untouched', () async {
     final repo = _repo(
       db,
-      _FailingAdapter((_) async => throw TimeoutException('catalog timeout')),
+      _HangingAdapter(),
+      timeout: const Duration(milliseconds: 50),
     );
 
     await expectLater(repo.refreshFromApi(), throwsA(isA<TimeoutException>()));

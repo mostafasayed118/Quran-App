@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/fakes.dart';
+
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
@@ -10,7 +12,7 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_screen.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, cairoCity;
+import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'settings_cubit_test.dart' show FakeReminderScheduler;
 import 'support/host.dart';
 import 'support/test_db.dart';
@@ -29,16 +31,23 @@ const String _batteryUnknown =
     'تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.';
 const String _fixAction = 'إصلاح';
 
-/// A diagnostics double: the reads answer from mutable fields, so a test can
-/// change the device state between a pump and a resume.
 /// The app-side half: whether the last plan write actually reached the OS.
-class FakeReminderApplyHealth implements ReminderApplyHealth {
+class FakeReminderApplyHealth extends ChangeNotifier
+    implements ReminderApplyHealth {
   bool failed = false;
 
   @override
   bool get lastApplyFailed => failed;
+
+  void setFailed(bool value) {
+    if (failed == value) return;
+    failed = value;
+    notifyListeners();
+  }
 }
 
+/// A diagnostics double: the reads answer from mutable fields, so a test can
+/// change the device state between a pump and a resume.
 class FakeReminderDiagnostics implements ReminderDiagnostics {
   bool notifications = true;
   bool exactAlarms = true;
@@ -119,12 +128,22 @@ void main() {
 
   testWidgets('a failed plan write shows the schedule row without a fix button',
       (tester) async {
-    applyHealth.failed = true;
+    applyHealth.setFailed(true);
     await pumpSettings(tester);
 
     expect(find.text(_title), findsOneWidget);
     expect(find.text(_scheduleIssue), findsOneWidget);
     expect(find.text(_fixAction), findsNothing);
+  });
+
+  testWidgets('a failure after mount appears without a resume', (tester) async {
+    await pumpSettings(tester);
+    expect(find.text(_scheduleIssue), findsNothing);
+
+    applyHealth.setFailed(true);
+    await settle(tester);
+
+    expect(find.text(_scheduleIssue), findsOneWidget);
   });
 
   testWidgets('a single issue shows its row and its fix action',

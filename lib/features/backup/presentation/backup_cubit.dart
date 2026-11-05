@@ -1,15 +1,10 @@
 import 'dart:developer' as dev;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/backup_io.dart';
 import '../data/backup_service.dart';
 import 'backup_state.dart';
-
-// The platform seams live in `data/`; re-exported so the existing hosts and
-// tests can keep importing them from the cubit.
-export '../data/backup_io.dart' show BackupPickBytes, BackupShareJson;
 
 /// Backup & restore surface: export shares the encoded JSON file through the
 /// system share sheet; import picks a `.json` file, decodes it with the
@@ -142,10 +137,4 @@ class BackupCubit extends Cubit<BackupState> {
     if (current is BackupIdle) return !current.busy;
     return current is BackupFailed || current is BackupInvalidFile;
   }
-
-  /// The worker-isolate decode, kept as a forwarding seam for the existing
-  /// unit test; the implementation lives in `data/backup_io.dart`.
-  @visibleForTesting
-  static Future<BackupDecodeResult> decodeInIsolate(Uint8List bytes) =>
-      decodeBackupInIsolate(bytes);
 }

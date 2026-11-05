@@ -28,7 +28,7 @@ Last updated: 2026-10-24 · Android only for this submission (no iOS/web listing
 | Historical (2026-10-24, `+2`) | AAB `68,195,926 B` · SHA-256 `90745181…CB713` · APK `69,497,234 B` · SHA-256 `61C95D0D…B63987` · versionCode `2` | Superseded; never published |
 | Keystore | `C:\Users\ASUS\keystores\quran-yahdi-release.jks` (`android/key.properties` is gitignored) | `docs/campaign-ledger.md:877` |
 
-> The `+3` rows are historical. The `+4` build above is the current verification artifact (size, SHA-256, `jarsigner`, versionCode 4, 16 KB alignment). It was built from the uncommitted debt-closeout tree; **rebuild it at the merge commit before upload** if any commit lands. Docs-only commits do not change the artifact. The AAB grew from 70.8 MB to 83.5 MB because the 2026-11-04 adhan-selection wave added 12.9 MB of bundled clips.
+> The `+3` rows are historical. The `+4` build above is the current verification artifact (size, SHA-256, `jarsigner`, versionCode 4, 16 KB alignment). It was built from the `wave/technical-debt-closeout` tree and rebuilt at `2c8b126` with the same SHA; **rebuild it at the merge commit before upload** if any commit lands. Docs-only commits do not change the artifact. The `+4` AAB is `16,764,512 B` larger than the `+3` one (`87,545,010` vs `70,780,498 B`); the 2026-11-04 adhan wave added nine clips (`12.9 MB` uncompressed), and the remainder is the normal build delta.
 
 - [x] Package name confirmed against the build script, not the store listing.
 - [ ] Confirm the AAB was built after the latest code change (`git log -1` at build time).

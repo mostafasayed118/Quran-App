@@ -1,5 +1,3 @@
-export 'support/fakes.dart' show cairoCity;
-
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support/fakes.dart';

@@ -16,7 +16,6 @@ import 'reciter_repository.dart';
 const Duration _connectTimeout = Duration(seconds: 15);
 const Duration _receiveTimeout = Duration(minutes: 2);
 
-/// Raised when a surah audio download cannot be completed.
 /// Opaque cancellation handle for one download attempt.
 ///
 /// The presentation layer owns this handle, never the transport token: the
@@ -40,6 +39,7 @@ class DownloadCancelToken {
   void cancel([Object? reason]) => _token.cancel(reason);
 }
 
+/// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
   /// A failure that may succeed on a second attempt (network, truncation).
   DownloadFailure(this.message) : retryable = true;

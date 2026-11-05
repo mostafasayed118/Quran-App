@@ -38,8 +38,8 @@ extension SurahRowMapping on Surah {
 
 /// Normalizes the free-text DB column to the two values the UI understands.
 ///
-/// An unknown value is logged instead of silently rendering "Madinah": the
-/// fallback keeps the screen usable, and the log names the bad row.
+/// An unknown value is LOGGED and falls back to `madinah` so the screen stays
+/// usable; the log names the bad row, but the UI still shows the fallback.
 String _normalizeRevelationType(String raw) {
   final value = raw.toLowerCase().trim();
   if (value == 'makkah' || value == 'madinah') return value;

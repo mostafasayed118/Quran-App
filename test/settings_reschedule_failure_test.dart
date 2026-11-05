@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/fakes.dart';
+
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
@@ -7,8 +9,7 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
-import 'prayer_times_cubit_test.dart'
-    show FakePrayerTimeService, cairoCity, fakeDay;
+import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
 import 'support/test_db.dart';
 
 /// The write succeeds, but the schedule cannot be rebuilt.

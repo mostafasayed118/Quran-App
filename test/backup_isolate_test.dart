@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/features/backup/data/backup_codec.dart';
-import 'package:quran_yahdi/features/backup/presentation/backup_cubit.dart';
+import 'package:quran_yahdi/features/backup/data/backup_io.dart';
 
 void main() {
   test('the worker-isolate decode path completes and decodes', () async {
@@ -20,7 +20,7 @@ void main() {
         settings: {'selected_city': '{"id":"cairo"}'},
       ),
     ));
-    final result = await BackupCubit.decodeInIsolate(
+    final result = await decodeBackupInIsolate(
       Uint8List.fromList(utf8.encode(raw)),
     );
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/fakes.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:quran_yahdi/app/router.dart';
@@ -14,7 +16,7 @@ import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, cairoCity;
+import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'settings_cubit_test.dart' show FakeReminderScheduler;
 import 'support/host.dart';
 import 'support/test_db.dart';

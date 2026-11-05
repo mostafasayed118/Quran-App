@@ -27,9 +27,6 @@ const List<int> featuredReciterIds = <int>[
   5,
 ];
 
-/// Catalog refresh budget; a hung API must not block the reciter list.
-const Duration _catalogTimeout = Duration(seconds: 20);
-
 /// File name the surah audio is stored under.
 String surahAudioFileName(int surahNumber) =>
     '${surahNumber.toString().padLeft(3, '0')}.mp3';
@@ -102,12 +99,17 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
     this._db, {
     Dio? client,
     String? apiEndpointOverride,
+    Duration? catalogTimeout,
   })  : _client = client ?? Dio(),
-        _endpoint = apiEndpointOverride ?? recitersApiEndpoint;
+        _endpoint = apiEndpointOverride ?? recitersApiEndpoint,
+        _catalogTimeout = catalogTimeout ?? const Duration(seconds: 20);
 
   final AppDatabase _db;
   final Dio _client;
   final String _endpoint;
+
+  /// Catalog refresh budget; a hung API must not block the reciter list.
+  final Duration _catalogTimeout;
 
   /// Single-flight gate: a first-run boot warm-up and the reciters screen can
   /// request the catalog at the same time; both must share one HTTP request
@@ -147,27 +149,20 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
   }
 
   Future<void> _refreshFromApi() async {
-    final Response<String> res;
-    try {
-      res = await _client
-          .get<String>(
-            _endpoint,
-            // Keep the payload a STRING: the worker isolate owns the JSON
-            // decode. A non-2xx is returned, not thrown: the status check
-            // below owns the message, as it did with package:http.
-            options: Options(
-              responseType: ResponseType.plain,
-              validateStatus: (_) => true,
-            ),
-          )
-          .timeout(_catalogTimeout);
-    } on DioException catch (error) {
-      // Preserve the documented caller contract: a timeout is a
-      // TimeoutException, not an opaque transport wrapper.
-      final cause = error.error;
-      if (cause is TimeoutException) throw cause;
-      rethrow;
-    }
+    final res = await _client
+        .get<String>(
+          _endpoint,
+          // Keep the payload a STRING: the worker isolate owns the JSON
+          // decode. A non-2xx is returned, not thrown: the status check
+          // below owns the message, as it did with package:http.
+          options: Options(
+            responseType: ResponseType.plain,
+            validateStatus: (_) => true,
+          ),
+        )
+        // A hung host surfaces as the documented TimeoutException, not an
+        // opaque transport wrapper.
+        .timeout(_catalogTimeout);
     if (res.statusCode != 200) {
       throw StateError('mp3quran HTTP ${res.statusCode}');
     }
