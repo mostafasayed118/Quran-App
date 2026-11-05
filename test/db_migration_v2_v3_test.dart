@@ -66,6 +66,59 @@ void main() {
     }
   });
 
+  test('a legacy non-unique index is replaced instead of blocking the open',
+      () async {
+    final file = await _tempDbFile();
+
+    final v2 = AppDatabase(NativeDatabase(file));
+    try {
+      await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
+      await v2.into(v2.downloads).insert(
+            DownloadsCompanion.insert(
+              reciterId: 'r1',
+              surahId: 1,
+              status: 'done',
+              path: '/audio/r1/001.mp3',
+            ),
+          );
+
+      // A build before the unique indexes wrote plain indexes under these
+      // names. CREATE UNIQUE fails while the name is taken, so the guards must
+      // drop the legacy index first — otherwise beforeOpen aborts every open.
+      await v2.customStatement('DROP INDEX idx_bookmarks_ayah');
+      await v2.customStatement('DROP INDEX idx_downloads_lookup');
+      await v2.customStatement(
+          'CREATE INDEX idx_bookmarks_ayah ON bookmarks(ayah_id)');
+      await v2.customStatement(
+          'CREATE INDEX idx_downloads_lookup ON downloads(reciter_id, surah_id)');
+
+      await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
+      await v2.into(v2.downloads).insert(
+            DownloadsCompanion.insert(
+              reciterId: 'r1',
+              surahId: 1,
+              status: 'queued',
+              path: '',
+            ),
+          );
+      await v2.customStatement('PRAGMA user_version = 2');
+    } finally {
+      await v2.close();
+    }
+
+    // Reopening must not throw ("index ... already exists").
+    final v3 = AppDatabase(NativeDatabase(file));
+    try {
+      expect(await _userVersion(v3), 3);
+      expect(await v3.select(v3.bookmarks).get(), hasLength(1));
+      expect(await v3.select(v3.downloads).get(), hasLength(1));
+      expect(await _uniqueIndexExists(v3, 'idx_bookmarks_ayah'), isTrue);
+      expect(await _uniqueIndexExists(v3, 'idx_downloads_lookup'), isTrue);
+    } finally {
+      await v3.close();
+    }
+  });
+
   test('a fresh v3 file carries every derived object', () async {
     final file = await _tempDbFile();
     final db = AppDatabase(NativeDatabase(file));

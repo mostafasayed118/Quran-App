@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -211,5 +212,66 @@ void main() {
       reason: 'the 416 must delete the part so the retry starts from zero',
     );
     expect(await file.readAsBytes(), _payload);
+  });
+
+  test(
+      'a 206 with an unknown total (bytes N-M/*) resumes without a false '
+      'oversize failure', () async {
+    final downloader = await serve((req, _) async {
+      req.response.statusCode = HttpStatus.partialContent;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        // No total: the host does not know the full size.
+        ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/*')
+        ..contentLength = 60;
+      req.response.add(_payload.sublist(40));
+      await req.response.close();
+    });
+
+    final part = await partFile(1);
+    await part.writeAsBytes(_payload.sublist(0, 40));
+
+    final file = await downloader.downloadSurah(
+      reciter: await reciter(),
+      surahNumber: 1,
+    );
+
+    expect(await file.readAsBytes(), _payload);
+  });
+
+  test('cancelling mid-transfer deletes the staging file', () async {
+    final gate = Completer<void>();
+    final started = Completer<void>();
+    final downloader = await serve((req, _) async {
+      req.response.statusCode = HttpStatus.ok;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        ..contentLength = 100;
+      req.response.add(_payload.sublist(0, 40));
+      await req.response.flush();
+      if (!started.isCompleted) started.complete();
+      await gate.future;
+      req.response.add(_payload.sublist(40));
+      await req.response.close();
+    });
+
+    final token = CancelToken();
+    final part = await partFile(1);
+    final future = downloader.downloadSurah(
+      reciter: await reciter(),
+      surahNumber: 1,
+      cancelToken: token,
+    );
+
+    await started.future;
+    token.cancel();
+    await expectLater(future, throwsA(anything));
+    gate.complete();
+
+    expect(
+      part.existsSync(),
+      isFalse,
+      reason: 'a cancel discards the transfer; only failures keep the prefix',
+    );
   });
 }

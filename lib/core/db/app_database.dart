@@ -34,10 +34,11 @@ class AppDatabase extends _$AppDatabase {
             await migrator.createAll();
           }
           if (from < 3) {
-            // v3: the duplicate repair and the derived objects are a versioned
-            // migration step now. beforeOpen used to run the two full-table
-            // repair scans on EVERY open; this runs them once, and the guards
-            // below make it a no-op when the invariant already holds.
+            // v3 records the derived-schema contract (and is the baseline for
+            // the drift snapshot). The full-table scans stop because of the
+            // index guards inside the shared function, not because of this
+            // call; this is a safety net for a file that lost an object before
+            // the bump.
             await _ensureDerivedSchema();
           }
         },
@@ -65,8 +66,11 @@ class AppDatabase extends _$AppDatabase {
         'ON ayahs(page)');
     // One bookmark per ayah is a user-visible invariant. When the unique index
     // is missing, repair duplicates left by the old read-then-write toggle
-    // before creating it (a failed CREATE would abort every open).
+    // before creating it (a failed CREATE would abort every open). A legacy
+    // NON-unique index under the same name is dropped first: `CREATE UNIQUE`
+    // fails while the name is taken, and this runs in beforeOpen.
     if (!await _uniqueIndexExists('idx_bookmarks_ayah')) {
+      await customStatement('DROP INDEX IF EXISTS idx_bookmarks_ayah');
       await customStatement('DELETE FROM bookmarks WHERE id NOT IN '
           '(SELECT MIN(id) FROM bookmarks GROUP BY ayah_id)');
       await customStatement('CREATE UNIQUE INDEX idx_bookmarks_ayah '
@@ -76,6 +80,7 @@ class AppDatabase extends _$AppDatabase {
     // is the registry entry of exactly one audio file, and every read of it
     // uses getSingleOrNull(). The oldest row wins (it owns the file).
     if (!await _uniqueIndexExists('idx_downloads_lookup')) {
+      await customStatement('DROP INDEX IF EXISTS idx_downloads_lookup');
       await customStatement('DELETE FROM downloads WHERE id NOT IN '
           '(SELECT MIN(id) FROM downloads GROUP BY reciter_id, surah_id)');
       await customStatement('CREATE UNIQUE INDEX idx_downloads_lookup '

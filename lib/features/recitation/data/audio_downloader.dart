@@ -18,10 +18,19 @@ const Duration _receiveTimeout = Duration(minutes: 2);
 
 /// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
-  DownloadFailure(this.message);
+  /// A failure that may succeed on a second attempt (network, truncation).
+  DownloadFailure(this.message) : retryable = true;
+
+  /// A failure the same request cannot fix (an HTML error page, a redirect
+  /// chain, an unsupported scheme): retrying would only burn the queue.
+  DownloadFailure.permanent(this.message) : retryable = false;
 
   /// Human-readable reason of the failure.
   final String message;
+
+  /// Whether one more attempt is worth it.
+  final bool retryable;
+
   @override
   String toString() => 'DownloadFailure: $message';
 }
@@ -82,7 +91,7 @@ class AudioDownloader {
   Future<Directory> _root() async {
     final resolver = _audioRoot;
     if (resolver != null) return resolver();
-    throw DownloadFailure(
+    throw DownloadFailure.permanent(
         'audioRootResolver not configured — call ensureAudioBindings() first');
   }
 
@@ -159,22 +168,23 @@ class AudioDownloader {
       final location = res.headers.value('location')?.trim();
       await _discardRedirectBody(res.data);
       if (location == null || location.isEmpty) {
-        throw DownloadFailure(
+        throw DownloadFailure.permanent(
             'audio redirect $status is missing a Location header');
       }
       final next = current.resolve(location);
       if (next.scheme != 'http' && next.scheme != 'https') {
-        throw DownloadFailure(
+        throw DownloadFailure.permanent(
             'audio redirect to unsupported scheme "${next.scheme}"');
       }
       // Reuses the catalog allowlist (https + mp3quran.net) — one rule, one
       // place: a host that cannot be a reciter server cannot serve bytes.
       if (!isTrustedAudioServer(next.toString())) {
-        throw DownloadFailure('audio redirect to untrusted host ${next.host}');
+        throw DownloadFailure.permanent(
+            'audio redirect to untrusted host ${next.host}');
       }
       current = next;
     }
-    throw DownloadFailure(
+    throw DownloadFailure.permanent(
         'audio redirect chain exceeded $maxRedirectHops hops');
   }
 
@@ -199,17 +209,25 @@ class AudioDownloader {
   ///
   /// A row that still says `downloading`/`queued` but has a complete target
   /// file is promoted to `done`; a row without a usable file becomes `failed`
-  /// so it is retryable. Orphan `.part` files under the audio root are
-  /// removed. This must run before any new download starts.
+  /// so it is retryable. A `.part` that belongs to a known, unfinished row is
+  /// **kept** — it is resume material — and only orphan parts (no row at all)
+  /// are removed. This must run before any new download starts.
   Future<void> reconcileOnStart() async {
     final root = await _root();
-    final rows = await (_db.select(_db.downloads)
-          ..where((d) => d.status.isIn([
-                DownloadStatus.downloading.name,
-                DownloadStatus.queued.name,
-              ])))
-        .get();
-    for (final row in rows) {
+    final all = await _db.select(_db.downloads).get();
+    // Parts owed by a row that is not done yet; a done row's staging file is
+    // stale and gets swept.
+    final keepParts = <String>{
+      for (final row in all)
+        if (row.path.isNotEmpty && row.status != DownloadStatus.done.name)
+          p.normalize('${row.path}.part'),
+    };
+    final unfinished = all.where(
+      (row) =>
+          row.status == DownloadStatus.downloading.name ||
+          row.status == DownloadStatus.queued.name,
+    );
+    for (final row in unfinished) {
       try {
         final target = row.path.isEmpty ? null : File(row.path);
         final part = row.path.isEmpty ? null : File('${row.path}.part');
@@ -223,6 +241,8 @@ class AudioDownloader {
             target.lengthSync(),
             target.path,
           );
+          if (part != null && part.existsSync()) part.deleteSync();
+          keepParts.remove(p.normalize('${row.path}.part'));
         } else {
           await _markStatus(
             row.reciterId,
@@ -231,8 +251,8 @@ class AudioDownloader {
             0,
             row.path,
           );
+          // The part stays: the next attempt resumes from it.
         }
-        if (part != null && part.existsSync()) part.deleteSync();
       } on Object catch (error, stackTrace) {
         dev.log('download reconcile row failed',
             name: 'quran_yahdi/downloads',
@@ -247,6 +267,7 @@ class AudioDownloader {
     for (final entity
         in audioDir.listSync(recursive: true, followLinks: false)) {
       if (entity is! File || !entity.path.endsWith('.part')) continue;
+      if (keepParts.contains(p.normalize(entity.path))) continue;
       try {
         entity.deleteSync();
       } on Object catch (error, stackTrace) {
@@ -265,7 +286,7 @@ class AudioDownloader {
   /// than 408/416/429 is a permanent answer (404 on a missing surah, 403 on a
   /// blocked host) and retrying it would only burn the queue.
   static bool _isRetryable(Object error) {
-    if (error is DownloadFailure) return true;
+    if (error is DownloadFailure) return error.retryable;
     if (error is DioException) {
       final status = error.response?.statusCode ?? 0;
       if (status == 0) return true;
@@ -335,7 +356,7 @@ class AudioDownloader {
       final contentType =
           res.headers.value(Headers.contentTypeHeader)?.toLowerCase().trim();
       if (contentType != null && contentType.contains('html')) {
-        throw DownloadFailure(
+        throw DownloadFailure.permanent(
             'audio response is an HTML page, not an audio stream');
       }
       final status = res.statusCode ?? 0;
@@ -358,8 +379,10 @@ class AudioDownloader {
           }
           append = true;
           received = resumeFrom;
-          final full = _totalFromContentRange(contentRange);
-          if (full != null) total = full;
+          // `bytes N-M/*` means the host did not state the full size: keep it
+          // unknown (0) so the completeness/oversize checks are skipped rather
+          // than comparing a full-file offset against a remaining length.
+          total = _totalFromContentRange(contentRange) ?? 0;
         } else {
           // The host ignored the Range header: remember it so the next
           // attempt does not waste a round-trip, and start from zero.
@@ -375,7 +398,8 @@ class AudioDownloader {
         await for (final chunk in body.stream) {
           received += chunk.length;
           if (received > maxAcceptedBytes(total)) {
-            throw DownloadFailure('audio stream exceeded its declared size');
+            throw DownloadFailure.permanent(
+                'audio stream exceeded its declared size');
           }
           sink.add(chunk);
           if (throttle.shouldReport(received, total)) {
@@ -395,9 +419,12 @@ class AudioDownloader {
           reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
       return promoted;
     } on Object catch (error) {
-      // A 416 means the stored prefix no longer matches the resource: drop it
-      // so the retry downloads from zero instead of looping.
-      if (error is DioException && error.response?.statusCode == 416) {
+      final cancelled = cancelToken?.isCancelled ?? false;
+      // A cancel discards the transfer, and a 416 means the stored prefix no
+      // longer matches the resource: drop the staging file in both cases. Any
+      // other failure keeps it as resume material.
+      if (cancelled ||
+          (error is DioException && error.response?.statusCode == 416)) {
         if (await part.exists()) await part.delete();
       }
       await _markStatus(

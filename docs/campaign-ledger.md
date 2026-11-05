@@ -1177,3 +1177,10 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Disclosed pin edits:** `audio_download_truncation_test` pinned the old "a failed transfer deletes the .part" rule; the final-file invariants (no corrupt target, previous file intact) are untouched, the two staging assertions now expect the resumable prefix, and `audio_redirect_guard_test` pins `retryDelay: null` (it pins the guard, not the retry policy).
 - **Gates:** format 0 · analyze 0 · full suite **1265/1265**.
 - **Not in this wave:** queue backoff beyond the single retry (needs a real-CDN pilot), B6 content (licensing), and the release AAB.
+
+#### Review round (trail #3) — 7 findings, 6 fixed, 1 accepted risk
+- **High ×2 (DB):** a legacy **non-unique** `idx_bookmarks_ayah` / `idx_downloads_lookup` made `CREATE UNIQUE` fail inside `beforeOpen`, aborting every open. The guards now `DROP INDEX IF EXISTS` before repairing and recreating, with a test that seeds a non-unique index plus a duplicate row and proves the file opens, dedupes and ends with a unique index.
+- **Medium ×2 (downloads):** `reconcileOnStart` swept **every** `.part`, so resume only worked inside one process — it now keeps the part of any unfinished row and removes only orphans (and a row promoted to `done` drops its part); a **cancel** left the staging file behind — cancellation now deletes it, while a failure keeps it.
+- **Low ×2 (downloads):** `DownloadFailure` gained a `retryable` flag so an HTML error page / redirect failures are not retried; a `Content-Range: bytes N-M/*` (unknown total) no longer fails as oversized.
+- **Low ×1 dismissed as accepted risk:** resume does not send `If-Range`/ETag. The catalog URLs are immutable CDN objects for a released recitation, and validating a swapped resource would need a stored validator (a schema change) for a failure mode that has no repro. Recorded rather than silently ignored.
+- **Gates after the review round:** format 0 · analyze 0 · full suite **1268/1268** (+3 tests: legacy index, unknown total, cancel).

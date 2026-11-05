@@ -53,7 +53,11 @@ void main() {
     expect(first.status, DownloadStatus.done.name);
     expect(first.bytes, 64);
     expect(second.status, DownloadStatus.failed.name);
-    expect(File('$missingPath.part').existsSync(), isFalse);
+    expect(
+      File('$missingPath.part').existsSync(),
+      isTrue,
+      reason: 'a failed row keeps its part as resume material',
+    );
   });
 
   test('orphan dot-part files with no row are removed', () async {
