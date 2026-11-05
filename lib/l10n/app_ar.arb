@@ -575,6 +575,10 @@
   "homeSectionWorship": "العبادة اليومية",
   "homeSectionMore": "المزيد",
   "qiblaAligned": "أنت تواجه القبلة",
+  "cardinalNorth": "شمال",
+  "cardinalEast": "شرق",
+  "cardinalSouth": "جنوب",
+  "cardinalWest": "غرب",
   "qiblaTurnRight": "أدر الهاتف {degrees}° يمينًا",
   "@qiblaTurnRight": {
     "placeholders": {
@@ -676,6 +680,7 @@
   "reminderIssueNotifications": "إذن الإشعارات مغلق — فعِّله من إعدادات جهازك.",
   "reminderIssueExactAlarms": "التنبيهات الدقيقة غير مسموحة — قد تتأخر التذكيرات.",
   "reminderIssueBattery": "تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.",
+  "reminderIssueScheduleFailed": "تعذّر جدولة التذكيرات — افتح التطبيق مرة أخرى ليُعيد المحاولة.",
   "reminderIssueBatteryUnknown": "تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.",
   "reminderFixAction": "إصلاح",
   "principlesTitle": "مبادئ التطبيق",

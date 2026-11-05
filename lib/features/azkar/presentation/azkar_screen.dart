@@ -4,12 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/azkar_repository.dart';
 import 'azkar_cubit.dart';
@@ -195,7 +195,7 @@ class _SearchResultsList extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 2, 14, AppSpacing.xs),
           child: Text(
-            loc.azkarSearchResultsFor(results.length.toArabicIndic),
+            loc.azkarSearchResultsFor(loc.number(results.length)),
             style: AppTheme.mutedFootnote(context),
           ),
         ),
@@ -212,7 +212,7 @@ class _SearchResultsList extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   child: Text(
                     loc.azkarSearchMore(
-                        AzkarRepository.searchLimit.toArabicIndic),
+                        loc.number(AzkarRepository.searchLimit)),
                     textAlign: TextAlign.center,
                     style: AppTheme.mutedFootnote(context),
                   ),
@@ -283,7 +283,7 @@ class _CollectionTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              loc.azkarItemsCount(collection.items.length.toArabicIndic),
+              loc.azkarItemsCount(loc.number(collection.items.length)),
               style: TextStyle(
                 fontSize: 12,
                 color: colors.onSurfaceVariant,
@@ -408,6 +408,7 @@ class _ZikrLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -437,7 +438,7 @@ class _ZikrLine extends StatelessWidget {
           child: done
               ? const Icon(Icons.check, size: 20)
               : Text(
-                  remaining.toArabicIndic,
+                  loc.number(remaining),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: colors.onPrimaryContainer,

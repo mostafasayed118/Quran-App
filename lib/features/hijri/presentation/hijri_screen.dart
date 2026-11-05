@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hijri_cubit.dart';
 import 'hijri_state.dart';
@@ -36,7 +36,7 @@ class HijriScreen extends StatelessWidget {
                 const EdgeInsets.all(AppSpacing.md),
               ),
               children: [
-                _TodayCard(todayHeader: todayHeader),
+                _TodayCard(todayHeader: loc.digits(todayHeader)),
                 _MonthNavBar(monthName: monthName, year: year),
                 _MonthGrid(offset: offset, cells: cells),
               ],
@@ -89,7 +89,7 @@ class _MonthNavBar extends StatelessWidget {
         ),
         Expanded(
           child: Text(
-            loc.hijriDate(monthName, year.toArabicIndic),
+            loc.hijriDate(monthName, loc.number(year)),
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -145,8 +145,8 @@ class _DayCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final label = loc.hijriCellSemantics(
-      cell.hDay.toArabicIndic,
-      cell.gDay.toArabicIndic,
+      loc.number(cell.hDay),
+      loc.number(cell.gDay),
     );
     return Semantics(
       label: cell.isToday ? '$label، ${loc.trackerDotToday}' : label,
@@ -168,14 +168,14 @@ class _DayCell extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              cell.hDay.toArabicIndic,
+              loc.number(cell.hDay),
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
             ),
             Text(
-              cell.gDay.toArabicIndic,
+              loc.number(cell.gDay),
               style: TextStyle(
                 fontSize: 11,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,

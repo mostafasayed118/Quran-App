@@ -16,6 +16,7 @@ import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'prayer_times_cubit.dart';
 import 'prayer_times_state.dart';
@@ -230,14 +231,15 @@ class _TomorrowNote extends StatelessWidget {
                   Text(
                     loc.nextPrayerTomorrow(
                       name.label(loc),
-                      formatHm(time),
+                      formatHm(time, arabicIndic: loc.usesArabicIndicDigits),
                     ),
                     style: AppTheme.cardTitle.copyWith(fontSize: 15),
                   ),
                   if (remaining != null) ...[
                     const SizedBox(height: 2),
                     Text(
-                      loc.remaining(formatDurationHm(remaining!)),
+                      loc.remaining(formatDurationHm(remaining!,
+                          arabicIndic: loc.usesArabicIndicDigits)),
                       style: AppTheme.caption
                           .copyWith(color: colors.onSurfaceVariant),
                     ),
@@ -375,7 +377,8 @@ class _PrayerRow extends StatelessWidget {
                 if (isNext && remaining != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    loc.remaining(formatDurationHm(remaining!)),
+                    loc.remaining(formatDurationHm(remaining!,
+                        arabicIndic: loc.usesArabicIndicDigits)),
                     style: AppTheme.caption.copyWith(color: muted),
                   ),
                 ],
@@ -384,7 +387,7 @@ class _PrayerRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(
-            formatHm(entry.time),
+            formatHm(entry.time, arabicIndic: loc.usesArabicIndicDigits),
             style: isNext
                 ? AppTheme.cardTitle.copyWith(color: foreground)
                 : AppTheme.rowTitle.copyWith(

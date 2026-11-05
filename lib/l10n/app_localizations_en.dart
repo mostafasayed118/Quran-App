@@ -845,6 +845,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qiblaAligned => 'You are facing the Qibla';
 
   @override
+  String get cardinalNorth => 'North';
+
+  @override
+  String get cardinalEast => 'East';
+
+  @override
+  String get cardinalSouth => 'South';
+
+  @override
+  String get cardinalWest => 'West';
+
+  @override
   String qiblaTurnRight(String degrees) {
     return 'Turn the phone $degrees° right';
   }
@@ -1041,6 +1053,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reminderIssueBattery =>
       'Battery optimisation may block reminders — exempt this app.';
+
+  @override
+  String get reminderIssueScheduleFailed =>
+      'Reminders could not be scheduled — reopen the app to retry.';
 
   @override
   String get reminderIssueBatteryUnknown =>

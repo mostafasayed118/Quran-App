@@ -70,6 +70,8 @@ void main() {
     await tester.tap(find.text('Ruqyah'));
     await tester.pumpAndSettle();
 
-    expect(find.text('×٣'), findsOneWidget);
+    expect(find.text('×3'), findsOneWidget);
+    expect(find.text('×٣'), findsNothing,
+        reason: 'English copy must not keep Arabic-Indic digits');
   });
 }

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_routes.dart';
-import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/format_bytes.dart';
 import '../../../core/utils/insets.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
@@ -14,6 +13,7 @@ import '../../../core/widgets/download_progress.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/error_strip.dart';
+import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/library_catalog.dart';
 import 'library_cubit.dart';
@@ -210,7 +210,7 @@ class _PackRow extends StatelessWidget {
     // Size + English title only: the pack's `version` is an upstream commit
     // SHA (a 40-char hex id) and means nothing to the reader.
     final subtitle = loc.libraryPackSubtitle(
-      loc.libraryPackSize(pack.approxSizeMb.toString().toArabicIndicDigits),
+      loc.libraryPackSize(loc.digits(pack.approxSizeMb.toString())),
       pack.titleEn,
     );
 
@@ -251,8 +251,8 @@ class _PackRow extends StatelessWidget {
         received: received,
         total: total,
         format: (r, t) => loc.downloadProgressOfTotal(
-          formatMegabytes(r).toArabicIndicDigits,
-          formatMegabytes(t).toArabicIndicDigits,
+          loc.digits(formatMegabytes(r)),
+          loc.digits(formatMegabytes(t)),
         ),
       );
     } else if (installed) {

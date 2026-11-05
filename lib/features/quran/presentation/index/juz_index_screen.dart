@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'juz_index_cubit.dart';
 import 'juz_index_state.dart';
@@ -37,11 +37,11 @@ class JuzIndexScreen extends StatelessWidget {
                 final entry = juz[index];
                 return ListTile(
                   leading: CircleAvatar(
-                    child: Text(entry.juz.toArabicIndic),
+                    child: Text(loc.number(entry.juz)),
                   ),
-                  title: Text(loc.juzLabel(entry.juz.toArabicIndic)),
+                  title: Text(loc.juzLabel(loc.number(entry.juz))),
                   subtitle: Text(
-                    '${entry.surahName} · ${entry.firstPage.toArabicIndic}',
+                    '${entry.surahName} · ${loc.number(entry.firstPage)}',
                   ),
                   trailing: const Icon(Icons.chevron_left),
                   onTap: () => context.push(

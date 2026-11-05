@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -14,6 +13,7 @@ import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../core/widgets/section_header.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/reciter_mapping.dart';
 import '../../domain/reciter_info.dart';
@@ -180,7 +180,7 @@ class _ReciterRow extends StatelessWidget {
             )
           : null,
       trailing: Text(
-        loc.surahCountLabel(reciter.surahTotal.toArabicIndic),
+        loc.surahCountLabel(loc.number(reciter.surahTotal)),
         style: TextStyle(color: colors.onSurfaceVariant),
       ),
     );

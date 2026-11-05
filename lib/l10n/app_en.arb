@@ -554,6 +554,10 @@
   "homeSectionWorship": "Daily worship",
   "homeSectionMore": "More",
   "qiblaAligned": "You are facing the Qibla",
+  "cardinalNorth": "North",
+  "cardinalEast": "East",
+  "cardinalSouth": "South",
+  "cardinalWest": "West",
   "qiblaTurnRight": "Turn the phone {degrees}° right",
   "@qiblaTurnRight": {
     "placeholders": {
@@ -655,6 +659,7 @@
   "reminderIssueNotifications": "Notification permission is off — enable it in your device settings.",
   "reminderIssueExactAlarms": "Exact alarms are not allowed — reminders may arrive late.",
   "reminderIssueBattery": "Battery optimisation may block reminders — exempt this app.",
+  "reminderIssueScheduleFailed": "Reminders could not be scheduled — reopen the app to retry.",
   "reminderIssueBatteryUnknown": "Battery optimisation could not be checked — make sure this app is exempt from it.",
   "reminderFixAction": "Fix",
   "principlesTitle": "Principles",

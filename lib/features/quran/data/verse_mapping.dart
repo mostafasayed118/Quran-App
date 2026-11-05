@@ -1,3 +1,5 @@
+import 'dart:developer' as dev;
+
 import '../../../core/db/app_database.dart';
 import '../domain/surah_summary.dart';
 import '../domain/verse.dart';
@@ -27,9 +29,24 @@ extension SurahRowMapping on Surah {
         id: id,
         nameAr: nameAr,
         nameEn: nameEn,
-        revelationType: revelationType,
+        revelationType: _normalizeRevelationType(revelationType),
         ayahCount: ayahCount,
         pagesStart: pagesStart,
         pagesEnd: pagesEnd,
       );
+}
+
+/// Normalizes the free-text DB column to the two values the UI understands.
+///
+/// An unknown value is logged instead of silently rendering "Madinah": the
+/// fallback keeps the screen usable, and the log names the bad row.
+String _normalizeRevelationType(String raw) {
+  final value = raw.toLowerCase().trim();
+  if (value == 'makkah' || value == 'madinah') return value;
+  dev.log(
+    'unknown revelation type',
+    name: 'quran_yahdi/quran',
+    error: raw,
+  );
+  return 'madinah';
 }

@@ -4,11 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/asma_repository.dart';
 import 'asma_cubit.dart';
@@ -107,7 +107,7 @@ class _NameSheet extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        loc.namePosition(name.n.toArabicIndic),
+                        loc.namePosition(loc.number(name.n)),
                         style: AppTheme.mutedAt(colors, 12),
                       ),
                     ),
@@ -182,6 +182,7 @@ class _NameCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
@@ -196,7 +197,7 @@ class _NameCell extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              name.n.toArabicIndic,
+              loc.number(name.n),
               style: AppTheme.mutedAt(colors, 10),
             ),
             const SizedBox(height: AppSpacing.xs),

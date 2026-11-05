@@ -20,4 +20,11 @@ class SurahSummary {
   final int ayahCount;
   final int pagesStart;
   final int pagesEnd;
+
+  /// Whether this surah was revealed in Makkah.
+  ///
+  /// [revelationType] is normalized to `makkah`/`madinah` at the mapping
+  /// boundary, so an unknown DB value cannot reach the UI as a silent
+  /// "Madinah" label.
+  bool get isMakkah => revelationType == 'makkah';
 }

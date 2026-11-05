@@ -4,13 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'bookmarks_cubit.dart';
 import 'bookmarks_state.dart';
@@ -69,7 +69,7 @@ class _BookmarkList extends StatelessWidget {
           final ayah = entries[index];
           return ListTile(
             leading: Text(
-              '${ayah.surahId.toArabicIndic}:${ayah.numberInSurah.toArabicIndic}',
+              '${loc.number(ayah.surahId)}:${loc.number(ayah.numberInSurah)}',
               style: const TextStyle(fontWeight: FontWeight.bold),
               textDirection: TextDirection.rtl,
             ),

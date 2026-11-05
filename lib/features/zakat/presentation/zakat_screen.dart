@@ -1,9 +1,9 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/zakat_calculator.dart';
@@ -166,9 +166,9 @@ class _SummaryCard extends StatelessWidget {
             ),
             if (!needsNisabPrice && ready.result.due)
               Text(
-                ready.result.amount
-                    .toStringAsFixed(_amountDecimals)
-                    .toArabicIndicDigits,
+                loc.digits(
+                  ready.result.amount.toStringAsFixed(_amountDecimals),
+                ),
                 textAlign: TextAlign.right,
                 style: _amountStyle.copyWith(color: colors.primary),
               ),
@@ -192,6 +192,7 @@ class _ZakatLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -204,7 +205,7 @@ class _ZakatLine extends StatelessWidget {
             ),
           ),
           Text(
-            value.toStringAsFixed(_amountDecimals).toArabicIndicDigits,
+            loc.digits(value.toStringAsFixed(_amountDecimals)),
             style: _lineValueStyle,
           ),
         ],

@@ -18,6 +18,7 @@ import '../../../../core/widgets/lifecycle_ticker.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/service_tile.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'home_cubit.dart';
 import 'home_state.dart';
@@ -254,8 +255,7 @@ class _ContinueReadingCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      loc.continueReadingAyah(
-                          lastRead.ayahNumber.toArabicIndic),
+                      loc.continueReadingAyah(loc.number(lastRead.ayahNumber)),
                       style: AppTheme.caption
                           .copyWith(color: colors.onSurfaceVariant),
                     ),
@@ -333,7 +333,10 @@ class _NextPrayerCard extends StatelessWidget {
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             Text(
-                              formatHm(prayer.time),
+                              formatHm(
+                                prayer.time,
+                                arabicIndic: loc.usesArabicIndicDigits,
+                              ),
                               style: AppTheme.caption.copyWith(
                                 color: colors.onPrimaryContainer,
                                 fontWeight: FontWeight.bold,
@@ -393,10 +396,14 @@ class _LiveCountdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return LifecycleTicker(
       builder: (context, _) => Text(
-        formatDurationHms(target.difference(DateTime.now())),
+        formatDurationHms(
+          target.difference(DateTime.now()),
+          arabicIndic: loc.usesArabicIndicDigits,
+        ),
         style: AppTheme.heroValue.copyWith(color: colors.onPrimaryContainer),
         maxLines: 2,
       ),

@@ -56,10 +56,10 @@ String formatHm(DateTime time, {bool arabicIndic = true}) {
 }
 
 /// H:mm label for a Duration (call-site transform, W3).
-String formatDurationHm(Duration duration) {
+String formatDurationHm(Duration duration, {bool arabicIndic = true}) {
   final clock = '${duration.inHours.toString().padLeft(2, '0')}:'
       '${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}';
-  return clock.toArabicIndicDigits;
+  return arabicIndic ? clock.toArabicIndicDigits : clock;
 }
 
 /// HH:mm:ss label for a live countdown.
@@ -67,10 +67,10 @@ String formatDurationHm(Duration duration) {
 /// A negative remainder (the moment the target time has just passed and the
 /// state has not reloaded yet) renders as zero instead of a minus sign, so the
 /// hero never shows "-00:00:01".
-String formatDurationHms(Duration duration) {
+String formatDurationHms(Duration duration, {bool arabicIndic = true}) {
   final safe = duration.isNegative ? Duration.zero : duration;
   final clock = '${safe.inHours.toString().padLeft(2, '0')}:'
       '${safe.inMinutes.remainder(60).toString().padLeft(2, '0')}:'
       '${safe.inSeconds.remainder(60).toString().padLeft(2, '0')}';
-  return clock.toArabicIndicDigits;
+  return arabicIndic ? clock.toArabicIndicDigits : clock;
 }

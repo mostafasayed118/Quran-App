@@ -16,6 +16,7 @@ import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
@@ -68,7 +69,7 @@ class _ReaderErrorView extends StatelessWidget {
                 ? errorPane(loc)
                 // A surah without readable ayahs is its own failure: the
                 // generic pane would blame a transient error.
-                : ErrorView(loc.readerNoAyahs(emptySurahId.toArabicIndic)),
+                : ErrorView(loc.readerNoAyahs(loc.number(emptySurahId))),
           ),
           Padding(
             padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
@@ -347,13 +348,13 @@ class _AyahActions extends StatelessWidget {
       textDirection: TextDirection.rtl,
       children: [
         Text(
-          loc.ornateBrackets(ayah.numberInSurah.toArabicIndic),
+          loc.ornateBrackets(loc.number(ayah.numberInSurah)),
           style: TextStyle(
             fontFamily: QuranFonts.meQuran,
             fontSize: 16,
             color: AppTheme.goldText(context),
           ),
-          semanticsLabel: loc.ayahNumberLabel(ayah.numberInSurah.toArabicIndic),
+          semanticsLabel: loc.ayahNumberLabel(loc.number(ayah.numberInSurah)),
         ),
         const Spacer(),
         IconButton(
@@ -533,7 +534,7 @@ class _MushafPagerState extends State<_MushafPager> {
                   '${a.textUnicode ?? stripAyahEndMarker(a.textUthmani)}\u00A0',
             ),
             TextSpan(
-              text: '${loc.ornateBrackets(a.numberInSurah.toArabicIndic)} ',
+              text: '${loc.ornateBrackets(loc.number(a.numberInSurah))} ',
               style: numberStyle,
             ),
           ],
@@ -568,7 +569,7 @@ class _MushafPagerState extends State<_MushafPager> {
               ),
               Text(
                 loc.ornateBrackets(
-                  loc.pageIndicator(block.page.toArabicIndic),
+                  loc.pageIndicator(loc.number(block.page)),
                 ),
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,

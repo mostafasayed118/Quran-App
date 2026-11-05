@@ -8,6 +8,7 @@ import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'prayer_month_cubit.dart';
 import 'prayer_month_state.dart';
@@ -109,7 +110,7 @@ class _MonthList extends StatelessWidget {
                 children: [
                   for (final prayer in day.prayers)
                     Text(
-                      '${prayer.name.label(loc)} ${formatHm(prayer.time)}',
+                      '${prayer.name.label(loc)} ${formatHm(prayer.time, arabicIndic: loc.usesArabicIndicDigits)}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                 ],

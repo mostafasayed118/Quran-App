@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
@@ -11,6 +10,7 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'downloads_cubit.dart';
 
@@ -193,12 +193,12 @@ class _SummaryHeader extends StatelessWidget {
                 children: [
                   Text(
                     loc.downloadsTotal(
-                      formatMegabytes(summary.bytes).toArabicIndicDigits,
+                      loc.digits(formatMegabytes(summary.bytes)),
                     ),
                     style: AppTheme.cardTitle,
                   ),
                   Text(
-                    loc.downloadsCount(summary.count.toArabicIndic),
+                    loc.downloadsCount(loc.number(summary.count)),
                     style: AppTheme.caption
                         .copyWith(color: colors.onSurfaceVariant),
                   ),
@@ -227,12 +227,12 @@ class _DownloadRow extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final surahName = item.surahName.isEmpty
-        ? loc.surahFallbackName(item.surahNumber.toArabicIndic)
+        ? loc.surahFallbackName(loc.number(item.surahNumber))
         : item.surahName;
     // The pack size is the app's existing "{size} MB" template; a downloaded
     // surah is sized the same way.
     final size = loc.libraryPackSize(
-      formatMegabytes(item.bytes).toArabicIndicDigits,
+      loc.digits(formatMegabytes(item.bytes)),
     );
     final reciterName = item.reciterName;
     final subtitle = reciterName.isEmpty ? size : '$reciterName · $size';

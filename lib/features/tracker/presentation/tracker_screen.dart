@@ -6,11 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/khatma_progress.dart';
 import '../data/prayer_log_repository.dart';
@@ -94,9 +94,9 @@ class _TodayCard extends StatelessWidget {
           children: [
             Text(
               loc.trackerGregorianDate(
-                today.day.day.toArabicIndic,
-                today.day.month.toArabicIndic,
-                today.day.year.toArabicIndic,
+                loc.number(today.day.day),
+                loc.number(today.day.month),
+                loc.number(today.day.year),
               ),
               style: AppTheme.mutedAt(Theme.of(context).colorScheme, 13),
             ),
@@ -166,7 +166,7 @@ class _Last7Row extends StatelessWidget {
       0 => loc.trackerDotToday,
       1 => loc.trackerDotYesterday,
       2 => loc.trackerDotTwoDaysAgo,
-      _ => loc.trackerDotDaysAgo(index.toArabicIndic),
+      _ => loc.trackerDotDaysAgo(loc.number(index)),
     };
     return loc.trackerDotSemantics(
       day,
@@ -240,7 +240,7 @@ class _StreakChip extends StatelessWidget {
           color: Theme.of(context).colorScheme.secondary,
         ),
         label: Text(
-          loc.streak(streakDays.toArabicIndic),
+          loc.streak(loc.number(streakDays)),
           style: _streakLabelStyle,
         ),
       ),
@@ -309,22 +309,22 @@ class _WirdCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 loc.wirdProgress(
-                  p.pagesDone.toArabicIndic,
-                  KhatmaProgress.totalPages.toArabicIndic,
+                  loc.number(p.pagesDone),
+                  loc.number(KhatmaProgress.totalPages),
                 ),
                 style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 loc.wirdTodayRange(
-                  p.todayStartPage.toArabicIndic,
-                  p.todayEndPage.toArabicIndic,
+                  loc.number(p.todayStartPage),
+                  loc.number(p.todayEndPage),
                 ),
                 style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                loc.wirdRemainingDays(p.remainingDays.toArabicIndic),
+                loc.wirdRemainingDays(loc.number(p.remainingDays)),
                 style: AppTheme.mutedAt(colors, 13),
               ),
               const SizedBox(height: 10),
@@ -382,7 +382,7 @@ class _WirdSetupSheet extends StatelessWidget {
               title: Text(_paceLabel(loc, target)),
               subtitle: Text(
                 loc.wirdDailyPages(
-                  KhatmaProgress.dailyPagesFor(target).toArabicIndic,
+                  loc.number(KhatmaProgress.dailyPagesFor(target)),
                 ),
               ),
               onTap: () => Navigator.of(context).pop(target),

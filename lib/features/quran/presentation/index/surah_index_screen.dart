@@ -5,13 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/surah_summary.dart';
 import 'surah_index_cubit.dart';
@@ -91,11 +91,11 @@ class _SurahRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final isMakkah = surah.revelationType == 'makkah';
+    final isMakkah = surah.isMakkah;
     return ListTile(
       contentPadding: AppTheme.tileContentPadding,
-      onTap: () => context.push(quranReaderPath(surah: surah.id, ayah: 0)),
-      leading: ArabicBadge(surah.id.toArabicIndic),
+      onTap: () => context.push(quranReaderPath(surah: surah.id)),
+      leading: ArabicBadge(loc.number(surah.id)),
       title: Text(
         surah.nameAr,
         style: AppTheme.meQuranHead,
@@ -103,7 +103,7 @@ class _SurahRow extends StatelessWidget {
         textDirection: TextDirection.rtl,
       ),
       subtitle: Text(
-        '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.ayatCount(surah.ayahCount).toArabicIndicDigits}',
+        '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.digits(loc.ayatCount(surah.ayahCount))}',
         style: TextStyle(color: colors.onSurfaceVariant),
         textAlign: TextAlign.right,
       ),

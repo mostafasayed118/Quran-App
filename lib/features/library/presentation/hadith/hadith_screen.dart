@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'hadith_cubit.dart';
 import 'hadith_state.dart';
@@ -119,6 +119,7 @@ class _HadithVerseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     final direction = rtl ? TextDirection.rtl : TextDirection.ltr;
     return Padding(
@@ -143,7 +144,7 @@ class _HadithVerseRow extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    number.toArabicIndic,
+                    loc.number(number),
                     style: const TextStyle(fontSize: 12),
                   ),
                 ),

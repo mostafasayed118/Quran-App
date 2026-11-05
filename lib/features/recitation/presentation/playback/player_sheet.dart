@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
@@ -80,12 +80,13 @@ class _PlayerSheetState extends State<_PlayerSheet> {
   double? _dragging;
 
   String _clock(Duration d) {
+    final loc = AppLocalizations.of(context);
     final seconds = d.inSeconds.remainder(60).toString().padLeft(2, '0');
     final minutes = d.inMinutes.remainder(60).toString().padLeft(2, '0');
     if (d.inHours > 0) {
-      return '${d.inHours}:$minutes:$seconds'.toArabicIndicDigits;
+      return loc.digits('${d.inHours}:$minutes:$seconds');
     }
-    return '${d.inMinutes}:$seconds'.toArabicIndicDigits;
+    return loc.digits('${d.inMinutes}:$seconds');
   }
 
   _Track? _trackOf(BuildContext context, PlaybackState state) {
@@ -101,7 +102,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
         _Track(
           reciterName: reciterName,
           surahLabel: surahName.isEmpty
-              ? loc.surahBadge(surahNumber.toArabicIndic)
+              ? loc.surahBadge(loc.number(surahNumber))
               : surahName,
           position: position,
           duration: duration,
@@ -117,7 +118,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
         _Track(
           reciterName: reciterName,
           surahLabel: surahName.isEmpty
-              ? loc.surahBadge(surahNumber.toArabicIndic)
+              ? loc.surahBadge(loc.number(surahNumber))
               : surahName,
           position: position,
           duration: duration,

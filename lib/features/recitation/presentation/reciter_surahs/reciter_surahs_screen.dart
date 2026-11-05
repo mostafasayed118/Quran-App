@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/download_status.dart';
 import '../../data/recitation_keys.dart';
@@ -73,7 +73,7 @@ class ReciterSurahsScreen extends StatelessWidget {
                 return _SurahDownloadRow(
                   reciter: row,
                   surahNumber: n,
-                  name: names[n] ?? loc.surahFallbackName(n.toArabicIndic),
+                  name: names[n] ?? loc.surahFallbackName(loc.number(n)),
                   teaser: previews[n],
                 );
               },
@@ -294,8 +294,8 @@ class _DownloadProgress extends StatelessWidget {
 /// received amount renders alone.
 @visibleForTesting
 String downloadProgressLabel(AppLocalizations loc, int received, int total) {
-  final receivedLabel = formatMegabytes(received).toArabicIndicDigits;
+  final receivedLabel = loc.digits(formatMegabytes(received));
   if (total <= 0) return loc.downloadProgressReceived(receivedLabel);
   return loc.downloadProgressOfTotal(
-      receivedLabel, formatMegabytes(total).toArabicIndicDigits);
+      receivedLabel, loc.digits(formatMegabytes(total)));
 }

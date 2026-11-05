@@ -842,6 +842,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get qiblaAligned => 'أنت تواجه القبلة';
 
   @override
+  String get cardinalNorth => 'شمال';
+
+  @override
+  String get cardinalEast => 'شرق';
+
+  @override
+  String get cardinalSouth => 'جنوب';
+
+  @override
+  String get cardinalWest => 'غرب';
+
+  @override
   String qiblaTurnRight(String degrees) {
     return 'أدر الهاتف $degrees° يمينًا';
   }
@@ -1035,6 +1047,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get reminderIssueBattery =>
       'تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.';
+
+  @override
+  String get reminderIssueScheduleFailed =>
+      'تعذّر جدولة التذكيرات — افتح التطبيق مرة أخرى ليُعيد المحاولة.';
 
   @override
   String get reminderIssueBatteryUnknown =>

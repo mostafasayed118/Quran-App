@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../core/widgets/section_header.dart';
+import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/backup_merger.dart';
 import 'backup_cubit.dart';
@@ -142,16 +142,16 @@ class _PreviewDialog extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final lines = <String>[
       if (summary.newBookmarks > 0)
-        loc.backupPreviewBookmarks(summary.newBookmarks.toArabicIndic),
+        loc.backupPreviewBookmarks(loc.number(summary.newBookmarks)),
       if (summary.lastReadChanged) loc.backupPreviewLastRead,
       if (summary.mergedPrayerDays > 0)
-        loc.backupPreviewPrayerDays(summary.mergedPrayerDays.toArabicIndic),
+        loc.backupPreviewPrayerDays(loc.number(summary.mergedPrayerDays)),
       if (summary.planReplaced) loc.backupPreviewPlan,
       if (summary.tasbihChanged) loc.backupPreviewTasbih,
       if (summary.settingsKeysApplied > 0)
-        loc.backupPreviewSettings(summary.settingsKeysApplied.toArabicIndic),
+        loc.backupPreviewSettings(loc.number(summary.settingsKeysApplied)),
       if (summary.rejectedEntries > 0)
-        loc.backupPreviewRejected(summary.rejectedEntries.toArabicIndic),
+        loc.backupPreviewRejected(loc.number(summary.rejectedEntries)),
     ];
     return AlertDialog(
       title: Text(loc.backupPreviewTitle),

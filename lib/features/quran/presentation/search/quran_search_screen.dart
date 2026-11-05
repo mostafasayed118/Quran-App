@@ -5,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/quran_search_source.dart';
 import 'quran_search_cubit.dart';
@@ -101,7 +101,7 @@ class _Results extends StatelessWidget {
           child: Align(
             alignment: AlignmentDirectional.centerStart,
             child: Text(
-              loc.searchQuranResultsCount(ready.total.toArabicIndic),
+              loc.searchQuranResultsCount(loc.number(ready.total)),
               style: AppTheme.mutedFootnote(context),
             ),
           ),
@@ -158,10 +158,11 @@ class _HitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Card(
       child: ListTile(
         leading: Text(
-          '${hit.surahId.toArabicIndic}:${hit.numberInSurah.toArabicIndic}',
+          '${loc.number(hit.surahId)}:${loc.number(hit.numberInSurah)}',
           style: const TextStyle(fontWeight: FontWeight.bold),
           textDirection: TextDirection.rtl,
         ),

@@ -1,11 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/widgets/error_strip.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'player_sheet.dart';
@@ -169,7 +169,7 @@ class _TrackInfo extends StatelessWidget {
         ),
         Text(
           surahName.isEmpty
-              ? loc.surahBadge(surahNumber.toArabicIndic)
+              ? loc.surahBadge(loc.number(surahNumber))
               : surahName,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,

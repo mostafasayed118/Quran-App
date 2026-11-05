@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -194,6 +194,11 @@ class _DialPainter extends CustomPainter {
     required this.heading,
     required this.bearing,
     required this.aligned,
+    required this.cardinalNorth,
+    required this.cardinalEast,
+    required this.cardinalSouth,
+    required this.cardinalWest,
+    required this.direction,
   });
 
   final ColorScheme colors;
@@ -201,14 +206,14 @@ class _DialPainter extends CustomPainter {
   final double bearing;
   final bool aligned;
 
-  /// Full words, not initials: شمال and شرق share the same first letter, so an
-  /// initial-only dial would print ش twice.
-  static const _cardinals = <(double, String)>[
-    (0, 'شمال'),
-    (90, 'شرق'),
-    (180, 'جنوب'),
-    (270, 'غرب'),
-  ];
+  /// Full words, not initials: Arabic شمال and شرق share the same first
+  /// letter, so an initial-only dial would print ش twice. The four labels
+  /// come from the catalogue so the dial follows the app language.
+  final String cardinalNorth;
+  final String cardinalEast;
+  final String cardinalSouth;
+  final String cardinalWest;
+  final TextDirection direction;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -247,7 +252,13 @@ class _DialPainter extends CustomPainter {
 
     // Cardinal letters sit at their true bearing, which is fixed on the dial
     // and moves on screen as the device turns.
-    for (final entry in _cardinals) {
+    final cardinals = <(double, String)>[
+      (0, cardinalNorth),
+      (90, cardinalEast),
+      (180, cardinalSouth),
+      (270, cardinalWest),
+    ];
+    for (final entry in cardinals) {
       final angle = (entry.$1 - heading) * math.pi / 180.0;
       final labelRadius = radius - 30;
       final offset = Offset(
@@ -264,7 +275,7 @@ class _DialPainter extends CustomPainter {
             fontFamily: AppTheme.sectionLabel.fontFamily,
           ),
         ),
-        textDirection: TextDirection.rtl,
+        textDirection: direction,
       )..layout();
       painter.paint(
         canvas,
@@ -291,7 +302,12 @@ class _DialPainter extends CustomPainter {
       oldDelegate.colors != colors ||
       oldDelegate.heading.round() != heading.round() ||
       oldDelegate.bearing != bearing ||
-      oldDelegate.aligned != aligned;
+      oldDelegate.aligned != aligned ||
+      oldDelegate.cardinalNorth != cardinalNorth ||
+      oldDelegate.cardinalEast != cardinalEast ||
+      oldDelegate.cardinalSouth != cardinalSouth ||
+      oldDelegate.cardinalWest != cardinalWest ||
+      oldDelegate.direction != direction;
 }
 
 class _CityTile extends StatelessWidget {
@@ -414,8 +430,8 @@ class _AlignmentHint extends StatelessWidget {
     return Center(
       child: Text(
         delta > 0
-            ? loc.qiblaTurnRight(degrees.toArabicIndic)
-            : loc.qiblaTurnLeft(degrees.toArabicIndic),
+            ? loc.qiblaTurnRight(loc.number(degrees))
+            : loc.qiblaTurnLeft(loc.number(degrees)),
         style: AppTheme.caption.copyWith(color: colors.onSurfaceVariant),
         textAlign: TextAlign.center,
       ),
@@ -433,7 +449,7 @@ class _DegreesLabel extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Center(
       child: Text(
-        loc.degreesFromNorth(bearing.round().toArabicIndic),
+        loc.degreesFromNorth(loc.number(bearing.round())),
         style: AppTheme.rowTitle,
       ),
     );
@@ -478,12 +494,12 @@ class _DialState extends State<_Dial> {
     final heading = widget.heading;
     final delta = qiblaDeltaDeg(widget.bearing, heading ?? 0);
     final spoken = heading == null
-        ? loc.degreesFromNorth(widget.bearing.round().toArabicIndic)
+        ? loc.degreesFromNorth(loc.number(widget.bearing.round()))
         : widget.aligned
             ? loc.qiblaAligned
             : delta > 0
-                ? loc.qiblaTurnRight(delta.abs().round().toArabicIndic)
-                : loc.qiblaTurnLeft(delta.abs().round().toArabicIndic);
+                ? loc.qiblaTurnRight(loc.number(delta.abs().round()))
+                : loc.qiblaTurnLeft(loc.number(delta.abs().round()));
     return Center(
       child: Semantics(
         label: spoken,
@@ -499,6 +515,11 @@ class _DialState extends State<_Dial> {
                   heading: widget.heading ?? 0,
                   bearing: widget.bearing,
                   aligned: widget.aligned,
+                  cardinalNorth: loc.cardinalNorth,
+                  cardinalEast: loc.cardinalEast,
+                  cardinalSouth: loc.cardinalSouth,
+                  cardinalWest: loc.cardinalWest,
+                  direction: Directionality.of(context),
                 ),
                 child: Center(
                   child: AnimatedRotation(

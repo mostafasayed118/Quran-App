@@ -1568,6 +1568,30 @@ abstract class AppLocalizations {
   /// **'أنت تواجه القبلة'**
   String get qiblaAligned;
 
+  /// No description provided for @cardinalNorth.
+  ///
+  /// In ar, this message translates to:
+  /// **'شمال'**
+  String get cardinalNorth;
+
+  /// No description provided for @cardinalEast.
+  ///
+  /// In ar, this message translates to:
+  /// **'شرق'**
+  String get cardinalEast;
+
+  /// No description provided for @cardinalSouth.
+  ///
+  /// In ar, this message translates to:
+  /// **'جنوب'**
+  String get cardinalSouth;
+
+  /// No description provided for @cardinalWest.
+  ///
+  /// In ar, this message translates to:
+  /// **'غرب'**
+  String get cardinalWest;
+
   /// No description provided for @qiblaTurnRight.
   ///
   /// In ar, this message translates to:
@@ -1915,6 +1939,12 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تحسين استهلاك البطارية قد يوقف التذكيرات — استثنِ التطبيق.'**
   String get reminderIssueBattery;
+
+  /// No description provided for @reminderIssueScheduleFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذّر جدولة التذكيرات — افتح التطبيق مرة أخرى ليُعيد المحاولة.'**
+  String get reminderIssueScheduleFailed;
 
   /// No description provided for @reminderIssueBatteryUnknown.
   ///

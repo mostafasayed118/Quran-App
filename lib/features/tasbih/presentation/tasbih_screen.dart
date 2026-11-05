@@ -4,9 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'tasbih_cubit.dart';
 import 'tasbih_state.dart';
@@ -79,7 +79,7 @@ class _TasbihDial extends StatelessWidget {
     return Semantics(
       button: true,
       label: loc.tasbih,
-      value: ready.count.toArabicIndic,
+      value: loc.number(ready.count),
       liveRegion: true,
       child: AnimatedScale(
         scale: done ? 1.06 : 1.0,
@@ -130,7 +130,7 @@ class _DialFace extends StatelessWidget {
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              ready.count.toArabicIndic,
+              loc.number(ready.count),
               style: TextStyle(
                 fontSize: 56,
                 fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _DialFace extends StatelessWidget {
           ),
         ),
         Text(
-          '${loc.tasbihTarget}: ${ready.target.toArabicIndic}',
+          '${loc.tasbihTarget}: ${loc.number(ready.target)}',
           style: TextStyle(
             fontSize: 13,
             color: colors.onPrimaryContainer,
@@ -166,7 +166,7 @@ class _TargetChips extends StatelessWidget {
       children: [
         for (final target in TasbihCubit.targets)
           ChoiceChip(
-            label: Text(target.toArabicIndic),
+            label: Text(loc.number(target)),
             selected: ready.target == target,
             onSelected: (_) {
               context.read<TasbihCubit>().selectTarget(target);
