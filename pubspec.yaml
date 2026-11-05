@@ -2,7 +2,7 @@ name: quran_yahdi
 description: "Quran Yahdi - a complete offline-first Islamic companion app"
 publish_to: "none"
 
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: ^3.5.0
@@ -21,7 +21,6 @@ dependencies:
   path_provider: ^2.1.6
   path: ^1.9.1
   meta: ^1.19.0
-  http: ^1.6.0
   crypto: ^3.0.7
   scrollable_positioned_list: ^0.3.8
   just_audio: ^0.10.6
@@ -57,6 +56,8 @@ dev_dependencies:
   path_provider_platform_interface: ^2.1.3
   # Used by tools/build_quran_db.dart (outside lib/), not shipped in the app.
   collection: ^1.19.1
+  # Used by the tools/ scripts only; the shipped app talks HTTP through dio.
+  http: ^1.6.0
 
 flutter_native_splash:
   color: "#f1ead7"

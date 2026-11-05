@@ -12,20 +12,23 @@ Last updated: 2026-10-24 · Android only for this submission (no iOS/web listing
 | Field | Value | Source |
 |---|---|---|
 | Package name | `com.mostafasayed.quranyahdi` | `android/app/build.gradle:49` |
-| Version name | `1.0.0` | `pubspec.yaml` (`version: 1.0.0+3`) |
-| Version code | `3` | `pubspec.yaml` (`version: 1.0.0+3`) — exceeds the 2026-10-24 `+2` build and the 2026-10-22 `+1` build whether or not either was uploaded |
+| Version name | `1.0.0` | `pubspec.yaml` (`version: 1.0.0+4`) |
+| Version code | `4` | `pubspec.yaml` (`version: 1.0.0+4`) — exceeds the `+3` build whether or not it was uploaded; a higher code is always accepted |
 | minSdk | `24` | `docs/campaign-ledger.md:878` |
 | targetSdk | `36` | `docs/campaign-ledger.md:878` |
 | Release AAB path | `build/app/outputs/bundle/release/app-release.aab` | Gradle output |
-| Last verified signed artifact (2026-11-01, `+3`, **R8 on**) | AAB `70,780,498 B` · SHA-256 `8546727A3109C31FB615FB054FCF6D0C77A34F530B8106CEC887F7B38239FD23` · versionCode `3` · `keytool -printcert -jarfile` → `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG`, SHA-256 `DB:7F:FE:…:46:85` · signature `SHA384withRSA` (`META-INF/QURAN_YA.RSA`) |
-| R8 mapping for the same build | `build/app/outputs/mapping/release/mapping.txt` `19,698,497 B` — upload it with the bundle so Play de-obfuscates stack traces |
-| R8 size delta (same tree, measured) | AAB `73,292,322 B` without minify → `70,780,498 B` with R8 + resource shrinking (**−2.4 MB, −3.4 %**) |
-| Historical (2026-10-28, `+3`, pre-R8) | AAB `68,892,199 B` · SHA-256 `AFAFD398…F0588` · versionCode `3` · superseded by the R8 build above |uran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` (SHA-256 `DB:7F:FE:F4…46:85`) | Built from `76da2d7` with `PUBLISH_RELEASE=true` |
+| Current verification build (2026-11-05, `+4`, **R8 on**) | AAB `87,545,010 B` · SHA-256 `6C4D73B5A725D0427684F1DA1C6099BABD2168516F4A195B6D262F6C60B75826` · versionCode `4` · `keytool -printcert -jarfile` → `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG`, SHA-256 `DB:7F:FE:…:46:85` · `SHA384withRSA` · `jarsigner -verify` → `jar verified` | Built from the `wave/technical-debt-closeout` tree with `PUBLISH_RELEASE=true`. **Rebuild at the merge commit before upload.** |
+| 16 KB alignment (same build) | `zipalign -c -P 16 -v 4` on the AAB and on `app-arm64-v8a-release.apk` → `Verification successful` | D12 closed locally; re-run on the final upload artifact |
+| Arm64 APK (same tree) | `app-arm64-v8a-release.apk` `42,635,084 B` · SHA-256 `37D7355BA0AFA16A250000704AF0C21EAA629F59CD1CB554AA1BC3808D95FDB7` · split versionCode `2004` (base `4` + ABI offset) | `flutter build apk --release --split-per-abi` |
+| Historical (2026-11-01, `+3`, **R8 on**) | AAB `70,780,498 B` · SHA-256 `8546727A3109C31FB615FB054FCF6D0C77A34F530B8106CEC887F7B38239FD23` · versionCode `3` · `keytool -printcert -jarfile` → `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG`, SHA-256 `DB:7F:FE:…:46:85` · signature `SHA384withRSA` (`META-INF/QURAN_YA.RSA`) |
+| R8 mapping (current `+4` build) | `build/app/outputs/mapping/release/mapping.txt` `23,316,959 B` — upload it with the bundle so Play de-obfuscates stack traces | Gradle `bundleRelease` |
+| R8 size delta (historical `+3` measurement) | AAB `73,292,322 B` without minify → `70,780,498 B` with R8 + resource shrinking (**−2.4 MB, −3.4 %**) |
+| Historical (2026-10-28, `+3`, pre-R8) | AAB `68,892,199 B` · SHA-256 `AFAFD398…F0588` · versionCode `3` · same owner cert (`SHA-256 DB:7F:FE:F4…46:85`) | Built from `76da2d7` with `PUBLISH_RELEASE=true`; superseded by the R8 build above |
 | Signed APK from the same tree (2026-10-28, `+3`) | `app-release.apk` `27,279,615 B` · SHA-256 `2A0E8E2C…73E423` · versionCode `3` · same cert · used for the emulator screenshot pass | `flutter build apk --release --target-platform android-x64` |
 | Historical (2026-10-24, `+2`) | AAB `68,195,926 B` · SHA-256 `90745181…CB713` · APK `69,497,234 B` · SHA-256 `61C95D0D…B63987` · versionCode `2` | Superseded; never published |
 | Keystore | `C:\Users\ASUS\keystores\quran-yahdi-release.jks` (`android/key.properties` is gitignored) | `docs/campaign-ledger.md:877` |
 
-> Both `+3` artifacts are built and verified (size, SHA-256, `jarsigner`, versionCode 3). The `+2` row is historical. Re-verify again if any commit lands before upload only when it touches `lib/`, `assets/`, `android/`, or `pubspec.yaml`; docs-only commits do not change the artifact.
+> The `+3` rows are historical. The `+4` build above is the current verification artifact (size, SHA-256, `jarsigner`, versionCode 4, 16 KB alignment). It was built from the uncommitted debt-closeout tree; **rebuild it at the merge commit before upload** if any commit lands. Docs-only commits do not change the artifact. The AAB grew from 70.8 MB to 83.5 MB because the 2026-11-04 adhan-selection wave added 12.9 MB of bundled clips.
 
 - [x] Package name confirmed against the build script, not the store listing.
 - [ ] Confirm the AAB was built after the latest code change (`git log -1` at build time).
