@@ -17,6 +17,29 @@ const Duration _connectTimeout = Duration(seconds: 15);
 const Duration _receiveTimeout = Duration(minutes: 2);
 
 /// Raised when a surah audio download cannot be completed.
+/// Opaque cancellation handle for one download attempt.
+///
+/// The presentation layer owns this handle, never the transport token: the
+/// queue must be able to abort a transfer without importing dio.
+class DownloadCancelToken {
+  /// Creates a handle that starts uncancelled.
+  DownloadCancelToken() : _token = CancelToken();
+
+  final CancelToken _token;
+
+  /// The transport token; only the data layer may use it.
+  CancelToken get dioToken => _token;
+
+  /// Whether [cancel] has been called.
+  bool get isCancelled => _token.isCancelled;
+
+  /// Completes when [cancel] is called (used by test doubles).
+  Future<void> get whenCancelled => _token.whenCancel;
+
+  /// Aborts the transfer.
+  void cancel([Object? reason]) => _token.cancel(reason);
+}
+
 class DownloadFailure implements Exception {
   /// A failure that may succeed on a second attempt (network, truncation).
   DownloadFailure(this.message) : retryable = true;
@@ -307,14 +330,15 @@ class AudioDownloader {
     required ReciterRow reciter,
     required int surahNumber,
     void Function(int received, int total)? onProgress,
-    CancelToken? cancelToken,
+    DownloadCancelToken? cancelToken,
   }) async {
+    final token = cancelToken?.dioToken;
     try {
       return await _downloadAttempt(
         reciter: reciter,
         surahNumber: surahNumber,
         onProgress: onProgress,
-        cancelToken: cancelToken,
+        cancelToken: token,
       );
     } on Object catch (error) {
       final cancelled = cancelToken?.isCancelled ?? false;
@@ -327,7 +351,7 @@ class AudioDownloader {
         reciter: reciter,
         surahNumber: surahNumber,
         onProgress: onProgress,
-        cancelToken: cancelToken,
+        cancelToken: token,
       );
     }
   }
@@ -472,7 +496,15 @@ class AudioDownloader {
         if (!await target.exists() && await backup.exists()) {
           await backup.rename(target.path);
         }
-      } on Object catch (_) {}
+      } on Object catch (error) {
+        // The recovery rename failed; the ORIGINAL promote failure is the
+        // one worth reporting, but keep a trace of the recovery attempt.
+        dev.log(
+          'download promote recovery failed',
+          name: 'quran_yahdi/downloads',
+          error: error.runtimeType,
+        );
+      }
       rethrow;
     }
     if (await backup.exists()) await backup.delete();

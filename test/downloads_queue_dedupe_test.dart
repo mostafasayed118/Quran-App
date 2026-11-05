@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -42,14 +41,14 @@ class _ControllableDownloader extends AudioDownloader {
     required ReciterRow reciter,
     required int surahNumber,
     void Function(int received, int total)? onProgress,
-    CancelToken? cancelToken,
+    DownloadCancelToken? cancelToken,
   }) async {
     downloadCalls += 1;
     final gate = Completer<void>();
     gates.add(gate);
     final token = cancelToken;
     if (token != null) {
-      unawaited(token.whenCancel.then((_) {
+      unawaited(token.whenCancelled.then((_) {
         if (!gate.isCompleted) gate.completeError(StateError('cancelled'));
       }));
     }

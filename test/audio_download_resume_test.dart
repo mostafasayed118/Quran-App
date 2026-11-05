@@ -255,7 +255,7 @@ void main() {
       await req.response.close();
     });
 
-    final token = CancelToken();
+    final token = DownloadCancelToken();
     final part = await partFile(1);
     final future = downloader.downloadSurah(
       reciter: await reciter(),

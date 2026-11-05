@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
-import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/audio_downloader.dart';
@@ -92,7 +91,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
 
   bool _draining = false;
   (String, int)? _active;
-  CancelToken? _activeToken;
+  DownloadCancelToken? _activeToken;
 
   String _key(String rowId, int surahNumber) => downloadKey(rowId, surahNumber);
 
@@ -253,7 +252,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
         final (rowId, surahNumber) = _queue.first;
         _queue.removeAt(0);
         final key = _key(rowId, surahNumber);
-        final token = CancelToken();
+        final token = DownloadCancelToken();
         _active = (rowId, surahNumber);
         _activeToken = token;
         try {
@@ -300,7 +299,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
   }
 
   /// Cancels a queued or in-flight download: a queued task leaves the queue,
-  /// the active task is aborted through its [CancelToken]. Either way the
+  /// the active task is aborted through its [DownloadCancelToken]. Either way the
   /// state entry is dropped and the registry row + partial file are cleaned
   /// up (mirrors [removeDone]). Idle or done rows are a no-op.
   Future<void> cancelDownload(String rowId, int surahNumber) async {
