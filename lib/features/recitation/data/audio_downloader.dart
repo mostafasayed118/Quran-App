@@ -32,6 +32,7 @@ class AudioDownloader {
     this._db, {
     Dio? dio,
     Future<Directory> Function()? audioRootResolver,
+    this.retryDelay = const Duration(seconds: 3),
   })  : _dio = dio ??
             Dio(BaseOptions(
               connectTimeout: _connectTimeout,
@@ -42,6 +43,18 @@ class AudioDownloader {
   final AppDatabase _db;
   final Dio _dio;
   final Future<Directory> Function()? _audioRoot;
+
+  /// Pause before the single automatic retry of a failed transfer.
+  ///
+  /// Injected so tests can wait zero; null disables the retry entirely.
+  final Duration? retryDelay;
+
+  /// Hosts that answered a `Range` request with 200 (range unsupported).
+  ///
+  /// A cheap per-host capability probe: a host that ignored the header once is
+  /// not asked again for this process's lifetime, so a resume attempt costs a
+  /// whole-file download at most once per host.
+  final Set<String> _hostsWithoutRange = <String>{};
 
   /// Folder name under the app documents directory: 'audio'.
   static const audioFolderName = 'audio';
@@ -122,6 +135,7 @@ class AudioDownloader {
   Future<Response<ResponseBody>> _fetchTrustedRedirects(
     Uri start, {
     CancelToken? cancelToken,
+    int rangeFrom = 0,
   }) async {
     var current = start;
     for (var hop = 0; hop <= maxRedirectHops; hop++) {
@@ -132,6 +146,11 @@ class AudioDownloader {
           // Dio must hand every 3xx back instead of following it itself.
           followRedirects: false,
           validateStatus: _acceptSuccessOrRedirect,
+          // Re-sent on every hop on purpose: a CDN redirect must not silently
+          // turn a resume into a full download.
+          headers: rangeFrom > 0
+              ? <String, Object>{HttpHeaders.rangeHeader: 'bytes=$rangeFrom-'}
+              : null,
         ),
         cancelToken: cancelToken,
       );
@@ -239,8 +258,59 @@ class AudioDownloader {
     }
   }
 
+  /// Whether a failed attempt is worth one immediate retry.
+  ///
+  /// Network errors, timeouts, truncated/oversized bodies and the range
+  /// mismatch (the prefix was already discarded) are transient. A 4xx other
+  /// than 408/416/429 is a permanent answer (404 on a missing surah, 403 on a
+  /// blocked host) and retrying it would only burn the queue.
+  static bool _isRetryable(Object error) {
+    if (error is DownloadFailure) return true;
+    if (error is DioException) {
+      final status = error.response?.statusCode ?? 0;
+      if (status == 0) return true;
+      return status == 408 || status == 416 || status == 429 || status >= 500;
+    }
+    return false;
+  }
+
   /// Downloads one surah for [reciter]; reports progress and honours [cancelToken].
+  ///
+  /// Interrupted transfers resume: an existing `<target>.part` is continued
+  /// with an HTTP `Range` request when the host honours it (206), and the
+  /// transfer restarts from zero when it does not (200). The part survives a
+  /// failure on purpose, so the retry below (and the next user attempt) resumes
+  /// instead of re-downloading the whole surah.
   Future<File> downloadSurah({
+    required ReciterRow reciter,
+    required int surahNumber,
+    void Function(int received, int total)? onProgress,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      return await _downloadAttempt(
+        reciter: reciter,
+        surahNumber: surahNumber,
+        onProgress: onProgress,
+        cancelToken: cancelToken,
+      );
+    } on Object catch (error) {
+      final cancelled = cancelToken?.isCancelled ?? false;
+      final delay = retryDelay;
+      if (cancelled || delay == null || !_isRetryable(error)) rethrow;
+      // One resume retry: a flaky CDN hop must not cost the whole file.
+      await Future<void>.delayed(delay);
+      if (cancelToken?.isCancelled ?? false) rethrow;
+      return _downloadAttempt(
+        reciter: reciter,
+        surahNumber: surahNumber,
+        onProgress: onProgress,
+        cancelToken: cancelToken,
+      );
+    }
+  }
+
+  Future<File> _downloadAttempt({
     required ReciterRow reciter,
     required int surahNumber,
     void Function(int received, int total)? onProgress,
@@ -249,12 +319,18 @@ class AudioDownloader {
     final target = await _targetFile(reciter.id, surahNumber);
     final part = File('${target.path}.part');
     final url = surahAudioUrl(reciter.server, surahNumber);
-    await _markStatus(
-        reciter.id, surahNumber, DownloadStatus.downloading, 0, target.path);
+    final host = Uri.parse(url).host;
+    var resumeFrom = 0;
+    if (!_hostsWithoutRange.contains(host) && await part.exists()) {
+      resumeFrom = await part.length();
+    }
+    await _markStatus(reciter.id, surahNumber, DownloadStatus.downloading,
+        resumeFrom, target.path);
     try {
       final res = await _fetchTrustedRedirects(
         Uri.parse(url),
         cancelToken: cancelToken,
+        rangeFrom: resumeFrom,
       );
       final contentType =
           res.headers.value(Headers.contentTypeHeader)?.toLowerCase().trim();
@@ -262,14 +338,39 @@ class AudioDownloader {
         throw DownloadFailure(
             'audio response is an HTML page, not an audio stream');
       }
-      final total =
+      final status = res.statusCode ?? 0;
+      final declared =
           int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ??
               0;
+      var total = declared;
       var received = 0;
+      var append = false;
+      if (resumeFrom > 0) {
+        if (status == 206) {
+          final contentRange =
+              res.headers.value(HttpHeaders.contentRangeHeader);
+          final start = _rangeStart(contentRange);
+          if (start != resumeFrom) {
+            // The host resumed somewhere else: the prefix is unusable, so
+            // discard it and let the retry start over.
+            await part.delete();
+            throw DownloadFailure('host returned an unexpected range start');
+          }
+          append = true;
+          received = resumeFrom;
+          final full = _totalFromContentRange(contentRange);
+          if (full != null) total = full;
+        } else {
+          // The host ignored the Range header: remember it so the next
+          // attempt does not waste a round-trip, and start from zero.
+          _hostsWithoutRange.add(host);
+        }
+      }
       final throttle = ProgressThrottle();
       final body = res.data;
       if (body == null) throw DownloadFailure('empty audio response');
-      final sink = part.openWrite();
+      final sink =
+          part.openWrite(mode: append ? FileMode.append : FileMode.write);
       try {
         await for (final chunk in body.stream) {
           received += chunk.length;
@@ -293,12 +394,28 @@ class AudioDownloader {
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
       return promoted;
-    } on Object {
+    } on Object catch (error) {
+      // A 416 means the stored prefix no longer matches the resource: drop it
+      // so the retry downloads from zero instead of looping.
+      if (error is DioException && error.response?.statusCode == 416) {
+        if (await part.exists()) await part.delete();
+      }
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
-      if (await part.exists()) await part.delete();
       rethrow;
     }
+  }
+
+  /// The first byte of a `Content-Range: bytes <start>-<end>/<total>` header.
+  static int? _rangeStart(String? value) {
+    final match = RegExp(r'bytes\s+(\d+)-').firstMatch(value ?? '');
+    return match == null ? null : int.tryParse(match.group(1)!);
+  }
+
+  /// The complete size of a `Content-Range: bytes <start>-<end>/<total>` header.
+  static int? _totalFromContentRange(String? value) {
+    final match = RegExp(r'/(\d+)\s*$').firstMatch(value ?? '');
+    return match == null ? null : int.tryParse(match.group(1)!);
   }
 
   /// Moves [part] onto [target] without discarding the previous target until

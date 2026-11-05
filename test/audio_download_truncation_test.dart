@@ -81,7 +81,7 @@ class _ShortAdapter implements HttpClientAdapter {
 }
 
 void main() {
-  test('a body shorter than content-length is failed and leaves no file',
+  test('a body shorter than content-length leaves no final file, only a prefix',
       () async {
     final db = newTestDb();
     final root = await Directory.systemTemp.createTemp('qy_audio_short');
@@ -99,6 +99,8 @@ void main() {
       db,
       dio: Dio()..httpClientAdapter = _ShortAdapter(),
       audioRootResolver: () async => root,
+      // One attempt: the resume/retry contract has its own file.
+      retryDelay: null,
     );
 
     await expectLater(
@@ -109,7 +111,11 @@ void main() {
     final row = await (db.select(db.downloads)).getSingle();
     expect(row.status, 'failed');
     expect(File(row.path).existsSync(), isFalse);
-    expect(File('${row.path}.part').existsSync(), isFalse);
+    expect(
+      File('${row.path}.part').existsSync(),
+      isTrue,
+      reason: 'the prefix is kept so the next attempt resumes',
+    );
   });
 
   test('a failed retry keeps the previously downloaded file intact', () async {
@@ -126,6 +132,8 @@ void main() {
       db,
       dio: Dio()..httpClientAdapter = _ShortAdapter(),
       audioRootResolver: () async => root,
+      // One attempt: the resume/retry contract has its own file.
+      retryDelay: null,
     );
 
     await expectLater(
@@ -136,7 +144,11 @@ void main() {
     expect(target.existsSync(), isTrue,
         reason: 'a failed retry must not delete the previous file');
     expect(await target.readAsBytes(), oldBytes);
-    expect(File('${target.path}.part').existsSync(), isFalse);
+    expect(
+      File('${target.path}.part').existsSync(),
+      isTrue,
+      reason: 'the failed attempt leaves a resumable prefix',
+    );
     final row = await (db.select(db.downloads)).getSingle();
     expect(row.status, 'failed');
     expect(row.path, target.path);

@@ -97,6 +97,8 @@ Future<AudioDownloader> _downloader(
       db,
       dio: Dio()..httpClientAdapter = adapter,
       audioRootResolver: () async => root,
+      // One attempt: these tests pin the redirect guard, not the retry policy.
+      retryDelay: null,
     );
 
 void main() {
