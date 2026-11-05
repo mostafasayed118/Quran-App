@@ -8,6 +8,13 @@
 reliability on aggressive Android OEMs and storage transparency — and publish the trust
 policy that keeps the app's "free, no ads, no account, local data" promise auditable.
 
+> **Status — 2026-11-05: Task 1, Task 2 and Task 3 all landed; the boxes below are
+> ticked for that reason.** Evidence: `reminder_health_test` + the settings diagnostics
+> card (Task 1), `DownloadsSummary`/`summary()`/`removeAll()` + `downloads_summary_test`
+> and `downloads_screen_header_test` (Task 2), `principles_screen_test` (Task 3). Task 4
+> stays a decision gate with no code. Section 9 (duplicate Gradle files) is resolved: no
+> `*.gradle.kts` exists or is tracked.
+
 **Architecture:** every change is additive and stays inside the existing feature split
 (`lib/features/notifications`, `lib/features/recitation/presentation/downloads`,
 `lib/features/settings`). The only native surface is one small `MethodChannel` in
@@ -99,43 +106,43 @@ has no way to tell the user, and no way for the user to fix it.
 - `List<ReminderIssue> diagnoseReminders({required bool notificationsEnabled, required bool exactAlarmsAllowed, required bool? batteryOptimizationIgnored})`
   returning `ReminderIssue.notificationsOff`, `.exactAlarmsOff`, `.batteryRestricted`.
 
-- [ ] **Step 1: Write the failing unit test** for `diagnoseReminders` — four cases: all
+- [x] **Step 1: Write the failing unit test** for `diagnoseReminders` — four cases: all
   healthy → empty; notifications off; exact alarms off; `batteryOptimizationIgnored == false`
   → `batteryRestricted`; `batteryOptimizationIgnored == null` → no battery issue.
-- [ ] **Step 2: Run it** — `flutter test test/reminder_health_test.dart` → fails
+- [x] **Step 2: Run it** — `flutter test test/reminder_health_test.dart` → fails
   (`diagnoseReminders` not defined).
-- [ ] **Step 3: Implement `reminder_diagnostics.dart`** — the enum, the pure function, the
+- [x] **Step 3: Implement `reminder_diagnostics.dart`** — the enum, the pure function, the
   abstract class. No Flutter imports.
-- [ ] **Step 4: Re-run** → passes.
-- [ ] **Step 5: Write the failing channel test** with a fake `MethodChannel`
+- [x] **Step 4: Re-run** → passes.
+- [x] **Step 5: Write the failing channel test** with a fake `MethodChannel`
   (`TestDefaultBinaryMessengerBinding`) asserting the three reads map to the Kotlin names
   `notificationsEnabled`, `exactAlarmsAllowed`, `batteryOptimizationIgnored`, and that a
   `PlatformException` maps to `null` rather than throwing.
-- [ ] **Step 6: Implement `reminder_diagnostics_channel.dart`** — `MethodChannel('quran_yahdi/reminder_diagnostics')`,
+- [x] **Step 6: Implement `reminder_diagnostics_channel.dart`** — `MethodChannel('quran_yahdi/reminder_diagnostics')`,
   wrap every call in `try/catch (PlatformException) => null`.
-- [ ] **Step 7: Implement the Kotlin side** in `MainActivity.configureFlutterEngine`:
+- [x] **Step 7: Implement the Kotlin side** in `MainActivity.configureFlutterEngine`:
   `areNotificationsEnabled()` via `NotificationManagerCompat`; exact alarms via
   `AlarmManager.canScheduleExactAlarms()` (guarded by `Build.VERSION >= S`);
   battery via `PowerManager.isIgnoringBatteryOptimizations(packageName)`; two open
   methods firing `ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS` and
   `ACTION_REQUEST_SCHEDULE_EXACT_ALARM`. Return `null` from the battery read when the
   OEM API throws.
-- [ ] **Step 8: Write the failing widget test** — pump the settings section with a fake
+- [x] **Step 8: Write the failing widget test** — pump the settings section with a fake
   `ReminderDiagnostics` in three states (healthy → no rows; one issue → that row + fix
   button; battery unknown → instruction row, no button). Assert the card also builds at
   `textScaler: TextScaler.linear(2.0)` without overflow. Use bounded pumps, no
   `pumpAndSettle`.
-- [ ] **Step 9: Add the UI** — a `_ReminderReliabilitySection` in `settings_screen.dart`
+- [x] **Step 9: Add the UI** — a `_ReminderReliabilitySection` in `settings_screen.dart`
   that reads diagnostics in `initState`, re-reads on `WidgetsBindingObserver.didChangeAppLifecycleState == resumed`,
   and renders one `ListTile` per issue with a "إصلاح" trailing action. Add l10n keys
   `reminderReliabilityTitle`, `reminderReliabilityIntro`, `reminderIssueNotifications`,
   `reminderIssueExactAlarms`, `reminderIssueBattery`, `reminderIssueBatteryUnknown`,
   `reminderFixAction`.
-- [ ] **Step 10: Register the implementation** in `lib/app/di/injector.dart` as a lazy singleton.
-- [ ] **Step 11: Gates** — `dart format`, `flutter analyze` (0), `flutter test` (full suite),
+- [x] **Step 10: Register the implementation** in `lib/app/di/injector.dart` as a lazy singleton.
+- [x] **Step 11: Gates** — `dart format`, `flutter analyze` (0), `flutter test` (full suite),
   then manual device check on the Infinix X6882: deny notifications → row appears → tap
   fix → grant → row clears after resume.
-- [ ] **Step 12: Commit** — `feat(settings): surface reminder permissions and OEM battery restrictions`.
+- [x] **Step 12: Commit** — `feat(settings): surface reminder permissions and OEM battery restrictions`.
 
 ## 5. Task 2 — Storage transparency (P0)
 
@@ -157,21 +164,21 @@ much space the app holds, and cannot free it in one action.
   existing `removeDone(rowId, surahNumber)`; stops at the first failure and rethrows so
   the screen can show the error pane.
 
-- [ ] **Step 1: Write the failing cubit test** — fake repository with three installed rows
+- [x] **Step 1: Write the failing cubit test** — fake repository with three installed rows
   (1 MB, 2 MB, 3 MB) → `summary()` returns `count: 3, bytes: 6 MB`; empty → zeroes.
-- [ ] **Step 2: Run it** → fails.
-- [ ] **Step 3: Implement `DownloadsSummary` + `summary()`**.
-- [ ] **Step 4: Re-run** → passes.
-- [ ] **Step 5: Write the failing `removeAll` test** — three rows → all removed, one repo
+- [x] **Step 2: Run it** → fails.
+- [x] **Step 3: Implement `DownloadsSummary` + `summary()`**.
+- [x] **Step 4: Re-run** → passes.
+- [x] **Step 5: Write the failing `removeAll` test** — three rows → all removed, one repo
   failure → earlier removals kept, error propagates.
-- [ ] **Step 6: Implement `removeAll()`**.
-- [ ] **Step 7: Write the failing widget test** — header shows `loc.downloadsTotal`
+- [x] **Step 6: Implement `removeAll()`**.
+- [x] **Step 7: Write the failing widget test** — header shows `loc.downloadsTotal`
   formatted with `format_bytes` and the row count; empty state shows no header.
-- [ ] **Step 8: Add the header + "حذف الكل"** — a `ListTile`-free summary card above the
+- [x] **Step 8: Add the header + "حذف الكل"** — a `ListTile`-free summary card above the
   list, trailing `TextButton` guarded by the existing `confirm_delete_dialog`; add l10n
   keys `downloadsTotal`, `downloadsCount`, `downloadsDeleteAll`, `downloadsDeleteAllBody`.
-- [ ] **Step 9: Gates** — format, analyze, full test suite.
-- [ ] **Step 10: Commit** — `feat(downloads): show total storage use and allow deleting all downloads`.
+- [x] **Step 9: Gates** — format, analyze, full test suite.
+- [x] **Step 10: Commit** — `feat(downloads): show total storage use and allow deleting all downloads`.
 
 ## 6. Task 3 — Principles page (P1, no risk)
 
@@ -192,14 +199,14 @@ This is a static page; it creates no new behaviour.
 3. التلاوات منسوبة لأصحابها — أي قائمة مستقبلية تُراجع بشريًا قبل النشر.
 4. إن أضفنا يومًا ميزة مدفوعة، تبقى كل الميزات الحالية مجانية.
 
-- [ ] **Step 1: Write the failing widget test** — route `/settings/principles` renders the
+- [x] **Step 1: Write the failing widget test** — route `/settings/principles` renders the
   four headings; textScale 2.0 renders without overflow.
-- [ ] **Step 2: Run it** → fails (route missing).
-- [ ] **Step 3: Add route + screen + settings entry** (`ListTile` under the licenses row).
-- [ ] **Step 4: Add l10n keys** `principlesTitle` + `principlesFree`, `principlesNoAccount`,
+- [x] **Step 2: Run it** → fails (route missing).
+- [x] **Step 3: Add route + screen + settings entry** (`ListTile` under the licenses row).
+- [x] **Step 4: Add l10n keys** `principlesTitle` + `principlesFree`, `principlesNoAccount`,
   `principlesAttribution`, `principlesFuturePaid`.
-- [ ] **Step 5: Gates** — format, analyze, full suite, plus a device render at textScale 2.0.
-- [ ] **Step 6: Commit** — `feat(settings): add the principles page`.
+- [x] **Step 5: Gates** — format, analyze, full suite, plus a device render at textScale 2.0.
+- [x] **Step 6: Commit** — `feat(settings): add the principles page`.
 
 ## 7. Task 4 — Curated packs: decision gate, no code (P1, blocked)
 
