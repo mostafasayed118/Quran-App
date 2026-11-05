@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/fake_playback_service.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -17,7 +19,6 @@ import 'package:quran_yahdi/features/quran/presentation/reader/reader_cubit.dart
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_screen.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
-import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
@@ -36,29 +37,6 @@ class _FakeUthmani implements UthmaniTextSource {
   @override
   Future<Map<int, String>> forSurah(int surahId) async =>
       {for (var i = 1; i <= 12; i++) i: 'آيَةٌ $i'};
-}
-
-class _FakePlaybackService implements PlaybackService {
-  @override
-  Stream<bool> playingStream() => const Stream<bool>.empty();
-
-  @override
-  Stream<Duration> positionStream() => const Stream<Duration>.empty();
-
-  @override
-  Stream<Duration?> durationStream() => const Stream<Duration?>.empty();
-
-  @override
-  Future<void> loadAndPlay(PlaybackSource source) async {}
-
-  @override
-  Future<void> pause() async {}
-
-  @override
-  Future<void> resume() async {}
-
-  @override
-  Future<void> stop() async {}
 }
 
 /// Private-use codepoints are how the bundled Hafs font encodes glyphs; they
@@ -102,7 +80,7 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
     final playbackCubit = PlaybackCubit(
-      service: _FakePlaybackService(),
+      service: FakePlaybackService(),
       reciters: ReciterRepository(db),
       downloader: AudioDownloader(db,
           audioRootResolver: () async => Directory.systemTemp),

@@ -1,4 +1,8 @@
+export 'support/fakes.dart' show cairoCity;
+
 import 'package:flutter_test/flutter_test.dart';
+
+import 'support/fakes.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
@@ -19,14 +23,6 @@ class FakePrayerTimeService implements PrayerTimeService {
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) => nextResult!;
 }
-
-const cairoCity = City(
-  id: 'cairo',
-  nameAr: 'القاهرة',
-  nameEn: 'Cairo',
-  lat: 30.0444,
-  lng: 31.2357,
-);
 
 const dubaiCity = City(
   id: 'dubai',

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/fakes.dart';
+
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/home/presentation/home_cubit.dart';
 import 'package:quran_yahdi/features/home/presentation/home_state.dart';
@@ -12,14 +14,6 @@ import 'package:quran_yahdi/features/quran/data/ayah_source.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_source.dart';
 
 import 'support/test_db.dart';
-
-const cairoCity = City(
-  id: 'cairo',
-  nameAr: 'القاهرة',
-  nameEn: 'Cairo',
-  lat: 30.0444,
-  lng: 31.2357,
-);
 
 /// Blocks the last-read chain until the test releases it, so the next-prayer
 /// chain's start time is observable.

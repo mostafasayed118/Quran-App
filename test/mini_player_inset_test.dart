@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support/fake_playback_service.dart';
+
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -15,7 +17,7 @@ import 'package:quran_yahdi/features/recitation/presentation/playback/playback_c
 import 'support/host.dart';
 import 'support/test_db.dart';
 
-class _FakePlaybackService implements PlaybackService {
+class _FakePlaybackService extends FakePlaybackService {
   final playing = StreamController<bool>.broadcast();
   final positionCtrl = StreamController<Duration>.broadcast();
   final durationCtrl = StreamController<Duration?>.broadcast();
