@@ -1200,3 +1200,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Push proof (2026-11-05):** code tip `6462a7e` landed on `main` (`e9652b4..6462a7e`); at push time `git ls-remote` matched the local tip and unpushed was 0; branch `wave/technical-debt-closeout` deleted (local and remote); trail #4 closed with **0 open findings**. The docs close-out commits follow on `main`.
 - **Not done:** the structural `SurahSummary.revelationType` enum and a generic preference controller were deliberately not introduced (the mapping now normalizes/logs and the two 26-line repositories are documented twins).
 
+
+### 2026-11-05 — Device smoke follow-up: adhan raw resources (release blocker) — ON MAIN
+- **Device:** Infinix X6882 · Android 14 (SDK 34) · `13372704AR007777` · package `com.mostafasayed.quranyahdi` · release APK `versionCode 4`.
+- **What passed:** cold launch; onboarding city picker (Cairo selected, returned to the flow); POST_NOTIFICATIONS granted; SCHEDULE_EXACT_ALARM allowed; **55 exact alarms** over the 7-day horizon (wird 20:00, Fajr 04:44, Dhuhr 11:40, Asr 14:42, Maghrib 17:04, Isha 18:24); a **live azkar notification** at 19:05 (channel `quran_yahdi_reminders`, id 2, «أذكار الصباح») with tap routing to **الأذكار**; qibla live compass («المقياس حي», `١٣٦° عن الشمال`, turn hint `٦١°`→`٦٠°`); WorkManager periodic job `#0` ran and `#1` was scheduled (`+13m34s`), app `exempted`/`WHITELISTED`; the battery reliability card detected the restriction and cleared after `cmd deviceidle whitelist`.
+- **Finding (release blocker):** `shrinkResources` removed `android/app/src/main/res/raw/*_clip.m4a` — the clips are referenced only from Dart by name (`RawResourceAndroidNotificationSound`), so the release APK had **no raw adhan resources**. Scheduling with a selected adhan threw, canceled the armed plan, and left no prayer alarms. The new `scheduleFailed` row surfaced it on the device.
+- **Fix (`e3a879d`):** `android/app/src/main/res/raw/keep.xml` with `tools:keep="@raw/*_clip"`. Rebuilt release APK: all 9 raw clips present, 55 exact alarms, live azkar notification + tap routing. Rebuilt AAB: `89,355,228 B`, SHA-256 `5DBE838FDA03FB16D6CB7361F97A976ECE8722C1782772E3123CDF5B8AFF7D5F`, versionCode 4, owner cert, `jarsigner` verified, 16 KB verified.
+- **Gates:** full suite **1278/1278** · format 0 · analyze 0 at `e3a879d`; CI follows the push.
+- **Evidence:** `docs/superpowers/audits/2026-11-05-device-smoke.md` + screenshots/dumps in `C:\Users\ASUS\AppData\Local\Temp\opencode\device_smoke_2026-11-05\`.
+- **Open:** Play App Signing SHA-256 into `web/public/.well-known/assetlinks.json` after the first upload, licensing written terms, and a final signed-device smoke on the store artifact after upload.
+
