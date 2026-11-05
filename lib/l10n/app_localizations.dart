@@ -488,6 +488,48 @@ abstract class AppLocalizations {
   /// **'تم إزالة الحفظ'**
   String get bookmarkRemoved;
 
+  /// No description provided for @bookmarkEdit.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعديل الملاحظة والمجلد'**
+  String get bookmarkEdit;
+
+  /// No description provided for @bookmarkMetaSave.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get bookmarkMetaSave;
+
+  /// No description provided for @bookmarkFolder.
+  ///
+  /// In ar, this message translates to:
+  /// **'المجلد'**
+  String get bookmarkFolder;
+
+  /// No description provided for @bookmarkNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة'**
+  String get bookmarkNote;
+
+  /// No description provided for @bookmarkFolderHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المجلد (اختياري)'**
+  String get bookmarkFolderHint;
+
+  /// No description provided for @bookmarkNoteHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ملاحظة (اختياري)'**
+  String get bookmarkNoteHint;
+
+  /// No description provided for @bookmarkFolderEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد علامات في هذا المجلد'**
+  String get bookmarkFolderEmpty;
+
   /// No description provided for @shareAyah.
   ///
   /// In ar, this message translates to:

@@ -47,6 +47,7 @@ abstract final class AppRoutes {
   /// allowed and pops normally.
   static const onboardingCity = '/onboarding/city';
   static const bookmarks = '/bookmarks';
+  static const bookmarksFolder = '/bookmarks/folder';
 }
 
 abstract final class AppRouteQuery {
@@ -55,6 +56,7 @@ abstract final class AppRouteQuery {
   static const pack = 'pack';
   static const row = 'row';
   static const q = 'q';
+  static const name = 'name';
 }
 
 /// `/quran/search[?q={query}]`
@@ -82,3 +84,8 @@ String hadithBrowsePath(String packId) =>
 
 String reciterSurahsPath(String rowId) =>
     '${AppRoutes.reciter}?${AppRouteQuery.row}=${Uri.encodeComponent(rowId)}';
+
+/// `/bookmarks/folder?name={folder}`
+String bookmarksFolderPath(String name) =>
+    '${AppRoutes.bookmarksFolder}?${AppRouteQuery.name}='
+    '${Uri.encodeQueryComponent(name)}';

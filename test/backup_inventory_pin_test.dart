@@ -8,6 +8,7 @@ import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+import 'package:quran_yahdi/features/quran/data/bookmark_meta_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/ramadan/data/qada_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -40,6 +41,7 @@ void main() {
     expect(backupKeyReaderFontScale, ReaderSettingsRepository.fontScaleKey);
     expect(backupKeyReaderLineHeight, ReaderSettingsRepository.lineHeightKey);
     expect(backupKeyHijriDayOffset, HijriOffsetRepository.key);
+    expect(backupKeyBookmarkMeta, BookmarkMetaRepository.key);
     expect(backupKeyQadaMissedFasts, QadaRepository.key);
     expect(
       backupKeyAzkarProgress,
@@ -88,6 +90,7 @@ void main() {
       ReaderSettingsRepository.fontScaleKey,
       ReaderSettingsRepository.lineHeightKey,
       HijriOffsetRepository.key,
+      BookmarkMetaRepository.key,
       QadaRepository.key,
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,

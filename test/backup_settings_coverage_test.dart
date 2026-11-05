@@ -9,6 +9,7 @@ import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+import 'package:quran_yahdi/features/quran/data/bookmark_meta_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/ramadan/data/qada_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -54,6 +55,8 @@ void main() {
     HijriOffsetRepository.key,
     // Missed fasts (ramadan/qada_repository.dart).
     QadaRepository.key,
+    // Bookmark folders and notes (quran/bookmark_meta_repository.dart).
+    BookmarkMetaRepository.key,
     // Azkar session state (azkar/azkar_saved_state_repository.dart).
     AzkarSavedStateRepository.progressKey,
     AzkarSavedStateRepository.favoritesKey,
@@ -125,6 +128,7 @@ void main() {
       ReaderSettingsRepository.lineHeightKey,
       HijriOffsetRepository.key,
       QadaRepository.key,
+      BookmarkMetaRepository.key,
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,
       selectedMoshafKey,

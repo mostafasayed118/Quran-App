@@ -224,6 +224,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkRemoved => 'Bookmark removed';
 
   @override
+  String get bookmarkEdit => 'Edit note and folder';
+
+  @override
+  String get bookmarkMetaSave => 'Save';
+
+  @override
+  String get bookmarkFolder => 'Folder';
+
+  @override
+  String get bookmarkNote => 'Note';
+
+  @override
+  String get bookmarkFolderHint => 'Folder name (optional)';
+
+  @override
+  String get bookmarkNoteHint => 'Note (optional)';
+
+  @override
+  String get bookmarkFolderEmpty => 'No bookmarks in this folder';
+
+  @override
   String get shareAyah => 'Share verse';
 
   @override

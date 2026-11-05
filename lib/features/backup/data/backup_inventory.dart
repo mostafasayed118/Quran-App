@@ -62,6 +62,9 @@ const String backupKeyReaderLineHeight = 'reader_line_height';
 /// `lib/features/hijri/data/hijri_offset_repository.dart`.
 const String backupKeyHijriDayOffset = 'hijri_day_offset';
 
+/// `lib/features/quran/data/bookmark_meta_repository.dart`.
+const String backupKeyBookmarkMeta = 'bookmark_meta_v1';
+
 /// `lib/features/ramadan/data/qada_repository.dart`.
 const String backupKeyQadaMissedFasts = 'qada_missed_fasts_v1';
 
@@ -107,6 +110,7 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyReaderFontScale,
   backupKeyReaderLineHeight,
   backupKeyHijriDayOffset,
+  backupKeyBookmarkMeta,
   backupKeyQadaMissedFasts,
   backupKeyAzkarProgress,
   backupKeyAzkarFavorites,

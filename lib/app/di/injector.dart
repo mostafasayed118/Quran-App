@@ -56,6 +56,8 @@ import 'package:quran_yahdi/features/qibla/data/compass_calibration.dart';
 import 'package:quran_yahdi/features/qibla/data/heading_service.dart';
 import 'package:quran_yahdi/features/qibla/data/qibla_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
+import 'package:quran_yahdi/features/quran/data/bookmark_meta.dart';
+import 'package:quran_yahdi/features/quran/data/bookmark_meta_repository.dart';
 import 'package:quran_yahdi/features/quran/data/juz_index_source.dart';
 import 'package:quran_yahdi/features/quran/data/juz_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
@@ -145,6 +147,10 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
+  getIt.registerLazySingleton<BookmarkMetaRepository>(
+      () => BookmarkMetaRepository(db));
+  getIt.registerLazySingleton<BookmarkMetaSource>(
+      () => getIt<BookmarkMetaRepository>());
   // Unicode Uthmani reading assets (OFL). Separate from the DB on purpose:
   // no migration, and a missing asset only disables selection for that surah.
   getIt.registerLazySingleton<UthmaniTextSource>(

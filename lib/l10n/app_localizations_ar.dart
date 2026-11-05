@@ -223,6 +223,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarkRemoved => 'تم إزالة الحفظ';
 
   @override
+  String get bookmarkEdit => 'تعديل الملاحظة والمجلد';
+
+  @override
+  String get bookmarkMetaSave => 'حفظ';
+
+  @override
+  String get bookmarkFolder => 'المجلد';
+
+  @override
+  String get bookmarkNote => 'ملاحظة';
+
+  @override
+  String get bookmarkFolderHint => 'اسم المجلد (اختياري)';
+
+  @override
+  String get bookmarkNoteHint => 'ملاحظة (اختياري)';
+
+  @override
+  String get bookmarkFolderEmpty => 'لا توجد علامات في هذا المجلد';
+
+  @override
   String get shareAyah => 'مشاركة الآية';
 
   @override

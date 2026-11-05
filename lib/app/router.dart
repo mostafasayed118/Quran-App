@@ -58,6 +58,7 @@ import '../core/domain/onboarding_status.dart';
 import '../features/onboarding/presentation/onboarding_cubit.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/quran/data/ayah_repository.dart';
+import '../features/quran/data/bookmark_meta.dart';
 import '../features/quran/data/juz_index_source.dart';
 import '../features/quran/data/page_anchor_source.dart';
 import '../features/quran/data/reader_layout_source.dart';
@@ -66,8 +67,11 @@ import '../features/quran/data/last_read_repository.dart';
 import '../features/quran/data/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
 import '../features/quran/data/uthmani_text_source.dart';
+import '../features/quran/presentation/bookmarks/bookmark_meta_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
+import '../features/quran/presentation/bookmarks/folder_bookmarks_cubit.dart';
+import '../features/quran/presentation/bookmarks/folder_bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
 import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/index/juz_index_cubit.dart';
@@ -577,15 +581,40 @@ abstract final class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.bookmarks,
-        builder: (_, __) => RouteCubitScope<BookmarksCubit>(
-          create: () => BookmarksCubit(
-            getIt<AyahRepository>(),
-            pager: getIt<AyahRepository>(),
+        builder: (_, __) => MultiBlocProvider(
+          providers: [
+            BlocProvider<BookmarkMetaCubit>(
+              create: (_) =>
+                  BookmarkMetaCubit(source: getIt<BookmarkMetaSource>())
+                    ..start(),
+            ),
+          ],
+          child: RouteCubitScope<BookmarksCubit>(
+            create: () => BookmarksCubit(
+              getIt<AyahRepository>(),
+              pager: getIt<AyahRepository>(),
+            ),
+            identity: AppRoutes.bookmarks,
+            start: (cubit) => cubit.start(),
+            child: const BookmarksScreen(showMeta: true),
           ),
-          identity: AppRoutes.bookmarks,
-          start: (cubit) => cubit.start(),
-          child: const BookmarksScreen(),
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.bookmarksFolder,
+        builder: (context, state) {
+          final folder = state.uri.queryParameters[AppRouteQuery.name] ?? '';
+          return RouteCubitScope<FolderBookmarksCubit>(
+            create: () => FolderBookmarksCubit(
+              folder: folder,
+              meta: getIt<BookmarkMetaSource>(),
+              ayahs: getIt<AyahLookup>(),
+            ),
+            identity: folder,
+            start: (cubit) => cubit.start(),
+            child: FolderBookmarksScreen(folder: folder),
+          );
+        },
       ),
     ],
   );
