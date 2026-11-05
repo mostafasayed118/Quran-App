@@ -281,10 +281,11 @@ class AudioDownloader {
 
   /// Whether a failed attempt is worth one immediate retry.
   ///
-  /// Network errors, timeouts, truncated/oversized bodies and the range
-  /// mismatch (the prefix was already discarded) are transient. A 4xx other
-  /// than 408/416/429 is a permanent answer (404 on a missing surah, 403 on a
-  /// blocked host) and retrying it would only burn the queue.
+  /// Network errors, timeouts, truncated bodies and the range mismatch (the
+  /// prefix was already discarded) are transient. A body that exceeds its
+  /// declared size is a lying host and is marked permanent, like a 4xx other
+  /// than 408/416/429 (404 on a missing surah, 403 on a blocked host): retrying
+  /// those would only burn the queue.
   static bool _isRetryable(Object error) {
     if (error is DownloadFailure) return error.retryable;
     if (error is DioException) {
