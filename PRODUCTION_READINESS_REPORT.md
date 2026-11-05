@@ -1,6 +1,12 @@
 # Production Readiness Audit — Quran Yahdi (`quran_yahdi`)
 
-> **Verdict: NOT PRODUCTION-READY for a public Android release at this commit.**
+> **Status — 2026-11-05:** this is a snapshot at `d39c1f7`. The P0 code items
+> (reminder engine, CI gating, R8/shrink) are closed on `e9652b4`; the
+> remaining P0s are the signed-artifact rebuild/versionCode, Play App Signing
+> in `assetlinks.json`, licensing sign-off, and a signed-device smoke. See
+> `docs/campaign-ledger.md` for the wave records.
+>
+> **Verdict (at the snapshot commit): NOT PRODUCTION-READY for a public Android release at this commit.**
 > The engineering foundations are strong, but four confirmed release blockers, a cluster of
 > high-severity reliability and data-integrity defects, and a store-readiness gap make a
 > public upload unsafe today. The application is a credible **internal / closed-testing
