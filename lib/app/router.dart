@@ -482,6 +482,20 @@ abstract final class AppRouter {
           start: (cubit) => cubit.start(),
           child: const OnboardingScreen(),
         ),
+        routes: [
+          GoRoute(
+            path: 'city',
+            builder: (_, __) => RouteCubitScope<CityPickerCubit>(
+              create: () => CityPickerCubit(
+                cityRepo: getIt<CityRepository>(),
+                location: getIt<LocationService>(),
+              ),
+              identity: AppRoutes.onboardingCity,
+              start: (cubit) => cubit.start(),
+              child: const CityPickerScreen(),
+            ),
+          ),
+        ],
       ),
       GoRoute(
         path: AppRoutes.reciter,

@@ -34,6 +34,15 @@ abstract final class AppRoutes {
   static const principles = '/settings/principles';
   static const adhanPicker = '/settings/adhan';
   static const onboarding = '/onboarding';
+
+  /// The city picker **inside** the onboarding flow.
+  ///
+  /// A separate path on purpose: while the flag is unset the gate sends every
+  /// non-onboarding route back to the flow, so pushing the standalone picker
+  /// (`/prayer-times/city`) would leave the picker as the only page and its
+  /// `pop` would have nothing to return to. A sub-route of the flow stays
+  /// allowed and pops normally.
+  static const onboardingCity = '/onboarding/city';
   static const bookmarks = '/bookmarks';
 }
 

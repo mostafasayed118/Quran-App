@@ -69,7 +69,7 @@ Widget _host({required Widget home}) {
     routes: [
       GoRoute(path: '/', builder: (_, __) => home),
       GoRoute(
-        path: AppRoutes.cityPicker,
+        path: AppRoutes.onboardingCity,
         builder: (_, __) => const Scaffold(body: Text('city-picker')),
       ),
     ],
@@ -110,6 +110,33 @@ void main() {
     expect(find.text('اختر مدينتك'), findsOneWidget);
     expect(find.text('تفعيل تذكير الصلوات'), findsOneWidget);
     expect(find.text('ابدأ الاستخدام'), findsOneWidget);
+  });
+
+  testWidgets('the city step opens the flow-scoped picker route',
+      (tester) async {
+    final cubit = OnboardingCubit(
+      city: _City(null),
+      status: _Status(),
+      reminders: _Scheduler(),
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await tester.pumpWidget(_host(
+      home: BlocProvider<OnboardingCubit>.value(
+        value: cubit,
+        child: const OnboardingScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('اختر مدينتك'));
+    await tester.pumpAndSettle();
+
+    // A sub-route of the flow, not the standalone picker: while the flag is
+    // unset the gate redirects every other route, which used to collapse the
+    // picker to a single page and break its pop.
+    expect(find.text('city-picker'), findsOneWidget);
   });
 
   testWidgets('start stores the flag', (tester) async {

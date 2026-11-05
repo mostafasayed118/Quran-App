@@ -96,7 +96,11 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
   String? decide(String location) {
     final completed = _completed;
     if (completed == null) return null;
-    final atOnboarding = location == AppRoutes.onboarding;
+    // Any route inside the flow (`/onboarding`, `/onboarding/city`, ...) is
+    // part of the flow: redirecting those would collapse the pushed page and
+    // leave its `pop` with nothing to return to.
+    final atOnboarding = location == AppRoutes.onboarding ||
+        location.startsWith('${AppRoutes.onboarding}/');
     if (!completed) {
       if (atOnboarding) return null;
       _pendingLocation = location;

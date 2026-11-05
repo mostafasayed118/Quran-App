@@ -92,7 +92,7 @@ class _Steps extends StatelessWidget {
           done: citySelected,
           actionLabel: citySelected ? loc.onboardingChangeCity : null,
           onTap: () async {
-            await context.push(AppRoutes.cityPicker);
+            await context.push(AppRoutes.onboardingCity);
             await cubit.refreshCity();
           },
         ),

@@ -44,6 +44,9 @@ void main() {
     expect(gate.decide(AppRoutes.quran), AppRoutes.onboarding);
     // Already on the flow: stay.
     expect(gate.decide(AppRoutes.onboarding), isNull);
+    // Sub-routes of the flow stay too: redirecting them would collapse the
+    // pushed page and leave its pop with nothing to return to.
+    expect(gate.decide(AppRoutes.onboardingCity), isNull);
   });
 
   test('the blocked route is restored after the flow', () async {
