@@ -2,6 +2,9 @@ import '../../../core/db/app_database.dart';
 import '../../../core/domain/app_theme.dart';
 
 /// Stores the appearance preference in the local settings table.
+///
+/// Deliberately a twin of `AppLocaleRepository`: two 26-line classes stay
+/// obvious, and a generic is only worth it when a third preference appears.
 class AppThemeRepository implements AppThemeSource {
   /// Creates the repository over the app database.
   AppThemeRepository(this._db);

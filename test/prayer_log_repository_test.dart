@@ -15,8 +15,11 @@ void main() {
   });
 
   test('toggle-on persists and re-reads', () async {
-    await repo.togglePrayer(DateTime.now(), PrayerSlot.fajr);
-    final day = await repo.dayView(DateTime.now());
+    // One read: two `DateTime.now()` calls can straddle midnight and make the
+    // write and the read land on different days.
+    final now = DateTime.now();
+    await repo.togglePrayer(now, PrayerSlot.fajr);
+    final day = await repo.dayView(now);
     expect(day.fajr, isTrue);
     expect(day.dhuhr, isFalse);
     expect(day.anyMarked, isTrue);

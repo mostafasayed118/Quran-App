@@ -33,14 +33,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await migrator.createAll();
           }
-          if (from < 3) {
-            // v3 records the derived-schema contract (and is the baseline for
-            // the drift snapshot). The full-table scans stop because of the
-            // index guards inside the shared function, not because of this
-            // call; this is a safety net for a file that lost an object before
-            // the bump.
-            await _ensureDerivedSchema();
-          }
+          // No v3 step: the derived objects and the duplicate repair are a
+          // startup invariant (beforeOpen), guarded by sqlite_master so a
+          // healthy file pays two lookups. Calling the same function here
+          // would run it twice on one upgrade for no extra effect.
         },
         beforeOpen: (details) async {
           // Non-destructive, O(1) on a healthy file: the bundled asset DB ships

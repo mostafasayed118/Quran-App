@@ -2,6 +2,9 @@ import '../../../core/db/app_database.dart';
 import '../../../core/domain/app_locale.dart';
 
 /// Stores the language preference in the local settings table.
+///
+/// Deliberately a twin of `AppThemeRepository`: two 26-line classes stay
+/// obvious, and a generic is only worth it when a third preference appears.
 class AppLocaleRepository implements AppLocaleSource {
   /// Creates the repository over the app database.
   AppLocaleRepository(this._db);

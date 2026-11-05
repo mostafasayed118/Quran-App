@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/theme/app_colors.dart';
-import 'package:quran_yahdi/core/theme/wcag_contrast.dart';
+import 'support/wcag_contrast.dart';
 
 void main() {
   const cardBackground = 0xFFFDF7;
