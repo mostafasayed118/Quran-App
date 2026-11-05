@@ -65,6 +65,11 @@ const String backupKeyHijriDayOffset = 'hijri_day_offset';
 /// `lib/features/quran/data/bookmark_meta_repository.dart`.
 const String backupKeyBookmarkMeta = 'bookmark_meta_v1';
 
+/// `lib/features/library/data/hadith_bookmark_repository.dart` and
+/// `hadith_position_repository.dart`.
+const String backupKeyHadithBookmarks = 'hadith_bookmarks_v1';
+const String backupKeyHadithPositions = 'hadith_positions_v1';
+
 /// `lib/features/ramadan/data/qada_repository.dart`.
 const String backupKeyQadaMissedFasts = 'qada_missed_fasts_v1';
 
@@ -111,6 +116,8 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyReaderLineHeight,
   backupKeyHijriDayOffset,
   backupKeyBookmarkMeta,
+  backupKeyHadithBookmarks,
+  backupKeyHadithPositions,
   backupKeyQadaMissedFasts,
   backupKeyAzkarProgress,
   backupKeyAzkarFavorites,

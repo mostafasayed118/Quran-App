@@ -1036,6 +1036,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hadithEmpty => 'لا توجد أحاديث في هذه الحزمة';
 
   @override
+  String get hadithSearchHint => 'ابحث في الأحاديث';
+
+  @override
+  String get hadithSearchEmpty => 'لا توجد نتائج';
+
+  @override
+  String get hadithBookmarks => 'الأحاديث المحفوظة';
+
+  @override
+  String get hadithNoBookmarks => 'لا توجد أحاديث محفوظة';
+
+  @override
+  String get hadithShowAll => 'عرض الكل';
+
+  @override
+  String get hadithBookmark => 'حفظ الحديث';
+
+  @override
+  String get hadithUnbookmark => 'إزالة الحفظ';
+
+  @override
   String get languageArabic => 'العربية';
 
   @override

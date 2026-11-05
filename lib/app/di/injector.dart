@@ -38,6 +38,9 @@ import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_offset_source.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_service.dart';
 import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
+import 'package:quran_yahdi/features/library/data/hadith_bookmark_repository.dart';
+import 'package:quran_yahdi/features/library/data/hadith_personal.dart';
+import 'package:quran_yahdi/features/library/data/hadith_position_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/library/data/pack_translation_search_source.dart';
@@ -286,6 +289,14 @@ Future<void> configureDependencies({
     getIt.registerLazySingleton<TranslationSearchSource>(
         () => PackTranslationSearchSource(getIt<PackDownloader>()));
   }
+  getIt.registerLazySingleton<HadithBookmarkRepository>(
+      () => HadithBookmarkRepository(db));
+  getIt.registerLazySingleton<HadithBookmarkSource>(
+      () => getIt<HadithBookmarkRepository>());
+  getIt.registerLazySingleton<HadithPositionRepository>(
+      () => HadithPositionRepository(db));
+  getIt.registerLazySingleton<HadithPositionSource>(
+      () => getIt<HadithPositionRepository>());
   getIt.registerLazySingleton<JustAudioPlaybackService>(
       () => JustAudioPlaybackService());
   getIt.registerLazySingleton<PlaybackService>(

@@ -145,8 +145,15 @@ extension HadithStatePatterns on HadithState {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
-    TResult Function(String packTitle, String language, List<HadithItem> items,
-            int offset, bool hasMore)?
+    TResult Function(
+            String packTitle,
+            String language,
+            List<HadithItem> items,
+            int offset,
+            bool hasMore,
+            String query,
+            bool bookmarksOnly,
+            Set<int> bookmarked)?
         ready,
     TResult Function()? failed,
     required TResult orElse(),
@@ -157,7 +164,7 @@ extension HadithStatePatterns on HadithState {
         return loading();
       case HadithReady() when ready != null:
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore);
+            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
       case HadithFailed() when failed != null:
         return failed();
       case _:
@@ -181,8 +188,15 @@ extension HadithStatePatterns on HadithState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
-    required TResult Function(String packTitle, String language,
-            List<HadithItem> items, int offset, bool hasMore)
+    required TResult Function(
+            String packTitle,
+            String language,
+            List<HadithItem> items,
+            int offset,
+            bool hasMore,
+            String query,
+            bool bookmarksOnly,
+            Set<int> bookmarked)
         ready,
     required TResult Function() failed,
   }) {
@@ -192,7 +206,7 @@ extension HadithStatePatterns on HadithState {
         return loading();
       case HadithReady():
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore);
+            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
       case HadithFailed():
         return failed();
     }
@@ -213,8 +227,15 @@ extension HadithStatePatterns on HadithState {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
-    TResult? Function(String packTitle, String language, List<HadithItem> items,
-            int offset, bool hasMore)?
+    TResult? Function(
+            String packTitle,
+            String language,
+            List<HadithItem> items,
+            int offset,
+            bool hasMore,
+            String query,
+            bool bookmarksOnly,
+            Set<int> bookmarked)?
         ready,
     TResult? Function()? failed,
   }) {
@@ -224,7 +245,7 @@ extension HadithStatePatterns on HadithState {
         return loading();
       case HadithReady() when ready != null:
         return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore);
+            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
       case HadithFailed() when failed != null:
         return failed();
       case _:
@@ -261,8 +282,12 @@ class HadithReady implements HadithState {
       required this.language,
       required List<HadithItem> items,
       required this.offset,
-      required this.hasMore})
-      : _items = items;
+      required this.hasMore,
+      this.query = '',
+      this.bookmarksOnly = false,
+      Set<int> bookmarked = const <int>{}})
+      : _items = items,
+        _bookmarked = bookmarked;
 
   final String packTitle;
   final String language;
@@ -275,6 +300,17 @@ class HadithReady implements HadithState {
 
   final int offset;
   final bool hasMore;
+  @JsonKey()
+  final String query;
+  @JsonKey()
+  final bool bookmarksOnly;
+  final Set<int> _bookmarked;
+  @JsonKey()
+  Set<int> get bookmarked {
+    if (_bookmarked is EqualUnmodifiableSetView) return _bookmarked;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableSetView(_bookmarked);
+  }
 
   /// Create a copy of HadithState
   /// with the given fields replaced by the non-null parameter values.
@@ -294,18 +330,31 @@ class HadithReady implements HadithState {
                 other.language == language) &&
             const DeepCollectionEquality().equals(other.items, _items) &&
             (identical(other.offset, offset) || other.offset == offset) &&
-            (identical(other.hasMore, hasMore) || other.hasMore == hasMore));
+            (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
+            (identical(other.query, query) || other.query == query) &&
+            (identical(other.bookmarksOnly, bookmarksOnly) ||
+                other.bookmarksOnly == bookmarksOnly) &&
+            const DeepCollectionEquality()
+                .equals(other.bookmarked, _bookmarked));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, packTitle, language,
-        const DeepCollectionEquality().hash(_items), offset, hasMore);
+    return Object.hash(
+        runtimeType,
+        packTitle,
+        language,
+        const DeepCollectionEquality().hash(_items),
+        offset,
+        hasMore,
+        query,
+        bookmarksOnly,
+        const DeepCollectionEquality().hash(_bookmarked));
   }
 
   @override
   String toString() {
-    return 'HadithState.ready(packTitle: $packTitle, language: $language, items: $items, offset: $offset, hasMore: $hasMore)';
+    return 'HadithState.ready(packTitle: $packTitle, language: $language, items: $items, offset: $offset, hasMore: $hasMore, query: $query, bookmarksOnly: $bookmarksOnly, bookmarked: $bookmarked)';
   }
 }
 
@@ -321,7 +370,10 @@ abstract mixin class $HadithReadyCopyWith<$Res>
       String language,
       List<HadithItem> items,
       int offset,
-      bool hasMore});
+      bool hasMore,
+      String query,
+      bool bookmarksOnly,
+      Set<int> bookmarked});
 }
 
 /// @nodoc
@@ -340,6 +392,9 @@ class _$HadithReadyCopyWithImpl<$Res> implements $HadithReadyCopyWith<$Res> {
     Object? items = null,
     Object? offset = null,
     Object? hasMore = null,
+    Object? query = null,
+    Object? bookmarksOnly = null,
+    Object? bookmarked = null,
   }) {
     return _then(HadithReady(
       packTitle: null == packTitle
@@ -362,6 +417,18 @@ class _$HadithReadyCopyWithImpl<$Res> implements $HadithReadyCopyWith<$Res> {
           ? _self.hasMore
           : hasMore // ignore: cast_nullable_to_non_nullable
               as bool,
+      query: null == query
+          ? _self.query
+          : query // ignore: cast_nullable_to_non_nullable
+              as String,
+      bookmarksOnly: null == bookmarksOnly
+          ? _self.bookmarksOnly
+          : bookmarksOnly // ignore: cast_nullable_to_non_nullable
+              as bool,
+      bookmarked: null == bookmarked
+          ? _self._bookmarked
+          : bookmarked // ignore: cast_nullable_to_non_nullable
+              as Set<int>,
     ));
   }
 }

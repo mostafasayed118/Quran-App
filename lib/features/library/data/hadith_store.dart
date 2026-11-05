@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/arabic_search.dart';
 import 'pack_reader.dart';
 
 /// DB-backed read index for installed hadith packs.
@@ -71,6 +72,98 @@ class HadithStore {
     return (items, offset + limit < total);
   }
 
+  /// A paged window of search matches in [packId].
+  ///
+  /// Matching is diacritics-insensitive: the query and every stored body run
+  /// through the same Arabic normalizer before the `LIKE`.
+  Future<(List<(int, String)>, bool)> search(
+    String packId,
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) async {
+    final prepared = prepareQuery(query);
+    if (prepared.isEmpty || offset < 0 || limit <= 0) {
+      return (const <(int, String)>[], false);
+    }
+    await _ensureTable();
+    await _ensureImported(packId);
+    await _backfillNorm(packId);
+    final rows = await _db.customSelect(
+      'SELECT number, body FROM hadith_entries '
+      'WHERE pack_id = ? AND norm LIKE ? '
+      'ORDER BY ordinal LIMIT ? OFFSET ?',
+      variables: [
+        Variable.withString(packId),
+        Variable.withString('%$prepared%'),
+        Variable.withInt(limit + 1),
+        Variable.withInt(offset),
+      ],
+    ).get();
+    final hasMore = rows.length > limit;
+    final items = <(int, String)>[
+      for (final row in rows.take(limit))
+        if (row.read<int>('number') >= 0)
+          (row.read<int>('number'), row.read<String>('body')),
+    ];
+    return (items, hasMore);
+  }
+
+  /// The stored rows whose hadith numbers are in [numbers], in book order.
+  Future<List<(int, String)>> byNumbers(
+    String packId,
+    Set<int> numbers,
+  ) async {
+    if (numbers.isEmpty) return const <(int, String)>[];
+    await _ensureTable();
+    await _ensureImported(packId);
+    final placeholders = List<String>.filled(numbers.length, '?').join(',');
+    final rows = await _db.customSelect(
+      'SELECT number, body FROM hadith_entries '
+      'WHERE pack_id = ? AND number IN ($placeholders) ORDER BY ordinal',
+      variables: [
+        Variable.withString(packId),
+        for (final number in numbers) Variable.withInt(number),
+      ],
+    ).get();
+    return <(int, String)>[
+      for (final row in rows)
+        if (row.read<int>('number') >= 0)
+          (row.read<int>('number'), row.read<String>('body')),
+    ];
+  }
+
+  /// Fills `norm` for rows imported before the search column existed.
+  Future<void> _backfillNorm(String packId) async {
+    final pending = await _db.customSelect(
+      "SELECT COUNT(*) AS c FROM hadith_entries "
+      "WHERE pack_id = ? AND body != '' AND norm = ''",
+      variables: [Variable.withString(packId)],
+    ).getSingle();
+    if (pending.read<int>('c') == 0) return;
+    final rows = await _db.customSelect(
+      'SELECT ordinal, body FROM hadith_entries WHERE pack_id = ?',
+      variables: [Variable.withString(packId)],
+    ).get();
+    await _db.transaction(() async {
+      await _db.batch((batch) {
+        for (final row in rows) {
+          batch.customStatement(
+            'UPDATE hadith_entries SET norm = ? '
+            'WHERE pack_id = ? AND ordinal = ?',
+            [
+              _normalize(row.read<String>('body')),
+              packId,
+              row.read<int>('ordinal'),
+            ],
+          );
+        }
+      });
+    });
+  }
+
+  static String _normalize(String text) => prepareQuery(text);
+
   /// Imports a projection produced by the install sniff, replacing any rows
   /// already stored for [packId].
   Future<void> importProjection(String packId, Object? projection) {
@@ -117,12 +210,27 @@ class HadithStore {
     });
   }
 
-  Future<void> _ensureTable() => _db.customStatement(
-        'CREATE TABLE IF NOT EXISTS hadith_entries '
-        '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '
-        'number INTEGER NOT NULL, body TEXT NOT NULL, '
-        'PRIMARY KEY (pack_id, ordinal))',
+  Future<void> _ensureTable() => _tableReady ??= _createTable();
+
+  Future<void>? _tableReady;
+
+  Future<void> _createTable() async {
+    await _db.customStatement(
+      'CREATE TABLE IF NOT EXISTS hadith_entries '
+      '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '
+      'number INTEGER NOT NULL, body TEXT NOT NULL, '
+      "norm TEXT NOT NULL DEFAULT '', "
+      'PRIMARY KEY (pack_id, ordinal))',
+    );
+    final info =
+        await _db.customSelect('PRAGMA table_info(hadith_entries)').get();
+    final hasNorm = info.any((row) => row.read<String>('name') == 'norm');
+    if (!hasNorm) {
+      await _db.customStatement(
+        "ALTER TABLE hadith_entries ADD COLUMN norm TEXT NOT NULL DEFAULT ''",
       );
+    }
+  }
 
   Future<int> _count(String packId) async {
     final row = await _db.customSelect(
@@ -144,9 +252,16 @@ class HadithStore {
           for (var i = start; i < end; i++) {
             final entry = compact[i];
             batch.customStatement(
-              'INSERT INTO hadith_entries(pack_id, ordinal, number, body) '
-              'VALUES (?, ?, ?, ?)',
-              [packId, i, entry?.$1 ?? -1, entry?.$2 ?? ''],
+              'INSERT INTO hadith_entries'
+              '(pack_id, ordinal, number, body, norm) '
+              'VALUES (?, ?, ?, ?, ?)',
+              [
+                packId,
+                i,
+                entry?.$1 ?? -1,
+                entry?.$2 ?? '',
+                _normalize(entry?.$2 ?? ''),
+              ],
             );
           }
         });

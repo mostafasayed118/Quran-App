@@ -1040,6 +1040,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hadithEmpty => 'No hadith in this pack';
 
   @override
+  String get hadithSearchHint => 'Search hadiths';
+
+  @override
+  String get hadithSearchEmpty => 'No results';
+
+  @override
+  String get hadithBookmarks => 'Saved hadiths';
+
+  @override
+  String get hadithNoBookmarks => 'No saved hadiths';
+
+  @override
+  String get hadithShowAll => 'Show all';
+
+  @override
+  String get hadithBookmark => 'Save hadith';
+
+  @override
+  String get hadithUnbookmark => 'Remove from saved';
+
+  @override
   String get languageArabic => 'Arabic';
 
   @override

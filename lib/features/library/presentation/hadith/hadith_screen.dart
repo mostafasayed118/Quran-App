@@ -17,26 +17,113 @@ class HadithScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final cubit = context.read<HadithCubit>();
     return Scaffold(
-      appBar: AppBar(title: const _HadithTitle()),
-      body: BlocBuilder<HadithCubit, HadithState>(
-        builder: (context, state) {
-          final Widget content = switch (state) {
-            HadithLoading() => const LoadingView(),
-            HadithFailed() => errorPane(loc),
-            final HadithReady ready when ready.items.isEmpty => EmptyState(
-                loc.hadithEmpty,
-                icon: Icons.menu_book_outlined,
-              ),
-            final HadithReady ready => Column(
-                children: [
-                  Expanded(child: _HadithVerses(ready: ready)),
-                  _HadithPager(ready: ready),
-                ],
-              ),
-          };
-          return content;
-        },
+      appBar: AppBar(
+        title: const _HadithTitle(),
+        actions: [
+          BlocBuilder<HadithCubit, HadithState>(
+            buildWhen: (a, b) =>
+                (a is HadithReady &&
+                    b is HadithReady &&
+                    a.bookmarksOnly != b.bookmarksOnly) ||
+                a.runtimeType != b.runtimeType,
+            builder: (context, state) {
+              final only = state is HadithReady && state.bookmarksOnly;
+              return IconButton(
+                tooltip: only ? loc.hadithShowAll : loc.hadithBookmarks,
+                icon: Icon(
+                  only ? Icons.bookmarks : Icons.bookmarks_outlined,
+                ),
+                onPressed: only ? cubit.showBrowse : cubit.showBookmarks,
+              );
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const _SearchBar(),
+          Expanded(
+            child: BlocBuilder<HadithCubit, HadithState>(
+              builder: (context, state) => switch (state) {
+                HadithLoading() => const LoadingView(),
+                HadithFailed() => errorPane(loc, onRetry: cubit.start),
+                final HadithReady ready when ready.items.isEmpty => EmptyState(
+                    _emptyMessage(loc, ready),
+                    icon: ready.bookmarksOnly
+                        ? Icons.bookmarks_outlined
+                        : Icons.menu_book_outlined,
+                  ),
+                final HadithReady ready => Column(
+                    children: [
+                      Expanded(child: _HadithVerses(ready: ready)),
+                      if (!ready.bookmarksOnly) _HadithPager(ready: ready),
+                    ],
+                  ),
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static String _emptyMessage(AppLocalizations loc, HadithReady ready) {
+    if (ready.bookmarksOnly) return loc.hadithNoBookmarks;
+    if (ready.query.isNotEmpty) return loc.hadithSearchEmpty;
+    return loc.hadithEmpty;
+  }
+}
+
+class _SearchBar extends StatefulWidget {
+  const _SearchBar();
+
+  @override
+  State<_SearchBar> createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<_SearchBar> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final cubit = context.read<HadithCubit>();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.xs,
+      ),
+      child: TextField(
+        controller: _controller,
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          hintText: loc.hadithSearchHint,
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: _controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _controller.clear();
+                    cubit.clearSearch();
+                    setState(() {});
+                  },
+                ),
+          border: const OutlineInputBorder(),
+          isDense: true,
+        ),
+        onChanged: (_) => setState(() {}),
+        onSubmitted: cubit.search,
       ),
     );
   }
@@ -91,6 +178,7 @@ class _HadithVerses extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<HadithCubit>();
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       itemCount: ready.items.length,
@@ -100,7 +188,13 @@ class _HadithVerses extends StatelessWidget {
         if (text.isEmpty) {
           return const SizedBox.shrink();
         }
-        return _HadithVerseRow(number: number, text: text, rtl: rtl);
+        return _HadithVerseRow(
+          number: number,
+          text: text,
+          rtl: rtl,
+          bookmarked: ready.bookmarked.contains(number),
+          onToggle: () => cubit.toggleBookmark(number),
+        );
       },
     );
   }
@@ -111,11 +205,15 @@ class _HadithVerseRow extends StatelessWidget {
     required this.number,
     required this.text,
     required this.rtl,
+    required this.bookmarked,
+    required this.onToggle,
   });
 
   final int number;
   final String text;
   final bool rtl;
+  final bool bookmarked;
+  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -158,6 +256,14 @@ class _HadithVerseRow extends StatelessWidget {
               style: const TextStyle(fontSize: 15, height: 1.8),
               textDirection: direction,
             ),
+          ),
+          IconButton(
+            tooltip: bookmarked ? loc.hadithUnbookmark : loc.hadithBookmark,
+            icon: Icon(
+              bookmarked ? Icons.bookmark : Icons.bookmark_border,
+              color: bookmarked ? colors.secondary : null,
+            ),
+            onPressed: onToggle,
           ),
         ],
       ),

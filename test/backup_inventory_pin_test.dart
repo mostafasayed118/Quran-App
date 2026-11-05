@@ -5,6 +5,8 @@ import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
+import 'package:quran_yahdi/features/library/data/hadith_bookmark_repository.dart';
+import 'package:quran_yahdi/features/library/data/hadith_position_repository.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
@@ -42,6 +44,8 @@ void main() {
     expect(backupKeyReaderLineHeight, ReaderSettingsRepository.lineHeightKey);
     expect(backupKeyHijriDayOffset, HijriOffsetRepository.key);
     expect(backupKeyBookmarkMeta, BookmarkMetaRepository.key);
+    expect(backupKeyHadithBookmarks, HadithBookmarkRepository.key);
+    expect(backupKeyHadithPositions, HadithPositionRepository.key);
     expect(backupKeyQadaMissedFasts, QadaRepository.key);
     expect(
       backupKeyAzkarProgress,
@@ -91,6 +95,8 @@ void main() {
       ReaderSettingsRepository.lineHeightKey,
       HijriOffsetRepository.key,
       BookmarkMetaRepository.key,
+      HadithBookmarkRepository.key,
+      HadithPositionRepository.key,
       QadaRepository.key,
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,

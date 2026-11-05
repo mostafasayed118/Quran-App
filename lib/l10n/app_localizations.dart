@@ -1910,6 +1910,48 @@ abstract class AppLocalizations {
   /// **'لا توجد أحاديث في هذه الحزمة'**
   String get hadithEmpty;
 
+  /// No description provided for @hadithSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في الأحاديث'**
+  String get hadithSearchHint;
+
+  /// No description provided for @hadithSearchEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد نتائج'**
+  String get hadithSearchEmpty;
+
+  /// No description provided for @hadithBookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'الأحاديث المحفوظة'**
+  String get hadithBookmarks;
+
+  /// No description provided for @hadithNoBookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد أحاديث محفوظة'**
+  String get hadithNoBookmarks;
+
+  /// No description provided for @hadithShowAll.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض الكل'**
+  String get hadithShowAll;
+
+  /// No description provided for @hadithBookmark.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ الحديث'**
+  String get hadithBookmark;
+
+  /// No description provided for @hadithUnbookmark.
+  ///
+  /// In ar, this message translates to:
+  /// **'إزالة الحفظ'**
+  String get hadithUnbookmark;
+
   /// No description provided for @languageArabic.
   ///
   /// In ar, this message translates to:

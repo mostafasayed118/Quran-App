@@ -712,6 +712,13 @@
     }
   },
   "hadithEmpty": "لا توجد أحاديث في هذه الحزمة",
+  "hadithSearchHint": "ابحث في الأحاديث",
+  "hadithSearchEmpty": "لا توجد نتائج",
+  "hadithBookmarks": "الأحاديث المحفوظة",
+  "hadithNoBookmarks": "لا توجد أحاديث محفوظة",
+  "hadithShowAll": "عرض الكل",
+  "hadithBookmark": "حفظ الحديث",
+  "hadithUnbookmark": "إزالة الحفظ",
   "languageArabic": "العربية",
   "languageEnglish": "الإنجليزية",
   "downloadsTitle": "التنزيلات",

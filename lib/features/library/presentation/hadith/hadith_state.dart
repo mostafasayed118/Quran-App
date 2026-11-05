@@ -15,6 +15,9 @@ sealed class HadithState with _$HadithState {
     required List<HadithItem> items,
     required int offset,
     required bool hasMore,
+    @Default('') String query,
+    @Default(false) bool bookmarksOnly,
+    @Default(<int>{}) Set<int> bookmarked,
   }) = HadithReady;
 
   const factory HadithState.failed() = HadithFailed;

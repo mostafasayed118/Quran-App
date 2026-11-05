@@ -630,4 +630,20 @@ class PackDownloader {
       return _reader.hadithPage(packId, offset, limit);
     }
   }
+
+  /// A paged, diacritics-insensitive search over an installed hadith pack.
+  Future<(List<(int, String)>, bool)> hadithSearch(
+    String packId,
+    String query, {
+    int offset = 0,
+    int limit = 20,
+  }) =>
+      _hadithStore.search(packId, query, offset: offset, limit: limit);
+
+  /// The stored hadiths whose numbers are in [numbers], in book order.
+  Future<List<(int, String)>> hadithByNumbers(
+    String packId,
+    Set<int> numbers,
+  ) =>
+      _hadithStore.byNumbers(packId, numbers);
 }

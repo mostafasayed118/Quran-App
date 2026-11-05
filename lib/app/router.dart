@@ -44,6 +44,7 @@ import '../features/hijri/data/hijri_service.dart';
 import '../features/library/presentation/hadith/hadith_cubit.dart';
 import '../features/library/presentation/hadith/hadith_screen.dart';
 import '../features/library/data/catalog_repository.dart';
+import '../features/library/data/hadith_personal.dart';
 import '../features/library/data/translation_search_source.dart';
 import '../features/library/data/pack_downloader.dart';
 import '../features/library/presentation/library_cubit.dart';
@@ -284,6 +285,8 @@ abstract final class AppRouter {
             create: () => HadithCubit(
               downloader: getIt<PackDownloader>(),
               packId: pack,
+              bookmarks: getIt<HadithBookmarkSource>(),
+              positions: getIt<HadithPositionSource>(),
             ),
             identity: pack,
             start: (cubit) => cubit.start(),
