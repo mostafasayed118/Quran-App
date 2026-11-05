@@ -133,7 +133,7 @@ void main() {
     expect(result, isA<BackupDecodeSuccess>());
     final success = result as BackupDecodeSuccess;
     expect(success.skippedEntries, 0);
-    expect(success.document.schemaVersion, 2);
+    expect(success.document.schemaVersion, db.schemaVersion);
 
     final fresh = newTestDb();
     final freshService = BackupService(
