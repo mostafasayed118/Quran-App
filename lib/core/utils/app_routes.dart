@@ -17,6 +17,7 @@ abstract final class AppRoutes {
   static const reciterPacks = '/recitation/packs';
   static const downloads = '/downloads';
   static const library = '/library';
+  static const librarySearch = '/library/search';
   static const hadith = '/library/hadith';
   static const prayerTimes = '/prayer-times';
   static const prayerSettings = '/prayer-times/settings';

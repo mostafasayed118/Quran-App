@@ -604,6 +604,10 @@ class PackDownloader {
   Future<String?> translationFor(String packId, int surah, int ayah) =>
       _reader.translationFor(packId, surah, ayah);
 
+  /// The whole ayah index of an installed translation pack.
+  Future<Map<int, String>> translationIndex(String packId) =>
+      _reader.translationIndex(packId);
+
   /// Tafsir text for an ayah from an installed tafsir wrapper.
   Future<String?> tafsirFor(String packId, int surah, int ayah) =>
       _reader.tafsirFor(packId, surah, ayah);

@@ -114,6 +114,7 @@ void main() {
     expect(await downloader.isInstalled('tp1', '1'), isTrue);
     expect(await downloader.isInstalled('tp1', '9'), isFalse);
     expect(await downloader.isInstalledAny('tp1'), isTrue);
+    expect(await downloader.translationIndex('tp1'), {1001: 'بسم الله'});
   });
 
   test('404 installs no row and leaves no partial file', () async {

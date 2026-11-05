@@ -44,9 +44,12 @@ import '../features/hijri/data/hijri_service.dart';
 import '../features/library/presentation/hadith/hadith_cubit.dart';
 import '../features/library/presentation/hadith/hadith_screen.dart';
 import '../features/library/data/catalog_repository.dart';
+import '../features/library/data/translation_search_source.dart';
 import '../features/library/data/pack_downloader.dart';
 import '../features/library/presentation/library_cubit.dart';
 import '../features/library/presentation/library_screen.dart';
+import '../features/library/presentation/search/translation_search_cubit.dart';
+import '../features/library/presentation/search/translation_search_screen.dart';
 import '../features/hijri/presentation/hijri_cubit.dart';
 import '../features/hijri/presentation/hijri_screen.dart';
 import '../features/home/presentation/home_cubit.dart';
@@ -283,6 +286,21 @@ abstract final class AppRouter {
             child: const HadithScreen(),
           );
         },
+      ),
+      GoRoute(
+        path: AppRoutes.librarySearch,
+        redirect: (_, __) =>
+            getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
+        builder: (_, __) => RouteCubitScope<TranslationSearchCubit>(
+          create: () => TranslationSearchCubit(
+            source: getIt<TranslationSearchSource>(),
+            surahName: (id) async =>
+                (await getIt<AyahLookup>().surahRefById(id))?.nameAr,
+          ),
+          identity: AppRoutes.librarySearch,
+          start: (cubit) => cubit.start(),
+          child: const TranslationSearchScreen(),
+        ),
       ),
       GoRoute(
         path: AppRoutes.cityPicker,

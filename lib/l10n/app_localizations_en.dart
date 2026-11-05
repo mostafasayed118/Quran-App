@@ -133,6 +133,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get library => 'Library';
 
   @override
+  String get translationSearchTitle => 'Search translations';
+
+  @override
+  String get translationSearchHint => 'Search installed translations';
+
+  @override
+  String get translationSearchEmpty => 'Type a word to search the translation.';
+
+  @override
+  String get translationSearchNoResults => 'No results';
+
+  @override
+  String get translationSearchNoPacks =>
+      'No translation is installed. Install one from the library first.';
+
+  @override
+  String translationSearchResults(String count) {
+    return '$count results';
+  }
+
+  @override
+  String get translationSearchAction => 'Search translations';
+
+  @override
   String get nextPrayer => 'Next Prayer';
 
   @override

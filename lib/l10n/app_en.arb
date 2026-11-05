@@ -73,6 +73,20 @@
   "themeDark": "Dark",
   "recitations": "Recitations",
   "library": "Library",
+  "translationSearchTitle": "Search translations",
+  "translationSearchHint": "Search installed translations",
+  "translationSearchEmpty": "Type a word to search the translation.",
+  "translationSearchNoResults": "No results",
+  "translationSearchNoPacks": "No translation is installed. Install one from the library first.",
+  "translationSearchResults": "{count} results",
+  "@translationSearchResults": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "translationSearchAction": "Search translations",
   "nextPrayer": "Next Prayer",
   "continueReading": "Continue Reading",
   "continueReadingAyah": "﴿{ayah}﴾ Continue Reading",

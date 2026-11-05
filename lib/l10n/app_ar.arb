@@ -73,6 +73,20 @@
   "themeDark": "غامق",
   "recitations": "التلاوات",
   "library": "المكتبة",
+  "translationSearchTitle": "بحث في الترجمات",
+  "translationSearchHint": "ابحث في الترجمات المثبتة",
+  "translationSearchEmpty": "اكتب كلمة للبحث في الترجمة.",
+  "translationSearchNoResults": "لا توجد نتائج",
+  "translationSearchNoPacks": "لا توجد ترجمة مثبتة. ثبّت ترجمة من المكتبة أولًا.",
+  "translationSearchResults": "{count} نتيجة",
+  "@translationSearchResults": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "translationSearchAction": "بحث في الترجمات",
   "nextPrayer": "الصلاة القادمة",
   "continueReading": "متابعة القراءة",
   "continueReadingAyah": "﴿{ayah}﴾ متابعة القراءة",

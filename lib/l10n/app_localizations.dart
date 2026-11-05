@@ -326,6 +326,48 @@ abstract class AppLocalizations {
   /// **'المكتبة'**
   String get library;
 
+  /// No description provided for @translationSearchTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث في الترجمات'**
+  String get translationSearchTitle;
+
+  /// No description provided for @translationSearchHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'ابحث في الترجمات المثبتة'**
+  String get translationSearchHint;
+
+  /// No description provided for @translationSearchEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'اكتب كلمة للبحث في الترجمة.'**
+  String get translationSearchEmpty;
+
+  /// No description provided for @translationSearchNoResults.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد نتائج'**
+  String get translationSearchNoResults;
+
+  /// No description provided for @translationSearchNoPacks.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد ترجمة مثبتة. ثبّت ترجمة من المكتبة أولًا.'**
+  String get translationSearchNoPacks;
+
+  /// No description provided for @translationSearchResults.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} نتيجة'**
+  String translationSearchResults(String count);
+
+  /// No description provided for @translationSearchAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'بحث في الترجمات'**
+  String get translationSearchAction;
+
   /// No description provided for @nextPrayer.
   ///
   /// In ar, this message translates to:

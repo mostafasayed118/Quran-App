@@ -133,6 +133,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get library => 'المكتبة';
 
   @override
+  String get translationSearchTitle => 'بحث في الترجمات';
+
+  @override
+  String get translationSearchHint => 'ابحث في الترجمات المثبتة';
+
+  @override
+  String get translationSearchEmpty => 'اكتب كلمة للبحث في الترجمة.';
+
+  @override
+  String get translationSearchNoResults => 'لا توجد نتائج';
+
+  @override
+  String get translationSearchNoPacks =>
+      'لا توجد ترجمة مثبتة. ثبّت ترجمة من المكتبة أولًا.';
+
+  @override
+  String translationSearchResults(String count) {
+    return '$count نتيجة';
+  }
+
+  @override
+  String get translationSearchAction => 'بحث في الترجمات';
+
+  @override
   String get nextPrayer => 'الصلاة القادمة';
 
   @override

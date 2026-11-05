@@ -44,6 +44,13 @@ class LibraryScreen extends StatelessWidget {
           child: Scaffold(
             appBar: AppBar(
               title: Text(loc.library),
+              actions: [
+                IconButton(
+                  tooltip: loc.translationSearchAction,
+                  icon: const Icon(Icons.search),
+                  onPressed: () => context.push(AppRoutes.librarySearch),
+                ),
+              ],
               bottom: catalogEmpty
                   ? null
                   : TabBar(

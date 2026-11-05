@@ -332,6 +332,15 @@ class PackReader {
     return index[_ayahKey(surah, ayah)];
   }
 
+  /// The whole translation index of [packId] (`surah * 1000 + ayah` → text).
+  ///
+  /// Returns an empty map when the pack is absent or has the wrong shape; the
+  /// search screen treats that as "no searchable text".
+  Future<Map<int, String>> translationIndex(String packId) async {
+    final index = await _load(packId, 'quran');
+    return index is Map<int, String> ? index : const <int, String>{};
+  }
+
   /// Tafsir text for an ayah from an installed tafsir pack.
   ///
   /// Supports both shapes: the per-surah wrapper (`tafsirs`) and a
