@@ -5,8 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'support/fakes.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
@@ -16,6 +14,7 @@ import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/fakes.dart';
 import 'support/test_db.dart';
 
 class _RecordingNavigatorObserver extends NavigatorObserver {
