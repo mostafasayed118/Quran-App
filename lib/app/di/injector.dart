@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:drift/drift.dart' show LazyDatabase;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
+import 'package:meta/meta.dart';
 import 'package:quran_yahdi/app/onboarding_gate.dart';
 import 'package:quran_yahdi/app/router.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -182,6 +183,10 @@ Future<void> configureDependencies({
       () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<ReminderSchedulerPort>(
       () => getIt<NotificationsBinding>());
+  // The reliability card reads the last plan write's outcome through this
+  // port; the binding owns it.
+  getIt.registerLazySingleton<ReminderApplyHealth>(
+      () => getIt<NotificationsBinding>());
   // Reminder-health readout for the settings screen: a thin platform channel
   // with no state of its own, so each call re-reads the OS (a permission
   // revoked while the app was backgrounded must show up on resume).
@@ -295,4 +300,14 @@ Future<void> configureDependencies({
         downloader: getIt<AudioDownloader>(),
       ));
   _configured = true;
+}
+
+/// Clears the one-time guard so a test can build a fresh graph.
+///
+/// `getIt.reset()` alone leaves [_configured] true, turning the next
+/// [configureDependencies] into a silent no-op. A test that resets the
+/// locator must call this too, or it keeps asserting against the old graph.
+@visibleForTesting
+void resetDependenciesForTest() {
+  _configured = false;
 }
