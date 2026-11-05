@@ -1,35 +1,15 @@
-import 'dart:convert';
 import 'dart:developer' as dev;
-import 'dart:io';
-import 'dart:isolate';
-import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
-import '../data/backup_codec.dart';
+import '../data/backup_io.dart';
 import '../data/backup_service.dart';
 import 'backup_state.dart';
 
-/// Injectable seam for the document picker; `null` = the user cancelled.
-typedef BackupPickBytes = Future<Uint8List?> Function();
-
-/// Injectable seam for the export share step; receives the encoded document.
-typedef BackupShareJson = Future<void> Function(String json);
-
-/// A backup payload is over [kBackupMaxBytes].
-///
-/// On import the picker reports the on-disk length before the bytes are read,
-/// so an oversized file never reaches memory. On export the encoded JSON is
-/// measured before it is shared: the app must never emit a file its own
-/// importer would reject.
-class _BackupTooLarge implements Exception {
-  const _BackupTooLarge();
-}
+// The platform seams live in `data/`; re-exported so the existing hosts and
+// tests can keep importing them from the cubit.
+export '../data/backup_io.dart' show BackupPickBytes, BackupShareJson;
 
 /// Backup & restore surface: export shares the encoded JSON file through the
 /// system share sheet; import picks a `.json` file, decodes it with the
@@ -44,8 +24,8 @@ class BackupCubit extends Cubit<BackupState> {
     BackupPickBytes? pickBytes,
     BackupShareJson? shareJson,
   })  : _service = service,
-        _pickBytes = pickBytes ?? _defaultPickBytes,
-        _shareJson = shareJson ?? _defaultShareJson,
+        _pickBytes = pickBytes ?? pickBackupBytes,
+        _shareJson = shareJson ?? shareBackupJson,
         super(const BackupState.idle());
 
   final BackupService _service;
@@ -60,8 +40,10 @@ class BackupCubit extends Cubit<BackupState> {
     emit(const BackupState.idle(busy: true));
     try {
       final json = await _service.exportJson();
-      if (utf8.encode(json).length > kBackupMaxBytes) {
-        throw const _BackupTooLarge();
+      // On export the encoded JSON is measured before it is shared: the app
+      // must never emit a file its own importer would reject.
+      if (exceedsBackupLimit(json)) {
+        throw const BackupTooLarge();
       }
       await _shareJson(json);
       if (isClosed) return;
@@ -94,7 +76,7 @@ class BackupCubit extends Cubit<BackupState> {
         emit(const BackupState.invalidFile());
         return;
       }
-      final result = await _decodeBackup(bytes);
+      final result = await decodeBackup(bytes);
       if (isClosed) return;
       if (result is! BackupDecodeSuccess) {
         emit(const BackupState.invalidFile());
@@ -103,7 +85,7 @@ class BackupCubit extends Cubit<BackupState> {
       final summary = await _service.preview(result.document);
       if (isClosed) return;
       emit(BackupState.preview(document: result.document, summary: summary));
-    } on _BackupTooLarge {
+    } on BackupTooLarge {
       if (isClosed) return;
       emit(const BackupState.invalidFile());
     } on Object catch (error, stackTrace) {
@@ -161,92 +143,9 @@ class BackupCubit extends Cubit<BackupState> {
     return current is BackupFailed || current is BackupInvalidFile;
   }
 
-  /// Decodes the picked backup document.
-  ///
-  /// The parse runs in a worker isolate: the document is capped at 2 MB, and
-  /// decoding it on the UI isolate blocks the frame for the whole JSON parse.
-  ///
-  /// A `flutter test` build decodes inline: an isolate completion never
-  /// arrives under the fake clock, so the import flow would hang
-  /// (probe-verified in this repo — see the report for the probe output).
-  static Future<BackupDecodeResult> _decodeBackup(Uint8List bytes) async {
-    if (Platform.environment['FLUTTER_TEST'] == 'true') {
-      return decode(utf8.decode(bytes, allowMalformed: true));
-    }
-    try {
-      return await decodeInIsolate(bytes);
-    } on Object {
-      // The worker is unavailable: decode inline so the failure states stay
-      // exactly the codec's.
-      return decode(utf8.decode(bytes, allowMalformed: true));
-    }
-  }
-
-  /// The real worker-isolate decode. Exposed so a unit test can prove the
-  /// non-test path completes; the widget suite runs under the fake clock,
-  /// where isolate completions never arrive.
+  /// The worker-isolate decode, kept as a forwarding seam for the existing
+  /// unit test; the implementation lives in `data/backup_io.dart`.
   @visibleForTesting
-  static Future<BackupDecodeResult> decodeInIsolate(Uint8List bytes) {
-    return Isolate.run(
-      () => decode(utf8.decode(bytes, allowMalformed: true)),
-    );
-  }
-
-  static Future<Uint8List?> _defaultPickBytes() async {
-    final file = await FilePicker.pickFile(
-      type: FileType.custom,
-      allowedExtensions: const ['json'],
-    );
-    if (file == null) return null;
-    // Size gate BEFORE the read: reading a multi-GB file first would OOM.
-    final length = await _pickedLength(file);
-    if (length != null && length > kBackupMaxBytes) {
-      throw const _BackupTooLarge();
-    }
-    if (length == null) {
-      return _readBounded(file);
-    }
-    return file.readAsBytes();
-  }
-
-  static Future<Uint8List> _readBounded(PlatformFile file) async {
-    final builder = BytesBuilder(copy: false);
-    await for (final chunk in file.readAsByteStream()) {
-      builder.add(chunk);
-      if (builder.length > kBackupMaxBytes) {
-        throw const _BackupTooLarge();
-      }
-    }
-    return builder.takeBytes();
-  }
-
-  /// The picked file's length in bytes, without reading its bytes, or null
-  /// when the picker cannot report it cheaply.
-  static Future<int?> _pickedLength(PlatformFile file) async {
-    final path = file.path;
-    if (path != null) {
-      try {
-        return await File(path).length();
-      } on FileSystemException {
-        // No readable path: fall back to the picker's reported size.
-      }
-    }
-    return file.lengthSync();
-  }
-
-  static Future<void> _defaultShareJson(String json) async {
-    final dir = await getTemporaryDirectory();
-    final stamp = DateTime.now().toIso8601String().substring(0, 10);
-    final file = File(p.join(dir.path, 'quran_yahdi_backup_$stamp.json'));
-    await file.writeAsString(json, flush: true);
-    try {
-      await SharePlus.instance.share(ShareParams(files: [XFile(file.path)]));
-    } finally {
-      try {
-        await file.delete();
-      } on FileSystemException {
-        // Best-effort cleanup: a leftover temp file fails nothing.
-      }
-    }
-  }
+  static Future<BackupDecodeResult> decodeInIsolate(Uint8List bytes) =>
+      decodeBackupInIsolate(bytes);
 }
