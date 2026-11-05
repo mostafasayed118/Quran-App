@@ -1,7 +1,8 @@
 # Production Readiness Audit — Quran Yahdi (`quran_yahdi`)
 
 > **Status — 2026-11-05:** this is a snapshot at `d39c1f7`. The P0 code items
-> (reminder engine, CI gating, R8/shrink) are closed on `e9652b4`; the
+> (reminder engine, CI gating, R8/shrink) are closed in the technical-debt
+> wave merged as `8e3dc6d`; the
 > remaining P0s are the signed-artifact rebuild/versionCode, Play App Signing
 > in `assetlinks.json`, licensing sign-off, and a signed-device smoke. See
 > `docs/campaign-ledger.md` for the wave records.
