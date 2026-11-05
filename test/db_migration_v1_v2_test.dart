@@ -41,7 +41,7 @@ void main() {
           bookmarkBefore);
       expect(await reopened.select(reopened.settingsTable).getSingle(),
           settingBefore);
-      expect(await _userVersion(reopened), 2);
+      expect(await _userVersion(reopened), reopened.schemaVersion);
     } finally {
       await reopened.close();
     }
@@ -65,7 +65,7 @@ void main() {
     final upgraded = AppDatabase(NativeDatabase(file));
     try {
       expect(await _tableExists(upgraded, 'reciters'), isTrue);
-      expect(await _userVersion(upgraded), 2);
+      expect(await _userVersion(upgraded), upgraded.schemaVersion);
     } finally {
       await upgraded.close();
     }
@@ -73,7 +73,7 @@ void main() {
     // Third open: schema version already matches, so no migration runs.
     final reopened = AppDatabase(NativeDatabase(file));
     try {
-      expect(await _userVersion(reopened), 2);
+      expect(await _userVersion(reopened), reopened.schemaVersion);
       expect(await reopened.select(reopened.reciters).get(), isEmpty);
       expect(await reopened.select(reopened.bookmarks).getSingle(),
           bookmarkBefore);

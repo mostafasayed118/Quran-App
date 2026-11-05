@@ -25,7 +25,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -33,59 +33,82 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await migrator.createAll();
           }
+          if (from < 3) {
+            // v3: the duplicate repair and the derived objects are a versioned
+            // migration step now. beforeOpen used to run the two full-table
+            // repair scans on EVERY open; this runs them once, and the guards
+            // below make it a no-op when the invariant already holds.
+            await _ensureDerivedSchema();
+          }
         },
         beforeOpen: (details) async {
-          // Hot-path indexes. IF NOT EXISTS: asset-seeded databases ship
-          // without them, fresh databases just created their tables — one
-          // idempotent statement covers every open (ayahs.surah_id is the
-          // reader's per-surah query; the others are per-check lookups).
-          await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_surah '
-              'ON ayahs(surah_id, number_in_surah)');
-          // The khatma page query filters `ayahs.page`; without this index
-          // every call scans the whole 6236-row table.
-          await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_page '
-              'ON ayahs(page)');
-          // One bookmark per ayah is a user-visible invariant. Repair any
-          // duplicates left by the old read-then-write toggle before the
-          // unique index is created (a failed CREATE would abort every open).
-          await customStatement('DELETE FROM bookmarks WHERE id NOT IN '
-              '(SELECT MIN(id) FROM bookmarks GROUP BY ayah_id)');
-          await customStatement('DROP INDEX IF EXISTS idx_bookmarks_ayah');
-          await customStatement(
-              'CREATE UNIQUE INDEX IF NOT EXISTS idx_bookmarks_ayah '
-              'ON bookmarks(ayah_id)');
-          // One download per (reciter, surah) is a user-visible invariant: the
-          // row is the registry entry of exactly one audio file, and every
-          // read of it uses getSingleOrNull(). Repair any duplicates left by
-          // the old read-then-write markStatus before the unique index is
-          // created (a failed CREATE would abort every open); the oldest row
-          // wins because it is the one that already owns the file.
-          await customStatement('DELETE FROM downloads WHERE id NOT IN '
-              '(SELECT MIN(id) FROM downloads GROUP BY reciter_id, surah_id)');
-          await customStatement('DROP INDEX IF EXISTS idx_downloads_lookup');
-          await customStatement(
-              'CREATE UNIQUE INDEX IF NOT EXISTS idx_downloads_lookup '
-              'ON downloads(reciter_id, surah_id)');
-          // The downloads screen filters `status='done'`; without this index
-          // every open of that screen scans the whole downloads table.
-          await customStatement(
-              'CREATE INDEX IF NOT EXISTS idx_downloads_status '
-              'ON downloads(status)');
-          // Derived Quran search index (see core/db/search_index.dart). A raw
-          // table on purpose: it is rebuilt content, not a drift entity, and
-          // keeping it out of the drift schema leaves the migration contract
-          // untouched.
-          await customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
-              '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
-          // Hadith pack read index. Already in the drift schema for fresh
-          // databases; this idempotent statement upgrades an existing v2 file
-          // without changing the pinned user_version.
-          await customStatement('CREATE TABLE IF NOT EXISTS hadith_entries '
-              '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '
-              'number INTEGER NOT NULL, body TEXT NOT NULL, '
-              'PRIMARY KEY (pack_id, ordinal))');
+          // Non-destructive, O(1) on a healthy file: the bundled asset DB ships
+          // without these raw objects, so every open reconciles them. The
+          // repair only runs when a unique index is actually missing.
+          await _ensureDerivedSchema();
         },
       );
+
+  /// Raw objects the drift schema cannot express, plus the repair that has to
+  /// run before each unique index exists.
+  ///
+  /// Everything here is idempotent: the index guards are a single
+  /// `sqlite_master` lookup each, and the table/index creates use IF NOT
+  /// EXISTS.
+  Future<void> _ensureDerivedSchema() async {
+    // Hot-path indexes (ayahs.surah_id is the reader's per-surah query).
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_surah '
+        'ON ayahs(surah_id, number_in_surah)');
+    // The khatma page query filters `ayahs.page`; without this index every
+    // call scans the whole 6236-row table.
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_page '
+        'ON ayahs(page)');
+    // One bookmark per ayah is a user-visible invariant. When the unique index
+    // is missing, repair duplicates left by the old read-then-write toggle
+    // before creating it (a failed CREATE would abort every open).
+    if (!await _uniqueIndexExists('idx_bookmarks_ayah')) {
+      await customStatement('DELETE FROM bookmarks WHERE id NOT IN '
+          '(SELECT MIN(id) FROM bookmarks GROUP BY ayah_id)');
+      await customStatement('CREATE UNIQUE INDEX idx_bookmarks_ayah '
+          'ON bookmarks(ayah_id)');
+    }
+    // One download per (reciter, surah) is a user-visible invariant: the row
+    // is the registry entry of exactly one audio file, and every read of it
+    // uses getSingleOrNull(). The oldest row wins (it owns the file).
+    if (!await _uniqueIndexExists('idx_downloads_lookup')) {
+      await customStatement('DELETE FROM downloads WHERE id NOT IN '
+          '(SELECT MIN(id) FROM downloads GROUP BY reciter_id, surah_id)');
+      await customStatement('CREATE UNIQUE INDEX idx_downloads_lookup '
+          'ON downloads(reciter_id, surah_id)');
+    }
+    // The downloads screen filters `status='done'`.
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_downloads_status '
+        'ON downloads(status)');
+    // Derived Quran search index (see core/db/search_index.dart). A raw table
+    // on purpose: it is rebuilt content, not a drift entity, and keeping it out
+    // of the drift schema leaves the migration contract untouched.
+    await customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
+        '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
+    // Hadith pack read index (in the drift schema for fresh databases).
+    await customStatement('CREATE TABLE IF NOT EXISTS hadith_entries '
+        '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '
+        'number INTEGER NOT NULL, body TEXT NOT NULL, '
+        'PRIMARY KEY (pack_id, ordinal))');
+  }
+
+  /// Whether [name] is an index whose SQL says UNIQUE.
+  ///
+  /// A non-unique index with the same name (written by an older build) must be
+  /// replaced, not trusted — otherwise the repair would be skipped and the
+  /// invariant would silently stay unenforced.
+  Future<bool> _uniqueIndexExists(String name) async {
+    final row = await customSelect(
+      "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+      variables: [Variable.withString(name)],
+    ).getSingleOrNull();
+    final sql = row?.readNullable<String>('sql') ?? '';
+    return sql.toUpperCase().contains('UNIQUE');
+  }
 
   /// Dev/seed helper (tools/build_quran_db.dart): creates the full schema on
   /// a fresh executor. Wraps the protected migrator; public by design.
