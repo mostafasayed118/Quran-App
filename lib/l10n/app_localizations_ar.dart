@@ -673,6 +673,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsPrayerReminder => 'تذكير الصلاة';
 
   @override
+  String get fajrFollowUp => 'تذكير متابعة الفجر';
+
+  @override
+  String get fajrFollowUpHint => 'تذكير إضافي بعد ٥ و١٠ دقائق من الفجر';
+
+  @override
+  String get reminderFajrFollowUp => 'تذكير: صلاة الفجر';
+
+  @override
   String get stopAction => 'وقف';
 
   @override

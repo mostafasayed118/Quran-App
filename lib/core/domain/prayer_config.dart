@@ -81,6 +81,7 @@ class PrayerConfig {
     this.madhab = PrayerMadhab.shafi,
     this.enabledPrayers = defaultEnabledPrayers,
     this.preAdhanMinutes = 0,
+    this.fajrFollowUp = false,
     this.adjustments = const <PrayerName, int>{},
     this.highLatitude = PrayerHighLatitudeRule.none,
   });
@@ -99,6 +100,9 @@ class PrayerConfig {
 
   /// Persisted key for [preAdhanMinutes].
   static const preAdhanMinutesKey = 'prayer_pre_adhan_minutes';
+
+  /// Persisted key for [fajrFollowUp].
+  static const fajrFollowUpKey = 'prayer_fajr_follow_up';
 
   /// Persisted key for [adjustments].
   static const adjustmentsKey = 'prayer_adjustments';
@@ -135,6 +139,10 @@ class PrayerConfig {
   /// 0 disables the early reminder; stored values are clamped to 0..60.
   final int preAdhanMinutes;
 
+  /// Whether the two extra Fajr follow-up nudges (+5 and +10 minutes) are
+  /// scheduled. Off by default: the historical plan stays the shipped one.
+  final bool fajrFollowUp;
+
   /// Per-prayer minute corrections applied after the calculation.
   ///
   /// Missing entries mean zero. Sunrise is never stored. Callers must treat
@@ -154,6 +162,7 @@ class PrayerConfig {
     PrayerMadhab? madhab,
     Set<PrayerName>? enabledPrayers,
     int? preAdhanMinutes,
+    bool? fajrFollowUp,
     Map<PrayerName, int>? adjustments,
     PrayerHighLatitudeRule? highLatitude,
   }) {
@@ -162,6 +171,7 @@ class PrayerConfig {
       madhab: madhab ?? this.madhab,
       enabledPrayers: enabledPrayers ?? this.enabledPrayers,
       preAdhanMinutes: preAdhanMinutes ?? this.preAdhanMinutes,
+      fajrFollowUp: fajrFollowUp ?? this.fajrFollowUp,
       adjustments: adjustments ?? this.adjustments,
       highLatitude: highLatitude ?? this.highLatitude,
     );
@@ -174,6 +184,7 @@ class PrayerConfig {
         enabledPrayersKey:
             enabledPrayers.map((prayer) => prayer.name).join(','),
         preAdhanMinutesKey: '$preAdhanMinutes',
+        fajrFollowUpKey: fajrFollowUp ? 'true' : 'false',
         adjustmentsKey: adjustments.entries
             .where(
                 (entry) => entry.key != PrayerName.sunrise && entry.value != 0)
@@ -192,6 +203,7 @@ class PrayerConfig {
           ? _prayersFromCsv(json[enabledPrayersKey])
           : defaultEnabledPrayers,
       preAdhanMinutes: _minutesFromString(json[preAdhanMinutesKey]),
+      fajrFollowUp: json[fajrFollowUpKey] == 'true',
       adjustments: _adjustmentsFromCsv(json[adjustmentsKey]),
       highLatitude: highLatitudeFromName(json[highLatitudeKey]),
     );
@@ -274,6 +286,7 @@ class PrayerConfig {
       other.method == method &&
       other.madhab == madhab &&
       other.preAdhanMinutes == preAdhanMinutes &&
+      other.fajrFollowUp == fajrFollowUp &&
       other.highLatitude == highLatitude &&
       _samePrayers(other.enabledPrayers, enabledPrayers) &&
       _sameAdjustments(other.adjustments, adjustments);
@@ -283,6 +296,7 @@ class PrayerConfig {
         method,
         madhab,
         preAdhanMinutes,
+        fajrFollowUp,
         highLatitude,
         Object.hashAllUnordered(enabledPrayers),
         Object.hashAllUnordered(

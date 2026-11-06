@@ -97,6 +97,10 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
     });
   }
 
+  /// Enables or disables the two Fajr follow-up nudges and persists it.
+  Future<void> setFajrFollowUp(bool enabled) =>
+      _enqueue((config) => config.copyWith(fajrFollowUp: enabled));
+
   Future<void> _enqueue(PrayerConfig Function(PrayerConfig) update) {
     final next = _pending.then((_) => _apply(update));
     _pending = next.catchError((Object _) {});

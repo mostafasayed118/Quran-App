@@ -25,6 +25,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
   required ReminderSettingsPort settings,
   required ReminderSchedulerPort scheduler,
   bool prayerEnabled = true,
+  bool fajrFollowUp = false,
   PrayerConfig config = PrayerConfig.egyptian,
   DateTime? now,
   AdhanPreferences? adhanPrefs,
@@ -75,6 +76,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
           loc.reminderAdhanSoon(name.label(loc), loc.number(minutes)),
       azkarTitle: loc.reminderAzkar,
       wirdTitle: loc.reminderWird,
+      fajrFollowUpTitle: fajrFollowUp ? loc.reminderFajrFollowUp : null,
     );
     final seed = planReminders(
       now: nowLocal,

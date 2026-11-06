@@ -35,6 +35,7 @@ void main() {
     expect(backupKeyPrayerMadhab, PrayerConfig.madhabKey);
     expect(backupKeyPrayerEnabledPrayers, PrayerConfig.enabledPrayersKey);
     expect(backupKeyPrayerPreAdhanMinutes, PrayerConfig.preAdhanMinutesKey);
+    expect(backupKeyPrayerFajrFollowUp, PrayerConfig.fajrFollowUpKey);
     expect(backupKeyPrayerAdjustments, PrayerConfig.adjustmentsKey);
     expect(backupKeyPrayerHighLatitude, PrayerConfig.highLatitudeKey);
   });
@@ -89,6 +90,7 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.fajrFollowUpKey,
       PrayerConfig.adjustmentsKey,
       PrayerConfig.highLatitudeKey,
       ReaderSettingsRepository.fontScaleKey,
@@ -121,6 +123,7 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.fajrFollowUpKey,
       PrayerConfig.adjustmentsKey,
       PrayerConfig.highLatitudeKey,
       selectedCityKey,

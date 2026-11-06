@@ -1298,6 +1298,24 @@ abstract class AppLocalizations {
   /// **'تذكير الصلاة'**
   String get settingsPrayerReminder;
 
+  /// No description provided for @fajrFollowUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير متابعة الفجر'**
+  String get fajrFollowUp;
+
+  /// No description provided for @fajrFollowUpHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير إضافي بعد ٥ و١٠ دقائق من الفجر'**
+  String get fajrFollowUpHint;
+
+  /// No description provided for @reminderFajrFollowUp.
+  ///
+  /// In ar, this message translates to:
+  /// **'تذكير: صلاة الفجر'**
+  String get reminderFajrFollowUp;
+
   /// No description provided for @stopAction.
   ///
   /// In ar, this message translates to:

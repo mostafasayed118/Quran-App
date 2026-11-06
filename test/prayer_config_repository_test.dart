@@ -90,6 +90,7 @@ void main() {
     const config = PrayerConfig(
       adjustments: {PrayerName.fajr: 6, PrayerName.isha: -2},
       highLatitude: PrayerHighLatitudeRule.twilightAngle,
+      fajrFollowUp: true,
     );
 
     await repo.save(config);

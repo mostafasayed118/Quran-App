@@ -48,6 +48,7 @@ void main() {
     PrayerConfig.madhabKey,
     PrayerConfig.enabledPrayersKey,
     PrayerConfig.preAdhanMinutesKey,
+    PrayerConfig.fajrFollowUpKey,
     PrayerConfig.adjustmentsKey,
     PrayerConfig.highLatitudeKey,
     // Reader display (quran/reader_settings_repository.dart).
@@ -116,6 +117,7 @@ void main() {
       PrayerConfig.madhabKey,
       PrayerConfig.enabledPrayersKey,
       PrayerConfig.preAdhanMinutesKey,
+      PrayerConfig.fajrFollowUpKey,
       PrayerConfig.adjustmentsKey,
       PrayerConfig.highLatitudeKey,
       selectedCityKey,

@@ -177,6 +177,7 @@ class ReminderSettings
       settings: this,
       scheduler: scheduler,
       prayerEnabled: enabled,
+      fajrFollowUp: config.fajrFollowUp,
       adhanPrefs: _adhanPrefs,
       config: config,
     );

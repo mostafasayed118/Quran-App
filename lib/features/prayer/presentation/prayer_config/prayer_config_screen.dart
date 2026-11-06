@@ -179,6 +179,13 @@ class _Ready extends StatelessWidget {
                 ),
           ),
         ),
+        SwitchListTile(
+          secondary: const Icon(Icons.alarm_outlined),
+          title: Text(loc.fajrFollowUp),
+          subtitle: Text(loc.fajrFollowUpHint),
+          value: config.fajrFollowUp,
+          onChanged: (value) => cubit.setFajrFollowUp(value),
+        ),
       ],
     );
   }

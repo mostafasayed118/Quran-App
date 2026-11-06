@@ -52,6 +52,7 @@ const String backupKeyPrayerCalcMethod = 'prayer_calc_method';
 const String backupKeyPrayerMadhab = 'prayer_madhab';
 const String backupKeyPrayerEnabledPrayers = 'prayer_enabled_prayers';
 const String backupKeyPrayerPreAdhanMinutes = 'prayer_pre_adhan_minutes';
+const String backupKeyPrayerFajrFollowUp = 'prayer_fajr_follow_up';
 const String backupKeyPrayerAdjustments = 'prayer_adjustments';
 const String backupKeyPrayerHighLatitude = 'prayer_high_latitude';
 
@@ -110,6 +111,7 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyPrayerMadhab,
   backupKeyPrayerEnabledPrayers,
   backupKeyPrayerPreAdhanMinutes,
+  backupKeyPrayerFajrFollowUp,
   backupKeyPrayerAdjustments,
   backupKeyPrayerHighLatitude,
   backupKeyReaderFontScale,
@@ -140,6 +142,7 @@ const Set<String> kBackupReminderRelevantKeys = {
   backupKeyPrayerMadhab,
   backupKeyPrayerEnabledPrayers,
   backupKeyPrayerPreAdhanMinutes,
+  backupKeyPrayerFajrFollowUp,
   backupKeyPrayerAdjustments,
   backupKeyPrayerHighLatitude,
   backupKeySelectedCity,

@@ -676,6 +676,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPrayerReminder => 'Prayer reminder';
 
   @override
+  String get fajrFollowUp => 'Fajr follow-up';
+
+  @override
+  String get fajrFollowUpHint => 'Two extra nudges 5 and 10 minutes after Fajr';
+
+  @override
+  String get reminderFajrFollowUp => 'Fajr reminder';
+
+  @override
   String get stopAction => 'Stop';
 
   @override

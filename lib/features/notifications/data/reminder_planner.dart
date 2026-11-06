@@ -68,6 +68,15 @@ int preAdhanAlarmId(DateTime day, PrayerName name) {
       _remindedPrayers.indexOf(name);
 }
 
+/// Reserved id block for the optional Fajr follow-up nudges.
+const int _horizonFajrFollowUpBase = 3000;
+
+/// The [index]-th follow-up of Fajr on [day]: 0 = +5 min, 1 = +10 min.
+int fajrFollowUpAlarmId(DateTime day, int index) {
+  assert(index >= 0 && index < 2, 'the Fajr follow-up is two nudges');
+  return _horizonFajrFollowUpBase + _horizonSlot(day) * 10 + index;
+}
+
 /// Every alarm id this planner can write.
 ///
 /// A plan change clears all of them before scheduling: the binding keeps no
@@ -83,6 +92,8 @@ Set<int> reminderAlarmIds() => <int>{
           _horizonPrayerBase + slot * 10 + i,
           _horizonPreAdhanBase + slot * 10 + i,
         ],
+      for (var slot = 0; slot < reminderHorizonDays; slot++)
+        for (var i = 0; i < 2; i++) _horizonFajrFollowUpBase + slot * 10 + i,
     };
 
 /// Tap payloads: cold/warm notification taps carry these tags so the app
@@ -106,6 +117,7 @@ class ReminderTexts {
     this.azkarBody,
     this.wirdTitle,
     this.wirdBody,
+    this.fajrFollowUpTitle,
   });
 
   /// Title builder for a prayer reminder.
@@ -125,6 +137,9 @@ class ReminderTexts {
 
   /// Optional shade body for the wird reminder; null keeps it title-only.
   final String? wirdBody;
+
+  /// Optional Fajr follow-up title; null skips the two nudges.
+  final String? fajrFollowUpTitle;
 }
 
 /// Pure scheduling policy (PM ruling, keep it dumb): the next prayer still
@@ -231,6 +246,11 @@ List<ScheduledReminder> planReminders({
 /// prayer still ahead is scheduled with a horizon id, so the alarms keep firing
 /// while the app stays closed. [skipAt] is the instant the seed reminder
 /// already covers — scheduling it twice would notify twice.
+///
+/// When [ReminderTexts.fajrFollowUpTitle] is non-null, two bounded follow-up
+/// nudges are added at +5 and +10 minutes after each Fajr; they use the OS
+/// default sound (the 25 s adhan clip is not replayed) and the same prayer
+/// tap payload.
 List<ScheduledReminder> planPrayerHorizon({
   required DateTime now,
   required List<List<PrayerChoice>> days,
@@ -246,6 +266,23 @@ List<ScheduledReminder> planPrayerHorizon({
     for (final choice in dayPrayers) {
       if (choice.name == PrayerName.sunrise) continue;
       if (!enabledPrayers.contains(choice.name)) continue;
+      // The follow-ups are independent of the prayer alarm: a Fajr that just
+      // passed can still have a +10 nudge ahead.
+      final followUpTitle = texts.fajrFollowUpTitle;
+      if (followUpTitle != null && choice.name == PrayerName.fajr) {
+        for (var i = 0; i < 2; i++) {
+          final fireAt = choice.time.add(Duration(minutes: 5 * (i + 1)));
+          if (!fireAt.isAfter(now)) continue;
+          out.add(
+            ScheduledReminder(
+              id: fajrFollowUpAlarmId(choice.time, i),
+              fireAt: fireAt,
+              title: followUpTitle,
+              payload: prayerReminderPayload,
+            ),
+          );
+        }
+      }
       if (!choice.time.isAfter(now)) continue;
       if (skipAt != null && choice.time.isAtSameMomentAs(skipAt)) continue;
       out.add(
