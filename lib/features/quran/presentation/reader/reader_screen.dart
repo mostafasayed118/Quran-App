@@ -54,6 +54,41 @@ bool readerShellShouldRebuild(ReaderState previous, ReaderState current) {
       current;
 }
 
+/// The reader failure body, shared by the full route and the workspace pane.
+class ReaderErrorBody extends StatelessWidget {
+  /// Creates the failure body for [state].
+  const ReaderErrorBody({super.key, required this.state});
+
+  /// The failed reader state.
+  final ReaderFailed state;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final emptySurahId = state.emptySurahId;
+    return AppContentFrame.reading(
+      child: Column(
+        children: [
+          Expanded(
+            child: emptySurahId == null
+                ? errorPane(loc)
+                // A surah without readable ayahs is its own failure: the
+                // generic pane would blame a transient error.
+                : ErrorView(loc.readerNoAyahs(loc.number(emptySurahId))),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
+            child: FilledButton(
+              onPressed: () => context.read<ReaderCubit>().reload(),
+              child: Text(loc.retry),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _ReaderErrorView extends StatelessWidget {
   const _ReaderErrorView({required this.state});
 
@@ -62,29 +97,119 @@ class _ReaderErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final emptySurahId = state.emptySurahId;
     return Scaffold(
       appBar: AppBar(title: Text(loc.quran)),
-      body: AppContentFrame.reading(
-        child: Column(
-          children: [
-            Expanded(
-              child: emptySurahId == null
-                  ? errorPane(loc)
-                  // A surah without readable ayahs is its own failure: the
-                  // generic pane would blame a transient error.
-                  : ErrorView(loc.readerNoAyahs(loc.number(emptySurahId))),
-            ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
-              child: FilledButton(
-                onPressed: () => context.read<ReaderCubit>().reload(),
-                child: Text(loc.retry),
+      body: ReaderErrorBody(state: state),
+    );
+  }
+}
+
+/// The reader body: basmala, verse list or mushaf pager, and the selection
+/// layer. No Scaffold and no mini player, so the workspace pane can mount it
+/// beside the master list.
+class ReaderView extends StatelessWidget {
+  /// Creates the body for [state].
+  const ReaderView({super.key, required this.state});
+
+  /// The ready reader state.
+  final ReaderReady state;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final isVerses = state.mode == ReaderMode.verses;
+    // Selection is enabled only when the surah's Unicode Uthmani asset is
+    // present: the fallback glyph column is a private-use encoding, and
+    // selecting it used to copy private-use glyphs into WhatsApp. With the
+    // Unicode text the selection is real Arabic and the native toolbar is
+    // correct.
+    return AppContentFrame.reading(
+      child: Builder(
+        builder: (context) {
+          final content = Column(
+            children: [
+              if (state.showBasmala)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    loc.basmala,
+                    style: TextStyle(
+                      fontFamily: QuranFonts.meQuran,
+                      fontSize: 22,
+                      color: AppTheme.goldText(context),
+                    ),
+                    textDirection: TextDirection.rtl,
+                  ),
+                ),
+              Expanded(
+                child: isVerses
+                    ? _VersesList(state: state)
+                    : _MushafPager(state: state),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+          return state.ayahs.every((v) => v.textUnicode != null)
+              ? SelectionArea(child: content)
+              : content;
+        },
       ),
+    );
+  }
+}
+
+/// The five reader AppBar actions, shared by the full route and the pane.
+class ReaderActions extends StatelessWidget {
+  /// Creates the actions; [onOpenBookmarks] overrides the default push.
+  const ReaderActions({super.key, required this.state, this.onOpenBookmarks});
+
+  /// The ready reader state.
+  final ReaderReady state;
+
+  /// The bookmarks action; null keeps the route push.
+  final VoidCallback? onOpenBookmarks;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final cubit = context.read<ReaderCubit>();
+    final isVerses = state.mode == ReaderMode.verses;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          tooltip: loc.listenTooltip,
+          icon: const Icon(Icons.headphones),
+          onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
+                state.surahId,
+                surahName: state.surahName,
+              ),
+        ),
+        IconButton(
+          tooltip: isVerses ? loc.mushafMode : loc.versesMode,
+          icon: Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
+          onPressed: cubit.toggleMode,
+        ),
+        IconButton(
+          tooltip: loc.bookmarks,
+          icon: const Icon(Icons.bookmarks_outlined),
+          onPressed: onOpenBookmarks ?? () => context.push(AppRoutes.bookmarks),
+        ),
+        IconButton(
+          tooltip: loc.pageJump,
+          icon: const Icon(Icons.pin_outlined),
+          onPressed: () => unawaited(_openPageJump(context, cubit, loc)),
+        ),
+        IconButton(
+          tooltip: loc.readerFontSize,
+          icon: const Icon(Icons.format_size),
+          onPressed: () => _showFontSheet(
+            context,
+            cubit,
+            state.fontScale,
+            state.lineHeight,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -96,83 +221,12 @@ class _ReadyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-    final cubit = context.read<ReaderCubit>();
-    final isVerses = state.mode == ReaderMode.verses;
     return Scaffold(
       appBar: AppBar(
         title: Text(state.surahName),
-        actions: [
-          IconButton(
-            tooltip: loc.listenTooltip,
-            icon: const Icon(Icons.headphones),
-            onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
-                  state.surahId,
-                  surahName: state.surahName,
-                ),
-          ),
-          IconButton(
-            tooltip: isVerses ? loc.mushafMode : loc.versesMode,
-            icon: Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
-            onPressed: cubit.toggleMode,
-          ),
-          IconButton(
-            tooltip: loc.bookmarks,
-            icon: const Icon(Icons.bookmarks_outlined),
-            onPressed: () => context.push(AppRoutes.bookmarks),
-          ),
-          IconButton(
-            tooltip: loc.pageJump,
-            icon: const Icon(Icons.pin_outlined),
-            onPressed: () => unawaited(_openPageJump(context, cubit, loc)),
-          ),
-          IconButton(
-            tooltip: loc.readerFontSize,
-            icon: const Icon(Icons.format_size),
-            onPressed: () => _showFontSheet(
-              context,
-              cubit,
-              state.fontScale,
-              state.lineHeight,
-            ),
-          ),
-        ],
+        actions: [ReaderActions(state: state)],
       ),
-      // Selection is enabled only when the surah's Unicode Uthmani asset is
-      // present: the fallback glyph column is a private-use encoding, and
-      // selecting it used to copy `   …` into WhatsApp. With the Unicode
-      // text the selection is real Arabic and the native toolbar is correct.
-      body: AppContentFrame.reading(
-        child: Builder(
-          builder: (context) {
-            final content = Column(
-              children: [
-                if (state.showBasmala)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Text(
-                      loc.basmala,
-                      style: TextStyle(
-                        fontFamily: QuranFonts.meQuran,
-                        fontSize: 22,
-                        color: AppTheme.goldText(context),
-                      ),
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ),
-                Expanded(
-                  child: isVerses
-                      ? _VersesList(state: state)
-                      : _MushafPager(state: state),
-                ),
-              ],
-            );
-            return state.ayahs.every((v) => v.textUnicode != null)
-                ? SelectionArea(child: content)
-                : content;
-          },
-        ),
-      ),
+      body: ReaderView(state: state),
       bottomSheet: const MiniPlayerBar(),
     );
   }

@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
-import '../../../../core/widgets/ar_badge.dart';
-import '../../../../core/widgets/loading_and_error_views.dart';
-import '../../../../core/widgets/empty_state.dart';
-import '../../../../core/widgets/error_pane.dart';
-import '../../../../core/widgets/search_field.dart';
-import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/surah_summary.dart';
-import 'surah_index_cubit.dart';
-import 'surah_index_state.dart';
+import 'surah_index_body.dart';
 
+/// The compact Quran tab: the surah list with the juz and search actions.
+///
+/// The list itself lives in [SurahIndexBody] so the expanded workspace can
+/// render the same rows beside the reader.
 class SurahIndexScreen extends StatelessWidget {
+  /// Creates the screen.
   const SurahIndexScreen({super.key});
 
   @override
@@ -26,7 +19,7 @@ class SurahIndexScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.surahIndexTitle),
+        title: Text(loc.quran),
         actions: [
           IconButton(
             tooltip: loc.juzIndexTitle,
@@ -41,79 +34,9 @@ class SurahIndexScreen extends StatelessWidget {
         ],
       ),
       body: AppContentFrame(
-        child: BlocBuilder<SurahIndexCubit, SurahIndexState>(
-          builder: (context, state) => switch (state) {
-            SurahIndexLoading() => const LoadingView(),
-            SurahIndexFailed() => errorPane(loc),
-            SurahIndexReady(:final surahs, :final query) => Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.md,
-                        AppSpacing.md, AppSpacing.md, AppSpacing.xs),
-                    child: SearchField(
-                      hint: loc.searchSurahHint,
-                      onChanged: context.read<SurahIndexCubit>().setQuery,
-                    ),
-                  ),
-                  Expanded(
-                    child: surahs.isEmpty
-                        ? (query.isEmpty
-                            ? EmptyState(loc.noResults)
-                            : EmptyState(
-                                loc.noResults,
-                                // The typed words matched no surah name: offer
-                                // the verse search for the same words instead
-                                // of a dead end.
-                                actionLabel: loc.searchAyahsFor(query),
-                                onAction: () =>
-                                    context.push(quranSearchPath(query: query)),
-                              ))
-                        : ListView.builder(
-                            padding: EdgeInsets.only(
-                                bottom: appBottomInset(context)),
-                            itemCount: surahs.length,
-                            itemBuilder: (context, i) =>
-                                _SurahRow(surah: surahs[i]),
-                          ),
-                  ),
-                ],
-              ),
-          },
+        child: SurahIndexBody(
+          onSelect: (surah) => context.push(quranReaderPath(surah: surah.id)),
         ),
-      ),
-    );
-  }
-}
-
-class _SurahRow extends StatelessWidget {
-  const _SurahRow({required this.surah});
-
-  final SurahSummary surah;
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-    final colors = Theme.of(context).colorScheme;
-    final isMakkah = surah.isMakkah;
-    return ListTile(
-      contentPadding: AppTheme.tileContentPadding,
-      onTap: () => context.push(quranReaderPath(surah: surah.id)),
-      leading: ArabicBadge(loc.number(surah.id)),
-      title: Text(
-        surah.nameAr,
-        style: AppTheme.meQuranHead,
-        textAlign: TextAlign.right,
-        textDirection: TextDirection.rtl,
-      ),
-      subtitle: Text(
-        '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.digits(loc.ayatCount(surah.ayahCount))}',
-        style: TextStyle(color: colors.onSurfaceVariant),
-        textAlign: TextAlign.start,
-      ),
-      trailing: Icon(
-        Directionality.of(context) == TextDirection.rtl
-            ? Icons.chevron_left
-            : Icons.chevron_right,
       ),
     );
   }

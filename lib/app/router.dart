@@ -79,6 +79,7 @@ import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/index/juz_index_cubit.dart';
 import '../features/quran/presentation/index/juz_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
+import '../features/quran/presentation/reader/reader_route_scope.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
 import '../features/quran/presentation/search/quran_search_screen.dart';
@@ -512,8 +513,9 @@ abstract final class AppRouter {
                 value: getIt<PlaybackCubit>(),
               ),
             ],
-            child: RouteCubitScope<ReaderCubit>(
-              identity: (surah, ayah),
+            child: ReaderRouteScope(
+              surah: surah,
+              ayah: ayah,
               create: () => ReaderCubit(
                 ayahRepository: getIt<AyahRepository>(),
                 lastReadRepository: getIt<LastReadRepository>(),
@@ -525,7 +527,6 @@ abstract final class AppRouter {
                 settings: getIt<ReaderSettingsSource>(),
                 layout: getIt<ReaderLayoutSource>(),
               ),
-              start: (cubit) => cubit.start(),
               child: const ReaderScreen(),
             ),
           );
