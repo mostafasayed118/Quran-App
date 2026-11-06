@@ -14,6 +14,7 @@ import '../core/domain/prayer_times.dart';
 import '../core/domain/quran_limits.dart';
 import '../core/domain/ramadan_calendar.dart';
 import '../core/domain/reminders.dart';
+import '../core/platform/home_widget_updater.dart';
 import '../core/utils/app_routes.dart';
 import '../core/widgets/placeholder_screen.dart';
 import '../features/azkar/data/azkar_repository.dart';
@@ -168,6 +169,7 @@ abstract final class AppRouter {
                 prayer: getIt<PrayerTimesPort>(),
                 city: getIt<CitySource>(),
                 configChanges: getIt<PrayerConfigSource>().changes,
+                widgetUpdater: getIt<HomeWidgetUpdater>(),
               ),
               identity: AppRoutes.home,
               start: (cubit) => cubit.start(),

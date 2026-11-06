@@ -86,6 +86,17 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>
+        <!-- Home-screen prayer widget (home_widget plugin). -->
+        <receiver
+            android:name="com.mostafasayed.quranyahdi.QuranYahdiWidgetProvider"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/quran_yahdi_widget_info" />
+        </receiver>
         <!-- W7b: shows notifications scheduled via zonedSchedule
              (flutter_local_notifications). -->
         <receiver

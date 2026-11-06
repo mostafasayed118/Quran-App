@@ -22,6 +22,7 @@ import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/ramadan_calendar.dart';
+import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
@@ -150,6 +151,8 @@ Future<void> configureDependencies({
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
   getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
+  getIt.registerLazySingleton<HomeWidgetUpdater>(
+      () => const PlatformHomeWidgetUpdater());
   getIt.registerLazySingleton<BookmarkMetaRepository>(
       () => BookmarkMetaRepository(db));
   getIt.registerLazySingleton<BookmarkMetaSource>(

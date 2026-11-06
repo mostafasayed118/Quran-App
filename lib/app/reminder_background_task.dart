@@ -6,7 +6,14 @@ import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../core/domain/city.dart';
+import '../core/domain/prayer_times.dart';
 import '../core/l10n/app_locale_controller.dart';
+import '../core/l10n/app_localizations_digits.dart';
+import '../core/l10n/platform_localizations.dart';
+import '../core/l10n/prayer_names.dart';
+import '../core/platform/home_widget_updater.dart';
+import '../core/utils/arabic_numbers.dart';
 import '../features/notifications/data/notifications_binding.dart';
 import 'bootstrap.dart';
 import 'di/injector.dart';
@@ -125,7 +132,34 @@ Future<void> refreshRemindersForBackground() async {
   await getIt<AppLocaleController>().load();
   await getIt<NotificationsBinding>().init();
   await runBootReminderSchedule();
+  await updateHomeWidgetFromState();
   await stampReminderRefresh('ok');
+}
+
+/// Mirrors the next prayer into the home-screen widget from the background
+/// isolate, so the widget does not wait for the app to be opened.
+Future<void> updateHomeWidgetFromState() async {
+  try {
+    final city = await getIt<CitySource>().selectedCity();
+    if (city == null) return;
+    final next = getIt<PrayerTimesPort>().nextPrayer(
+      city.coordinates,
+      DateTime.now(),
+    );
+    final loc = platformLocalizations();
+    await getIt<HomeWidgetUpdater>().update(
+      appName: loc.appName,
+      label: loc.nextPrayer,
+      prayer: next.name.label(loc),
+      time: formatHm(next.time, arabicIndic: loc.usesArabicIndicDigits),
+      city: city.nameAr,
+    );
+  } on Object catch (error, stackTrace) {
+    dev.log('background widget update failed',
+        name: 'quran_yahdi/background',
+        error: error.runtimeType,
+        stackTrace: stackTrace);
+  }
 }
 
 /// The stamp file, or null when neither directory is usable.

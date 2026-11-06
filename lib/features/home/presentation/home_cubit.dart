@@ -7,6 +7,11 @@ import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
+import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
+import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
+import 'package:quran_yahdi/core/l10n/prayer_names.dart';
+import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
+import 'package:quran_yahdi/core/utils/arabic_numbers.dart';
 
 import 'home_state.dart';
 
@@ -20,11 +25,13 @@ class HomeCubit extends Cubit<HomeState> {
     required PrayerTimesPort prayer,
     required CitySource city,
     Stream<PrayerConfig>? configChanges,
+    HomeWidgetUpdater? widgetUpdater,
   })  : _lastRead = lastRead,
         _ayahs = ayahs,
         _prayer = prayer,
         _city = city,
         _configChanges = configChanges,
+        _widgetUpdater = widgetUpdater,
         super(const HomeState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
@@ -44,6 +51,7 @@ class HomeCubit extends Cubit<HomeState> {
   final PrayerTimesPort _prayer;
   final CitySource _city;
   final Stream<PrayerConfig>? _configChanges;
+  final HomeWidgetUpdater? _widgetUpdater;
   StreamSubscription<PrayerConfig>? _configSub;
 
   /// Monotonic token: only the newest [reload] may emit, so a slow older
@@ -77,6 +85,7 @@ class HomeCubit extends Cubit<HomeState> {
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
       ));
+      await _syncWidget(nextPrayerCard);
       _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
       dev.log('home load failed',
@@ -109,6 +118,28 @@ class HomeCubit extends Cubit<HomeState> {
       time: next.time,
       cityName: selected.nameAr,
     );
+  }
+
+  /// Mirrors the next prayer into the Android home-screen widget.
+  ///
+  /// Best-effort: a missing card or updater is a no-op, and a platform failure
+  /// is logged instead of failing the home load.
+  Future<void> _syncWidget(NextPrayerCard? card) async {
+    final updater = _widgetUpdater;
+    if (card == null || updater == null) return;
+    final loc = platformLocalizations();
+    try {
+      await updater.update(
+        appName: loc.appName,
+        label: loc.nextPrayer,
+        prayer: card.name.label(loc),
+        time: formatHm(card.time, arabicIndic: loc.usesArabicIndicDigits),
+        city: card.cityName,
+      );
+    } on Object catch (error, stackTrace) {
+      dev.log('home widget sync failed',
+          name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
+    }
   }
 
   void _scheduleNextPrayerRefresh(NextPrayerCard? card) {
