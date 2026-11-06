@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
@@ -65,30 +66,32 @@ class ReciterSurahsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
-        builder: (context, state) => switch (state) {
-          ReciterSurahsLoading() => const LoadingView(),
-          ReciterSurahsFailed() => errorPane(loc),
-          ReciterSurahsReady(
-            :final row,
-            :final surahNumbers,
-            :final names,
-            :final previews,
-          ) =>
-            ListView.builder(
-              padding: EdgeInsets.only(bottom: appBottomInset(context)),
-              itemCount: surahNumbers.length,
-              itemBuilder: (context, i) {
-                final n = surahNumbers[i];
-                return _SurahDownloadRow(
-                  reciter: row,
-                  surahNumber: n,
-                  name: names[n] ?? loc.surahFallbackName(loc.number(n)),
-                  teaser: previews[n],
-                );
-              },
-            ),
-        },
+      body: AppContentFrame(
+        child: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
+          builder: (context, state) => switch (state) {
+            ReciterSurahsLoading() => const LoadingView(),
+            ReciterSurahsFailed() => errorPane(loc),
+            ReciterSurahsReady(
+              :final row,
+              :final surahNumbers,
+              :final names,
+              :final previews,
+            ) =>
+              ListView.builder(
+                padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                itemCount: surahNumbers.length,
+                itemBuilder: (context, i) {
+                  final n = surahNumbers[i];
+                  return _SurahDownloadRow(
+                    reciter: row,
+                    surahNumber: n,
+                    name: names[n] ?? loc.surahFallbackName(loc.number(n)),
+                    teaser: previews[n],
+                  );
+                },
+              ),
+          },
+        ),
       ),
       bottomSheet: const MiniPlayerBar(),
     );

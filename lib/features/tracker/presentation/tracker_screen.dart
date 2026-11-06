@@ -7,6 +7,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -27,52 +29,55 @@ class TrackerScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.worshipTracker)),
-      body: BlocListener<TrackerCubit, TrackerState>(
-        listenWhen: (previous, current) =>
-            previous is TrackerReady &&
-            !previous.actionFailed &&
-            current is TrackerReady &&
-            current.actionFailed,
-        listener: (context, state) {
-          AppToast.show(context, loc.genericError, tone: ToastTone.error);
-          context.read<TrackerCubit>().acknowledgeActionFailure();
-        },
-        child: BlocBuilder<TrackerCubit, TrackerState>(
-          builder: (context, state) => switch (state) {
-            TrackerLoading() => const LoadingView(),
-            TrackerFailed() => errorPane(loc),
-            TrackerReady(
-              :final today,
-              :final streakDays,
-              :final last7,
-              :final khatmaAvailable,
-              :final khatma,
-            ) =>
-              ListView(
-                padding: appScrollPadding(
-                  context,
-                  const EdgeInsets.all(AppSpacing.md),
-                ),
-                children: [
-                  _TodayCard(today: today),
-                  const SizedBox(height: AppSpacing.sm),
-                  for (final slot in PrayerSlot.values)
-                    _SlotTile(slot: slot, today: today),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    loc.last7Days,
-                    style: AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
-                  ),
-                  const SizedBox(height: 6),
-                  _Last7Row(last7: last7, today: today.day),
-                  if (streakDays > 0) _StreakChip(streakDays: streakDays),
-                  if (khatmaAvailable) ...[
-                    const SizedBox(height: AppSpacing.md),
-                    _WirdCard(progress: khatma),
-                  ],
-                ],
-              ),
+      body: AppContentFrame.form(
+        child: BlocListener<TrackerCubit, TrackerState>(
+          listenWhen: (previous, current) =>
+              previous is TrackerReady &&
+              !previous.actionFailed &&
+              current is TrackerReady &&
+              current.actionFailed,
+          listener: (context, state) {
+            AppToast.show(context, loc.genericError, tone: ToastTone.error);
+            context.read<TrackerCubit>().acknowledgeActionFailure();
           },
+          child: BlocBuilder<TrackerCubit, TrackerState>(
+            builder: (context, state) => switch (state) {
+              TrackerLoading() => const LoadingView(),
+              TrackerFailed() => errorPane(loc),
+              TrackerReady(
+                :final today,
+                :final streakDays,
+                :final last7,
+                :final khatmaAvailable,
+                :final khatma,
+              ) =>
+                ListView(
+                  padding: appScrollPadding(
+                    context,
+                    const EdgeInsets.all(AppSpacing.md),
+                  ),
+                  children: [
+                    _TodayCard(today: today),
+                    const SizedBox(height: AppSpacing.sm),
+                    for (final slot in PrayerSlot.values)
+                      _SlotTile(slot: slot, today: today),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      loc.last7Days,
+                      style:
+                          AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
+                    ),
+                    const SizedBox(height: 6),
+                    _Last7Row(last7: last7, today: today.day),
+                    if (streakDays > 0) _StreakChip(streakDays: streakDays),
+                    if (khatmaAvailable) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      _WirdCard(progress: khatma),
+                    ],
+                  ],
+                ),
+            },
+          ),
         ),
       ),
     );
@@ -262,8 +267,9 @@ class _WirdCard extends StatelessWidget {
 
   Future<void> _openSetupSheet(BuildContext context) async {
     final cubit = context.read<TrackerCubit>();
-    final target = await showModalBottomSheet<int>(
+    final target = await showAppSheet<int>(
       context: context,
+      isScrollControlled: true,
       builder: (_) => const _WirdSetupSheet(),
     );
     if (target != null) await cubit.startKhatma(target);
@@ -369,25 +375,27 @@ class _WirdSetupSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.lg, AppSpacing.md, 6),
-            child: Text(loc.wirdPaceSheetTitle, style: AppTheme.rowTitle),
-          ),
-          for (final target in KhatmaProgress.targetChoices)
-            ListTile(
-              title: Text(_paceLabel(loc, target)),
-              subtitle: Text(
-                loc.wirdDailyPages(
-                  loc.number(KhatmaProgress.dailyPagesFor(target)),
-                ),
-              ),
-              onTap: () => Navigator.of(context).pop(target),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md, AppSpacing.lg, AppSpacing.md, 6),
+              child: Text(loc.wirdPaceSheetTitle, style: AppTheme.rowTitle),
             ),
-        ],
+            for (final target in KhatmaProgress.targetChoices)
+              ListTile(
+                title: Text(_paceLabel(loc, target)),
+                subtitle: Text(
+                  loc.wirdDailyPages(
+                    loc.number(KhatmaProgress.dailyPagesFor(target)),
+                  ),
+                ),
+                onTap: () => Navigator.of(context).pop(target),
+              ),
+          ],
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -110,43 +111,45 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.downloadsTitle)),
-      body: FutureBuilder<_DownloadsView>(
-        future: _data,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const LoadingView();
-          }
-          if (snapshot.hasError) return errorPane(loc, onRetry: _reload);
-          final view = snapshot.data;
-          if (view == null || view.items.isEmpty) {
-            return EmptyState(
-              loc.downloadsEmpty,
-              icon: Icons.download_done_outlined,
-            );
-          }
-          return Column(
-            children: [
-              // The header is a Card, never a ListTile: the list rows own that
-              // type. It appears only from two rows up, where a total and a
-              // "delete all" are worth the space.
-              if (view.summary.count >= 2)
-                _SummaryHeader(
-                  summary: view.summary,
-                  onDeleteAll: _deleteAll,
-                ),
-              Expanded(
-                child: ListView.builder(
-                  padding: EdgeInsets.only(bottom: appBottomInset(context)),
-                  itemCount: view.items.length,
-                  itemBuilder: (context, i) => _DownloadRow(
-                    item: view.items[i],
-                    onDelete: () => _delete(view.items[i]),
+      body: AppContentFrame(
+        child: FutureBuilder<_DownloadsView>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const LoadingView();
+            }
+            if (snapshot.hasError) return errorPane(loc, onRetry: _reload);
+            final view = snapshot.data;
+            if (view == null || view.items.isEmpty) {
+              return EmptyState(
+                loc.downloadsEmpty,
+                icon: Icons.download_done_outlined,
+              );
+            }
+            return Column(
+              children: [
+                // The header is a Card, never a ListTile: the list rows own that
+                // type. It appears only from two rows up, where a total and a
+                // "delete all" are worth the space.
+                if (view.summary.count >= 2)
+                  _SummaryHeader(
+                    summary: view.summary,
+                    onDeleteAll: _deleteAll,
+                  ),
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                    itemCount: view.items.length,
+                    itemBuilder: (context, i) => _DownloadRow(
+                      item: view.items[i],
+                      onDelete: () => _delete(view.items[i]),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

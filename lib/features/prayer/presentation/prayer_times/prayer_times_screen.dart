@@ -13,6 +13,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -54,24 +55,26 @@ class PrayerTimesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
-        builder: (context, state) => switch (state) {
-          PrayerTimesLoading() => const LoadingView(),
-          PrayerTimesFailed() => errorPane(
-              loc,
-              onRetry: () => context.read<PrayerTimesCubit>().reload(),
-            ),
-          PrayerTimesReady(:final city?) => RefreshIndicator(
-              onRefresh: () => context.read<PrayerTimesCubit>().reload(),
-              child: _TimesList(state: state, city: city),
-            ),
-          PrayerTimesReady() => EmptyState(
-              loc.noCity,
-              icon: Icons.location_off_outlined,
-              actionLabel: loc.selectCity,
-              onAction: () => _openCityPicker(context),
-            ),
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<PrayerTimesCubit, PrayerTimesState>(
+          builder: (context, state) => switch (state) {
+            PrayerTimesLoading() => const LoadingView(),
+            PrayerTimesFailed() => errorPane(
+                loc,
+                onRetry: () => context.read<PrayerTimesCubit>().reload(),
+              ),
+            PrayerTimesReady(:final city?) => RefreshIndicator(
+                onRefresh: () => context.read<PrayerTimesCubit>().reload(),
+                child: _TimesList(state: state, city: city),
+              ),
+            PrayerTimesReady() => EmptyState(
+                loc.noCity,
+                icon: Icons.location_off_outlined,
+                actionLabel: loc.selectCity,
+                onAction: () => _openCityPicker(context),
+              ),
+          },
+        ),
       ),
     );
   }

@@ -109,6 +109,7 @@ void main() {
     WidgetTester tester,
     PlaybackCubit target, {
     Duration duration = const Duration(minutes: 2),
+    double? textScale,
   }) async {
     await target.playReciter(
       const ReciterInfo(
@@ -125,6 +126,7 @@ void main() {
     await pumpAppHost(
       tester,
       settle: false,
+      textScale: textScale,
       home: BlocProvider<PlaybackCubit>.value(
         value: target,
         child: Scaffold(
@@ -191,5 +193,19 @@ void main() {
     );
 
     expect(find.text('٢:٠٣:٠٤'), findsOneWidget);
+  });
+
+  testWidgets('landscape 640x360 at textScale 2.0 keeps the player usable',
+      (tester) async {
+    tester.view.physicalSize = const Size(640, 360);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await openSheet(tester, cubit, textScale: 2.0);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('الفاتحة'), findsOneWidget);
+    // The sheet scrolls instead of overflowing the short viewport.
+    expect(find.byType(SingleChildScrollView), findsWidgets);
   });
 }

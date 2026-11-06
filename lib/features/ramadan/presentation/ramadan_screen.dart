@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -34,25 +35,27 @@ class RamadanScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<RamadanCubit, RamadanState>(
-        builder: (context, state) => switch (state) {
-          RamadanLoading() => const LoadingView(),
-          RamadanFailed() => errorPane(loc, onRetry: cubit.start),
-          RamadanReady(:final days) when days.isEmpty =>
-            EmptyState(loc.noCity, icon: Icons.location_off_outlined),
-          RamadanReady(
-            :final monthName,
-            :final hijriYear,
-            :final days,
-            :final today,
-          ) =>
-            _RamadanList(
-              monthName: monthName,
-              hijriYear: hijriYear,
-              days: days,
-              today: today,
-            ),
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<RamadanCubit, RamadanState>(
+          builder: (context, state) => switch (state) {
+            RamadanLoading() => const LoadingView(),
+            RamadanFailed() => errorPane(loc, onRetry: cubit.start),
+            RamadanReady(:final days) when days.isEmpty =>
+              EmptyState(loc.noCity, icon: Icons.location_off_outlined),
+            RamadanReady(
+              :final monthName,
+              :final hijriYear,
+              :final days,
+              :final today,
+            ) =>
+              _RamadanList(
+                monthName: monthName,
+                hijriYear: hijriYear,
+                days: days,
+                today: today,
+              ),
+          },
+        ),
       ),
     );
   }

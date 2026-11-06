@@ -64,7 +64,7 @@ const _cairo = City(
 );
 
 /// A tiny router so the screen can push the city picker and pop on finish.
-Widget _host({required Widget home}) {
+Widget _host({required Widget home, double? textScale}) {
   final router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (_, __) => home),
@@ -85,6 +85,14 @@ Widget _host({required Widget home}) {
       GlobalCupertinoLocalizations.delegate,
     ],
     theme: AppTheme.light,
+    builder: textScale == null
+        ? null
+        : (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(textScale),
+              ),
+              child: child!,
+            ),
   );
 }
 
@@ -234,5 +242,39 @@ void main() {
 
     expect(scheduler.requests, 1);
     expect(find.text('التنبيهات مفعّلة'), findsOneWidget);
+  });
+
+  testWidgets('320 dp at textScale 2.0 keeps the step action intact',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final cubit = OnboardingCubit(
+      city: _City(_cairo),
+      status: _Status(),
+      reminders: _Scheduler(),
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await tester.pumpWidget(_host(
+      textScale: 2.0,
+      home: BlocProvider<OnboardingCubit>.value(
+        value: cubit,
+        child: const OnboardingScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('تغيير المدينة'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('ابدأ الاستخدام'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('ابدأ الاستخدام'), findsOneWidget);
   });
 }

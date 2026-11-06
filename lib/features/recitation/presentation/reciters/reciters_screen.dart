@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -47,42 +48,44 @@ class RecitersScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<RecitersCubit, RecitersState>(
-        builder: (context, state) => switch (state) {
-          RecitersLoading() => const LoadingView(),
-          RecitersFailed() => errorPane(loc),
-          RecitersReady(:final reciters, :final query, :final dataError) =>
-            Column(
-              children: [
-                if (dataError)
-                  ErrorStrip(
-                    loc.recitersRefreshFailed,
-                    icon: Icons.wifi_off,
-                    onDismiss: () =>
-                        context.read<RecitersCubit>().clearDataError(),
+      body: AppContentFrame(
+        child: BlocBuilder<RecitersCubit, RecitersState>(
+          builder: (context, state) => switch (state) {
+            RecitersLoading() => const LoadingView(),
+            RecitersFailed() => errorPane(loc),
+            RecitersReady(:final reciters, :final query, :final dataError) =>
+              Column(
+                children: [
+                  if (dataError)
+                    ErrorStrip(
+                      loc.recitersRefreshFailed,
+                      icon: Icons.wifi_off,
+                      onDismiss: () =>
+                          context.read<RecitersCubit>().clearDataError(),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.md,
+                        AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+                    child: SearchField(
+                      hint: loc.searchReciters,
+                      onChanged: context.read<RecitersCubit>().setQuery,
+                    ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.md,
-                      AppSpacing.md, AppSpacing.md, AppSpacing.xs),
-                  child: SearchField(
-                    hint: loc.searchReciters,
-                    onChanged: context.read<RecitersCubit>().setQuery,
+                  Expanded(
+                    child: reciters.isEmpty
+                        ? EmptyState(
+                            query.isEmpty ? loc.noReciters : loc.noResults,
+                            actionLabel: query.isEmpty ? loc.refresh : null,
+                            onAction: query.isEmpty
+                                ? () => context.read<RecitersCubit>().refresh()
+                                : null,
+                          )
+                        : _RecitersList(reciters: reciters),
                   ),
-                ),
-                Expanded(
-                  child: reciters.isEmpty
-                      ? EmptyState(
-                          query.isEmpty ? loc.noReciters : loc.noResults,
-                          actionLabel: query.isEmpty ? loc.refresh : null,
-                          onAction: query.isEmpty
-                              ? () => context.read<RecitersCubit>().refresh()
-                              : null,
-                        )
-                      : _RecitersList(reciters: reciters),
-                ),
-              ],
-            ),
-        },
+                ],
+              ),
+          },
+        ),
       ),
     );
   }

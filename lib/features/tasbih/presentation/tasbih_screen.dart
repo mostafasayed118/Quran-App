@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -19,48 +20,50 @@ class TasbihScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.tasbih)),
-      body: BlocBuilder<TasbihCubit, TasbihState>(
-        builder: (context, state) {
-          final TasbihReady ready = switch (state) {
-            TasbihReady() => state,
-          };
-          final done = ready.count >= ready.target;
-          // Full width so the dial and the chips centre on the screen: a bare
-          // Column in a loose body shrink-wraps to its widest child and sits
-          // against the start edge.
-          return SingleChildScrollView(
-            padding: appScrollPadding(
-              context,
-              const EdgeInsets.symmetric(vertical: AppSpacing.md),
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: Column(
-                children: [
-                  const SizedBox(height: AppSpacing.lg),
-                  _TasbihDial(ready: ready),
-                  const SizedBox(height: 20),
-                  _TargetChips(ready: ready),
-                  const SizedBox(height: AppSpacing.md),
-                  OutlinedButton.icon(
-                    onPressed: () => context.read<TasbihCubit>().reset(),
-                    icon: const Icon(Icons.refresh),
-                    label: Text(loc.tasbihReset),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  if (done)
-                    Text(
-                      loc.azkarDone,
-                      style: TextStyle(
-                        color: AppTheme.goldText(context),
-                        fontSize: 13,
-                      ),
-                    ),
-                ],
+      body: AppContentFrame.form(
+        child: BlocBuilder<TasbihCubit, TasbihState>(
+          builder: (context, state) {
+            final TasbihReady ready = switch (state) {
+              TasbihReady() => state,
+            };
+            final done = ready.count >= ready.target;
+            // Full width so the dial and the chips centre on the screen: a bare
+            // Column in a loose body shrink-wraps to its widest child and sits
+            // against the start edge.
+            return SingleChildScrollView(
+              padding: appScrollPadding(
+                context,
+                const EdgeInsets.symmetric(vertical: AppSpacing.md),
               ),
-            ),
-          );
-        },
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    const SizedBox(height: AppSpacing.lg),
+                    _TasbihDial(ready: ready),
+                    const SizedBox(height: 20),
+                    _TargetChips(ready: ready),
+                    const SizedBox(height: AppSpacing.md),
+                    OutlinedButton.icon(
+                      onPressed: () => context.read<TasbihCubit>().reset(),
+                      icon: const Icon(Icons.refresh),
+                      label: Text(loc.tasbihReset),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    if (done)
+                      Text(
+                        loc.azkarDone,
+                        style: TextStyle(
+                          color: AppTheme.goldText(context),
+                          fontSize: 13,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

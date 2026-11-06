@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'onboarding_cubit.dart';
@@ -43,19 +44,21 @@ class OnboardingScreen extends StatelessWidget {
               ),
           ],
         ),
-        body: switch (state) {
-          OnboardingLoading() => const LoadingView(),
-          OnboardingReady(
-            :final citySelected,
-            :final cityName,
-            :final remindersGranted,
-          ) =>
-            _Steps(
-              citySelected: citySelected,
-              cityName: cityName,
-              remindersGranted: remindersGranted,
-            ),
-        },
+        body: AppContentFrame.form(
+          child: switch (state) {
+            OnboardingLoading() => const LoadingView(),
+            OnboardingReady(
+              :final citySelected,
+              :final cityName,
+              :final remindersGranted,
+            ) =>
+              _Steps(
+                citySelected: citySelected,
+                cityName: cityName,
+                remindersGranted: remindersGranted,
+              ),
+          },
+        ),
       ),
     );
   }
@@ -175,11 +178,14 @@ class _StepCard extends StatelessWidget {
                           color: colors.secondary, size: 20),
                     ),
                   if (actionLabel != null)
-                    Text(
-                      actionLabel!,
-                      style: TextStyle(
-                        color: colors.primary,
-                        fontWeight: FontWeight.w700,
+                    Flexible(
+                      child: Text(
+                        actionLabel!,
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                          color: colors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
                 ],

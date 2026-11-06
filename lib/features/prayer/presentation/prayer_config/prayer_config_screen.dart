@@ -9,6 +9,7 @@ import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -28,15 +29,18 @@ class PrayerConfigScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.prayerSettings)),
-      body: BlocBuilder<PrayerConfigCubit, PrayerConfigState>(
-        builder: (context, state) => switch (state) {
-          PrayerConfigLoading() => const LoadingView(),
-          PrayerConfigFailed() => errorPane(
-              loc,
-              onRetry: () => context.read<PrayerConfigCubit>().start(),
-            ),
-          PrayerConfigReady(:final config) => _Ready(config: config, loc: loc),
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<PrayerConfigCubit, PrayerConfigState>(
+          builder: (context, state) => switch (state) {
+            PrayerConfigLoading() => const LoadingView(),
+            PrayerConfigFailed() => errorPane(
+                loc,
+                onRetry: () => context.read<PrayerConfigCubit>().start(),
+              ),
+            PrayerConfigReady(:final config) =>
+              _Ready(config: config, loc: loc),
+          },
+        ),
       ),
     );
   }

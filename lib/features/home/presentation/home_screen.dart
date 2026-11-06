@@ -13,6 +13,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/lifecycle_ticker.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -135,48 +136,51 @@ class _HomeScreenState extends State<HomeScreen>
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.appName)),
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) => switch (state) {
-          HomeLoading() => const LoadingView(),
-          HomeFailed() => errorPane(
-              loc,
-              onRetry: () => context.read<HomeCubit>().reload(),
-            ),
-          HomeReady(:final lastRead, :final nextPrayer) => ListView(
-              padding: appScrollPadding(
-                context,
-                const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.lg,
-                  AppSpacing.md,
-                  AppSpacing.md,
-                ),
+      body: AppContentFrame(
+        child: BlocBuilder<HomeCubit, HomeState>(
+          builder: (context, state) => switch (state) {
+            HomeLoading() => const LoadingView(),
+            HomeFailed() => errorPane(
+                loc,
+                onRetry: () => context.read<HomeCubit>().reload(),
               ),
-              children: [
-                // One Column child rather than a lazy list: the dashboard is a
-                // fixed 14 tiles plus three cards, and eager building keeps
-                // every label reachable at a 2.0 text scale.
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (lastRead != null)
-                      _ContinueReadingCard(lastRead: lastRead),
-                    if (lastRead != null) const SizedBox(height: AppSpacing.sm),
-                    if (nextPrayer != null)
-                      _NextPrayerCard(prayer: nextPrayer)
-                    else
-                      const _NoCityCard(),
-                    SectionHeader(title: loc.homeSectionQuran, inset: 0),
-                    const _ServiceGrid(services: _quranServices),
-                    SectionHeader(title: loc.homeSectionWorship, inset: 0),
-                    const _ServiceGrid(services: _worshipServices),
-                    SectionHeader(title: loc.homeSectionMore, inset: 0),
-                    const _ServiceGrid(services: _moreServices),
-                  ],
+            HomeReady(:final lastRead, :final nextPrayer) => ListView(
+                padding: appScrollPadding(
+                  context,
+                  const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                    AppSpacing.md,
+                  ),
                 ),
-              ],
-            ),
-        },
+                children: [
+                  // One Column child rather than a lazy list: the dashboard is a
+                  // fixed 14 tiles plus three cards, and eager building keeps
+                  // every label reachable at a 2.0 text scale.
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (lastRead != null)
+                        _ContinueReadingCard(lastRead: lastRead),
+                      if (lastRead != null)
+                        const SizedBox(height: AppSpacing.sm),
+                      if (nextPrayer != null)
+                        _NextPrayerCard(prayer: nextPrayer)
+                      else
+                        const _NoCityCard(),
+                      SectionHeader(title: loc.homeSectionQuran, inset: 0),
+                      const _ServiceGrid(services: _quranServices),
+                      SectionHeader(title: loc.homeSectionWorship, inset: 0),
+                      const _ServiceGrid(services: _worshipServices),
+                      SectionHeader(title: loc.homeSectionMore, inset: 0),
+                      const _ServiceGrid(services: _moreServices),
+                    ],
+                  ),
+                ],
+              ),
+          },
+        ),
       ),
     );
   }
@@ -466,41 +470,48 @@ class _ServiceGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const gap = AppSpacing.sm;
-    const columns = 3;
     final loc = AppLocalizations.of(context);
-    final rows = <List<_Service>>[
-      for (var i = 0; i < services.length; i += columns)
-        services.sublist(
-          i,
-          i + columns > services.length ? services.length : i + columns,
-        ),
-    ];
-    return Column(
-      children: [
-        for (var r = 0; r < rows.length; r++) ...[
-          if (r > 0) const SizedBox(height: gap),
-          IntrinsicHeight(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (var c = 0; c < columns; c++) ...[
-                  if (c > 0) const SizedBox(width: gap),
-                  if (c < rows[r].length)
-                    Expanded(
-                      child: ServiceTile(
-                        icon: rows[r][c].icon,
-                        label: rows[r][c].label(loc),
-                        onTap: () => context.push(rows[r][c].route),
-                      ),
-                    )
-                  else
-                    const Spacer(),
-                ],
-              ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Two columns on a 320 dp phone keep the label readable; three from
+        // 340 dp up. The width comes from the frame, not MediaQuery, because
+        // a tablet renders this grid inside a capped column.
+        final columns = constraints.maxWidth < 340 ? 2 : 3;
+        final rows = <List<_Service>>[
+          for (var i = 0; i < services.length; i += columns)
+            services.sublist(
+              i,
+              i + columns > services.length ? services.length : i + columns,
             ),
-          ),
-        ],
-      ],
+        ];
+        return Column(
+          children: [
+            for (var r = 0; r < rows.length; r++) ...[
+              if (r > 0) const SizedBox(height: gap),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var c = 0; c < columns; c++) ...[
+                      if (c > 0) const SizedBox(width: gap),
+                      if (c < rows[r].length)
+                        Expanded(
+                          child: ServiceTile(
+                            icon: rows[r][c].icon,
+                            label: rows[r][c].label(loc),
+                            onTap: () => context.push(rows[r][c].route),
+                          ),
+                        )
+                      else
+                        const Spacer(),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
     );
   }
 }

@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
@@ -59,26 +60,28 @@ class AzkarScreen extends StatelessWidget {
                   ),
               ],
             ),
-            body: switch (state) {
-              AzkarLoading() => const LoadingView(),
-              AzkarFailed() => errorPane(loc),
-              AzkarBrowsing(
-                :final collections,
-                :final favorites,
-                :final query,
-                :final searchResults,
-                :final searchHasMore,
-              ) =>
-                _BrowsingView(
-                  collections: collections,
-                  favorites: favorites,
-                  query: query,
-                  searchResults: searchResults,
-                  searchHasMore: searchHasMore,
-                ),
-              AzkarReciting(:final collection) =>
-                _RecitingList(collection: collection),
-            },
+            body: AppContentFrame(
+              child: switch (state) {
+                AzkarLoading() => const LoadingView(),
+                AzkarFailed() => errorPane(loc),
+                AzkarBrowsing(
+                  :final collections,
+                  :final favorites,
+                  :final query,
+                  :final searchResults,
+                  :final searchHasMore,
+                ) =>
+                  _BrowsingView(
+                    collections: collections,
+                    favorites: favorites,
+                    query: query,
+                    searchResults: searchResults,
+                    searchHasMore: searchHasMore,
+                  ),
+                AzkarReciting(:final collection) =>
+                  _RecitingList(collection: collection),
+              },
+            ),
           ),
         );
       },

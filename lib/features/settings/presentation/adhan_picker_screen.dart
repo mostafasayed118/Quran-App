@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../l10n/app_localizations.dart';
@@ -45,12 +46,14 @@ class _AdhanPickerScreenState extends State<AdhanPickerScreen> {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.adhanTitle)),
-      body: BlocBuilder<AdhanPickerCubit, AdhanPickerState>(
-        builder: (context, state) => switch (state) {
-          AdhanPickerLoading() => const LoadingView(),
-          AdhanPickerFailed() => errorPane(loc, onRetry: _cubit.start),
-          AdhanPickerReady() => _body(loc, state),
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<AdhanPickerCubit, AdhanPickerState>(
+          builder: (context, state) => switch (state) {
+            AdhanPickerLoading() => const LoadingView(),
+            AdhanPickerFailed() => errorPane(loc, onRetry: _cubit.start),
+            AdhanPickerReady() => _body(loc, state),
+          },
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -38,16 +39,18 @@ class PrayerMonthScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<PrayerMonthCubit, PrayerMonthState>(
-        builder: (context, state) => switch (state) {
-          PrayerMonthLoading() => const LoadingView(),
-          PrayerMonthFailed() => errorPane(loc, onRetry: cubit.start),
-          PrayerMonthReady(:final city, :final days)
-              when city == null || days.isEmpty =>
-            EmptyState(loc.noCity, icon: Icons.location_off_outlined),
-          PrayerMonthReady(:final year, :final month, :final days) =>
-            _MonthList(year: year, month: month, days: days),
-        },
+      body: AppContentFrame(
+        child: BlocBuilder<PrayerMonthCubit, PrayerMonthState>(
+          builder: (context, state) => switch (state) {
+            PrayerMonthLoading() => const LoadingView(),
+            PrayerMonthFailed() => errorPane(loc, onRetry: cubit.start),
+            PrayerMonthReady(:final city, :final days)
+                when city == null || days.isEmpty =>
+              EmptyState(loc.noCity, icon: Icons.location_off_outlined),
+            PrayerMonthReady(:final year, :final month, :final days) =>
+              _MonthList(year: year, month: month, days: days),
+          },
+        ),
       ),
     );
   }

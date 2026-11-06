@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import 'support/fake_playback_service.dart';
 
@@ -238,6 +239,51 @@ void main() {
     expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
     expect(find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'), findsOneWidget);
     expect(find.text('المكتبة'), findsOneWidget);
+  });
+
+  testWidgets('a 1024 dp window caps the reader at the reading measure',
+      (tester) async {
+    tester.view.physicalSize = const Size(1024, 768);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await getIt.reset();
+    getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(db,
+        libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode));
+    addTearDown(getIt.reset);
+
+    final cubit = ReaderCubit(
+      ayahRepository: _TeardownSafeAyahRepository(db),
+      lastReadRepository: LastReadRepository(db),
+      surahId: 2,
+      initialAyah: 0,
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+    final playbackCubit = PlaybackCubit(
+      service: FakePlaybackService(),
+      reciters: ReciterRepository(db),
+      downloader: AudioDownloader(db,
+          audioRootResolver: () async => Directory.systemTemp),
+    );
+    addTearDown(playbackCubit.close);
+
+    await tester.pumpWidget(localizedShell(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: const ReaderScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(
+      tester.getSize(find.byType(ScrollablePositionedList)).width,
+      760,
+    );
   });
 
   testWidgets(

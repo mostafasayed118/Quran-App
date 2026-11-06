@@ -7,6 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
@@ -51,35 +52,37 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.searchQuranTitle)),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
-            child: SearchField(
-              hint: loc.searchQuranHint,
-              controller: _controller,
-              // Arriving with a query means the results are the point; only
-              // the empty prompt wants the keyboard.
-              autofocus: widget.initialQuery.trim().isEmpty,
-              onChanged: context.read<QuranSearchCubit>().onQueryChanged,
+      body: AppContentFrame(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+              child: SearchField(
+                hint: loc.searchQuranHint,
+                controller: _controller,
+                // Arriving with a query means the results are the point; only
+                // the empty prompt wants the keyboard.
+                autofocus: widget.initialQuery.trim().isEmpty,
+                onChanged: context.read<QuranSearchCubit>().onQueryChanged,
+              ),
             ),
-          ),
-          Expanded(
-            child: BlocBuilder<QuranSearchCubit, QuranSearchState>(
-              builder: (context, state) => switch (state) {
-                QuranSearchLoading() => const LoadingView(),
-                QuranSearchFailed() => errorPane(loc),
-                QuranSearchReady(:final query, :final hits) =>
-                  !quranSearchQueryUsable(query)
-                      ? EmptyState(loc.searchQuranPrompt)
-                      : hits.isEmpty
-                          ? EmptyState(loc.noResults)
-                          : _Results(ready: state),
-              },
+            Expanded(
+              child: BlocBuilder<QuranSearchCubit, QuranSearchState>(
+                builder: (context, state) => switch (state) {
+                  QuranSearchLoading() => const LoadingView(),
+                  QuranSearchFailed() => errorPane(loc),
+                  QuranSearchReady(:final query, :final hits) =>
+                    !quranSearchQueryUsable(query)
+                        ? EmptyState(loc.searchQuranPrompt)
+                        : hits.isEmpty
+                            ? EmptyState(loc.noResults)
+                            : _Results(ready: state),
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

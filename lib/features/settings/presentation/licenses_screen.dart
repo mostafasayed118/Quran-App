@@ -4,6 +4,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/insets.dart';
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -25,66 +26,68 @@ class LicensesScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.licensesTitle)),
-      body: ListView(
-        padding: appScrollPadding(
-          context,
-          const EdgeInsets.only(bottom: AppSpacing.lg),
+      body: AppContentFrame(
+        child: ListView(
+          padding: appScrollPadding(
+            context,
+            const EdgeInsets.only(bottom: AppSpacing.lg),
+          ),
+          children: [
+            SectionHeader(title: loc.licensesContentSection),
+            _InfoTile(
+              icon: Icons.menu_book_outlined,
+              text: loc.licensesQuranText,
+            ),
+            _AssetTile(
+              icon: Icons.verified_outlined,
+              title: loc.licensesQuranUthmani,
+              action: loc.licensesTanzilTerms,
+              asset: _tanzilTerms,
+            ),
+            _InfoTile(icon: Icons.translate_outlined, text: loc.licensesSiraj),
+            _InfoTile(
+                icon: Icons.translate_outlined, text: loc.licensesPickthall),
+            _InfoTile(
+                icon: Icons.library_books_outlined, text: loc.licensesBukhari),
+            _InfoTile(icon: Icons.spa_outlined, text: loc.licensesAzkar),
+            _InfoTile(icon: Icons.headphones_outlined, text: loc.licensesAudio),
+            SectionHeader(title: loc.licensesFontsSection),
+            _AssetTile(
+              icon: Icons.font_download_outlined,
+              title: loc.licensesHafsSmart,
+              action: loc.licensesHafsEula,
+              asset: _hafsEula,
+            ),
+            _AssetTile(
+              icon: Icons.font_download_outlined,
+              title: loc.licensesMeQuran,
+              action: loc.licensesMeQuranTerms,
+              asset: _meQuranTerms,
+            ),
+            _AssetTile(
+              icon: Icons.font_download_outlined,
+              title: loc.licensesCairo,
+              action: loc.licensesCairoOfl,
+              asset: _cairoOfl,
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.code),
+              title: Text(loc.licensesOpenSource),
+              onTap: () => showLicensePage(
+                context: context,
+                applicationName: loc.appName,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Text(
+                loc.licensesWithdrawn,
+                style: AppTheme.mutedFootnote(context),
+              ),
+            ),
+          ],
         ),
-        children: [
-          SectionHeader(title: loc.licensesContentSection),
-          _InfoTile(
-            icon: Icons.menu_book_outlined,
-            text: loc.licensesQuranText,
-          ),
-          _AssetTile(
-            icon: Icons.verified_outlined,
-            title: loc.licensesQuranUthmani,
-            action: loc.licensesTanzilTerms,
-            asset: _tanzilTerms,
-          ),
-          _InfoTile(icon: Icons.translate_outlined, text: loc.licensesSiraj),
-          _InfoTile(
-              icon: Icons.translate_outlined, text: loc.licensesPickthall),
-          _InfoTile(
-              icon: Icons.library_books_outlined, text: loc.licensesBukhari),
-          _InfoTile(icon: Icons.spa_outlined, text: loc.licensesAzkar),
-          _InfoTile(icon: Icons.headphones_outlined, text: loc.licensesAudio),
-          SectionHeader(title: loc.licensesFontsSection),
-          _AssetTile(
-            icon: Icons.font_download_outlined,
-            title: loc.licensesHafsSmart,
-            action: loc.licensesHafsEula,
-            asset: _hafsEula,
-          ),
-          _AssetTile(
-            icon: Icons.font_download_outlined,
-            title: loc.licensesMeQuran,
-            action: loc.licensesMeQuranTerms,
-            asset: _meQuranTerms,
-          ),
-          _AssetTile(
-            icon: Icons.font_download_outlined,
-            title: loc.licensesCairo,
-            action: loc.licensesCairoOfl,
-            asset: _cairoOfl,
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.code),
-            title: Text(loc.licensesOpenSource),
-            onTap: () => showLicensePage(
-              context: context,
-              applicationName: loc.appName,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Text(
-              loc.licensesWithdrawn,
-              style: AppTheme.mutedFootnote(context),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -124,7 +127,11 @@ class _AssetTile extends StatelessWidget {
       leading: Icon(icon),
       title: Text(title, style: const TextStyle(fontSize: 14)),
       subtitle: Text(action),
-      trailing: const Icon(Icons.chevron_right),
+      trailing: Icon(
+        Directionality.of(context) == TextDirection.rtl
+            ? Icons.chevron_left
+            : Icons.chevron_right,
+      ),
       onTap: () => _open(context, title, asset),
     );
   }

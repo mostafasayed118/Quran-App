@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/layout/app_breakpoints.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -90,94 +92,99 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.qibla)),
-      body: BlocBuilder<QiblaCubit, QiblaState>(
-        buildWhen: qiblaBodyShouldRebuild,
-        builder: (context, state) {
-          if (state is QiblaLoading) return const LoadingView();
-          if (state is QiblaFailed) {
-            return errorPane(
-              loc,
-              onRetry: () => context.read<QiblaCubit>().reload(),
-            );
-          }
-          final (
-            :city,
-            :bearing,
-            :heading,
-            :compassUnavailable,
-            :calibrationNeeded,
-          ) = switch (state) {
-            QiblaReady() => (
-                city: state.city,
-                bearing: state.bearing,
-                heading: state.heading,
-                compassUnavailable: state.compassUnavailable,
-                calibrationNeeded: state.calibrationNeeded,
-              ),
-            QiblaLoading() => (
-                city: state.city,
-                bearing: state.bearing,
-                heading: state.heading,
-                compassUnavailable: state.compassUnavailable,
-                calibrationNeeded: state.calibrationNeeded,
-              ),
-            QiblaFailed() => (
-                city: null,
-                bearing: null,
-                heading: null,
-                compassUnavailable: false,
-                calibrationNeeded: false,
-              ),
-          };
-          if (city == null || bearing == null) {
-            return EmptyState(
-              loc.noCity,
-              icon: Icons.location_off_outlined,
-              actionLabel: loc.selectCity,
-              onAction: () async {
-                final selected = await context.push<bool>(AppRoutes.cityPicker);
-                if (selected == true && context.mounted) {
-                  await context.read<QiblaCubit>().reload();
-                }
-              },
-            );
-          }
-          final delta = qiblaDeltaDeg(bearing, heading ?? 0);
-          final aligned = heading != null && delta.abs() <= kQiblaToleranceDeg;
-          return ListView(
-            padding:
-                appScrollPadding(context, const EdgeInsets.all(AppSpacing.lg)),
-            children: [
-              _CityTile(title: city.nameAr),
-              const SizedBox(height: AppSpacing.lg),
-              _Dial(
-                bearing: bearing,
-                heading: heading,
-                aligned: aligned,
-                cityName: city.nameAr,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              if (heading == null)
-                _CompassNote(
-                  text:
-                      compassUnavailable ? loc.compassStatic : loc.compassLive,
-                )
-              else
-                _CompassNote(text: loc.compassLive),
-              const SizedBox(height: AppSpacing.sm),
-              if (heading != null && calibrationNeeded)
-                _CalibrationHint(text: loc.qiblaCalibrationHint),
-              if (heading != null && calibrationNeeded)
+      body: AppContentFrame.form(
+        child: BlocBuilder<QiblaCubit, QiblaState>(
+          buildWhen: qiblaBodyShouldRebuild,
+          builder: (context, state) {
+            if (state is QiblaLoading) return const LoadingView();
+            if (state is QiblaFailed) {
+              return errorPane(
+                loc,
+                onRetry: () => context.read<QiblaCubit>().reload(),
+              );
+            }
+            final (
+              :city,
+              :bearing,
+              :heading,
+              :compassUnavailable,
+              :calibrationNeeded,
+            ) = switch (state) {
+              QiblaReady() => (
+                  city: state.city,
+                  bearing: state.bearing,
+                  heading: state.heading,
+                  compassUnavailable: state.compassUnavailable,
+                  calibrationNeeded: state.calibrationNeeded,
+                ),
+              QiblaLoading() => (
+                  city: state.city,
+                  bearing: state.bearing,
+                  heading: state.heading,
+                  compassUnavailable: state.compassUnavailable,
+                  calibrationNeeded: state.calibrationNeeded,
+                ),
+              QiblaFailed() => (
+                  city: null,
+                  bearing: null,
+                  heading: null,
+                  compassUnavailable: false,
+                  calibrationNeeded: false,
+                ),
+            };
+            if (city == null || bearing == null) {
+              return EmptyState(
+                loc.noCity,
+                icon: Icons.location_off_outlined,
+                actionLabel: loc.selectCity,
+                onAction: () async {
+                  final selected =
+                      await context.push<bool>(AppRoutes.cityPicker);
+                  if (selected == true && context.mounted) {
+                    await context.read<QiblaCubit>().reload();
+                  }
+                },
+              );
+            }
+            final delta = qiblaDeltaDeg(bearing, heading ?? 0);
+            final aligned =
+                heading != null && delta.abs() <= kQiblaToleranceDeg;
+            return ListView(
+              padding: appScrollPadding(
+                  context, const EdgeInsets.all(AppSpacing.lg)),
+              children: [
+                _CityTile(title: city.nameAr),
+                const SizedBox(height: AppSpacing.lg),
+                _Dial(
+                  bearing: bearing,
+                  heading: heading,
+                  aligned: aligned,
+                  cityName: city.nameAr,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (heading == null)
+                  _CompassNote(
+                    text: compassUnavailable
+                        ? loc.compassStatic
+                        : loc.compassLive,
+                  )
+                else
+                  _CompassNote(text: loc.compassLive),
                 const SizedBox(height: AppSpacing.sm),
-              if (heading != null)
-                _AlignmentHint(delta: delta, aligned: aligned)
-              else
-                const SizedBox.shrink(),
-              const SizedBox(height: AppSpacing.md),
-              _DegreesLabel(bearing: bearing),
-            ],
-          );
-        },
+                if (heading != null && calibrationNeeded)
+                  _CalibrationHint(text: loc.qiblaCalibrationHint),
+                if (heading != null && calibrationNeeded)
+                  const SizedBox(height: AppSpacing.sm),
+                if (heading != null)
+                  _AlignmentHint(delta: delta, aligned: aligned)
+                else
+                  const SizedBox.shrink(),
+                const SizedBox(height: AppSpacing.md),
+                _DegreesLabel(bearing: bearing),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -505,7 +512,10 @@ class _DialState extends State<_Dial> {
         label: spoken,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final size = math.min(constraints.maxWidth, 320.0);
+            // The dial only grows on an expanded window: at phone widths the
+            // 320 dp dial keeps the hints above the fold.
+            final maxDial = AppBreakpoints.isExpanded(context) ? 420.0 : 320.0;
+            final size = math.min(constraints.maxWidth, maxDial);
             return SizedBox(
               width: size,
               height: size,

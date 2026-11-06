@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
@@ -20,51 +21,54 @@ class DuasScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.duasAndRuqyah)),
-      body: BlocBuilder<DuasCubit, DuasState>(
-        builder: (context, state) => Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, 10, AppSpacing.md, AppSpacing.xs),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SegmentedButton<DuasTab>(
-                      segments: [
-                        ButtonSegment(
-                          value: DuasTab.duas,
-                          label: Text(loc.duasTab),
-                          icon: const Icon(Icons.volunteer_activism),
-                        ),
-                        ButtonSegment(
-                          value: DuasTab.ruqyah,
-                          label: Text(loc.ruqyahTab),
-                          icon: const Icon(Icons.healing),
-                        ),
-                      ],
-                      selected: {
-                        state is RuqyahInView ||
-                                (state is DuasFailed &&
-                                    state.tab == DuasTab.ruqyah)
-                            ? DuasTab.ruqyah
-                            : DuasTab.duas,
-                      },
-                      onSelectionChanged: (selection) =>
-                          context.read<DuasCubit>().selectTab(selection.first),
+      body: AppContentFrame(
+        child: BlocBuilder<DuasCubit, DuasState>(
+          builder: (context, state) => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md, 10, AppSpacing.md, AppSpacing.xs),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: SegmentedButton<DuasTab>(
+                        segments: [
+                          ButtonSegment(
+                            value: DuasTab.duas,
+                            label: Text(loc.duasTab),
+                            icon: const Icon(Icons.volunteer_activism),
+                          ),
+                          ButtonSegment(
+                            value: DuasTab.ruqyah,
+                            label: Text(loc.ruqyahTab),
+                            icon: const Icon(Icons.healing),
+                          ),
+                        ],
+                        selected: {
+                          state is RuqyahInView ||
+                                  (state is DuasFailed &&
+                                      state.tab == DuasTab.ruqyah)
+                              ? DuasTab.ruqyah
+                              : DuasTab.duas,
+                        },
+                        onSelectionChanged: (selection) => context
+                            .read<DuasCubit>()
+                            .selectTab(selection.first),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: switch (state) {
-                DuasLoading() => const LoadingView(),
-                DuasFailed() => errorPane(loc),
-                DuasInView() => const _DuasView(),
-                RuqyahInView() => const _RuqyahView(),
-              },
-            ),
-          ],
+              Expanded(
+                child: switch (state) {
+                  DuasLoading() => const LoadingView(),
+                  DuasFailed() => errorPane(loc),
+                  DuasInView() => const _DuasView(),
+                  RuqyahInView() => const _RuqyahView(),
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -91,7 +95,9 @@ class _DuasView extends StatelessWidget {
                 children: [
                   for (final category in view.categories)
                     Padding(
-                      padding: const EdgeInsets.only(left: AppSpacing.xs),
+                      padding: const EdgeInsetsDirectional.only(
+                        start: AppSpacing.xs,
+                      ),
                       child: ChoiceChip(
                         label: Text(category),
                         selected: view.selectedCategory == category,

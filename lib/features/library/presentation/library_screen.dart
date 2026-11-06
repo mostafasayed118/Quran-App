@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/format_bytes.dart';
 import '../../../core/utils/insets.dart';
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/download_progress.dart';
@@ -60,28 +61,30 @@ class LibraryScreen extends StatelessWidget {
                       ],
                     ),
             ),
-            body: switch (state) {
-              LibraryLoading() => const LoadingView(),
-              LibraryFailed() => errorPane(loc),
-              final LibraryReady ready when ready.packs.isEmpty => EmptyState(
-                  loc.libraryEmpty,
-                  icon: Icons.inventory_2_outlined,
-                ),
-              final LibraryReady ready => Column(
-                  children: [
-                    if (ready.failed.isNotEmpty && ready.progress.isEmpty)
-                      _failureStrip(context, ready),
-                    Expanded(
-                      child: TabBarView(
-                        children: [
-                          for (final kind in kinds)
-                            _PackList(packs: ready.packsWhere(kind)),
-                        ],
+            body: AppContentFrame(
+              child: switch (state) {
+                LibraryLoading() => const LoadingView(),
+                LibraryFailed() => errorPane(loc),
+                final LibraryReady ready when ready.packs.isEmpty => EmptyState(
+                    loc.libraryEmpty,
+                    icon: Icons.inventory_2_outlined,
+                  ),
+                final LibraryReady ready => Column(
+                    children: [
+                      if (ready.failed.isNotEmpty && ready.progress.isEmpty)
+                        _failureStrip(context, ready),
+                      Expanded(
+                        child: TabBarView(
+                          children: [
+                            for (final kind in kinds)
+                              _PackList(packs: ready.packsWhere(kind)),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-            },
+                    ],
+                  ),
+              },
+            ),
           ),
         );
       },

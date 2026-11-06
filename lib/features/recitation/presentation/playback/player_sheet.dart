@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/domain/quran_limits.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
@@ -60,10 +61,9 @@ class _Track {
 /// (where the provider is visible) and re-provided inside the sheet.
 Future<void> showPlayerSheet(BuildContext context) {
   final cubit = context.read<PlaybackCubit>();
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    showDragHandle: true,
-    useSafeArea: true,
+    isScrollControlled: true,
     builder: (_) => BlocProvider<PlaybackCubit>.value(
       value: cubit,
       child: const _PlayerSheet(),
@@ -192,144 +192,148 @@ class _PlayerSheetState extends State<_PlayerSheet> {
         };
         final value = (_dragging ?? track.position.inMilliseconds.toDouble())
             .clamp(0.0, maxMs > 0 ? maxMs : 0.0);
-        return Padding(
-          // `useSafeArea: true` only protects the top/sides of a modal sheet;
-          // the bottom keeps the system inset so the transport row never sits
-          // in the gesture/navigation strip on an edge-to-edge build.
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.xs,
-            AppSpacing.lg,
-            AppSpacing.lg + appBottomInset(context),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                track.reciterName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+        return SingleChildScrollView(
+          child: Padding(
+            // `useSafeArea: true` only protects the top/sides of a modal sheet;
+            // the bottom keeps the system inset so the transport row never sits
+            // in the gesture/navigation strip on an edge-to-edge build.
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              AppSpacing.xs,
+              AppSpacing.lg,
+              AppSpacing.lg + appBottomInset(context),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  track.reciterName,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                track.surahLabel,
-                style: AppTheme.mutedAt(colors, 13),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Slider(
-                value: value,
-                max: maxMs > 0 ? maxMs : 1,
-                label: _clock(Duration(milliseconds: value.round())),
-                onChanged: maxMs > 0
-                    ? (next) => setState(() => _dragging = next)
-                    : null,
-                onChangeEnd: maxMs > 0
-                    ? (next) {
-                        context
-                            .read<PlaybackCubit>()
-                            .seek(Duration(milliseconds: next.round()));
-                        setState(() => _dragging = null);
-                      }
-                    : null,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                const SizedBox(height: 2),
+                Text(
+                  track.surahLabel,
+                  style: AppTheme.mutedAt(colors, 13),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Slider(
+                  value: value,
+                  max: maxMs > 0 ? maxMs : 1,
+                  label: _clock(Duration(milliseconds: value.round())),
+                  onChanged: maxMs > 0
+                      ? (next) => setState(() => _dragging = next)
+                      : null,
+                  onChangeEnd: maxMs > 0
+                      ? (next) {
+                          context
+                              .read<PlaybackCubit>()
+                              .seek(Duration(milliseconds: next.round()));
+                          setState(() => _dragging = null);
+                        }
+                      : null,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _clock(Duration(milliseconds: value.round())),
+                        style: AppTheme.mutedAt(colors, 12),
+                      ),
+                      Text(
+                        _clock(track.duration),
+                        style: AppTheme.mutedAt(colors, 12),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      _clock(Duration(milliseconds: value.round())),
-                      style: AppTheme.mutedAt(colors, 12),
+                    IconButton(
+                      tooltip: loc.repeatSurah,
+                      isSelected: controls.repeatMode == PlaybackRepeatMode.one,
+                      icon: const Icon(Icons.repeat_one),
+                      onPressed: cubit.toggleRepeat,
                     ),
-                    Text(
-                      _clock(track.duration),
-                      style: AppTheme.mutedAt(colors, 12),
+                    Tooltip(
+                      message: loc.playbackSpeed,
+                      child: ActionChip(
+                        onPressed: cubit.cycleSpeed,
+                        label: Text(loc.digits(_speedLabel(controls.speed))),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    TextButton.icon(
+                      onPressed: () => _showSleepMenu(
+                        context,
+                        cubit,
+                        controls.sleepTimer,
+                      ),
+                      icon: Icon(
+                        controls.sleepTimer == null
+                            ? Icons.bedtime_outlined
+                            : Icons.bedtime,
+                      ),
+                      label: Text(
+                        controls.sleepTimer == null
+                            ? loc.sleepTimer
+                            : loc.sleepTimerMinutes(
+                                loc.number(controls.sleepTimer!.inMinutes),
+                              ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: loc.repeatSurah,
-                    isSelected: controls.repeatMode == PlaybackRepeatMode.one,
-                    icon: const Icon(Icons.repeat_one),
-                    onPressed: cubit.toggleRepeat,
-                  ),
-                  Tooltip(
-                    message: loc.playbackSpeed,
-                    child: ActionChip(
-                      onPressed: cubit.cycleSpeed,
-                      label: Text(loc.digits(_speedLabel(controls.speed))),
+                const SizedBox(height: AppSpacing.sm),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      tooltip: loc.previousSurah,
+                      onPressed:
+                          track.surahNumber > 1 ? cubit.previousSurah : null,
+                      icon: const Icon(Icons.skip_previous),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  TextButton.icon(
-                    onPressed: () => _showSleepMenu(
-                      context,
-                      cubit,
-                      controls.sleepTimer,
+                    const SizedBox(width: AppSpacing.sm),
+                    IconButton.filledTonal(
+                      iconSize: 34,
+                      tooltip:
+                          track.playing ? loc.pauseTooltip : loc.playTooltip,
+                      icon: Icon(
+                        track.playing ? Icons.pause : Icons.play_arrow,
+                      ),
+                      onPressed: cubit.toggle,
                     ),
-                    icon: Icon(
-                      controls.sleepTimer == null
-                          ? Icons.bedtime_outlined
-                          : Icons.bedtime,
+                    const SizedBox(width: AppSpacing.sm),
+                    IconButton(
+                      tooltip: loc.nextSurah,
+                      onPressed: track.surahNumber > 0 &&
+                              track.surahNumber < kSurahCount
+                          ? cubit.nextSurah
+                          : null,
+                      icon: const Icon(Icons.skip_next),
                     ),
-                    label: Text(
-                      controls.sleepTimer == null
-                          ? loc.sleepTimer
-                          : loc.sleepTimerMinutes(
-                              loc.number(controls.sleepTimer!.inMinutes),
-                            ),
+                    const SizedBox(width: AppSpacing.lg),
+                    IconButton(
+                      tooltip: loc.stopTooltip,
+                      icon: const Icon(Icons.stop),
+                      // The state-driven branch above closes the sheet once the
+                      // cubit reaches its initial state; popping here as well
+                      // could close the underlying route on a double pop.
+                      onPressed: cubit.stopAndReset,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: loc.previousSurah,
-                    onPressed:
-                        track.surahNumber > 1 ? cubit.previousSurah : null,
-                    icon: const Icon(Icons.skip_previous),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  IconButton.filledTonal(
-                    iconSize: 34,
-                    tooltip: track.playing ? loc.pauseTooltip : loc.playTooltip,
-                    icon: Icon(
-                      track.playing ? Icons.pause : Icons.play_arrow,
-                    ),
-                    onPressed: cubit.toggle,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  IconButton(
-                    tooltip: loc.nextSurah,
-                    onPressed:
-                        track.surahNumber > 0 && track.surahNumber < kSurahCount
-                            ? cubit.nextSurah
-                            : null,
-                    icon: const Icon(Icons.skip_next),
-                  ),
-                  const SizedBox(width: AppSpacing.lg),
-                  IconButton(
-                    tooltip: loc.stopTooltip,
-                    icon: const Icon(Icons.stop),
-                    // The state-driven branch above closes the sheet once the
-                    // cubit reaches its initial state; popping here as well
-                    // could close the underlying route on a double pop.
-                    onPressed: cubit.stopAndReset,
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -349,39 +353,42 @@ Future<void> _showSleepMenu(
   Duration? current,
 ) {
   final loc = AppLocalizations.of(context);
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    showDragHandle: true,
-    useSafeArea: true,
-    builder: (sheetContext) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Text(
-            loc.sleepTimer,
-            style: Theme.of(sheetContext).textTheme.titleMedium,
+    isScrollControlled: true,
+    builder: (sheetContext) => SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: appBottomInset(sheetContext)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Text(
+              loc.sleepTimer,
+              style: Theme.of(sheetContext).textTheme.titleMedium,
+            ),
           ),
-        ),
-        for (final minutes in const [15, 30, 45, 60])
+          for (final minutes in const [15, 30, 45, 60])
+            ListTile(
+              title: Text(loc.sleepTimerMinutes(loc.number(minutes))),
+              trailing: current?.inMinutes == minutes
+                  ? const Icon(Icons.check)
+                  : null,
+              onTap: () {
+                Navigator.of(sheetContext).pop();
+                cubit.startSleepTimer(Duration(minutes: minutes));
+              },
+            ),
           ListTile(
-            title: Text(loc.sleepTimerMinutes(loc.number(minutes))),
-            trailing:
-                current?.inMinutes == minutes ? const Icon(Icons.check) : null,
+            title: Text(loc.sleepTimerOff),
+            trailing: current == null ? const Icon(Icons.check) : null,
             onTap: () {
               Navigator.of(sheetContext).pop();
-              cubit.startSleepTimer(Duration(minutes: minutes));
+              cubit.cancelSleepTimer();
             },
           ),
-        ListTile(
-          title: Text(loc.sleepTimerOff),
-          trailing: current == null ? const Icon(Icons.check) : null,
-          onTap: () {
-            Navigator.of(sheetContext).pop();
-            cubit.cancelSleepTimer();
-          },
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }

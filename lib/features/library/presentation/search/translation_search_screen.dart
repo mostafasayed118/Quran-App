@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -44,28 +45,31 @@ class _TranslationSearchScreenState extends State<TranslationSearchScreen> {
     final cubit = context.read<TranslationSearchCubit>();
     return Scaffold(
       appBar: AppBar(title: Text(loc.translationSearchTitle)),
-      body: BlocBuilder<TranslationSearchCubit, TranslationSearchState>(
-        builder: (context, state) => switch (state) {
-          TranslationSearchLoading() => const LoadingView(),
-          TranslationSearchFailed() => errorPane(loc, onRetry: cubit.start),
-          TranslationSearchReady(:final hasPacks) when !hasPacks => EmptyState(
-              loc.translationSearchNoPacks,
-              icon: Icons.translate,
-              actionLabel: loc.library,
-              onAction: () => context.pop(),
-            ),
-          TranslationSearchReady(
-            :final query,
-            :final hits,
-            :final total,
-          ) =>
-            _Results(
-              controller: _controller,
-              query: query,
-              hits: hits,
-              total: total,
-            ),
-        },
+      body: AppContentFrame(
+        child: BlocBuilder<TranslationSearchCubit, TranslationSearchState>(
+          builder: (context, state) => switch (state) {
+            TranslationSearchLoading() => const LoadingView(),
+            TranslationSearchFailed() => errorPane(loc, onRetry: cubit.start),
+            TranslationSearchReady(:final hasPacks) when !hasPacks =>
+              EmptyState(
+                loc.translationSearchNoPacks,
+                icon: Icons.translate,
+                actionLabel: loc.library,
+                onAction: () => context.pop(),
+              ),
+            TranslationSearchReady(
+              :final query,
+              :final hits,
+              :final total,
+            ) =>
+              _Results(
+                controller: _controller,
+                query: query,
+                hits: hits,
+                total: total,
+              ),
+          },
+        ),
       ),
     );
   }

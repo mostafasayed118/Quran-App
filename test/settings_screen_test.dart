@@ -110,4 +110,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TimePickerDialog), findsNothing);
   });
+
+  testWidgets('a 1024 dp window caps the settings list at 720', (tester) async {
+    tester.view.physicalSize = const Size(1024, 768);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await pumpHost(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(ListView)).width, 720);
+  });
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/insets.dart';
@@ -18,29 +19,31 @@ class PrinciplesScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.principlesTitle)),
-      body: ListView(
-        padding: appScrollPadding(
-          context,
-          const EdgeInsets.symmetric(vertical: AppSpacing.md),
+      body: AppContentFrame(
+        child: ListView(
+          padding: appScrollPadding(
+            context,
+            const EdgeInsets.symmetric(vertical: AppSpacing.md),
+          ),
+          children: [
+            _PrincipleTile(
+              icon: Icons.money_off_outlined,
+              text: loc.principlesFree,
+            ),
+            _PrincipleTile(
+              icon: Icons.lock_outline,
+              text: loc.principlesNoAccount,
+            ),
+            _PrincipleTile(
+              icon: Icons.record_voice_over_outlined,
+              text: loc.principlesAttribution,
+            ),
+            _PrincipleTile(
+              icon: Icons.handshake_outlined,
+              text: loc.principlesFuturePaid,
+            ),
+          ],
         ),
-        children: [
-          _PrincipleTile(
-            icon: Icons.money_off_outlined,
-            text: loc.principlesFree,
-          ),
-          _PrincipleTile(
-            icon: Icons.lock_outline,
-            text: loc.principlesNoAccount,
-          ),
-          _PrincipleTile(
-            icon: Icons.record_voice_over_outlined,
-            text: loc.principlesAttribution,
-          ),
-          _PrincipleTile(
-            icon: Icons.handshake_outlined,
-            text: loc.principlesFuturePaid,
-          ),
-        ],
       ),
     );
   }

@@ -11,6 +11,8 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -33,7 +35,8 @@ class ReaderScreen extends StatelessWidget {
     return BlocBuilder<ReaderCubit, ReaderState>(
       buildWhen: readerShellShouldRebuild,
       builder: (context, state) => switch (state) {
-        ReaderLoading() => const Scaffold(body: LoadingView()),
+        ReaderLoading() =>
+          const Scaffold(body: AppContentFrame.reading(child: LoadingView())),
         ReaderFailed() => _ReaderErrorView(state: state),
         ReaderReady() => _ReadyView(state: state),
       },
@@ -62,23 +65,25 @@ class _ReaderErrorView extends StatelessWidget {
     final emptySurahId = state.emptySurahId;
     return Scaffold(
       appBar: AppBar(title: Text(loc.quran)),
-      body: Column(
-        children: [
-          Expanded(
-            child: emptySurahId == null
-                ? errorPane(loc)
-                // A surah without readable ayahs is its own failure: the
-                // generic pane would blame a transient error.
-                : ErrorView(loc.readerNoAyahs(loc.number(emptySurahId))),
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
-            child: FilledButton(
-              onPressed: () => context.read<ReaderCubit>().reload(),
-              child: Text(loc.retry),
+      body: AppContentFrame.reading(
+        child: Column(
+          children: [
+            Expanded(
+              child: emptySurahId == null
+                  ? errorPane(loc)
+                  // A surah without readable ayahs is its own failure: the
+                  // generic pane would blame a transient error.
+                  : ErrorView(loc.readerNoAyahs(loc.number(emptySurahId))),
             ),
-          ),
-        ],
+            Padding(
+              padding: EdgeInsets.only(bottom: 32 + appBottomInset(context)),
+              child: FilledButton(
+                onPressed: () => context.read<ReaderCubit>().reload(),
+                child: Text(loc.retry),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -137,34 +142,36 @@ class _ReadyView extends StatelessWidget {
       // present: the fallback glyph column is a private-use encoding, and
       // selecting it used to copy `   …` into WhatsApp. With the Unicode
       // text the selection is real Arabic and the native toolbar is correct.
-      body: Builder(
-        builder: (context) {
-          final content = Column(
-            children: [
-              if (state.showBasmala)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    loc.basmala,
-                    style: TextStyle(
-                      fontFamily: QuranFonts.meQuran,
-                      fontSize: 22,
-                      color: AppTheme.goldText(context),
+      body: AppContentFrame.reading(
+        child: Builder(
+          builder: (context) {
+            final content = Column(
+              children: [
+                if (state.showBasmala)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      loc.basmala,
+                      style: TextStyle(
+                        fontFamily: QuranFonts.meQuran,
+                        fontSize: 22,
+                        color: AppTheme.goldText(context),
+                      ),
+                      textDirection: TextDirection.rtl,
                     ),
-                    textDirection: TextDirection.rtl,
                   ),
+                Expanded(
+                  child: isVerses
+                      ? _VersesList(state: state)
+                      : _MushafPager(state: state),
                 ),
-              Expanded(
-                child: isVerses
-                    ? _VersesList(state: state)
-                    : _MushafPager(state: state),
-              ),
-            ],
-          );
-          return state.ayahs.every((v) => v.textUnicode != null)
-              ? SelectionArea(child: content)
-              : content;
-        },
+              ],
+            );
+            return state.ayahs.every((v) => v.textUnicode != null)
+                ? SelectionArea(child: content)
+                : content;
+          },
+        ),
       ),
       bottomSheet: const MiniPlayerBar(),
     );
@@ -369,13 +376,9 @@ class _AyahActions extends StatelessWidget {
         IconButton(
           tooltip: loc.ayahSheetTitle,
           icon: const Icon(Icons.menu_book_outlined),
-          onPressed: () => showModalBottomSheet<void>(
+          onPressed: () => showAppSheet<void>(
             context: context,
-            useSafeArea: true,
             isScrollControlled: true,
-            // The drag handle is part of the sheet's contract (pinned by the
-            // textScale probe); the rounded strip above the card is intended.
-            showDragHandle: true,
             builder: (_) => AyahSheet(
               surahId: ayah.surahId,
               surahName: surahName,
@@ -681,47 +684,50 @@ void _showFontSheet(
 ) {
   var value = initial;
   var lineHeight = initialLineHeight;
-  unawaited(showModalBottomSheet<void>(
+  unawaited(showAppSheet<void>(
     context: context,
+    isScrollControlled: true,
     builder: (sheetContext) => StatefulBuilder(
       builder: (context, setSheetState) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                AppLocalizations.of(context).readerFontSize,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Slider(
-                value: value,
-                min: 0.8,
-                max: 2,
-                divisions: 12,
-                label: value.toStringAsFixed(1),
-                onChanged: (next) {
-                  setSheetState(() => value = next);
-                  unawaited(cubit.setFontScale(next));
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                AppLocalizations.of(context).readerLineSpacing,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              Slider(
-                value: lineHeight,
-                min: ReaderLayoutSource.minLineHeight,
-                max: ReaderLayoutSource.maxLineHeight,
-                divisions: 14,
-                label: lineHeight.toStringAsFixed(1),
-                onChanged: (next) {
-                  setSheetState(() => lineHeight = next);
-                  unawaited(cubit.setLineHeight(next));
-                },
-              ),
-            ],
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  AppLocalizations.of(context).readerFontSize,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Slider(
+                  value: value,
+                  min: 0.8,
+                  max: 2,
+                  divisions: 12,
+                  label: value.toStringAsFixed(1),
+                  onChanged: (next) {
+                    setSheetState(() => value = next);
+                    unawaited(cubit.setFontScale(next));
+                  },
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  AppLocalizations.of(context).readerLineSpacing,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                Slider(
+                  value: lineHeight,
+                  min: ReaderLayoutSource.minLineHeight,
+                  max: ReaderLayoutSource.maxLineHeight,
+                  divisions: 14,
+                  label: lineHeight.toStringAsFixed(1),
+                  onChanged: (next) {
+                    setSheetState(() => lineHeight = next);
+                    unawaited(cubit.setLineHeight(next));
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

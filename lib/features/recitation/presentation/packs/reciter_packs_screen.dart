@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -39,41 +40,43 @@ class ReciterPacksScreen extends StatelessWidget {
     ];
     return Scaffold(
       appBar: AppBar(title: Text(loc.reciterPacksTitle)),
-      body: ListView(
-        key: const Key('reciterPacksList'),
-        padding: appScrollPadding(
-          context,
-          const EdgeInsets.symmetric(vertical: AppSpacing.md),
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            child: Text(loc.reciterPacksIntro, style: AppTheme.bodyText),
+      body: AppContentFrame(
+        child: ListView(
+          key: const Key('reciterPacksList'),
+          padding: appScrollPadding(
+            context,
+            const EdgeInsets.symmetric(vertical: AppSpacing.md),
           ),
-          SectionHeader(
-            title: loc.reciterPacksCriteriaTitle,
-            inset: AppSpacing.lg,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                for (final criterion in criteria) _Bullet(text: criterion),
-              ],
-            ),
-          ),
-          if (published.isEmpty)
+          children: [
             Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.xl),
-              child: EmptyState(
-                loc.reciterPacksEmpty,
-                icon: Icons.collections_bookmark_outlined,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: Text(loc.reciterPacksIntro, style: AppTheme.bodyText),
+            ),
+            SectionHeader(
+              title: loc.reciterPacksCriteriaTitle,
+              inset: AppSpacing.lg,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final criterion in criteria) _Bullet(text: criterion),
+                ],
               ),
-            )
-          else
-            for (final pack in published) _PackCard(pack: pack),
-        ],
+            ),
+            if (published.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.xl),
+                child: EmptyState(
+                  loc.reciterPacksEmpty,
+                  icon: Icons.collections_bookmark_outlined,
+                ),
+              )
+            else
+              for (final pack in published) _PackCard(pack: pack),
+          ],
+        ),
       ),
     );
   }

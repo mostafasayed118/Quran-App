@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
@@ -20,31 +21,33 @@ class HijriScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.hijriCalendar)),
-      body: BlocBuilder<HijriCubit, HijriState>(
-        builder: (context, state) => switch (state) {
-          HijriLoading() => const LoadingView(),
-          HijriFailed() => errorPane(loc),
-          HijriReady(
-            :final monthName,
-            :final year,
-            :final offset,
-            :final cells,
-            :final todayHeader,
-            :final dayOffset,
-          ) =>
-            ListView(
-              padding: appScrollPadding(
-                context,
-                const EdgeInsets.all(AppSpacing.md),
+      body: AppContentFrame(
+        child: BlocBuilder<HijriCubit, HijriState>(
+          builder: (context, state) => switch (state) {
+            HijriLoading() => const LoadingView(),
+            HijriFailed() => errorPane(loc),
+            HijriReady(
+              :final monthName,
+              :final year,
+              :final offset,
+              :final cells,
+              :final todayHeader,
+              :final dayOffset,
+            ) =>
+              ListView(
+                padding: appScrollPadding(
+                  context,
+                  const EdgeInsets.all(AppSpacing.md),
+                ),
+                children: [
+                  _TodayCard(todayHeader: loc.digits(todayHeader)),
+                  _OffsetCard(dayOffset: dayOffset),
+                  _MonthNavBar(monthName: monthName, year: year),
+                  _MonthGrid(offset: offset, cells: cells),
+                ],
               ),
-              children: [
-                _TodayCard(todayHeader: loc.digits(todayHeader)),
-                _OffsetCard(dayOffset: dayOffset),
-                _MonthNavBar(monthName: monthName, year: year),
-                _MonthGrid(offset: offset, cells: cells),
-              ],
-            ),
-        },
+          },
+        ),
       ),
     );
   }

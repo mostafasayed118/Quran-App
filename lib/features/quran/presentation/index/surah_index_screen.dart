@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/ar_badge.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -39,44 +40,46 @@ class SurahIndexScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<SurahIndexCubit, SurahIndexState>(
-        builder: (context, state) => switch (state) {
-          SurahIndexLoading() => const LoadingView(),
-          SurahIndexFailed() => errorPane(loc),
-          SurahIndexReady(:final surahs, :final query) => Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.md,
-                      AppSpacing.md, AppSpacing.md, AppSpacing.xs),
-                  child: SearchField(
-                    hint: loc.searchSurahHint,
-                    onChanged: context.read<SurahIndexCubit>().setQuery,
+      body: AppContentFrame(
+        child: BlocBuilder<SurahIndexCubit, SurahIndexState>(
+          builder: (context, state) => switch (state) {
+            SurahIndexLoading() => const LoadingView(),
+            SurahIndexFailed() => errorPane(loc),
+            SurahIndexReady(:final surahs, :final query) => Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.md,
+                        AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+                    child: SearchField(
+                      hint: loc.searchSurahHint,
+                      onChanged: context.read<SurahIndexCubit>().setQuery,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: surahs.isEmpty
-                      ? (query.isEmpty
-                          ? EmptyState(loc.noResults)
-                          : EmptyState(
-                              loc.noResults,
-                              // The typed words matched no surah name: offer
-                              // the verse search for the same words instead
-                              // of a dead end.
-                              actionLabel: loc.searchAyahsFor(query),
-                              onAction: () =>
-                                  context.push(quranSearchPath(query: query)),
-                            ))
-                      : ListView.builder(
-                          padding:
-                              EdgeInsets.only(bottom: appBottomInset(context)),
-                          itemCount: surahs.length,
-                          itemBuilder: (context, i) =>
-                              _SurahRow(surah: surahs[i]),
-                        ),
-                ),
-              ],
-            ),
-        },
+                  Expanded(
+                    child: surahs.isEmpty
+                        ? (query.isEmpty
+                            ? EmptyState(loc.noResults)
+                            : EmptyState(
+                                loc.noResults,
+                                // The typed words matched no surah name: offer
+                                // the verse search for the same words instead
+                                // of a dead end.
+                                actionLabel: loc.searchAyahsFor(query),
+                                onAction: () =>
+                                    context.push(quranSearchPath(query: query)),
+                              ))
+                        : ListView.builder(
+                            padding: EdgeInsets.only(
+                                bottom: appBottomInset(context)),
+                            itemCount: surahs.length,
+                            itemBuilder: (context, i) =>
+                                _SurahRow(surah: surahs[i]),
+                          ),
+                  ),
+                ],
+              ),
+          },
+        ),
       ),
     );
   }
@@ -105,7 +108,7 @@ class _SurahRow extends StatelessWidget {
       subtitle: Text(
         '${isMakkah ? loc.revelationMakkah : loc.revelationMadinah} · ${loc.digits(loc.ayatCount(surah.ayahCount))}',
         style: TextStyle(color: colors.onSurfaceVariant),
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.start,
       ),
       trailing: Icon(
         Directionality.of(context) == TextDirection.rtl

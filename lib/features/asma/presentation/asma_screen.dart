@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
@@ -54,21 +55,23 @@ class AsmaScreen extends StatelessWidget {
           },
           child: Scaffold(
             appBar: AppBar(title: Text(loc.asmaUlHusna)),
-            body: switch (state) {
-              AsmaLoading() => const LoadingView(),
-              AsmaFailed() => errorPane(loc),
-              AsmaReady(:final names) when names.isEmpty =>
-                EmptyState(loc.noResults),
-              AsmaReady(:final names, :final selected) => Stack(
-                  children: [
-                    _NamesGrid(names: names),
-                    if (selected != null) ...[
-                      const Positioned.fill(child: _Scrim()),
-                      _NameSheet(name: selected),
+            body: AppContentFrame.grid(
+              child: switch (state) {
+                AsmaLoading() => const LoadingView(),
+                AsmaFailed() => errorPane(loc),
+                AsmaReady(:final names) when names.isEmpty =>
+                  EmptyState(loc.noResults),
+                AsmaReady(:final names, :final selected) => Stack(
+                    children: [
+                      _NamesGrid(names: names),
+                      if (selected != null) ...[
+                        const Positioned.fill(child: _Scrim()),
+                        _NameSheet(name: selected),
+                      ],
                     ],
-                  ],
-                ),
-            },
+                  ),
+              },
+            ),
           ),
         );
       },

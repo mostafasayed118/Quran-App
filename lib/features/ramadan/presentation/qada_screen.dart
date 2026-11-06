@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -38,14 +39,16 @@ class QadaScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<QadaCubit, QadaState>(
-        builder: (context, state) => switch (state) {
-          QadaLoading() => const LoadingView(),
-          QadaFailed() => errorPane(loc, onRetry: cubit.start),
-          QadaReady(:final dates) when dates.isEmpty =>
-            EmptyState(loc.qadaEmpty, icon: Icons.event_available_outlined),
-          QadaReady(:final dates) => _QadaList(dates: dates),
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<QadaCubit, QadaState>(
+          builder: (context, state) => switch (state) {
+            QadaLoading() => const LoadingView(),
+            QadaFailed() => errorPane(loc, onRetry: cubit.start),
+            QadaReady(:final dates) when dates.isEmpty =>
+              EmptyState(loc.qadaEmpty, icon: Icons.event_available_outlined),
+            QadaReady(:final dates) => _QadaList(dates: dates),
+          },
+        ),
       ),
     );
   }

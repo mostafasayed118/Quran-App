@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
@@ -34,22 +35,27 @@ class BookmarksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<BookmarksCubit, BookmarksState>(
       builder: (context, state) => switch (state) {
-        BookmarksLoading() => const Scaffold(body: LoadingView()),
+        BookmarksLoading() =>
+          const Scaffold(body: AppContentFrame(child: LoadingView())),
         BookmarksFailed() => Scaffold(
             appBar: AppBar(title: Text(AppLocalizations.of(context).bookmarks)),
-            body: errorPane(AppLocalizations.of(context)),
+            body: AppContentFrame(
+              child: errorPane(AppLocalizations.of(context)),
+            ),
           ),
         BookmarksReady() => Scaffold(
             appBar: AppBar(
               title: Text(AppLocalizations.of(context).bookmarks),
             ),
-            body: state.entries.isEmpty
-                ? EmptyState(
-                    AppLocalizations.of(context).noBookmarks,
-                    actionLabel: AppLocalizations.of(context).quran,
-                    onAction: () => context.push(AppRoutes.quran),
-                  )
-                : _body(context, state),
+            body: AppContentFrame(
+              child: state.entries.isEmpty
+                  ? EmptyState(
+                      AppLocalizations.of(context).noBookmarks,
+                      actionLabel: AppLocalizations.of(context).quran,
+                      onAction: () => context.push(AppRoutes.quran),
+                    )
+                  : _body(context, state),
+            ),
           ),
       },
     );

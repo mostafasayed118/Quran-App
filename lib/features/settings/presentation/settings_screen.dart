@@ -20,6 +20,7 @@ import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/hour_minute.dart';
 import '../../../core/utils/insets.dart';
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/error_pane.dart';
 import '../../../core/widgets/section_header.dart';
@@ -65,35 +66,37 @@ class SettingsScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.settings)),
-      body: BlocBuilder<SettingsCubit, SettingsState>(
-        builder: (context, state) => switch (state) {
-          SettingsLoading() => const LoadingView(),
-          SettingsFailed() => errorPane(loc),
-          SettingsReady(
-            :final prayerEnabled,
-            :final azkarEnabled,
-            :final azkarTimeHm,
-            :final wirdEnabled,
-            :final wirdTimeHm,
-            :final azkarPermissionDenied,
-            :final wirdPermissionDenied,
-            :final adhanId,
-          ) =>
-            _SettingsList(
-              prayerEnabled: prayerEnabled,
-              azkarEnabled: azkarEnabled,
-              azkarTimeHm: azkarTimeHm,
-              wirdEnabled: wirdEnabled,
-              wirdTimeHm: wirdTimeHm,
-              permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
-              adhanNameAr: adhanById(adhanId).nameAr,
-              backupSection: backupSection,
-              locale: locale,
-              theme: theme,
-              reminderDiagnostics: reminderDiagnostics,
-              reminderApplyHealth: reminderApplyHealth,
-            ),
-        },
+      body: AppContentFrame(
+        child: BlocBuilder<SettingsCubit, SettingsState>(
+          builder: (context, state) => switch (state) {
+            SettingsLoading() => const LoadingView(),
+            SettingsFailed() => errorPane(loc),
+            SettingsReady(
+              :final prayerEnabled,
+              :final azkarEnabled,
+              :final azkarTimeHm,
+              :final wirdEnabled,
+              :final wirdTimeHm,
+              :final azkarPermissionDenied,
+              :final wirdPermissionDenied,
+              :final adhanId,
+            ) =>
+              _SettingsList(
+                prayerEnabled: prayerEnabled,
+                azkarEnabled: azkarEnabled,
+                azkarTimeHm: azkarTimeHm,
+                wirdEnabled: wirdEnabled,
+                wirdTimeHm: wirdTimeHm,
+                permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
+                adhanNameAr: adhanById(adhanId).nameAr,
+                backupSection: backupSection,
+                locale: locale,
+                theme: theme,
+                reminderDiagnostics: reminderDiagnostics,
+                reminderApplyHealth: reminderApplyHealth,
+              ),
+          },
+        ),
       ),
     );
   }

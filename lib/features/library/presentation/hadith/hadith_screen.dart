@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -41,30 +42,33 @@ class HadithScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          const _SearchBar(),
-          Expanded(
-            child: BlocBuilder<HadithCubit, HadithState>(
-              builder: (context, state) => switch (state) {
-                HadithLoading() => const LoadingView(),
-                HadithFailed() => errorPane(loc, onRetry: cubit.start),
-                final HadithReady ready when ready.items.isEmpty => EmptyState(
-                    _emptyMessage(loc, ready),
-                    icon: ready.bookmarksOnly
-                        ? Icons.bookmarks_outlined
-                        : Icons.menu_book_outlined,
-                  ),
-                final HadithReady ready => Column(
-                    children: [
-                      Expanded(child: _HadithVerses(ready: ready)),
-                      if (!ready.bookmarksOnly) _HadithPager(ready: ready),
-                    ],
-                  ),
-              },
+      body: AppContentFrame.reading(
+        child: Column(
+          children: [
+            const _SearchBar(),
+            Expanded(
+              child: BlocBuilder<HadithCubit, HadithState>(
+                builder: (context, state) => switch (state) {
+                  HadithLoading() => const LoadingView(),
+                  HadithFailed() => errorPane(loc, onRetry: cubit.start),
+                  final HadithReady ready when ready.items.isEmpty =>
+                    EmptyState(
+                      _emptyMessage(loc, ready),
+                      icon: ready.bookmarksOnly
+                          ? Icons.bookmarks_outlined
+                          : Icons.menu_book_outlined,
+                    ),
+                  final HadithReady ready => Column(
+                      children: [
+                        Expanded(child: _HadithVerses(ready: ready)),
+                        if (!ready.bookmarksOnly) _HadithPager(ready: ready),
+                      ],
+                    ),
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

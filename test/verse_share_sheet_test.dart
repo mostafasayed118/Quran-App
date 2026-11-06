@@ -48,11 +48,20 @@ class _FakeSharer implements AyahSharer {
 Widget _app({
   required _FakeSharer sharer,
   required VerseImageCapture? capture,
+  double? textScale,
 }) =>
     MaterialApp(
       locale: const Locale('ar'),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: textScale == null
+          ? null
+          : (context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: TextScaler.linear(textScale),
+                ),
+                child: child!,
+              ),
       home: Scaffold(
         body: Builder(
           builder: (context) => TextButton(
@@ -73,8 +82,11 @@ Future<void> _openSheet(
   WidgetTester tester, {
   required _FakeSharer sharer,
   required VerseImageCapture? capture,
+  double? textScale,
 }) async {
-  await tester.pumpWidget(_app(sharer: sharer, capture: capture));
+  await tester.pumpWidget(
+    _app(sharer: sharer, capture: capture, textScale: textScale),
+  );
   await tester.tap(find.text('open'));
   await tester.pumpAndSettle();
 }
@@ -172,5 +184,33 @@ void main() {
     final bytes = sharer.lastImage;
     expect(bytes, isNotNull);
     expect(bytes!.take(4), [0x89, 0x50, 0x4E, 0x47]);
+  });
+
+  testWidgets('320 dp at textScale 2.0 keeps the actions above the inset',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    tester.view.padding = const FakeViewPadding(bottom: 48);
+    tester.view.viewPadding = const FakeViewPadding(bottom: 48);
+    addTearDown(tester.view.reset);
+
+    await _openSheet(
+      tester,
+      sharer: _FakeSharer(),
+      capture: (_) async => null,
+      textScale: 2.0,
+    );
+
+    expect(tester.takeException(), isNull);
+
+    await tester.scrollUntilVisible(
+      find.text('مشاركة كصورة'),
+      300,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
+
+    final action = tester.getRect(find.text('مشاركة كصورة'));
+    expect(action.bottom, lessThanOrEqualTo(640 - 48));
   });
 }

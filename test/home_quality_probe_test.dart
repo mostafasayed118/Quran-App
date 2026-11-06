@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
+import 'package:quran_yahdi/core/widgets/service_tile.dart';
 import 'package:quran_yahdi/features/home/presentation/home_cubit.dart';
 import 'package:quran_yahdi/features/home/presentation/home_screen.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
@@ -137,5 +138,53 @@ void main() {
 
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('a 320 dp phone gets two service columns, not three',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await city.select(cairoCity);
+    final cubit = HomeCubit(
+      lastRead: lastRead,
+      ayahs: ayahs,
+      prayer: FakePrayerTimeService(),
+      city: city,
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await pumpHome(tester, cubit, textScaler: const TextScaler.linear(2.0));
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ServiceTile), findsNWidgets(15));
+    // Row 1 is Qur'an + recitations; bookmarks must wrap to row 2.
+    final first = tester.getTopLeft(find.text('القرآن الكريم')).dy;
+    final third = tester.getTopLeft(find.text('العلامات المرجعية')).dy;
+    expect(third, greaterThan(first));
+  });
+
+  testWidgets('a 1024 dp window caps the dashboard at the content measure',
+      (tester) async {
+    tester.view.physicalSize = const Size(1024, 768);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await city.select(cairoCity);
+    final cubit = HomeCubit(
+      lastRead: lastRead,
+      ayahs: ayahs,
+      prayer: FakePrayerTimeService(),
+      city: city,
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await pumpHome(tester, cubit);
+
+    expect(tester.takeException(), isNull);
+    expect(tester.getSize(find.byType(ListView)).width, 720);
   });
 }

@@ -1,10 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../data/zakat_calculator.dart';
 import 'zakat_cubit.dart';
@@ -32,69 +33,71 @@ class ZakatScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.zakat)),
-      body: BlocBuilder<ZakatCubit, ZakatState>(
-        builder: (context, state) {
-          final ZakatReady ready = switch (state) {
-            ZakatReady() => state,
-          };
-          final hasInvalid = <String>[
-            ready.goldGrams,
-            ready.silverGrams,
-            ready.goldPrice,
-            ready.silverPrice,
-            ready.cash,
-            ready.debts,
-          ].any(_isInvalid);
-          final needsNisabPrice =
-              ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
-          final verdictText = hasInvalid
-              ? loc.zakatFixInputs
-              : needsNisabPrice
-                  ? loc.zakatEnterPrice
-                  : ready.result.due
-                      ? loc.zakatDue
-                      : loc.zakatNotDue;
-          String? errorFor(String text) =>
-              _isInvalid(text) ? loc.zakatInvalidNumber : null;
-          return ListView(
-            padding:
-                appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
-            children: [
-              _NisabToggle(ready: ready),
-              const SizedBox(height: 10),
-              _Field(
-                  label: loc.goldGrams,
-                  errorText: errorFor(ready.goldGrams),
-                  onChanged: context.read<ZakatCubit>().setGoldGrams),
-              _Field(
-                  label: loc.silverGrams,
-                  errorText: errorFor(ready.silverGrams),
-                  onChanged: context.read<ZakatCubit>().setSilverGrams),
-              _Field(
-                  label: loc.goldPrice,
-                  errorText: errorFor(ready.goldPrice),
-                  onChanged: context.read<ZakatCubit>().setGoldPrice),
-              _Field(
-                  label: loc.silverPrice,
-                  errorText: errorFor(ready.silverPrice),
-                  onChanged: context.read<ZakatCubit>().setSilverPrice),
-              _Field(
-                  label: loc.cash,
-                  errorText: errorFor(ready.cash),
-                  onChanged: context.read<ZakatCubit>().setCash),
-              _Field(
-                  label: loc.debts,
-                  errorText: errorFor(ready.debts),
-                  onChanged: context.read<ZakatCubit>().setDebts),
-              const SizedBox(height: 14),
-              _SummaryCard(
-                ready: ready,
-                needsNisabPrice: needsNisabPrice,
-                verdictText: verdictText,
-              ),
-            ],
-          );
-        },
+      body: AppContentFrame.form(
+        child: BlocBuilder<ZakatCubit, ZakatState>(
+          builder: (context, state) {
+            final ZakatReady ready = switch (state) {
+              ZakatReady() => state,
+            };
+            final hasInvalid = <String>[
+              ready.goldGrams,
+              ready.silverGrams,
+              ready.goldPrice,
+              ready.silverPrice,
+              ready.cash,
+              ready.debts,
+            ].any(_isInvalid);
+            final needsNisabPrice =
+                ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
+            final verdictText = hasInvalid
+                ? loc.zakatFixInputs
+                : needsNisabPrice
+                    ? loc.zakatEnterPrice
+                    : ready.result.due
+                        ? loc.zakatDue
+                        : loc.zakatNotDue;
+            String? errorFor(String text) =>
+                _isInvalid(text) ? loc.zakatInvalidNumber : null;
+            return ListView(
+              padding: appScrollPadding(
+                  context, const EdgeInsets.all(AppSpacing.md)),
+              children: [
+                _NisabToggle(ready: ready),
+                const SizedBox(height: 10),
+                _Field(
+                    label: loc.goldGrams,
+                    errorText: errorFor(ready.goldGrams),
+                    onChanged: context.read<ZakatCubit>().setGoldGrams),
+                _Field(
+                    label: loc.silverGrams,
+                    errorText: errorFor(ready.silverGrams),
+                    onChanged: context.read<ZakatCubit>().setSilverGrams),
+                _Field(
+                    label: loc.goldPrice,
+                    errorText: errorFor(ready.goldPrice),
+                    onChanged: context.read<ZakatCubit>().setGoldPrice),
+                _Field(
+                    label: loc.silverPrice,
+                    errorText: errorFor(ready.silverPrice),
+                    onChanged: context.read<ZakatCubit>().setSilverPrice),
+                _Field(
+                    label: loc.cash,
+                    errorText: errorFor(ready.cash),
+                    onChanged: context.read<ZakatCubit>().setCash),
+                _Field(
+                    label: loc.debts,
+                    errorText: errorFor(ready.debts),
+                    onChanged: context.read<ZakatCubit>().setDebts),
+                const SizedBox(height: 14),
+                _SummaryCard(
+                  ready: ready,
+                  needsNisabPrice: needsNisabPrice,
+                  verdictText: verdictText,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -157,7 +160,7 @@ class _SummaryCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               verdictText,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: AppTheme.rowTitle.copyWith(
                 color: ready.result.due
                     ? AppTheme.goldText(context)
@@ -169,7 +172,7 @@ class _SummaryCard extends StatelessWidget {
                 loc.digits(
                   ready.result.amount.toStringAsFixed(_amountDecimals),
                 ),
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: _amountStyle.copyWith(color: colors.primary),
               ),
             const SizedBox(height: AppSpacing.sm),
@@ -196,7 +199,6 @@ class _ZakatLine extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
-        textDirection: TextDirection.rtl,
         children: [
           Expanded(
             child: Text(

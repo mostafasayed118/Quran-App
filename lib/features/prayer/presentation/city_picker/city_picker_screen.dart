@@ -6,6 +6,7 @@ import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -21,35 +22,37 @@ class CityPickerScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(loc.selectCity)),
-      body: Column(
-        children: [
-          const _CitySearchField(),
-          Expanded(
-            child: BlocBuilder<CityPickerCubit, CityPickerState>(
-              builder: (context, state) => switch (state) {
-                CityPickerLoading() => const LoadingView(),
-                CityPickerFailed() => errorPane(loc),
-                CityPickerReady(
-                  :final results,
-                  :final locating,
-                  :final selectedCityId,
-                ) =>
-                  Column(
-                    children: [
-                      _MyLocationTile(locating: locating),
-                      const Divider(height: 1),
-                      Expanded(
-                        child: _CityResults(
-                          results: results,
-                          selectedCityId: selectedCityId,
+      body: AppContentFrame.form(
+        child: Column(
+          children: [
+            const _CitySearchField(),
+            Expanded(
+              child: BlocBuilder<CityPickerCubit, CityPickerState>(
+                builder: (context, state) => switch (state) {
+                  CityPickerLoading() => const LoadingView(),
+                  CityPickerFailed() => errorPane(loc),
+                  CityPickerReady(
+                    :final results,
+                    :final locating,
+                    :final selectedCityId,
+                  ) =>
+                    Column(
+                      children: [
+                        _MyLocationTile(locating: locating),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: _CityResults(
+                            results: results,
+                            selectedCityId: selectedCityId,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-              },
+                      ],
+                    ),
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

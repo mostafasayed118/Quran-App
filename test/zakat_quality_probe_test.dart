@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,13 +19,17 @@ void main() {
     'الديون',
   ];
 
-  Future<void> pumpZakat(WidgetTester tester, {double textScale = 1.0}) async {
+  Future<void> pumpZakat(
+    WidgetTester tester, {
+    double textScale = 1.0,
+    Locale locale = const Locale('ar'),
+  }) async {
     final cubit = ZakatCubit();
     addTearDown(cubit.close);
     await tester.pumpWidget(BlocProvider<ZakatCubit>.value(
       value: cubit,
       child: MaterialApp(
-        locale: const Locale('ar'),
+        locale: locale,
         supportedLocales: const [Locale('ar'), Locale('en')],
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -121,5 +126,14 @@ void main() {
         scrollable: find.byType(Scrollable).first);
     expect(find.textContaining('النسبة ثابتة'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('the summary rows follow LTR in English', (tester) async {
+    usePhoneViewport(tester);
+    await pumpZakat(tester, locale: const Locale('en'));
+
+    final label = tester
+        .renderObject<RenderParagraph>(find.text('Money subject to zakat'));
+    expect(label.textDirection, TextDirection.ltr);
   });
 }

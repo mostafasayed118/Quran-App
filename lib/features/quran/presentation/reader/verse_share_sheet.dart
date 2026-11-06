@@ -5,7 +5,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/insets.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ayah_sharer.dart';
@@ -25,11 +27,9 @@ Future<void> showVerseShareSheet(
   AyahSharer? sharer,
   VerseImageCapture? capture,
 }) {
-  return showModalBottomSheet<void>(
+  return showAppSheet<void>(
     context: context,
-    showDragHandle: true,
     isScrollControlled: true,
-    useSafeArea: true,
     builder: (_) => VerseShareSheet(
       ayah: ayah,
       surahName: surahName,
@@ -140,11 +140,11 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,
         AppSpacing.lg,
-        AppSpacing.lg,
+        AppSpacing.lg + appBottomInset(context),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
