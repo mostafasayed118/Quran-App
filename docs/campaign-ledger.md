@@ -1210,3 +1210,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Evidence:** `docs/superpowers/audits/2026-11-05-device-smoke.md` + screenshots/dumps in `C:\Users\ASUS\AppData\Local\Temp\opencode\device_smoke_2026-11-05\`.
 - **Open:** Play App Signing SHA-256 into `web/public/.well-known/assetlinks.json` after the first upload, licensing written terms, and a final signed-device smoke on the store artifact after upload.
 
+
+### 2026-11-06 — Responsive/adaptive audit and fix wave — ON MAIN
+- **Owner ask:** «شوفلي المشروع كله … responsive and adaptive 100%؟ ولا لا واعملي بلان … وابدء تنفيذ». Read-only audit found the app was phone-portrait-only in practice: no breakpoints, no content measure, a bottom bar at every width, full-bleed reading surfaces and eight direction hard-codes.
+- **Plan:** `docs/superpowers/plans/2026-11-06-responsive-adaptive.md` (R-01…R-20, per-screen measure map, waves R1–R8, checklist).
+- **Commits:** `4559917` layout foundation (breakpoints, `AppContentFrame`, `showAppSheet`, search-field direction) · `67d4f8a` navigation rail at ≥ 840 dp · `2c90d8b` the 33-screen application, reading measure, sheet scrolling/insets and RTL/LTR fixes. Tests: +18 responsive probes (320/1024 home, 320 onboarding, 640×360 player, 1024 reader/settings/shell, share-sheet inset at 320 dp / 48 dp).
+- **Direction and insets:** localized copy uses `start`; zakat rows drop forced RTL; juz/licenses chevrons follow `Directionality`; the duas strip uses `EdgeInsetsDirectional`; the share and sleep sheets add `appBottomInset`. An emulator run at 320 dp / 2.0 exposed the share-sheet action under the gesture bar before the fix.
+- **Gates:** format 0 · analyze 0 · full suite **1412/1412** at the push tip.
+- **Device proof (API 36 emulator):** phone portrait 411 dp (1.0/2.0), 320 dp / 2.0 (2-column home), tablet 1024×640 dp (1.0/2.0, rail on the right in Arabic), phone landscape 914×411 dp; reader capped at 760 dp; screenshots in `C:\Users\ASUS\AppData\Local\Temp\opencode\responsive_shots\`.
+- **Push proof:** `669877b..2c90d8b` on `main` (5 commits: the two 2026-11-05 widget/Fajr commits plus the three layout commits); `git ls-remote` == `2c90d8b3e766ec19567096c564e0970dad83e5e6`; unpushed 0. CI on `2c90d8b`: `ci` (42278804594), `web-gates` (42278804721) and `db-drift` (42278804857) all **success**.
+- **Open / deferred:** two-pane master/detail on tablets is a feature follow-up, not a fix; the full 33-screen × 5-width × 3-scale matrix is not exhaustive (structural frame + 18 probes cover the critical surfaces); iOS remains out of scope for v1.
