@@ -24,7 +24,10 @@ class SearchField extends StatelessWidget {
       controller: controller,
       onChanged: onChanged,
       autofocus: autofocus,
-      textAlign: TextAlign.right,
+      // `start` follows the ambient direction: right in Arabic, left in
+      // English. The field used to hard-code right, which put English input
+      // against the wrong edge.
+      textAlign: TextAlign.start,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.search),
         hintText: hint,
