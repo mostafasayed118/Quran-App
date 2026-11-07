@@ -1231,3 +1231,10 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Device (API 36, 1024×640 dp):** rail on the right; workspace with the three tabs and the prompt; Al-Fatiha opens in the pane; back returns to the prompt; the juz tab lists the 30 starts; no overflow banner. Screenshots: `C:\Users\ASUS\AppData\Local\Temp\opencode\quran_workspace\`.
 - **State:** branch tip `af08e7d`, 3 commits ahead of `main`; **no push** — the owner opens the push window separately.
 - **Merged and pushed (2026-11-07):** `wave/quran-workspace` fast-forwarded into `main` (`9d9bfb7..facb8df`); `git ls-remote` matched and unpushed = 0; PR #24 auto-merged and the branch was deleted (local + remote). CI on `facb8df`: `ci` run `42411498874` **success** (analyze-test + release-artifact).
+
+### 2026-11-07 — Quran workspace minors + responsive matrix — ON BRANCH `wave/quran-minors-matrix`
+- **Owner GO:** «5 minors + matrix».
+- **`235157c` fix(quran):** page jump resolves inside the pane (anchor callback + root dialog); bookmark-delete confirmation on the root navigator; dead `createBookmarkMeta` removed; IME focus released on tab switch; short tab labels (سور/أجزاء/علامات) fit the 300–340 dp master. Tests: page jump in-pane, focus release, tab-label fit.
+- **`907b148` test(responsive):** 320×640 / 2.0 probes for library, bookmarks, folder bookmarks, prayer month, quran search, adhan picker, licenses, settings and hijri; onboarding and reciters/reciter-surahs were already covered. **Ruling:** per-screen 1024/1.0 probes were not added — the shared frame is pinned by `responsive_foundation_test`, settings 1024, reader 1024 and the workspace route; cost if wrong: a screen-specific 1024 bug can slip.
+- **Gates:** format 0 · analyze 0 · full suite **1442/1442** at `907b148`.
+- **Push:** the branch (code tip `907b148` plus this docs close-out) is pushed in the same owner window; CI follows on the draft PR. No merge until the owner's merge GO.
