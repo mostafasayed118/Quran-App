@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../app/route_cubit_scope.dart';
+import '../../../../core/routing/route_cubit_scope.dart';
 import 'reader_cubit.dart';
 
 /// Scopes a [ReaderCubit] to one `(surah, ayah)` pair.

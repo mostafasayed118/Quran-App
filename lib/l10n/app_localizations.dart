@@ -116,6 +116,12 @@ abstract class AppLocalizations {
   /// **'القرآن الكريم'**
   String get quran;
 
+  /// No description provided for @quranWorkspacePrompt.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختر سورة أو جزءًا أو علامة للقراءة'**
+  String get quranWorkspacePrompt;
+
   /// No description provided for @azkar.
   ///
   /// In ar, this message translates to:

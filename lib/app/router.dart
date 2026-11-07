@@ -75,12 +75,12 @@ import '../features/quran/presentation/bookmarks/bookmarks_screen.dart';
 import '../features/quran/presentation/bookmarks/folder_bookmarks_cubit.dart';
 import '../features/quran/presentation/bookmarks/folder_bookmarks_screen.dart';
 import '../features/quran/presentation/index/surah_index_cubit.dart';
-import '../features/quran/presentation/index/surah_index_screen.dart';
 import '../features/quran/presentation/index/juz_index_cubit.dart';
 import '../features/quran/presentation/index/juz_index_screen.dart';
 import '../features/quran/presentation/reader/reader_cubit.dart';
 import '../features/quran/presentation/reader/reader_route_scope.dart';
 import '../features/quran/presentation/reader/reader_screen.dart';
+import '../features/quran/presentation/workspace/quran_tab_screen.dart';
 import '../features/quran/presentation/search/quran_search_cubit.dart';
 import '../features/quran/presentation/search/quran_search_screen.dart';
 import '../features/ramadan/data/qada_source.dart';
@@ -121,7 +121,7 @@ import '../l10n/app_localizations.dart';
 import 'app_shell.dart';
 import 'onboarding_gate.dart';
 import 'di/injector.dart';
-import 'route_cubit_scope.dart';
+import '../core/routing/route_cubit_scope.dart';
 import 'route_observer.dart';
 
 abstract final class AppRouter {
@@ -183,7 +183,17 @@ abstract final class AppRouter {
               create: () => SurahIndexCubit(getIt<SurahSource>()),
               identity: AppRoutes.quran,
               start: (cubit) => cubit.start(),
-              child: const SurahIndexScreen(),
+              child: QuranTabScreen(
+                createReader: _createReader,
+                createJuz: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
+                createBookmarks: () => BookmarksCubit(
+                  getIt<AyahRepository>(),
+                  pager: getIt<AyahRepository>(),
+                ),
+                createBookmarkMeta: () => BookmarkMetaCubit(
+                  source: getIt<BookmarkMetaSource>(),
+                ),
+              ),
             ),
           ),
           GoRoute(
@@ -516,17 +526,7 @@ abstract final class AppRouter {
             child: ReaderRouteScope(
               surah: surah,
               ayah: ayah,
-              create: () => ReaderCubit(
-                ayahRepository: getIt<AyahRepository>(),
-                lastReadRepository: getIt<LastReadRepository>(),
-                surahId: surah,
-                initialAyah: ayah,
-                wirdProgress: getIt<KhatmaRepository>(),
-                uthmani: getIt<UthmaniTextSource>(),
-                pageAnchors: getIt<PageAnchorSource>(),
-                settings: getIt<ReaderSettingsSource>(),
-                layout: getIt<ReaderLayoutSource>(),
-              ),
+              create: () => _createReader(surah, ayah),
               child: const ReaderScreen(),
             ),
           );
@@ -625,3 +625,16 @@ abstract final class AppRouter {
     ],
   );
 }
+
+/// Builds the reader cubit shared by the full route and the workspace pane.
+ReaderCubit _createReader(int surah, int ayah) => ReaderCubit(
+      ayahRepository: getIt<AyahRepository>(),
+      lastReadRepository: getIt<LastReadRepository>(),
+      surahId: surah,
+      initialAyah: ayah,
+      wirdProgress: getIt<KhatmaRepository>(),
+      uthmani: getIt<UthmaniTextSource>(),
+      pageAnchors: getIt<PageAnchorSource>(),
+      settings: getIt<ReaderSettingsSource>(),
+      layout: getIt<ReaderLayoutSource>(),
+    );

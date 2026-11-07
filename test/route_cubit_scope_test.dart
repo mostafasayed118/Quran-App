@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:quran_yahdi/app/route_cubit_scope.dart';
+import 'package:quran_yahdi/core/routing/route_cubit_scope.dart';
 
 class _FakeCubit extends Cubit<int> {
   _FakeCubit(this.id) : super(0);

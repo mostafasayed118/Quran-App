@@ -18,6 +18,7 @@ Future<T?> showAppSheet<T>({
     context: context,
     isScrollControlled: isScrollControlled,
     useSafeArea: true,
+    useRootNavigator: true,
     showDragHandle: true,
     constraints: const BoxConstraints(maxWidth: AppBreakpoints.sheetMaxWidth),
     builder: builder,

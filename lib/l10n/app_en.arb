@@ -3,6 +3,7 @@
   "appName": "Quran Yahdi",
   "home": "Home",
   "quran": "Quran",
+  "quranWorkspacePrompt": "Pick a surah, juz or bookmark to read",
   "azkar": "Azkar",
   "tasbih": "Tasbih",
   "prayerTimes": "Prayer Times",
