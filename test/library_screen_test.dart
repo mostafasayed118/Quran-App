@@ -227,7 +227,8 @@ void main() {
       return cubit;
     }
 
-    Widget screen(LibraryCubit cubit) => BlocProvider<LibraryCubit>.value(
+    Widget screen(LibraryCubit cubit, {double? textScale}) =>
+        BlocProvider<LibraryCubit>.value(
           value: cubit,
           child: MaterialApp(
             locale: const Locale('ar'),
@@ -239,6 +240,13 @@ void main() {
               GlobalCupertinoLocalizations.delegate,
             ],
             theme: AppTheme.light,
+            builder: textScale == null
+                ? null
+                : (context, child) => MediaQuery(
+                      data: MediaQuery.of(context)
+                          .copyWith(textScaler: TextScaler.linear(textScale)),
+                      child: child!,
+                    ),
             home: const LibraryScreen(),
           ),
         );
@@ -308,6 +316,27 @@ void main() {
         File('${tempRoot.path}/library/real-stream.json').existsSync(),
         isTrue,
       );
+    });
+
+    testWidgets('320 dp at textScale 2.0 survives the library', (tester) async {
+      tester.view.physicalSize = const Size(320, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final cubit = screenCubit(
+        db,
+        catalog: CatalogRepository(
+          source: BundledCatalogSource(loader: () async => fixtureCatalog()),
+        ),
+        downloader: ControllableFakeDownloader(db),
+      );
+      await cubit.start();
+
+      await tester.pumpWidget(screen(cubit, textScale: 2.0));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('التفسير'), findsOneWidget);
     });
   });
 }

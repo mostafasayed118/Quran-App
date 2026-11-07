@@ -36,4 +36,39 @@ void main() {
     expect(find.textContaining('الشهر'), findsOneWidget);
     expect(find.textContaining('١٥'), findsAtLeastNWidgets(1));
   });
+
+  testWidgets('320 dp at textScale 2.0 survives the month grid',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final cubit = HijriCubit(service: HijriService());
+    addTearDown(cubit.close);
+    await cubit.start();
+    await tester.pumpWidget(BlocProvider<HijriCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(2.0)),
+          child: child!,
+        ),
+        home: const HijriScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byTooltip('اليوم'), findsOneWidget);
+  });
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -69,5 +70,32 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('ديسمبر'), findsWidgets);
+  });
+
+  testWidgets('320 dp at textScale 2.0 survives the timetable', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final cubit = PrayerMonthCubit(
+      city: const _City(),
+      prayer: _Prayer(),
+      clock: () => DateTime(2026, 11, 15),
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await pumpAppHost(
+      tester,
+      textScale: 2.0,
+      home: BlocProvider<PrayerMonthCubit>.value(
+        value: cubit,
+        child: const PrayerMonthScreen(),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('جدول الشهر'), findsOneWidget);
+    expect(find.textContaining('فجر'), findsWidgets);
   });
 }

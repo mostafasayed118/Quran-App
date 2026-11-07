@@ -37,7 +37,7 @@ Widget _host() => BlocProvider<QuranSearchCubit>(
       child: const QuranSearchScreen(),
     );
 
-Future<void> _pump(WidgetTester tester) async {
+Future<void> _pump(WidgetTester tester, {double? textScale}) async {
   await tester.pumpWidget(MaterialApp(
     locale: const Locale('ar'),
     supportedLocales: const [Locale('ar'), Locale('en')],
@@ -47,6 +47,13 @@ Future<void> _pump(WidgetTester tester) async {
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
+    builder: textScale == null
+        ? null
+        : (context, child) => MediaQuery(
+              data: MediaQuery.of(context)
+                  .copyWith(textScaler: TextScaler.linear(textScale)),
+              child: child!,
+            ),
     home: _host(),
   ));
   await tester.pump();
@@ -76,5 +83,21 @@ void main() {
     expect(find.text('البقرة'), findsOneWidget);
     expect(find.text('٢:٣'), findsOneWidget);
     expect(find.text('عدد النتائج: ١'), findsOneWidget);
+  });
+
+  testWidgets('320 dp at textScale 2.0 keeps the result row readable',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, textScale: 2.0);
+
+    await tester.enterText(find.byType(TextField), 'الصلاة');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('الذين يؤمنون بالغيب ويقيمون الصلاة'), findsOneWidget);
   });
 }

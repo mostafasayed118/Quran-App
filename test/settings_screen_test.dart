@@ -30,7 +30,7 @@ void main() {
         matching: find.byType(Switch),
       );
 
-  Future<void> pumpHost(WidgetTester tester) async {
+  Future<void> pumpHost(WidgetTester tester, {double? textScale}) async {
     final cubit = SettingsCubit(
       settings: settings,
       city: CityRepository(db: db, loader: () async => [cairoCity.toJson()]),
@@ -41,6 +41,7 @@ void main() {
     await cubit.start();
     await pumpAppHost(
       tester,
+      textScale: textScale,
       wrap: (app) =>
           BlocProvider<SettingsCubit>.value(value: cubit, child: app),
       home: const SettingsScreen(),
@@ -120,5 +121,17 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(tester.getSize(find.byType(ListView)).width, 720);
+  });
+
+  testWidgets('320 dp at textScale 2.0 survives the settings list',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await pumpHost(tester, textScale: 2.0);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('الإعدادات'), findsOneWidget);
   });
 }

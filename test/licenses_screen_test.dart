@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,7 +34,6 @@ void main() {
   testWidgets('the screen lists the shipped content and font sources',
       (tester) async {
     await pumpAppHost(tester, home: const LicensesScreen());
-
     expect(find.text('التراخيص والمصادر'), findsOneWidget);
     expect(find.textContaining('QuranEnc.com'), findsOneWidget);
     expect(find.textContaining('بيكثال'), findsOneWidget);
@@ -66,5 +66,17 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('Free of Cost'), findsOneWidget);
+  });
+
+  testWidgets('320 dp at textScale 2.0 survives the licenses list',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await pumpAppHost(tester, textScale: 2.0, home: const LicensesScreen());
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('التراخيص والمصادر'), findsOneWidget);
   });
 }

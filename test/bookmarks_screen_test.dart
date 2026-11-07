@@ -53,7 +53,11 @@ void main() {
     );
   }
 
-  Future<void> pump(WidgetTester tester, Widget child) async {
+  Future<void> pump(
+    WidgetTester tester,
+    Widget child, {
+    double? textScale,
+  }) async {
     await tester.pumpWidget(MaterialApp(
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar'), Locale('en')],
@@ -64,6 +68,13 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: AppTheme.light,
+      builder: textScale == null
+          ? null
+          : (context, child) => MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
+                child: child!,
+              ),
       home: child,
     ));
     await tester.pumpAndSettle();
@@ -105,5 +116,22 @@ void main() {
     final text = 'ذلك الكتاب لا ريب فيه';
     await pump(tester, await host([_entry(db, ayahId: 9, text: text)]));
     expect(find.byTooltip('أزل الحفظ'), findsOneWidget);
+  });
+
+  testWidgets('320 dp at textScale 2.0 survives the bookmark list',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const text = 'ذلك الكتاب لا ريب فيه';
+    await pump(
+      tester,
+      await host([_entry(db, ayahId: 9, text: text)]),
+      textScale: 2.0,
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.textContaining(text), findsOneWidget);
   });
 }

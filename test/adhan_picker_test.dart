@@ -87,15 +87,20 @@ void main() {
     await cubit.start();
   }
 
-  Future<void> pumpPicker(WidgetTester tester) async {
+  Future<void> pumpPicker(
+    WidgetTester tester, {
+    Size size = const Size(1080, 3000),
+    double textScale = 1,
+  }) async {
     // Both sections are long enough that a default 800x600 surface leaves the
     // Fajr list unmounted, and an unmounted row cannot be found or tapped.
-    tester.view.physicalSize = const Size(1080, 3000);
+    tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
     await pumpAppHost(
       tester,
+      textScale: textScale == 1 ? null : textScale,
       home: const AdhanPickerScreen(),
       wrap: (app) => BlocProvider<AdhanPickerCubit>.value(
         value: cubit,
@@ -103,6 +108,18 @@ void main() {
       ),
     );
   }
+
+  testWidgets('320 dp at textScale 2.0 survives the picker', (tester) async {
+    await setUpCubit();
+    await pumpPicker(
+      tester,
+      size: const Size(320, 640),
+      textScale: 2.0,
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(AdhanPickerScreen), findsOneWidget);
+  });
 
   testWidgets('renders every reciter in both sections', (tester) async {
     await setUpCubit();
