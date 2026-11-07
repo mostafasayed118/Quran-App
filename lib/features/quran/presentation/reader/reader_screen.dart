@@ -159,14 +159,22 @@ class ReaderView extends StatelessWidget {
 
 /// The five reader AppBar actions, shared by the full route and the pane.
 class ReaderActions extends StatelessWidget {
-  /// Creates the actions; [onOpenBookmarks] overrides the default push.
-  const ReaderActions({super.key, required this.state, this.onOpenBookmarks});
+  /// Creates the actions; [onOpenBookmarks] and [onOpenAyah] override pushes.
+  const ReaderActions({
+    super.key,
+    required this.state,
+    this.onOpenBookmarks,
+    this.onOpenAyah,
+  });
 
   /// The ready reader state.
   final ReaderReady state;
 
   /// The bookmarks action; null keeps the route push.
   final VoidCallback? onOpenBookmarks;
+
+  /// The page-jump destination; null keeps the reader-route push.
+  final void Function(int surah, int ayah)? onOpenAyah;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +205,9 @@ class ReaderActions extends StatelessWidget {
         IconButton(
           tooltip: loc.pageJump,
           icon: const Icon(Icons.pin_outlined),
-          onPressed: () => unawaited(_openPageJump(context, cubit, loc)),
+          onPressed: () => unawaited(
+            _openPageJump(context, cubit, loc, onResolved: onOpenAyah),
+          ),
         ),
         IconButton(
           tooltip: loc.readerFontSize,
@@ -654,10 +664,12 @@ class _MushafPagerState extends State<_MushafPager> {
 Future<void> _openPageJump(
   BuildContext context,
   ReaderCubit cubit,
-  AppLocalizations loc,
-) async {
+  AppLocalizations loc, {
+  void Function(int surah, int ayah)? onResolved,
+}) async {
   final page = await showDialog<int>(
     context: context,
+    useRootNavigator: true,
     builder: (_) => _PageJumpDialog(loc: loc),
   );
   if (!context.mounted || page == null) return;
@@ -669,6 +681,10 @@ Future<void> _openPageJump(
   if (!context.mounted) return;
   if (anchor == null) {
     _showInvalidPage(context, loc);
+    return;
+  }
+  if (onResolved != null) {
+    onResolved(anchor.surahId, anchor.numberInSurah);
     return;
   }
   unawaited(context.push(

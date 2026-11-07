@@ -32,14 +32,22 @@ class _QuranWorkspaceScreenState extends State<QuranWorkspaceScreen>
   ({int surah, int ayah})? _selection;
   int? _selectedJuz;
   int? _selectedAyahId;
+  int _lastTab = 0;
 
   @override
   void initState() {
     super.initState();
-    _tabs = TabController(length: 3, vsync: this)
-      ..addListener(() {
-        if (mounted) setState(() {});
-      });
+    _tabs = TabController(length: 3, vsync: this)..addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (!mounted) return;
+    if (_tabs.index != _lastTab) {
+      _lastTab = _tabs.index;
+      // A hidden tab must not keep the IME up over the visible list.
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
+    setState(() {});
   }
 
   @override
@@ -99,9 +107,9 @@ class _QuranWorkspaceScreenState extends State<QuranWorkspaceScreen>
                       controller: _tabs,
                       isScrollable: true,
                       tabs: [
-                        Tab(text: loc.quran),
-                        Tab(text: loc.juzIndexTitle),
-                        Tab(text: loc.bookmarks),
+                        Tab(text: loc.quranTabSurahs),
+                        Tab(text: loc.quranTabJuz),
+                        Tab(text: loc.quranTabBookmarks),
                       ],
                     ),
                     Expanded(
@@ -156,6 +164,8 @@ class _QuranWorkspaceScreenState extends State<QuranWorkspaceScreen>
                         createReader: widget.createReader,
                         onOpenBookmarks: () => _tabs.index = 2,
                         onBack: _clearSelection,
+                        onOpenAyah: (surah, ayah) =>
+                            _select(surah: surah, ayah: ayah),
                       ),
                     ),
                 ],

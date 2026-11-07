@@ -18,6 +18,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quran => 'Quran';
 
   @override
+  String get quranTabSurahs => 'Surahs';
+
+  @override
+  String get quranTabJuz => 'Juz';
+
+  @override
+  String get quranTabBookmarks => 'Bookmarks';
+
+  @override
   String get quranWorkspacePrompt => 'Pick a surah, juz or bookmark to read';
 
   @override

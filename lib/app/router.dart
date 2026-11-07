@@ -190,9 +190,6 @@ abstract final class AppRouter {
                   getIt<AyahRepository>(),
                   pager: getIt<AyahRepository>(),
                 ),
-                createBookmarkMeta: () => BookmarkMetaCubit(
-                  source: getIt<BookmarkMetaSource>(),
-                ),
               ),
             ),
           ),

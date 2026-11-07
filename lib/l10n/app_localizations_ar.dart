@@ -18,6 +18,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get quran => 'القرآن الكريم';
 
   @override
+  String get quranTabSurahs => 'سور';
+
+  @override
+  String get quranTabJuz => 'أجزاء';
+
+  @override
+  String get quranTabBookmarks => 'علامات';
+
+  @override
   String get quranWorkspacePrompt => 'اختر سورة أو جزءًا أو علامة للقراءة';
 
   @override

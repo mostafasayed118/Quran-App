@@ -13,6 +13,7 @@ Future<bool> confirmDeleteDialog(
   final loc = AppLocalizations.of(context);
   final confirmed = await showDialog<bool>(
     context: context,
+    useRootNavigator: true,
     builder: (dialogContext) => AlertDialog(
       title: Text(title),
       content: Text(body),

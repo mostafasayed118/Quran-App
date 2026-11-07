@@ -116,6 +116,24 @@ abstract class AppLocalizations {
   /// **'القرآن الكريم'**
   String get quran;
 
+  /// No description provided for @quranTabSurahs.
+  ///
+  /// In ar, this message translates to:
+  /// **'سور'**
+  String get quranTabSurahs;
+
+  /// No description provided for @quranTabJuz.
+  ///
+  /// In ar, this message translates to:
+  /// **'أجزاء'**
+  String get quranTabJuz;
+
+  /// No description provided for @quranTabBookmarks.
+  ///
+  /// In ar, this message translates to:
+  /// **'علامات'**
+  String get quranTabBookmarks;
+
   /// No description provided for @quranWorkspacePrompt.
   ///
   /// In ar, this message translates to:

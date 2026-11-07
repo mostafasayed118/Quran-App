@@ -9,6 +9,7 @@ import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/juz_index_source.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
+import 'package:quran_yahdi/features/quran/data/page_anchor_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/domain/juz_summary.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmarks_cubit.dart';
@@ -25,9 +26,16 @@ import 'support/fake_playback_service.dart';
 import 'support/host.dart';
 import 'support/test_db.dart';
 
+class _FakePageAnchors implements PageAnchorSource {
+  const _FakePageAnchors();
+
+  @override
+  Future<({int surahId, int numberInSurah})?> anchorForPage(int page) async =>
+      (surahId: 2, numberInSurah: 2);
+}
+
 class _JuzSource implements JuzIndexSource {
   const _JuzSource();
-
   @override
   Stream<List<JuzSummary>> watchJuz() => Stream.value(const [
         JuzSummary(
@@ -163,6 +171,7 @@ void main() {
         lastReadRepository: LastReadRepository(db),
         surahId: surah,
         initialAyah: ayah,
+        pageAnchors: const _FakePageAnchors(),
       );
     }
 
@@ -207,9 +216,9 @@ void main() {
     await pumpWorkspace(tester);
 
     expect(find.byType(QuranWorkspaceScreen), findsOneWidget);
-    expect(tab('القرآن الكريم'), findsOneWidget);
-    expect(tab('فهرس الأجزاء'), findsOneWidget);
-    expect(tab('العلامات المرجعية'), findsOneWidget);
+    expect(tab('سور'), findsOneWidget);
+    expect(tab('أجزاء'), findsOneWidget);
+    expect(tab('علامات'), findsOneWidget);
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
   });
 
@@ -235,7 +244,7 @@ void main() {
       (tester) async {
     final calls = await pumpWorkspace(tester);
 
-    await openTab(tester, 'فهرس الأجزاء');
+    await openTab(tester, 'أجزاء');
     await tester.tap(find.text('الجزء ١'));
     await tester.pumpAndSettle();
 
@@ -247,7 +256,7 @@ void main() {
       (tester) async {
     final calls = await pumpWorkspace(tester);
 
-    await openTab(tester, 'العلامات المرجعية');
+    await openTab(tester, 'علامات');
     await tester.tap(find.text('ذلك الكتاب'));
     await tester.pumpAndSettle();
 
@@ -264,8 +273,8 @@ void main() {
     await tester.enterText(find.byType(TextField), 'بقرة');
     await tester.pump();
 
-    await openTab(tester, 'فهرس الأجزاء');
-    await openTab(tester, 'القرآن الكريم');
+    await openTab(tester, 'أجزاء');
+    await openTab(tester, 'سور');
 
     expect(
       tester.widget<EditableText>(find.byType(EditableText)).controller.text,
@@ -301,5 +310,63 @@ void main() {
     final master = tester.getTopLeft(find.byKey(const Key('quran-master')));
     final detail = tester.getTopLeft(find.byKey(const Key('quran-detail')));
     expect(master.dx, lessThan(detail.dx));
+  });
+
+  testWidgets('page jump resolves inside the pane', (tester) async {
+    final calls = await pumpWorkspace(tester);
+
+    await tester.tap(surahRow('الفاتحة'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.byType(TextField),
+      ),
+      '2',
+    );
+    await tester.tap(find.text('انتقال'));
+    await tester.pumpAndSettle();
+
+    expect(calls.last, (surah: 2, ayah: 2));
+    expect(find.byType(ReaderPane), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(ReaderPane),
+        matching: find.text('البقرة'),
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('switching tabs releases the IME focus', (tester) async {
+    await pumpWorkspace(tester);
+
+    await tester.enterText(find.byType(TextField), 'بقرة');
+    await tester.pump();
+    expect(
+      tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus,
+      isTrue,
+    );
+
+    await openTab(tester, 'أجزاء');
+
+    final hidden = tester.widget<EditableText>(
+      find.byType(EditableText, skipOffstage: false),
+    );
+    expect(hidden.focusNode.hasFocus, isFalse);
+  });
+
+  testWidgets('all three tab labels fit the 340 dp master', (tester) async {
+    await pumpWorkspace(tester);
+
+    final master = tester.getRect(find.byKey(const Key('quran-master')));
+    for (final label in const ['سور', 'أجزاء', 'علامات']) {
+      final rect = tester.getRect(tab(label));
+      expect(rect.left, greaterThanOrEqualTo(master.left - 0.5));
+      expect(rect.right, lessThanOrEqualTo(master.right + 0.5));
+    }
   });
 }

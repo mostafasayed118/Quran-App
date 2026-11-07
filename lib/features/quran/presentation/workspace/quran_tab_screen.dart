@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/layout/app_breakpoints.dart';
 import '../../../../core/routing/route_cubit_scope.dart';
 import '../../../../core/utils/app_routes.dart';
-import '../bookmarks/bookmark_meta_cubit.dart';
 import '../bookmarks/bookmarks_cubit.dart';
 import '../index/juz_index_cubit.dart';
 import '../index/surah_index_screen.dart';
@@ -23,7 +21,6 @@ class QuranTabScreen extends StatelessWidget {
     required this.createReader,
     required this.createJuz,
     required this.createBookmarks,
-    required this.createBookmarkMeta,
   });
 
   /// Builds a side-effect-free reader cubit for one selection.
@@ -34,9 +31,6 @@ class QuranTabScreen extends StatelessWidget {
 
   /// Builds the bookmarks master cubit.
   final BookmarksCubit Function() createBookmarks;
-
-  /// Builds the bookmark metadata cubit.
-  final BookmarkMetaCubit Function() createBookmarkMeta;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +45,7 @@ class QuranTabScreen extends StatelessWidget {
         identity: AppRoutes.quran,
         create: createBookmarks,
         start: (cubit) => cubit.start(),
-        child: BlocProvider<BookmarkMetaCubit>(
-          create: (_) => createBookmarkMeta()..start(),
-          child: QuranWorkspaceScreen(createReader: createReader),
-        ),
+        child: QuranWorkspaceScreen(createReader: createReader),
       ),
     );
   }

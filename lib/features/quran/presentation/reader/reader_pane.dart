@@ -22,6 +22,7 @@ class ReaderPane extends StatelessWidget {
     required this.createReader,
     this.onOpenBookmarks,
     this.onBack,
+    this.onOpenAyah,
   });
 
   /// The selected surah.
@@ -38,6 +39,9 @@ class ReaderPane extends StatelessWidget {
 
   /// The explicit back action; null keeps the Navigator's own leading.
   final VoidCallback? onBack;
+
+  /// The page-jump destination; null keeps the full-reader push.
+  final void Function(int surah, int ayah)? onOpenAyah;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +67,7 @@ class ReaderPane extends StatelessWidget {
                   ReaderActions(
                     state: state,
                     onOpenBookmarks: onOpenBookmarks,
+                    onOpenAyah: onOpenAyah,
                   ),
                 ],
               ),
