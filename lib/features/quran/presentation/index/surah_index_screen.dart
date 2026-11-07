@@ -19,7 +19,7 @@ class SurahIndexScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.quran),
+        title: Text(loc.surahIndexTitle),
         actions: [
           IconButton(
             tooltip: loc.juzIndexTitle,

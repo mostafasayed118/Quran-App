@@ -139,4 +139,59 @@ void main() {
       TextAlign.start,
     );
   });
+
+  testWidgets('showAppSheet roots itself above a nested Navigator',
+      (tester) async {
+    tester.view.physicalSize = const Size(1024, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const nestedKey = Key('nested-navigator');
+    await tester.pumpWidget(MaterialApp(
+      home: Row(
+        children: [
+          SizedBox(
+            width: 300,
+            child: Navigator(
+              key: nestedKey,
+              onGenerateRoute: (_) => MaterialPageRoute(
+                builder: (_) => Scaffold(
+                  body: Builder(
+                    builder: (context) => ElevatedButton(
+                      onPressed: () => showAppSheet<void>(
+                        context: context,
+                        builder: (_) => const SizedBox(
+                          key: Key('sheet-content'),
+                          height: 100,
+                          width: double.infinity,
+                        ),
+                      ),
+                      child: const Text('open'),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Expanded(child: SizedBox()),
+        ],
+      ),
+    ));
+
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(BottomSheet), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(nestedKey),
+        matching: find.byType(BottomSheet),
+      ),
+      findsNothing,
+    );
+    expect(
+      tester.getSize(find.byKey(const Key('sheet-content'))).width,
+      AppBreakpoints.sheetMaxWidth,
+    );
+  });
 }
