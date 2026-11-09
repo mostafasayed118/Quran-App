@@ -23,10 +23,13 @@ class QuranSearchRepository implements QuranSearchSource {
     if (tokens.isEmpty || !quranSearchQueryUsable(query)) {
       return const QuranSearchPage(hits: [], total: 0, hasMore: false);
     }
-    final clauses = [for (final _ in tokens) 'text_norm LIKE ?'];
-    final args = <Object?>[for (final token in tokens) '%$token%'];
-    final total = await _totalFor(tokens, clauses, args);
-    final rows = await _rows(clauses, args, afterAyahId, limit + 1);
+    // FTS5 trigram + MATCH preserves the legacy substring/contains semantics
+    // (LIKE '%token%') while using the FTS index. Tokens are normalized
+    // Arabic/digits ([quranSearchTokens]) so they are safe FTS terms; implicit
+    // space = AND across tokens.
+    final match = _ftsMatch(tokens);
+    final total = await _totalFor(tokens, match);
+    final rows = await _rows(match, afterAyahId, limit + 1);
     final hasMore = rows.length > limit;
     final hits = [
       for (final row in hasMore ? rows.sublist(0, limit) : rows)
@@ -41,47 +44,47 @@ class QuranSearchRepository implements QuranSearchSource {
     return QuranSearchPage(hits: hits, total: total, hasMore: hasMore);
   }
 
-  Future<int> _totalFor(
-    List<String> tokens,
-    List<String> clauses,
-    List<Object?> args,
-  ) async {
+  /// Builds an FTS5 MATCH expression: every token must appear (AND).
+  ///
+  /// Each token is quoted so FTS5 treats it as a literal term; tokens are
+  /// already stripped to safe search characters by [quranSearchTokens].
+  static String _ftsMatch(List<String> tokens) =>
+      tokens.map((t) => '"${t.replaceAll('"', '""')}"').join(' ');
+
+  Future<int> _totalFor(List<String> tokens, String match) async {
     final signature = tokens.join(' ');
     final cached = _totals.lookup(signature);
     if (cached != null) return cached;
-    final total = await _count(clauses, args);
+    final total = await _count(match);
     _totals.store(signature, total);
     return total;
   }
 
-  Future<int> _count(List<String> clauses, List<Object?> args) async {
+  Future<int> _count(String match) async {
     final row = await _db.customSelect(
-      'SELECT COUNT(*) AS c FROM ayah_search WHERE ${clauses.join(' AND ')}',
-      variables: [for (final arg in args) Variable(arg)],
+      'SELECT COUNT(*) AS c FROM ayah_search WHERE ayah_search MATCH ?',
+      variables: [Variable<String>(match)],
     ).getSingle();
     return row.read<int>('c');
   }
 
   Future<List<QueryRow>> _rows(
-    List<String> clauses,
-    List<Object?> args,
+    String match,
     int? afterAyahId,
     int fetch,
   ) async {
-    final sql = StringBuffer('SELECT s.ayah_id, a.surah_id, a.number_in_surah, '
-        'u.name_ar, a.text_imlaei '
+    final sql = StringBuffer('SELECT s.rowid AS ayah_id, a.surah_id, '
+        'a.number_in_surah, u.name_ar, a.text_imlaei '
         'FROM ayah_search s '
-        'JOIN ayahs a ON a.id = s.ayah_id '
+        'JOIN ayahs a ON a.id = s.rowid '
         'JOIN surahs u ON u.id = a.surah_id '
-        'WHERE ${clauses.join(' AND ')}');
-    final variables = <Variable<Object>>[
-      for (final arg in args) Variable<Object>(arg),
-    ];
+        'WHERE ayah_search MATCH ?');
+    final variables = <Variable<Object>>[Variable<String>(match)];
     if (afterAyahId != null) {
-      sql.write(' AND s.ayah_id > ?');
+      sql.write(' AND s.rowid > ?');
       variables.add(Variable<int>(afterAyahId));
     }
-    sql.write(' ORDER BY s.ayah_id LIMIT ?');
+    sql.write(' ORDER BY s.rowid LIMIT ?');
     variables.add(Variable<int>(fetch));
     return _db.customSelect(sql.toString(), variables: variables).get();
   }

@@ -61,7 +61,7 @@ void main() {
     await ensureQuranSearchIndex(db);
 
     final row = await db
-        .customSelect('SELECT text_norm FROM ayah_search WHERE ayah_id = 1')
+        .customSelect('SELECT text_norm FROM ayah_search WHERE rowid = 1')
         .getSingle();
     expect(row.read<String>('text_norm'), 'نص جديد');
   });

@@ -38,7 +38,7 @@ void main() {
 
     expect(calls, 1);
     final row = await db
-        .customSelect('SELECT text_norm FROM ayah_search WHERE ayah_id = 1')
+        .customSelect('SELECT text_norm FROM ayah_search WHERE rowid = 1')
         .getSingle();
     expect(row.read<String>('text_norm'), _normalizedText);
   });
@@ -59,7 +59,7 @@ void main() {
     expect(captured, normalizeSearchEntries([(7, _seededText)]));
     expect(captured, [(7, _normalizedText)]);
     final row = await db
-        .customSelect('SELECT text_norm FROM ayah_search WHERE ayah_id = 7')
+        .customSelect('SELECT text_norm FROM ayah_search WHERE rowid = 7')
         .getSingle();
     expect(row.read<String>('text_norm'), _normalizedText);
   });

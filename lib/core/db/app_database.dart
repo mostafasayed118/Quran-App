@@ -85,11 +85,26 @@ class AppDatabase extends _$AppDatabase {
     // The downloads screen filters `status='done'`.
     await customStatement('CREATE INDEX IF NOT EXISTS idx_downloads_status '
         'ON downloads(status)');
-    // Derived Quran search index (see core/db/search_index.dart). A raw table
-    // on purpose: it is rebuilt content, not a drift entity, and keeping it out
-    // of the drift schema leaves the migration contract untouched.
-    await customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
-        '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
+    // Derived Quran search index (see core/db/search_index.dart). An FTS5
+    // trigram virtual table (not a drift entity): rebuilt content, and
+    // substring MATCH preserves the legacy LIKE '%token%' semantics while using
+    // the FTS index. Older installs may still have the legacy regular table —
+    // drop and recreate it (derived content only; ensureQuranSearchIndex
+    // rebuilds and re-stamps on the next boot).
+    final searchSql = await customSelect(
+      "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'ayah_search'",
+    ).getSingleOrNull();
+    final searchShape =
+        (searchSql?.readNullable<String>('sql') ?? '').toUpperCase();
+    if (searchShape.isNotEmpty && !searchShape.contains('USING FTS5')) {
+      await customStatement('DROP TABLE IF EXISTS ayah_search');
+    }
+    if (!searchShape.contains('USING FTS5')) {
+      await customStatement(
+        'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
+        "USING fts5(text_norm, tokenize='trigram')",
+      );
+    }
     // Hadith pack read index (in the drift schema for fresh databases).
     await customStatement('CREATE TABLE IF NOT EXISTS hadith_entries '
         '(pack_id TEXT NOT NULL, ordinal INTEGER NOT NULL, '

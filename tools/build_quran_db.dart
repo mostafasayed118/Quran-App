@@ -112,10 +112,13 @@ Future<void> main() async {
 
   // Ship the derived search index prebuilt. Boot's ensureQuranSearchIndex then
   // short-circuits on the matching stamp, so a fresh install never rebuilds
-  // 6,236 rows on the DB executor. Same DDL as AppDatabase.beforeOpen; the rows
-  // come from the runtime builder so the normalization is never forked.
-  await db.customStatement('CREATE TABLE IF NOT EXISTS ayah_search '
-      '(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)');
+  // 6,236 rows on the DB executor. Uses the same FTS5 trigram DDL as the app
+  // (substring MATCH preserves legacy LIKE semantics); rows come from the
+  // runtime builder so normalization is never forked.
+  await db.customStatement(
+    'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
+    "USING fts5(text_norm, tokenize='trigram')",
+  );
   await rebuildQuranSearchIndex(db);
 
   final surahCount = (await db.select(db.surahs).get()).length;

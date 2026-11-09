@@ -8,6 +8,15 @@ import 'content_version.dart';
 /// Quran search index was built from.
 const String kSearchIndexVersionKey = 'search_index_version';
 
+/// FTS5 virtual table DDL for Quran text search.
+///
+/// Uses the `trigram` tokenizer so `MATCH` preserves the existing
+/// substring/contains semantics (the previous `LIKE '%token%'` behavior).
+/// `rowid` carries the global ayah id (1..6236), keeping joins and ordering
+/// compatible with the rest of the reader/search pipeline.
+const String kAyahSearchDdl = 'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
+    "USING fts5(text_norm, tokenize='trigram')";
+
 /// Awaits a computation off the UI isolate.
 ///
 /// Production passes nothing (see [ensureQuranSearchIndex] /
@@ -24,9 +33,32 @@ Future<void> ensureQuranSearchIndex(
   AppDatabase db, {
   IsolateRunner? run,
 }) async {
+  await ensureAyahSearchSchema(db);
   final stamp = await _indexStamp(db);
   if (stamp == kContentVersion && await _hasIndexedRows(db)) return;
   await rebuildQuranSearchIndex(db, run: run);
+}
+
+/// Ensures `ayah_search` exists as the current FTS5 trigram table.
+///
+/// Older installs may carry the legacy regular table
+/// `(ayah_id INTEGER PRIMARY KEY, text_norm TEXT NOT NULL)`. That shape is
+/// incompatible with FTS5 `MATCH`, so it is dropped (derived content only) and
+/// recreated; the caller will then rebuild and re-stamp it.
+Future<void> ensureAyahSearchSchema(AppDatabase db) async {
+  final row = await db
+      .customSelect(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'ayah_search'",
+      )
+      .getSingleOrNull();
+  final sql = (row?.readNullable<String>('sql') ?? '').toUpperCase();
+  if (sql.contains('USING FTS5')) return;
+  if (sql.isNotEmpty) {
+    // Legacy regular table (or any non-FTS5 shape): drop so the FTS5 DDL can
+    // create the virtual table. Derived, rebuildable content — safe to drop.
+    await db.customStatement('DROP TABLE IF EXISTS ayah_search');
+  }
+  await db.customStatement(kAyahSearchDdl);
 }
 
 /// Pure projection used by the worker isolate.
@@ -46,11 +78,13 @@ List<(int, String)> Function() _normalizationJob(List<(int, String)> input) =>
 /// Rebuilds `ayah_search` from `ayahs.text_imlaei` in one transaction.
 ///
 /// `text_uthmani` is private-use glyph data for the HafsSmart font, so the
-/// readable imla'i text is the only searchable source.
+/// readable imla'i text is the only searchable source. The FTS5 `rowid` is the
+/// global ayah id.
 Future<void> rebuildQuranSearchIndex(
   AppDatabase db, {
   IsolateRunner? run,
 }) async {
+  await ensureAyahSearchSchema(db);
   final rows = await db.customSelect('SELECT id, text_imlaei FROM ayahs').get();
   // Only plain records cross the isolate boundary: drift QueryRows are not a
   // stable transfer type.
@@ -65,8 +99,7 @@ Future<void> rebuildQuranSearchIndex(
     await db.batch((batch) {
       for (final (ayahId, text) in entries) {
         batch.customStatement(
-          'INSERT OR REPLACE INTO ayah_search(ayah_id, text_norm) '
-          'VALUES (?, ?)',
+          'INSERT INTO ayah_search(rowid, text_norm) VALUES (?, ?)',
           [ayahId, text],
         );
       }
