@@ -24,6 +24,7 @@ Quran Yahdi is a complete, offline-first Quran companion for Android: the full M
 | 12 | الأدعية والرقية | مختارات مرتبة من المصنفات التقليدية مع آيات النصوص |
 | 13 | متتبع العبادات | الصلوات الخمس اليومية وخطط الختمة |
 | 14 | الإعدادات والإضافات | وضع ليلي، حساب الزكاة، التقويم الهجري، أسماء الله الحسنى |
+| 15 | رمضان | جدول إمساك وإفطار شهر رمضان بالمدينة المختارة + سجل أيام القضاء |
 
 ## لقطات الشاشات
 
@@ -54,7 +55,7 @@ dart run build_runner build --delete-conflicting-outputs
 dart run tools/build_quran_db.dart   # يعيد بناء assets/db/quran.sqlite من المصدر (حتمي)
 
 flutter analyze        # بوابة الحملة: 0 مشكلات
-flutter test           # البوابة الكاملة: 921 اختبار
+flutter test           # البوابة الكاملة: 1443 اختبار
 
 flutter build apk --debug          # للتثبيت السريع على جهاز
 $env:PUBLISH_RELEASE="true"; flutter build appbundle --release  # مخرجات المتجر (بلا مفتاح = فشل بناء)
