@@ -13,7 +13,7 @@ import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../data/quran_search_source.dart';
+import '../../domain/quran_search_source.dart';
 import 'quran_search_cubit.dart';
 import 'quran_search_state.dart';
 

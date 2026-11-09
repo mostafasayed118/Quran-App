@@ -7,7 +7,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../data/zakat_calculator.dart';
+import '../domain/zakat_calculator.dart';
 import 'zakat_cubit.dart';
 import 'zakat_state.dart';
 

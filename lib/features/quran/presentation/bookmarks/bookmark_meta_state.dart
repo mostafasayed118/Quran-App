@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../data/bookmark_meta.dart';
+import '../../domain/bookmark_meta.dart';
 
 part 'bookmark_meta_state.freezed.dart';
 

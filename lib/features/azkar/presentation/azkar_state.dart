@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/azkar_repository.dart';
+import '../domain/azkar_models.dart';
 
 part 'azkar_state.freezed.dart';
 

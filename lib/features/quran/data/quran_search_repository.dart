@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
-import 'quran_search_source.dart';
+import '../domain/quran_search_source.dart';
 
 /// Reads Quran search results from the derived `ayah_search` index.
 class QuranSearchRepository implements QuranSearchSource {

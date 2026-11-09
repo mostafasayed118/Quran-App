@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../data/city_repository.dart';
+import '../../../../core/domain/city.dart';
 
 part 'city_picker_state.freezed.dart';
 

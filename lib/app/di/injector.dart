@@ -71,7 +71,7 @@ import 'package:quran_yahdi/features/quran/data/reader_layout_source.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_source.dart';
 import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
-import 'package:quran_yahdi/features/quran/data/quran_search_source.dart';
+import 'package:quran_yahdi/features/quran/domain/quran_search_source.dart';
 import 'package:quran_yahdi/features/quran/data/surah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/surah_source.dart';
 import 'package:quran_yahdi/features/quran/data/uthmani_text_source.dart';

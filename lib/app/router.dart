@@ -66,7 +66,7 @@ import '../features/quran/data/page_anchor_source.dart';
 import '../features/quran/data/reader_layout_source.dart';
 import '../features/quran/data/reader_settings_source.dart';
 import '../features/quran/data/last_read_repository.dart';
-import '../features/quran/data/quran_search_source.dart';
+import '../features/quran/domain/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
 import '../features/quran/data/uthmani_text_source.dart';
 import '../features/quran/presentation/bookmarks/bookmark_meta_cubit.dart';

@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../data/quran_search_source.dart';
+import '../../domain/quran_search_source.dart';
 
 part 'quran_search_state.freezed.dart';
 

@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/asma_repository.dart';
+import '../domain/asma_models.dart';
 
 part 'asma_state.freezed.dart';
 

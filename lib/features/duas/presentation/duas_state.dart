@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/dua_repository.dart';
+import '../domain/duas_models.dart';
 
 part 'duas_state.freezed.dart';
 

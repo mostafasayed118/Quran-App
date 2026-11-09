@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../data/download_status.dart';
+import '../../domain/download_status.dart';
 
 part 'downloads_state.freezed.dart';
 

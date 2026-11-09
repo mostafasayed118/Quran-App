@@ -3,7 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/quran_search_source.dart';
+import '../../domain/quran_search_source.dart';
 import 'quran_search_state.dart';
 
 /// Drives the Quran text search: one query, keyset-paged result pages.
