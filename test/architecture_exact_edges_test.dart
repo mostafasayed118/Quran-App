@@ -62,7 +62,7 @@ void main() {
             'app -> features -> core)');
   });
 
-  test('the live cross-feature edges are exactly the ratified three', () {
+  test('the live cross-feature edges are exactly the ratified two', () {
     final live = <String>{};
     sources.forEach((rel, src) {
       if (!rel.startsWith('lib/features/')) return;

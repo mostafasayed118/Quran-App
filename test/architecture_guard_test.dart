@@ -145,6 +145,40 @@ void main() {
             'features must not depend on lib/app/ — move shared logic to core/');
   });
 
+  test('only lib/core/di/injector.dart may import the app layer', () {
+    const allowedCoreAppImporter = 'lib/core/di/injector.dart';
+    final offenders = <String>[];
+    sources.forEach((rel, src) {
+      if (!rel.startsWith('lib/core/')) return;
+      for (final m in _importRe.allMatches(src)) {
+        final target = resolveTarget(rel, m.group(1)!);
+        if (target != null && target.startsWith('lib/app/')) {
+          if (rel != allowedCoreAppImporter) {
+            offenders.add('$rel -> ${m.group(1)}');
+          }
+        }
+      }
+    });
+    expect(offenders, isEmpty,
+        reason:
+            'core must not depend on lib/app/ — lib/core/di/injector.dart is '
+            'the sole compat re-export shim (frozen-test path); any other '
+            'core->app import is a dependency-direction violation');
+    // Pin the exception itself so it cannot silently disappear or multiply.
+    final shimTargets = <String>[];
+    for (final m
+        in _importRe.allMatches(sources[allowedCoreAppImporter] ?? '')) {
+      final target = resolveTarget(allowedCoreAppImporter, m.group(1)!);
+      if (target != null && target.startsWith('lib/app/')) {
+        shimTargets.add(target);
+      }
+    }
+    expect(shimTargets, isNotEmpty,
+        reason:
+            'the documented compat shim must still re-export an app target; '
+            'if the shim was removed, delete this exception and migrate tests');
+  });
+
   test('cross-feature edges stay within the pinned allowlist', () {
     final offenders = <String>[];
     sources.forEach((rel, src) {
