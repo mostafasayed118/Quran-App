@@ -30,6 +30,10 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
   final Duration _debounceDuration;
   final List<_Entry> _entries = <_Entry>[];
 
+  /// Surah names are static content; resolve each id at most once per cubit
+  /// lifetime instead of on every keystroke.
+  final Map<int, String> _surahNames = <int, String>{};
+
   Timer? _timer;
   bool _started = false;
   int _generation = 0;
@@ -102,14 +106,28 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
         if (matches.length < maxHits) matches.add(entry);
       }
     }
-    final names = <int, String>{};
-    for (final surah in {for (final match in matches) match.surah}) {
-      try {
-        names[surah] = await _surahName(surah) ?? '';
-      } on Object catch (error, stackTrace) {
-        dev.log('surah name lookup failed',
-            name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
-        names[surah] = '';
+    final names = _surahNames;
+    final missing = <int>{for (final match in matches) match.surah}
+        .difference(names.keys.toSet());
+    if (missing.isNotEmpty) {
+      final resolved = await Future.wait([
+        for (final id in missing)
+          () async {
+            try {
+              return (id, await _surahName(id) ?? '');
+            } on Object catch (error, stackTrace) {
+              dev.log(
+                'surah name lookup failed',
+                name: 'quran_yahdi/library',
+                error: error,
+                stackTrace: stackTrace,
+              );
+              return (id, '');
+            }
+          }(),
+      ]);
+      for (final (id, name) in resolved) {
+        names[id] = name;
       }
     }
     if (isClosed || generation != _generation) return;
