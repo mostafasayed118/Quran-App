@@ -34,22 +34,29 @@ sealed class ReaderState with _$ReaderState {
   }) = ReaderFailed;
 }
 
-/// The mushaf pages, derived from [ReaderReady.ayahs] on demand.
+/// The mushaf pages, derived from [ReaderReady.ayahs] and memoized per
+/// [ReaderReady] instance.
 ///
 /// They were a second stored field until 2026-11-05; a `copyWith(ayahs:)`
-/// could then leave the page list stale. Deriving them makes divergence
-/// impossible, and the surah-sized grouping is cheap enough for the build.
+/// could then leave the page list stale. Deriving them avoids divergence, and
+/// the [Expando] cache prevents recomputing the surah-sized grouping on every
+/// rebuild/page-change access (the same ready instance is read many times).
+final Expando<List<MushafPageBlock>> _readerMushafPagesCache =
+    Expando<List<MushafPageBlock>>('readerMushafPages');
+
 extension ReaderReadyPages on ReaderReady {
   /// The ayahs grouped by their mushaf page, in page order.
-  List<MushafPageBlock> get mushafPages => groupVersesByPage(ayahs);
+  List<MushafPageBlock> get mushafPages =>
+      _readerMushafPagesCache[this] ??= groupVersesByPage(ayahs);
 }
 
 /// Legacy alias for the pre-rename concrete class (frozen suite).
 typedef ReaderError = ReaderFailed;
 
-/// Legacy accessor: the failed state carries no diagnostic any more (the
-/// localized error pane is the UI contract), but the frozen suite still
-/// reads `message`.
+/// Legacy test-only accessor: the failed state carries no diagnostic any more
+/// (the localized error pane is the UI contract). Frozen Class A tests may still
+/// read `message`; removing this shim requires migrating those tests under the
+/// frozen-test policy (owner ruling). Do not use in production/UI code.
 extension ReaderFailedMessage on ReaderFailed {
   String get message => 'failed';
 }

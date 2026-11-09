@@ -262,6 +262,18 @@ class ReciterRepository implements ReciterSource, ReciterInfoSource {
       (_db.select(_db.reciters)..where((r) => r.id.equals(rowId)))
           .getSingleOrNull();
 
+  /// Reciters for [rowIds] in one query, keyed by row id.
+  ///
+  /// Avoids the per-id lookup loop when a caller needs several reciters (e.g.
+  /// resolving a download list). Unknown ids are simply absent from the map.
+  Future<Map<String, ReciterRow>> byIds(Set<String> rowIds) async {
+    if (rowIds.isEmpty) return const <String, ReciterRow>{};
+    final rows = await (_db.select(_db.reciters)
+          ..where((r) => r.id.isIn(rowIds.toList())))
+        .get();
+    return {for (final r in rows) r.id: r};
+  }
+
   @override
   Future<void> selectMoshaf(String rowId) async {
     await _db.into(_db.settingsTable).insertOnConflictUpdate(

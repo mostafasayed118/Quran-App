@@ -121,19 +121,17 @@ class DownloadsCubit extends Cubit<DownloadsState> {
 
   /// The installed downloads, resolved for the downloads list.
   ///
-  /// Reciter names come from [ReciterRepository.byId] and surah names from
-  /// [ReciterRepository.surahNamesFor] — the same bundled catalog the reciter
-  /// surahs screen reads. A failure propagates: the screen owns the error arm,
-  /// unlike [refreshDone], which is a soft merge into the state.
+  /// Reciter and surah names come from the bundled catalog in batched lookups
+  /// — the same catalog the reciter surahs screen reads. A failure propagates:
+  /// the screen owns the error arm, unlike [refreshDone], which is a soft merge
+  /// into the state.
   Future<List<InstalledDownload>> installed() async {
     await _ensureReconciled();
     final rows = await _downloader.listDone();
     if (rows.isEmpty) return const <InstalledDownload>[];
-    final reciterNames = <String, String>{};
-    for (final rowId in {for (final row in rows) row.reciterId}) {
-      final reciter = await _reciters.byId(rowId);
-      if (reciter != null) reciterNames[rowId] = reciter.reciterName.trim();
-    }
+    final recitersById = await _reciters.byIds(
+      {for (final row in rows) row.reciterId},
+    );
     final surahNames = await _reciters.surahNamesFor(
       {for (final row in rows) row.surahId}.toList(growable: false),
     );
@@ -142,7 +140,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
         InstalledDownload(
           rowId: row.reciterId,
           surahNumber: row.surahId,
-          reciterName: reciterNames[row.reciterId] ?? '',
+          reciterName: recitersById[row.reciterId]?.reciterName.trim() ?? '',
           surahName: surahNames[row.surahId] ?? '',
           bytes: row.bytes,
         ),
