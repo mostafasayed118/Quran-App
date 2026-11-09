@@ -150,87 +150,97 @@ abstract final class AppRouter {
       );
     },
     routes: [
-      ShellRoute(
-        builder: (context, state, child) => BlocProvider<PlaybackCubit>.value(
-          // The player is an app-level singleton (registered in DI) so the
-          // mini player can live above the tabs instead of inside the reader.
-          value: getIt<PlaybackCubit>(),
-          child: AppShell(
-            location: state.uri.path,
-            child: child,
+      _shellRoute(),
+      ..._postShellRoutes(),
+    ],
+  );
+
+  static RouteBase _shellRoute() {
+    return ShellRoute(
+      builder: (context, state, child) => BlocProvider<PlaybackCubit>.value(
+        // The player is an app-level singleton (registered in DI) so the
+        // mini player can live above the tabs instead of inside the reader.
+        value: getIt<PlaybackCubit>(),
+        child: AppShell(
+          location: state.uri.path,
+          child: child,
+        ),
+      ),
+      routes: [
+        GoRoute(
+          path: AppRoutes.home,
+          builder: (_, __) => RouteCubitScope<HomeCubit>(
+            create: () => HomeCubit(
+              lastRead: getIt<LastReadMarker>(),
+              ayahs: getIt<AyahLookup>(),
+              prayer: getIt<PrayerTimesPort>(),
+              city: getIt<CitySource>(),
+              configChanges: getIt<PrayerConfigSource>().changes,
+              widgetUpdater: getIt<HomeWidgetUpdater>(),
+            ),
+            identity: AppRoutes.home,
+            start: (cubit) => cubit.start(),
+            child: const HomeScreen(),
           ),
         ),
-        routes: [
-          GoRoute(
-            path: AppRoutes.home,
-            builder: (_, __) => RouteCubitScope<HomeCubit>(
-              create: () => HomeCubit(
-                lastRead: getIt<LastReadMarker>(),
-                ayahs: getIt<AyahLookup>(),
-                prayer: getIt<PrayerTimesPort>(),
-                city: getIt<CitySource>(),
-                configChanges: getIt<PrayerConfigSource>().changes,
-                widgetUpdater: getIt<HomeWidgetUpdater>(),
-              ),
-              identity: AppRoutes.home,
-              start: (cubit) => cubit.start(),
-              child: const HomeScreen(),
-            ),
-          ),
-          GoRoute(
-            path: AppRoutes.quran,
-            builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
-              create: () => SurahIndexCubit(getIt<SurahSource>()),
-              identity: AppRoutes.quran,
-              start: (cubit) => cubit.start(),
-              child: QuranTabScreen(
-                createReader: _createReader,
-                createJuz: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
-                createBookmarks: () => BookmarksCubit(
-                  getIt<AyahRepository>(),
-                  pager: getIt<AyahRepository>(),
-                ),
+        GoRoute(
+          path: AppRoutes.quran,
+          builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
+            create: () => SurahIndexCubit(getIt<SurahSource>()),
+            identity: AppRoutes.quran,
+            start: (cubit) => cubit.start(),
+            child: QuranTabScreen(
+              createReader: _createReader,
+              createJuz: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
+              createBookmarks: () => BookmarksCubit(
+                getIt<AyahRepository>(),
+                pager: getIt<AyahRepository>(),
               ),
             ),
           ),
-          GoRoute(
-            path: AppRoutes.juzIndex,
-            builder: (_, __) => RouteCubitScope<JuzIndexCubit>(
-              create: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
-              identity: AppRoutes.juzIndex,
-              start: (cubit) => cubit.start(),
-              child: const JuzIndexScreen(),
-            ),
+        ),
+        GoRoute(
+          path: AppRoutes.juzIndex,
+          builder: (_, __) => RouteCubitScope<JuzIndexCubit>(
+            create: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
+            identity: AppRoutes.juzIndex,
+            start: (cubit) => cubit.start(),
+            child: const JuzIndexScreen(),
           ),
-          GoRoute(
-            path: AppRoutes.prayerTimes,
-            builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
-              create: () => PrayerTimesCubit(
-                prayer: getIt<PrayerTimesPort>(),
-                city: getIt<CitySource>(),
-                settings: getIt<ReminderSettingsPort>(),
-                scheduler: getIt<ReminderSchedulerPort>(),
-                configChanges: getIt<PrayerConfigSource>().changes,
-              ),
-              identity: AppRoutes.prayerTimes,
-              start: (cubit) => cubit.start(),
-              child: const PrayerTimesScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.prayerTimes,
+          builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
+            create: () => PrayerTimesCubit(
+              prayer: getIt<PrayerTimesPort>(),
+              city: getIt<CitySource>(),
+              settings: getIt<ReminderSettingsPort>(),
+              scheduler: getIt<ReminderSchedulerPort>(),
+              configChanges: getIt<PrayerConfigSource>().changes,
             ),
+            identity: AppRoutes.prayerTimes,
+            start: (cubit) => cubit.start(),
+            child: const PrayerTimesScreen(),
           ),
-          GoRoute(
-            path: AppRoutes.azkar,
-            builder: (_, __) => RouteCubitScope<AzkarCubit>(
-              create: () => AzkarCubit(
-                repository: getIt<AzkarRepository>(),
-                savedState: getIt<AzkarSavedStateSource>(),
-              ),
-              identity: AppRoutes.azkar,
-              start: (cubit) => cubit.start(),
-              child: const AzkarScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.azkar,
+          builder: (_, __) => RouteCubitScope<AzkarCubit>(
+            create: () => AzkarCubit(
+              repository: getIt<AzkarRepository>(),
+              savedState: getIt<AzkarSavedStateSource>(),
             ),
+            identity: AppRoutes.azkar,
+            start: (cubit) => cubit.start(),
+            child: const AzkarScreen(),
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+
+  static List<RouteBase> _postShellRoutes() {
+    return [
       GoRoute(
         path: AppRoutes.quranSearch,
         builder: (context, state) => BlocProvider<QuranSearchCubit>(
@@ -619,8 +629,8 @@ abstract final class AppRouter {
           );
         },
       ),
-    ],
-  );
+    ];
+  }
 }
 
 /// Builds the reader cubit shared by the full route and the workspace pane.
