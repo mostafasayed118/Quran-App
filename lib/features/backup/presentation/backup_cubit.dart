@@ -1,9 +1,12 @@
 import 'dart:developer' as dev;
+import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../data/backup_crypto.dart';
 import '../data/backup_io.dart';
 import '../data/backup_service.dart';
+import '../domain/backup_models.dart';
 import 'backup_state.dart';
 
 /// Backup & restore surface: export shares the encoded JSON file through the
@@ -26,6 +29,10 @@ class BackupCubit extends Cubit<BackupState> {
   final BackupService _service;
   final BackupPickBytes _pickBytes;
   final BackupShareJson _shareJson;
+
+  /// Bytes of the pending encrypted import; held between
+  /// [BackupState.passphraseRequired] and [submitImportPassphrase].
+  Uint8List? _pendingEncryptedBytes;
 
   /// Encodes every backed-up entity and hands the JSON to the share sheet.
   /// Never throws: a failure emits the `failed(duringExport: true)` state.
@@ -73,6 +80,12 @@ class BackupCubit extends Cubit<BackupState> {
       }
       final result = await decodeBackup(bytes);
       if (isClosed) return;
+      if (result is BackupDecodeFailure &&
+          result.reason == BackupDecodeFailureReason.encrypted) {
+        _pendingEncryptedBytes = bytes;
+        emit(const BackupState.passphraseRequired());
+        return;
+      }
       if (result is! BackupDecodeSuccess) {
         emit(const BackupState.invalidFile());
         return;
@@ -94,6 +107,79 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: false));
     }
+  }
+
+  /// Encodes the backup as AES-256-GCM behind [passphrase] and shares the
+  /// envelope. An empty passphrase fails fast to the export-failure state;
+  /// the UI enforces non-empty first.
+  Future<void> exportEncrypted(String passphrase) async {
+    if (isClosed) return;
+    if (!_canStart) return;
+    if (passphrase.isEmpty) {
+      emit(const BackupState.failed(duringExport: true));
+      return;
+    }
+    emit(const BackupState.idle(busy: true));
+    try {
+      final json = await _service.exportJson();
+      final encrypted = await encryptBackupJson(json, passphrase);
+      // Never emit a file this app's own importer would reject.
+      if (exceedsBackupLimit(encrypted)) {
+        throw const BackupTooLarge();
+      }
+      await _shareJson(encrypted);
+      if (isClosed) return;
+      emit(const BackupState.exported());
+    } on Object catch (error, stackTrace) {
+      dev.log('backup export failed',
+          name: 'quran_yahdi/backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
+      if (isClosed) return;
+      emit(const BackupState.failed(duringExport: true));
+    }
+  }
+
+  /// Unlocks the pending encrypted file with [passphrase] and, on success,
+  /// shows the same read-only merge preview as the plaintext import.
+  Future<void> submitImportPassphrase(String passphrase) async {
+    final bytes = _pendingEncryptedBytes;
+    if (isClosed || bytes == null) return;
+    emit(const BackupState.idle(busy: true));
+    try {
+      final result = await decodeBackup(bytes, passphrase: passphrase);
+      if (isClosed) return;
+      if (result is! BackupDecodeSuccess) {
+        _pendingEncryptedBytes = null;
+        if (result is BackupDecodeFailure &&
+            result.reason == BackupDecodeFailureReason.encrypted) {
+          // Wrong passphrase or tampered payload: honest import failure.
+          emit(const BackupState.failed(duringExport: false));
+        } else {
+          emit(const BackupState.invalidFile());
+        }
+        return;
+      }
+      final summary = await _service.preview(result.document);
+      if (isClosed) return;
+      _pendingEncryptedBytes = null;
+      emit(BackupState.preview(document: result.document, summary: summary));
+    } on Object catch (error, stackTrace) {
+      dev.log('backup import failed',
+          name: 'quran_yahdi/backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
+      _pendingEncryptedBytes = null;
+      if (isClosed) return;
+      emit(const BackupState.failed(duringExport: false));
+    }
+  }
+
+  /// Drops the pending encrypted file without decoding it.
+  void cancelEncryptedImport() {
+    if (isClosed) return;
+    _pendingEncryptedBytes = null;
+    if (state is BackupPassphraseRequired) emit(const BackupState.idle());
   }
 
   /// The preview dialog's confirm: applies inside the service transaction.

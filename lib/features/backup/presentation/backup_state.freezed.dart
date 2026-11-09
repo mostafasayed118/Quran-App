@@ -57,6 +57,7 @@ extension BackupStatePatterns on BackupState {
     TResult Function(BackupImported value)? imported,
     TResult Function(BackupFailed value)? failed,
     TResult Function(BackupInvalidFile value)? invalidFile,
+    TResult Function(BackupPassphraseRequired value)? passphraseRequired,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -73,6 +74,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that);
       case BackupInvalidFile() when invalidFile != null:
         return invalidFile(_that);
+      case BackupPassphraseRequired() when passphraseRequired != null:
+        return passphraseRequired(_that);
       case _:
         return orElse();
     }
@@ -99,6 +102,8 @@ extension BackupStatePatterns on BackupState {
     required TResult Function(BackupImported value) imported,
     required TResult Function(BackupFailed value) failed,
     required TResult Function(BackupInvalidFile value) invalidFile,
+    required TResult Function(BackupPassphraseRequired value)
+        passphraseRequired,
   }) {
     final _that = this;
     switch (_that) {
@@ -114,6 +119,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that);
       case BackupInvalidFile():
         return invalidFile(_that);
+      case BackupPassphraseRequired():
+        return passphraseRequired(_that);
     }
   }
 
@@ -137,6 +144,7 @@ extension BackupStatePatterns on BackupState {
     TResult? Function(BackupImported value)? imported,
     TResult? Function(BackupFailed value)? failed,
     TResult? Function(BackupInvalidFile value)? invalidFile,
+    TResult? Function(BackupPassphraseRequired value)? passphraseRequired,
   }) {
     final _that = this;
     switch (_that) {
@@ -152,6 +160,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that);
       case BackupInvalidFile() when invalidFile != null:
         return invalidFile(_that);
+      case BackupPassphraseRequired() when passphraseRequired != null:
+        return passphraseRequired(_that);
       case _:
         return null;
     }
@@ -177,6 +187,7 @@ extension BackupStatePatterns on BackupState {
     TResult Function(BackupSummary summary)? imported,
     TResult Function(bool duringExport)? failed,
     TResult Function()? invalidFile,
+    TResult Function()? passphraseRequired,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -193,6 +204,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that.duringExport);
       case BackupInvalidFile() when invalidFile != null:
         return invalidFile();
+      case BackupPassphraseRequired() when passphraseRequired != null:
+        return passphraseRequired();
       case _:
         return orElse();
     }
@@ -220,6 +233,7 @@ extension BackupStatePatterns on BackupState {
     required TResult Function(BackupSummary summary) imported,
     required TResult Function(bool duringExport) failed,
     required TResult Function() invalidFile,
+    required TResult Function() passphraseRequired,
   }) {
     final _that = this;
     switch (_that) {
@@ -235,6 +249,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that.duringExport);
       case BackupInvalidFile():
         return invalidFile();
+      case BackupPassphraseRequired():
+        return passphraseRequired();
     }
   }
 
@@ -258,6 +274,7 @@ extension BackupStatePatterns on BackupState {
     TResult? Function(BackupSummary summary)? imported,
     TResult? Function(bool duringExport)? failed,
     TResult? Function()? invalidFile,
+    TResult? Function()? passphraseRequired,
   }) {
     final _that = this;
     switch (_that) {
@@ -273,6 +290,8 @@ extension BackupStatePatterns on BackupState {
         return failed(_that.duringExport);
       case BackupInvalidFile() when invalidFile != null:
         return invalidFile();
+      case BackupPassphraseRequired() when passphraseRequired != null:
+        return passphraseRequired();
       case _:
         return null;
     }
@@ -588,6 +607,26 @@ class BackupInvalidFile implements BackupState {
   @override
   String toString() {
     return 'BackupState.invalidFile()';
+  }
+}
+
+/// @nodoc
+
+class BackupPassphraseRequired implements BackupState {
+  const BackupPassphraseRequired();
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is BackupPassphraseRequired);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  String toString() {
+    return 'BackupState.passphraseRequired()';
   }
 }
 

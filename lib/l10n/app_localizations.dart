@@ -1628,6 +1628,66 @@ abstract class AppLocalizations {
   /// **'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.'**
   String get backupUnencryptedWarning;
 
+  /// No description provided for @backupExportEncrypted.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير مشفّر'**
+  String get backupExportEncrypted;
+
+  /// No description provided for @backupEncryptedExportHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن فتح الملف لاحقًا إلا بعبارة المرور التي تختارها.'**
+  String get backupEncryptedExportHint;
+
+  /// No description provided for @backupEncryptedPassphrase.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة مرور التشفير'**
+  String get backupEncryptedPassphrase;
+
+  /// No description provided for @backupEncryptedConfirmPassphrase.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد عبارة المرور'**
+  String get backupEncryptedConfirmPassphrase;
+
+  /// No description provided for @backupPassphraseMismatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارتا المرور غير متطابقتين'**
+  String get backupPassphraseMismatch;
+
+  /// No description provided for @backupPassphraseEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة المرور مطلوبة'**
+  String get backupPassphraseEmpty;
+
+  /// No description provided for @backupImportPassphraseTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه النسخة مشفّرة'**
+  String get backupImportPassphraseTitle;
+
+  /// No description provided for @backupImportPassphraseBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل عبارة مرور التشفير لفكّ النسخة واستعادتها.'**
+  String get backupImportPassphraseBody;
+
+  /// No description provided for @backupPassphraseCancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get backupPassphraseCancel;
+
+  /// No description provided for @backupPassphraseConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة'**
+  String get backupPassphraseConfirm;
+
   /// No description provided for @licensesTitle.
   ///
   /// In ar, this message translates to:

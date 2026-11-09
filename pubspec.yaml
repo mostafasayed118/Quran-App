@@ -36,6 +36,7 @@ dependencies:
   file_picker: ^13.1.0
   workmanager: ^0.10.10
   home_widget: ^0.10.0
+  cryptography: ^2.9.0
 
 flutter_launcher_icons:
   android: true

@@ -54,6 +54,17 @@ class BackupSection extends StatelessWidget {
                 cubit.cancelPreview();
               }
             }));
+          case BackupPassphraseRequired():
+            unawaited(showDialog<void>(
+              context: context,
+              builder: (dialogContext) => _ImportPassphraseDialog(
+                onSubmit: (passphrase) {
+                  Navigator.of(dialogContext).pop();
+                  cubit.submitImportPassphrase(passphrase);
+                },
+                onCancel: cubit.cancelEncryptedImport,
+              ),
+            ));
           case BackupIdle() || BackupFailed() || BackupInvalidFile():
             break;
         }
@@ -96,6 +107,26 @@ class BackupSection extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.lock_outline),
+              title: Text(loc.backupExportEncrypted),
+              enabled: canAct,
+              onTap: canAct
+                  ? () => unawaited(showDialog<void>(
+                        context: context,
+                        builder: (dialogContext) => _ExportPassphraseDialog(
+                          onConfirmed: (passphrase) {
+                            Navigator.of(dialogContext).pop();
+                            cubit.exportEncrypted(passphrase);
+                          },
+                        ),
+                      ))
+                  : null,
+              subtitle: Text(
+                loc.backupEncryptedExportHint,
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
             ListTile(
@@ -180,6 +211,173 @@ class _PreviewDialog extends StatelessWidget {
             onMerge();
           },
           child: Text(loc.backupMerge),
+        ),
+      ],
+    );
+  }
+}
+
+/// Export-with-passphrase dialog: collects the secret twice, blocks empty
+/// and mismatched entries with an inline message.
+class _ExportPassphraseDialog extends StatefulWidget {
+  const _ExportPassphraseDialog({required this.onConfirmed});
+
+  final void Function(String passphrase) onConfirmed;
+
+  @override
+  State<_ExportPassphraseDialog> createState() =>
+      _ExportPassphraseDialogState();
+}
+
+class _ExportPassphraseDialogState extends State<_ExportPassphraseDialog> {
+  final _passphrase = TextEditingController();
+  final _confirm = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _passphrase.dispose();
+    _confirm.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final loc = AppLocalizations.of(context);
+    final first = _passphrase.text;
+    final second = _confirm.text;
+    if (first.isEmpty) {
+      setState(() => _error = loc.backupPassphraseEmpty);
+      return;
+    }
+    if (first != second) {
+      setState(() => _error = loc.backupPassphraseMismatch);
+      return;
+    }
+    widget.onConfirmed(first);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(loc.backupExportEncrypted),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _passphrase,
+            autofocus: true,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: InputDecoration(
+              labelText: loc.backupEncryptedPassphrase,
+            ),
+            onChanged: (_) {
+              if (_error != null) setState(() => _error = null);
+            },
+          ),
+          TextField(
+            controller: _confirm,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: InputDecoration(
+              labelText: loc.backupEncryptedConfirmPassphrase,
+            ),
+            onChanged: (_) {
+              if (_error != null) setState(() => _error = null);
+            },
+            onSubmitted: (_) => _submit(),
+          ),
+          if (_error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                _error!,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(color: Theme.of(context).colorScheme.error),
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(loc.backupPassphraseCancel),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          child: Text(loc.backupPassphraseConfirm),
+        ),
+      ],
+    );
+  }
+}
+
+/// Import passphrase prompt: single field; wrong entries land in the normal
+/// import-failure strip via the cubit.
+class _ImportPassphraseDialog extends StatefulWidget {
+  const _ImportPassphraseDialog(
+      {required this.onSubmit, required this.onCancel});
+
+  final void Function(String passphrase) onSubmit;
+  final VoidCallback onCancel;
+
+  @override
+  State<_ImportPassphraseDialog> createState() =>
+      _ImportPassphraseDialogState();
+}
+
+class _ImportPassphraseDialogState extends State<_ImportPassphraseDialog> {
+  final _passphrase = TextEditingController();
+
+  @override
+  void dispose() {
+    _passphrase.dispose();
+    super.dispose();
+  }
+
+  void _submit() {
+    final text = _passphrase.text;
+    if (text.isEmpty) return;
+    widget.onSubmit(text);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return AlertDialog(
+      title: Text(loc.backupImportPassphraseTitle),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(loc.backupImportPassphraseBody),
+          TextField(
+            controller: _passphrase,
+            autofocus: true,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            onSubmitted: (_) => _submit(),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            widget.onCancel();
+          },
+          child: Text(loc.backupPassphraseCancel),
+        ),
+        FilledButton(
+          onPressed: _submit,
+          child: Text(loc.backupPassphraseConfirm),
         ),
       ],
     );

@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import 'backup_codec.dart';
+import 'backup_crypto.dart';
 
 export 'backup_codec.dart'
     show BackupDecodeResult, BackupDecodeSuccess, kBackupMaxBytes;
@@ -91,22 +92,40 @@ Future<void> shareBackupJson(String json) async {
 
 /// Decodes the picked backup document.
 ///
+/// An encrypted envelope ([kEncryptedBackupFormat]) needs [passphrase];
+/// without it — or with a wrong one — the failure reason is `encrypted` so
+/// the importer can offer the prompt. Plaintext files decode exactly as
+/// before.
+///
 /// The parse runs in a worker isolate: the document is capped at 2 MB, and
 /// decoding it on the UI isolate blocks the frame for the whole JSON parse.
 ///
 /// A `flutter test` build decodes inline: an isolate completion never
 /// arrives under the fake clock, so the import flow would hang
 /// (probe-verified in this repo — see the report for the probe output).
-Future<BackupDecodeResult> decodeBackup(Uint8List bytes) async {
+Future<BackupDecodeResult> decodeBackup(
+  Uint8List bytes, {
+  String? passphrase,
+}) async {
+  final text = utf8.decode(bytes, allowMalformed: true);
+  if (isEncryptedBackupEnvelope(text)) {
+    if (passphrase != null) {
+      final unlocked = await decryptBackupJson(text, passphrase);
+      if (unlocked != null) {
+        return decode(unlocked);
+      }
+    }
+    return const BackupDecodeFailure(BackupDecodeFailureReason.encrypted);
+  }
   if (Platform.environment['FLUTTER_TEST'] == 'true') {
-    return decode(utf8.decode(bytes, allowMalformed: true));
+    return decode(text);
   }
   try {
     return await decodeBackupInIsolate(bytes);
   } on Object {
     // The worker is unavailable: decode inline so the failure states stay
     // exactly the codec's.
-    return decode(utf8.decode(bytes, allowMalformed: true));
+    return decode(text);
   }
 }
 
