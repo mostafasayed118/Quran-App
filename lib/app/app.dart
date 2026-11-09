@@ -17,6 +17,7 @@ import 'bootstrap.dart';
 import 'di/injector.dart';
 import 'reminder_plan_freshness.dart';
 import 'router.dart';
+import 'splash_screen.dart';
 
 class QuranYahdiApp extends StatefulWidget {
   const QuranYahdiApp({super.key});
@@ -147,7 +148,7 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
         ],
         builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
           value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
-          child: child!,
+          child: SplashScreen(child: child!),
         ),
         routerConfig: AppRouter.router,
       ),

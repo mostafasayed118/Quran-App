@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Quran Yahdi';
 
   @override
+  String get splashTagline => 'The Holy Quran, right in your hands.';
+
+  @override
   String get home => 'Home';
 
   @override

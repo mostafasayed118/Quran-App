@@ -91,7 +91,7 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 | Asset | Requirement | Status |
 |---|---|---|
 | Phone screenshots | 2–8 per type | **11 captured**, 1080×2160, at `docs/store/screenshots/` (`01-home` … `11-settings`) — pick 2–8 and order them by the priority in `listing-en.md` / `listing-ar.md` |
-| App icon | 512×512 PNG | `docs/store/app-icon-512.png` — 512×512, byte copy of `assets/icons/app_icon_2.png` (not resized) |
+| App icon | 512×512 PNG | `docs/store/app-icon-512.png` — 512×512, resized from `assets/icons/logo_master.png` (2026-11-10, brand refresh) |
 | Feature graphic | 1024×500 PNG/JPG | `docs/store/feature-graphic-1024x500.png` — 1024×500, built from the real app icon + Cairo type |
 | Tablet screenshots | 7"/10" | **None** — not planned for this submission (optional on Play) |
 | Localized screenshot sets | per locale | **None** — one phone set serves both `ar` and `en` |

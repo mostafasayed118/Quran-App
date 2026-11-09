@@ -12,6 +12,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appName => 'قرآن يَهدي';
 
   @override
+  String get splashTagline => 'القرآن الكريم بين يديك';
+
+  @override
   String get home => 'الرئيسية';
 
   @override

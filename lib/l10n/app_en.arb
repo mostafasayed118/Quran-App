@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "appName": "Quran Yahdi",
+  "splashTagline": "The Holy Quran, right in your hands.",
   "home": "Home",
   "quran": "Quran",
   "quranTabSurahs": "Surahs",

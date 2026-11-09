@@ -40,7 +40,9 @@ dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/app_icon_2.png"
+  image_path: "assets/icons/logo_master.png"
+  adaptive_icon_background: "#012A27"
+  adaptive_icon_foreground: "assets/icons/logo_master.png"
   remove_alpha_ios: true
 
 dev_dependencies:
@@ -61,10 +63,20 @@ dev_dependencies:
   http: ^1.6.0
 
 flutter_native_splash:
-  color: "#f1ead7"
-  image: "assets/icons/app_icon_2.png"
+  color: "#EFE9DA"
+  image: "assets/icons/splash_mark.png"
+  color_dark: "#101410"
+  image_dark: "assets/icons/splash_mark_dark.png"
+  android_12:
+    color: "#EFE9DA"
+    image: "assets/icons/splash_mark_android12.png"
+    icon_background_color: "#EFE9DA"
+    color_dark: "#101410"
+    image_dark: "assets/icons/splash_mark_android12.png"
+    icon_background_color_dark: "#101410"
   android: true
   ios: true
+  web: false
 
 flutter:
 
@@ -81,6 +93,9 @@ flutter:
     - assets/audio/adhan/
     - assets/audio/adhan/clips/
     - assets/fonts/Cairo-OFL.txt
+    # In-app splash glyph (calligraphy only, no margin); the master/logo files
+    # stay out of the bundle on purpose.
+    - assets/icons/logo_glyph.png
 
   fonts:
     - family: HafsSmart

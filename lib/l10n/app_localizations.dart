@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'قرآن يَهدي'**
   String get appName;
 
+  /// No description provided for @splashTagline.
+  ///
+  /// In ar, this message translates to:
+  /// **'القرآن الكريم بين يديك'**
+  String get splashTagline;
+
   /// No description provided for @home.
   ///
   /// In ar, this message translates to:
