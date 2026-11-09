@@ -70,7 +70,8 @@ void main() {
 
     fake.todayResult = _day(fajrHour: 5, fajrMinute: 0);
     await tester.tap(find.byTooltip('تحديث'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(fake.todayCalls, 2);
     expect(find.text('٠٥:٠٠'), findsOneWidget);
@@ -93,7 +94,8 @@ void main() {
     expect(fake.todayCalls, 1);
 
     await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(fake.todayCalls, 2);
   });

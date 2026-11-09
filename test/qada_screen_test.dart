@@ -68,11 +68,13 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.byIcon(Icons.delete_outline).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('حذف اليوم؟'), findsOneWidget);
 
     await tester.tap(find.text('حذف').last);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ListTile), findsOneWidget);
     expect(source.dates, hasLength(1));

@@ -160,14 +160,16 @@ void main() {
         home: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('القرآن الكريم'), findsOneWidget);
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
     expect(find.text('أعِد المحاولة'), findsOneWidget);
 
     await tester.tap(find.text('أعِد المحاولة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أعِد المحاولة'), findsNothing);
     expect(find.text('الم'), findsOneWidget);

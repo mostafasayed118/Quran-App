@@ -58,7 +58,8 @@ void main() {
     // The real router: proves the address is wired, not just the widget.
     AppRouter.router.go(AppRoutes.principles);
     await tester.pumpWidget(_routerApp(AppRouter.router));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(PrinciplesScreen), findsOneWidget);
     for (final copy in _blocks) {
@@ -130,11 +131,13 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_routerApp(router));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.scrollUntilVisible(find.text('مبادئ التطبيق'), 100);
     await tester.tap(find.text('مبادئ التطبيق'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(PrinciplesScreen), findsOneWidget);
     expect(find.text(_free), findsOneWidget);

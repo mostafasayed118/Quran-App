@@ -201,9 +201,11 @@ void main() {
   Future<void> openTab(WidgetTester tester, String label) async {
     final target = tab(label);
     await tester.ensureVisible(target);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(target);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   Finder surahRow(String name) => find.descendant(
@@ -227,14 +229,16 @@ void main() {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(calls, [(surah: 1, ayah: 0)]);
     expect(find.byType(ReaderPane), findsOneWidget);
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsNothing);
 
     await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ReaderPane), findsNothing);
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
@@ -246,7 +250,8 @@ void main() {
 
     await openTab(tester, 'أجزاء');
     await tester.tap(find.text('الجزء ١'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(calls, [(surah: 1, ayah: 1)]);
     expect(find.byType(ReaderPane), findsOneWidget);
@@ -258,7 +263,8 @@ void main() {
 
     await openTab(tester, 'علامات');
     await tester.tap(find.text('ذلك الكتاب'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(calls, [(surah: 2, ayah: 2)]);
     expect(find.byType(ReaderPane), findsOneWidget);
@@ -269,7 +275,8 @@ void main() {
     await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.enterText(find.byType(TextField), 'بقرة');
     await tester.pump();
 
@@ -288,9 +295,11 @@ void main() {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(calls, [(surah: 1, ayah: 0)]);
     expect(find.byType(ReaderPane), findsOneWidget);
@@ -316,9 +325,11 @@ void main() {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.enterText(
       find.descendant(
@@ -328,7 +339,8 @@ void main() {
       '2',
     );
     await tester.tap(find.text('انتقال'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(calls.last, (surah: 2, ayah: 2));
     expect(find.byType(ReaderPane), findsOneWidget);

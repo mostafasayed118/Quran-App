@@ -111,7 +111,8 @@ void main() {
         child: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ReaderView), findsOneWidget);
     expect(find.byType(ReaderActions), findsOneWidget);

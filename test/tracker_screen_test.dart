@@ -40,7 +40,8 @@ void main() {
     expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(5));
 
     await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(4));
     expect(find.text('سلسلة ١ يوم'), findsOneWidget);

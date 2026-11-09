@@ -46,7 +46,8 @@ void main() {
     for (var i = 0; i < 33; i++) {
       await cubit.increment();
     }
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.text('تم بحمد الله'), findsOneWidget);

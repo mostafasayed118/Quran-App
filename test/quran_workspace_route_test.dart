@@ -203,7 +203,8 @@ void main() {
 
     // System back clears the pane and keeps the tab.
     await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ReaderPane), findsNothing);
     expect(find.byType(QuranWorkspaceScreen), findsOneWidget);

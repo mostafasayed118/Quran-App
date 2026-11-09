@@ -83,7 +83,8 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('﴿الإخلاص ١–٢﴾'), findsOneWidget);
     expect(find.text('﴿الإخلاص 1–2﴾'), findsNothing,

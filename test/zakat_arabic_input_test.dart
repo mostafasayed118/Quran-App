@@ -46,14 +46,17 @@ void main() {
         home: const ZakatScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.enterText(
         find.widgetWithText(TextField, 'سعر جرام الفضة'), '١');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.enterText(
         find.widgetWithText(TextField, 'النقد المعروض'), '١٠٠٠');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('الزكاة الواجبة'), findsOneWidget);
     expect(find.textContaining('٢٥'), findsOneWidget);

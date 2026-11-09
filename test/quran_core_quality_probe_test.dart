@@ -147,7 +147,8 @@ void main() {
       locale: locale,
       textScaler: textScaler,
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('textScale 2.0: the surah index rows survive the layout',
@@ -204,7 +205,8 @@ void main() {
       ),
       textScaler: const TextScaler.linear(2.0),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('الم'), findsOneWidget);
@@ -217,18 +219,21 @@ void main() {
     semantics.dispose();
 
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.textContaining('صفحة'), findsOneWidget);
 
     await tester.tap(find.byTooltip('وضع الآيات'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.byIcon(Icons.menu_book_outlined).first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     final sheet = tester.widget<BottomSheet>(find.ancestor(
@@ -277,7 +282,8 @@ void main() {
         child: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(
@@ -319,7 +325,8 @@ void main() {
       ),
       textScaler: const TextScaler.linear(2.0),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     final title = tester.widget<Text>(find.text(longText));

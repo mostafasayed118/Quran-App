@@ -106,7 +106,8 @@ void main() {
       ),
     );
     await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(
       tester.getSize(find.byKey(const Key('sheet-content'))).width,
@@ -179,7 +180,8 @@ void main() {
     ));
 
     await tester.tap(find.text('open'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(BottomSheet), findsOneWidget);
     expect(

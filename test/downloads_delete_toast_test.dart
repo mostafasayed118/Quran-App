@@ -80,10 +80,12 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.byTooltip('حذف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     // The dialog title and its confirm button share the word "حذف".
     await tester.tap(find.widgetWithText(TextButton, 'حذف'));
     // Bounded pumps: `pumpAndSettle` would keep advancing fake time while the
@@ -97,6 +99,7 @@ void main() {
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
 }

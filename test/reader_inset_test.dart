@@ -103,14 +103,16 @@ void main() {
       theme: AppTheme.light,
       home: screen,
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('mushaf page indicator clears the nav bar', (tester) async {
     await pumpScreen(tester, await host(2));
 
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final indicator = tester.getRect(find.textContaining('صفحة'));
     expect(indicator.bottom, lessThanOrEqualTo(kLimit));

@@ -88,7 +88,8 @@ Future<void> _openSheet(
     _app(sharer: sharer, capture: capture, textScale: textScale),
   );
   await tester.tap(find.text('open'));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {
@@ -208,7 +209,8 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).last,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final action = tester.getRect(find.text('مشاركة كصورة'));
     expect(action.bottom, lessThanOrEqualTo(640 - 48));

@@ -86,7 +86,8 @@ void main() {
 
     expect(find.text('الذين يؤمنون بالغيب'), findsOneWidget);
     await tester.tap(find.text('الذين يؤمنون بالغيب'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('reader:2:3'), findsOneWidget);
   });

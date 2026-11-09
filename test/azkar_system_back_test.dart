@@ -34,14 +34,17 @@ void main() {
         home: const AzkarScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsOneWidget);
 
     await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أذكار الصباح'), findsOneWidget);
     expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsNothing);

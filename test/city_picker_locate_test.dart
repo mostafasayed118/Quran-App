@@ -51,7 +51,8 @@ void main() {
         home: const CityPickerScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('a failed locate offers a working location-settings action',
@@ -62,7 +63,8 @@ void main() {
     await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تعذّر تحديد الموقع — اختر يدويًا'), findsOneWidget);
     expect(find.text('إعدادات الموقع'), findsOneWidget);
@@ -73,7 +75,8 @@ void main() {
     expect(location.opened, isTrue);
 
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
 
   testWidgets(
@@ -84,7 +87,8 @@ void main() {
     await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تعذّر تحديد الموقع — اختر يدويًا'), findsOneWidget);
 
@@ -94,6 +98,7 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
 }

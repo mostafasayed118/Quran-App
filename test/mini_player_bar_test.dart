@@ -97,7 +97,8 @@ void main() {
 
   testWidgets('idle state renders nothing', (tester) async {
     await pumpHost(tester);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(LinearProgressIndicator), findsNothing);
     expect(find.byType(IconButton), findsNothing);
@@ -109,12 +110,14 @@ void main() {
     await seedRow();
     final row = (await ReciterRepository(db).byId('51-53'))!;
     await pumpHost(tester);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await cubit.playSurah(row, 1);
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.textContaining('عبدالباسط عبدالصمد'), findsOneWidget);
     expect(find.text('سورة ١'), findsOneWidget);
@@ -122,7 +125,8 @@ void main() {
     expect(find.byTooltip('إيقاف مؤقت'), findsOneWidget);
 
     await tester.tap(find.byTooltip('إيقاف مؤقت'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byTooltip('تشغيل'), findsOneWidget);
     expect(find.byTooltip('إيقاف مؤقت'), findsNothing);
   });

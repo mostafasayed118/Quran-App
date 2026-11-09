@@ -48,7 +48,8 @@ void main() {
         home: const TrackerScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   void usePhoneViewport(WidgetTester tester) {
@@ -82,7 +83,8 @@ void main() {
     expect(find.text('صلوات اليوم'), findsOneWidget);
 
     await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(tester.takeException(), isNull);
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
 

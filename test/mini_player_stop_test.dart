@@ -114,7 +114,8 @@ void main() {
         home: const Scaffold(bottomSheet: MiniPlayerBar()),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('the stop control uses the stop glyph and resets playback',
@@ -126,7 +127,8 @@ void main() {
     // that animates forever and would never let pumpAndSettle settle.
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byIcon(Icons.stop), findsOneWidget);
     expect(find.byIcon(Icons.close), findsNothing,
@@ -136,7 +138,8 @@ void main() {
     // Subscription-cancel futures (inside stopAndReset) only complete on a
     // real event-loop turn; plain fake-clock pumps never resolve them.
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(fake.stopCount, 1);
     expect(cubit.state, isA<PlaybackInitial>());
@@ -149,7 +152,8 @@ void main() {
     fake.loadError = StateError('boom');
     await pumpBar(tester, cubit);
     await cubit.playSurah(_row, 1);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(cubit.state, isA<PlaybackFailed>());
     expect(find.byTooltip('إيقاف'), findsOneWidget);

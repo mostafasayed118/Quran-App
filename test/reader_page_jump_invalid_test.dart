@@ -100,23 +100,27 @@ void main() {
         home: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('a page outside 1..604 reports the error toast', (tester) async {
     await pumpReader(tester);
 
     await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.enterText(find.byType(TextField), '999');
     await tester.tap(find.widgetWithText(FilledButton, 'انتقال'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('صفحة غير موجودة'), findsOneWidget);
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
 }

@@ -52,7 +52,8 @@ Future<void> pumpAsmaAt2x(WidgetTester tester) async {
       home: const AsmaScreen(),
     ),
   ));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {
@@ -77,7 +78,8 @@ void main() {
     await pumpAsmaAt2x(tester);
 
     await tester.tap(find.text('الرحمن'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('ذو الرحمة الواسعة التي وسعت كل شيء'), findsOneWidget);

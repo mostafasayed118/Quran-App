@@ -28,7 +28,8 @@ void main() {
         home: const ZakatScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('لا زكاة عليك'), findsOneWidget);
 
@@ -37,9 +38,11 @@ void main() {
 
     // Field order: gold g, silver g, gold price, silver price, cash, debts.
     await tester.enterText(fields.at(3), '1');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.enterText(fields.at(4), '1000');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('الزكاة الواجبة'), findsOneWidget);
     expect(find.text('المال الزكوي'), findsOneWidget);

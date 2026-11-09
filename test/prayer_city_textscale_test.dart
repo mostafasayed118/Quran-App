@@ -44,7 +44,8 @@ void main() {
       ),
       home: home,
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('prayer times list + countdown survive textScale 2.0',

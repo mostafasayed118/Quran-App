@@ -28,7 +28,8 @@ Future<void> pumpAsma(WidgetTester tester, AsmaRepository repository) async {
       home: const AsmaScreen(),
     ),
   ));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {

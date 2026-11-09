@@ -55,7 +55,8 @@ void main() {
     ]);
 
     await tester.enterText(find.byType(TextField), 'عفاسي');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('مشاري العفاسي'), findsOneWidget);
     expect(find.text('عبدالباسط عبدالصمد'), findsNothing);

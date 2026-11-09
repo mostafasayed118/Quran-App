@@ -222,7 +222,8 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
       expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('الفاتحة ﴿١﴾'), findsOneWidget);
       expect(find.text('تفسير'), findsOneWidget);
@@ -351,7 +352,8 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
       expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('سميت الفاتحة'), findsOneWidget);
     });

@@ -82,10 +82,12 @@ void main() {
         home: const LibraryScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('الأحاديث'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('حديث تجريبي'), findsOneWidget);
     expect(find.byTooltip('اقرأ'), findsOneWidget);

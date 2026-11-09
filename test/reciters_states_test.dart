@@ -88,7 +88,8 @@ void main() {
     await pumpScreen(tester, repo);
 
     await tester.tap(find.byTooltip('تحديث'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تعذّر تحديث قائمة القرّاء'), findsOneWidget);
     expect(find.textContaining('StateError'), findsNothing);
@@ -99,7 +100,8 @@ void main() {
       matching: find.byType(IconButton),
     );
     await tester.tap(dismiss);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تعذّر تحديث قائمة القرّاء'), findsNothing);
   });
@@ -111,7 +113,8 @@ void main() {
     await pumpScreen(tester, repo);
 
     await tester.enterText(find.byType(TextField), 'zzz');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('لا نتائج مطابقة'), findsOneWidget);
     expect(find.text('حمّل فهرس القرّاء من الإنترنت'), findsNothing);

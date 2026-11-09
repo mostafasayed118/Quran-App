@@ -30,7 +30,8 @@ void main() {
         home: const HijriScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byTooltip('اليوم'), findsOneWidget);
     expect(find.textContaining('الشهر'), findsOneWidget);
@@ -66,7 +67,8 @@ void main() {
         home: const HijriScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.byTooltip('اليوم'), findsOneWidget);

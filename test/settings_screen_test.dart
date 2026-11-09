@@ -69,7 +69,8 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(await settings.azkarEnabled(), isTrue);
     expect(tester.widget<Switch>(azkarSwitch()).value, isTrue);
@@ -85,7 +86,8 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(
       find.text('إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'),
@@ -98,17 +100,21 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('وقت التذكير'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byType(TimePickerDialog), findsNothing);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.text('وقت التذكير'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byType(TimePickerDialog), findsOneWidget);
 
     await tester.tap(find.text('الإلغاء'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byType(TimePickerDialog), findsNothing);
   });
 

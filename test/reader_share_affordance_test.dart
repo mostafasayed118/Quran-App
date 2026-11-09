@@ -89,7 +89,8 @@ void main() {
         home: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byTooltip('مشاركة الآية'), findsWidgets,
         reason: 'one share button per verse card (share_plus affordance)');

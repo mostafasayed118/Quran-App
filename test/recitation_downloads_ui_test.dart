@@ -127,7 +127,8 @@ void main() {
         home: const ReciterSurahsScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     return downloads;
   }
 
@@ -137,7 +138,8 @@ void main() {
 
     downloads
         .seed({'51-53-1': const DownloadItem(status: DownloadStatus.queued)});
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byTooltip('إلغاء'), findsOneWidget);
     // Surah 2 stays on the plain download affordance.
@@ -158,7 +160,8 @@ void main() {
         total: 3145728, // 3.0 MiB
       ),
     });
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('١.٥ من ٣.٠ م.ب'), findsOneWidget);
     await tester.tap(find.byTooltip('إلغاء'));
@@ -190,7 +193,8 @@ void main() {
 
     downloads
         .seed({'51-53-1': const DownloadItem(status: DownloadStatus.failed)});
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byTooltip('أعِد المحاولة'), findsOneWidget);
   });

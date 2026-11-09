@@ -55,9 +55,11 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('اللغة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.text('الإنجليزية'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(locale.language, AppLanguage.english);
     expect(await AppLocaleRepository(db).load(), AppLanguage.english);
@@ -68,9 +70,11 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('اللغة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tapAt(const Offset(8, 8));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(locale.language, AppLanguage.arabic);
   });

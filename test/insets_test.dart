@@ -84,7 +84,8 @@ void main() {
       ),
     ));
     await tester.drag(find.byType(ListView), const Offset(0, -5000));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     final rect = tester.getRect(find.byKey(const Key('last')));
     expect(rect.bottom, lessThanOrEqualTo(kHeight - kInset));
   });

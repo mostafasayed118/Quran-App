@@ -49,7 +49,8 @@ Future<void> pumpAzkarAt2x(WidgetTester tester) async {
       home: const AzkarScreen(),
     ),
   ));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {
@@ -67,7 +68,8 @@ void main() {
     await pumpAzkarAt2x(tester);
 
     await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsOneWidget);

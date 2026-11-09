@@ -65,7 +65,8 @@ void main() {
     await tester.pumpWidget(_app(controller));
 
     await controller.setLanguage(AppLanguage.english);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('Settings'), findsOneWidget);
     expect(find.text('ltr'), findsOneWidget);

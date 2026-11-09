@@ -46,7 +46,8 @@ void main() {
         home: const ZakatScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   void usePhoneViewport(WidgetTester tester) {
@@ -61,7 +62,8 @@ void main() {
     await tester.scrollUntilVisible(field, 60,
         scrollable: find.byType(Scrollable).first);
     await tester.enterText(field, text);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('nisab segments and all six fields meet the 48 dp bar (360-wide)',

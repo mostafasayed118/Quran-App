@@ -53,7 +53,8 @@ class _Probe extends StatelessWidget {
 /// test never tears down with a pending snackbar timer.
 Future<void> _drain(WidgetTester tester) async {
   await tester.pump(const Duration(seconds: 5));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {

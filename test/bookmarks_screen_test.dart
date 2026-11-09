@@ -77,7 +77,8 @@ void main() {
               ),
       home: child,
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('empty state message when no bookmarks', (tester) async {
@@ -104,10 +105,12 @@ void main() {
 
     expect(find.textContaining(text), findsOneWidget);
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     // Owner-requested behaviour change: deleting a bookmark now asks first.
     await tester.tap(find.widgetWithText(TextButton, 'حذف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(await db.select(db.bookmarks).get(), isEmpty);
   });
 

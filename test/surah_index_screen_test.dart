@@ -68,7 +68,8 @@ void main() {
     expect(find.text('البقرة'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'بقرة');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('البقرة'), findsOneWidget);
     expect(find.text('الفاتحة'), findsNothing);
@@ -77,7 +78,8 @@ void main() {
   testWidgets('number search narrows by surah id', (tester) async {
     await pumpHost(tester);
     await tester.enterText(find.byType(TextField), '2');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('البقرة'), findsOneWidget);
     expect(find.text('الفاتحة'), findsNothing);
     expect(find.text('النمل'), findsNothing);

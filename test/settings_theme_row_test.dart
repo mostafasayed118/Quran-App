@@ -54,9 +54,11 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('المظهر'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.text('غامق'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(theme.mode, AppThemeMode.dark);
     expect(await AppThemeRepository(db).load(), AppThemeMode.dark);
@@ -66,9 +68,11 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('المظهر'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tapAt(const Offset(8, 8));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(theme.mode, AppThemeMode.system);
   });

@@ -83,19 +83,22 @@ void main() {
         home: const BookmarksScreen(showMeta: true),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تفسير'), findsWidgets);
     expect(find.text('ملاحظة قديمة'), findsOneWidget);
     expect(find.byIcon(Icons.edit_note), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.edit_note));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('تعديل الملاحظة والمجلد'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).at(1), 'ملاحظة جديدة');
     await tester.tap(find.widgetWithText(TextButton, 'حفظ'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(source.entries[9]?.note, 'ملاحظة جديدة');
     expect(find.text('ملاحظة جديدة'), findsOneWidget);

@@ -34,20 +34,23 @@ void main() {
         home: const AsmaScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('الرحمن'), findsOneWidget);
     expect(find.text('الرحيم'), findsOneWidget);
 
     await tester.tap(find.text('الرحيم'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.textContaining('الاسم ٢'), findsOneWidget);
     expect(find.text('النازل بالرحمة'), findsOneWidget);
     expect(find.text('The Most Merciful'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.close));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.textContaining('الاسم ٢'), findsNothing);
   });
 }

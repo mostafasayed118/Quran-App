@@ -169,7 +169,8 @@ void main() {
         child: const RecitersScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('عبدالباسط عبدالصمد'), findsOneWidget);
@@ -208,7 +209,8 @@ void main() {
       ],
       child: const ReciterSurahsScreen(),
     )));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     downloads.seed({
       '51-53-1': const DownloadItem(
@@ -218,7 +220,8 @@ void main() {
       ),
       '51-53-2': const DownloadItem(status: DownloadStatus.done),
     });
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('الفاتحة'), findsOneWidget);
@@ -243,12 +246,14 @@ void main() {
         child: const MiniPlayerBar(),
       ),
     )));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await cubit.playSurah(_playRow, 1);
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.textContaining('عبدالباسط عبدالصمد'), findsOneWidget);
@@ -272,10 +277,12 @@ void main() {
         child: const MiniPlayerBar(),
       ),
     )));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await cubit.playSurah(_playRow, 1);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('تعذّر تشغيل التلاوة'), findsOneWidget);

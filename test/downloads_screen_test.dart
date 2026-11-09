@@ -81,7 +81,8 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     return cubit;
   }
 
@@ -109,12 +110,14 @@ void main() {
     await pumpScreen(tester);
 
     await tester.tap(find.byTooltip('حذف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('سيُحذف هذا الملف من جهازك.'), findsOneWidget);
 
     await tester.tap(find.text('إلغاء'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('الفاتحة'), findsOneWidget);
     expect(find.text('سيُحذف هذا الملف من جهازك.'), findsNothing);

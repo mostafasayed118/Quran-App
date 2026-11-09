@@ -81,7 +81,8 @@ void main() {
         home: const ReciterSurahsScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('rows render surah names + opening ayah teasers', (tester) async {
@@ -101,7 +102,8 @@ void main() {
     await pumpSurahsHost(tester, downloads);
 
     await tester.tap(find.byIcon(Icons.download).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(downloads.enqueuedKey, '51-53-1');
   });
@@ -126,11 +128,13 @@ void main() {
     expect(find.byIcon(Icons.check), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.byType(AlertDialog), findsOneWidget);
 
     await tester.tap(find.text('حذف').last);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(downloads.removedKeys, contains('51-53-1'));
   });

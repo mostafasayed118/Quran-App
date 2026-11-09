@@ -98,7 +98,8 @@ void main() {
     await tester.tap(find.text('open'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final pane = tester.getRect(find.byType(ListView));
     expect(pane.bottom, lessThanOrEqualTo(kHeight - kInset));

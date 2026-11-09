@@ -107,7 +107,8 @@ void main() {
     expect(find.text('سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا'), findsOneWidget);
 
     await tester.tap(find.text('المنزل'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('بِسْمِ اللَّهِ وَلَجْنَا'), findsOneWidget);
     expect(find.text('سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا'), findsNothing);
   });
@@ -117,7 +118,8 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.textContaining('أَعُوذُ بِكَلِمَاتِ اللَّهِ'), findsOneWidget);
     expect(find.text('قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ'),

@@ -102,7 +102,8 @@ void main() {
     fake.nextResult =
         PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5));
     await tester.pump(const Duration(seconds: 1));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('متبقٍ ٠٢:٢٩'), findsOneWidget);
     expect(find.byIcon(Icons.schedule), findsOneWidget);

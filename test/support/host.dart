@@ -50,5 +50,11 @@ Future<void> pumpAppHost(
   await tester.pumpWidget(
     appShell(home: home, locale: locale, textScale: textScale, wrap: wrap),
   );
-  if (settle) await tester.pumpAndSettle();
+  if (settle) {
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+  }
 }

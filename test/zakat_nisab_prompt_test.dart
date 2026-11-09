@@ -29,7 +29,8 @@ void main() {
         home: const ZakatScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('لا زكاة عليك'), findsOneWidget);
 
@@ -39,7 +40,8 @@ void main() {
     // Field order: gold g, silver g, gold price, silver price, cash, debts.
     // Cash only — the active silver price (default mode) stays blank.
     await tester.enterText(fields.at(4), '1000');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsOneWidget);
     expect(find.text('الزكاة الواجبة'), findsNothing);
@@ -48,7 +50,8 @@ void main() {
 
     // Supply the silver price → the normal verdict and amount appear.
     await tester.enterText(fields.at(3), '1');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsNothing);
     expect(find.text('الزكاة الواجبة'), findsOneWidget);

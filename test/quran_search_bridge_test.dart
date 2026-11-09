@@ -62,7 +62,8 @@ void main() {
         child: const QuranSearchScreen(initialQuery: 'الرحمن'),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(source.queries, ['الرحمن'],
         reason: 'the handed-over query must run without typing');
@@ -103,10 +104,12 @@ void main() {
         child: const SurahIndexScreen(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.enterText(find.byType(TextField), 'الرحمن');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('لا نتائج مطابقة'), findsOneWidget);
     expect(find.textContaining('ابحث عن'), findsOneWidget,

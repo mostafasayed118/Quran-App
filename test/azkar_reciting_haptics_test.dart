@@ -58,26 +58,32 @@ void main() {
         home: const AzkarScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(haptics, isEmpty);
 
     await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(haptics, hasLength(1));
     expect(haptics.single.arguments, 'HapticFeedbackType.selectionClick');
 
     await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(haptics, hasLength(3));
     expect(find.byIcon(Icons.check), findsOneWidget);
 
     await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(haptics, hasLength(3));
   });
 }

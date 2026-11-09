@@ -91,19 +91,22 @@ void main() {
     ));
 
     await tester.tap(find.text('OPEN'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('اختر مدينتك'), findsOneWidget);
     expect(find.text('القاهرة'), findsOneWidget);
     expect(find.text('الرياض'), findsOneWidget);
     expect(find.text('دبي'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'cai');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('القاهرة'), findsOneWidget);
     expect(find.text('الرياض'), findsNothing);
 
     await tester.tap(find.text('القاهرة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('اختر مدينتك'), findsNothing);
     final selected = await repo.selectedCity();

@@ -112,7 +112,8 @@ void main() {
         home: const Scaffold(bottomSheet: MiniPlayerBar()),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('a network failure keeps the playback wording', (tester) async {

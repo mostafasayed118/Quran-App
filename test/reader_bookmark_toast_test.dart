@@ -112,7 +112,8 @@ void main() {
         home: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('tapping the bookmark confirms that the verse was saved',
@@ -120,13 +121,15 @@ void main() {
     await pumpReader(tester);
 
     await tester.tap(find.byIcon(Icons.bookmark_border).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('تم حفظ الآية'), findsOneWidget);
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
 
   test('a failed bookmark write reports false instead of throwing', () async {

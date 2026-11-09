@@ -262,7 +262,8 @@ void main() {
       await cubit.start();
 
       await tester.pumpWidget(screen(cubit));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
       expect(find.text('التفسير'), findsOneWidget);
       expect(find.text('الترجمات'), findsOneWidget);
@@ -270,7 +271,8 @@ void main() {
       expect(find.text('تفسير تجريبي'), findsOneWidget);
 
       await tester.tap(find.text('الترجمات'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
       expect(find.text('ترجمة تجريبية'), findsOneWidget);
     });
 
@@ -298,17 +300,20 @@ void main() {
       await cubit.start();
 
       await tester.pumpWidget(screen(cubit));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
       await tester.tap(find.text('الترجمات'));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
       downloader.gate = Completer<void>();
       await tester.tap(find.text('تنزيل').first);
       await tester.pump();
       expect(find.byType(LinearProgressIndicator), findsOneWidget,
           reason: 'progress becomes visible while the stream runs');
       downloader.gate!.complete();
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
       expect(find.text('مثبّت'), findsOneWidget);
       expect(find.byIcon(Icons.delete_outline), findsOneWidget);
@@ -333,7 +338,8 @@ void main() {
       await cubit.start();
 
       await tester.pumpWidget(screen(cubit, textScale: 2.0));
-      await tester.pumpAndSettle();
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
       expect(tester.takeException(), isNull);
       expect(find.text('التفسير'), findsOneWidget);

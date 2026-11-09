@@ -42,7 +42,8 @@ void main() {
         home: const TasbihScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('٠'), findsOneWidget);
     final targetLabels = [

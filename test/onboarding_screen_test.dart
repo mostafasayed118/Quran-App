@@ -112,7 +112,8 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('البداية'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
@@ -136,10 +137,12 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('اختر مدينتك'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     // A sub-route of the flow, not the standalone picker: while the flag is
     // unset the gate redirects every other route, which used to collapse the
@@ -163,10 +166,12 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('ابدأ الاستخدام'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(status.writes, 1);
     expect(status.completed, isTrue);
@@ -188,10 +193,12 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('تخطّي'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(status.writes, 1);
   });
@@ -212,7 +219,8 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('المدينة: القاهرة'), findsOneWidget);
     expect(find.text('تغيير المدينة'), findsOneWidget);
@@ -235,10 +243,12 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('تفعيل'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(scheduler.requests, 1);
     expect(find.text('التنبيهات مفعّلة'), findsOneWidget);
@@ -265,7 +275,8 @@ void main() {
         child: const OnboardingScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('تغيير المدينة'), findsOneWidget);

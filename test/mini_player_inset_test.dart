@@ -94,13 +94,15 @@ void main() {
       home: const Scaffold(bottomSheet: MiniPlayerBar()),
       settle: false,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final row = (await ReciterRepository(db).byId('51-53'))!;
     await cubit.playSurah(row, 1);
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final stopButton = tester.getRect(find.byTooltip('إيقاف'));
     expect(stopButton.bottom, lessThanOrEqualTo(kHeight - kInset));

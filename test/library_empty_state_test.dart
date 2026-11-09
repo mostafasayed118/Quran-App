@@ -71,7 +71,8 @@ void main() {
         home: const LibraryScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('an empty catalog shows one empty state instead of blank tabs',

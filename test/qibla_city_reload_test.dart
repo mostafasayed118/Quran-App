@@ -66,18 +66,22 @@ void main() {
       ],
       theme: AppTheme.light,
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
 
     await tester.tap(find.text('اختر مدينتك'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('PICK-CITY-STUB'), findsOneWidget);
 
     await tester.tap(find.text('PICK-CITY-STUB'));
-    await tester.pumpAndSettle();
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('PICK-CITY-STUB'), findsNothing);
     expect(find.text('اختر مدينتك'), findsNothing);

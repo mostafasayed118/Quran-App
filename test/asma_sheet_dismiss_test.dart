@@ -32,7 +32,8 @@ Future<void> pumpAsma(WidgetTester tester) async {
       home: const AsmaScreen(),
     ),
   ));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {
@@ -40,11 +41,13 @@ void main() {
     await pumpAsma(tester);
 
     await tester.tap(find.text('الرحيم'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('النازل بالرحمة'), findsOneWidget);
 
     await tester.tapAt(const Offset(20, 300));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.text('النازل بالرحمة'), findsNothing);
@@ -54,10 +57,12 @@ void main() {
     await pumpAsma(tester);
 
     await tester.tap(find.text('الرحيم'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('النازل بالرحمة'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('النازل بالرحمة'), findsOneWidget);
   });
@@ -66,12 +71,15 @@ void main() {
     await pumpAsma(tester);
 
     await tester.tap(find.text('الرحيم'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tapAt(const Offset(20, 300));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     await tester.tap(find.text('الرحمن'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('ذو الرحمة الواسعة'), findsOneWidget);
   });

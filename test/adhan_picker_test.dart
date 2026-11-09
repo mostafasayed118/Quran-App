@@ -147,7 +147,8 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.text('عمر هشام العربي').first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(await prefs.adhanId(), 'omar_hisham');
     expect(reschedules, 1);
@@ -160,7 +161,8 @@ void main() {
 
     final loc = AppLocalizations.of(tester.element(find.byType(Scaffold)));
     await tester.tap(find.text(loc.adhanSameAsDefault));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(await prefs.fajrAdhanId(), isNull);
     expect(reschedules, 1);
@@ -173,12 +175,14 @@ void main() {
 
     final previewButton = find.byIcon(Icons.play_circle_outline).first;
     await tester.tap(previewButton);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(player.previews, 1);
 
     // The same row now offers "stop".
     await tester.tap(find.byIcon(Icons.stop_circle_outlined).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(player.stopCalls, greaterThanOrEqualTo(1));
   });
 
@@ -188,9 +192,11 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).at(0));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byIcon(Icons.play_circle_outline).at(0));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     // Two previews, but the first was stopped before the second started.
     expect(player.previews, 2);
@@ -202,11 +208,13 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     final before = player.stopCalls;
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(player.stopCalls, greaterThan(before));
   });
@@ -218,11 +226,13 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     final before = player.stopCalls;
 
     await tester.tap(find.text('عمر هشام العربي').first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(player.stopCalls, greaterThan(before));
     expect(await prefs.adhanId(), 'omar_hisham');

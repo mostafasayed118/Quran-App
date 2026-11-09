@@ -86,7 +86,8 @@ void main() {
         home: const HomeScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('البقرة'), findsOneWidget);
     expect(find.text('﴿٥﴾ متابعة القراءة'), findsOneWidget);

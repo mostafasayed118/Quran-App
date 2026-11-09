@@ -56,7 +56,8 @@ void main() {
     await pumpHost(tester, locale: const Locale('ar'));
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('×٣'), findsOneWidget);
     expect(find.text('×3'), findsNothing,
@@ -68,7 +69,8 @@ void main() {
     await pumpHost(tester, locale: const Locale('en'));
 
     await tester.tap(find.text('Ruqyah'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('×3'), findsOneWidget);
     expect(find.text('×٣'), findsNothing,

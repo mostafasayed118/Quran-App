@@ -82,7 +82,8 @@ void main() {
     for (var i = 0; i < 33; i++) {
       await cubit.increment();
     }
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(tester.takeException(), isNull);
     expect(find.byIcon(Icons.check_circle), findsOneWidget);

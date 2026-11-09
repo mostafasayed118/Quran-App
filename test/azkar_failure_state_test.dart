@@ -28,7 +28,8 @@ Future<void> pumpAzkar(WidgetTester tester, AzkarRepository repository) async {
       home: const AzkarScreen(),
     ),
   ));
-  await tester.pumpAndSettle();
+  await tester.pumpAndSettle(const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 }
 
 void main() {

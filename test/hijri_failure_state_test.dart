@@ -47,7 +47,8 @@ void main() {
         home: const HijriScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);

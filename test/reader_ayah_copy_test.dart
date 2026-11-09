@@ -105,7 +105,8 @@ void main() {
         home: const ReaderScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   List<MethodCall> captureClipboard(WidgetTester tester) {
@@ -137,7 +138,8 @@ void main() {
     final clipboard = captureClipboard(tester);
 
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(clipboard, hasLength(1));
     final text = (clipboard.single.arguments as Map)['text'] as String;
@@ -152,7 +154,8 @@ void main() {
     final clipboard = captureClipboard(tester);
 
     await tester.longPress(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     // SelectionArea owns the gesture; the copy shortcut only exists for the
     // glyph fallback where selection would be meaningless.
@@ -165,7 +168,8 @@ void main() {
     final clipboard = captureClipboard(tester);
 
     await tester.longPress(find.textContaining('\uE8DB').first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(clipboard, hasLength(1));
     final text = (clipboard.single.arguments as Map)['text'] as String;
@@ -184,7 +188,8 @@ void main() {
 
     final clipboard = captureClipboard(tester);
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final text = (clipboard.single.arguments as Map)['text'] as String;
     expect(text, 'آية 1');
@@ -205,7 +210,8 @@ void main() {
       find.byType(ScrollablePositionedList),
       const Offset(0, -200),
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(list.position.pixels, greaterThan(before + 100));
   });
@@ -214,7 +220,8 @@ void main() {
       (tester) async {
     await pumpReader(tester);
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     String pageLabel() =>
         tester.widget<Text>(find.textContaining('صفحة')).data!;
@@ -227,7 +234,8 @@ void main() {
       Offset(rtl ? 600 : -600, 0),
       1000,
     );
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(pageLabel(), contains('٣'));
   });

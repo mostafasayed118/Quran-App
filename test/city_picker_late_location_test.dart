@@ -111,7 +111,8 @@ void main() {
       ),
     );
     await tester.tap(find.text('OPEN'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     expect(find.text('اختر مدينتك'), findsOneWidget);
     return cubit;
   }

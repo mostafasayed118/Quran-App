@@ -51,7 +51,8 @@ void main() {
         home: const CityPickerScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('the persisted city is marked, and raw ids no longer render',
@@ -92,7 +93,8 @@ void main() {
 
     await cubit.persist(cairoCity);
     await cubit.search('');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
   });

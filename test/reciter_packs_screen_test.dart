@@ -214,14 +214,16 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_routerApp(router));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     // An action, never a list row: the reciters list must stay row-free for
     // the frozen "no catalog, no list" test to keep passing.
     expect(find.byTooltip('حزم القرّاء'), findsOneWidget);
 
     await tester.tap(find.byTooltip('حزم القرّاء'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ReciterPacksScreen), findsOneWidget);
     expect(find.text(_emptyCopy), findsOneWidget);
@@ -231,7 +233,8 @@ void main() {
     // The real router: proves the address is wired, not just the widget.
     AppRouter.router.go(AppRoutes.reciterPacks);
     await tester.pumpWidget(_routerApp(AppRouter.router));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byType(ReciterPacksScreen), findsOneWidget);
     expect(find.text('حزم القرّاء'), findsOneWidget);

@@ -38,17 +38,20 @@ void main() {
         home: const ZakatScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     final fields = find.byType(TextField);
     await tester.enterText(fields.first, 'abc');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أدخل رقمًا صحيحًا'), findsOneWidget);
     expect(find.text('صحّح الحقول غير الصحيحة أولًا'), findsOneWidget);
 
     await tester.enterText(fields.first, '10');
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.text('أدخل رقمًا صحيحًا'), findsNothing);
     expect(find.text('صحّح الحقول غير الصحيحة أولًا'), findsNothing);

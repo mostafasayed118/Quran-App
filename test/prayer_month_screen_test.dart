@@ -67,7 +67,8 @@ void main() {
     expect(find.textContaining('فجر'), findsWidgets);
 
     await tester.tap(find.byTooltip('الشهر التالي'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.textContaining('ديسمبر'), findsWidgets);
   });

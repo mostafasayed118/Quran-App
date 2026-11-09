@@ -42,7 +42,8 @@ void main() {
         home: const TrackerScreen(),
       ),
     ));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   }
 
   testWidgets('each of the seven dots announces its day and marked state',
@@ -75,7 +76,8 @@ void main() {
     expect(data.flagsCollection.isChecked, CheckedState.isFalse);
 
     await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     data = tester.getSemantics(find.bySemanticsLabel('فجر')).getSemanticsData();
     expect(data.flagsCollection.isChecked, CheckedState.isTrue);
