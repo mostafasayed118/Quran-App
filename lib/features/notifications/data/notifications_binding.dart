@@ -382,19 +382,7 @@ class NotificationsBinding extends ChangeNotifier
       _pendingPlan = List<ScheduledReminder>.of(reminders);
       return;
     }
-    final previous = _applyQueue;
-    final run = () async {
-      if (previous != null) {
-        try {
-          await previous;
-        } on Object {
-          // _applyPlan swallows its own failures; keep the chain alive.
-        }
-      }
-      await _applyPlan(reminders);
-    }();
-    _applyQueue = run;
-    await run;
+    await _joinApplyQueue(() => _applyPlan(reminders));
   }
 
   /// Clears the optional pre-adhan alarm.
@@ -411,16 +399,24 @@ class NotificationsBinding extends ChangeNotifier
       _pendingCancelPreAdhan = true;
       return;
     }
+    await _joinApplyQueue(_cancelPreAdhanNow);
+  }
+
+  /// Joins the shared apply chain: waits for every in-flight plan write
+  /// before running [body], then stores [body]'s future as the new tail so
+  /// callers cannot interleave. Plan bodies swallow their own failures; a
+  /// throwing body is tolerated so the chain never dies.
+  Future<void> _joinApplyQueue(Future<void> Function() body) async {
     final previous = _applyQueue;
     final run = () async {
       if (previous != null) {
         try {
           await previous;
         } on Object {
-          // _applyPlan swallows its own failures; keep the chain alive.
+          // A failing body cannot interleave the chain; keep it alive.
         }
       }
-      await _cancelPreAdhanNow();
+      await body();
     }();
     _applyQueue = run;
     await run;

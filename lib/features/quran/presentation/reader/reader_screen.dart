@@ -22,6 +22,7 @@ import '../../../library/presentation/ayah_sheet/library_sheet.dart';
 import '../../../recitation/presentation/playback/mini_player_bar.dart';
 import '../../../recitation/presentation/playback/playback_cubit.dart';
 import '../../data/reader_layout_source.dart';
+import '../../../../core/domain/quran_limits.dart';
 import '../../domain/verse.dart';
 import 'reader_cubit.dart';
 import 'reader_state.dart';
@@ -673,7 +674,7 @@ Future<void> _openPageJump(
     builder: (_) => _PageJumpDialog(loc: loc),
   );
   if (!context.mounted || page == null) return;
-  if (page < 1 || page > 604) {
+  if (page < 1 || page > kMushafPageCount) {
     _showInvalidPage(context, loc);
     return;
   }

@@ -518,37 +518,58 @@ String _themeLabel(AppLocalizations loc, AppThemeMode mode) => switch (mode) {
 
 /// Offers the three appearance modes; the controller applies and persists the
 /// pick, and the app root repaints immediately.
-Future<void> _pickTheme(
-  BuildContext context,
-  AppLocalizations loc,
-  AppThemeController controller,
-) async {
-  final selected = await showDialog<AppThemeMode>(
+/// Shared radio-option dialog body for the single-choice settings pickers.
+/// Returns the picked value, or null when the dialog was dismissed.
+Future<T?> _pickFromList<T>({
+  required BuildContext context,
+  required String title,
+  required List<T> values,
+  required T current,
+  required String Function(T value) label,
+  required Future<void> Function(T value) apply,
+}) async {
+  final selected = await showDialog<T>(
     context: context,
     builder: (dialogContext) => SimpleDialog(
-      title: Text(loc.settingsTheme),
+      title: Text(title),
       children: [
-        for (final mode in AppThemeMode.values)
+        for (final value in values)
           SimpleDialogOption(
-            onPressed: () => Navigator.of(dialogContext).pop(mode),
+            onPressed: () => Navigator.of(dialogContext).pop(value),
             child: Row(
               children: [
                 Icon(
-                  controller.mode == mode
+                  current == value
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
                   size: 20,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text(_themeLabel(loc, mode)),
+                Text(label(value)),
               ],
             ),
           ),
       ],
     ),
   );
-  if (selected == null) return;
-  await controller.setMode(selected);
+  if (selected == null) return null;
+  await apply(selected);
+  return selected;
+}
+
+Future<void> _pickTheme(
+  BuildContext context,
+  AppLocalizations loc,
+  AppThemeController controller,
+) async {
+  await _pickFromList<AppThemeMode>(
+    context: context,
+    title: loc.settingsTheme,
+    values: AppThemeMode.values,
+    current: controller.mode,
+    label: (mode) => _themeLabel(loc, mode),
+    apply: controller.setMode,
+  );
 }
 
 /// Offers the shipped languages; the controller applies and persists the pick.
@@ -557,37 +578,19 @@ Future<void> _pickLanguage(
   AppLocalizations loc,
   AppLocaleController controller,
 ) async {
-  final selected = await showDialog<AppLanguage>(
+  final picked = await _pickFromList<AppLanguage>(
     context: context,
-    builder: (dialogContext) => SimpleDialog(
-      title: Text(loc.language),
-      children: [
-        for (final language in AppLanguage.values)
-          SimpleDialogOption(
-            onPressed: () => Navigator.of(dialogContext).pop(language),
-            child: Row(
-              children: [
-                Icon(
-                  controller.language == language
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_unchecked,
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  language == AppLanguage.arabic
-                      ? loc.languageArabic
-                      : loc.languageEnglish,
-                ),
-              ],
-            ),
-          ),
-      ],
-    ),
+    title: loc.language,
+    values: AppLanguage.values,
+    current: controller.language,
+    label: (language) => language == AppLanguage.arabic
+        ? loc.languageArabic
+        : loc.languageEnglish,
+    apply: controller.setLanguage,
   );
-  if (selected == null) return;
-  await controller.setLanguage(selected);
   // The reminder copy is localized at schedule time: re-plan so a pending
   // notification does not keep yesterday's language in the shade.
-  if (context.mounted) await context.read<SettingsCubit>().refreshReminders();
+  if (picked != null && context.mounted) {
+    await context.read<SettingsCubit>().refreshReminders();
+  }
 }
