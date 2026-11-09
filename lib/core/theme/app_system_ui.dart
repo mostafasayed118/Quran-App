@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// System-bar chrome for a forced edge-to-edge Android window.
@@ -7,15 +6,17 @@ import 'package:flutter/services.dart';
 /// colors, so the only levers left are the icon brightness and transparent
 /// bar backgrounds (the app content itself paints the strip).
 abstract final class AppSystemUi {
+  static const Color _transparent = Color(0x00000000);
+
   static SystemUiOverlayStyle overlayStyle(Brightness brightness) {
     final isLight = brightness == Brightness.light;
     final iconBrightness = isLight ? Brightness.dark : Brightness.light;
     return SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
+      statusBarColor: _transparent,
       statusBarIconBrightness: iconBrightness,
       statusBarBrightness: brightness,
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarColor: _transparent,
+      systemNavigationBarDividerColor: _transparent,
       systemNavigationBarIconBrightness: iconBrightness,
     );
   }

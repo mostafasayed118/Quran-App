@@ -356,8 +356,13 @@ class PackDownloader {
     if (body == null) return;
     try {
       await body.stream.drain<void>();
-    } on Object catch (_) {
-      // A broken redirect body cannot change the guard's verdict.
+    } on Object catch (error, stackTrace) {
+      // A broken redirect body cannot change the guard's verdict; log for
+      // correlation only (best-effort cleanup).
+      dev.log('discard redirect body failed',
+          name: 'quran_yahdi/library',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
     }
   }
 

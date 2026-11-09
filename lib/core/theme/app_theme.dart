@@ -185,7 +185,7 @@ abstract final class AppTheme {
       seedColor: AppColors.emerald,
       brightness: brightness,
       primary: isLight ? AppColors.emerald : AppColors.emeraldLight,
-      onPrimary: isLight ? Colors.white : AppColors.ink,
+      onPrimary: isLight ? AppColors.cardBackground : AppColors.ink,
       secondary: AppColors.gold,
       // Gold is a light accent: white on it is ~2.2:1. Ink keeps the token
       // usable if a component ever puts text on `secondary`.
