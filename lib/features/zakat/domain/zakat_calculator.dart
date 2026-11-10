@@ -8,6 +8,8 @@ const int _arabicDecimalSeparator = 0x066B;
 const int _arabicThousandsSeparator = 0x066C;
 const int _asciiZero = 0x30;
 
+final RegExp _thousandsGrouped = RegExp(r'^\d{1,3}(,\d{3})+$');
+
 double parseDecimal(String raw) => parseDecimalOrNull(raw) ?? 0;
 
 /// Parses [raw] like [parseDecimal], but returns null when the text is not a
@@ -24,7 +26,12 @@ double? parseDecimalOrNull(String raw) {
     final thousandsSep = decimalSep == ',' ? '.' : ',';
     normalized = s.replaceAll(thousandsSep, '').replaceFirst(decimalSep, '.');
   } else if (hasComma) {
-    normalized = s.replaceAll(',', '.');
+    // A lone comma is ambiguous: "1,5" is a decimal comma, but "1,000" is a
+    // thousands group. Read it as grouped only when every group after the
+    // first is exactly three digits; otherwise keep the decimal meaning.
+    normalized = _thousandsGrouped.hasMatch(s)
+        ? s.replaceAll(',', '')
+        : s.replaceAll(',', '.');
   }
   final parsed = double.tryParse(normalized);
   if (parsed == null || !parsed.isFinite || parsed < 0) return null;
