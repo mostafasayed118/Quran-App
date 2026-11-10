@@ -220,10 +220,12 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                   style: AppTheme.mutedAt(colors, 13),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Slider(
+                _SeekRow(
                   value: value,
-                  max: maxMs > 0 ? maxMs : 1,
-                  label: _clock(Duration(milliseconds: value.round())),
+                  maxMs: maxMs,
+                  positionLabel: _clock(Duration(milliseconds: value.round())),
+                  durationLabel: _clock(track.duration),
+                  colors: colors,
                   onChanged: maxMs > 0
                       ? (next) => setState(() => _dragging = next)
                       : null,
@@ -235,23 +237,6 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                           setState(() => _dragging = null);
                         }
                       : null,
-                ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _clock(Duration(milliseconds: value.round())),
-                        style: AppTheme.mutedAt(colors, 12),
-                      ),
-                      Text(
-                        _clock(track.duration),
-                        style: AppTheme.mutedAt(colors, 12),
-                      ),
-                    ],
-                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 _OptionsRow(
@@ -270,6 +255,63 @@ class _PlayerSheetState extends State<_PlayerSheet> {
           ),
         );
       },
+    );
+  }
+}
+
+/// Seek slider plus its two clock labels.
+///
+/// The pair travels together and sits flush inside the parent column; the
+/// inner `Column` is `min` so the parent lays out exactly as it did when the
+/// two were siblings.
+class _SeekRow extends StatelessWidget {
+  const _SeekRow({
+    required this.value,
+    required this.maxMs,
+    required this.positionLabel,
+    required this.durationLabel,
+    required this.colors,
+    this.onChanged,
+    this.onChangeEnd,
+  });
+
+  final double value;
+  final double maxMs;
+  final String positionLabel;
+  final String durationLabel;
+  final ColorScheme colors;
+  final ValueChanged<double>? onChanged;
+  final ValueChanged<double>? onChangeEnd;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Slider(
+          value: value,
+          max: maxMs > 0 ? maxMs : 1,
+          label: positionLabel,
+          onChanged: onChanged,
+          onChangeEnd: onChangeEnd,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                positionLabel,
+                style: AppTheme.mutedAt(colors, 12),
+              ),
+              Text(
+                durationLabel,
+                style: AppTheme.mutedAt(colors, 12),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
