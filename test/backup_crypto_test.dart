@@ -46,7 +46,8 @@ void main() {
     expect(isEncryptedBackupEnvelope(tampered), isTrue);
   });
 
-  test('decodeBackup: encrypted file without passphrase is reported, not '
+  test(
+      'decodeBackup: encrypted file without passphrase is reported, not '
       'decoded', () async {
     final envelope = await encryptBackupJson(
       jsonEncode({
