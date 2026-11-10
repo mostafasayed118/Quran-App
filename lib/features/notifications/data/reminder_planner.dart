@@ -255,12 +255,14 @@ List<ScheduledReminder> planPrayerHorizon({
   required DateTime now,
   required List<List<PrayerChoice>> days,
   DateTime? skipAt,
+  bool prayerEnabled = true,
   Set<PrayerName> enabledPrayers = PrayerConfig.defaultEnabledPrayers,
   int preAdhanMinutes = 0,
   required ReminderTexts texts,
   String? adhanId,
   String? fajrAdhanId,
 }) {
+  if (!prayerEnabled) return const <ScheduledReminder>[];
   final out = <ScheduledReminder>[];
   for (final dayPrayers in days) {
     for (final choice in dayPrayers) {
