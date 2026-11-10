@@ -19,6 +19,10 @@ sealed class ReaderState with _$ReaderState {
     required String surahName,
     required int initialAyah,
     required List<Verse> ayahs,
+
+    /// The ayah the reader is on now. It survives a mode switch and is the
+    /// anchor both modes start from; [initialAyah] is only the route request.
+    @Default(0) int currentAyahId,
     @Default(ReaderMode.verses) ReaderMode mode,
     @Default(<int>{}) Set<int> bookmarkedAyahIds,
     @Default(true) bool showBasmala,

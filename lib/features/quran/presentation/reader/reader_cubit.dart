@@ -74,6 +74,11 @@ class ReaderCubit extends Cubit<ReaderState> {
   final Set<int> _bookmarkedIds = <int>{};
   int? _lastVisibleAyahId;
 
+  /// The live reading anchor. Kept off the state so scrolling does not emit;
+  /// [toggleMode] copies it into the ready state for the next mode's first
+  /// frame.
+  int _currentAyahId = 0;
+
   Future<void> _load() async {
     try {
       final (surah, ayahs) = await (
@@ -93,7 +98,8 @@ class ReaderCubit extends Cubit<ReaderState> {
       final startAyahId =
           startList.isNotEmpty ? startList.first.id : ayahs.first.id;
       _lastVisibleAyahId = startAyahId;
-      unawaited(_saveLastRead(startAyahId));
+      _currentAyahId = startAyahId;
+      await _saveStartIfNeeded(startAyahId);
       // Unicode Uthmani is an asset (no DB migration). When it is missing the
       // verses keep glyph text and the reader turns selection off.
       final unicode =
@@ -108,6 +114,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',
         initialAyah: _initialAyah,
+        currentAyahId: startAyahId,
         ayahs: verses,
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
         showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
@@ -119,6 +126,21 @@ class ReaderCubit extends Cubit<ReaderState> {
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const ReaderState.failed());
+    }
+  }
+
+  /// Seeds the marker on a first read or an explicit deep link, but never
+  /// rewinds an existing continue-reading position just because the user
+  /// opened the surah at verse 1.
+  Future<void> _saveStartIfNeeded(int startAyahId) async {
+    try {
+      final existing = await _lastReadRepository.loadAyahId();
+      if (_initialAyah > 0 || existing == null || existing <= 0) {
+        await _saveLastRead(startAyahId);
+      }
+    } on Object catch (error, stackTrace) {
+      appLog('last-read read failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
 
@@ -141,6 +163,7 @@ class ReaderCubit extends Cubit<ReaderState> {
   Future<void> onVisibleAyah(int ayahId) async {
     if (ayahId <= 0 || ayahId == _lastVisibleAyahId) return;
     _lastVisibleAyahId = ayahId;
+    _currentAyahId = ayahId;
     await _saveLastRead(ayahId);
   }
 
@@ -166,6 +189,8 @@ class ReaderCubit extends Cubit<ReaderState> {
     final current = state;
     if (current is! ReaderReady || isClosed) return;
     emit(current.copyWith(
+      currentAyahId:
+          _currentAyahId > 0 ? _currentAyahId : current.currentAyahId,
       mode: current.mode == ReaderMode.verses
           ? ReaderMode.mushaf
           : ReaderMode.verses,
@@ -268,6 +293,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     if (blockIndex < 0 || blockIndex >= current.mushafPages.length) return;
     final pageAyahs = current.mushafPages[blockIndex].ayahs;
     if (pageAyahs.isEmpty) return;
+    _currentAyahId = pageAyahs.first.id;
     await _saveLastRead(pageAyahs.first.id);
     final sink = _wirdProgress;
     if (sink == null) return;
