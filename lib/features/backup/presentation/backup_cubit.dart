@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/backup_crypto.dart';
 import '../data/backup_io.dart';
 import '../data/backup_service.dart';
 import '../domain/backup_models.dart';
@@ -122,7 +121,7 @@ class BackupCubit extends Cubit<BackupState> {
     emit(const BackupState.idle(busy: true));
     try {
       final json = await _service.exportJson();
-      final encrypted = await encryptBackupJson(json, passphrase);
+      final encrypted = await encryptBackupJsonInIsolate(json, passphrase);
       // Never emit a file this app's own importer would reject.
       if (exceedsBackupLimit(encrypted)) {
         throw const BackupTooLarge();
