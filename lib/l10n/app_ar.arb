@@ -251,7 +251,7 @@
   "onboardingSkip": "تخطّي",
   "searchCity": "ابحث عن مدينة…",
   "noCity": "لم تُحدَّد مدينة بعد",
-  "degreesFromNorth": "{degrees}° عن الشمال",
+  "degreesFromNorth": "{degrees} درجة عن الشمال",
   "@degreesFromNorth": {
     "placeholders": {
       "degrees": {
@@ -697,7 +697,7 @@
   "cardinalEast": "شرق",
   "cardinalSouth": "جنوب",
   "cardinalWest": "غرب",
-  "qiblaTurnRight": "أدر الهاتف {degrees}° يمينًا",
+  "qiblaTurnRight": "أدر الهاتف {degrees} درجة يمينًا",
   "@qiblaTurnRight": {
     "placeholders": {
       "degrees": {
@@ -705,7 +705,7 @@
       }
     }
   },
-  "qiblaTurnLeft": "أدر الهاتف {degrees}° يسارًا",
+  "qiblaTurnLeft": "أدر الهاتف {degrees} درجة يسارًا",
   "@qiblaTurnLeft": {
     "placeholders": {
       "degrees": {

@@ -423,7 +423,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String degreesFromNorth(String degrees) {
-    return '$degrees° عن الشمال';
+    return '$degrees درجة عن الشمال';
   }
 
   @override
@@ -1060,12 +1060,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String qiblaTurnRight(String degrees) {
-    return 'أدر الهاتف $degrees° يمينًا';
+    return 'أدر الهاتف $degrees درجة يمينًا';
   }
 
   @override
   String qiblaTurnLeft(String degrees) {
-    return 'أدر الهاتف $degrees° يسارًا';
+    return 'أدر الهاتف $degrees درجة يسارًا';
   }
 
   @override

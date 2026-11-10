@@ -81,7 +81,7 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('أدر الهاتف ٣٠° يمينًا'), findsOneWidget);
+    expect(find.text('أدر الهاتف ٣٠ درجة يمينًا'), findsOneWidget);
     expect(find.text('أنت تواجه القبلة'), findsNothing);
   });
 
@@ -94,6 +94,6 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('أدر الهاتف ٣٠° يسارًا'), findsOneWidget);
+    expect(find.text('أدر الهاتف ٣٠ درجة يسارًا'), findsOneWidget);
   });
 }
