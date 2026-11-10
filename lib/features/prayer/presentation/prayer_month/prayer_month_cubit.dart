@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -59,7 +59,7 @@ class PrayerMonthCubit extends Cubit<PrayerMonthState> {
         days: List<PrayerMonthDay>.unmodifiable(days),
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('prayer month load failed',
+      appLog('prayer month load failed',
           name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const PrayerMonthState.failed());
     }

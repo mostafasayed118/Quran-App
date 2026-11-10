@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -246,7 +246,7 @@ class AudioDownloader {
           // The part stays: the next attempt resumes from it.
         }
       } on Object catch (error, stackTrace) {
-        dev.log('download reconcile row failed',
+        appLog('download reconcile row failed',
             name: 'quran_yahdi/downloads',
             error: error,
             stackTrace: stackTrace);
@@ -263,7 +263,7 @@ class AudioDownloader {
       try {
         entity.deleteSync();
       } on Object catch (error, stackTrace) {
-        dev.log('download part cleanup failed',
+        appLog('download part cleanup failed',
             name: 'quran_yahdi/downloads',
             error: error,
             stackTrace: stackTrace);
@@ -468,7 +468,7 @@ class AudioDownloader {
       } on Object catch (error) {
         // The recovery rename failed; the ORIGINAL promote failure is the
         // one worth reporting, but keep a trace of the recovery attempt.
-        dev.log(
+        appLog(
           'download promote recovery failed',
           name: 'quran_yahdi/downloads',
           error: error.runtimeType,

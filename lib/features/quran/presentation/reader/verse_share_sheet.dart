@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -83,7 +83,7 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
     try {
       await _sharer.shareText(_composeText(AppLocalizations.of(context)));
     } on Object catch (error, stackTrace) {
-      dev.log('ayah text share failed',
+      appLog('ayah text share failed',
           name: 'quran_yahdi/share', error: error, stackTrace: stackTrace);
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -109,12 +109,12 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
       );
     } on Object catch (error, stackTrace) {
       // A failed raster or share must never leave the user with nothing.
-      dev.log('ayah image share failed',
+      appLog('ayah image share failed',
           name: 'quran_yahdi/share', error: error, stackTrace: stackTrace);
       try {
         await _sharer.shareText(text);
       } on Object catch (fallbackError, fallbackStack) {
-        dev.log('ayah text fallback failed',
+        appLog('ayah text fallback failed',
             name: 'quran_yahdi/share',
             error: fallbackError,
             stackTrace: fallbackStack);

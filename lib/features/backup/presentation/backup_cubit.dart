@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,7 +50,7 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(const BackupState.exported());
     } on Object catch (error, stackTrace) {
-      dev.log('backup export failed',
+      appLog('backup export failed',
           name: 'quran_yahdi/backup',
           error: error.runtimeType,
           stackTrace: stackTrace);
@@ -99,7 +99,7 @@ class BackupCubit extends Cubit<BackupState> {
       // The error MESSAGE is never logged: a jsonDecode failure embeds a
       // snippet of the imported file, and the imported file is user content.
       // The runtime type is enough to diagnose the failure.
-      dev.log('backup import failed',
+      appLog('backup import failed',
           name: 'quran_yahdi/backup',
           error: error.runtimeType,
           stackTrace: stackTrace);
@@ -130,7 +130,7 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(const BackupState.exported());
     } on Object catch (error, stackTrace) {
-      dev.log('backup export failed',
+      appLog('backup export failed',
           name: 'quran_yahdi/backup',
           error: error.runtimeType,
           stackTrace: stackTrace);
@@ -164,7 +164,7 @@ class BackupCubit extends Cubit<BackupState> {
       _pendingEncryptedBytes = null;
       emit(BackupState.preview(document: result.document, summary: summary));
     } on Object catch (error, stackTrace) {
-      dev.log('backup import failed',
+      appLog('backup import failed',
           name: 'quran_yahdi/backup',
           error: error.runtimeType,
           stackTrace: stackTrace);
@@ -192,7 +192,7 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(BackupState.imported(summary: outcome.summary));
     } on Object catch (error, stackTrace) {
-      dev.log('backup apply failed',
+      appLog('backup apply failed',
           name: 'quran_yahdi/backup',
           error: error.runtimeType,
           stackTrace: stackTrace);

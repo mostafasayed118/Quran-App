@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -34,7 +34,7 @@ class RecitersCubit extends Cubit<RecitersState> {
         _kickOnce();
       },
       onError: (Object error, StackTrace stackTrace) {
-        dev.log('reciters stream failed',
+        appLog('reciters stream failed',
             name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
         if (isClosed) return;
         emit(const RecitersState.failed());
@@ -60,7 +60,7 @@ class RecitersCubit extends Cubit<RecitersState> {
     try {
       await _repo.refreshFromApi();
     } on Object catch (error, stackTrace) {
-      dev.log('reciters refresh failed',
+      appLog('reciters refresh failed',
           name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
       _failSoft();
     }

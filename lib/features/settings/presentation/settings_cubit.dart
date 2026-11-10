@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
@@ -89,7 +89,7 @@ class SettingsCubit extends Cubit<SettingsState> {
         adhanId: adhanId,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('settings load failed',
+      appLog('settings load failed',
           name: 'quran_yahdi/settings', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const SettingsState.failed());
@@ -220,7 +220,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     try {
       return !(await _scheduler.ensurePermissions());
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'settings notification permission failed',
         name: 'quran_yahdi/settings',
         error: error.runtimeType,
@@ -243,7 +243,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     try {
       await _reschedule();
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'settings reschedule failed',
         name: 'quran_yahdi/settings',
         error: error.runtimeType,
@@ -259,7 +259,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     Object error,
     StackTrace stackTrace,
   ) {
-    dev.log(
+    appLog(
       'settings $operation failed',
       name: 'quran_yahdi/settings',
       error: error.runtimeType,

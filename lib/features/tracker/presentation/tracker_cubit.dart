@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -80,7 +80,7 @@ class TrackerCubit extends Cubit<TrackerState> {
         khatma: khatma.progress,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('tracker load failed',
+      appLog('tracker load failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _reloadSeq) return;
       emit(const TrackerState.failed());
@@ -108,7 +108,7 @@ class TrackerCubit extends Cubit<TrackerState> {
         ),
       );
     } on Object catch (error, stackTrace) {
-      dev.log('khatma load failed',
+      appLog('khatma load failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       return (available: false, progress: null);
     }
@@ -121,7 +121,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await repo.startPlan(targetPages);
     } on Object catch (error, stackTrace) {
-      dev.log('khatma start failed',
+      appLog('khatma start failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       _markActionFailed();
       return;
@@ -149,7 +149,7 @@ class TrackerCubit extends Cubit<TrackerState> {
         await repo.advanceTo(first);
       }
     } on Object catch (error, stackTrace) {
-      dev.log('khatma advance failed',
+      appLog('khatma advance failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       _markActionFailed();
       return;
@@ -164,7 +164,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await repo.reset();
     } on Object catch (error, stackTrace) {
-      dev.log('khatma reset failed',
+      appLog('khatma reset failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       _markActionFailed();
       return;
@@ -225,7 +225,7 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await _repo.togglePrayer(_clock(), slot);
     } on Object catch (error, stackTrace) {
-      dev.log('tracker toggle failed',
+      appLog('tracker toggle failed',
           name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
       _markActionFailed();
       return;

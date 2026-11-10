@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -101,7 +101,7 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
       if (previous == null || previous == allowed) return;
       await _rescheduleGuarded('exact-alarm grant changed');
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'exact-alarm grant read failed',
         name: 'quran_yahdi/app',
         error: error.runtimeType,
@@ -117,7 +117,7 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
       if (!getIt.isRegistered<ReminderRescheduler>()) return;
       await runBootReminderSchedule();
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'reminder re-plan on $reason failed',
         name: 'quran_yahdi/app',
         error: error.runtimeType,

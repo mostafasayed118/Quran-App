@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:ui' show DartPluginRegistrant;
 
@@ -64,7 +64,7 @@ Future<bool> runReminderRefreshTask(Future<void> Function() body) async {
   } on Object catch (error, stackTrace) {
     // A background isolate has no UI: this log is the only trace the device
     // check can read (`adb logcat -s flutter`).
-    dev.log(
+    appLog(
       'reminder refresh task failed',
       name: 'quran_yahdi/background',
       error: error.runtimeType,
@@ -118,7 +118,7 @@ Future<void> refreshRemindersForBackground() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Proves the isolate actually started.
   await stampReminderRefresh('start');
-  dev.log('reminder refresh task started', name: 'quran_yahdi/background');
+  appLog('reminder refresh task started', name: 'quran_yahdi/background');
   // Plugins that register Dart-side handlers in a secondary isolate need this;
   // it is a no-op when the platform already registered them.
   try {
@@ -155,7 +155,7 @@ Future<void> updateHomeWidgetFromState() async {
       city: city.nameAr,
     );
   } on Object catch (error, stackTrace) {
-    dev.log('background widget update failed',
+    appLog('background widget update failed',
         name: 'quran_yahdi/background',
         error: error.runtimeType,
         stackTrace: stackTrace);

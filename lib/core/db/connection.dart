@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -52,7 +52,7 @@ Future<void> ensureContentCurrent(
     await seedFile.writeAsBytes(bytes, flush: true);
     await _seedContentFromFile(db, seedFile, bundledVersion);
   } on Object catch (error, stackTrace) {
-    dev.log('content refresh failed',
+    appLog('content refresh failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
@@ -153,7 +153,7 @@ Future<void> writeAssetOffUiIsolate(
         return;
       }
     } on Object catch (error, stackTrace) {
-      dev.log('db asset copy on the worker isolate failed',
+      appLog('db asset copy on the worker isolate failed',
           name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
     }
   }
@@ -201,7 +201,7 @@ Future<void> _ensureContentCurrentOffUiIsolate(
     await _writeAssetOffUiIsolate(seedFile, dbAssetKey);
     await _seedContentFromFile(db, seedFile, kContentVersion);
   } on Object catch (error, stackTrace) {
-    dev.log('content refresh failed',
+    appLog('content refresh failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
@@ -239,7 +239,7 @@ Future<void> _ensureSearchIndex(AppDatabase db) async {
   try {
     await ensureQuranSearchIndex(db);
   } on Object catch (error, stackTrace) {
-    dev.log('search index build failed',
+    appLog('search index build failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   }
 }

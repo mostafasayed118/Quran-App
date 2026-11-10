@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -168,7 +168,7 @@ class PackDownloader {
         // without its integrity hashes.
         final gap = catalogIntegrityGap(pack);
         if (gap != null) {
-          dev.log(
+          appLog(
               'pack "${pack.id}" is not integrity-pinned ($gap): the install is validated by shape only',
               name: 'quran_yahdi/library');
         }
@@ -486,7 +486,7 @@ class PackDownloader {
     try {
       await _hadithStore.importProjection(pack.id, projection);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith pack import failed',
+      appLog('hadith pack import failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
   }
@@ -535,7 +535,7 @@ class PackDownloader {
     try {
       await _hadithStore.deletePack(packId);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith pack index cleanup failed',
+      appLog('hadith pack index cleanup failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
     final finalFile = await _store.packFile(packId);
@@ -596,7 +596,7 @@ class PackDownloader {
     try {
       return await _hadithStore.hadithPage(packId, offset, limit);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith DB page failed; reading the pack directly',
+      appLog('hadith DB page failed; reading the pack directly',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       return _reader.hadithPage(packId, offset, limit);
     }

@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
 import '../domain/surah_summary.dart';
@@ -47,7 +47,7 @@ extension SurahRowMapping on Surah {
 String _normalizeRevelationType(String raw) {
   final value = raw.toLowerCase().trim();
   if (value == 'makkah' || value == 'madinah') return value;
-  dev.log(
+  appLog(
     'unknown revelation type',
     name: 'quran_yahdi/quran',
     error: raw,

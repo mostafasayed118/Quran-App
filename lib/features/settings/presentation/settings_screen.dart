@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -360,7 +360,7 @@ class _ReminderReliabilitySectionState
         _batteryUnknown = battery == null;
       });
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'settings reminder diagnostics read failed',
         name: 'quran_yahdi/settings',
         error: error.runtimeType,

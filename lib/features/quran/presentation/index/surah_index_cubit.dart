@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +28,7 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
         _emitFiltered();
       },
       onError: (Object error, StackTrace stackTrace) {
-        dev.log('surah index stream failed',
+        appLog('surah index stream failed',
             name: 'quran_yahdi/surah_index',
             error: error,
             stackTrace: stackTrace);

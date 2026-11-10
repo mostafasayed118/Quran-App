@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,13 +25,13 @@ class JuzIndexCubit extends Cubit<JuzIndexState> {
           if (!isClosed) emit(JuzIndexState.ready(juz));
         },
         onError: (Object error, StackTrace stackTrace) {
-          dev.log('juz index stream failed',
+          appLog('juz index stream failed',
               name: 'quran_yahdi/quran', error: error, stackTrace: stackTrace);
           if (!isClosed) emit(const JuzIndexState.failed());
         },
       );
     } on Object catch (error, stackTrace) {
-      dev.log('juz index load failed',
+      appLog('juz index load failed',
           name: 'quran_yahdi/quran', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const JuzIndexState.failed());
     }

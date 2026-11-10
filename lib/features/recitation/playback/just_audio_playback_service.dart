@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
@@ -31,7 +31,7 @@ void issuePlayRequest(
 }
 
 void _logPlayFailure(String operation, Object error, StackTrace stackTrace) {
-  dev.log(operation,
+  appLog(operation,
       name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
 }
 
@@ -150,7 +150,7 @@ class JustAudioPlaybackService
     try {
       await _player.stop();
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'stopForAdhan failed',
         name: 'quran_yahdi/playback',
         error: error.runtimeType,

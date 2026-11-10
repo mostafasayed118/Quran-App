@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -64,7 +64,7 @@ class QiblaCubit extends Cubit<QiblaState> {
         calibrationNeeded: _calibrationNeeded,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('qibla reload failed',
+      appLog('qibla reload failed',
           name: 'quran_yahdi/qibla', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const QiblaState.failed());
@@ -100,7 +100,7 @@ class QiblaCubit extends Cubit<QiblaState> {
     _headingSub = stream.listen(
       _onHeading,
       onError: (Object error, StackTrace stackTrace) {
-        dev.log(
+        appLog(
           'heading stream error',
           name: 'quran_yahdi/qibla',
           error: error,
@@ -125,7 +125,7 @@ class QiblaCubit extends Cubit<QiblaState> {
     _calibrationSub = stream.listen(
       _onCalibration,
       onError: (Object error, StackTrace stackTrace) {
-        dev.log(
+        appLog(
           'calibration stream error',
           name: 'quran_yahdi/qibla',
           error: error,

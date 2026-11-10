@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -24,7 +24,7 @@ class QadaCubit extends Cubit<QadaState> {
       final dates = await _source.loadMissed();
       if (!isClosed) emit(QadaState.ready(dates: dates));
     } on Object catch (error, stackTrace) {
-      dev.log('qada load failed',
+      appLog('qada load failed',
           name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const QadaState.failed());
     }
@@ -56,7 +56,7 @@ class QadaCubit extends Cubit<QadaState> {
       await _source.saveMissed(next);
       return true;
     } on Object catch (error, stackTrace) {
-      dev.log('qada save failed',
+      appLog('qada save failed',
           name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(current);
       return false;

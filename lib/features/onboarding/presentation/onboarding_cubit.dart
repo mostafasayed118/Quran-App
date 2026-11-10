@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -63,7 +63,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       granted = await _reminders.ensurePermissions();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding permission request failed',
+      appLog('onboarding permission request failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
     }
     if (isClosed) return;
@@ -79,7 +79,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       await _status.markCompleted();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding flag write failed',
+      appLog('onboarding flag write failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
     }
     if (isClosed) return;
@@ -93,7 +93,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       return await _status.isCompleted();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding flag read failed',
+      appLog('onboarding flag read failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
       // Never nag a user we cannot read: treat the flow as done.
       return true;
@@ -104,7 +104,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       return await _city.selectedCity();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding city read failed',
+      appLog('onboarding city read failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
       return null;
     }

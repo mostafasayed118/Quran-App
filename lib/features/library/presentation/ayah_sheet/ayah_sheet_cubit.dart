@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,7 +55,7 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
         ],
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('ayah sheet load failed',
+      appLog('ayah sheet load failed',
           name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const AyahSheetState.failed());
@@ -68,7 +68,7 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       final text = await _downloader.tafsirFor(packId, _surah, _ayah);
       return text == null ? null : (title: title, text: text);
     } on Object catch (error, stackTrace) {
-      dev.log('ayah sheet tafsir read failed',
+      appLog('ayah sheet tafsir read failed',
           name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
       return null;
     }
@@ -79,7 +79,7 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       final text = await _downloader.translationFor(packId, _surah, _ayah);
       return text == null ? null : (title: title, text: text);
     } on Object catch (error, stackTrace) {
-      dev.log('ayah sheet translation read failed',
+      appLog('ayah sheet translation read failed',
           name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
       return null;
     }

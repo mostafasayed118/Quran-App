@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -44,7 +44,7 @@ class TasbihCubit extends Cubit<TasbihState> {
         ));
       }
     } on Object catch (error, stackTrace) {
-      dev.log('tasbih load failed',
+      appLog('tasbih load failed',
           name: 'quran_yahdi/tasbih', error: error, stackTrace: stackTrace);
     } finally {
       if (!_loaded.isCompleted) {
@@ -94,7 +94,7 @@ class TasbihCubit extends Cubit<TasbihState> {
     try {
       await _repo.save(count, target);
     } on Object catch (error, stackTrace) {
-      dev.log('tasbih save failed',
+      appLog('tasbih save failed',
           name: 'quran_yahdi/tasbih', error: error, stackTrace: stackTrace);
     }
   }

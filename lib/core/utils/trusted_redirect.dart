@@ -7,7 +7,7 @@
 /// share one implementation so a hardening fix cannot drift.
 library;
 
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:dio/dio.dart';
 
@@ -32,7 +32,7 @@ Future<void> discardRedirectBody(
   try {
     await body.stream.drain<void>();
   } on Object catch (error, stackTrace) {
-    dev.log(
+    appLog(
       'discard redirect body failed',
       name: devLogName,
       error: error.runtimeType,

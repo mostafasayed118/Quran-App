@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -71,7 +71,7 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
         emit(const TranslationSearchState.ready(hasPacks: true));
       }
     } on Object catch (error, stackTrace) {
-      dev.log('translation search load failed',
+      appLog('translation search load failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const TranslationSearchState.failed());
     }
@@ -116,7 +116,7 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
             try {
               return (id, await _surahName(id) ?? '');
             } on Object catch (error, stackTrace) {
-              dev.log(
+              appLog(
                 'surah name lookup failed',
                 name: 'quran_yahdi/library',
                 error: error,

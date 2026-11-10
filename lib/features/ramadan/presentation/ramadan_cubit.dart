@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -80,7 +80,7 @@ class RamadanCubit extends Cubit<RamadanState> {
         today: todayRow,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('ramadan load failed',
+      appLog('ramadan load failed',
           name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const RamadanState.failed());
     }

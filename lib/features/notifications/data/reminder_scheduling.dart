@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -125,7 +125,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
     // A failed (re)schedule must never break boot or a screen (W7b v1), but
     // it must be diagnosable: the binding keeps its own flag for the settings
     // readout, and this log is the trace a device check can read.
-    dev.log(
+    appLog(
       'reminder schedule failed',
       name: 'quran_yahdi/reminders',
       error: error.runtimeType,

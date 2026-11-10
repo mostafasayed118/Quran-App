@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,7 +43,7 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       final row = await _reciters.byId(_rowId);
       if (isClosed) return;
       if (row == null) {
-        dev.log('reciter row not found',
+        appLog('reciter row not found',
             name: 'quran_yahdi/reciter_surahs', error: _rowId);
         emit(const ReciterSurahsState.failed());
         return;
@@ -63,7 +63,7 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
         previews: previews,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('reciter surahs load failed',
+      appLog('reciter surahs load failed',
           name: 'quran_yahdi/reciter_surahs',
           error: error,
           stackTrace: stackTrace);
@@ -81,7 +81,7 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       await _reciters.selectMoshaf(_rowId);
       return true;
     } on Object catch (error, stackTrace) {
-      dev.log('select moshaf failed',
+      appLog('select moshaf failed',
           name: 'quran_yahdi/reciter_surahs',
           error: error,
           stackTrace: stackTrace);

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// F-D1 fail-open boot gate: runs [init] with at most [timeout] to complete,
 /// so a plugin that hangs (or fails) can never stall app startup. On timeout
@@ -14,13 +14,13 @@ Future<T?> failOpenBootInit<T>(
   try {
     return await init().timeout(timeout);
   } on TimeoutException {
-    dev.log(
+    appLog(
       'boot init "$label" exceeded its ${timeout.inMilliseconds}ms bound — continuing fail-open',
       name: 'quran_yahdi/boot',
     );
     return null;
   } on Object catch (error, stackTrace) {
-    dev.log(
+    appLog(
       'boot init "$label" failed: $error — continuing fail-open',
       name: 'quran_yahdi/boot',
       error: error,

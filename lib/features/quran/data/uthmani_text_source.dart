@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/services.dart';
 
@@ -40,7 +40,7 @@ class AssetUthmaniTextSource implements UthmaniTextSource {
     } on Object catch (error, stackTrace) {
       // A missing/corrupt asset must not break the reader: it falls back to
       // the glyph column and simply loses selection for that surah.
-      dev.log(
+      appLog(
         'uthmani asset unavailable for surah $surahId',
         name: 'quran_yahdi/uthmani',
         error: error,

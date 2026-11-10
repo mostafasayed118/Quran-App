@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
@@ -56,7 +56,7 @@ class DuasCubit extends Cubit<DuasState> {
       _allDuas = entries;
       emit(DuasState.duas(categories: categories, entries: entries));
     } on Object catch (error, stackTrace) {
-      dev.log('duas load failed',
+      appLog('duas load failed',
           name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed());
@@ -88,7 +88,7 @@ class DuasCubit extends Cubit<DuasState> {
       _resolvedRuqyah = resolved;
       emit(DuasState.ruqyah(entries: resolved));
     } on Object catch (error, stackTrace) {
-      dev.log('ruqyah load failed',
+      appLog('ruqyah load failed',
           name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed(tab: DuasTab.ruqyah));

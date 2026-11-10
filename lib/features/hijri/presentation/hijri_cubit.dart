@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -59,7 +59,7 @@ class HijriCubit extends Cubit<HijriState> {
         dayOffset: _service.offsetDays,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('hijri load failed',
+      appLog('hijri load failed',
           name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const HijriState.failed());
@@ -72,7 +72,7 @@ class HijriCubit extends Cubit<HijriState> {
     try {
       return await _offset?.loadOffsetDays() ?? 0;
     } on Object catch (error, stackTrace) {
-      dev.log('hijri offset read failed',
+      appLog('hijri offset read failed',
           name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
       return 0;
     }
@@ -90,7 +90,7 @@ class HijriCubit extends Cubit<HijriState> {
     try {
       await _offset?.saveOffsetDays(safe);
     } on Object catch (error, stackTrace) {
-      dev.log('hijri offset write failed',
+      appLog('hijri offset write failed',
           name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
     }
     final current = state;
@@ -126,7 +126,7 @@ class HijriCubit extends Cubit<HijriState> {
       final hijri = _service.fromGregorian(now);
       await show(hijri.hYear, hijri.hMonth);
     } on Object catch (error, stackTrace) {
-      dev.log('hijri today failed',
+      appLog('hijri today failed',
           name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const HijriState.failed());
