@@ -37,6 +37,7 @@ abstract final class AppRoutes {
   static const principles = '/settings/principles';
   static const adhanPicker = '/settings/adhan';
   static const onboarding = '/onboarding';
+  static const update = '/update';
 
   /// The city picker **inside** the onboarding flow.
   ///

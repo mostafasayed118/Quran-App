@@ -20,7 +20,7 @@ Last updated: 2026-10-30 · Applies to version 1.0.0
 | Permission | Why it is needed | Where it is used |
 |---|---|---|
 | Location (coarse only) | To compute the **nearest city to you** automatically, for accurate prayer times and Qibla direction | Processed **on-device only**; your position is compared against a city list bundled inside the app to pick the nearest one. **The location is never sent, stored, or shared with any party — ever.** |
-| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to two fixed, pinned endpoints hardcoded in the app: `mp3quran.net` (audio) and `cdn.jsdelivr.net` (tafsir and translation packs, pinned to a specific commit). **At startup**, when the reciter list is empty (normally only the first run), the app fetches the reciter catalog from `mp3quran.net` automatically to populate the list and caches it on your device. No device identifiers or personal data are attached to any of these requests. |
+| Internet | To download/stream **Quranic audio recitations** from the free mp3quran.net service, and to download text packs for tafsir and hadith | Connections are limited to three fixed, pinned endpoints hardcoded in the app: `mp3quran.net` (audio), `cdn.jsdelivr.net` (tafsir and translation packs, pinned to a specific commit), and `quranyahdi.pages.dev` (a small JSON file, fetched once at launch, carrying the minimum app version the author still supports — so the app can ask you to update instead of running against an incompatible backend; the fetch is anonymous, carries no device identifiers and nothing about your activity, and the app starts normally if it fails or is missing). **At startup**, when the reciter list is empty (normally only the first run), the app fetches the reciter catalog from `mp3quran.net` automatically to populate the list and caches it on your device. No device identifiers or personal data are attached to any of these requests. |
 | Notifications / exact alarms | To remind you of prayer times **that you enable yourself** in settings | Reminders are computed and scheduled locally on your device. |
 | Foreground service (audio) | To keep recitation playing when the app is minimized | Playback info (reciter & surah names) appears in the media bar and stays on your device. |
 
@@ -37,6 +37,10 @@ Everything the app stores stays **on your device only**, inside the app's privat
 - You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process. That backup file is an unencrypted JSON file, so store and share it with care.
 
 Uninstalling the app permanently deletes all of it. We keep no copy.
+
+## Reviewing on Google Play
+
+After completing the "ابدأ الاستخدام" (Get started) step for the first time, the app may show a single, one-time invitation to rate it via Google Play, using Google Play's official In-App Review interface. Google Play decides whether the dialog appears at all (often it does not — that is expected), the invitation is shown at most once per install, and we collect no data from it and cannot see who rated it. No review prompt ever appears at app launch or during reading, prayer or adhkar flows.
 
 ## The website (quranyahdi.pages.dev)
 

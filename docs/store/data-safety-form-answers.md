@@ -4,7 +4,7 @@
 > permission census of the codebase. Evidence-or-silence rule: every answer below cites its
 > source fact. Anything not citable would be flagged `OPEN-FOR-OWNER` — there are none.
 
-Last updated: 2026-10-30 · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+3
+Last updated: 2026-11-09 (force-update policy fetch + In-App Review dependency disclosed) · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+4 (artifact versionCode 2004 — see PERF-13/owner note in `docs/release-readiness-audit.md`)
 
 ## 1. Permission census (run live against the code)
 
@@ -32,6 +32,10 @@ with the runtime grace flow in `lib/features/notifications/data/notifications_bi
 Plugin manifests also merge `android.permission.VIBRATE` and
 `android.permission.ACCESS_NETWORK_STATE` into the built artifact. Neither touches user data:
 vibration backs local reminder notifications, and network-state is connectivity plumbing.
+The release artifact also declares `android.permission.RECEIVE_BOOT_COMPLETED` (reminder
+restore plumbing merged by `flutter_local_notifications`/`workmanager` manifests — verified with
+`aapt dump badging` on the signed release APK, 2026-11-09); it is platform restore plumbing, not
+a data-collection or broadcast channel for user data.
 Verified with `aapt dump permissions` on the signed release APK (2026-10-30); the artifact
 declares **no `ACCESS_FINE_LOCATION`** and **no `com.google.android.gms.permission.AD_ID`**.
 
@@ -55,13 +59,26 @@ or personal data are attached (`PRIVACY.md` line 23 (AR) / `PRIVACY.en.md` line 
 - **One automatic request at startup** when the reciter list is empty (normally only the first
   run): the mp3quran reciter catalog is fetched so playback works before the user opens the
   recitations screen (`lib/features/recitation/data/reciter_repository.dart:220-225`, called
-  from `lib/main.dart:87,97-99`). It carries no parameters, identifiers, or user data.
+  from `lib/main.dart`). It carries no parameters, identifiers, or user data.
+- **One anonymous request at launch** for the force-update policy (added 2026-11-09):
+  `GET https://quranyahdi.pages.dev/version.json` from `lib/features/update/data/version_policy_service.dart`
+  (wired in `lib/main.dart`). The JSON is a static file on the owner's Cloudflare Pages site
+  declaring the minimum supported version and the latest version; it carries **no** device
+  identifiers, no parameters and nothing about the user, and if the fetch fails the app starts
+  normally. Still no identifiers or personal data in any of these requests
+  (`PRIVACY.md` line 23 (AR) / `PRIVACY.en.md` line 23 (EN)).
+- The **In-App Review** prompt (added 2026-11-09) is the official Google Play API inside a
+  dependency (`in_app_review`); it reveals no user data to this app or to us. It is shown at
+  most once per install and never at launch.
 
 ### Q: "Is this data shared with third parties?"
 
 **Answer: Not shared.** No user data is transmitted, so there is nothing that could be shared;
 no third-party analytics, advertising, or attribution SDK exists in the dependency set
-(`pubspec.yaml` — UI/storage/audio/notify packages only).
+(`pubspec.yaml` — UI/storage/audio/notify packages only, plus two owner-approved 2026-11-09
+release-readiness packages: `package_info_plus` — reads the installed version from the platform,
+transmits nothing; `in_app_review` — a thin wrapper over the official Play In-App Review API,
+revealed data are handled by Google Play, never by this app and never by us).
 
 ### The honest per-data-type matrix (prepared for the form's data-type pages)
 
@@ -71,6 +88,7 @@ no third-party analytics, advertising, or attribution SDK exists in the dependen
 | Personal info / IDs / contacts / media / photos | No | — | — | — |
 | App activity, diagnostics, browsing | No app-owned analytics/telemetry exists (see platform note below) | — | — | — |
 | Reciter catalog (app content, not user data) | Fetched automatically at startup when the local list is empty | Request carries **no** device identifier or personal data | No | No |
+| Force-update policy (app config, not user data) | One anonymous HTTPS GET at launch; 404/timeout → app starts normally | Request carries **no** device identifier, no parameters, nothing about the user | No | No |
 | Downloaded content (audio, text packs) | User-initiated downloads to app-private storage | No (requests carry no user data) | No | No |
 
 Because no user data is transmitted, per Play's rules **none of these count as "collected"** —

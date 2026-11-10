@@ -37,6 +37,10 @@ dependencies:
   workmanager: ^0.10.10
   home_widget: ^0.10.0
   cryptography: ^2.9.0
+  # Force Update + store-listing button; owner-approved 2026-11-09 (release-readiness session).
+  package_info_plus: ^10.2.2
+  # In-App Review prompt (requestReview); owner-approved 2026-11-09.
+  in_app_review: ^2.0.12
 
 flutter_launcher_icons:
   android: true

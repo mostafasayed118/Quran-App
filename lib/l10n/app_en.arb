@@ -835,5 +835,12 @@
   "adhanSameAsDefault": "Same as default",
   "adhanPreview": "Preview",
   "adhanStopPreview": "Stop",
-  "adhanPlayAction": "Play adhan"
+  "adhanPlayAction": "Play adhan",
+  "updateRequiredTitle": "Update required",
+  "updateRequiredBody": "This version of the app is no longer supported. Update to continue — the app cannot be used before updating.",
+  "updateRecommendedTitle": "Update available",
+  "updateRecommendedBody": "A newer version is available. We recommend updating for the latest improvements and fixes.",
+  "updateNow": "Update now",
+  "updateLater": "Later",
+  "updateUnavailable": "Could not open the store. You can update from the app's Play Store page."
 }

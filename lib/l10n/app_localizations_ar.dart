@@ -1401,4 +1401,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adhanPlayAction => 'تشغيل الأذان';
+
+  @override
+  String get updateRequiredTitle => 'تحديث مطلوب';
+
+  @override
+  String get updateRequiredBody =>
+      'النسخة المثبّتة من التطبيق لم تعد مدعومة. حدّث التطبيق للمتابعة — لا يمكن استخدام التطبيق قبل التحديث.';
+
+  @override
+  String get updateRecommendedTitle => 'يتوفر تحديث';
+
+  @override
+  String get updateRecommendedBody =>
+      'نسخة أحدث متاحة. نوصي بالتحديث للاستفادة من التحسينات وإصلاحات المشاكل.';
+
+  @override
+  String get updateNow => 'حدّث الآن';
+
+  @override
+  String get updateLater => 'لاحقاً';
+
+  @override
+  String get updateUnavailable =>
+      'تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play.';
 }

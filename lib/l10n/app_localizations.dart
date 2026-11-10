@@ -2587,6 +2587,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تشغيل الأذان'**
   String get adhanPlayAction;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث مطلوب'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخة المثبّتة من التطبيق لم تعد مدعومة. حدّث التطبيق للمتابعة — لا يمكن استخدام التطبيق قبل التحديث.'**
+  String get updateRequiredBody;
+
+  /// No description provided for @updateRecommendedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتوفر تحديث'**
+  String get updateRecommendedTitle;
+
+  /// No description provided for @updateRecommendedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخة أحدث متاحة. نوصي بالتحديث للاستفادة من التحسينات وإصلاحات المشاكل.'**
+  String get updateRecommendedBody;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدّث الآن'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقاً'**
+  String get updateLater;
+
+  /// No description provided for @updateUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play.'**
+  String get updateUnavailable;
 }
 
 class _AppLocalizationsDelegate

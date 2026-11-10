@@ -856,5 +856,12 @@
   "adhanSameAsDefault": "مثل الافتراضي",
   "adhanPreview": "استماع",
   "adhanStopPreview": "إيقاف",
-  "adhanPlayAction": "تشغيل الأذان"
+  "adhanPlayAction": "تشغيل الأذان",
+  "updateRequiredTitle": "تحديث مطلوب",
+  "updateRequiredBody": "النسخة المثبّتة من التطبيق لم تعد مدعومة. حدّث التطبيق للمتابعة — لا يمكن استخدام التطبيق قبل التحديث.",
+  "updateRecommendedTitle": "يتوفر تحديث",
+  "updateRecommendedBody": "نسخة أحدث متاحة. نوصي بالتحديث للاستفادة من التحسينات وإصلاحات المشاكل.",
+  "updateNow": "حدّث الآن",
+  "updateLater": "لاحقاً",
+  "updateUnavailable": "تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play."
 }

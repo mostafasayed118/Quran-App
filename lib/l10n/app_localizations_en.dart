@@ -1411,4 +1411,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhanPlayAction => 'Play adhan';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'This version of the app is no longer supported. Update to continue — the app cannot be used before updating.';
+
+  @override
+  String get updateRecommendedTitle => 'Update available';
+
+  @override
+  String get updateRecommendedBody =>
+      'A newer version is available. We recommend updating for the latest improvements and fixes.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get updateLater => 'Later';
+
+  @override
+  String get updateUnavailable =>
+      'Could not open the store. You can update from the app\'s Play Store page.';
 }

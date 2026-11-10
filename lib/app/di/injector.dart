@@ -6,7 +6,14 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
 import 'package:quran_yahdi/app/onboarding_gate.dart';
+import 'package:quran_yahdi/core/domain/store_listing.dart';
+import 'package:quran_yahdi/core/domain/version_ack_store.dart';
+import 'package:quran_yahdi/features/update/data/review_service.dart';
 import 'package:quran_yahdi/app/router.dart';
+import 'package:quran_yahdi/features/update/data/version_ack_store.dart';
+import 'package:quran_yahdi/app/version_gate.dart';
+import 'package:quran_yahdi/features/update/data/version_policy_service.dart';
+import 'package:quran_yahdi/core/domain/version_policy_source.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/db/connection.dart';
 import 'package:quran_yahdi/core/domain/adhan_player.dart';
@@ -155,6 +162,7 @@ Future<void> configureDependencies({
   _registerLibraryAndHadith(db, libraryCatalogLoader, libraryRootResolver);
   _registerBackup(db);
   _registerOnboardingAndSettings(db);
+  _registerVersionGate(db);
 
   _configured = true;
 }
@@ -361,13 +369,43 @@ void _registerBackup(AppDatabase db) {
       ));
 }
 
+/// Schedules the review prompt off the onboarding completion seam.
+///
+/// Both the finish and the skip paths flow through here; the service itself
+/// is double-guarded (process-wide flag + persisted one-shot marker).
+void _scheduleReviewPrompt() {
+  unawaited(getIt<ReviewService>().maybeRequestAfterOnboarding());
+}
+
+/// The update gate's policy source, the ack store for the optional prompt,
+/// and the review service. All fail-open: the gate can only enforce a valid
+/// remote policy, and the review seam schedules at most one prompt per
+/// install after the user finishes (or skips) onboarding.
+void _registerVersionGate(AppDatabase db) {
+  getIt.registerLazySingleton<VersionPolicyService>(
+      () => VersionPolicyService(db: db));
+  getIt.registerLazySingleton<VersionPolicySource>(
+      () => getIt<VersionPolicyService>());
+  getIt.registerLazySingleton<VersionAckStore>(() => DriftVersionAckStore(db));
+  // The installed version arrives asynchronously (PackageInfo) — main.dart
+  // attaches the gate behind the first frame.
+  getIt.registerLazySingleton<VersionGate>(() => AppRouter.versionGate);
+  getIt.registerLazySingleton<StoreListingGateway>(
+      () => InAppReviewStoreListing());
+}
+
 void _registerOnboardingAndSettings(AppDatabase db) {
   getIt.registerLazySingleton<OnboardingRepository>(
       () => OnboardingRepository(db));
+  // The review prompt hangs off the same completion seam as the gate: finish
+  // and skip both call [OnboardingGate.complete], which fires this at most
+  // once per install, never at cold start.
+  getIt.registerLazySingleton<ReviewService>(() => ReviewService(db: db));
   // One instance serves both the router gate and the flow: the gate caches the
   // flag for the synchronous redirect, and a finish/skip notifies the router.
-  getIt.registerLazySingleton<OnboardingGate>(
-      () => AppRouter.onboardingGate..attach(getIt<OnboardingRepository>()));
+  getIt.registerLazySingleton<OnboardingGate>(() => AppRouter.onboardingGate
+    ..onCompleted = _scheduleReviewPrompt
+    ..attach(getIt<OnboardingRepository>()));
   getIt.registerLazySingleton<OnboardingStatusSource>(
       () => getIt<OnboardingGate>());
   getIt.registerLazySingleton<AppLocaleRepository>(

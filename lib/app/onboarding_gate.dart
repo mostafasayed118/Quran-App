@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
 
@@ -30,6 +30,11 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
   /// The route that was blocked by the gate, restored after the flow.
   String? get pendingLocation => _pendingLocation;
 
+  /// Optional seam invoked after the flow completes (finish or skip).
+  /// Production wires this to the review prompt; tests leave it null.
+  /// Called synchronously after the gate flips; must not throw.
+  void Function()? onCompleted;
+
   /// Points the gate at its storage and starts the first read.
   void attach(OnboardingStatusSource source) {
     _source = source;
@@ -44,7 +49,7 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
     try {
       completed = await source.isCompleted();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding gate read failed',
+      appLog('onboarding gate read failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
       // A flag we cannot read must never trap the user behind the flow.
       completed = true;
@@ -60,12 +65,23 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
     try {
       await _source?.markCompleted();
     } on Object catch (error, stackTrace) {
-      dev.log('onboarding gate write failed',
+      appLog('onboarding gate write failed',
           name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
     }
     if (_completed == true) return;
     _completed = true;
     notifyListeners();
+    try {
+      onCompleted?.call();
+    } on Object catch (error, stackTrace) {
+      // A failing review seam must never break the completion path.
+      appLog(
+        'onboarding completion seam failed',
+        name: 'quran_yahdi/onboarding',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   /// The cached answer, or the storage read when nothing landed yet.
