@@ -11,6 +11,9 @@ import '../domain/verse.dart';
 /// to entities here instead.
 extension AyahRowMapping on Ayah {
   /// Maps this row to the reader-facing [Verse] model.
+  ///
+  /// The ayah-end medallion is stripped here, once per row, so the reader
+  /// never does it inside a rebuild.
   Verse toVerse() => Verse(
         id: id,
         surahId: surahId,
@@ -20,6 +23,7 @@ extension AyahRowMapping on Ayah {
         textUthmani: textUthmani,
         textImlaei: textImlaei,
         sajda: sajda,
+        displayUthmani: stripAyahEndMarker(textUthmani),
       );
 }
 

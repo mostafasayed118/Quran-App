@@ -378,7 +378,7 @@ class _AyahCard extends StatelessWidget {
           Builder(
             builder: (context) {
               final unicode = ayah.textUnicode;
-              final text = unicode ?? stripAyahEndMarker(ayah.textUthmani);
+              final text = ayah.displayText;
               final widget = Text(
                 text,
                 style: AppTheme.hafsAyah.copyWith(
@@ -607,8 +607,7 @@ class _MushafPagerState extends State<_MushafPager> {
             // word, never land at the start of the next line (where it would
             // read as if it belonged to the following verse).
             TextSpan(
-              text:
-                  '${a.textUnicode ?? stripAyahEndMarker(a.textUthmani)}\u00A0',
+              text: '${a.displayText}\u00A0',
             ),
             TextSpan(
               text: '${loc.ornateBrackets(loc.number(a.numberInSurah))} ',

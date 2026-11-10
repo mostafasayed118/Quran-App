@@ -41,6 +41,7 @@ class Verse {
     required this.textImlaei,
     required this.sajda,
     this.textUnicode,
+    this.displayUthmani,
   });
 
   /// Same verse, with the Unicode Uthmani reading attached.
@@ -54,6 +55,7 @@ class Verse {
         textImlaei: textImlaei,
         sajda: sajda,
         textUnicode: unicode,
+        displayUthmani: displayUthmani,
       );
 
   final int id;
@@ -75,4 +77,19 @@ class Verse {
   /// What belongs on the clipboard: Unicode Uthmani when available, otherwise
   /// the imlaei orthography. Never [textUthmani] — that is a glyph encoding.
   String get copyText => textUnicode ?? textImlaei;
+
+  /// [textUthmani] with the ayah-end medallion already stripped.
+  ///
+  /// Computed once at the row→entity mapping boundary ([AyahRowMapping]).
+  /// Null on a hand-built instance (tests, the clipboard path), in which case
+  /// [displayText] strips on demand — never inside a hot rebuild.
+  final String? displayUthmani;
+
+  /// The text the reader draws for this verse.
+  ///
+  /// The reader rebuilds a card on every scroll tick; stripping the medallion
+  /// allocates a rune list plus a fresh string for the whole ayah, so it runs
+  /// once at mapping time rather than inside `build()`.
+  String get displayText =>
+      textUnicode ?? displayUthmani ?? stripAyahEndMarker(textUthmani);
 }

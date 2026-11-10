@@ -60,6 +60,11 @@ class AppDatabase extends _$AppDatabase {
     // call scans the whole 6236-row table.
     await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_page '
         'ON ayahs(page)');
+    // The juz index groups `ayahs.juz` and orders by id. On the shipped asset
+    // the uncovered query was a full scan plus two temp B-trees; the covering
+    // index turns it into one index range seek.
+    await customStatement('CREATE INDEX IF NOT EXISTS idx_ayahs_juz '
+        'ON ayahs(juz, id)');
     // One bookmark per ayah is a user-visible invariant. When the unique index
     // is missing, repair duplicates left by the old read-then-write toggle
     // before creating it (a failed CREATE would abort every open). A legacy

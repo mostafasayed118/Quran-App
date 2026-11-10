@@ -38,7 +38,7 @@ class VerseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final text = ayah.textUnicode ?? stripAyahEndMarker(ayah.textUthmani);
+    final text = ayah.displayText;
     final fontSize = text.length > 400 ? 18.0 : 22.0;
     final host = Uri.parse(
       webSurahUrl(ayah.surahId, ayah.numberInSurah),
