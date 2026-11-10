@@ -1,7 +1,7 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../domain/app_locale.dart';
 import 'platform_localizations.dart';

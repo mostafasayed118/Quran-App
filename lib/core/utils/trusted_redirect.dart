@@ -7,9 +7,8 @@
 /// share one implementation so a hardening fix cannot drift.
 library;
 
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:dio/dio.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// The 3xx codes worth following. Anything else is terminal (2xx streams as
 /// before; other statuses fail like Dio would).

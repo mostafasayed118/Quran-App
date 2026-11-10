@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/insets.dart';
+import '../../../core/widgets/app_content_frame.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// What the app promises the reader: free without ads, no account, recitations

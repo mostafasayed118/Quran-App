@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/update/presentation/update_gate_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';

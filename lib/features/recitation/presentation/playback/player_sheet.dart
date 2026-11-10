@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/domain/quran_limits.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
-import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
 import 'playback_state.dart';
@@ -254,89 +254,129 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      tooltip: loc.repeatSurah,
-                      isSelected: controls.repeatMode == PlaybackRepeatMode.one,
-                      icon: const Icon(Icons.repeat_one),
-                      onPressed: cubit.toggleRepeat,
-                    ),
-                    Tooltip(
-                      message: loc.playbackSpeed,
-                      child: ActionChip(
-                        onPressed: cubit.cycleSpeed,
-                        label: Text(loc.digits(_speedLabel(controls.speed))),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    TextButton.icon(
-                      onPressed: () => _showSleepMenu(
-                        context,
-                        cubit,
-                        controls.sleepTimer,
-                      ),
-                      icon: Icon(
-                        controls.sleepTimer == null
-                            ? Icons.bedtime_outlined
-                            : Icons.bedtime,
-                      ),
-                      label: Text(
-                        controls.sleepTimer == null
-                            ? loc.sleepTimer
-                            : loc.sleepTimerMinutes(
-                                loc.number(controls.sleepTimer!.inMinutes),
-                              ),
-                      ),
-                    ),
-                  ],
+                _OptionsRow(
+                  loc: loc,
+                  cubit: cubit,
+                  speed: controls.speed,
+                  repeatMode: controls.repeatMode,
+                  sleepTimer: controls.sleepTimer,
+                  onSleepPressed: () =>
+                      _showSleepMenu(context, cubit, controls.sleepTimer),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      tooltip: loc.previousSurah,
-                      onPressed:
-                          track.surahNumber > 1 ? cubit.previousSurah : null,
-                      icon: const Icon(Icons.skip_previous),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    IconButton.filledTonal(
-                      iconSize: 34,
-                      tooltip:
-                          track.playing ? loc.pauseTooltip : loc.playTooltip,
-                      icon: Icon(
-                        track.playing ? Icons.pause : Icons.play_arrow,
-                      ),
-                      onPressed: cubit.toggle,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    IconButton(
-                      tooltip: loc.nextSurah,
-                      onPressed: track.surahNumber > 0 &&
-                              track.surahNumber < kSurahCount
-                          ? cubit.nextSurah
-                          : null,
-                      icon: const Icon(Icons.skip_next),
-                    ),
-                    const SizedBox(width: AppSpacing.lg),
-                    IconButton(
-                      tooltip: loc.stopTooltip,
-                      icon: const Icon(Icons.stop),
-                      // The state-driven branch above closes the sheet once the
-                      // cubit reaches its initial state; popping here as well
-                      // could close the underlying route on a double pop.
-                      onPressed: cubit.stopAndReset,
-                    ),
-                  ],
-                ),
+                _TransportRow(loc: loc, cubit: cubit, track: track),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+/// Repeat / speed / sleep-timer row.
+///
+/// Lifted out of a 189-line `build()`; it takes plain values and one callback
+/// so it holds no state of its own.
+class _OptionsRow extends StatelessWidget {
+  const _OptionsRow({
+    required this.loc,
+    required this.cubit,
+    required this.speed,
+    required this.repeatMode,
+    required this.sleepTimer,
+    required this.onSleepPressed,
+  });
+
+  final AppLocalizations loc;
+  final PlaybackCubit cubit;
+  final double speed;
+  final PlaybackRepeatMode repeatMode;
+  final Duration? sleepTimer;
+  final VoidCallback onSleepPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          tooltip: loc.repeatSurah,
+          isSelected: repeatMode == PlaybackRepeatMode.one,
+          icon: const Icon(Icons.repeat_one),
+          onPressed: cubit.toggleRepeat,
+        ),
+        Tooltip(
+          message: loc.playbackSpeed,
+          child: ActionChip(
+            onPressed: cubit.cycleSpeed,
+            label: Text(loc.digits(_speedLabel(speed))),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        TextButton.icon(
+          onPressed: onSleepPressed,
+          icon: Icon(
+            sleepTimer == null ? Icons.bedtime_outlined : Icons.bedtime,
+          ),
+          label: Text(
+            sleepTimer == null
+                ? loc.sleepTimer
+                : loc.sleepTimerMinutes(loc.number(sleepTimer!.inMinutes)),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Previous / play-pause / next / stop.
+class _TransportRow extends StatelessWidget {
+  const _TransportRow({
+    required this.loc,
+    required this.cubit,
+    required this.track,
+  });
+
+  final AppLocalizations loc;
+  final PlaybackCubit cubit;
+  final _Track track;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton(
+          tooltip: loc.previousSurah,
+          onPressed: track.surahNumber > 1 ? cubit.previousSurah : null,
+          icon: const Icon(Icons.skip_previous),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        IconButton.filledTonal(
+          iconSize: 34,
+          tooltip: track.playing ? loc.pauseTooltip : loc.playTooltip,
+          icon: Icon(track.playing ? Icons.pause : Icons.play_arrow),
+          onPressed: cubit.toggle,
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        IconButton(
+          tooltip: loc.nextSurah,
+          onPressed: track.surahNumber > 0 && track.surahNumber < kSurahCount
+              ? cubit.nextSurah
+              : null,
+          icon: const Icon(Icons.skip_next),
+        ),
+        const SizedBox(width: AppSpacing.lg),
+        IconButton(
+          tooltip: loc.stopTooltip,
+          icon: const Icon(Icons.stop),
+          // The state-driven branch above closes the sheet once the cubit
+          // reaches its initial state; popping here as well could close the
+          // underlying route on a double pop.
+          onPressed: cubit.stopAndReset,
+        ),
+      ],
     );
   }
 }

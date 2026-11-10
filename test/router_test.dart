@@ -1,5 +1,5 @@
-import 'package:go_router/go_router.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quran_yahdi/app/router.dart';
 
 /// Every `GoRoute` in the tree, including the ones nested inside the shell

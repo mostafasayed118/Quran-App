@@ -1,7 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
@@ -11,8 +10,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'support/fakes.dart';
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
+import 'support/fakes.dart';
 
 class CapturingScheduler implements ReminderSchedulerPort {
   final plans = <List<ScheduledReminder>>[];

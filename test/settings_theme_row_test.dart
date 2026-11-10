@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/app_theme.dart';
 import 'package:quran_yahdi/core/theme/app_theme_controller.dart';
@@ -10,9 +9,9 @@ import 'package:quran_yahdi/features/settings/data/app_theme_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_screen.dart';
 
-import 'support/fakes.dart';
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'settings_cubit_test.dart' show FakeReminderScheduler;
+import 'support/fakes.dart';
 import 'support/host.dart';
 import 'support/test_db.dart';
 

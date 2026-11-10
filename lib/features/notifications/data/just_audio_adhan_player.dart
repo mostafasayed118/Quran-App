@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/adhan_player.dart';
 import 'package:quran_yahdi/core/domain/media_playback_control.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// Plays the adhan through the app's single audio player, owning the policy:
 ///

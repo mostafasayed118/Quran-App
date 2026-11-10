@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/domain/app_locale.dart';
@@ -13,6 +13,7 @@ import '../../../core/domain/app_theme.dart';
 import '../../../core/domain/reminder_diagnostics.dart';
 import '../../../core/domain/reminders.dart';
 import '../../../core/l10n/app_locale_controller.dart';
+import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_theme_controller.dart';
@@ -21,14 +22,13 @@ import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/hour_minute.dart';
 import '../../../core/utils/insets.dart';
 import '../../../core/widgets/app_content_frame.dart';
-import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/error_pane.dart';
+import '../../../core/widgets/loading_and_error_views.dart';
 import '../../../core/widgets/section_header.dart';
-import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../l10n/app_localizations.dart';
+import 'licenses_screen.dart';
 import 'settings_cubit.dart';
 import 'settings_state.dart';
-import 'licenses_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({

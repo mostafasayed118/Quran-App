@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/insets.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/error_strip.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'playback_cubit.dart';
-import 'player_sheet.dart';
 import 'playback_state.dart';
+import 'player_sheet.dart';
 
 /// Rebuild gate for the mini-player shell. Position ticks arrive ~5 Hz and
 /// only feed the progress row, which owns its own [BlocBuilder]; every other

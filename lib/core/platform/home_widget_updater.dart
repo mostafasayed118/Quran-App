@@ -1,6 +1,5 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:home_widget/home_widget.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// The data the Android home-screen widget renders.
 abstract interface class HomeWidgetUpdater {

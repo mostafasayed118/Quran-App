@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:meta/meta.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/domain/media_playback_control.dart';
 import '../../../core/l10n/platform_localizations.dart';

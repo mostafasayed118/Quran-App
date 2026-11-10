@@ -5,9 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'support/fake_playback_service.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
@@ -21,6 +18,7 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/fake_playback_service.dart';
 import 'support/test_db.dart';
 
 class _RecordingSink implements WirdProgressSink {

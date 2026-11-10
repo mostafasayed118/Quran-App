@@ -1,8 +1,7 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/adhan_player.dart';
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'adhan_picker_state.dart';
 

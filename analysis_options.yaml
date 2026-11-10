@@ -70,6 +70,9 @@ linter:
     sort_child_properties_last: true
     slash_for_doc_comments: true
 
+    # --- import hygiene: one canonical order, mechanically enforced ---
+    directives_ordering: true
+
     # --- package hygiene ---
     depend_on_referenced_packages: true
     implementation_imports: true

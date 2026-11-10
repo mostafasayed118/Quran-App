@@ -1,9 +1,9 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../core/domain/city.dart';

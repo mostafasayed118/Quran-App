@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/insets.dart';
-import '../../../../core/widgets/app_toast.dart';
-import '../../../../core/widgets/loading_and_error_views.dart';
-import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/app_content_frame.dart';
+import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/search_field.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/city_repository.dart';

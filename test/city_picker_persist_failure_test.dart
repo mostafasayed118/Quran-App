@@ -1,12 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_state.dart';
 
-import 'support/fakes.dart';
 import 'prayer_times_cubit_test.dart' show dubaiCity;
+import 'support/fakes.dart';
 import 'support/test_db.dart';
 
 class _FlakySelectRepo extends CityRepository {

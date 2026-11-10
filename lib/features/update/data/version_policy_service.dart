@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:cryptography/cryptography.dart';
 import 'package:dio/dio.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/domain/version_policy.dart';

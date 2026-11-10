@@ -1,9 +1,8 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_name.dart';
+import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'prayer_config_state.dart';
 

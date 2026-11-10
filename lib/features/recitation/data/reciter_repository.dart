@@ -1,7 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:isolate';
-
-import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';

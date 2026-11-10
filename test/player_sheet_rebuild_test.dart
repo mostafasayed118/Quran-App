@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:quran_yahdi/features/recitation/presentation/playback/player_sheet.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_state.dart';
+import 'package:quran_yahdi/features/recitation/presentation/playback/player_sheet.dart';
 
 PlaybackState _playing({
   Duration position = Duration.zero,

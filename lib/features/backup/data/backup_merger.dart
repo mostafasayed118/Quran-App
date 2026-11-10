@@ -1,10 +1,11 @@
 import '../../../core/utils/date_only.dart';
-// Compat: existing importers of this file keep resolving [BackupSummary],
-// which now lives in domain/ so presentation stays off the data layer.
-export '../domain/backup_models.dart' show BackupSummary;
 import '../domain/backup_models.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
+
+// Compat: existing importers of this file keep resolving [BackupSummary],
+// which now lives in domain/ so presentation stays off the data layer.
+export '../domain/backup_models.dart' show BackupSummary;
 
 /// Highest global ayah id (1..6236) accepted for the last-read pointer.
 const int kBackupMaxAyahId = 6236;

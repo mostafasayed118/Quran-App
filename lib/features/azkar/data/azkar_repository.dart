@@ -1,10 +1,10 @@
 import '../../../core/utils/arabic_search.dart';
 import '../../../core/utils/cached_loader.dart';
+import '../domain/azkar_models.dart';
 
 // Compat: existing importers of this file keep resolving the DTOs, which
 // now live in [azkar_models.dart] so presentation stays off the data layer.
 export '../domain/azkar_models.dart';
-import '../domain/azkar_models.dart';
 
 /// Reads the bundled azkar catalog and searches it locally.
 class AzkarRepository {

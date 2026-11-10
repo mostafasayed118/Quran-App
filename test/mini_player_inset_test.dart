@@ -4,9 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'support/fake_playback_service.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
@@ -14,6 +11,7 @@ import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/mini_player_bar.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 
+import 'support/fake_playback_service.dart';
 import 'support/host.dart';
 import 'support/test_db.dart';
 

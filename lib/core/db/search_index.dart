@@ -16,6 +16,16 @@ const String kSearchIndexVersionKey = 'search_index_version';
 /// three characters: such a token matches nothing and is dropped from the
 /// MATCH expression. The reader therefore falls back to the legacy substring
 /// scan for any query that contains one (see `QuranSearchRepository`).
+///
+/// **The table must stay contentful (no `content=''`).** A contentless FTS5
+/// table stores no column values: `SELECT text_norm` returns NULL and
+/// `text_norm LIKE ?` matches nothing, which would silently re-break exactly
+/// the short-token fallback above. Measured on the 6,236-ayah corpus,
+/// contentless would save ~815 KB (2,121,728 B → 1,306,624 B); that is the
+/// price of working short-token search, and `search_index_contentful_test.dart`
+/// pins it. The only way to reclaim it is a schema change that stores the
+/// normalized text as a regular `ayahs` column — not a tokenizer flag.
+///
 /// `rowid` carries the global ayah id (1..6236), keeping joins and ordering
 /// compatible with the rest of the reader/search pipeline.
 const String kAyahSearchDdl = 'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
