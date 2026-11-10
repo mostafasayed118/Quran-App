@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
@@ -113,7 +113,7 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       ));
       _scheduleReminders();
     } on Object catch (error, stackTrace) {
-      dev.log('prayer times load failed',
+      appLog('prayer times load failed',
           name: 'quran_yahdi/prayer_times',
           error: error,
           stackTrace: stackTrace);

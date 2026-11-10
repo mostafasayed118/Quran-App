@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,14 +26,14 @@ class HadithCubit extends Cubit<HadithState> {
     try {
       _bookmarked = await _bookmarks?.load(_packId) ?? <int>{};
     } on Object catch (error, stackTrace) {
-      dev.log('hadith bookmarks load failed',
+      appLog('hadith bookmarks load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
     }
     var offset = 0;
     try {
       offset = await _positions?.load(_packId) ?? 0;
     } on Object catch (error, stackTrace) {
-      dev.log('hadith position load failed',
+      appLog('hadith position load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
     }
     await _load(offset);
@@ -90,7 +90,7 @@ class HadithCubit extends Cubit<HadithState> {
     try {
       await _bookmarks?.save(_packId, next);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith bookmark save failed',
+      appLog('hadith bookmark save failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
       _bookmarked = previous;
       final latest = state;
@@ -161,7 +161,7 @@ class HadithCubit extends Cubit<HadithState> {
           );
         }
       } on Object catch (error, stackTrace) {
-        dev.log('hadith load failed',
+        appLog('hadith load failed',
             name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
         if (isClosed) return;
         emit(const HadithState.failed());
@@ -190,7 +190,7 @@ class HadithCubit extends Cubit<HadithState> {
         try {
           await _positions?.save(_packId, effectiveOffset);
         } on Object catch (error, stackTrace) {
-          dev.log('hadith position save failed',
+          appLog('hadith position save failed',
               name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
         }
       }

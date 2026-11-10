@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,7 +52,7 @@ class FolderBookmarksCubit extends Cubit<FolderBookmarksState> {
         items: List<FolderBookmark>.unmodifiable(items),
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('folder bookmarks load failed',
+      appLog('folder bookmarks load failed',
           name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const FolderBookmarksState.failed());
     }

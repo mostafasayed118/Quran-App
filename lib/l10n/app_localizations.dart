@@ -1634,6 +1634,66 @@ abstract class AppLocalizations {
   /// **'الملف المصدَّر غير مشفَّر — أي شخص يحصل عليه يمكنه قراءة علاماتك وسجل العبادات وإعداداتك. احفظه في مكان آمن.'**
   String get backupUnencryptedWarning;
 
+  /// No description provided for @backupExportEncrypted.
+  ///
+  /// In ar, this message translates to:
+  /// **'تصدير مشفّر'**
+  String get backupExportEncrypted;
+
+  /// No description provided for @backupEncryptedExportHint.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا يمكن فتح الملف لاحقًا إلا بعبارة المرور التي تختارها.'**
+  String get backupEncryptedExportHint;
+
+  /// No description provided for @backupEncryptedPassphrase.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة مرور التشفير'**
+  String get backupEncryptedPassphrase;
+
+  /// No description provided for @backupEncryptedConfirmPassphrase.
+  ///
+  /// In ar, this message translates to:
+  /// **'تأكيد عبارة المرور'**
+  String get backupEncryptedConfirmPassphrase;
+
+  /// No description provided for @backupPassphraseMismatch.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارتا المرور غير متطابقتين'**
+  String get backupPassphraseMismatch;
+
+  /// No description provided for @backupPassphraseEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة المرور مطلوبة'**
+  String get backupPassphraseEmpty;
+
+  /// No description provided for @backupImportPassphraseTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'هذه النسخة مشفّرة'**
+  String get backupImportPassphraseTitle;
+
+  /// No description provided for @backupImportPassphraseBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'أدخل عبارة مرور التشفير لفكّ النسخة واستعادتها.'**
+  String get backupImportPassphraseBody;
+
+  /// No description provided for @backupPassphraseCancel.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء'**
+  String get backupPassphraseCancel;
+
+  /// No description provided for @backupPassphraseConfirm.
+  ///
+  /// In ar, this message translates to:
+  /// **'استعادة'**
+  String get backupPassphraseConfirm;
+
   /// No description provided for @licensesTitle.
   ///
   /// In ar, this message translates to:
@@ -2533,6 +2593,48 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تشغيل الأذان'**
   String get adhanPlayAction;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تحديث مطلوب'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'النسخة المثبّتة من التطبيق لم تعد مدعومة. حدّث التطبيق للمتابعة — لا يمكن استخدام التطبيق قبل التحديث.'**
+  String get updateRequiredBody;
+
+  /// No description provided for @updateRecommendedTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتوفر تحديث'**
+  String get updateRecommendedTitle;
+
+  /// No description provided for @updateRecommendedBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخة أحدث متاحة. نوصي بالتحديث للاستفادة من التحسينات وإصلاحات المشاكل.'**
+  String get updateRecommendedBody;
+
+  /// No description provided for @updateNow.
+  ///
+  /// In ar, this message translates to:
+  /// **'حدّث الآن'**
+  String get updateNow;
+
+  /// No description provided for @updateLater.
+  ///
+  /// In ar, this message translates to:
+  /// **'لاحقاً'**
+  String get updateLater;
+
+  /// No description provided for @updateUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play.'**
+  String get updateUnavailable;
 }
 
 class _AppLocalizationsDelegate

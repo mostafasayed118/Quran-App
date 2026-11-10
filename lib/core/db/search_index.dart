@@ -10,8 +10,12 @@ const String kSearchIndexVersionKey = 'search_index_version';
 
 /// FTS5 virtual table DDL for Quran text search.
 ///
-/// Uses the `trigram` tokenizer so `MATCH` preserves the existing
-/// substring/contains semantics (the previous `LIKE '%token%'` behavior).
+/// Uses the `trigram` tokenizer so `MATCH` can serve the common queries
+/// without scanning the corpus. A trigram index only stores overlapping
+/// three-character sequences, so it CANNOT represent a token shorter than
+/// three characters: such a token matches nothing and is dropped from the
+/// MATCH expression. The reader therefore falls back to the legacy substring
+/// scan for any query that contains one (see `QuranSearchRepository`).
 /// `rowid` carries the global ayah id (1..6236), keeping joins and ordering
 /// compatible with the rest of the reader/search pipeline.
 const String kAyahSearchDdl = 'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '

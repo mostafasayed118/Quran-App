@@ -1,13 +1,23 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
-import 'quran_search_source.dart';
+import '../domain/quran_search_source.dart';
 
 /// Reads Quran search results from the derived `ayah_search` index.
 class QuranSearchRepository implements QuranSearchSource {
   QuranSearchRepository(this._db);
 
   final AppDatabase _db;
+
+  /// The shortest token the FTS5 `trigram` tokenizer can represent.
+  ///
+  /// A trigram index only stores overlapping three-character sequences, so a
+  /// token shorter than this matches nothing — and is dropped from the MATCH
+  /// expression entirely, which silently degrades an AND across tokens into
+  /// the longer tokens alone (a superset of the truth). The common Arabic
+  /// particles (`لا`, `ال`, `يا`) are all two characters, so a trigram-only
+  /// index silently loses them.
+  static const int _ftsTrigramMinTokenLength = 3;
 
   /// Paging re-runs the same query with the same tokens; the total is a
   /// property of the (static) search index, so it is computed once per query.
@@ -23,13 +33,13 @@ class QuranSearchRepository implements QuranSearchSource {
     if (tokens.isEmpty || !quranSearchQueryUsable(query)) {
       return const QuranSearchPage(hits: [], total: 0, hasMore: false);
     }
-    // FTS5 trigram + MATCH preserves the legacy substring/contains semantics
-    // (LIKE '%token%') while using the FTS index. Tokens are normalized
-    // Arabic/digits ([quranSearchTokens]) so they are safe FTS terms; implicit
-    // space = AND across tokens.
-    final match = _ftsMatch(tokens);
-    final total = await _totalFor(tokens, match);
-    final rows = await _rows(match, afterAyahId, limit + 1);
+    // Every token must appear (AND) and a token matches anywhere inside the
+    // ayah. That is the semantics this file has always promised, so a query
+    // the trigram tokenizer cannot represent falls back to the legacy
+    // substring scan instead of quietly losing the short token.
+    final plan = _planFor(tokens);
+    final total = await _totalFor(tokens, plan);
+    final rows = await _rows(plan, afterAyahId, limit + 1);
     final hasMore = rows.length > limit;
     final hits = [
       for (final row in hasMore ? rows.sublist(0, limit) : rows)
@@ -51,43 +61,98 @@ class QuranSearchRepository implements QuranSearchSource {
   static String _ftsMatch(List<String> tokens) =>
       tokens.map((t) => '"${t.replaceAll('"', '""')}"').join(' ');
 
-  Future<int> _totalFor(List<String> tokens, String match) async {
+  /// How one search is run against the index.
+  ///
+  /// FTS5's `MATCH` needs the real table name (an alias is not accepted:
+  /// "no such column"), so the two shapes cannot share one FROM clause — but
+  /// they do share the ayah/surah join and the ayah-id expression.
+  static _SearchPlan _planFor(List<String> tokens) {
+    if (tokens.every((t) => t.length >= _ftsTrigramMinTokenLength)) {
+      return _SearchPlan(
+        from: 'ayah_search',
+        join: 'JOIN ayahs a ON a.id = ayah_search.rowid '
+            'JOIN surahs u ON u.id = a.surah_id',
+        where: 'ayah_search MATCH ?',
+        ayahIdExpr: 'ayah_search.rowid',
+        variables: [Variable<String>(_ftsMatch(tokens))],
+      );
+    }
+    // The legacy substring scan. It cannot use the FTS index, but it is the
+    // only shape that can match a token shorter than a trigram, and it is
+    // bounded by the same 6,236-row corpus.
+    return _SearchPlan(
+      from: 'ayah_search s',
+      join: 'JOIN ayahs a ON a.id = s.rowid '
+          'JOIN surahs u ON u.id = a.surah_id',
+      where: List.filled(tokens.length, 's.text_norm LIKE ?').join(' AND '),
+      ayahIdExpr: 's.rowid',
+      variables: [for (final token in tokens) Variable<String>('%$token%')],
+    );
+  }
+
+  Future<int> _totalFor(List<String> tokens, _SearchPlan plan) async {
     final signature = tokens.join(' ');
     final cached = _totals.lookup(signature);
     if (cached != null) return cached;
-    final total = await _count(match);
+    final total = await _count(plan);
     _totals.store(signature, total);
     return total;
   }
 
-  Future<int> _count(String match) async {
-    final row = await _db.customSelect(
-      'SELECT COUNT(*) AS c FROM ayah_search WHERE ayah_search MATCH ?',
-      variables: [Variable<String>(match)],
-    ).getSingle();
+  Future<int> _count(_SearchPlan plan) async {
+    final row = await _db
+        .customSelect(
+          'SELECT COUNT(*) AS c FROM ${plan.from} WHERE ${plan.where}',
+          variables: plan.variables,
+        )
+        .getSingle();
     return row.read<int>('c');
   }
 
   Future<List<QueryRow>> _rows(
-    String match,
+    _SearchPlan plan,
     int? afterAyahId,
     int fetch,
   ) async {
-    final sql = StringBuffer('SELECT s.rowid AS ayah_id, a.surah_id, '
-        'a.number_in_surah, u.name_ar, a.text_imlaei '
-        'FROM ayah_search s '
-        'JOIN ayahs a ON a.id = s.rowid '
-        'JOIN surahs u ON u.id = a.surah_id '
-        'WHERE ayah_search MATCH ?');
-    final variables = <Variable<Object>>[Variable<String>(match)];
+    final sql = StringBuffer('SELECT ${plan.ayahIdExpr} AS ayah_id, '
+        'a.surah_id, a.number_in_surah, u.name_ar, a.text_imlaei '
+        'FROM ${plan.from} ${plan.join} '
+        'WHERE ${plan.where}');
+    final variables = <Variable<Object>>[...plan.variables];
     if (afterAyahId != null) {
-      sql.write(' AND s.rowid > ?');
+      sql.write(' AND ${plan.ayahIdExpr} > ?');
       variables.add(Variable<int>(afterAyahId));
     }
-    sql.write(' ORDER BY s.rowid LIMIT ?');
+    sql.write(' ORDER BY ${plan.ayahIdExpr} LIMIT ?');
     variables.add(Variable<int>(fetch));
     return _db.customSelect(sql.toString(), variables: variables).get();
   }
+}
+
+/// One search plan: the tables, the predicate and the bound values.
+class _SearchPlan {
+  const _SearchPlan({
+    required this.from,
+    required this.join,
+    required this.where,
+    required this.ayahIdExpr,
+    required this.variables,
+  });
+
+  /// The table (and alias) the predicate runs against.
+  final String from;
+
+  /// The ayah/surah join, using the same alias as [from].
+  final String join;
+
+  /// The predicate, with its placeholders.
+  final String where;
+
+  /// The expression that yields the global ayah id.
+  final String ayahIdExpr;
+
+  /// The bound values for [where], in order.
+  final List<Variable<Object>> variables;
 }
 
 /// One-entry memo for the search `COUNT(*)` scan.

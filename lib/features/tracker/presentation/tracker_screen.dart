@@ -14,8 +14,8 @@ import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../data/khatma_progress.dart';
-import '../data/prayer_log_repository.dart';
+import '../domain/khatma_progress.dart';
+import '../domain/tracker_day.dart';
 import 'tracker_cubit.dart';
 import 'tracker_state.dart';
 

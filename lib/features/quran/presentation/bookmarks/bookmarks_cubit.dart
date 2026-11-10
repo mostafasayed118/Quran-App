@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -61,7 +61,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     try {
       await _repo.deleteBookmark(ayahId);
     } on Object catch (error, stackTrace) {
-      dev.log('delete bookmark failed',
+      appLog('delete bookmark failed',
           name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
       return false;
     }
@@ -101,7 +101,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       _olderHasMore = page.hasMore;
       _emit();
     } on Object catch (error, stackTrace) {
-      dev.log('bookmark page failed',
+      appLog('bookmark page failed',
           name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       final latest = state;
@@ -203,7 +203,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   }
 
   void _onError(Object error, StackTrace stackTrace) {
-    dev.log('bookmarks stream failed',
+    appLog('bookmarks stream failed',
         name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
     if (isClosed) return;
     emit(const BookmarksState.failed());
@@ -211,9 +211,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   /// Cancels the bookmark subscriptions before closing the cubit.
   @override
-  Future<void> close() {
-    _sub?.cancel();
-    _pageSub?.cancel();
+  Future<void> close() async {
+    await _sub?.cancel();
+    await _pageSub?.cancel();
     return super.close();
   }
 }

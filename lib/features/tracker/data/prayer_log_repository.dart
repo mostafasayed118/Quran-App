@@ -2,70 +2,21 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/utils/date_only.dart';
+import '../domain/tracker_day.dart';
 
 export '../../../core/utils/date_only.dart' show dateOnly;
+export '../domain/tracker_day.dart';
 
-enum PrayerSlot { fajr, dhuhr, asr, maghrib, isha }
-
-/// The prayers marked on one calendar day.
-class TrackerDay {
-  const TrackerDay({
-    required this.day,
-    required this.fajr,
-    required this.dhuhr,
-    required this.asr,
-    required this.maghrib,
-    required this.isha,
-  });
-
-  /// The calendar day this record describes.
-  final DateTime day;
-
-  /// Fajr marked.
-  final bool fajr;
-
-  /// Dhuhr marked.
-  final bool dhuhr;
-
-  /// Asr marked.
-  final bool asr;
-
-  /// Maghrib marked.
-  final bool maghrib;
-
-  /// Isha marked.
-  final bool isha;
-
-  /// True when at least one prayer is marked.
-  bool get anyMarked => fajr || dhuhr || asr || maghrib || isha;
-
-  /// Whether the prayer of [slot] is marked.
-  bool forSlot(PrayerSlot slot) => switch (slot) {
-        PrayerSlot.fajr => fajr,
-        PrayerSlot.dhuhr => dhuhr,
-        PrayerSlot.asr => asr,
-        PrayerSlot.maghrib => maghrib,
-        PrayerSlot.isha => isha,
-      };
-
-  factory TrackerDay.fromRow(PrayerLogData row) => TrackerDay(
-        day: dateOnly(row.day),
-        fajr: row.fajr,
-        dhuhr: row.dhuhr,
-        asr: row.asr,
-        maghrib: row.maghrib,
-        isha: row.isha,
-      );
-
-  factory TrackerDay.empty(DateTime day) => TrackerDay(
-        day: dateOnly(day),
-        fajr: false,
-        dhuhr: false,
-        asr: false,
-        maghrib: false,
-        isha: false,
-      );
-}
+/// The prayers marked on one calendar day as stored in the database; the
+/// pure record lives in [tracker_day.dart].
+TrackerDay trackerDayFromRow(PrayerLogData row) => TrackerDay(
+      day: dateOnly(row.day),
+      fajr: row.fajr,
+      dhuhr: row.dhuhr,
+      asr: row.asr,
+      maghrib: row.maghrib,
+      isha: row.isha,
+    );
 
 /// Reads and toggles the daily prayer log.
 class PrayerLogRepository {
@@ -79,7 +30,7 @@ class PrayerLogRepository {
     final row = await (_db.select(_db.prayerLog)
           ..where((p) => p.day.equals(key)))
         .getSingleOrNull();
-    return row == null ? TrackerDay.empty(key) : TrackerDay.fromRow(row);
+    return row == null ? TrackerDay.empty(key) : trackerDayFromRow(row);
   }
 
   /// True when at least one prayer is marked on [day].
@@ -117,7 +68,7 @@ class PrayerLogRepository {
         await (_db.select(_db.prayerLog)..where((p) => p.day.isIn(days))).get();
     final marked = <String>{
       for (final row in rows)
-        if (TrackerDay.fromRow(row).anyMarked) dayKey(row.day),
+        if (trackerDayFromRow(row).anyMarked) dayKey(row.day),
     };
     return [
       for (final day in days)

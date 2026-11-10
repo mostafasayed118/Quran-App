@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/library_catalog.dart';
+import '../domain/library_pack.dart';
 
 part 'library_state.freezed.dart';
 

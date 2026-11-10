@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/quran_search_source.dart';
+import '../../domain/quran_search_source.dart';
 import 'quran_search_state.dart';
 
 /// Drives the Quran text search: one query, keyset-paged result pages.
@@ -62,7 +62,7 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
         hasMore: page.hasMore,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('quran search failed',
+      appLog('quran search failed',
           name: 'quran_yahdi/search', error: error, stackTrace: stackTrace);
       if (isClosed || generation != _generation) return;
       emit(const QuranSearchState.failed());
@@ -97,7 +97,7 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
         loadingMore: false,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('quran search page failed',
+      appLog('quran search page failed',
           name: 'quran_yahdi/search', error: error, stackTrace: stackTrace);
       if (isClosed || generation != _generation) return;
       final latest = state;

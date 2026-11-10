@@ -52,6 +52,7 @@ class _QuranWorkspaceScreenState extends State<QuranWorkspaceScreen>
 
   @override
   void dispose() {
+    _tabs.removeListener(_onTabChanged);
     _tabs.dispose();
     super.dispose();
   }

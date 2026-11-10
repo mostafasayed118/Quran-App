@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -59,7 +59,7 @@ class AzkarCubit extends Cubit<AzkarState> {
       _searchSeq++;
       emit(_browsing());
     } on Object catch (error, stackTrace) {
-      dev.log('azkar load failed',
+      appLog('azkar load failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const AzkarState.failed());
@@ -110,7 +110,7 @@ class AzkarCubit extends Cubit<AzkarState> {
         searchHasMore: results.hasMore,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('azkar search failed',
+      appLog('azkar search failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _searchSeq) return;
       emit(_browsing(query: query));
@@ -250,7 +250,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       return await source.load();
     } on Object catch (error, stackTrace) {
-      dev.log('azkar saved state read failed',
+      appLog('azkar saved state read failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
       return const AzkarSavedState();
     }
@@ -282,7 +282,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       await source.saveRemaining(collectionId, remaining, day);
     } on Object catch (error, stackTrace) {
-      dev.log('azkar counter write failed',
+      appLog('azkar counter write failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
     }
   }
@@ -293,7 +293,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       await source.saveFavorites(favorites);
     } on Object catch (error, stackTrace) {
-      dev.log('azkar favorites write failed',
+      appLog('azkar favorites write failed',
           name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
     }
   }

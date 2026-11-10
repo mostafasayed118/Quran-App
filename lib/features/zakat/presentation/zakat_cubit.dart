@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../data/zakat_calculator.dart';
+import '../domain/zakat_calculator.dart';
 import 'zakat_state.dart';
 
 /// The zakat screen: the nisab inputs and the computed result.

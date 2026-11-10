@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -52,7 +52,7 @@ class LibraryCubit extends Cubit<LibraryState> {
       final rows = await _downloader.installedPacks();
       installed = {for (final row in rows) row.packId};
     } on Object catch (error, stackTrace) {
-      dev.log('library load failed',
+      appLog('library load failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const LibraryState.failed());
@@ -100,7 +100,7 @@ class LibraryCubit extends Cubit<LibraryState> {
       ));
       onInstalled(pack.id);
     } on Object catch (error, stackTrace) {
-      dev.log('library install failed',
+      appLog('library install failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       final ready = state;
@@ -129,7 +129,7 @@ class LibraryCubit extends Cubit<LibraryState> {
     try {
       await _downloader.uninstall(packId);
     } on Object catch (error, stackTrace) {
-      dev.log('library uninstall failed',
+      appLog('library uninstall failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       final ready = state;
@@ -158,7 +158,7 @@ class LibraryCubit extends Cubit<LibraryState> {
       if (pack == null) return;
       await install(pack);
     } on Object catch (error, stackTrace) {
-      dev.log('library retry failed',
+      appLog('library retry failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
   }

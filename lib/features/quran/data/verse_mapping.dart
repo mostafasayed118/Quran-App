@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
 import '../domain/surah_summary.dart';
@@ -11,6 +11,9 @@ import '../domain/verse.dart';
 /// to entities here instead.
 extension AyahRowMapping on Ayah {
   /// Maps this row to the reader-facing [Verse] model.
+  ///
+  /// The ayah-end medallion is stripped here, once per row, so the reader
+  /// never does it inside a rebuild.
   Verse toVerse() => Verse(
         id: id,
         surahId: surahId,
@@ -20,6 +23,7 @@ extension AyahRowMapping on Ayah {
         textUthmani: textUthmani,
         textImlaei: textImlaei,
         sajda: sajda,
+        displayUthmani: stripAyahEndMarker(textUthmani),
       );
 }
 
@@ -43,7 +47,7 @@ extension SurahRowMapping on Surah {
 String _normalizeRevelationType(String raw) {
   final value = raw.toLowerCase().trim();
   if (value == 'makkah' || value == 'madinah') return value;
-  dev.log(
+  appLog(
     'unknown revelation type',
     name: 'quran_yahdi/quran',
     error: raw,

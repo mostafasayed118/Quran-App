@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:workmanager/workmanager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
@@ -12,6 +13,10 @@ import 'app/di/injector.dart';
 import 'app/onboarding_gate.dart';
 import 'app/reminder_background_task.dart';
 import 'app/router.dart';
+import 'app/version_gate.dart';
+import 'core/domain/version_ack_store.dart';
+import 'core/domain/version_policy.dart';
+import 'core/domain/version_policy_source.dart';
 import 'core/domain/adhan_player.dart';
 import 'core/l10n/app_locale_controller.dart';
 import 'core/theme/app_theme_controller.dart';
@@ -54,6 +59,10 @@ Future<void> main() async {
   // answer is known — and a launch target (reminder tap, deep link) is
   // remembered and restored after the flow.
   getIt<OnboardingGate>();
+  // The version gate attaches behind the first frame: it needs the installed
+  // version from PackageInfo. Fail-open — if this never lands, the gate never
+  // blocks a route.
+  unawaited(_attachVersionGate());
   // Same for the language: the stored choice is read behind the first frame
   // and the root rebuilds when it lands (Arabic until then).
   unawaited(getIt<AppLocaleController>().load());
@@ -130,7 +139,7 @@ Future<void> _registerBackgroundReminders() async {
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
     );
   } on Object catch (error, stackTrace) {
-    dev.log(
+    appLog(
       'background reminder registration failed',
       name: 'quran_yahdi/boot',
       error: error.runtimeType,
@@ -150,7 +159,7 @@ Future<void> _warmReciterCatalog() async {
   try {
     await getIt<ReciterRepository>().ensureCatalog();
   } on Object catch (error, stackTrace) {
-    dev.log('reciter catalog warm-up failed',
+    appLog('reciter catalog warm-up failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);
@@ -177,7 +186,7 @@ Future<void> _openReminderLaunchTarget() async {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => AppRouter.router.go(route));
   } on Object catch (error, stackTrace) {
-    dev.log('reminder launch routing failed',
+    appLog('reminder launch routing failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);
@@ -193,7 +202,7 @@ Future<void> _playAdhanLaunchTarget() async {
     if (trackId == null) return;
     await getIt<AdhanPlayer>().play(trackId);
   } on Object catch (error, stackTrace) {
-    dev.log('adhan launch target failed',
+    appLog('adhan launch target failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);
@@ -209,7 +218,7 @@ Future<void> _requestBootNotificationGrace() async {
     await getIt<NotificationsBinding>()
         .requestBootPermission(azkarEnabled: azkarEnabled);
   } on Object catch (error, stackTrace) {
-    dev.log('boot notification grace failed',
+    appLog('boot notification grace failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);
@@ -228,10 +237,42 @@ Future<void> _openDeepLinkLaunchTarget() async {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => AppRouter.router.go(route));
   } on Object catch (error, stackTrace) {
-    dev.log('deep link launch routing failed',
+    appLog('deep link launch routing failed',
         name: 'quran_yahdi/boot',
         error: error.runtimeType,
         stackTrace: stackTrace);
+  }
+}
+
+/// Resolves the installed version and attaches the version gate.
+///
+/// When (and only when) the policy read reports "update recommended" — the
+/// install is supported but behind the latest — and the user has not already
+/// dismissed this recommendation, the optional-update prompt is pushed once
+/// after the first frame settles. A mandatory policy never pushes: the
+/// router redirects everything to `/update` on its own.
+Future<void> _attachVersionGate() async {
+  try {
+    final info = await PackageInfo.fromPlatform();
+    final installed = AppVersion.parse('${info.version}+${info.buildNumber}') ??
+        AppVersion.parse(info.version);
+    final gate = getIt<VersionGate>();
+    gate.attach(
+      source: getIt<VersionPolicySource>(),
+      ackStore: getIt<VersionAckStore>(),
+      installed: installed ?? const AppVersion(1, 0, 0),
+    );
+    await gate.settled;
+    if (!gate.shouldShowRecommendedPrompt) return;
+    await WidgetsBinding.instance.endOfFrame;
+    await AppRouter.router.push(AppRoutes.update);
+  } on Object catch (error, stackTrace) {
+    appLog(
+      'version gate attach failed',
+      name: 'quran_yahdi/version-gate',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }
 

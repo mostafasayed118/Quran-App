@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../data/city_repository.dart';
-import '../../data/prayer_time_service.dart';
+import '../../../../core/domain/city.dart';
+import '../../../../core/domain/prayer_times.dart';
 
 part 'prayer_times_state.freezed.dart';
 

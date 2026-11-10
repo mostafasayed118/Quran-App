@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show ThemeMode;
@@ -37,7 +37,7 @@ class AppThemeController extends ChangeNotifier {
     try {
       _mode = await _source.load();
     } on Object catch (error, stackTrace) {
-      dev.log('app theme read failed',
+      appLog('app theme read failed',
           name: 'quran_yahdi/theme', error: error, stackTrace: stackTrace);
       _mode = AppThemeMode.system;
     }
@@ -53,7 +53,7 @@ class AppThemeController extends ChangeNotifier {
     try {
       await _source.save(mode);
     } on Object catch (error, stackTrace) {
-      dev.log('app theme write failed',
+      appLog('app theme write failed',
           name: 'quran_yahdi/theme', error: error, stackTrace: stackTrace);
     }
   }

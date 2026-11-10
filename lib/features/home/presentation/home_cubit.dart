@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
@@ -88,7 +88,7 @@ class HomeCubit extends Cubit<HomeState> {
       await _syncWidget(nextPrayerCard);
       _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
-      dev.log('home load failed',
+      appLog('home load failed',
           name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
       if (isClosed || seq != _reloadSeq) return;
       emit(const HomeState.failed());
@@ -137,7 +137,7 @@ class HomeCubit extends Cubit<HomeState> {
         city: card.cityName,
       );
     } on Object catch (error, stackTrace) {
-      dev.log('home widget sync failed',
+      appLog('home widget sync failed',
           name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
     }
   }

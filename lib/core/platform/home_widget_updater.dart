@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:home_widget/home_widget.dart';
 
@@ -43,7 +43,7 @@ class PlatformHomeWidgetUpdater implements HomeWidgetUpdater {
       await HomeWidget.updateWidget(qualifiedAndroidName: providerClass);
     } on Object catch (error, stackTrace) {
       // A widget refresh must never break the app or the background plan.
-      dev.log('home widget update failed',
+      appLog('home widget update failed',
           name: 'quran_yahdi/widget', error: error, stackTrace: stackTrace);
     }
   }

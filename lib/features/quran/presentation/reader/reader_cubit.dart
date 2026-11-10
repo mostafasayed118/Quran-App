@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/wird_progress_sink.dart';
@@ -51,7 +51,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     if (_bookmarksSub != null) return;
     _bookmarksSub = _ayahRepository.watchBookmarkedIds().listen(
           _onBookmarks,
-          onError: (Object error, StackTrace stackTrace) => dev.log(
+          onError: (Object error, StackTrace stackTrace) => appLog(
             'bookmarks stream error',
             name: 'quran_yahdi/reader',
             error: error,
@@ -82,7 +82,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       ).wait;
       if (ayahs.isEmpty) {
         if (isClosed) return;
-        dev.log('surah $_surahId has no readable ayahs',
+        appLog('surah $_surahId has no readable ayahs',
             name: 'quran_yahdi/reader');
         emit(ReaderState.failed(emptySurahId: _surahId));
         return;
@@ -115,7 +115,7 @@ class ReaderCubit extends Cubit<ReaderState> {
         lineHeight: lineHeight,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('reader load failed',
+      appLog('reader load failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const ReaderState.failed());
@@ -128,7 +128,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await _lastReadRepository.saveAyahId(ayahId);
     } on Object catch (error, stackTrace) {
-      dev.log('last-read save failed',
+      appLog('last-read save failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
@@ -176,7 +176,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       return await _settings?.loadFontScale() ?? 1.0;
     } on Object catch (error, stackTrace) {
-      dev.log('reader font scale read failed',
+      appLog('reader font scale read failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       return 1.0;
     }
@@ -193,7 +193,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await _settings?.saveFontScale(safe);
     } on Object catch (error, stackTrace) {
-      dev.log('reader font scale write failed',
+      appLog('reader font scale write failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
@@ -203,7 +203,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       return await _layout?.loadLineHeight() ??
           ReaderLayoutSource.defaultLineHeight;
     } on Object catch (error, stackTrace) {
-      dev.log('reader line height read failed',
+      appLog('reader line height read failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       return ReaderLayoutSource.defaultLineHeight;
     }
@@ -224,7 +224,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await _layout?.saveLineHeight(safe);
     } on Object catch (error, stackTrace) {
-      dev.log('reader line height write failed',
+      appLog('reader line height write failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
@@ -237,7 +237,7 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       return await source.anchorForPage(page);
     } on Object catch (error, stackTrace) {
-      dev.log('page anchor read failed',
+      appLog('page anchor read failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       return null;
     }
@@ -252,7 +252,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       await _ayahRepository.toggleBookmark(ayahId);
       return true;
     } on Object catch (error, stackTrace) {
-      dev.log('toggle bookmark failed',
+      appLog('toggle bookmark failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
       return false;
     }
@@ -274,15 +274,15 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await sink.advanceTo(pageAyahs.first.id);
     } on Object catch (error, stackTrace) {
-      dev.log('wird progress advance failed',
+      appLog('wird progress advance failed',
           name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
     }
   }
 
   /// Cancels the bookmark subscription before closing the cubit.
   @override
-  Future<void> close() {
-    _bookmarksSub?.cancel();
+  Future<void> close() async {
+    await _bookmarksSub?.cancel();
     return super.close();
   }
 }

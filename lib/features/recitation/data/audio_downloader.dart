@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import '../../../core/db/app_database.dart';
 import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
+import '../../../core/utils/trusted_redirect.dart';
 import 'download_status.dart';
 import 'reciter_repository.dart';
 
@@ -96,8 +97,6 @@ class AudioDownloader {
   /// transport follow the CDN wherever it likes.
   static const int maxRedirectHops = 3;
 
-  static const Set<int> _redirectStatuses = {301, 302, 303, 307, 308};
-
   /// Guard against a lying/compromised host streaming unbounded bytes:
   /// up to 2x the sent content-length plus 64 KiB slack, never above the
   /// [maxAcceptedBytesCeiling] absolute ceiling (a surah mp3 is ~1-2 MB) —
@@ -169,68 +168,33 @@ class AudioDownloader {
     CancelToken? cancelToken,
     int rangeFrom = 0,
   }) async {
-    var current = start;
-    for (var hop = 0; hop <= maxRedirectHops; hop++) {
-      final res = await _dio.get<ResponseBody>(
-        current.toString(),
-        options: Options(
-          responseType: ResponseType.stream,
-          // Dio must hand every 3xx back instead of following it itself.
-          followRedirects: false,
-          validateStatus: _acceptSuccessOrRedirect,
-          // Re-sent on every hop on purpose: a CDN redirect must not silently
-          // turn a resume into a full download.
-          headers: rangeFrom > 0
-              ? <String, Object>{HttpHeaders.rangeHeader: 'bytes=$rangeFrom-'}
-              : null,
-        ),
-        cancelToken: cancelToken,
-      );
-      final status = res.statusCode ?? 0;
-      if (!_redirectStatuses.contains(status)) return res;
-      final location = res.headers.value('location')?.trim();
-      await _discardRedirectBody(res.data);
-      if (location == null || location.isEmpty) {
-        throw DownloadFailure.permanent(
-            'audio redirect $status is missing a Location header');
-      }
-      final next = current.resolve(location);
-      if (next.scheme != 'http' && next.scheme != 'https') {
-        throw DownloadFailure.permanent(
-            'audio redirect to unsupported scheme "${next.scheme}"');
-      }
-      // Reuses the catalog allowlist (https + mp3quran.net) — one rule, one
-      // place: a host that cannot be a reciter server cannot serve bytes.
-      if (!isTrustedAudioServer(next.toString())) {
-        throw DownloadFailure.permanent(
-            'audio redirect to untrusted host ${next.host}');
-      }
-      current = next;
-    }
-    throw DownloadFailure.permanent(
-        'audio redirect chain exceeded $maxRedirectHops hops');
-  }
-
-  /// 2xx streams as before; 3xx must reach the hop guard rather than being
-  /// collapsed into a [DioException] before its Location can be inspected.
-  static bool _acceptSuccessOrRedirect(int? status) =>
-      status != null &&
-      ((status >= 200 && status < 300) || _redirectStatuses.contains(status));
-
-  /// Releases a redirect response body so its socket is not left half-read.
-  /// Bounded by the receive timeout; a redirect body is normally empty.
-  static Future<void> _discardRedirectBody(ResponseBody? body) async {
-    if (body == null) return;
-    try {
-      await body.stream.drain<void>();
-    } on Object catch (error, stackTrace) {
-      // A broken redirect body cannot change the guard's verdict; log for
-      // correlation only (best-effort cleanup).
-      dev.log('discard redirect body failed',
-          name: 'quran_yahdi/recitation',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
-    }
+    return followTrustedRedirects(
+      dio: _dio,
+      start: start,
+      maxHops: maxRedirectHops,
+      devLogName: 'quran_yahdi/recitation',
+      cancelToken: cancelToken,
+      // Re-sent on every hop on purpose: a CDN redirect must not silently
+      // turn a resume into a full download.
+      headers: rangeFrom > 0
+          ? <String, Object>{HttpHeaders.rangeHeader: 'bytes=$rangeFrom-'}
+          : null,
+      resolveNext: (current, location) {
+        final next = current.resolve(location);
+        if (next.scheme != 'http' && next.scheme != 'https') {
+          throw DownloadFailure.permanent(
+              'audio redirect to unsupported scheme "${next.scheme}"');
+        }
+        // Reuses the catalog allowlist (https + mp3quran.net) — one rule, one
+        // place: a host that cannot be a reciter server cannot serve bytes.
+        if (!isTrustedAudioServer(next.toString())) {
+          throw DownloadFailure.permanent(
+              'audio redirect to untrusted host ${next.host}');
+        }
+        return next;
+      },
+      failure: (message) => DownloadFailure.permanent('audio $message'),
+    );
   }
 
   /// Reconciles rows and dot-part files left by a killed process.
@@ -282,7 +246,7 @@ class AudioDownloader {
           // The part stays: the next attempt resumes from it.
         }
       } on Object catch (error, stackTrace) {
-        dev.log('download reconcile row failed',
+        appLog('download reconcile row failed',
             name: 'quran_yahdi/downloads',
             error: error,
             stackTrace: stackTrace);
@@ -299,7 +263,7 @@ class AudioDownloader {
       try {
         entity.deleteSync();
       } on Object catch (error, stackTrace) {
-        dev.log('download part cleanup failed',
+        appLog('download part cleanup failed',
             name: 'quran_yahdi/downloads',
             error: error,
             stackTrace: stackTrace);
@@ -504,7 +468,7 @@ class AudioDownloader {
       } on Object catch (error) {
         // The recovery rename failed; the ORIGINAL promote failure is the
         // one worth reporting, but keep a trace of the recovery attempt.
-        dev.log(
+        appLog(
           'download promote recovery failed',
           name: 'quran_yahdi/downloads',
           error: error.runtimeType,
@@ -516,26 +480,25 @@ class AudioDownloader {
     return swapped;
   }
 
+  /// The completed download row for [rowId]/[surahNumber], or null.
+  Future<Download?> _doneRow(String rowId, int surahNumber) =>
+      (_db.select(_db.downloads)
+            ..where((d) =>
+                d.reciterId.equals(rowId) &
+                d.surahId.equals(surahNumber) &
+                d.status.equals(DownloadStatus.done.name)))
+          .getSingleOrNull();
+
   /// True when the surah finished downloading for that reciter.
   Future<bool> isDownloaded(String rowId, int surahNumber) async {
-    final row = await (_db.select(_db.downloads)
-          ..where((d) =>
-              d.reciterId.equals(rowId) &
-              d.surahId.equals(surahNumber) &
-              d.status.equals(DownloadStatus.done.name)))
-        .getSingleOrNull();
+    final row = await _doneRow(rowId, surahNumber);
     if (row == null) return false;
     return File(row.path).exists();
   }
 
   /// Path of the downloaded file, or null when it is not downloaded.
   Future<String?> downloadedPath(String rowId, int surahNumber) async {
-    final row = await (_db.select(_db.downloads)
-          ..where((d) =>
-              d.reciterId.equals(rowId) &
-              d.surahId.equals(surahNumber) &
-              d.status.equals(DownloadStatus.done.name)))
-        .getSingleOrNull();
+    final row = await _doneRow(rowId, surahNumber);
     if (row == null) return null;
     return await File(row.path).exists() ? row.path : null;
   }

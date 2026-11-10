@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,7 +14,7 @@ import 'playback_state.dart';
 
 // The row-typed entry point lives in its own file so this surface never
 // imports a drift row; it is re-exported for the frozen recitation doubles.
-export 'playback_row_entry.dart';
+export '../../data/playback_row_entry.dart';
 
 /// The player: the current track, its position and the mini player's state.
 class PlaybackCubit extends Cubit<PlaybackState> {
@@ -122,7 +122,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     } on Object catch (error, stackTrace) {
       // A registry read failure is not a playback failure: fall back to the
       // remote URL instead of leaving the state stuck in loading.
-      dev.log('download lookup failed',
+      appLog('download lookup failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       downloaded = null;
     }
@@ -154,7 +154,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         sleepTimer: _sleepTimerDuration,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('playback load failed',
+      appLog('playback load failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
@@ -178,7 +178,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       reciter = await _reciters.defaultReciter();
     } on Object catch (error, stackTrace) {
-      dev.log('reciter lookup failed',
+      appLog('reciter lookup failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
@@ -210,7 +210,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await tunable.setSpeed(safe);
       } on Object catch (error, stackTrace) {
-        dev.log('speed change failed',
+        appLog('speed change failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
     }
@@ -233,7 +233,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
       } on Object catch (error, stackTrace) {
-        dev.log('repeat change failed',
+        appLog('repeat change failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
     }
@@ -270,7 +270,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await tunable.setSpeed(_speed);
         await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
       } on Object catch (error, stackTrace) {
-        dev.log('playback tuning failed',
+        appLog('playback tuning failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
     }
@@ -333,7 +333,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       } on Object catch (error, stackTrace) {
         // The timer still clears; the audio may keep playing and the user can
         // pause it manually.
-        dev.log('sleep timer pause failed',
+        appLog('sleep timer pause failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
       if (isClosed) return;
@@ -399,7 +399,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
-      dev.log('playback stop failed',
+      appLog('playback stop failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
     }
   }
@@ -414,7 +414,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await seekable.seek(to);
       } on Object catch (error, stackTrace) {
-        dev.log('seek failed',
+        appLog('seek failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
     }
@@ -432,7 +432,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await _service.pause();
       } on Object catch (error, stackTrace) {
         // Keep the playing state: the audio is still audible.
-        dev.log('pause failed',
+        appLog('pause failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
         return;
       }
@@ -452,7 +452,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await _service.resume();
       } on Object catch (error, stackTrace) {
         // Keep the paused state: resume did not take effect.
-        dev.log('resume failed',
+        appLog('resume failed',
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
         return;
       }
@@ -483,7 +483,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
-      dev.log('stop failed',
+      appLog('stop failed',
           name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
     }
     // A newer play (or stop) superseded this one: its streams must stay bound.
@@ -512,7 +512,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   void _onStreamError(Object error, StackTrace stackTrace) {
-    dev.log('playback stream error',
+    appLog('playback stream error',
         name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
   }
 

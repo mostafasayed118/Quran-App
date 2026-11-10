@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,7 +26,7 @@ class AsmaCubit extends Cubit<AsmaState> {
       if (isClosed) return;
       emit(AsmaState.ready(names: names));
     } on Object catch (error, stackTrace) {
-      dev.log('asma load failed',
+      appLog('asma load failed',
           name: 'quran_yahdi/asma', error: error, stackTrace: stackTrace);
       if (isClosed) return;
       emit(const AsmaState.failed());

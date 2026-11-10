@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -84,7 +84,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     try {
       await downloader.reconcileOnStart();
     } on Object catch (error, stackTrace) {
-      dev.log('download reconciliation failed',
+      appLog('download reconciliation failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
     }
   }
@@ -114,7 +114,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     } on Object catch (error, stackTrace) {
       // Soft failure: the caller's screen keeps rendering; done rows are
       // just missing until the next refresh.
-      dev.log('downloads refresh failed',
+      appLog('downloads refresh failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
     }
   }
@@ -181,7 +181,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     try {
       await _downloader.removeDownload(rowId, surahNumber);
     } on Object catch (error, stackTrace) {
-      dev.log('download remove failed',
+      appLog('download remove failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
       return false;
     }
@@ -313,7 +313,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
           if (token.isCancelled) {
             await _dropCancelled(rowId, surahNumber, key);
           } else {
-            dev.log('surah download failed',
+            appLog('surah download failed',
                 name: 'quran_yahdi/downloads',
                 error: error,
                 stackTrace: stackTrace);
@@ -356,7 +356,7 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     try {
       await _downloader.removeDownload(rowId, surahNumber);
     } on Object catch (error, stackTrace) {
-      dev.log('cancelled download cleanup failed',
+      appLog('cancelled download cleanup failed',
           name: 'quran_yahdi/downloads', error: error, stackTrace: stackTrace);
     }
     _removeEntry(key);

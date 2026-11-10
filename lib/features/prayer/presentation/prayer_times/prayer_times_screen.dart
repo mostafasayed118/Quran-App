@@ -97,7 +97,10 @@ class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _startTicker();
+    // A screen can mount while the app is already backgrounded; the binding's
+    // current state decides, not the fact that initState ran.
+    final state = WidgetsBinding.instance.lifecycleState;
+    if (state == null || state == AppLifecycleState.resumed) _startTicker();
   }
 
   void _startTicker() {

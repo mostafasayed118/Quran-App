@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/adhan_player.dart';
@@ -137,7 +137,7 @@ class AdhanPickerCubit extends Cubit<AdhanPickerState> {
   }
 
   void _log(String operation, Object error, StackTrace stackTrace) {
-    dev.log(
+    appLog(
       'adhan picker $operation failed',
       name: 'quran_yahdi/adhan',
       error: error.runtimeType,

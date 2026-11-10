@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:ui' show Locale;
 
 import 'package:flutter/foundation.dart';
@@ -40,7 +40,7 @@ class AppLocaleController extends ChangeNotifier {
     try {
       _language = await _source.load();
     } on Object catch (error, stackTrace) {
-      dev.log('app locale read failed',
+      appLog('app locale read failed',
           name: 'quran_yahdi/locale', error: error, stackTrace: stackTrace);
       _language = AppLanguage.arabic;
     }
@@ -58,7 +58,7 @@ class AppLocaleController extends ChangeNotifier {
     try {
       await _source.save(language);
     } on Object catch (error, stackTrace) {
-      dev.log('app locale write failed',
+      appLog('app locale write failed',
           name: 'quran_yahdi/locale', error: error, stackTrace: stackTrace);
     }
   }

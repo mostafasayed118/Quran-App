@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
@@ -12,6 +12,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/utils/download_limits.dart';
 import '../../../core/utils/progress_throttle.dart';
+import '../../../core/utils/trusted_redirect.dart';
 import 'hadith_store.dart';
 import 'library_catalog.dart';
 import 'pack_reader.dart';
@@ -167,7 +168,7 @@ class PackDownloader {
         // without its integrity hashes.
         final gap = catalogIntegrityGap(pack);
         if (gap != null) {
-          dev.log(
+          appLog(
               'pack "${pack.id}" is not integrity-pinned ($gap): the install is validated by shape only',
               name: 'quran_yahdi/library');
         }
@@ -317,56 +318,21 @@ class PackDownloader {
         '${start.scheme}://${start.host}',
       );
     }
-    var current = start;
-    for (var hop = 0; hop <= kMaxPackRedirectHops; hop++) {
-      final res = await _dio.get<ResponseBody>(
-        current.toString(),
-        options: Options(
-          responseType: ResponseType.stream,
-          // Dio must hand every 3xx back instead of following it itself.
-          followRedirects: false,
-          validateStatus: _acceptSuccessOrRedirect,
-        ),
-      );
-      final status = res.statusCode ?? 0;
-      if (!_redirectStatuses.contains(status)) return res;
-      final location = res.headers.value('location')?.trim();
-      await _discardRedirectBody(res.data);
-      if (location == null || location.isEmpty) {
-        throw PackFailure('pack redirect $status is missing a Location header');
-      }
-      try {
-        current = resolveTrustedPackRedirect(current, location);
-      } on PackRedirectException catch (error) {
-        throw PackFailure(error.message);
-      }
-    }
-    throw PackFailure(
-        'pack redirect chain exceeded $kMaxPackRedirectHops hops');
+    return followTrustedRedirects(
+      dio: _dio,
+      start: start,
+      maxHops: kMaxPackRedirectHops,
+      devLogName: 'quran_yahdi/library',
+      resolveNext: (current, location) {
+        try {
+          return resolveTrustedPackRedirect(current, location);
+        } on PackRedirectException catch (error) {
+          throw PackFailure(error.message);
+        }
+      },
+      failure: (message) => PackFailure('pack $message'),
+    );
   }
-
-  /// 2xx streams as before; 3xx must reach the hop guard rather than being
-  /// collapsed into a [DioException] before its Location can be inspected.
-  static bool _acceptSuccessOrRedirect(int? status) =>
-      status != null &&
-      ((status >= 200 && status < 300) || _redirectStatuses.contains(status));
-
-  /// Releases a redirect response body so its socket is not left half-read.
-  static Future<void> _discardRedirectBody(ResponseBody? body) async {
-    if (body == null) return;
-    try {
-      await body.stream.drain<void>();
-    } on Object catch (error, stackTrace) {
-      // A broken redirect body cannot change the guard's verdict; log for
-      // correlation only (best-effort cleanup).
-      dev.log('discard redirect body failed',
-          name: 'quran_yahdi/library',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
-    }
-  }
-
-  static const Set<int> _redirectStatuses = {301, 302, 303, 307, 308};
 
   /// Streams one surah body, enforcing the pack-wide size cap.
   ///
@@ -520,7 +486,7 @@ class PackDownloader {
     try {
       await _hadithStore.importProjection(pack.id, projection);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith pack import failed',
+      appLog('hadith pack import failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
   }
@@ -569,7 +535,7 @@ class PackDownloader {
     try {
       await _hadithStore.deletePack(packId);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith pack index cleanup failed',
+      appLog('hadith pack index cleanup failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
     }
     final finalFile = await _store.packFile(packId);
@@ -630,7 +596,7 @@ class PackDownloader {
     try {
       return await _hadithStore.hadithPage(packId, offset, limit);
     } on Object catch (error, stackTrace) {
-      dev.log('hadith DB page failed; reading the pack directly',
+      appLog('hadith DB page failed; reading the pack directly',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
       return _reader.hadithPage(packId, offset, limit);
     }

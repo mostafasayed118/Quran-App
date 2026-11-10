@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/adhan_player.dart';
@@ -103,7 +103,7 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
         title: track.nameAr,
       );
     } on Object catch (error, stackTrace) {
-      dev.log(
+      appLog(
         'adhan ${preview ? 'preview' : 'play'} failed',
         name: 'quran_yahdi/adhan',
         error: error.runtimeType,
@@ -124,7 +124,7 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
     if (!_states.isClosed) _states.add(next);
   }
 
-  void _log(String message) => dev.log(
+  void _log(String message) => appLog(
         message,
         name: 'quran_yahdi/adhan',
       );

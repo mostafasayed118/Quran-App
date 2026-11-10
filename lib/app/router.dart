@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -66,7 +67,7 @@ import '../features/quran/data/page_anchor_source.dart';
 import '../features/quran/data/reader_layout_source.dart';
 import '../features/quran/data/reader_settings_source.dart';
 import '../features/quran/data/last_read_repository.dart';
-import '../features/quran/data/quran_search_source.dart';
+import '../features/quran/domain/quran_search_source.dart';
 import '../features/quran/data/surah_source.dart';
 import '../features/quran/data/uthmani_text_source.dart';
 import '../features/quran/presentation/bookmarks/bookmark_meta_cubit.dart';
@@ -118,8 +119,12 @@ import '../features/qibla/data/qibla_service.dart';
 import '../features/qibla/presentation/qibla_cubit.dart';
 import '../features/qibla/presentation/qibla_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../core/domain/version_policy.dart';
+import '../features/update/presentation/update_gate_screen.dart';
 import 'app_shell.dart';
 import 'onboarding_gate.dart';
+import '../core/domain/store_listing.dart';
+import 'version_gate.dart';
 import 'di/injector.dart';
 import '../core/routing/route_cubit_scope.dart';
 import 'route_observer.dart';
@@ -129,16 +134,27 @@ abstract final class AppRouter {
   /// onboarding flow (it is the app's `OnboardingStatusSource`).
   static final OnboardingGate onboardingGate = OnboardingGate();
 
+  /// The update gate (fail-open). The redirect needs the answer synchronously,
+  /// so the verdict is cached here and the router re-evaluates when it lands.
+  static final VersionGate versionGate = VersionGate();
+
   /// The redirect for [location]; null keeps the requested route.
   ///
-  /// A thin seam so the decision is testable without booting the router.
-  static String? redirectFor(String location) =>
-      onboardingGate.decide(location);
+  /// Onboarding decides first (a first-run user must reach the flow), then the
+  /// update gate (an unsupported install must not run the app). A valid
+  /// mandatory policy wins over everything; an absent/invalid one blocks
+  /// nothing.
+  static String? redirectFor(String location) {
+    final onboarding = onboardingGate.decide(location);
+    if (onboarding != null) return onboarding;
+    return versionGate.decide(location);
+  }
 
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.home,
     observers: [appRouteObserver],
-    refreshListenable: onboardingGate,
+    refreshListenable:
+        Listenable.merge(<Listenable>[onboardingGate, versionGate]),
     redirect: (_, state) => redirectFor(state.matchedLocation),
     errorBuilder: (context, state) {
       final loc = AppLocalizations.of(context);
@@ -241,6 +257,24 @@ abstract final class AppRouter {
 
   static List<RouteBase> _postShellRoutes() {
     return [
+      GoRoute(
+        path: AppRoutes.update,
+        // The blocking surface for an unsupported install, or the dismissible
+        // optional-update prompt. The mode is read from the gate at build time;
+        // the screen receives plain callbacks and never imports the DI root.
+        builder: (_, __) {
+          final mandatory =
+              AppRouter.versionGate.verdict == VersionVerdict.updateRequired;
+          return UpdateGateScreen(
+            mandatory: mandatory,
+            onOpenStore: () => getIt<StoreListingGateway>().open(),
+            // Only the recommended (dismissible) surface gets the ack callback.
+            onLater: mandatory
+                ? null
+                : () => AppRouter.versionGate.acknowledgeRecommended(),
+          );
+        },
+      ),
       GoRoute(
         path: AppRoutes.quranSearch,
         builder: (context, state) => BlocProvider<QuranSearchCubit>(

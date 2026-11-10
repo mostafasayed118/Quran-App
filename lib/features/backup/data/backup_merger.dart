@@ -1,4 +1,8 @@
 import '../../../core/utils/date_only.dart';
+// Compat: existing importers of this file keep resolving [BackupSummary],
+// which now lives in domain/ so presentation stays off the data layer.
+export '../domain/backup_models.dart' show BackupSummary;
+import '../domain/backup_models.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
 
@@ -233,51 +237,5 @@ SettingsMerge mergeSettings({
   return SettingsMerge(Map<String, String>.unmodifiable(toWrite));
 }
 
-/// Per-entity summary of a plan (preview counts and apply outcome).
-class BackupSummary {
-  /// What a backup import changed, in numbers.
-  const BackupSummary({
-    required this.newBookmarks,
-    required this.mergedPrayerDays,
-    required this.planReplaced,
-    required this.tasbihCountDelta,
-    required this.tasbihChanged,
-    required this.lastReadChanged,
-    required this.settingsKeysApplied,
-    this.rejectedEntries = 0,
-  });
-
-  /// New bookmarks a merge would add (existing rows stay).
-  final int newBookmarks;
-
-  /// Worship days a merge would update (OR-flips only).
-  final int mergedPrayerDays;
-
-  /// Whether the khatma/wird plan row would be replaced by a newer one.
-  final bool planReplaced;
-
-  /// Tasbih count gain from the max-merge.
-  final int tasbihCountDelta;
-
-  /// Whether any tasbih field (count or target) would change.
-  final bool tasbihChanged;
-
-  /// Whether the last-read pointer would move.
-  final bool lastReadChanged;
-
-  /// Whitelisted settings keys that would be (re)written.
-  final int settingsKeysApplied;
-
-  /// Imported bookmark/khatma rows rejected by the id/range guards.
-  final int rejectedEntries;
-
-  /// True when the import changed nothing at all.
-  bool get isEmpty =>
-      newBookmarks == 0 &&
-      mergedPrayerDays == 0 &&
-      !planReplaced &&
-      !tasbihChanged &&
-      !lastReadChanged &&
-      settingsKeysApplied == 0 &&
-      rejectedEntries == 0;
-}
+/// Per-entity summary of a plan (preview counts and apply outcome) lives in
+/// [backup_models.dart]; this file re-exports it for existing importers.

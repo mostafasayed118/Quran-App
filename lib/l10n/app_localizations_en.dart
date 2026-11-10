@@ -863,6 +863,38 @@ class AppLocalizationsEn extends AppLocalizations {
       'The exported file isn\'t encrypted — anyone who gets it can read your bookmarks, worship log and settings. Keep it somewhere safe.';
 
   @override
+  String get backupExportEncrypted => 'Export encrypted';
+
+  @override
+  String get backupEncryptedExportHint =>
+      'The file can only be opened later with the passphrase you choose.';
+
+  @override
+  String get backupEncryptedPassphrase => 'Encryption passphrase';
+
+  @override
+  String get backupEncryptedConfirmPassphrase => 'Confirm passphrase';
+
+  @override
+  String get backupPassphraseMismatch => 'The two passphrases do not match';
+
+  @override
+  String get backupPassphraseEmpty => 'A passphrase is required';
+
+  @override
+  String get backupImportPassphraseTitle => 'This backup is encrypted';
+
+  @override
+  String get backupImportPassphraseBody =>
+      'Enter the encryption passphrase to unlock and restore it.';
+
+  @override
+  String get backupPassphraseCancel => 'Cancel';
+
+  @override
+  String get backupPassphraseConfirm => 'Restore';
+
+  @override
   String get licensesTitle => 'Licenses & sources';
 
   @override
@@ -1382,4 +1414,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adhanPlayAction => 'Play adhan';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredBody =>
+      'This version of the app is no longer supported. Update to continue — the app cannot be used before updating.';
+
+  @override
+  String get updateRecommendedTitle => 'Update available';
+
+  @override
+  String get updateRecommendedBody =>
+      'A newer version is available. We recommend updating for the latest improvements and fixes.';
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get updateLater => 'Later';
+
+  @override
+  String get updateUnavailable =>
+      'Could not open the store. You can update from the app\'s Play Store page.';
 }

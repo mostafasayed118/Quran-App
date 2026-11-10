@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
@@ -40,7 +40,7 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
       _confirmed = config;
       if (!isClosed) emit(PrayerConfigState.ready(config));
     } on Object catch (error, stackTrace) {
-      dev.log('prayer config load failed',
+      appLog('prayer config load failed',
           name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
       if (!isClosed) emit(const PrayerConfigState.failed());
     }
@@ -118,7 +118,7 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
       if (!isClosed) emit(PrayerConfigState.ready(next));
     } on Object catch (error, stackTrace) {
       // Keep the last confirmed state; the screen keeps showing it.
-      dev.log('prayer config save failed',
+      appLog('prayer config save failed',
           name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
     }
   }

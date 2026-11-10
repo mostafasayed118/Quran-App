@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/backup_codec.dart';
-import '../data/backup_merger.dart';
+import '../domain/backup_models.dart';
 
 part 'backup_state.freezed.dart';
 
@@ -28,4 +27,8 @@ sealed class BackupState with _$BackupState {
 
   /// The picked file is not a valid backup (size cap / decode guards).
   const factory BackupState.invalidFile() = BackupInvalidFile;
+
+  /// The picked file is an encrypted backup; the UI shows the passphrase
+  /// prompt. Nothing is written until the passphrase unlocks the payload.
+  const factory BackupState.passphraseRequired() = BackupPassphraseRequired;
 }

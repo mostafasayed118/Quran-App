@@ -44,7 +44,8 @@ Google’s terms; it is not an app-owned data channel.
 
 1. Upload the signed AAB to the **internal track** first; install from Play on a real device.
 2. Smoke: cold launch, open a surah, play a recitation, download one surah, prayer times,
-   qibla, backup export/import, settings, one notification tap.
+   qibla, backup export/import, settings, one notification tap, and — on a side-loaded build
+   only — the `/update` gate against a locally-served policy document (see §3).
 3. Promote to **closed testing**; watch crash/ANR for at least 24 hours.
 4. Production rollout in stages: **5 % → 20 % → 50 % → 100 %**, with a 24-hour watch at each
    stage (or the shortest window the owner accepts).
@@ -61,10 +62,23 @@ Google’s terms; it is not an app-owned data channel.
   no keystore, so CI artifacts are `debug-signed-*` and must never be uploaded to Play.
 - Store-bound builds use `$env:PUBLISH_RELEASE="true"; flutter build appbundle --release`
   (PowerShell); a missing key fails the build by design.
-- There are no remote feature flags. Content/catalog changes require a code release; endpoints
-  are compile-time constants.
-- Do not change `applicationId` or signing keys. A new signing key permanently breaks updates
-  for existing installs.
+- There are no remote feature flags. The **one** remotely-controlled behavior is the
+  **force-update policy**: `GET https://quranyahdi.pages.dev/version.json` at launch
+  (`lib/features/update/data/version_policy_service.dart`). It fails open — missing/malformed/404/slow → the app
+  starts normally; only a *valid* document that marks the install below `min_supported` blocks
+  the app (blocking `/update` screen, store listing as the only way past). Publish/edit the
+  JSON on Cloudflare Pages (web/ campaign); no app release is needed to change it. Runtime
+  override for tests/dev: `--dart-define=QURAN_VERSION_POLICY_URL=<url|off>`.
+- Endpoints are compile-time constants. Do not change `applicationId` or signing keys. A new
+  signing key permanently breaks updates for existing installs.
+- **Unblocking a bad lock-out**: publish a corrected `version.json` with a `min_supported`
+  that accepts the field builds (or a `latest` at/above them) — users are unblocked on their
+  next launch, without a store release. Never lock users out without a way back; if you do,
+  you must be ready to flip the file within minutes (have the Pages edit rights ready before
+  the rollout).
+- In-App Review (once per install, post-onboarding) and the version policy add two
+  `SettingsTable` keys (`review_requested`, `version_update_prompt_ack`) and one cache
+  (`version_policy_cache`); all three are deliberately outside the backup whitelist.
 
 ## 4. Incident escalation
 
@@ -112,4 +126,4 @@ Adding one is an owner decision that requires a privacy-policy and Data-safety u
 
 ---
 
-**Last updated:** 2026-10-30 · **Applies to:** versionCode 3 and later
+**Last updated:** 2026-11-09 (version policy / force-update gate + one-shot In-App Review disclosed) · **Applies to:** versionCode 2004 and later

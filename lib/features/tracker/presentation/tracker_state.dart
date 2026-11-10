@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/khatma_progress.dart';
-import '../data/prayer_log_repository.dart';
+import '../domain/khatma_progress.dart';
+import '../domain/tracker_day.dart';
 
 part 'tracker_state.freezed.dart';
 

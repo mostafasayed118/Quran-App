@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -29,16 +30,10 @@ class VerseCard extends StatelessWidget {
   /// Logical width of the card.
   final double width;
 
-  static const _backgroundTop = Color(0xFF0B2E24);
-  static const _backgroundBottom = Color(0xFF144233);
-  static const _textColor = Color(0xFFF4E6C3);
-  static const _gold = Color(0xFFD9B45B);
-  static const _muted = Color(0xFFB9C9C0);
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final text = ayah.textUnicode ?? stripAyahEndMarker(ayah.textUthmani);
+    final text = ayah.displayText;
     final fontSize = text.length > 400 ? 18.0 : 22.0;
     final host = Uri.parse(
       webSurahUrl(ayah.surahId, ayah.numberInSurah),
@@ -50,12 +45,13 @@ class VerseCard extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [_backgroundTop, _backgroundBottom],
+            colors: [AppColors.mushafCardTop, AppColors.mushafCardBottom],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: _gold.withValues(alpha: 0.35)),
+          border: Border.all(
+              color: AppColors.mushafCardAccent.withValues(alpha: 0.35)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -68,7 +64,7 @@ class VerseCard extends StatelessWidget {
                     loc.appName,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: _gold,
+                      color: AppColors.mushafCardAccent,
                       fontFamily: QuranFonts.ui,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -82,7 +78,7 @@ class VerseCard extends StatelessWidget {
                     textAlign: TextAlign.end,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: _textColor,
+                      color: AppColors.mushafCardInk,
                       fontFamily: QuranFonts.ui,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -97,7 +93,7 @@ class VerseCard extends StatelessWidget {
               textAlign: TextAlign.center,
               textDirection: TextDirection.rtl,
               style: TextStyle(
-                color: _textColor,
+                color: AppColors.mushafCardInk,
                 fontFamily: QuranFonts.quran,
                 fontSize: fontSize,
                 height: 2,
@@ -108,20 +104,22 @@ class VerseCard extends StatelessWidget {
               loc.ornateBrackets(loc.number(ayah.numberInSurah)),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: _gold,
+                color: AppColors.mushafCardAccent,
                 fontFamily: QuranFonts.meQuran,
                 fontSize: 16,
               ),
             ),
             const SizedBox(height: 18),
-            Container(height: 1, color: _gold.withValues(alpha: 0.25)),
+            Container(
+                height: 1,
+                color: AppColors.mushafCardAccent.withValues(alpha: 0.25)),
             const SizedBox(height: 10),
             Row(
               children: [
                 const Text(
                   'quran yahdi',
                   style: TextStyle(
-                    color: _muted,
+                    color: AppColors.mushafCardMuted,
                     fontFamily: QuranFonts.ui,
                     fontSize: 10,
                     letterSpacing: 0.4,
@@ -134,7 +132,7 @@ class VerseCard extends StatelessWidget {
                     textAlign: TextAlign.end,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: _muted,
+                      color: AppColors.mushafCardMuted,
                       fontFamily: QuranFonts.ui,
                       fontSize: 10,
                     ),

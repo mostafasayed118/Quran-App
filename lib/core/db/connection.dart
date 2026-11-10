@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:io';
 import 'dart:isolate';
 
@@ -52,7 +52,7 @@ Future<void> ensureContentCurrent(
     await seedFile.writeAsBytes(bytes, flush: true);
     await _seedContentFromFile(db, seedFile, bundledVersion);
   } on Object catch (error, stackTrace) {
-    dev.log('content refresh failed',
+    appLog('content refresh failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
@@ -91,7 +91,7 @@ Future<void> _seedContentFromFile(
 
 /// Loads the bundled asset on a WORKER isolate.
 ///
-/// The DB asset is ~4.0 MiB (4,173,824 B); loading and writing it on the UI isolate costs
+/// The DB asset is ~5.3 MiB (5,574,656 B); loading and writing it on the UI isolate costs
 /// a boot-time frame stall and a full-size allocation on the isolate that
 /// renders the app. [rootBundle] cannot be used on a background isolate (a
 /// background isolate has no ServicesBinding), so the worker talks to the
@@ -153,7 +153,7 @@ Future<void> writeAssetOffUiIsolate(
         return;
       }
     } on Object catch (error, stackTrace) {
-      dev.log('db asset copy on the worker isolate failed',
+      appLog('db asset copy on the worker isolate failed',
           name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
     }
   }
@@ -201,7 +201,7 @@ Future<void> _ensureContentCurrentOffUiIsolate(
     await _writeAssetOffUiIsolate(seedFile, dbAssetKey);
     await _seedContentFromFile(db, seedFile, kContentVersion);
   } on Object catch (error, stackTrace) {
-    dev.log('content refresh failed',
+    appLog('content refresh failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
@@ -212,7 +212,7 @@ Future<void> _ensureContentCurrentOffUiIsolate(
 ///
 /// The UI isolate only ever receives the executor: the asset copy and the
 /// content re-seed run on a worker isolate (and on drift's background
-/// isolate for the SQL), so the 4.0 MiB asset never lands on the isolate
+/// isolate for the SQL), so the 5.3 MiB asset never lands on the isolate
 /// that renders the first frame.
 Future<QueryExecutor> openAppDatabase() async {
   final dir = await getApplicationSupportDirectory();
@@ -239,7 +239,7 @@ Future<void> _ensureSearchIndex(AppDatabase db) async {
   try {
     await ensureQuranSearchIndex(db);
   } on Object catch (error, stackTrace) {
-    dev.log('search index build failed',
+    appLog('search index build failed',
         name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
   }
 }

@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../data/zakat_calculator.dart';
+import '../domain/zakat_calculator.dart';
 
 part 'zakat_state.freezed.dart';
 

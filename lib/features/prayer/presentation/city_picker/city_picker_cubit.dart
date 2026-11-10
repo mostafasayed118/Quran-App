@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,7 +48,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
         selectedCityId: _selectedCityId,
       ));
     } on Object catch (error, stackTrace) {
-      dev.log('city search failed',
+      appLog('city search failed',
           name: 'quran_yahdi/city_picker',
           error: error,
           stackTrace: stackTrace);
@@ -65,7 +65,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
     try {
       await _cityRepo.select(city);
     } on Object catch (error, stackTrace) {
-      dev.log('city persist failed',
+      appLog('city persist failed',
           name: 'quran_yahdi/city_picker',
           error: error,
           stackTrace: stackTrace);
@@ -97,7 +97,7 @@ class CityPickerCubit extends Cubit<CityPickerState> {
       _emitLocating(false);
       return city;
     } on Object catch (error, stackTrace) {
-      dev.log('nearest-city resolve failed',
+      appLog('nearest-city resolve failed',
           name: 'quran_yahdi/city_picker',
           error: error,
           stackTrace: stackTrace);
