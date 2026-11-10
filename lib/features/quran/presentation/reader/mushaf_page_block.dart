@@ -1,6 +1,6 @@
 import '../../domain/verse.dart';
 
-export 'mushaf_page_block_rows.dart';
+export '../../data/mushaf_page_block_rows.dart';
 
 /// A single rendered page block in mushaf mode: the surah's ayahs that share
 /// one mushaf page. Pages the surah owns no ayahs on are omitted (surah-

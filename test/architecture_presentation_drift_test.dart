@@ -3,17 +3,14 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
-/// The only `presentation/` files allowed to read the drift layer directly.
+/// No `presentation/` file may read the drift layer directly.
 ///
-/// Both are frozen-test compatibility shims: their public symbols are called
-/// **only from `test/`**, and moving them out of `presentation/` would change
-/// an import path a frozen test pins. Pinning the current set means a THIRD
-/// one is a deliberate architecture decision, not a silent drift — which is
-/// what the existing guard's rules cannot express for `lib/core/db/`.
-const Set<String> allowedPresentationDriftReaders = {
-  'lib/features/quran/presentation/reader/mushaf_page_block_rows.dart',
-  'lib/features/recitation/presentation/playback/playback_row_entry.dart',
-};
+/// The set is empty on purpose. It used to hold two frozen-test
+/// compatibility shims (`mushaf_page_block_rows`, `playback_row_entry`);
+/// both now live in their feature's `data/` layer and are re-exported from the
+/// same public path the frozen tests import, so the presentation layer is
+/// drift-free while the tests keep compiling.
+const Set<String> allowedPresentationDriftReaders = <String>{};
 
 final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
 
