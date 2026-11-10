@@ -243,6 +243,7 @@ void _registerRecitation(
         service: getIt<PlaybackService>(),
         reciters: getIt<ReciterRepository>(),
         downloader: getIt<AudioDownloader>(),
+        adhanStates: getIt<AdhanPlayer>().state,
       ));
 }
 

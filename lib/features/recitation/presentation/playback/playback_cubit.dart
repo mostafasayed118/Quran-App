@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/domain/adhan_player.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../../core/domain/quran_limits.dart';
@@ -27,11 +28,14 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     required ReciterInfoSource reciters,
     required AudioDownloader downloader,
     bool Function()? backgroundActive,
+    Stream<AdhanPlaybackState>? adhanStates,
   })  : _service = service,
         _reciters = reciters,
         _downloader = downloader,
         _backgroundActive = backgroundActive ?? _probeBackgroundInit,
-        super(const PlaybackState.initial());
+        super(const PlaybackState.initial()) {
+    _adhanSub = adhanStates?.listen(_onAdhanState, onError: _onStreamError);
+  }
 
   final PlaybackService _service;
   final ReciterInfoSource _reciters;
@@ -92,6 +96,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
   StreamSubscription<void>? _completionSub;
+  StreamSubscription<AdhanPlaybackState>? _adhanSub;
+
+  /// True while the shared player is carrying the adhan (full or preview).
+  /// The player's streams are the adhan's during that window, not the
+  /// recitation's, so they must not rebuild the surah state.
+  bool _externalAudioActive = false;
 
   /// Entity entry for the re-typed screens (ready states carry
   /// [ReciterInfo], never drift rows).
@@ -292,7 +302,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
 
   /// The end-of-track policy: repeat, advance, or stop.
   Future<void> _onCompleted() async {
-    if (isClosed) return;
+    if (isClosed || _externalAudioActive) return;
     final state = this.state;
     final current = switch (state) {
       PlaybackPlaying(:final surahNumber, :final surahName) => (
@@ -516,6 +526,30 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
   }
 
+  /// The adhan took over the shared player: clear the surah state without
+  /// stopping the player (the adhan already did) and drop the recitation
+  /// stream subscriptions so the adhan's events cannot be read as the surah's.
+  void _onAdhanState(AdhanPlaybackState adhan) {
+    if (isClosed) return;
+    if (adhan.isPlaying) {
+      if (_externalAudioActive) return;
+      _externalAudioActive = true;
+      _resetForExternalAudio();
+    } else if (_externalAudioActive) {
+      _externalAudioActive = false;
+    }
+  }
+
+  void _resetForExternalAudio() {
+    _sleepTimer?.cancel();
+    _sleepTimer = null;
+    _sleepTimerDuration = null;
+    _rowId = '';
+    _episode++;
+    unawaited(_unbindStreams());
+    if (!isClosed) emit(const PlaybackState.initial());
+  }
+
   Future<void> _unbindStreams() async {
     await _playingSub?.cancel();
     await _positionSub?.cancel();
@@ -534,6 +568,8 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _sleepTimer?.cancel();
     _sleepTimer = null;
     try {
+      await _adhanSub?.cancel();
+      _adhanSub = null;
       await _unbindStreams();
       // The service owns the platform resources (ExoPlayer, audio focus). It
       // is disposed only when it exposes the capability - the frozen test
@@ -548,7 +584,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   void _onPlayingChanged(bool playing) {
-    if (isClosed) return;
+    if (isClosed || _externalAudioActive) return;
     final state = this.state;
     if (playing && state is PlaybackLoading && state.reciterName != null) {
       emit(PlaybackState.playing(
@@ -587,7 +623,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   void _onPositionChanged(Duration position) {
-    if (isClosed) return;
+    if (isClosed || _externalAudioActive) return;
     final state = this.state;
     final current = switch (state) {
       PlaybackPlaying(position: final p) => p,
@@ -605,7 +641,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   void _onDurationChanged(Duration? duration) {
-    if (isClosed || duration == null) return;
+    if (isClosed || _externalAudioActive || duration == null) return;
     _lastDuration = duration;
     final state = this.state;
     if (state is PlaybackPlaying) {
