@@ -34,6 +34,18 @@ abstract final class AppColors {
   static const tileLight = Color(0xFFE6E2D4);
   static const tileDark = Color(0xFF1A251F);
 
+  /// The mushaf verse card's own palette.
+  ///
+  /// Deliberately dark in both themes: the card is the reader's "parchment"
+  /// surface and its identity does not follow the app chrome. Declared here
+  /// so the reader holds no raw `Color(0x…)` literals of its own — a theme
+  /// change reaches them through this one file.
+  static const mushafCardTop = Color(0xFF0B2E24);
+  static const mushafCardBottom = Color(0xFF144233);
+  static const mushafCardInk = Color(0xFFF4E6C3);
+  static const mushafCardAccent = Color(0xFFD9B45B);
+  static const mushafCardMuted = Color(0xFFB9C9C0);
+
   static const double badgeTintAlpha = 0.12;
   static const double fieldTintAlpha = 0.08;
   static const double mutedSurfaceAlpha = 0.5;

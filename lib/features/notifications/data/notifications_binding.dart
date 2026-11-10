@@ -1,4 +1,4 @@
-import 'dart:developer' as dev;
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -205,7 +205,7 @@ class NotificationsBinding extends ChangeNotifier
       _ready = false;
       _initFailed = true;
       _setApplyFailed(true);
-      dev.log(
+      appLog(
         'notifications init failed',
         name: 'quran_yahdi/reminders',
         error: error.runtimeType,
@@ -516,15 +516,14 @@ class NotificationsBinding extends ChangeNotifier
       // fixed and small (the rolling window), so this stays a targeted cancel
       // — a blanket `cancelAll()` would wipe the playback notification owned
       // by `just_audio_background`.
-      for (final id in reminderAlarmIds()) {
-        await _plugin.cancel(id: id);
-      }
+      await _inChunks(reminderAlarmIds(), (id) => _plugin.cancel(id: id));
       _appliedPlanIds = <int>{
         ..._appliedPlanIds,
         ...reminders.map((reminder) => reminder.id),
       };
-      for (final reminder in reminders) {
-        await _plugin.zonedSchedule(
+      await _inChunks(
+        reminders,
+        (reminder) => _plugin.zonedSchedule(
           id: reminder.id,
           title: reminder.title,
           body: reminder.body,
@@ -537,8 +536,8 @@ class NotificationsBinding extends ChangeNotifier
           // Prayer reminders stay one-shot: their time moves every day.
           matchDateTimeComponents:
               reminder.repeatsDaily ? DateTimeComponents.time : null,
-        );
-      }
+        ),
+      );
       _appliedPlan = fingerprint;
       _appliedExact = exact;
       _setApplyFailed(false);
@@ -546,7 +545,7 @@ class NotificationsBinding extends ChangeNotifier
       // Best-effort: a failed schedule must not crash the caller, but it can
       // no longer be silent — the reliability card and logcat both read it.
       _setApplyFailed(true);
-      dev.log(
+      appLog(
         'reminder plan apply failed',
         name: 'quran_yahdi/reminders',
         error: error.runtimeType,
@@ -583,5 +582,28 @@ class NotificationsBinding extends ChangeNotifier
       }
     }
     return fields.join();
+  }
+
+  /// Runs [action] over [items] with bounded concurrency.
+  ///
+  /// The platform channel is the bottleneck in an apply: a full plan is ~88
+  /// cancels plus ~74 schedules, and awaiting them strictly one at a time
+  /// keeps the call on the channel for its full serial latency. Eight in
+  /// flight collapses that without flooding the channel. The id sets are
+  /// unchanged, and every operation here is per-id, so order does not matter.
+  Future<void> _inChunks<T>(
+    Iterable<T> items,
+    Future<void> Function(T item) action, {
+    int concurrency = 8,
+  }) async {
+    final queue = items.toList();
+    for (var start = 0; start < queue.length; start += concurrency) {
+      final end = start + concurrency < queue.length
+          ? start + concurrency
+          : queue.length;
+      await Future.wait([
+        for (var i = start; i < end; i++) action(queue[i]),
+      ]);
+    }
   }
 }
