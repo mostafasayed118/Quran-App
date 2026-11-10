@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/core/l10n/app_locale_controller.dart';
+import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 /// The English switch must change the CONTENT, not only the settings label and

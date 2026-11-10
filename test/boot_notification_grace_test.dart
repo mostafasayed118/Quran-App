@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-
 import 'package:quran_yahdi/app/app.dart';
 import 'package:quran_yahdi/app/bootstrap.dart';
 import 'package:quran_yahdi/app/router.dart';

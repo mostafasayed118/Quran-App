@@ -1,11 +1,10 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'settings_state.dart';
 

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:go_router/go_router.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/home/presentation/home_cubit.dart';
@@ -14,8 +12,8 @@ import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'support/fakes.dart';
 import 'home_cubit_test.dart' show FakePrayerTimeService;
+import 'support/fakes.dart';
 import 'support/test_db.dart';
 
 void main() {

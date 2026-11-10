@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/routing/route_observer.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -19,7 +20,6 @@ import '../../../../core/widgets/lifecycle_ticker.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/service_tile.dart';
-import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'home_cubit.dart';
 import 'home_state.dart';

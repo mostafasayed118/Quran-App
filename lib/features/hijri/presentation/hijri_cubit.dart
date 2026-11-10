@@ -1,6 +1,5 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../../core/utils/arabic_numbers.dart';
 import '../data/hijri_offset_source.dart';

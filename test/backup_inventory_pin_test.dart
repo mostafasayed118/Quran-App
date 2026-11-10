@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dart';
@@ -9,8 +8,8 @@ import 'package:quran_yahdi/features/library/data/hadith_bookmark_repository.dar
 import 'package:quran_yahdi/features/library/data/hadith_position_repository.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
-import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/data/bookmark_meta_repository.dart';
+import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/data/reader_settings_repository.dart';
 import 'package:quran_yahdi/features/ramadan/data/qada_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';

@@ -1,14 +1,14 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
-import '../../../../core/widgets/app_sheet.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/insets.dart';
 import '../../../../core/utils/deep_links.dart';
+import '../../../../core/utils/insets.dart';
+import '../../../../core/widgets/app_sheet.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/ayah_sharer.dart';
 import '../../domain/verse.dart';

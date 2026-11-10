@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../core/domain/reminder_diagnostics.dart';
 import '../core/domain/reminders.dart';
 import '../core/l10n/app_locale_controller.dart';
-import '../core/theme/app_theme_controller.dart';
 import '../core/theme/app_system_ui.dart';
 import '../core/theme/app_theme.dart';
+import '../core/theme/app_theme_controller.dart';
 import '../features/library/data/pack_downloader.dart';
 import '../l10n/app_localizations.dart';
 import 'bootstrap.dart';

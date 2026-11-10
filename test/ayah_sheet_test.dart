@@ -7,10 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'support/fake_playback_service.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/di/injector.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
@@ -26,6 +23,8 @@ import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/fake_playback_service.dart';
 
 /// FakeAsync-safe pack decoder: isolate completions never arrive under the
 /// widget-test zone, so these tests use the PackDownloader decoder seam.

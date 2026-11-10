@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/services.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// The Unicode Uthmani reading of the Quran, one asset file per surah.
 ///

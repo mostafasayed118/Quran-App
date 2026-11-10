@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/format_bytes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
-import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
-import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../l10n/app_localizations.dart';
-import '../../domain/download_status.dart';
 import '../../data/recitation_keys.dart';
+import '../../domain/download_status.dart';
 import '../../domain/reciter_info.dart';
 import '../downloads/downloads_cubit.dart';
 import '../downloads/downloads_state.dart';
-import '../playback/playback_cubit.dart';
 import '../playback/mini_player_bar.dart';
+import '../playback/playback_cubit.dart';
 import 'reciter_surahs_cubit.dart';
 import 'reciter_surahs_state.dart';
 

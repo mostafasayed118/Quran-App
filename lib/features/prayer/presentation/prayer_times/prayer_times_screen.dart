@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/domain/city.dart';
 import '../../../../core/domain/prayer_name.dart';
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -17,7 +18,6 @@ import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
-import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'forbidden_windows_section.dart';
 import 'prayer_times_cubit.dart';

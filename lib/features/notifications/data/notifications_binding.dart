@@ -1,5 +1,3 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
@@ -7,6 +5,7 @@ import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show preAdhanReminderId, reminderAlarmIds, shouldRequestBootPermission;
 import 'package:timezone/timezone.dart' as tz;

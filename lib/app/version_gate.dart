@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../core/domain/version_ack_store.dart';
 import '../core/domain/version_policy.dart';

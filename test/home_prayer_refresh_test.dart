@@ -1,10 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/last_read.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
-import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/home/presentation/home_cubit.dart';
 
 class _NoLastRead implements LastReadMarker {

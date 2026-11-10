@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/format_bytes.dart';
@@ -11,7 +12,6 @@ import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
-import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../l10n/app_localizations.dart';
 import 'downloads_cubit.dart';
 

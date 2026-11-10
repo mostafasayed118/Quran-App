@@ -1,5 +1,3 @@
-import 'package:quran_yahdi/core/utils/app_log.dart';
-
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
@@ -8,6 +6,7 @@ import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/l10n/prayer_names.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'reminder_planner.dart';
 

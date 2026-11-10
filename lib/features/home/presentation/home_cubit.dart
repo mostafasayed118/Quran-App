@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/domain/ayah_lookup.dart';
@@ -11,6 +10,7 @@ import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/l10n/prayer_names.dart';
 import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'package:quran_yahdi/core/utils/arabic_numbers.dart';
 
 import 'home_state.dart';

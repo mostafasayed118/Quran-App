@@ -1,5 +1,5 @@
-import 'package:quran_yahdi/core/utils/hour_minute.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:quran_yahdi/core/utils/hour_minute.dart';
 
 void main() {
   test('accepts H:mm and HH:mm', () {

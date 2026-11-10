@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:workmanager/workmanager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:quran_yahdi/core/utils/app_log.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'app/app.dart';
 import 'app/bootstrap.dart';
@@ -14,13 +14,13 @@ import 'app/onboarding_gate.dart';
 import 'app/reminder_background_task.dart';
 import 'app/router.dart';
 import 'app/version_gate.dart';
+import 'core/domain/adhan_player.dart';
 import 'core/domain/version_ack_store.dart';
 import 'core/domain/version_policy.dart';
 import 'core/domain/version_policy_source.dart';
-import 'core/domain/adhan_player.dart';
 import 'core/l10n/app_locale_controller.dart';
-import 'core/theme/app_theme_controller.dart';
 import 'core/l10n/platform_localizations.dart';
+import 'core/theme/app_theme_controller.dart';
 import 'core/utils/app_routes.dart';
 import 'core/utils/boot_fail_open.dart';
 import 'core/utils/deep_links.dart';

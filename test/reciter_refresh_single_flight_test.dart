@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
-
+import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 
 import 'support/test_db.dart';
