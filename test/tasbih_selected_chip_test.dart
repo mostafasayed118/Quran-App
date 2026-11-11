@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 import 'package:quran_yahdi/features/tasbih/presentation/tasbih_cubit.dart';
