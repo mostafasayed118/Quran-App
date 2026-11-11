@@ -73,6 +73,9 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
     } on Object catch (error, stackTrace) {
       appLog('translation search load failed',
           name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      // Let the retry button re-enter the load; the latch only covers a
+      // successful/in-flight attempt.
+      _started = false;
       if (!isClosed) emit(const TranslationSearchState.failed());
     }
   }
