@@ -258,6 +258,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get bookmarkFolderHint => 'اسم المجلد (اختياري)';
 
   @override
+  String get bookmarkFolderName => 'اسم المجلد';
+
+  @override
+  String get bookmarkFolderRename => 'إعادة تسمية المجلد';
+
+  @override
+  String get bookmarkFolderDelete => 'حذف المجلد';
+
+  @override
+  String get bookmarkFolderDeleteBody =>
+      'ستُزال التسمية من كل العلامات في هذا المجلد، والعلامات نفسها تبقى.';
+
+  @override
   String get bookmarkNoteHint => 'ملاحظة (اختياري)';
 
   @override

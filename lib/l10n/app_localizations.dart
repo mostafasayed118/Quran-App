@@ -554,6 +554,30 @@ abstract class AppLocalizations {
   /// **'اسم المجلد (اختياري)'**
   String get bookmarkFolderHint;
 
+  /// No description provided for @bookmarkFolderName.
+  ///
+  /// In ar, this message translates to:
+  /// **'اسم المجلد'**
+  String get bookmarkFolderName;
+
+  /// No description provided for @bookmarkFolderRename.
+  ///
+  /// In ar, this message translates to:
+  /// **'إعادة تسمية المجلد'**
+  String get bookmarkFolderRename;
+
+  /// No description provided for @bookmarkFolderDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف المجلد'**
+  String get bookmarkFolderDelete;
+
+  /// No description provided for @bookmarkFolderDeleteBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'ستُزال التسمية من كل العلامات في هذا المجلد، والعلامات نفسها تبقى.'**
+  String get bookmarkFolderDeleteBody;
+
   /// No description provided for @bookmarkNoteHint.
   ///
   /// In ar, this message translates to:
