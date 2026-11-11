@@ -58,6 +58,23 @@ void main() {
     expect(find.byType(ListTile), findsNothing);
   });
 
+  testWidgets('the picker reaches ten years back, not two', (tester) async {
+    final cubit = QadaCubit(source: _Source([]));
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await tester.pumpWidget(_app(cubit));
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('إضافة يوم'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    final dialog =
+        tester.widget<DatePickerDialog>(find.byType(DatePickerDialog));
+    expect(dialog.firstDate.year, DateTime.now().year - 10);
+  });
+
   testWidgets('deleting a day confirms and removes it', (tester) async {
     final source = _Source([DateTime(2027, 3, 1), DateTime(2027, 3, 2)]);
     final cubit = QadaCubit(source: source);
