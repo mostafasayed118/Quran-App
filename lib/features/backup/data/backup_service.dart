@@ -5,6 +5,7 @@ import 'dart:isolate';
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/utils/app_log.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
 import 'backup_merger.dart';
@@ -13,13 +14,20 @@ import 'backup_merger.dart';
 /// summary plus whether the injected reschedule hook ran after the commit.
 class BackupOutcome {
   /// What an applied backup did.
-  const BackupOutcome({required this.summary, required this.rescheduled});
+  const BackupOutcome({
+    required this.summary,
+    required this.rescheduled,
+    this.rescheduleFailed = false,
+  });
 
   /// Counts of what changed.
   final BackupSummary summary;
 
   /// True when reminders were rescheduled after the import.
   final bool rescheduled;
+
+  /// True when the import committed but the reminder re-plan threw.
+  final bool rescheduleFailed;
 }
 
 /// Gather / preview / transactional-apply for the user-controlled backup file.
@@ -82,10 +90,26 @@ class BackupService {
       return plan;
     });
     final rescheduled = plan.reminderRelevantChanged;
+    var rescheduleFailed = false;
     if (rescheduled) {
-      await _reschedule();
+      // The data is already committed; a reminder-hook failure must not
+      // report the import as failed and must not be retried as an import
+      // (the second apply sees no changed keys and would skip the re-plan).
+      try {
+        await _reschedule();
+      } on Object catch (error, stackTrace) {
+        rescheduleFailed = true;
+        appLog('backup reminder reschedule failed',
+            name: 'quran_yahdi/backup',
+            error: error.runtimeType,
+            stackTrace: stackTrace);
+      }
     }
-    return BackupOutcome(summary: plan.summary, rescheduled: rescheduled);
+    return BackupOutcome(
+      summary: plan.summary,
+      rescheduled: rescheduled,
+      rescheduleFailed: rescheduleFailed,
+    );
   }
 
   Future<BackupData> _gather() async {
