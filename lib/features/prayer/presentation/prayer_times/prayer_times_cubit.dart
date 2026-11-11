@@ -52,6 +52,7 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
 
   DateTime? _loadedDay;
   bool _reloading = false;
+  bool _reloadPending = false;
   Completer<void>? _reloadDone;
 
   /// Loads the selected city, today's prayers and the countdown, then emits
@@ -62,6 +63,9 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
   /// unhandled async error).
   Future<void> reload() async {
     if (_reloading) {
+      // A city change can land while a load is in flight: run one more pass
+      // after it instead of dropping the request (the old city would stay).
+      _reloadPending = true;
       final done = _reloadDone;
       if (done != null) await done.future;
       return;
@@ -69,61 +73,68 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     _reloading = true;
     final done = _reloadDone = Completer<void>();
     try {
-      final selected = await _city.selectedCity();
-      if (isClosed) return;
-      if (selected == null) {
-        emit(const PrayerTimesState.ready());
-        return;
+      await _reloadOnce();
+      while (_reloadPending && !isClosed) {
+        _reloadPending = false;
+        await _reloadOnce();
       }
-      final now = _clock();
-      final next = _prayer.nextPrayer(selected.coordinates, now);
-      final entries = <PrayerEntry>[
-        for (final choice in _prayer.today(selected.coordinates, now))
-          PrayerEntry(
-            name: choice.name,
-            time: choice.time,
-            // Same-occurrence match: after Isha the service returns tomorrow's
-            // Fajr — it must not flag today's already-passed Fajr row.
-            isNext: choice.name == next.name &&
-                choice.time.isAtSameMomentAs(next.time),
-          ),
-      ];
-      final nextEntry = entries
-          .where((e) => e.isNext)
-          .fold<PrayerEntry?>(null, (best, e) => best ?? e);
-      // After Isha no today row is next and the service has already rolled
-      // over to tomorrow's Fajr. Keep it out of [entries] (the panel is
-      // today's six times) but carry it so the screen can say what is coming.
-      final tomorrow = nextEntry == null ? next : null;
-      final remaining = nextEntry?.time.difference(now);
-      final tomorrowRemaining = tomorrow?.time.difference(now);
-      if (isClosed) return;
-      _loadedDay = DateTime(now.year, now.month, now.day);
-      emit(PrayerTimesState.ready(
-        city: selected,
-        entries: entries,
-        remaining:
-            remaining != null && remaining > Duration.zero ? remaining : null,
-        nextTomorrowName: tomorrow?.name,
-        nextTomorrowTime: tomorrow?.time,
-        nextTomorrowRemaining:
-            tomorrowRemaining != null && tomorrowRemaining > Duration.zero
-                ? tomorrowRemaining
-                : null,
-      ));
-      _scheduleReminders();
     } on Object catch (error, stackTrace) {
       appLog('prayer times load failed',
           name: 'quran_yahdi/prayer_times',
           error: error,
           stackTrace: stackTrace);
-      if (isClosed) return;
-      emit(const PrayerTimesState.failed());
+      if (!isClosed) emit(const PrayerTimesState.failed());
     } finally {
       _reloading = false;
       _reloadDone = null;
       if (!done.isCompleted) done.complete();
     }
+  }
+
+  Future<void> _reloadOnce() async {
+    final selected = await _city.selectedCity();
+    if (isClosed) return;
+    if (selected == null) {
+      emit(const PrayerTimesState.ready());
+      return;
+    }
+    final now = _clock();
+    final next = _prayer.nextPrayer(selected.coordinates, now);
+    final entries = <PrayerEntry>[
+      for (final choice in _prayer.today(selected.coordinates, now))
+        PrayerEntry(
+          name: choice.name,
+          time: choice.time,
+          // Same-occurrence match: after Isha the service returns tomorrow's
+          // Fajr — it must not flag today's already-passed Fajr row.
+          isNext: choice.name == next.name &&
+              choice.time.isAtSameMomentAs(next.time),
+        ),
+    ];
+    final nextEntry = entries
+        .where((e) => e.isNext)
+        .fold<PrayerEntry?>(null, (best, e) => best ?? e);
+    // After Isha no today row is next and the service has already rolled
+    // over to tomorrow's Fajr. Keep it out of [entries] (the panel is
+    // today's six times) but carry it so the screen can say what is coming.
+    final tomorrow = nextEntry == null ? next : null;
+    final remaining = nextEntry?.time.difference(now);
+    final tomorrowRemaining = tomorrow?.time.difference(now);
+    if (isClosed) return;
+    _loadedDay = DateTime(now.year, now.month, now.day);
+    emit(PrayerTimesState.ready(
+      city: selected,
+      entries: entries,
+      remaining:
+          remaining != null && remaining > Duration.zero ? remaining : null,
+      nextTomorrowName: tomorrow?.name,
+      nextTomorrowTime: tomorrow?.time,
+      nextTomorrowRemaining:
+          tomorrowRemaining != null && tomorrowRemaining > Duration.zero
+              ? tomorrowRemaining
+              : null,
+    ));
+    _scheduleReminders();
   }
 
   /// Recomputes the countdown while the screen is open (the screen owns the
