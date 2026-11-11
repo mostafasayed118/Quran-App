@@ -66,23 +66,43 @@ class HadithCubit extends Cubit<HadithState> {
     final query = value.trim();
     _query = query;
     _bookmarksOnly = false;
-    return _load(0, query: query, bookmarksOnly: false);
+    return _request(0, query: query, bookmarksOnly: false);
   }
 
   /// Clears the search and returns to the saved browse position.
   Future<void> clearSearch() =>
-      _load(_browseOffset, query: '', bookmarksOnly: false);
+      _request(_browseOffset, query: '', bookmarksOnly: false);
 
   /// Shows only the bookmarked hadiths (one page).
   Future<void> showBookmarks() {
     _query = '';
     _bookmarksOnly = true;
-    return _load(0, query: '', bookmarksOnly: true);
+    return _request(0, query: '', bookmarksOnly: true);
   }
 
   /// Returns to the browse pages at the saved position.
   Future<void> showBrowse() =>
-      _load(_browseOffset, query: '', bookmarksOnly: false);
+      _request(_browseOffset, query: '', bookmarksOnly: false);
+
+  ({int offset, String query, bool bookmarksOnly})? _pending;
+
+  /// Runs an explicit request, or remembers the latest one while a page load
+  /// is in flight.
+  ///
+  /// [next]/[prev] keep the old drop-while-paging behaviour (pinned by the
+  /// paging-race test): a repeated page request is noise. A search or a tab
+  /// switch is not: dropping it left the state (and `_query`) on the old view.
+  Future<void> _request(
+    int offset, {
+    required String query,
+    required bool bookmarksOnly,
+  }) async {
+    if (_paging) {
+      _pending = (offset: offset, query: query, bookmarksOnly: bookmarksOnly);
+      return;
+    }
+    await _load(offset, query: query, bookmarksOnly: bookmarksOnly);
+  }
 
   /// Toggles [number] in the bookmarked set and persists it.
   Future<void> toggleBookmark(int number) async {
@@ -222,6 +242,15 @@ class HadithCubit extends Cubit<HadithState> {
       }
     } finally {
       _paging = false;
+      final pending = _pending;
+      if (pending != null && !isClosed) {
+        _pending = null;
+        await _load(
+          pending.offset,
+          query: pending.query,
+          bookmarksOnly: pending.bookmarksOnly,
+        );
+      }
     }
   }
 }
