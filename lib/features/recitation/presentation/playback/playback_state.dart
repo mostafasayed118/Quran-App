@@ -6,7 +6,7 @@ enum PlaybackFailureKind { network, noReciters, backgroundUnavailable }
 
 /// What the player does when the current surah ends.
 enum PlaybackRepeatMode {
-  /// Advance to the next surah (the historical behaviour).
+  /// Stop at the end of the current surah (the historical behaviour).
   off,
 
   /// Replay the current surah.

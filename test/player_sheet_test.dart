@@ -208,4 +208,17 @@ void main() {
     // The sheet scrolls instead of overflowing the short viewport.
     expect(find.byType(SingleChildScrollView), findsWidgets);
   });
+
+  testWidgets('portrait 360x640 at textScale 2.0 wraps the options row',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await openSheet(tester, cubit, textScale: 2.0);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byTooltip('تكرار السورة'), findsOneWidget);
+    expect(find.text('مؤقت النوم'), findsOneWidget);
+  });
 }

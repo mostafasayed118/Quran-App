@@ -543,14 +543,6 @@ class PackDownloader {
     _reader.invalidate(packId);
   }
 
-  /// True when the pack is installed AND at exactly [version].
-  Future<bool> isInstalled(String packId, String version) async {
-    final row = await (_db.select(_db.installedPacks)
-          ..where((p) => p.packId.equals(packId)))
-        .getSingleOrNull();
-    return row != null && row.version == version;
-  }
-
   Future<bool> isInstalledAny(String packId) async {
     final row = await (_db.select(_db.installedPacks)
           ..where((p) => p.packId.equals(packId)))

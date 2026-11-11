@@ -129,6 +129,27 @@ void main() {
     await cubit.close();
   });
 
+  test('visible verses advance the sink once per distinct ayah', () async {
+    final sink = _RecordingSink();
+    final cubit = ReaderCubit(
+        ayahRepository: ayahs,
+        lastReadRepository: lastRead,
+        surahId: 2,
+        initialAyah: 0,
+        wirdProgress: sink);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    await readyFuture;
+
+    // The load already marks ayah 8 visible; 9 and 10 are the scroll.
+    await cubit.onVisibleAyah(9);
+    await cubit.onVisibleAyah(9);
+    await cubit.onVisibleAyah(10);
+
+    expect(sink.ids, [9, 10]);
+    await cubit.close();
+  });
+
   test('without a sink the page change still persists last-read', () async {
     final cubit = ReaderCubit(
         ayahRepository: ayahs,

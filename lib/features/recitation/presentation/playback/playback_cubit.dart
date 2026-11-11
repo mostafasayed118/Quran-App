@@ -234,7 +234,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     return setSpeed(next);
   }
 
-  /// Toggles between advancing to the next surah and repeating this one.
+  /// Toggles between stopping at the end of the surah and repeating it.
   Future<void> toggleRepeat() async {
     _repeatMode = _repeatMode == PlaybackRepeatMode.one
         ? PlaybackRepeatMode.off
@@ -300,7 +300,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     await _start(_rowId, _reciterName, _server, next, '');
   }
 
-  /// The end-of-track policy: repeat, advance, or stop.
+  /// The end-of-track policy: repeat the surah or stop.
   Future<void> _onCompleted() async {
     if (isClosed || _externalAudioActive) return;
     final state = this.state;

@@ -182,34 +182,85 @@ class ReaderActions extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<ReaderCubit>();
     final isVerses = state.mode == ReaderMode.verses;
+
+    final listen = IconButton(
+      tooltip: loc.listenTooltip,
+      icon: const Icon(Icons.headphones),
+      onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
+            state.surahId,
+            surahName: state.surahName,
+          ),
+    );
+    final bookmarks = IconButton(
+      tooltip: loc.bookmarks,
+      icon: const Icon(Icons.bookmarks_outlined),
+      onPressed: onOpenBookmarks ?? () => context.push(AppRoutes.bookmarks),
+    );
+    final pageJump = IconButton(
+      tooltip: loc.pageJump,
+      icon: const Icon(Icons.pin_outlined),
+      onPressed: () => unawaited(
+        _openPageJump(context, cubit, loc, onResolved: onOpenAyah),
+      ),
+    );
+
+    // Five icons plus a long surah title do not fit a 360 dp bar at
+    // textScale 2.0: fold the two display toggles into one menu there.
+    if (MediaQuery.sizeOf(context).width < 400) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          listen,
+          bookmarks,
+          pageJump,
+          PopupMenuButton<_ReaderMoreAction>(
+            tooltip: MaterialLocalizations.of(context).showMenuTooltip,
+            onSelected: (action) {
+              switch (action) {
+                case _ReaderMoreAction.mode:
+                  cubit.toggleMode();
+                case _ReaderMoreAction.font:
+                  _showFontSheet(
+                    context,
+                    cubit,
+                    state.fontScale,
+                    state.lineHeight,
+                  );
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ReaderMoreAction.mode,
+                child: ListTile(
+                  leading:
+                      Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
+                  title: Text(isVerses ? loc.mushafMode : loc.versesMode),
+                ),
+              ),
+              PopupMenuItem(
+                value: _ReaderMoreAction.font,
+                child: ListTile(
+                  leading: const Icon(Icons.format_size),
+                  title: Text(loc.readerFontSize),
+                ),
+              ),
+            ],
+          ),
+        ],
+      );
+    }
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          tooltip: loc.listenTooltip,
-          icon: const Icon(Icons.headphones),
-          onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
-                state.surahId,
-                surahName: state.surahName,
-              ),
-        ),
+        listen,
         IconButton(
           tooltip: isVerses ? loc.mushafMode : loc.versesMode,
           icon: Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
           onPressed: cubit.toggleMode,
         ),
-        IconButton(
-          tooltip: loc.bookmarks,
-          icon: const Icon(Icons.bookmarks_outlined),
-          onPressed: onOpenBookmarks ?? () => context.push(AppRoutes.bookmarks),
-        ),
-        IconButton(
-          tooltip: loc.pageJump,
-          icon: const Icon(Icons.pin_outlined),
-          onPressed: () => unawaited(
-            _openPageJump(context, cubit, loc, onResolved: onOpenAyah),
-          ),
-        ),
+        bookmarks,
+        pageJump,
         IconButton(
           tooltip: loc.readerFontSize,
           icon: const Icon(Icons.format_size),
@@ -224,6 +275,8 @@ class ReaderActions extends StatelessWidget {
     );
   }
 }
+
+enum _ReaderMoreAction { mode, font }
 
 class _ReadyView extends StatelessWidget {
   const _ReadyView({required this.state});

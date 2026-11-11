@@ -66,6 +66,35 @@ class BookmarkMetaCubit extends Cubit<BookmarkMetaState> {
     return _persist(current, next);
   }
 
+  /// Renames [from] to [to] on every entry that carried the folder.
+  Future<bool> renameFolder(String from, String to) {
+    final current = state;
+    if (current is! BookmarkMetaReady) return Future<bool>.value(false);
+    final clean = to.trim();
+    if (clean == from) return Future<bool>.value(true);
+    if (clean.isEmpty) return Future<bool>.value(false);
+    final next = <int, BookmarkMetaEntry>{
+      for (final entry in current.entries.entries)
+        entry.key: entry.value.folder == from
+            ? entry.value.copyWith(folder: clean)
+            : entry.value,
+    };
+    return _persist(current, next);
+  }
+
+  /// Removes [folder] from every entry that carried it; notes stay.
+  Future<bool> deleteFolder(String folder) {
+    final current = state;
+    if (current is! BookmarkMetaReady) return Future<bool>.value(false);
+    final next = <int, BookmarkMetaEntry>{
+      for (final entry in current.entries.entries)
+        entry.key: entry.value.folder == folder
+            ? entry.value.copyWith(folder: '')
+            : entry.value,
+    };
+    return _persist(current, next);
+  }
+
   Future<bool> _persist(
     BookmarkMetaReady previous,
     Map<int, BookmarkMetaEntry> next,

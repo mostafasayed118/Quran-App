@@ -147,4 +147,19 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
+
+  testWidgets('a narrow reader folds mode and font into one menu',
+      (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await pumpReader(tester);
+
+    expect(tester.takeException(), isNull);
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byTooltip('حجم الخط'), findsNothing);
+    expect(find.byTooltip('وضع المصحف'), findsNothing);
+    expect(find.byTooltip('الانتقال إلى صفحة'), findsOneWidget);
+  });
 }

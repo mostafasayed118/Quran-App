@@ -170,6 +170,16 @@ class ReaderCubit extends Cubit<ReaderState> {
     _lastVisibleAyahId = ayahId;
     _currentAyahId = ayahId;
     await _saveLastRead(ayahId);
+    // Verse mode feeds the same wird plan as mushaf paging: scrolling past a
+    // verse advances the read-up-to pointer (max-wins on the sink side).
+    final sink = _wirdProgress;
+    if (sink == null) return;
+    try {
+      await sink.advanceTo(ayahId);
+    } on Object catch (error, stackTrace) {
+      appLog('wird progress advance failed',
+          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+    }
   }
 
   /// Re-runs the load after a failure (error-state retry).

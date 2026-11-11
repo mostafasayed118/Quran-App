@@ -63,7 +63,9 @@ Future<void> _pickDate(BuildContext context, QadaCubit cubit) async {
   final picked = await showDatePicker(
     context: context,
     initialDate: yesterday,
-    firstDate: DateTime(now.year - 2),
+    // Missed fasts accumulate over years, not months; ten years covers a
+    // normal backlog without turning the picker into a scroll marathon.
+    firstDate: DateTime(now.year - 10),
     lastDate: yesterday,
     helpText: loc.qadaPickDate,
   );

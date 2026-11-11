@@ -98,4 +98,52 @@ void main() {
     expect(await cubit.set(9, folder: 'تفسير', note: ''), isFalse);
     expect(cubit.state, isA<BookmarkMetaLoading>());
   });
+
+  test('renameFolder moves every bookmark in the folder', () async {
+    final source = _Source({
+      9: const BookmarkMetaEntry(folder: 'تفسير', note: 'ملاحظة'),
+      8: const BookmarkMetaEntry(folder: 'تفسير'),
+      7: const BookmarkMetaEntry(folder: 'أذكار'),
+    });
+    final cubit = BookmarkMetaCubit(source: source);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    expect(await cubit.renameFolder('تفسير', 'تدبر'), isTrue);
+
+    final ready = cubit.state as BookmarkMetaReady;
+    expect(ready.folders, ['أذكار', 'تدبر']);
+    expect(ready.entries[9]?.note, 'ملاحظة');
+    expect(source.entries[8]?.folder, 'تدبر');
+  });
+
+  test('deleteFolder drops the label and keeps the notes', () async {
+    final source = _Source({
+      9: const BookmarkMetaEntry(folder: 'تفسير', note: 'ملاحظة'),
+      8: const BookmarkMetaEntry(folder: 'أذكار'),
+    });
+    final cubit = BookmarkMetaCubit(source: source);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    expect(await cubit.deleteFolder('تفسير'), isTrue);
+
+    final ready = cubit.state as BookmarkMetaReady;
+    expect(ready.folders, ['أذكار']);
+    expect(ready.entries[9]?.folder, isEmpty);
+    expect(ready.entries[9]?.note, 'ملاحظة');
+  });
+
+  test('a failed folder rename reverts to the previous map', () async {
+    final source = _Source({
+      9: const BookmarkMetaEntry(folder: 'تفسير'),
+    })
+      ..throwOnSave = true;
+    final cubit = BookmarkMetaCubit(source: source);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    expect(await cubit.renameFolder('تفسير', 'تدبر'), isFalse);
+    expect((cubit.state as BookmarkMetaReady).folders, ['تفسير']);
+  });
 }

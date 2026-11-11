@@ -259,6 +259,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookmarkFolderHint => 'Folder name (optional)';
 
   @override
+  String get bookmarkFolderName => 'Folder name';
+
+  @override
+  String get bookmarkFolderRename => 'Rename folder';
+
+  @override
+  String get bookmarkFolderDelete => 'Delete folder';
+
+  @override
+  String get bookmarkFolderDeleteBody =>
+      'Every bookmark keeps its note but loses this folder.';
+
+  @override
   String get bookmarkNoteHint => 'Note (optional)';
 
   @override

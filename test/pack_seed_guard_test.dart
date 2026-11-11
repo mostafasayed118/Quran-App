@@ -137,7 +137,7 @@ void main() {
       expect(adapter.requested, [url]);
       expect(file.existsSync(), isTrue);
       expect(_partials(root), isEmpty);
-      expect(await downloader.isInstalled('seed-guard', '1'), isTrue);
+      expect(await downloader.isInstalledAny('seed-guard'), isTrue);
     });
   });
 }
