@@ -36,10 +36,11 @@ class SurahIndexBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final cubit = context.read<SurahIndexCubit>();
     return BlocBuilder<SurahIndexCubit, SurahIndexState>(
       builder: (context, state) => switch (state) {
         SurahIndexLoading() => const LoadingView(),
-        SurahIndexFailed() => errorPane(loc),
+        SurahIndexFailed() => errorPane(loc, onRetry: cubit.reload),
         SurahIndexReady(:final surahs, :final query) => Column(
             children: [
               Padding(
