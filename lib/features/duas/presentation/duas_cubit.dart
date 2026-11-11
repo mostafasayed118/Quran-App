@@ -125,9 +125,11 @@ class DuasCubit extends Cubit<DuasState> {
 
   /// Switches the visible tab; a no-op when the tab is already shown.
   Future<void> selectTab(DuasTab tab) async {
-    final isAlreadyDuas = state is DuasInView && tab == DuasTab.duas;
-    final isAlreadyRuqyah = state is RuqyahInView && tab == DuasTab.ruqyah;
-    if (isAlreadyDuas || isAlreadyRuqyah) return;
+    final current = state;
+    final isAlreadyDuas = current is DuasInView && tab == DuasTab.duas;
+    final isAlreadyRuqyah = current is RuqyahInView && tab == DuasTab.ruqyah;
+    final isLoadingSame = current is DuasLoading && current.tab == tab;
+    if (isAlreadyDuas || isAlreadyRuqyah || isLoadingSame) return;
     if (tab == DuasTab.duas) {
       await showDuas();
     } else {
