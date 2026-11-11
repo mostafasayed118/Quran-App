@@ -142,9 +142,10 @@ abstract final class AppRouter {
   /// The redirect for [location]; null keeps the requested route.
   ///
   /// Onboarding decides first (a first-run user must reach the flow), then the
-  /// update gate (an unsupported install must not run the app). A valid
-  /// mandatory policy wins over everything; an absent/invalid one blocks
-  /// nothing.
+  /// update gate. The mandatory policy is evaluated only on the routes an
+  /// onboarded user can reach: it deliberately does not interrupt the first-run
+  /// flow, because updating before onboarding would strand a new user on a
+  /// screen whose only action leaves the app.
   static String? redirectFor(String location) {
     final onboarding = onboardingGate.decide(location);
     if (onboarding != null) return onboarding;
