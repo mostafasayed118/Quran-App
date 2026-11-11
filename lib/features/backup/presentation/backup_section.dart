@@ -57,6 +57,9 @@ class BackupSection extends StatelessWidget {
           case BackupPassphraseRequired():
             unawaited(showDialog<void>(
               context: context,
+              // Back/outside-tap must not leave the section stuck in
+              // passphraseRequired with every action disabled.
+              barrierDismissible: false,
               builder: (dialogContext) => _ImportPassphraseDialog(
                 onSubmit: (passphrase) {
                   Navigator.of(dialogContext).pop();
@@ -64,7 +67,11 @@ class BackupSection extends StatelessWidget {
                 },
                 onCancel: cubit.cancelEncryptedImport,
               ),
-            ));
+            ).then((_) {
+              if (!cubit.isClosed && cubit.state is BackupPassphraseRequired) {
+                cubit.cancelEncryptedImport();
+              }
+            }));
           case BackupIdle() || BackupFailed() || BackupInvalidFile():
             break;
         }
