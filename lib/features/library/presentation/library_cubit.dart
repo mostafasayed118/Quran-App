@@ -151,8 +151,16 @@ class LibraryCubit extends Cubit<LibraryState> {
     emit(ready.copyWith(failed: {...ready.failed}..remove(packId)));
   }
 
-  /// Re-runs the install for [packId]; a no-op when the pack is unknown.
+  /// Re-runs the failed operation for [packId].
+  ///
+  /// An install failure re-installs; an uninstall failure retries the delete.
+  /// The pack is still in [LibraryReady.installed] when the delete failed.
   Future<void> retry(String packId) async {
+    final ready = state;
+    if (ready is LibraryReady && ready.installed.contains(packId)) {
+      await uninstall(packId);
+      return;
+    }
     try {
       final pack = await _catalog.byId(packId);
       if (pack == null) return;
