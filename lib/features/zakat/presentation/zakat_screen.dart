@@ -47,8 +47,12 @@ class ZakatScreen extends StatelessWidget {
               ready.cash,
               ready.debts,
             ].any(_isInvalid);
-            final needsNisabPrice =
-                ready.result.nisabValue <= 0 && ready.result.zakatable > 0;
+            // Weight-only entries contribute 0 while the price is blank, so
+            // zakatable can still be 0. Ask for the price whenever any asset
+            // was entered, not only when cash already crossed zero.
+            final anyAsset = [ready.goldGrams, ready.silverGrams, ready.cash]
+                .any((text) => (parseDecimalOrNull(text) ?? 0) > 0);
+            final needsNisabPrice = ready.result.nisabValue <= 0 && anyAsset;
             final verdictText = hasInvalid
                 ? loc.zakatFixInputs
                 : needsNisabPrice

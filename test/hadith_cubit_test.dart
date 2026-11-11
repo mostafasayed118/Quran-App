@@ -164,6 +164,34 @@ void main() {
 
     expect((cubit.state as HadithReady).bookmarked, isEmpty);
   });
+
+  test('clearing a search returns to the saved browse page', () async {
+    final positions = _Positions()..offset = 10;
+    final cubit = HadithCubit(
+      downloader: _FakeDownloader(newTestDb()),
+      packId: 'p1',
+      bookmarks: _Marks(),
+      positions: positions,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.start();
+    expect((cubit.state as HadithReady).offset, 10);
+
+    await cubit.search('hadith 2');
+    expect((cubit.state as HadithReady).query, 'hadith 2');
+    expect((cubit.state as HadithReady).offset, 0);
+
+    await cubit.clearSearch();
+    expect((cubit.state as HadithReady).offset, 10);
+    expect((cubit.state as HadithReady).query, isEmpty);
+    expect(positions.offset, 10);
+
+    await cubit.showBookmarks();
+    expect((cubit.state as HadithReady).bookmarksOnly, isTrue);
+    await cubit.showBrowse();
+    expect((cubit.state as HadithReady).offset, 10);
+  });
 }
 
 class _ThrowingMarks implements HadithBookmarkSource {

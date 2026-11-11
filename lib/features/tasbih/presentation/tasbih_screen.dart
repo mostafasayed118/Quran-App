@@ -171,7 +171,10 @@ class _TargetChips extends StatelessWidget {
           ChoiceChip(
             label: Text(loc.number(target)),
             selected: ready.target == target,
-            onSelected: (_) {
+            onSelected: (selected) {
+              // RawChip reports false when the already-selected chip is
+              // tapped; selecting the current target would reset the count.
+              if (!selected) return;
               context.read<TasbihCubit>().selectTarget(target);
               AppToast.show(
                 context,

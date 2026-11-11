@@ -43,6 +43,15 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
   String _query = '';
   StreamSubscription<List<SurahSummary>>? _sub;
 
+  /// Re-subscribes after a failure; [start]'s guard keeps a retry a no-op
+  /// while the failed subscription is still assigned.
+  Future<void> reload() async {
+    await _sub?.cancel();
+    _sub = null;
+    if (!isClosed) emit(const SurahIndexState.loading());
+    await start();
+  }
+
   /// Filters the list by [raw] (trimmed); an empty query shows every surah.
   void setQuery(String raw) {
     _query = raw.trim();

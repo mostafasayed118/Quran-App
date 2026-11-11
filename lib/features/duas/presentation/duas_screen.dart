@@ -45,11 +45,13 @@ class DuasScreen extends StatelessWidget {
                           ),
                         ],
                         selected: {
-                          state is RuqyahInView ||
-                                  (state is DuasFailed &&
-                                      state.tab == DuasTab.ruqyah)
-                              ? DuasTab.ruqyah
-                              : DuasTab.duas,
+                          switch (state) {
+                            DuasLoading(:final tab) ||
+                            DuasFailed(:final tab) =>
+                              tab,
+                            RuqyahInView() => DuasTab.ruqyah,
+                            DuasInView() => DuasTab.duas,
+                          }
                         },
                         onSelectionChanged: (selection) => context
                             .read<DuasCubit>()

@@ -332,4 +332,35 @@ void main() {
     expect(browsing.favorites, {'morning'});
     expect(browsing.collections.first.id, 'morning');
   });
+
+  test('a tap after midnight starts from a fresh day', () async {
+    var now = DateTime(2026, 11, 1, 23, 55);
+    final source = _Source();
+    final cubit = _cubit(source: source, clock: () => now);
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    final morning = (cubit.state as AzkarBrowsing)
+        .collections
+        .firstWhere((collection) => collection.id == 'morning');
+    cubit.open(morning);
+    await pumpEventQueue();
+    expect(cubit.state, isA<AzkarReciting>());
+
+    cubit.tapItem(0);
+    await pumpEventQueue();
+    expect(source.stored.day, '2026-11-01');
+    expect(source.stored.remaining['morning'], [2, 2]);
+
+    now = DateTime(2026, 11, 2, 0, 5);
+    cubit.tapItem(0);
+    await pumpEventQueue();
+
+    expect(source.stored.day, '2026-11-02');
+    expect(
+      source.stored.remaining['morning'],
+      [2, 2],
+      reason: 'the fresh count is 3, minus this tap; yesterday is discarded',
+    );
+  });
 }

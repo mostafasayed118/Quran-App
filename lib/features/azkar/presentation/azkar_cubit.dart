@@ -154,8 +154,15 @@ class AzkarCubit extends Cubit<AzkarState> {
     if (state is! AzkarReciting) return;
     if (index < 0 || index >= state.remaining.length) return;
     final item = state.collection.items[index];
-    final next = (state.remaining[index] - 1).clamp(0, item.count);
-    final remaining = [...state.remaining]..[index] = next;
+    // The view can outlive midnight: the displayed counts then belong to
+    // yesterday and must not be re-stamped as today's. Start from a fresh set
+    // and apply this tap to it.
+    final dayChanged = _saved.day.isNotEmpty && _saved.day != _today;
+    final base = dayChanged
+        ? [for (final entry in state.collection.items) entry.count]
+        : state.remaining;
+    final next = (base[index] - 1).clamp(0, item.count);
+    final remaining = [...base]..[index] = next;
     emit(state.copyWith(remaining: remaining));
     unawaited(_persistRemaining(state.collection.id, remaining));
   }

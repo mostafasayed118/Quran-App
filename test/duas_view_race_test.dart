@@ -92,4 +92,33 @@ void main() {
       reason: 'the stale failure must not replace the newer intent',
     );
   });
+
+  test('a second tap while ruqyah is loading does not restart it', () async {
+    final gate = Completer<void>();
+    var loads = 0;
+    final cubit = DuasCubit(
+      duas: _duas(),
+      ruqyah: RuqyahRepository(loader: () async {
+        loads += 1;
+        await gate.future;
+        return [
+          {'id': 'r1', 'kind': 'dhikr', 'text': 'رقية'},
+        ];
+      }),
+      ayahs: _NoAyahs(),
+    );
+    addTearDown(cubit.close);
+
+    await cubit.showDuas();
+    final first = cubit.showRuqyah();
+    await pumpEventQueue();
+    expect(cubit.state, isA<DuasLoading>());
+
+    await cubit.selectTab(DuasTab.ruqyah);
+    gate.complete();
+    await first;
+
+    expect(loads, 1, reason: 'the loading tab must not start a second load');
+    expect(cubit.state, isA<RuqyahInView>());
+  });
 }
