@@ -93,12 +93,14 @@ class ReaderCubit extends Cubit<ReaderState> {
         return;
       }
       if (isClosed) return;
-      final startList =
-          ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      // A deep link can carry an ayah outside the surah: render the first one
-      // and report it as the initial ayah instead of keeping a number that is
-      // not on the page.
-      final startAyah = startList.isNotEmpty ? startList.first : ayahs.first;
+      // 0 (and any negative the route clamped) is the "no specific ayah"
+      // sentinel and stays 0. A positive ayah outside the surah is a bad deep
+      // link: render the first ayah and report that instead.
+      final requested = _initialAyah;
+      final match = requested > 0
+          ? ayahs.where((a) => a.numberInSurah == requested).firstOrNull
+          : null;
+      final startAyah = match ?? ayahs.first;
       final startAyahId = startAyah.id;
       _lastVisibleAyahId = startAyahId;
       _currentAyahId = startAyahId;
@@ -116,7 +118,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       emit(ReaderState.ready(
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',
-        initialAyah: startAyah.numberInSurah,
+        initialAyah: requested > 0 ? startAyah.numberInSurah : 0,
         currentAyahId: startAyahId,
         ayahs: verses,
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
