@@ -64,6 +64,28 @@ void main() {
     expect(cubit.state, isA<HijriReady>());
     expect((cubit.state as HijriReady).dayOffset, 0);
   });
+
+  test('a failed offset write leaves the applied offset unchanged', () async {
+    final service = HijriService();
+    final cubit = HijriCubit(service: service, offset: _ThrowingSave());
+    addTearDown(cubit.close);
+
+    await cubit.start();
+    await cubit.setOffset(2);
+
+    expect((cubit.state as HijriReady).dayOffset, 0);
+    expect(service.offsetDays, 0);
+  });
+}
+
+class _ThrowingSave implements HijriOffsetSource {
+  @override
+  Future<int> loadOffsetDays() async => 0;
+
+  @override
+  Future<void> saveOffsetDays(int days) async {
+    throw StateError('disk full');
+  }
 }
 
 class _ThrowingOffset implements HijriOffsetSource {

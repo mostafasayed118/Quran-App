@@ -85,13 +85,16 @@ class HijriCubit extends Cubit<HijriState> {
             ? HijriService.maxOffsetDays
             : days);
     if (safe == _service.offsetDays) return;
-    _service.offsetDays = safe;
+    // Persist before applying: a failed write must not show a correction that
+    // silently disappears on the next launch.
     try {
       await _offset?.saveOffsetDays(safe);
     } on Object catch (error, stackTrace) {
       appLog('hijri offset write failed',
           name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      return;
     }
+    _service.offsetDays = safe;
     final current = state;
     if (current is HijriReady) {
       await show(current.year, current.month);
