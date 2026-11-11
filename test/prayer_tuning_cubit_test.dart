@@ -50,6 +50,20 @@ void main() {
     expect(source.current.adjustments.containsKey(PrayerName.fajr), isFalse);
   });
 
+  test('adjustBy accumulates rapid taps instead of one absolute value',
+      () async {
+    final source = _FakeSource();
+    final cubit = PrayerConfigCubit(source: source);
+    await cubit.start();
+
+    final first = cubit.adjustBy(PrayerName.fajr, 1);
+    final second = cubit.adjustBy(PrayerName.fajr, 1);
+    await Future.wait([first, second]);
+
+    expect(source.current.adjustmentFor(PrayerName.fajr), 2);
+    expect(source.saves, 2);
+  });
+
   test('sunrise is rejected without a write', () async {
     final source = _FakeSource();
     final cubit = PrayerConfigCubit(source: source);

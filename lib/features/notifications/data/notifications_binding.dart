@@ -6,6 +6,7 @@ import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_plan_store.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show preAdhanReminderId, reminderAlarmIds, shouldRequestBootPermission;
 import 'package:timezone/timezone.dart' as tz;
@@ -44,8 +45,11 @@ import 'package:timezone/timezone.dart' as tz;
 /// plugin: a caller that awaited readiness would hang instead of queueing.
 class NotificationsBinding extends ChangeNotifier
     implements ReminderSchedulerPort, PreAdhanCanceller, ReminderApplyHealth {
-  NotificationsBinding({FlutterLocalNotificationsPlugin? plugin})
-      : _plugin = plugin ?? FlutterLocalNotificationsPlugin();
+  NotificationsBinding({
+    FlutterLocalNotificationsPlugin? plugin,
+    ReminderPlanStore? store,
+  })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
+        _store = store;
 
   static const String channelId = 'quran_yahdi_reminders';
 
@@ -59,6 +63,10 @@ class NotificationsBinding extends ChangeNotifier
   static const String defaultIcon = '@mipmap/ic_launcher';
 
   final FlutterLocalNotificationsPlugin _plugin;
+
+  /// Persists the applied plan across process starts (the 15-minute
+  /// background isolate builds a new binding every run).
+  final ReminderPlanStore? _store;
 
   bool _ready = false;
   NotificationDetails? _details;
@@ -217,6 +225,21 @@ class NotificationsBinding extends ChangeNotifier
       _pendingPermission = false;
       _pendingCancelPreAdhan = false;
       return;
+    }
+    try {
+      final saved = await _store?.read();
+      if (saved != null) {
+        // A plan applied before this process started is already on the OS;
+        // the in-memory value wins only when this binding has a newer one.
+        _appliedPlan ??= saved.fingerprint;
+        _appliedExact ??= saved.exact;
+      }
+    } on Object catch (error, stackTrace) {
+      // A store hiccup must not disable reminders; it only costs one re-apply.
+      appLog('reminder plan restore failed',
+          name: 'quran_yahdi/reminders',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
     }
     await _drainPending();
   }
@@ -430,7 +453,10 @@ class NotificationsBinding extends ChangeNotifier
       return;
     }
     final hadPreAdhan = _appliedPlanIds.contains(preAdhanReminderId);
-    if (hadPreAdhan) _appliedPlan = null;
+    if (hadPreAdhan) {
+      _appliedPlan = null;
+      await _store?.clear();
+    }
     _appliedPlanIds = <int>{..._appliedPlanIds}..remove(preAdhanReminderId);
   }
 
@@ -554,6 +580,9 @@ class NotificationsBinding extends ChangeNotifier
       _appliedPlan = fingerprint;
       _appliedExact = exact;
       _setApplyFailed(false);
+      await _store?.write(
+        ReminderPlanSnapshot(fingerprint: fingerprint, exact: exact),
+      );
     } on Object catch (error, stackTrace) {
       // Best-effort: a failed schedule must not crash the caller, but it can
       // no longer be silent — the reliability card and logcat both read it.

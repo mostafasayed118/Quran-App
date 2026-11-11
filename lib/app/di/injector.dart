@@ -54,6 +54,7 @@ import 'package:quran_yahdi/features/notifications/data/adhan_preferences_impl.d
 import 'package:quran_yahdi/features/notifications/data/just_audio_adhan_player.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_diagnostics_channel.dart';
+import 'package:quran_yahdi/features/notifications/data/reminder_plan_store.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/onboarding/data/onboarding_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
@@ -275,7 +276,9 @@ void _registerPrayerAndNotifications(
   getIt.registerLazySingleton<ReminderRescheduler>(
       () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<NotificationsBinding>(
-      () => NotificationsBinding());
+      () => NotificationsBinding(store: getIt<ReminderPlanStore>()));
+  getIt.registerLazySingleton<ReminderPlanStore>(
+      () => DriftReminderPlanStore(getIt<AppDatabase>()));
   getIt.registerLazySingleton<PreAdhanCanceller>(
       () => getIt<NotificationsBinding>());
   getIt.registerLazySingleton<ReminderSchedulerPort>(

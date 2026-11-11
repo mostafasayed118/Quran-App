@@ -68,6 +68,26 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
     });
   }
 
+  /// Adjusts [prayer] by [delta] relative to the stored correction.
+  ///
+  /// The stepper sends deltas so two taps made before a rebuild both count; an
+  /// absolute value computed in build collapses them into one.
+  Future<void> adjustBy(PrayerName prayer, int delta) {
+    if (prayer == PrayerName.sunrise) return Future<void>.value();
+    return _enqueue((config) {
+      final next = Map<PrayerName, int>.of(config.adjustments);
+      final safe = PrayerConfig.clampAdjustment(
+        (config.adjustments[prayer] ?? 0) + delta,
+      );
+      if (safe == 0) {
+        next.remove(prayer);
+      } else {
+        next[prayer] = safe;
+      }
+      return config.copyWith(adjustments: next);
+    });
+  }
+
   /// Selects the high-latitude rule and persists it.
   Future<void> setHighLatitude(PrayerHighLatitudeRule rule) =>
       _enqueue((config) => config.copyWith(highLatitude: rule));

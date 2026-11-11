@@ -25,6 +25,7 @@ class HadithCubit extends Cubit<HadithState> {
     try {
       _bookmarked = await _bookmarks?.load(_packId) ?? <int>{};
     } on Object catch (error, stackTrace) {
+      _bookmarksLoaded = false;
       appLog('hadith bookmarks load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
     }
@@ -52,6 +53,10 @@ class HadithCubit extends Cubit<HadithState> {
   bool _bookmarksOnly = false;
   bool _paging = false;
 
+  /// False when the initial bookmark read threw: the in-memory set is then
+  /// unknown, not empty, and saving it would overwrite the stored marks.
+  bool _bookmarksLoaded = true;
+
   /// The last browse page (not a search result, not the bookmarks filter).
   /// Clearing a search or leaving bookmarks returns here instead of page 0.
   int _browseOffset = 0;
@@ -61,26 +66,64 @@ class HadithCubit extends Cubit<HadithState> {
     final query = value.trim();
     _query = query;
     _bookmarksOnly = false;
-    return _load(0, query: query, bookmarksOnly: false);
+    return _request(0, query: query, bookmarksOnly: false);
   }
 
   /// Clears the search and returns to the saved browse position.
   Future<void> clearSearch() =>
-      _load(_browseOffset, query: '', bookmarksOnly: false);
+      _request(_browseOffset, query: '', bookmarksOnly: false);
 
   /// Shows only the bookmarked hadiths (one page).
   Future<void> showBookmarks() {
     _query = '';
     _bookmarksOnly = true;
-    return _load(0, query: '', bookmarksOnly: true);
+    return _request(0, query: '', bookmarksOnly: true);
   }
 
   /// Returns to the browse pages at the saved position.
   Future<void> showBrowse() =>
-      _load(_browseOffset, query: '', bookmarksOnly: false);
+      _request(_browseOffset, query: '', bookmarksOnly: false);
+
+  ({int offset, String query, bool bookmarksOnly})? _pending;
+
+  /// Runs an explicit request, or remembers the latest one while a page load
+  /// is in flight.
+  ///
+  /// [next]/[prev] keep the old drop-while-paging behaviour (pinned by the
+  /// paging-race test): a repeated page request is noise. A search or a tab
+  /// switch is not: dropping it left the state (and `_query`) on the old view.
+  Future<void> _request(
+    int offset, {
+    required String query,
+    required bool bookmarksOnly,
+  }) async {
+    if (_paging) {
+      _pending = (offset: offset, query: query, bookmarksOnly: bookmarksOnly);
+      return;
+    }
+    await _load(offset, query: query, bookmarksOnly: bookmarksOnly);
+  }
 
   /// Toggles [number] in the bookmarked set and persists it.
   Future<void> toggleBookmark(int number) async {
+    if (!_bookmarksLoaded) {
+      final source = _bookmarks;
+      if (source == null) return;
+      try {
+        // The first read failed, so the stored marks are unknown; re-read
+        // them instead of treating the empty set as the truth.
+        _bookmarked = await source.load(_packId);
+        _bookmarksLoaded = true;
+        final current = state;
+        if (!isClosed && current is HadithReady) {
+          emit(current.copyWith(bookmarked: _bookmarked));
+        }
+      } on Object catch (error, stackTrace) {
+        appLog('hadith bookmarks reload failed',
+            name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+        return; // never save a set we could not read
+      }
+    }
     final previous = _bookmarked;
     final next = <int>{..._bookmarked};
     if (!next.remove(number)) next.add(number);
@@ -199,6 +242,15 @@ class HadithCubit extends Cubit<HadithState> {
       }
     } finally {
       _paging = false;
+      final pending = _pending;
+      if (pending != null && !isClosed) {
+        _pending = null;
+        await _load(
+          pending.offset,
+          query: pending.query,
+          bookmarksOnly: pending.bookmarksOnly,
+        );
+      }
     }
   }
 }

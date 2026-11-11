@@ -121,4 +121,30 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
   });
+
+  testWidgets('a non-numeric page keeps the dialog and reports the error',
+      (tester) async {
+    await pumpReader(tester);
+
+    await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.enterText(find.byType(TextField), 'abc');
+    await tester.tap(find.widgetWithText(FilledButton, 'انتقال'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    expect(find.byType(AlertDialog), findsOneWidget,
+        reason: 'an invalid entry must not close the dialog silently');
+    expect(find.text('صفحة غير موجودة'), findsOneWidget);
+
+    await tester.tap(find.text('إلغاء'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    // Let the toast's auto-dismiss timer fire before teardown.
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  });
 }

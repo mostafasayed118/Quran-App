@@ -192,6 +192,24 @@ void main() {
     await cubit.showBrowse();
     expect((cubit.state as HadithReady).offset, 10);
   });
+
+  test('a failed bookmark load re-reads before the first save', () async {
+    final marks = _FlakyMarks();
+    final cubit = HadithCubit(
+      downloader: _FakeDownloader(newTestDb()),
+      packId: 'p1',
+      bookmarks: marks,
+    );
+    addTearDown(cubit.close);
+
+    await cubit.start();
+    expect(cubit.state, isA<HadithReady>());
+
+    await cubit.toggleBookmark(9);
+
+    expect(marks.stored, {7, 9},
+        reason: 'the stored mark 7 must survive an unreadable first load');
+  });
 }
 
 class _ThrowingMarks implements HadithBookmarkSource {
@@ -201,5 +219,24 @@ class _ThrowingMarks implements HadithBookmarkSource {
   @override
   Future<void> save(String packId, Set<int> numbers) async {
     throw StateError('save failed');
+  }
+}
+
+class _FlakyMarks implements HadithBookmarkSource {
+  bool failNextLoad = true;
+  Set<int> stored = {7};
+
+  @override
+  Future<Set<int>> load(String packId) async {
+    if (failNextLoad) {
+      failNextLoad = false;
+      throw StateError('bookmarks down');
+    }
+    return stored;
+  }
+
+  @override
+  Future<void> save(String packId, Set<int> numbers) async {
+    stored = numbers;
   }
 }

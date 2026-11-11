@@ -843,6 +843,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get backupPreviewTitle => 'مراجعة الاستيراد';
 
   @override
+  String get backupPreviewNothing =>
+      'لا توجد تغييرات — النسخة مطابقة لبياناتك الحالية';
+
+  @override
   String get backupMerge => 'دمج';
 
   @override

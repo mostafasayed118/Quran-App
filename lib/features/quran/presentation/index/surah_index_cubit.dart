@@ -69,9 +69,11 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
   List<SurahSummary> _filter(List<SurahSummary> surahs) {
     if (_query.isEmpty) return surahs;
     final westernQuery = _query.toWesternDigits;
+    final prepared = prepareQuery(_query);
     return surahs.where((s) {
-      return matchesQuery(s.nameAr, _query) ||
-          matchesQuery(s.nameEn, _query) ||
+      return matchesPrepared(
+              normalizeArabic(s.nameAr).toLowerCase(), prepared) ||
+          matchesPrepared(normalizeArabic(s.nameEn).toLowerCase(), prepared) ||
           s.id.toString() == westernQuery;
     }).toList();
   }

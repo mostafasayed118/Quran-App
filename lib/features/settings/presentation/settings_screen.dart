@@ -238,16 +238,28 @@ class _SettingsList extends StatelessWidget {
           onTap: () => context.push(AppRoutes.principles),
         ),
         const Divider(),
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            loc.settingsMinimalNote,
-            style: AppTheme.mutedFootnote(context),
+        // The note explains the SYSTEM default; once the user picks an
+        // appearance the picker above is the single truth.
+        if (appearance == null)
+          _minimalNote(context, loc)
+        else
+          ListenableBuilder(
+            listenable: appearance,
+            builder: (context, _) => appearance.mode == AppThemeMode.system
+                ? _minimalNote(context, loc)
+                : const SizedBox.shrink(),
           ),
-        ),
       ],
     );
   }
+
+  Widget _minimalNote(BuildContext context, AppLocalizations loc) => Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Text(
+          loc.settingsMinimalNote,
+          style: AppTheme.mutedFootnote(context),
+        ),
+      );
 
   /// The reminder-health readout, or an empty box when this host has none:
   /// the service locator registration, or the diagnostics a host passes in.

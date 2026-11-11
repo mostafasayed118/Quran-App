@@ -490,6 +490,18 @@ class _Dial extends StatefulWidget {
 class _DialState extends State<_Dial> {
   bool _wasAligned = false;
 
+  /// Unwrapped turns for the arrow: [AnimatedRotation] interpolates the
+  /// number, so a 359°→0° crossing must stay a small step (not a full spin).
+  late double _turns;
+
+  double get _angle => dialAngleDeg(widget.bearing, widget.heading ?? 0);
+
+  @override
+  void initState() {
+    super.initState();
+    _turns = _angle / 360.0;
+  }
+
   @override
   void didUpdateWidget(covariant _Dial oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -498,6 +510,9 @@ class _DialState extends State<_Dial> {
       HapticFeedback.mediumImpact();
     }
     _wasAligned = widget.aligned;
+
+    final previous = dialAngleDeg(oldWidget.bearing, oldWidget.heading ?? 0);
+    _turns += shortestAngleDeltaDeg(_angle, previous) / 360.0;
   }
 
   @override
@@ -540,8 +555,7 @@ class _DialState extends State<_Dial> {
                 ),
                 child: Center(
                   child: AnimatedRotation(
-                    turns: dialAngleDeg(widget.bearing, widget.heading ?? 0) /
-                        360.0,
+                    turns: _turns,
                     duration: const Duration(milliseconds: 180),
                     child: Icon(
                       Icons.navigation,

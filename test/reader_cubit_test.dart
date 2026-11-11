@@ -148,4 +148,35 @@ void main() {
     expect(await lastRead.loadAyahId(), 8);
     await cubit.close();
   });
+
+  test('an out-of-range initial ayah is clamped to the first ayah', () async {
+    final cubit = ReaderCubit(
+        ayahRepository: ayahs,
+        lastReadRepository: lastRead,
+        surahId: 2,
+        initialAyah: 999);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
+
+    expect(ready.initialAyah, 1);
+    expect(ready.currentAyahId, ready.ayahs.first.id);
+    expect(await lastRead.loadAyahId(), ready.ayahs.first.id);
+    await cubit.close();
+  });
+
+  test('the zero initial ayah stays the start sentinel', () async {
+    final cubit = ReaderCubit(
+        ayahRepository: ayahs,
+        lastReadRepository: lastRead,
+        surahId: 2,
+        initialAyah: 0);
+    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+    await cubit.start();
+    final ready = await readyFuture as ReaderReady;
+
+    expect(ready.initialAyah, 0);
+    expect(ready.currentAyahId, ready.ayahs.first.id);
+    await cubit.close();
+  });
 }

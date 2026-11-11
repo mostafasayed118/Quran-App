@@ -503,6 +503,7 @@
   "backupExport": "Export data",
   "backupImport": "Import data",
   "backupPreviewTitle": "Review import",
+  "backupPreviewNothing": "No changes - this backup matches your current data",
   "backupMerge": "Merge",
   "backupExportSuccess": "Data exported",
   "backupImportSuccess": "Data imported and merged",

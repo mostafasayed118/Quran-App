@@ -148,7 +148,7 @@ class _Ready extends StatelessWidget {
             _AdjustmentRow(
               label: prayer.label(loc),
               minutes: config.adjustmentFor(prayer),
-              onChanged: (value) => cubit.setAdjustment(prayer, value),
+              onStep: (delta) => cubit.adjustBy(prayer, delta),
             ),
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -301,12 +301,12 @@ class _AdjustmentRow extends StatelessWidget {
   const _AdjustmentRow({
     required this.label,
     required this.minutes,
-    required this.onChanged,
+    required this.onStep,
   });
 
   final String label;
   final int minutes;
-  final ValueChanged<int> onChanged;
+  final ValueChanged<int> onStep;
 
   @override
   Widget build(BuildContext context) {
@@ -321,7 +321,7 @@ class _AdjustmentRow extends StatelessWidget {
             tooltip: loc.prayerAdjustmentDecrease,
             onPressed: minutes <= PrayerConfig.minAdjustmentMinutes
                 ? null
-                : () => onChanged(minutes - 1),
+                : () => onStep(-1),
             icon: const Icon(Icons.remove),
           ),
           SizedBox(
@@ -332,7 +332,7 @@ class _AdjustmentRow extends StatelessWidget {
             tooltip: loc.prayerAdjustmentIncrease,
             onPressed: minutes >= PrayerConfig.maxAdjustmentMinutes
                 ? null
-                : () => onChanged(minutes + 1),
+                : () => onStep(1),
             icon: const Icon(Icons.add),
           ),
         ],
