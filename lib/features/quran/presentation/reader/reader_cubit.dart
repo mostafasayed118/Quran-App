@@ -95,8 +95,11 @@ class ReaderCubit extends Cubit<ReaderState> {
       if (isClosed) return;
       final startList =
           ayahs.where((a) => a.numberInSurah == _initialAyah).toList();
-      final startAyahId =
-          startList.isNotEmpty ? startList.first.id : ayahs.first.id;
+      // A deep link can carry an ayah outside the surah: render the first one
+      // and report it as the initial ayah instead of keeping a number that is
+      // not on the page.
+      final startAyah = startList.isNotEmpty ? startList.first : ayahs.first;
+      final startAyahId = startAyah.id;
       _lastVisibleAyahId = startAyahId;
       _currentAyahId = startAyahId;
       await _saveStartIfNeeded(startAyahId);
@@ -113,7 +116,7 @@ class ReaderCubit extends Cubit<ReaderState> {
       emit(ReaderState.ready(
         surahId: _surahId,
         surahName: surah?.nameAr ?? '',
-        initialAyah: _initialAyah,
+        initialAyah: startAyah.numberInSurah,
         currentAyahId: startAyahId,
         ayahs: verses,
         bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
