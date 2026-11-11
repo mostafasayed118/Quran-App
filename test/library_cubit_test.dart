@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -58,5 +60,42 @@ void main() {
     expect(cubit.state, isA<LibraryReady>());
 
     await cubit.close();
+  });
+
+  test('an installed pack missing from the catalog stays visible and delete',
+      () async {
+    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
+          packId: 'gone',
+          kind: 'translation',
+          language: 'ar',
+          title: 'حزمة قديمة',
+          sizeMb: 2.0,
+          version: '1',
+        ));
+    final cubit = LibraryCubit(
+      catalog: CatalogRepository(
+        source: BundledCatalogSource(loader: () async => const []),
+      ),
+      downloader: PackDownloader(
+        db,
+        libraryRootResolver: () async => Directory.systemTemp,
+      ),
+    );
+    addTearDown(cubit.close);
+
+    await cubit.start();
+
+    final ready = cubit.state as LibraryReady;
+    final orphan = ready.packs.firstWhere((pack) => pack.id == 'gone');
+    expect(orphan.orphan, isTrue);
+    expect(orphan.titleAr, 'حزمة قديمة');
+    expect(ready.installed, contains('gone'));
+
+    await cubit.uninstall('gone');
+
+    final after = cubit.state as LibraryReady;
+    expect(after.installed, isNot(contains('gone')));
+    expect(after.packs.where((pack) => pack.id == 'gone'), isEmpty,
+        reason: 'an orphan has no catalog entry to reinstall from');
   });
 }

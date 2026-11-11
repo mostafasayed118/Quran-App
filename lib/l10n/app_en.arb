@@ -357,6 +357,7 @@
   "libraryDelete": "Delete",
   "libraryInstalled": "Installed",
   "libraryFailed": "Download failed",
+  "libraryPackUnavailable": "Installed on your device but no longer in the catalog - you can delete it.",
   "libraryRetry": "Retry",
   "retry": "Retry",
   "cancel": "Cancel",

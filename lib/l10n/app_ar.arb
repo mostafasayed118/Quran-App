@@ -378,6 +378,7 @@
   "libraryDelete": "حذف",
   "libraryInstalled": "مثبّت",
   "libraryFailed": "تعذّر التنزيل",
+  "libraryPackUnavailable": "مثبتة على جهازك، لكنها لم تعد في الكتالوج — يمكنك حذفها.",
   "libraryRetry": "أعِد المحاولة",
   "retry": "أعِد المحاولة",
   "cancel": "إلغاء",

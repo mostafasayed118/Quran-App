@@ -31,6 +31,7 @@ class LibraryPackInfo {
     this.fileCount,
     this.sha256,
     this.sha256PerSurah,
+    this.orphan = false,
   });
 
   /// Stable id of the pack.
@@ -72,6 +73,12 @@ class LibraryPackInfo {
   /// Per-surah tafsir only: lowercase-hex sha256 per surah file in `{n}`
   /// order (index 0 = surah 1). Verified before decode/merge when present.
   final List<String>? sha256PerSurah;
+
+  /// Approval: the pack is still installed but the catalog no longer lists it.
+  ///
+  /// The row stays visible (and deletable) instead of disappearing with its
+  /// file; [sourceUrl]/[urlTemplate]/[sha256] are absent for these rows.
+  final bool orphan;
 
   factory LibraryPackInfo.fromJson(Map<String, dynamic> json) {
     final id = _requireString(json, 'id');

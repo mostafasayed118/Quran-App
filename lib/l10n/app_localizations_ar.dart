@@ -619,6 +619,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get libraryFailed => 'تعذّر التنزيل';
 
   @override
+  String get libraryPackUnavailable =>
+      'مثبتة على جهازك، لكنها لم تعد في الكتالوج — يمكنك حذفها.';
+
+  @override
   String get libraryRetry => 'أعِد المحاولة';
 
   @override
