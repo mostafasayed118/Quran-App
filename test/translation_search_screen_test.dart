@@ -95,4 +95,29 @@ void main() {
 
     expect(find.text('لا توجد نتائج'), findsOneWidget);
   });
+
+  testWidgets('more than maxHits shows the truncation footer', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(360, 9000));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final cubit = TranslationSearchCubit(
+      source: _Source({
+        'en1': {
+          for (var i = 1; i <= 101; i++) 1000 + i: 'mercy $i',
+        },
+      }),
+      surahName: (id) async => 'الفاتحة',
+      debounce: Duration.zero,
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+
+    await tester.pumpWidget(_app(cubit));
+    await tester.pump();
+    await tester.enterText(find.byType(TextField), 'mercy');
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(find.textContaining('عرض أول'), findsOneWidget);
+    expect(find.textContaining('١٠١'), findsWidgets);
+  });
 }

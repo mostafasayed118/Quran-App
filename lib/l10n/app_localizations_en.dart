@@ -169,6 +169,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String translationSearchTruncated(Object shown, Object total) {
+    return 'Showing the first $shown of $total results';
+  }
+
+  @override
   String get translationSearchAction => 'Search translations';
 
   @override

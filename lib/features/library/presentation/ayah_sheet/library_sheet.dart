@@ -9,6 +9,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
+import '../../../../core/utils/text_direction.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -241,7 +242,11 @@ class _SheetPane extends StatelessWidget {
               Text(
                 entry.text,
                 style: const TextStyle(fontSize: 16, height: 1.9),
-                textDirection: TextDirection.rtl,
+                // The shipped translation is English; forcing RTL puts its
+                // punctuation and parentheses on the wrong side.
+                textDirection: isArabicText(entry.text)
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
               ),
             ],
           ),

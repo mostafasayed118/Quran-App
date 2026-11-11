@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/utils/pager_icons.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/error_pane.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
@@ -139,12 +140,13 @@ class _MonthNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final direction = Directionality.of(context);
     return Row(
       textDirection: TextDirection.rtl,
       children: [
         IconButton(
           tooltip: loc.nextMonth,
-          icon: const Icon(Icons.chevron_right),
+          icon: Icon(pagerChevronFor(direction, next: true)),
           onPressed: () => context.read<HijriCubit>().next(),
         ),
         Expanded(
@@ -164,7 +166,7 @@ class _MonthNavBar extends StatelessWidget {
         ),
         IconButton(
           tooltip: loc.previousMonth,
-          icon: const Icon(Icons.chevron_left),
+          icon: Icon(pagerChevronFor(direction, next: false)),
           onPressed: () => context.read<HijriCubit>().prev(),
         ),
       ],

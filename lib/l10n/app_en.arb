@@ -84,6 +84,7 @@
   "translationSearchNoResults": "No results",
   "translationSearchNoPacks": "No translation is installed. Install one from the library first.",
   "translationSearchResults": "{count} results",
+  "translationSearchTruncated": "Showing the first {shown} of {total} results",
   "@translationSearchResults": {
     "placeholders": {
       "count": {

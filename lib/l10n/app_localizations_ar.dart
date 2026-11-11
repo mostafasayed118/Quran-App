@@ -169,6 +169,11 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String translationSearchTruncated(Object shown, Object total) {
+    return 'عرض أول $shown من $total نتيجة';
+  }
+
+  @override
   String get translationSearchAction => 'بحث في الترجمات';
 
   @override

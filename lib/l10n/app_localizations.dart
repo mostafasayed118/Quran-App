@@ -392,6 +392,12 @@ abstract class AppLocalizations {
   /// **'{count} نتيجة'**
   String translationSearchResults(String count);
 
+  /// No description provided for @translationSearchTruncated.
+  ///
+  /// In ar, this message translates to:
+  /// **'عرض أول {shown} من {total} نتيجة'**
+  String translationSearchTruncated(Object shown, Object total);
+
   /// No description provided for @translationSearchAction.
   ///
   /// In ar, this message translates to:

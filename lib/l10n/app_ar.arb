@@ -84,6 +84,7 @@
   "translationSearchNoResults": "لا توجد نتائج",
   "translationSearchNoPacks": "لا توجد ترجمة مثبتة. ثبّت ترجمة من المكتبة أولًا.",
   "translationSearchResults": "{count} نتيجة",
+  "translationSearchTruncated": "عرض أول {shown} من {total} نتيجة",
   "@translationSearchResults": {
     "placeholders": {
       "count": {

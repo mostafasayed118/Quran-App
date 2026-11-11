@@ -88,7 +88,9 @@ class SettingsScreen extends StatelessWidget {
                 wirdEnabled: wirdEnabled,
                 wirdTimeHm: wirdTimeHm,
                 permissionDenied: azkarPermissionDenied || wirdPermissionDenied,
-                adhanNameAr: adhanById(adhanId).nameAr,
+                adhanName: locale?.language == AppLanguage.english
+                    ? adhanById(adhanId).nameEn
+                    : adhanById(adhanId).nameAr,
                 backupSection: backupSection,
                 locale: locale,
                 theme: theme,
@@ -112,7 +114,7 @@ class _SettingsList extends StatelessWidget {
     required this.wirdEnabled,
     required this.wirdTimeHm,
     required this.permissionDenied,
-    required this.adhanNameAr,
+    required this.adhanName,
     required this.backupSection,
     required this.locale,
     required this.theme,
@@ -126,7 +128,7 @@ class _SettingsList extends StatelessWidget {
   final bool wirdEnabled;
   final String wirdTimeHm;
   final bool permissionDenied;
-  final String adhanNameAr;
+  final String adhanName;
   final Widget? backupSection;
   final AppLocaleController? locale;
   final AppThemeController? theme;
@@ -175,7 +177,7 @@ class _SettingsList extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.music_note_outlined),
           title: Text(loc.adhanTitle),
-          subtitle: Text(adhanNameAr),
+          subtitle: Text(adhanName),
           onTap: () async {
             await context.push(AppRoutes.adhanPicker);
             // The picker owns the write, so re-read on return; otherwise the
