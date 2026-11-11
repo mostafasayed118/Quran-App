@@ -171,7 +171,8 @@ Future<void> configureDependencies({
 void _registerQuran(AppDatabase db) {
   getIt.registerLazySingleton<SurahRepository>(() => SurahRepository(db));
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());
-  getIt.registerLazySingleton<AyahRepository>(() => AyahRepository(db));
+  getIt.registerLazySingleton<AyahRepository>(
+      () => AyahRepository(db, meta: getIt<BookmarkMetaRepository>()));
   getIt.registerLazySingleton<AyahLookup>(() => getIt<AyahRepository>());
   getIt.registerLazySingleton<AyahBatchLookup>(() => getIt<AyahRepository>());
   getIt.registerLazySingleton<HomeWidgetUpdater>(
@@ -242,6 +243,7 @@ void _registerRecitation(
         service: getIt<PlaybackService>(),
         reciters: getIt<ReciterRepository>(),
         downloader: getIt<AudioDownloader>(),
+        adhanStates: getIt<AdhanPlayer>().state,
       ));
 }
 

@@ -270,8 +270,10 @@ class _VersesListState extends State<_VersesList> {
   void initState() {
     super.initState();
     final state = widget.state;
-    final index =
-        state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
+    final anchor = state.currentAyahId;
+    final index = anchor > 0
+        ? state.ayahs.indexWhere((a) => a.id == anchor)
+        : state.ayahs.indexWhere((a) => a.numberInSurah == state.initialAyah);
     _initialIndex = index > 0 ? index : 0;
     _positions.itemPositions.addListener(_reportFirstVisible);
   }
@@ -561,9 +563,12 @@ class _MushafPagerState extends State<_MushafPager> {
   void initState() {
     super.initState();
     final pages = widget.state.mushafPages;
-    final target = widget.state.ayahs
-        .where((a) => a.numberInSurah == widget.state.initialAyah)
-        .toList();
+    final anchor = widget.state.currentAyahId;
+    final target = anchor > 0
+        ? widget.state.ayahs.where((a) => a.id == anchor).toList()
+        : widget.state.ayahs
+            .where((a) => a.numberInSurah == widget.state.initialAyah)
+            .toList();
     var index = 0;
     if (target.isNotEmpty) {
       final idx = pages.indexWhere((b) => b.page == target.first.page);

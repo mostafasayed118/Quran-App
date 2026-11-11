@@ -149,39 +149,45 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
             final delta = qiblaDeltaDeg(bearing, heading ?? 0);
             final aligned =
                 heading != null && delta.abs() <= kQiblaToleranceDeg;
-            return ListView(
+            // The page is short enough to build eagerly: the degree label is
+            // part of the same reading as the dial, and a lazy ListView could
+            // leave it unbuilt at large text scales.
+            return SingleChildScrollView(
               padding: appScrollPadding(
                   context, const EdgeInsets.all(AppSpacing.lg)),
-              children: [
-                _CityTile(title: city.nameAr),
-                const SizedBox(height: AppSpacing.lg),
-                _Dial(
-                  bearing: bearing,
-                  heading: heading,
-                  aligned: aligned,
-                  cityName: city.nameAr,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                if (heading == null)
-                  _CompassNote(
-                    text: compassUnavailable
-                        ? loc.compassStatic
-                        : loc.compassLive,
-                  )
-                else
-                  _CompassNote(text: loc.compassLive),
-                const SizedBox(height: AppSpacing.sm),
-                if (heading != null && calibrationNeeded)
-                  _CalibrationHint(text: loc.qiblaCalibrationHint),
-                if (heading != null && calibrationNeeded)
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _CityTile(title: city.nameAr),
+                  const SizedBox(height: AppSpacing.lg),
+                  _Dial(
+                    bearing: bearing,
+                    heading: heading,
+                    aligned: aligned,
+                    cityName: city.nameAr,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (heading == null)
+                    _CompassNote(
+                      text: compassUnavailable
+                          ? loc.compassStatic
+                          : loc.compassLive,
+                    )
+                  else
+                    _CompassNote(text: loc.compassLive),
                   const SizedBox(height: AppSpacing.sm),
-                if (heading != null)
-                  _AlignmentHint(delta: delta, aligned: aligned)
-                else
-                  const SizedBox.shrink(),
-                const SizedBox(height: AppSpacing.md),
-                _DegreesLabel(bearing: bearing),
-              ],
+                  if (heading != null && calibrationNeeded)
+                    _CalibrationHint(text: loc.qiblaCalibrationHint),
+                  if (heading != null && calibrationNeeded)
+                    const SizedBox(height: AppSpacing.sm),
+                  if (heading != null)
+                    _AlignmentHint(delta: delta, aligned: aligned)
+                  else
+                    const SizedBox.shrink(),
+                  const SizedBox(height: AppSpacing.md),
+                  _DegreesLabel(bearing: bearing),
+                ],
+              ),
             );
           },
         ),

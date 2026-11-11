@@ -851,7 +851,7 @@ abstract class AppLocalizations {
   /// No description provided for @degreesFromNorth.
   ///
   /// In ar, this message translates to:
-  /// **'{degrees}° عن الشمال'**
+  /// **'{degrees} درجة عن الشمال'**
   String degreesFromNorth(String degrees);
 
   /// No description provided for @azkarItemsCount.
@@ -1967,13 +1967,13 @@ abstract class AppLocalizations {
   /// No description provided for @qiblaTurnRight.
   ///
   /// In ar, this message translates to:
-  /// **'أدر الهاتف {degrees}° يمينًا'**
+  /// **'أدر الهاتف {degrees} درجة يمينًا'**
   String qiblaTurnRight(String degrees);
 
   /// No description provided for @qiblaTurnLeft.
   ///
   /// In ar, this message translates to:
-  /// **'أدر الهاتف {degrees}° يسارًا'**
+  /// **'أدر الهاتف {degrees} درجة يسارًا'**
   String qiblaTurnLeft(String degrees);
 
   /// No description provided for @more.

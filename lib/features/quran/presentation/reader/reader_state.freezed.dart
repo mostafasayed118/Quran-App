@@ -150,6 +150,7 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
+            int currentAyahId,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -169,6 +170,7 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
+            _that.currentAyahId,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -202,6 +204,7 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
+            int currentAyahId,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -220,6 +223,7 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
+            _that.currentAyahId,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -250,6 +254,7 @@ extension ReaderStatePatterns on ReaderState {
             String surahName,
             int initialAyah,
             List<Verse> ayahs,
+            int currentAyahId,
             ReaderMode mode,
             Set<int> bookmarkedAyahIds,
             bool showBasmala,
@@ -268,6 +273,7 @@ extension ReaderStatePatterns on ReaderState {
             _that.surahName,
             _that.initialAyah,
             _that.ayahs,
+            _that.currentAyahId,
             _that.mode,
             _that.bookmarkedAyahIds,
             _that.showBasmala,
@@ -363,6 +369,7 @@ class ReaderReady implements ReaderState {
       required this.surahName,
       required this.initialAyah,
       required List<Verse> ayahs,
+      this.currentAyahId = 0,
       this.mode = ReaderMode.verses,
       Set<int> bookmarkedAyahIds = const <int>{},
       this.showBasmala = true,
@@ -381,6 +388,10 @@ class ReaderReady implements ReaderState {
     return EqualUnmodifiableListView(_ayahs);
   }
 
+  /// The ayah the reader is on now. It survives a mode switch and is the
+  /// anchor both modes start from; [initialAyah] is only the route request.
+  @JsonKey()
+  final int currentAyahId;
   @JsonKey()
   final ReaderMode mode;
   final Set<int> _bookmarkedAyahIds;
@@ -417,6 +428,8 @@ class ReaderReady implements ReaderState {
             (identical(other.initialAyah, initialAyah) ||
                 other.initialAyah == initialAyah) &&
             const DeepCollectionEquality().equals(other.ayahs, _ayahs) &&
+            (identical(other.currentAyahId, currentAyahId) ||
+                other.currentAyahId == currentAyahId) &&
             (identical(other.mode, mode) || other.mode == mode) &&
             const DeepCollectionEquality()
                 .equals(other.bookmarkedAyahIds, _bookmarkedAyahIds) &&
@@ -436,6 +449,7 @@ class ReaderReady implements ReaderState {
         surahName,
         initialAyah,
         const DeepCollectionEquality().hash(_ayahs),
+        currentAyahId,
         mode,
         const DeepCollectionEquality().hash(_bookmarkedAyahIds),
         showBasmala,
@@ -445,7 +459,7 @@ class ReaderReady implements ReaderState {
 
   @override
   String toString() {
-    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale, lineHeight: $lineHeight)';
+    return 'ReaderState.ready(surahId: $surahId, surahName: $surahName, initialAyah: $initialAyah, ayahs: $ayahs, currentAyahId: $currentAyahId, mode: $mode, bookmarkedAyahIds: $bookmarkedAyahIds, showBasmala: $showBasmala, fontScale: $fontScale, lineHeight: $lineHeight)';
   }
 }
 
@@ -461,6 +475,7 @@ abstract mixin class $ReaderReadyCopyWith<$Res>
       String surahName,
       int initialAyah,
       List<Verse> ayahs,
+      int currentAyahId,
       ReaderMode mode,
       Set<int> bookmarkedAyahIds,
       bool showBasmala,
@@ -483,6 +498,7 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
     Object? surahName = null,
     Object? initialAyah = null,
     Object? ayahs = null,
+    Object? currentAyahId = null,
     Object? mode = null,
     Object? bookmarkedAyahIds = null,
     Object? showBasmala = null,
@@ -506,6 +522,10 @@ class _$ReaderReadyCopyWithImpl<$Res> implements $ReaderReadyCopyWith<$Res> {
           ? _self._ayahs
           : ayahs // ignore: cast_nullable_to_non_nullable
               as List<Verse>,
+      currentAyahId: null == currentAyahId
+          ? _self.currentAyahId
+          : currentAyahId // ignore: cast_nullable_to_non_nullable
+              as int,
       mode: null == mode
           ? _self.mode
           : mode // ignore: cast_nullable_to_non_nullable

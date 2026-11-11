@@ -38,7 +38,17 @@ CalculationParameters parametersFor(PrayerConfig config) {
       HighLatitudeRule.seventh_of_the_night,
     PrayerHighLatitudeRule.twilightAngle => HighLatitudeRule.twilight_angle,
   };
-  if (highLatitude != null) parameters.highLatitudeRule = highLatitude;
+  if (highLatitude != null) {
+    // adhan evaluates the rule for every computation and throws when the
+    // method carries no Isha angle (Umm al-Qura and Qatar set an interval
+    // instead). Fall back to the rule those methods already default to.
+    final unsupportedTwilight =
+        highLatitude == HighLatitudeRule.twilight_angle &&
+            parameters.ishaAngle == null;
+    parameters.highLatitudeRule = unsupportedTwilight
+        ? HighLatitudeRule.seventh_of_the_night
+        : highLatitude;
+  }
   return parameters;
 }
 

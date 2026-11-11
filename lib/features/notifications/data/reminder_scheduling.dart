@@ -111,6 +111,7 @@ Future<List<ScheduledReminder>> scheduleReminders({
       now: nowLocal,
       days: horizonDays,
       skipAt: seedPrayerAt,
+      prayerEnabled: prayerEnabled,
       enabledPrayers: config.enabledPrayers,
       preAdhanMinutes: config.preAdhanMinutes,
       adhanId: adhanId,

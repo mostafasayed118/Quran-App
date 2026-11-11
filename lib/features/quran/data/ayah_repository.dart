@@ -2,7 +2,9 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/domain/ayah_batch_lookup.dart';
+import '../../../core/utils/app_log.dart';
 import 'ayah_source.dart';
+import 'bookmark_meta.dart';
 import 'bookmark_pager.dart';
 
 export 'bookmark_pager.dart'
@@ -10,9 +12,10 @@ export 'bookmark_pager.dart'
 
 /// Reads ayahs and bookmarks from the local database.
 class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
-  AyahRepository(this._db);
+  AyahRepository(this._db, {BookmarkMetaSource? meta}) : _meta = meta;
 
   final AppDatabase _db;
+  final BookmarkMetaSource? _meta;
 
   @override
   Future<List<Ayah>> surahAyahs(int surahId) {
@@ -56,8 +59,8 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   }
 
   @override
-  Future<void> toggleBookmark(int ayahId) {
-    return _db.transaction(() async {
+  Future<void> toggleBookmark(int ayahId) async {
+    final removed = await _db.transaction(() async {
       final existing = await (_db.select(_db.bookmarks)
             ..where((b) => b.ayahId.equals(ayahId)))
           .getSingleOrNull();
@@ -66,17 +69,35 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
               BookmarksCompanion.insert(ayahId: ayahId),
               mode: InsertMode.insertOrIgnore,
             );
-      } else {
-        await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
-            .go();
+        return false;
       }
+      await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
+          .go();
+      return true;
     });
+    if (removed) await _removeMeta(ayahId);
   }
 
   @override
   Future<void> deleteBookmark(int ayahId) async {
     await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
         .go();
+    await _removeMeta(ayahId);
+  }
+
+  /// Best-effort cleanup outside the bookmark transaction.
+  ///
+  /// The bookmark is the source of truth; a settings write failure must not
+  /// turn a successful unbookmark into an error the user sees.
+  Future<void> _removeMeta(int ayahId) async {
+    final meta = _meta;
+    if (meta == null) return;
+    try {
+      await removeBookmarkMeta(meta, ayahId);
+    } on Object catch (error, stackTrace) {
+      appLog('bookmark meta cleanup failed',
+          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+    }
   }
 
   @override
