@@ -48,4 +48,36 @@ void main() {
     expect(find.text('المال الزكوي'), findsOneWidget);
     expect(find.textContaining('٢٥'), findsOneWidget);
   });
+
+  testWidgets('scientific notation is refused by the amount fields',
+      (tester) async {
+    final cubit = ZakatCubit();
+    addTearDown(cubit.close);
+    await tester.pumpWidget(BlocProvider<ZakatCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        home: const ZakatScreen(),
+      ),
+    ));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    final cash = find.byType(TextField).at(4);
+    await tester.enterText(cash, '1e3');
+    await tester.pump();
+
+    final editable = tester.widget<EditableText>(
+      find.descendant(of: cash, matching: find.byType(EditableText)),
+    );
+    expect(editable.controller.text, '13');
+  });
 }

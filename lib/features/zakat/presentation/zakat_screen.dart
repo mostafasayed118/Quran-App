@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
@@ -245,6 +246,11 @@ class _Field extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: TextField(
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        // Amounts are typed in decimal; scientific notation (1e3) would parse
+        // but reads as a typo, so the field refuses the exponent letters.
+        inputFormatters: [
+          FilteringTextInputFormatter.deny(RegExp('[eE]')),
+        ],
         // Filled + outlined like the app's cards: the raw Material underline
         // read as an empty row on the beige page.
         decoration: InputDecoration(
