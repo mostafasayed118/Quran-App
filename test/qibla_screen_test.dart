@@ -94,6 +94,33 @@ void main() {
     expect(find.text('المقياس حي'), findsOneWidget);
   });
 
+  testWidgets('the arrow crosses north with a small step, not a full spin',
+      (tester) async {
+    final controller = StreamController<double>();
+    addTearDown(controller.close);
+    await pumpHost(
+      tester,
+      seeded: true,
+      heading: HeadingService(streamFactory: () => controller.stream),
+    );
+
+    controller.add(120.0);
+    await tester.pump();
+    await tester.pump();
+    final before =
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns;
+
+    controller.add(140.0);
+    await tester.pump();
+    await tester.pump();
+    final after =
+        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns;
+
+    expect(after, lessThan(before),
+        reason: 'the dial angle wraps past north; the turns must not');
+    expect(after, closeTo(before - 20 / 360.0, 1e-9));
+  });
+
   testWidgets('without a live heading the dial stays static and no hint shows',
       (tester) async {
     await pumpHost(tester, seeded: true);
