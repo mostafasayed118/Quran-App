@@ -64,7 +64,8 @@ class DuasScreen extends StatelessWidget {
               Expanded(
                 child: switch (state) {
                   DuasLoading() => const LoadingView(),
-                  DuasFailed() => errorPane(loc),
+                  DuasFailed() =>
+                    errorPane(loc, onRetry: context.read<DuasCubit>().start),
                   DuasInView() => const _DuasView(),
                   RuqyahInView() => const _RuqyahView(),
                 },
@@ -85,8 +86,9 @@ class _DuasView extends StatelessWidget {
     return BlocBuilder<DuasCubit, DuasState>(
       builder: (context, state) {
         final view = state as DuasInView;
+        final loc = AppLocalizations.of(context);
         if (view.entries.isEmpty) {
-          return EmptyState(AppLocalizations.of(context).noResults);
+          return EmptyState(loc.noResults);
         }
         return Column(
           children: [
@@ -101,7 +103,11 @@ class _DuasView extends StatelessWidget {
                         start: AppSpacing.xs,
                       ),
                       child: ChoiceChip(
-                        label: Text(category),
+                        label: Text(
+                          loc.localeName == 'ar'
+                              ? category
+                              : (view.categoryLabels[category] ?? category),
+                        ),
                         selected: view.selectedCategory == category,
                         onSelected: (_) =>
                             context.read<DuasCubit>().selectCategory(

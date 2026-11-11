@@ -10,9 +10,13 @@ import 'hijri_state.dart';
 class HijriCubit extends Cubit<HijriState> {
   /// Creates the cubit; the constructor is side-effect free and does no
   /// work — [start] performs the first load.
-  HijriCubit({required HijriService service, HijriOffsetSource? offset})
-      : _service = service,
+  HijriCubit({
+    required HijriService service,
+    HijriOffsetSource? offset,
+    String Function()? locale,
+  })  : _service = service,
         _offset = offset,
+        _locale = locale,
         super(const HijriState.loading());
 
   /// Loads the saved local correction, then shows today.
@@ -23,6 +27,9 @@ class HijriCubit extends Cubit<HijriState> {
 
   final HijriService _service;
   final HijriOffsetSource? _offset;
+  final String Function()? _locale;
+
+  String _language() => _locale?.call() ?? 'ar';
 
   /// Shows the given Hijri month and emits the ready state.
   ///
@@ -45,13 +52,15 @@ class HijriCubit extends Cubit<HijriState> {
                 todayHijri.hDay == day,
           ),
       ];
+      final language = _language();
       final todayHeader =
-          '${_arabic(todayHijri.hDay)} ${_service.monthName(todayHijri.hYear, todayHijri.hMonth)} ${_arabic(todayHijri.hYear)}';
+          '${_arabic(todayHijri.hDay)} ${_service.localizedMonthName(todayHijri.hYear, todayHijri.hMonth, locale: language)} ${_arabic(todayHijri.hYear)}';
       if (isClosed) return;
       emit(HijriState.ready(
         month: hijriMonth,
         year: hijriYear,
-        monthName: _service.monthName(hijriYear, hijriMonth),
+        monthName: _service.localizedMonthName(hijriYear, hijriMonth,
+            locale: language),
         offset: offset,
         cells: cells,
         todayHeader: todayHeader,

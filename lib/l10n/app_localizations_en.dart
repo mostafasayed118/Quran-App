@@ -1134,6 +1134,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get downloadsEmpty => 'No downloaded recitations yet';
 
   @override
+  String get downloadsNoSpace =>
+      'Not enough space on this device. Free some space, then try again.';
+
+  @override
   String get downloadsDeleteBody =>
       'This file will be removed from your device.';
 

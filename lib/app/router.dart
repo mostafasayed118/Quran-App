@@ -515,6 +515,7 @@ abstract final class AppRouter {
             create: () => HijriCubit(
               service: getIt<HijriService>(),
               offset: getIt<HijriOffsetSource>(),
+              locale: () => getIt<AppLocaleController>().language.code,
             ),
             identity: AppRoutes.hijri,
             start: (cubit) => cubit.start(),

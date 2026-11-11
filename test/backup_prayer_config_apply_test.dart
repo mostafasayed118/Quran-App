@@ -55,6 +55,32 @@ void main() {
     expect(reschedules, 1);
   });
 
+  test('a failed reminder re-plan does not turn the import into a failure',
+      () async {
+    final db = newTestDb();
+    final service = BackupService(
+      db: db,
+      reschedule: () async => throw StateError('schedule down'),
+    );
+
+    final outcome = await service.apply(_document({
+      PrayerConfig.methodKey: 'ummAlQura',
+      PrayerConfig.madhabKey: 'hanafi',
+      PrayerConfig.enabledPrayersKey: 'fajr,dhuhr',
+      PrayerConfig.preAdhanMinutesKey: '10',
+    }));
+
+    expect(outcome.rescheduleFailed, isTrue);
+    expect(outcome.rescheduled, isTrue);
+    expect(outcome.summary.settingsKeysApplied, 4);
+
+    final row = await (db.select(db.settingsTable)
+          ..where((setting) => setting.key.equals(PrayerConfig.methodKey)))
+        .getSingle();
+    expect(row.value, 'ummAlQura',
+        reason: 'the transaction committed before the hook ran');
+  });
+
   test('an imported font scale and azkar state are written without a re-plan',
       () async {
     final db = newTestDb();

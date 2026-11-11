@@ -721,6 +721,7 @@
   "languageEnglish": "English",
   "downloadsTitle": "Downloads",
   "downloadsEmpty": "No downloaded recitations yet",
+  "downloadsNoSpace": "Not enough space on this device. Free some space, then try again.",
   "downloadsDeleteBody": "This file will be removed from your device.",
   "downloadsTotal": "Storage used: {size} MB",
   "@downloadsTotal": {

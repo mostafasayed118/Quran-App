@@ -345,6 +345,11 @@ class __$DownloadItemCopyWithImpl<$Res>
 mixin _$DownloadsState {
   Map<String, DownloadItem> get items;
 
+  /// True when the last failure was a full disk; the screen shows the
+  /// localized "not enough space" strip until the user dismisses it or a
+  /// later download succeeds.
+  bool get outOfSpace;
+
   /// Create a copy of DownloadsState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -359,20 +364,22 @@ mixin _$DownloadsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is DownloadsState &&
-            const DeepCollectionEquality().equals(other.items, _this.items));
+            const DeepCollectionEquality().equals(other.items, _this.items) &&
+            (identical(other.outOfSpace, _this.outOfSpace) ||
+                other.outOfSpace == _this.outOfSpace));
   }
 
   @override
   int get hashCode {
     final _this = this as DownloadsState;
-    return Object.hash(
-        runtimeType, const DeepCollectionEquality().hash(_this.items));
+    return Object.hash(runtimeType,
+        const DeepCollectionEquality().hash(_this.items), _this.outOfSpace);
   }
 
   @override
   String toString() {
     final _this = this as DownloadsState;
-    return 'DownloadsState(items: ${_this.items})';
+    return 'DownloadsState(items: ${_this.items}, outOfSpace: ${_this.outOfSpace})';
   }
 }
 
@@ -382,7 +389,7 @@ abstract mixin class $DownloadsStateCopyWith<$Res> {
           DownloadsState value, $Res Function(DownloadsState) _then) =
       _$DownloadsStateCopyWithImpl;
   @useResult
-  $Res call({Map<String, DownloadItem> items});
+  $Res call({Map<String, DownloadItem> items, bool outOfSpace});
 }
 
 /// @nodoc
@@ -399,12 +406,17 @@ class _$DownloadsStateCopyWithImpl<$Res>
   @override
   $Res call({
     Object? items = null,
+    Object? outOfSpace = null,
   }) {
     return _then(DownloadsState(
       items: null == items
           ? _self.items
           : items // ignore: cast_nullable_to_non_nullable
               as Map<String, DownloadItem>,
+      outOfSpace: null == outOfSpace
+          ? _self.outOfSpace
+          : outOfSpace // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }
@@ -500,13 +512,14 @@ extension DownloadsStatePatterns on DownloadsState {
 
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>(
-    TResult Function(Map<String, DownloadItem> items)? $default, {
+    TResult Function(Map<String, DownloadItem> items, bool outOfSpace)?
+        $default, {
     required TResult orElse(),
   }) {
     final _that = this;
     switch (_that) {
       case _DownloadsState() when $default != null:
-        return $default(_that.items);
+        return $default(_that.items, _that.outOfSpace);
       case _:
         return orElse();
     }
@@ -527,12 +540,12 @@ extension DownloadsStatePatterns on DownloadsState {
 
   @optionalTypeArgs
   TResult when<TResult extends Object?>(
-    TResult Function(Map<String, DownloadItem> items) $default,
+    TResult Function(Map<String, DownloadItem> items, bool outOfSpace) $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DownloadsState():
-        return $default(_that.items);
+        return $default(_that.items, _that.outOfSpace);
     }
   }
 
@@ -550,12 +563,13 @@ extension DownloadsStatePatterns on DownloadsState {
 
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>(
-    TResult? Function(Map<String, DownloadItem> items)? $default,
+    TResult? Function(Map<String, DownloadItem> items, bool outOfSpace)?
+        $default,
   ) {
     final _that = this;
     switch (_that) {
       case _DownloadsState() when $default != null:
-        return $default(_that.items);
+        return $default(_that.items, _that.outOfSpace);
       case _:
         return null;
     }
@@ -566,7 +580,8 @@ extension DownloadsStatePatterns on DownloadsState {
 
 class _DownloadsState implements DownloadsState {
   const _DownloadsState(
-      {Map<String, DownloadItem> items = const <String, DownloadItem>{}})
+      {Map<String, DownloadItem> items = const <String, DownloadItem>{},
+      this.outOfSpace = false})
       : _items = items;
 
   final Map<String, DownloadItem> _items;
@@ -577,6 +592,13 @@ class _DownloadsState implements DownloadsState {
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableMapView(_items);
   }
+
+  /// True when the last failure was a full disk; the screen shows the
+  /// localized "not enough space" strip until the user dismisses it or a
+  /// later download succeeds.
+  @override
+  @JsonKey()
+  final bool outOfSpace;
 
   /// Create a copy of DownloadsState
   /// with the given fields replaced by the non-null parameter values.
@@ -591,18 +613,20 @@ class _DownloadsState implements DownloadsState {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _DownloadsState &&
-            const DeepCollectionEquality().equals(other.items, _items));
+            const DeepCollectionEquality().equals(other.items, _items) &&
+            (identical(other.outOfSpace, outOfSpace) ||
+                other.outOfSpace == outOfSpace));
   }
 
   @override
   int get hashCode {
     return Object.hash(
-        runtimeType, const DeepCollectionEquality().hash(_items));
+        runtimeType, const DeepCollectionEquality().hash(_items), outOfSpace);
   }
 
   @override
   String toString() {
-    return 'DownloadsState(items: $items)';
+    return 'DownloadsState(items: $items, outOfSpace: $outOfSpace)';
   }
 }
 
@@ -614,7 +638,7 @@ abstract mixin class _$DownloadsStateCopyWith<$Res>
       __$DownloadsStateCopyWithImpl;
   @override
   @useResult
-  $Res call({Map<String, DownloadItem> items});
+  $Res call({Map<String, DownloadItem> items, bool outOfSpace});
 }
 
 /// @nodoc
@@ -631,12 +655,17 @@ class __$DownloadsStateCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   $Res call({
     Object? items = null,
+    Object? outOfSpace = null,
   }) {
     return _then(_DownloadsState(
       items: null == items
           ? _self._items
           : items // ignore: cast_nullable_to_non_nullable
               as Map<String, DownloadItem>,
+      outOfSpace: null == outOfSpace
+          ? _self.outOfSpace
+          : outOfSpace // ignore: cast_nullable_to_non_nullable
+              as bool,
     ));
   }
 }

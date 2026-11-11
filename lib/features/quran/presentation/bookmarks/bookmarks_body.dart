@@ -49,7 +49,10 @@ class BookmarksBody extends StatelessWidget {
     return BlocBuilder<BookmarksCubit, BookmarksState>(
       builder: (context, state) => switch (state) {
         BookmarksLoading() => const LoadingView(),
-        BookmarksFailed() => errorPane(loc),
+        BookmarksFailed() => errorPane(
+            loc,
+            onRetry: context.read<BookmarksCubit>().reload,
+          ),
         BookmarksReady() => state.entries.isEmpty
             ? EmptyState(
                 loc.noBookmarks,

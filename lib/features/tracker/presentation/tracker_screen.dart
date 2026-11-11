@@ -43,7 +43,8 @@ class TrackerScreen extends StatelessWidget {
           child: BlocBuilder<TrackerCubit, TrackerState>(
             builder: (context, state) => switch (state) {
               TrackerLoading() => const LoadingView(),
-              TrackerFailed() => errorPane(loc),
+              TrackerFailed() =>
+                errorPane(loc, onRetry: context.read<TrackerCubit>().reload),
               TrackerReady(
                 :final today,
                 :final streakDays,

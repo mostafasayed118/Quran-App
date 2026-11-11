@@ -1130,6 +1130,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get downloadsEmpty => 'لا توجد تلاوات منزّلة بعد';
 
   @override
+  String get downloadsNoSpace =>
+      'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.';
+
+  @override
   String get downloadsDeleteBody => 'سيُحذف هذا الملف من جهازك.';
 
   @override

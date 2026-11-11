@@ -87,6 +87,7 @@ class HomeCubit extends Cubit<HomeState> {
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
         cityTimezone: selected?.timezone,
+        cityNameEn: selected?.nameEn,
       ));
       await _syncWidget(nextPrayerCard, selected?.timezone);
       _scheduleNextPrayerRefresh(nextPrayerCard);

@@ -149,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
               :final lastRead,
               :final nextPrayer,
               :final cityTimezone,
+              :final cityNameEn,
             ) =>
               ListView(
                 padding: appScrollPadding(
@@ -175,6 +176,7 @@ class _HomeScreenState extends State<HomeScreen>
                         _NextPrayerCard(
                           prayer: nextPrayer,
                           timezone: cityTimezone,
+                          cityNameEn: cityNameEn,
                         )
                       else
                         const _NoCityCard(),
@@ -286,10 +288,15 @@ class _ContinueReadingCard extends StatelessWidget {
 }
 
 class _NextPrayerCard extends StatelessWidget {
-  const _NextPrayerCard({required this.prayer, this.timezone});
+  const _NextPrayerCard({
+    required this.prayer,
+    this.timezone,
+    this.cityNameEn,
+  });
 
   final NextPrayerCard prayer;
   final String? timezone;
+  final String? cityNameEn;
 
   @override
   Widget build(BuildContext context) {
@@ -363,7 +370,9 @@ class _NextPrayerCard extends StatelessWidget {
                                   .withValues(alpha: 0.7),
                             ),
                             Text(
-                              prayer.cityName,
+                              loc.localeName == 'ar'
+                                  ? prayer.cityName
+                                  : (cityNameEn ?? prayer.cityName),
                               style: AppTheme.caption.copyWith(
                                 color: colors.onPrimaryContainer
                                     .withValues(alpha: 0.7),

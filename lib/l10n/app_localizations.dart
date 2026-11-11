@@ -2090,6 +2090,12 @@ abstract class AppLocalizations {
   /// **'لا توجد تلاوات منزّلة بعد'**
   String get downloadsEmpty;
 
+  /// Shown when a download fails because the device storage is full.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.'**
+  String get downloadsNoSpace;
+
   /// No description provided for @downloadsDeleteBody.
   ///
   /// In ar, this message translates to:

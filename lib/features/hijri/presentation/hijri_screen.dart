@@ -26,7 +26,8 @@ class HijriScreen extends StatelessWidget {
         child: BlocBuilder<HijriCubit, HijriState>(
           builder: (context, state) => switch (state) {
             HijriLoading() => const LoadingView(),
-            HijriFailed() => errorPane(loc),
+            HijriFailed() =>
+              errorPane(loc, onRetry: context.read<HijriCubit>().start),
             HijriReady(
               :final monthName,
               :final year,
