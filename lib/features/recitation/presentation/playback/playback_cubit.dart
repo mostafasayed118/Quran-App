@@ -69,6 +69,10 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   String _rowId = '';
   String _server = '';
 
+  /// The surahs the current reciter serves, in catalog order. Empty falls
+  /// back to the whole 1..114 range (old behaviour).
+  List<int> _surahNumbers = const <int>[];
+
   /// Player preferences that survive track changes.
   double _speed = 1.0;
   PlaybackRepeatMode _repeatMode = PlaybackRepeatMode.off;
@@ -109,9 +113,23 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// [surahName] is the display name when the caller knows it; the player
   /// shows it instead of a bare number.
   Future<void> playReciter(ReciterInfo reciter, int surahNumber,
-          {String surahName = ''}) =>
-      _start(reciter.id, reciter.reciterName, reciter.server, surahNumber,
-          surahName);
+      {String surahName = ''}) {
+    _useQueue(reciter.surahList);
+    return _start(reciter.id, reciter.reciterName, reciter.server, surahNumber,
+        surahName);
+  }
+
+  /// Parses the reciter's comma-separated surah list into a queue.
+  void _useQueue(String surahList) {
+    final numbers = <int>[];
+    for (final part in surahList.split(',')) {
+      final number = int.tryParse(part.trim());
+      if (number != null && number >= kFirstSurahId && number <= kSurahCount) {
+        numbers.add(number);
+      }
+    }
+    _surahNumbers = numbers;
+  }
 
   Future<void> _start(String rowId, String reciterName, String server,
       int surahNumber, String surahName) async {
@@ -273,6 +291,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// Plays the previous surah of the current reciter when one exists.
   Future<void> previousSurah() => _skipTo(-1);
 
+  /// Whether the current track has a next surah in this reciter's list.
+  bool get hasNextSurah => _stepTarget(1) != null;
+
+  /// Whether the current track has a previous surah in this reciter's list.
+  bool get hasPreviousSurah => _stepTarget(-1) != null;
+
   /// Applies the retained speed/loop preference to a freshly loaded source.
   Future<void> _applyTuning() async {
     if (_service case final TunablePlaybackService tunable) {
@@ -287,6 +311,16 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   Future<void> _skipTo(int delta) async {
+    final target = _stepTarget(delta);
+    if (target == null || _rowId.isEmpty) return;
+    await _start(_rowId, _reciterName, _server, target, '');
+  }
+
+  /// The surah [delta] steps away in the reciter's list, or null at an edge.
+  ///
+  /// A reciter that serves a subset must step within that subset (1, 3, 7 -
+  /// never the missing 2); an unknown/empty list falls back to 1..114.
+  int? _stepTarget(int delta) {
     final state = this.state;
     final current = switch (state) {
       PlaybackPlaying(:final surahNumber) => surahNumber,
@@ -294,10 +328,18 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       PlaybackLoading(:final surahNumber) => surahNumber,
       PlaybackFailed() => 0,
     };
-    if (current <= 0 || _rowId.isEmpty) return;
+    if (current <= 0) return null;
+    final queue = _surahNumbers;
+    final index = queue.indexOf(current);
+    if (index >= 0) {
+      final nextIndex = index + delta;
+      return nextIndex < 0 || nextIndex >= queue.length
+          ? null
+          : queue[nextIndex];
+    }
     final next = current + delta;
-    if (next < kFirstSurahId || next > kSurahCount) return;
-    await _start(_rowId, _reciterName, _server, next, '');
+    if (next < kFirstSurahId || next > kSurahCount) return null;
+    return next;
   }
 
   /// The end-of-track policy: repeat the surah or stop.
@@ -489,6 +531,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _sleepTimer = null;
     _sleepTimerDuration = null;
     _rowId = '';
+    _surahNumbers = const <int>[];
     final episode = ++_episode;
     try {
       await _service.stop();
@@ -545,6 +588,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _sleepTimer = null;
     _sleepTimerDuration = null;
     _rowId = '';
+    _surahNumbers = const <int>[];
     _episode++;
     unawaited(_unbindStreams());
     if (!isClosed) emit(const PlaybackState.initial());

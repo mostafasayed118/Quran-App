@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/domain/quran_limits.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -393,7 +392,7 @@ class _TransportRow extends StatelessWidget {
       children: [
         IconButton(
           tooltip: loc.previousSurah,
-          onPressed: track.surahNumber > 1 ? cubit.previousSurah : null,
+          onPressed: cubit.hasPreviousSurah ? cubit.previousSurah : null,
           icon: const Icon(Icons.skip_previous),
         ),
         const SizedBox(width: AppSpacing.sm),
@@ -406,9 +405,7 @@ class _TransportRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         IconButton(
           tooltip: loc.nextSurah,
-          onPressed: track.surahNumber > 0 && track.surahNumber < kSurahCount
-              ? cubit.nextSurah
-              : null,
+          onPressed: cubit.hasNextSurah ? cubit.nextSurah : null,
           icon: const Icon(Icons.skip_next),
         ),
         const SizedBox(width: AppSpacing.lg),
