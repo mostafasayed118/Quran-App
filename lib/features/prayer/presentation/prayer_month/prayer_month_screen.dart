@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/city_clock.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -47,8 +48,18 @@ class PrayerMonthScreen extends StatelessWidget {
             PrayerMonthReady(:final city, :final days)
                 when city == null || days.isEmpty =>
               EmptyState(loc.noCity, icon: Icons.location_off_outlined),
-            PrayerMonthReady(:final year, :final month, :final days) =>
-              _MonthList(year: year, month: month, days: days),
+            PrayerMonthReady(
+              :final city,
+              :final year,
+              :final month,
+              :final days,
+            ) =>
+              _MonthList(
+                year: year,
+                month: month,
+                days: days,
+                timezone: city?.timezone,
+              ),
           },
         ),
       ),
@@ -61,11 +72,13 @@ class _MonthList extends StatelessWidget {
     required this.year,
     required this.month,
     required this.days,
+    this.timezone,
   });
 
   final int year;
   final int month;
   final List<PrayerMonthDay> days;
+  final String? timezone;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +126,7 @@ class _MonthList extends StatelessWidget {
                 children: [
                   for (final prayer in day.prayers)
                     Text(
-                      '${prayer.name.label(loc)} ${formatHm(prayer.time, arabicIndic: loc.usesArabicIndicDigits)}',
+                      '${prayer.name.label(loc)} ${formatHm(cityWallClock(prayer.time, timezone), arabicIndic: loc.usesArabicIndicDigits)}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                 ],

@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/city_clock.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -144,7 +145,12 @@ class _HomeScreenState extends State<HomeScreen>
                 loc,
                 onRetry: () => context.read<HomeCubit>().reload(),
               ),
-            HomeReady(:final lastRead, :final nextPrayer) => ListView(
+            HomeReady(
+              :final lastRead,
+              :final nextPrayer,
+              :final cityTimezone,
+            ) =>
+              ListView(
                 padding: appScrollPadding(
                   context,
                   const EdgeInsets.fromLTRB(
@@ -166,7 +172,10 @@ class _HomeScreenState extends State<HomeScreen>
                       if (lastRead != null)
                         const SizedBox(height: AppSpacing.sm),
                       if (nextPrayer != null)
-                        _NextPrayerCard(prayer: nextPrayer)
+                        _NextPrayerCard(
+                          prayer: nextPrayer,
+                          timezone: cityTimezone,
+                        )
                       else
                         const _NoCityCard(),
                       SectionHeader(title: loc.homeSectionQuran, inset: 0),
@@ -277,9 +286,10 @@ class _ContinueReadingCard extends StatelessWidget {
 }
 
 class _NextPrayerCard extends StatelessWidget {
-  const _NextPrayerCard({required this.prayer});
+  const _NextPrayerCard({required this.prayer, this.timezone});
 
   final NextPrayerCard prayer;
+  final String? timezone;
 
   @override
   Widget build(BuildContext context) {
@@ -338,7 +348,7 @@ class _NextPrayerCard extends StatelessWidget {
                           children: [
                             Text(
                               formatHm(
-                                prayer.time,
+                                cityWallClock(prayer.time, timezone),
                                 arabicIndic: loc.usesArabicIndicDigits,
                               ),
                               style: AppTheme.caption.copyWith(

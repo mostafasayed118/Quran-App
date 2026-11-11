@@ -24,5 +24,6 @@ sealed class HomeState with _$HomeState {
   const factory HomeState.ready({
     @Default(null) LastReadCard? lastRead,
     @Default(null) NextPrayerCard? nextPrayer,
+    @Default(null) String? cityTimezone,
   }) = HomeReady;
 }

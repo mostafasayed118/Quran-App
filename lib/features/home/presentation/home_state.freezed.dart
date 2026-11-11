@@ -146,7 +146,9 @@ extension HomeStatePatterns on HomeState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loading,
     TResult Function()? failed,
-    TResult Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)? ready,
+    TResult Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer,
+            String? cityTimezone)?
+        ready,
     required TResult orElse(),
   }) {
     final _that = this;
@@ -156,7 +158,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed() when failed != null:
         return failed();
       case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer);
+        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone);
       case _:
         return orElse();
     }
@@ -179,8 +181,8 @@ extension HomeStatePatterns on HomeState {
   TResult when<TResult extends Object?>({
     required TResult Function() loading,
     required TResult Function() failed,
-    required TResult Function(
-            LastReadCard? lastRead, NextPrayerCard? nextPrayer)
+    required TResult Function(LastReadCard? lastRead,
+            NextPrayerCard? nextPrayer, String? cityTimezone)
         ready,
   }) {
     final _that = this;
@@ -190,7 +192,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed():
         return failed();
       case HomeReady():
-        return ready(_that.lastRead, _that.nextPrayer);
+        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone);
     }
   }
 
@@ -210,7 +212,8 @@ extension HomeStatePatterns on HomeState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loading,
     TResult? Function()? failed,
-    TResult? Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer)?
+    TResult? Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer,
+            String? cityTimezone)?
         ready,
   }) {
     final _that = this;
@@ -220,7 +223,7 @@ extension HomeStatePatterns on HomeState {
       case HomeFailed() when failed != null:
         return failed();
       case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer);
+        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone);
       case _:
         return null;
     }
@@ -270,12 +273,15 @@ class HomeFailed implements HomeState {
 /// @nodoc
 
 class HomeReady implements HomeState {
-  const HomeReady({this.lastRead = null, this.nextPrayer = null});
+  const HomeReady(
+      {this.lastRead = null, this.nextPrayer = null, this.cityTimezone = null});
 
   @JsonKey()
   final LastReadCard? lastRead;
   @JsonKey()
   final NextPrayerCard? nextPrayer;
+  @JsonKey()
+  final String? cityTimezone;
 
   /// Create a copy of HomeState
   /// with the given fields replaced by the non-null parameter values.
@@ -292,17 +298,19 @@ class HomeReady implements HomeState {
             (identical(other.lastRead, lastRead) ||
                 other.lastRead == lastRead) &&
             (identical(other.nextPrayer, nextPrayer) ||
-                other.nextPrayer == nextPrayer));
+                other.nextPrayer == nextPrayer) &&
+            (identical(other.cityTimezone, cityTimezone) ||
+                other.cityTimezone == cityTimezone));
   }
 
   @override
   int get hashCode {
-    return Object.hash(runtimeType, lastRead, nextPrayer);
+    return Object.hash(runtimeType, lastRead, nextPrayer, cityTimezone);
   }
 
   @override
   String toString() {
-    return 'HomeState.ready(lastRead: $lastRead, nextPrayer: $nextPrayer)';
+    return 'HomeState.ready(lastRead: $lastRead, nextPrayer: $nextPrayer, cityTimezone: $cityTimezone)';
   }
 }
 
@@ -312,7 +320,10 @@ abstract mixin class $HomeReadyCopyWith<$Res>
   factory $HomeReadyCopyWith(HomeReady value, $Res Function(HomeReady) _then) =
       _$HomeReadyCopyWithImpl;
   @useResult
-  $Res call({LastReadCard? lastRead, NextPrayerCard? nextPrayer});
+  $Res call(
+      {LastReadCard? lastRead,
+      NextPrayerCard? nextPrayer,
+      String? cityTimezone});
 }
 
 /// @nodoc
@@ -328,6 +339,7 @@ class _$HomeReadyCopyWithImpl<$Res> implements $HomeReadyCopyWith<$Res> {
   $Res call({
     Object? lastRead = freezed,
     Object? nextPrayer = freezed,
+    Object? cityTimezone = freezed,
   }) {
     return _then(HomeReady(
       lastRead: freezed == lastRead
@@ -338,6 +350,10 @@ class _$HomeReadyCopyWithImpl<$Res> implements $HomeReadyCopyWith<$Res> {
           ? _self.nextPrayer
           : nextPrayer // ignore: cast_nullable_to_non_nullable
               as NextPrayerCard?,
+      cityTimezone: freezed == cityTimezone
+          ? _self.cityTimezone
+          : cityTimezone // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }

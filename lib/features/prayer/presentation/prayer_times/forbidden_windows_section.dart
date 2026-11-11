@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/city_clock.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/forbidden_windows.dart';
 import 'prayer_times_state.dart';
@@ -15,15 +16,23 @@ import 'prayer_times_state.dart';
 /// avoids the [Card] widget so the panel stays the only schedule card.
 class ForbiddenWindowsSection extends StatelessWidget {
   /// Creates the section from the day's entries.
-  const ForbiddenWindowsSection({super.key, required this.entries});
+  const ForbiddenWindowsSection({
+    super.key,
+    required this.entries,
+    this.timezone,
+  });
 
   /// Today's six times (sunrise included).
   final List<PrayerEntry> entries;
 
+  /// The selected city's IANA zone; null keeps the device wall clock.
+  final String? timezone;
+
   @override
   Widget build(BuildContext context) {
     final times = <PrayerName, DateTime>{
-      for (final entry in entries) entry.name: entry.time,
+      for (final entry in entries)
+        entry.name: cityWallClock(entry.time, timezone),
     };
     final fajr = times[PrayerName.fajr];
     final sunrise = times[PrayerName.sunrise];

@@ -12,6 +12,7 @@ import 'package:quran_yahdi/core/l10n/prayer_names.dart';
 import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'package:quran_yahdi/core/utils/arabic_numbers.dart';
+import 'package:quran_yahdi/core/utils/city_clock.dart';
 
 import 'home_state.dart';
 
@@ -80,12 +81,14 @@ class HomeCubit extends Cubit<HomeState> {
       ]);
       final lastReadCard = results[0] as LastReadCard?;
       final nextPrayerCard = results[1] as NextPrayerCard?;
+      final selected = await _city.selectedCity();
       if (isClosed || seq != _reloadSeq) return;
       emit(HomeState.ready(
         lastRead: lastReadCard,
         nextPrayer: nextPrayerCard,
+        cityTimezone: selected?.timezone,
       ));
-      await _syncWidget(nextPrayerCard);
+      await _syncWidget(nextPrayerCard, selected?.timezone);
       _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
       appLog('home load failed',
@@ -124,7 +127,7 @@ class HomeCubit extends Cubit<HomeState> {
   ///
   /// Best-effort: a missing card or updater is a no-op, and a platform failure
   /// is logged instead of failing the home load.
-  Future<void> _syncWidget(NextPrayerCard? card) async {
+  Future<void> _syncWidget(NextPrayerCard? card, String? timezone) async {
     final updater = _widgetUpdater;
     if (card == null || updater == null) return;
     final loc = platformLocalizations();
@@ -133,7 +136,10 @@ class HomeCubit extends Cubit<HomeState> {
         appName: loc.appName,
         label: loc.nextPrayer,
         prayer: card.name.label(loc),
-        time: formatHm(card.time, arabicIndic: loc.usesArabicIndicDigits),
+        time: formatHm(
+          cityWallClock(card.time, timezone),
+          arabicIndic: loc.usesArabicIndicDigits,
+        ),
         city: card.cityName,
       );
     } on Object catch (error, stackTrace) {

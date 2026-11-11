@@ -13,6 +13,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
+import '../../../../core/utils/city_clock.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -171,6 +172,7 @@ class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
                   entry: entries[i],
                   remaining: state.remaining,
                   loc: loc,
+                  timezone: state.city?.timezone,
                 ),
                 if (i != entries.length - 1)
                   const Divider(height: 1, indent: 14, endIndent: 14),
@@ -185,10 +187,14 @@ class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
             name: state.nextTomorrowName!,
             time: state.nextTomorrowTime!,
             remaining: state.nextTomorrowRemaining,
+            timezone: state.city?.timezone,
           ),
         ],
         const SizedBox(height: AppSpacing.md),
-        ForbiddenWindowsSection(entries: entries),
+        ForbiddenWindowsSection(
+          entries: entries,
+          timezone: state.city?.timezone,
+        ),
       ],
     );
   }
@@ -203,11 +209,13 @@ class _TomorrowNote extends StatelessWidget {
     required this.name,
     required this.time,
     required this.remaining,
+    this.timezone,
   });
 
   final PrayerName name;
   final DateTime time;
   final Duration? remaining;
+  final String? timezone;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +248,10 @@ class _TomorrowNote extends StatelessWidget {
                   Text(
                     loc.nextPrayerTomorrow(
                       name.label(loc),
-                      formatHm(time, arabicIndic: loc.usesArabicIndicDigits),
+                      formatHm(
+                        cityWallClock(time, timezone),
+                        arabicIndic: loc.usesArabicIndicDigits,
+                      ),
                     ),
                     style: AppTheme.cardTitle.copyWith(fontSize: 15),
                   ),
@@ -327,11 +338,13 @@ class _PrayerRow extends StatelessWidget {
     required this.entry,
     required this.remaining,
     required this.loc,
+    this.timezone,
   });
 
   final PrayerEntry entry;
   final Duration? remaining;
   final AppLocalizations loc;
+  final String? timezone;
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +409,10 @@ class _PrayerRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           Text(
-            formatHm(entry.time, arabicIndic: loc.usesArabicIndicDigits),
+            formatHm(
+              cityWallClock(entry.time, timezone),
+              arabicIndic: loc.usesArabicIndicDigits,
+            ),
             style: isNext
                 ? AppTheme.cardTitle.copyWith(color: foreground)
                 : AppTheme.rowTitle.copyWith(

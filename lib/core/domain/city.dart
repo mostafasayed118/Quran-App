@@ -10,6 +10,7 @@ class City {
     required this.nameEn,
     required this.lat,
     required this.lng,
+    this.timezone,
   });
 
   /// The stable city id; the persisted selection refers to it.
@@ -27,6 +28,12 @@ class City {
   /// The longitude in decimal degrees (WGS84), -180..180.
   final double lng;
 
+  /// The IANA zone id (e.g. `Africa/Cairo`); null on older city fixtures.
+  ///
+  /// Prayer times are instants; this zone is only used to render them in the
+  /// city's wall clock instead of the device's.
+  final String? timezone;
+
   /// The city as a bare [CityCoordinates] point.
   CityCoordinates get coordinates => CityCoordinates(lat, lng);
 
@@ -41,6 +48,7 @@ class City {
         nameEn: json['nameEn'] as String,
         lat: (json['lat'] as num).toDouble(),
         lng: (json['lng'] as num).toDouble(),
+        timezone: json['timezone'] as String?,
       );
 
   /// The persisted JSON representation of this city (the inverse of
@@ -51,6 +59,7 @@ class City {
         'nameEn': nameEn,
         'lat': lat,
         'lng': lng,
+        if (timezone != null) 'timezone': timezone,
       };
 }
 
