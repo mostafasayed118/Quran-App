@@ -38,6 +38,17 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     }
   }
 
+  /// Re-subscribes after a failure; [start]'s guard keeps a retry a no-op
+  /// while the failed subscriptions are still assigned.
+  Future<void> reload() async {
+    await _sub?.cancel();
+    _sub = null;
+    await _pageSub?.cancel();
+    _pageSub = null;
+    if (!isClosed) emit(const BookmarksState.loading());
+    await start();
+  }
+
   final AyahSource _repo;
   final BookmarkPager? _pager;
   StreamSubscription<List<BookmarkEntry>>? _sub;

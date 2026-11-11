@@ -64,7 +64,8 @@ class DuasScreen extends StatelessWidget {
               Expanded(
                 child: switch (state) {
                   DuasLoading() => const LoadingView(),
-                  DuasFailed() => errorPane(loc),
+                  DuasFailed() =>
+                    errorPane(loc, onRetry: context.read<DuasCubit>().start),
                   DuasInView() => const _DuasView(),
                   RuqyahInView() => const _RuqyahView(),
                 },

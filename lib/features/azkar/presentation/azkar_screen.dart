@@ -63,7 +63,8 @@ class AzkarScreen extends StatelessWidget {
             body: AppContentFrame(
               child: switch (state) {
                 AzkarLoading() => const LoadingView(),
-                AzkarFailed() => errorPane(loc),
+                AzkarFailed() =>
+                  errorPane(loc, onRetry: context.read<AzkarCubit>().start),
                 AzkarBrowsing(
                   :final collections,
                   :final favorites,

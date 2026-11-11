@@ -30,6 +30,13 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
   final int _surah;
   final int _ayah;
 
+  /// Re-runs the resolution after a failure.
+  Future<void> reload() {
+    if (isClosed) return Future<void>.value();
+    emit(const AyahSheetState.loading());
+    return _load();
+  }
+
   Future<void> _load() async {
     try {
       final rows = await _downloader.installedPacks();

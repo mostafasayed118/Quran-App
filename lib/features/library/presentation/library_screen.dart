@@ -64,7 +64,8 @@ class LibraryScreen extends StatelessWidget {
             body: AppContentFrame(
               child: switch (state) {
                 LibraryLoading() => const LoadingView(),
-                LibraryFailed() => errorPane(loc),
+                LibraryFailed() =>
+                  errorPane(loc, onRetry: context.read<LibraryCubit>().load),
                 final LibraryReady ready when ready.packs.isEmpty => EmptyState(
                     loc.libraryEmpty,
                     icon: Icons.inventory_2_outlined,

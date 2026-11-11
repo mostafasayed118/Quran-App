@@ -70,7 +70,10 @@ class ReciterSurahsScreen extends StatelessWidget {
         child: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
           builder: (context, state) => switch (state) {
             ReciterSurahsLoading() => const LoadingView(),
-            ReciterSurahsFailed() => errorPane(loc),
+            ReciterSurahsFailed() => errorPane(
+                loc,
+                onRetry: context.read<ReciterSurahsCubit>().start,
+              ),
             ReciterSurahsReady(
               :final row,
               :final surahNumbers,

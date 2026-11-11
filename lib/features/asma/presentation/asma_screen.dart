@@ -58,7 +58,8 @@ class AsmaScreen extends StatelessWidget {
             body: AppContentFrame.grid(
               child: switch (state) {
                 AsmaLoading() => const LoadingView(),
-                AsmaFailed() => errorPane(loc),
+                AsmaFailed() =>
+                  errorPane(loc, onRetry: context.read<AsmaCubit>().start),
                 AsmaReady(:final names) when names.isEmpty =>
                   EmptyState(loc.noResults),
                 AsmaReady(:final names, :final selected) => Stack(

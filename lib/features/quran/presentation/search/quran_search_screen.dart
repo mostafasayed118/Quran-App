@@ -71,7 +71,12 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
               child: BlocBuilder<QuranSearchCubit, QuranSearchState>(
                 builder: (context, state) => switch (state) {
                   QuranSearchLoading() => const LoadingView(),
-                  QuranSearchFailed() => errorPane(loc),
+                  QuranSearchFailed() => errorPane(
+                      loc,
+                      onRetry: () => context
+                          .read<QuranSearchCubit>()
+                          .search(_controller.text.trim()),
+                    ),
                   QuranSearchReady(:final query, :final hits) =>
                     !quranSearchQueryUsable(query)
                         ? EmptyState(loc.searchQuranPrompt)
