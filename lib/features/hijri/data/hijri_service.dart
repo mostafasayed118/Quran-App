@@ -53,10 +53,26 @@ class HijriService implements RamadanCalendar {
 
   /// Arabic name of the given Hijri month (calendar-pure).
   @override
-  String monthName(int hijriYear, int hijriMonth) {
-    // Mid-month gregorian anchor is stable within the month.
-    final anchor = HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, 15);
-    return HijriCalendar.fromDate(anchor).longMonthName;
+  String monthName(int hijriYear, int hijriMonth) =>
+      localizedMonthName(hijriYear, hijriMonth);
+
+  /// The month name in [locale] (`ar`/`en`/`tr`), restoring the previous
+  /// package locale afterwards so other readers keep their names.
+  String localizedMonthName(
+    int hijriYear,
+    int hijriMonth, {
+    String locale = 'ar',
+  }) {
+    final previous = HijriCalendar.language;
+    try {
+      HijriCalendar.setLocal(locale);
+      // Mid-month gregorian anchor is stable within the month.
+      final anchor =
+          HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, 15);
+      return HijriCalendar.fromDate(anchor).longMonthName;
+    } finally {
+      HijriCalendar.setLocal(previous);
+    }
   }
 
   static DateTime _shift(DateTime date, int days) =>

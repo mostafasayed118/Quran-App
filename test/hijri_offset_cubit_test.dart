@@ -65,6 +65,17 @@ void main() {
     expect((cubit.state as HijriReady).dayOffset, 0);
   });
 
+  test('the English locale renders an English month name', () async {
+    final service = HijriService();
+    final cubit = HijriCubit(service: service, locale: () => 'en');
+    addTearDown(cubit.close);
+    await cubit.start();
+    final ready = cubit.state as HijriReady;
+    expect(RegExp('[\u0600-\u06FF]').hasMatch(ready.monthName), isFalse);
+    expect(ready.monthName,
+        service.localizedMonthName(ready.year, ready.month, locale: 'en'));
+  });
+
   test('a failed offset write leaves the applied offset unchanged', () async {
     final service = HijriService();
     final cubit = HijriCubit(service: service, offset: _ThrowingSave());

@@ -34,6 +34,12 @@ void main() {
     }
   });
 
+  test('month names follow the requested locale and restore the default', () {
+    expect(service.localizedMonthName(1447, 1, locale: 'en'), 'Muharram');
+    expect(service.localizedMonthName(1447, 1), isNot('Muharram'));
+    expect(service.monthName(1447, 1), isNot('Muharram'));
+  });
+
   test('known span ordering: 1447 starts before 1448', () {
     final start1447 = service.toGregorian(1447, 1, 1);
     final start1448 = service.toGregorian(1448, 1, 1);
