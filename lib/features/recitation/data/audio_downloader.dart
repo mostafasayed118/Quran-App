@@ -43,11 +43,21 @@ class DownloadCancelToken {
 /// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
   /// A failure that may succeed on a second attempt (network, truncation).
-  DownloadFailure(this.message) : retryable = true;
+  DownloadFailure(this.message)
+      : retryable = true,
+        outOfSpace = false;
 
   /// A failure the same request cannot fix (an HTML error page, a redirect
   /// chain, an unsupported scheme): retrying would only burn the queue.
-  DownloadFailure.permanent(this.message) : retryable = false;
+  DownloadFailure.permanent(this.message)
+      : retryable = false,
+        outOfSpace = false;
+
+  /// The write hit a full disk: the request is fine, the device is not.
+  DownloadFailure.outOfSpace()
+      : message = 'no space left on device',
+        retryable = false,
+        outOfSpace = true;
 
   /// Human-readable reason of the failure.
   final String message;
@@ -55,8 +65,30 @@ class DownloadFailure implements Exception {
   /// Whether one more attempt is worth it.
   final bool retryable;
 
+  /// Whether the transfer failed because the device has no free space.
+  final bool outOfSpace;
+
   @override
   String toString() => 'DownloadFailure: $message';
+}
+
+/// Whether [error] (or the error a [DioException] wraps) reports a full disk.
+///
+/// ENOSPC is 28 on Android/Linux and ERROR_DISK_FULL is 112 on Windows; the
+/// text check covers platforms whose code we cannot rely on.
+bool isOutOfSpaceError(Object error) {
+  if (error is FileSystemException) {
+    final os = error.osError;
+    final text = '${error.message} ${os?.message ?? ''}'.toLowerCase();
+    return os?.errorCode == 28 ||
+        os?.errorCode == 112 ||
+        text.contains('no space left') ||
+        text.contains('not enough space');
+  }
+  if (error is DioException && error.error != null) {
+    return isOutOfSpaceError(error.error!);
+  }
+  return false;
 }
 
 /// Downloads surah audio files and tracks them in the database.
@@ -423,6 +455,9 @@ class AudioDownloader {
       }
       await _markStatus(
           reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
+      if (!cancelled && isOutOfSpaceError(error)) {
+        throw DownloadFailure.outOfSpace();
+      }
       rethrow;
     }
   }

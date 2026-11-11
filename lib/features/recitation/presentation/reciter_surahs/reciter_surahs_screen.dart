@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../../core/widgets/error_pane.dart';
+import '../../../../core/widgets/error_strip.dart';
 import '../../../../core/widgets/loading_and_error_views.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../data/recitation_keys.dart';
@@ -80,18 +81,38 @@ class ReciterSurahsScreen extends StatelessWidget {
               :final names,
               :final previews,
             ) =>
-              ListView.builder(
-                padding: EdgeInsets.only(bottom: appBottomInset(context)),
-                itemCount: surahNumbers.length,
-                itemBuilder: (context, i) {
-                  final n = surahNumbers[i];
-                  return _SurahDownloadRow(
-                    reciter: row,
-                    surahNumber: n,
-                    name: names[n] ?? loc.surahFallbackName(loc.number(n)),
-                    teaser: previews[n],
-                  );
-                },
+              Column(
+                children: [
+                  BlocBuilder<DownloadsCubit, DownloadsState>(
+                    buildWhen: (previous, current) =>
+                        previous.outOfSpace != current.outOfSpace,
+                    builder: (context, downloads) => downloads.outOfSpace
+                        ? ErrorStrip(
+                            loc.downloadsNoSpace,
+                            icon: Icons.sd_storage_outlined,
+                            onDismiss: context
+                                .read<DownloadsCubit>()
+                                .dismissOutOfSpace,
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                      itemCount: surahNumbers.length,
+                      itemBuilder: (context, i) {
+                        final n = surahNumbers[i];
+                        return _SurahDownloadRow(
+                          reciter: row,
+                          surahNumber: n,
+                          name:
+                              names[n] ?? loc.surahFallbackName(loc.number(n)),
+                          teaser: previews[n],
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
           },
         ),

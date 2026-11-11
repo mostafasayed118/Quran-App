@@ -17,5 +17,10 @@ sealed class DownloadItem with _$DownloadItem {
 sealed class DownloadsState with _$DownloadsState {
   const factory DownloadsState({
     @Default(<String, DownloadItem>{}) Map<String, DownloadItem> items,
+
+    /// True when the last failure was a full disk; the screen shows the
+    /// localized "not enough space" strip until the user dismisses it or a
+    /// later download succeeds.
+    @Default(false) bool outOfSpace,
   }) = _DownloadsState;
 }

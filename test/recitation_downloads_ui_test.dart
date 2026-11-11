@@ -54,6 +54,8 @@ class _SeededDownloadsCubit extends DownloadsCubit {
   void seed(Map<String, DownloadItem> items) =>
       emit(DownloadsState(items: items));
 
+  void seedSpaceWarning() => emit(state.copyWith(outOfSpace: true));
+
   @override
   Future<void> cancelDownload(String rowId, int surahNumber) async {
     cancelled.add('$rowId-$surahNumber');
@@ -195,5 +197,31 @@ void main() {
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(find.byTooltip('أعِد المحاولة'), findsOneWidget);
+  });
+
+  testWidgets('a full disk shows the localized strip and dismiss hides it',
+      (tester) async {
+    final downloads = await pumpSurahsHost(tester);
+
+    downloads.seedSpaceWarning();
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    expect(
+      find.text(
+          'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byTooltip('إغلاق'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    expect(downloads.state.outOfSpace, isFalse);
+    expect(
+      find.text(
+          'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.'),
+      findsNothing,
+    );
   });
 }

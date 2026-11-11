@@ -742,6 +742,10 @@
   "languageEnglish": "الإنجليزية",
   "downloadsTitle": "التنزيلات",
   "downloadsEmpty": "لا توجد تلاوات منزّلة بعد",
+  "downloadsNoSpace": "لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.",
+  "@downloadsNoSpace": {
+    "description": "Shown when a download fails because the device storage is full."
+  },
   "downloadsDeleteBody": "سيُحذف هذا الملف من جهازك.",
   "downloadsTotal": "المساحة المستخدمة: {size} م.ب",
   "@downloadsTotal": {

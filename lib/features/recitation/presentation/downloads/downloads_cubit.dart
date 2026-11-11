@@ -308,6 +308,9 @@ class DownloadsCubit extends Cubit<DownloadsState> {
             },
           );
           if (isClosed) return;
+          if (state.outOfSpace) {
+            emit(state.copyWith(outOfSpace: false));
+          }
           emit(_bump(key, status: DownloadStatus.done));
         } on Object catch (error, stackTrace) {
           if (token.isCancelled) {
@@ -318,6 +321,9 @@ class DownloadsCubit extends Cubit<DownloadsState> {
                 error: error,
                 stackTrace: stackTrace);
             if (isClosed) return;
+            if (error is DownloadFailure && error.outOfSpace) {
+              emit(state.copyWith(outOfSpace: true));
+            }
             await _setFailed(key);
           }
         } finally {
@@ -373,6 +379,12 @@ class DownloadsCubit extends Cubit<DownloadsState> {
     if (isClosed) return;
     // The failed status in the DB is owned by the downloader; mirror in state.
     emit(_bump(key, status: DownloadStatus.failed));
+  }
+
+  /// Dismisses the "not enough space" strip without retrying anything.
+  void dismissOutOfSpace() {
+    if (isClosed || !state.outOfSpace) return;
+    emit(state.copyWith(outOfSpace: false));
   }
 
   /// Cancels the in-flight download and drops the pending queue.
