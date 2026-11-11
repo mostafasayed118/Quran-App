@@ -6,7 +6,6 @@ import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
-import 'package:quran_yahdi/features/library/domain/library_pack.dart';
 import 'package:quran_yahdi/features/library/presentation/library_cubit.dart';
 import 'package:quran_yahdi/features/library/presentation/library_state.dart';
 
