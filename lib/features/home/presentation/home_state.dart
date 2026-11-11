@@ -25,5 +25,6 @@ sealed class HomeState with _$HomeState {
     @Default(null) LastReadCard? lastRead,
     @Default(null) NextPrayerCard? nextPrayer,
     @Default(null) String? cityTimezone,
+    @Default(null) String? cityNameEn,
   }) = HomeReady;
 }

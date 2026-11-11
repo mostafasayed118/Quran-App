@@ -105,6 +105,15 @@ void main() {
     await cubit.close();
   });
 
+  test('the ready state carries the English city name too', () async {
+    await city.select(cairoCity);
+    final cubit = await build();
+    final ready = cubit.state as HomeReady;
+    expect(ready.cityNameEn, cairoCity.nameEn);
+    expect(ready.cityNameEn, 'Cairo');
+    await cubit.close();
+  });
+
   test('a throwing load emits failed instead of hanging on loading', () async {
     await city.select(cairoCity);
     fake.throwOnNext = true;
