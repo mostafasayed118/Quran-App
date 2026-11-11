@@ -339,8 +339,11 @@ class _OptionsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: AppSpacing.sm,
+      runSpacing: AppSpacing.xs,
       children: [
         IconButton(
           tooltip: loc.repeatSurah,
@@ -355,7 +358,6 @@ class _OptionsRow extends StatelessWidget {
             label: Text(loc.digits(_speedLabel(speed))),
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
         TextButton.icon(
           onPressed: onSleepPressed,
           icon: Icon(
