@@ -726,7 +726,12 @@ class _PageJumpDialogState extends State<_PageJumpDialog> {
   }
 
   void _submit() {
-    Navigator.of(context).pop(int.tryParse(_controller.text.toWesternDigits));
+    final page = int.tryParse(_controller.text.toWesternDigits);
+    if (page == null) {
+      AppToast.show(context, widget.loc.pageJumpInvalid, tone: ToastTone.error);
+      return;
+    }
+    Navigator.of(context).pop(page);
   }
 
   @override
