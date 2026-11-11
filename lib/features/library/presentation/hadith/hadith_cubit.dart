@@ -25,6 +25,7 @@ class HadithCubit extends Cubit<HadithState> {
     try {
       _bookmarked = await _bookmarks?.load(_packId) ?? <int>{};
     } on Object catch (error, stackTrace) {
+      _bookmarksLoaded = false;
       appLog('hadith bookmarks load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
     }
@@ -51,6 +52,10 @@ class HadithCubit extends Cubit<HadithState> {
   String _query = '';
   bool _bookmarksOnly = false;
   bool _paging = false;
+
+  /// False when the initial bookmark read threw: the in-memory set is then
+  /// unknown, not empty, and saving it would overwrite the stored marks.
+  bool _bookmarksLoaded = true;
 
   /// The last browse page (not a search result, not the bookmarks filter).
   /// Clearing a search or leaving bookmarks returns here instead of page 0.
@@ -81,6 +86,24 @@ class HadithCubit extends Cubit<HadithState> {
 
   /// Toggles [number] in the bookmarked set and persists it.
   Future<void> toggleBookmark(int number) async {
+    if (!_bookmarksLoaded) {
+      final source = _bookmarks;
+      if (source == null) return;
+      try {
+        // The first read failed, so the stored marks are unknown; re-read
+        // them instead of treating the empty set as the truth.
+        _bookmarked = await source.load(_packId);
+        _bookmarksLoaded = true;
+        final current = state;
+        if (!isClosed && current is HadithReady) {
+          emit(current.copyWith(bookmarked: _bookmarked));
+        }
+      } on Object catch (error, stackTrace) {
+        appLog('hadith bookmarks reload failed',
+            name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+        return; // never save a set we could not read
+      }
+    }
     final previous = _bookmarked;
     final next = <int>{..._bookmarked};
     if (!next.remove(number)) next.add(number);
