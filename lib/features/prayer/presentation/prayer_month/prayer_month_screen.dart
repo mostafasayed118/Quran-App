@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/city_clock.dart';
 import '../../../../core/utils/insets.dart';
+import '../../../../core/utils/pager_icons.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -24,18 +25,19 @@ class PrayerMonthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<PrayerMonthCubit>();
+    final direction = Directionality.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.monthlyTimetable),
         actions: [
           IconButton(
             tooltip: loc.previousMonth,
-            icon: const Icon(Icons.chevron_right),
+            icon: Icon(pagerChevronFor(direction, next: false)),
             onPressed: cubit.previousMonth,
           ),
           IconButton(
             tooltip: loc.nextMonth,
-            icon: const Icon(Icons.chevron_left),
+            icon: Icon(pagerChevronFor(direction, next: true)),
             onPressed: cubit.nextMonth,
           ),
         ],
