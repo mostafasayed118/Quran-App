@@ -1335,3 +1335,19 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Process:** #31 was opened against `wave/medium-quickwins` and retargeted to `main` after #30 merged; both branches were deleted local + remote (`wave/*` refs = 0).
 - **CI on `main` (`e9c0949`):** run `43026713874` — see the next entry/CI result.
 - **Carried forward:** 4B (M1 remaining retry panes, M18 import re-schedule failure, M22 download free-space, the M12 remainder), the 24 Low (Wave 5A/5B plan), and the owner-ruled M8 (catalog-removed packs), M15 (tasbih hydration), M21 (reciter surah set).
+
+### 2026-11-11 (close) — Waves 4B, 5A, 5B: the remaining Medium/Low findings — MERGED ON MAIN
+
+- **Owner asks:** «افتح سيشن جديدة بالـhandoff وأكمل 4B → 5A → 5B», «كمل», M22 «ENOSPC + رسالة محلية», L20 «سيبهم و وثّق», 5B rulings: L7 «نعم، يقدّم الختمة», L11 «شيل الـAPI الميت», L19 «وسّع المدى».
+- **4B** — branch `wave/low-hanging-4b` → PR **#32**, merge `04e3a0b`, **6 commits**. Gates at `f623ae6`: format **804/0** · analyze **0** · suite **1568/1568**; CI **43044354357 success**.
+  - M18 backup reschedule guarded (`517f023`); M12 home `cityNameEn` (`7a5036f`), duas `categoryEn` (`16cc190`), Hijri month locale (`bd36aea`); M1 retry on 13 failed panes (`b9eea9c`); M22 ENOSPC detection + localized strip (`f623ae6`).
+  - M1 note: the reader keeps its dedicated bottom retry; its frozen test pins one button.
+- **5A** — branch `wave/low-hanging-5a` → PR **#33**, merge `24a1123`, **14 commits**. Gates at `29c7999`: format **808/0** · analyze **0** · suite **1581/1581**; CI **43054074616 success**.
+  - L3 `bd7b81a` · L4 `2662c7a` · L6 `0aa64a2` + `29c7999` · L8 `40e44cc` · L9 `4488ab6` · L12 `c196717` · L13 `2dfd22f` · L14 `abe8c1f` · L16 `3fb8f10` · L21 `30c2b7f` · L22 `700b774` · L23 `c80469b` · L24 `23f5b92`.
+  - **Frozen-test catch:** the first L6 cut rewrote the `0` "start of surah" sentinel; `reader_route_params_test` + `reader_route_reentry_test` failed. `29c7999` keeps `0` as `0` and normalizes only a positive out-of-range ayah; **no frozen test edited**.
+- **5B** — branch `wave/low-hanging-5b` → PR **#34**, merge `5d6f44c`, **8 commits**. Gates at `8899a1a`: format **808/0** · analyze **0** · suite **1588/1588**; CI **43058374807 success**.
+  - L5 `25c0f8f` · L15 `e6d98f9` · L7 `7cefff2` · L11 `cb6cfe3` · L19 `3ded4c5` · L17 `ca640c9` · L1 `43ad694` · L10 `8899a1a`.
+  - **Owner-approved Class A edits:** L11 removed the dead `isInstalled(packId, version)` and updated `pack_downloader_test` + `pack_seed_guard_test`; the installed row's version is still pinned there. Recorded here by the owner's explicit ruling.
+  - **L20 rule-deferred:** `QadaCubit.clear` and `TasbihState.reachedTarget` have no UI user but are pinned by Class A tests; the owner ruled to keep them (no code change).
+- **Process note:** commit-message files written with `Set-Content -Encoding UTF8` produced a BOM on two 4B subjects; fixed before push by rewriting the messages with `-Encoding ascii`. Use ASCII for message files.
+- **Carried forward:** M8 (catalog-removed packs), M15 (tasbih hydration), M21 (reciter next/prev set) remain owner-gated. Status after this window: **8 High closed** (Waves 1/2), **20 of 23 Medium closed** (Waves 3/4A/4B; M8/M15/M21 open), **23 of 24 Low fixed** (4B + 5A + 5B), with **L20 rule-deferred** by the owner.
