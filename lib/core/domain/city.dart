@@ -63,6 +63,10 @@ class City {
       };
 }
 
+/// The city name for [localeName]: Arabic for `ar`, English otherwise.
+String cityDisplayName(City city, String localeName) =>
+    localeName == 'ar' ? city.nameAr : city.nameEn;
+
 /// A point on earth, decoupled from the city it came from.
 class CityCoordinates {
   /// Creates a point from decimal degrees (WGS84).

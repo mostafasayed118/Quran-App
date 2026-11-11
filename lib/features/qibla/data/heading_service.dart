@@ -16,6 +16,13 @@ double headingFromMagnetometer(double x, double y) {
 double dialAngleDeg(double bearingDeg, double headingDeg) =>
     (bearingDeg - headingDeg) % 360.0;
 
+/// Screen angle of a fixed dial tick after the device heading.
+///
+/// The cardinal words and the qibla marker already rotate with [headingDeg];
+/// the tick ring is the same frame, so it must rotate by the same term.
+double dialTickAngleDeg(double tickDeg, double headingDeg) =>
+    (tickDeg - headingDeg) % 360.0;
+
 /// EMA weight for one magnetometer sample. sensors_plus' default interval is
 /// 200 ms (5 Hz), so 0.3 is a ~0.5 s time constant.
 const double kHeadingSmoothingAlpha = 0.3;

@@ -312,7 +312,10 @@ class _CityCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(city.nameAr, style: AppTheme.meQuranTitle),
+                child: Text(
+                  cityDisplayName(city, loc.localeName),
+                  style: AppTheme.meQuranTitle,
+                ),
               ),
               IconButton(
                 tooltip: loc.selectCity,

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/city.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/layout/app_breakpoints.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -158,13 +159,13 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _CityTile(title: city.nameAr),
+                  _CityTile(title: cityDisplayName(city, loc.localeName)),
                   const SizedBox(height: AppSpacing.lg),
                   _Dial(
                     bearing: bearing,
                     heading: heading,
                     aligned: aligned,
-                    cityName: city.nameAr,
+                    cityName: cityDisplayName(city, loc.localeName),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   if (heading == null)
@@ -244,7 +245,7 @@ class _DialPainter extends CustomPainter {
     );
 
     for (var i = 0; i < 360; i += 30) {
-      final angle = i * math.pi / 180.0;
+      final angle = dialTickAngleDeg(i.toDouble(), heading) * math.pi / 180.0;
       final isMajor = i % 90 == 0;
       final p1 = Offset(
         center.dx + (radius - (isMajor ? 14 : 10)) * math.sin(angle),
