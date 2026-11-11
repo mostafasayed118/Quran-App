@@ -19,6 +19,10 @@ class JuzIndexCubit extends Cubit<JuzIndexState> {
 
   /// Starts the live read.
   Future<void> start() async {
+    // A retry must not orphan the previous subscription: it would keep
+    // running and emitting into this cubit for the process lifetime.
+    await _sub?.cancel();
+    _sub = null;
     try {
       _sub = _source.watchJuz().listen(
         (juz) {
