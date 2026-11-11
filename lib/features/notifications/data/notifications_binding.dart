@@ -520,23 +520,37 @@ class NotificationsBinding extends ChangeNotifier
         ..._appliedPlanIds,
         ...reminders.map((reminder) => reminder.id),
       };
-      await _inChunks(
-        reminders,
-        (reminder) => _plugin.zonedSchedule(
-          id: reminder.id,
-          title: reminder.title,
-          body: reminder.body,
-          payload: reminder.payload,
-          scheduledDate: tz.TZDateTime.from(reminder.fireAt.toUtc(), tz.UTC),
-          notificationDetails: _detailsFor(reminder, details),
-          androidScheduleMode: mode,
-          // Azkar and wird fire at a fixed clock time, so the OS can repeat
-          // them forever and restore them after a reboot with no app start.
-          // Prayer reminders stay one-shot: their time moves every day.
-          matchDateTimeComponents:
-              reminder.repeatsDaily ? DateTimeComponents.time : null,
-        ),
-      );
+      final scheduleFailures = <Object>[];
+      await _inChunks(reminders, (reminder) async {
+        try {
+          await _plugin.zonedSchedule(
+            id: reminder.id,
+            title: reminder.title,
+            body: reminder.body,
+            payload: reminder.payload,
+            scheduledDate: tz.TZDateTime.from(reminder.fireAt.toUtc(), tz.UTC),
+            notificationDetails: _detailsFor(reminder, details),
+            androidScheduleMode: mode,
+            // Azkar and wird fire at a fixed clock time, so the OS can repeat
+            // them forever and restore them after a reboot with no app start.
+            // Prayer reminders stay one-shot: their time moves every day.
+            matchDateTimeComponents:
+                reminder.repeatsDaily ? DateTimeComponents.time : null,
+          );
+        } on Object catch (error, stackTrace) {
+          // One rejected alarm must not abort the rest of the window: the
+          // user would silently lose every reminder after it.
+          scheduleFailures.add(error);
+          appLog('reminder schedule failed',
+              name: 'quran_yahdi/reminders',
+              error: error.runtimeType,
+              stackTrace: stackTrace);
+        }
+      });
+      if (scheduleFailures.isNotEmpty) {
+        _setApplyFailed(true);
+        return;
+      }
       _appliedPlan = fingerprint;
       _appliedExact = exact;
       _setApplyFailed(false);
