@@ -172,7 +172,9 @@ class _HitTile extends StatelessWidget {
         leading: Text(
           '${loc.number(hit.surahId)}:${loc.number(hit.numberInSurah)}',
           style: const TextStyle(fontWeight: FontWeight.bold),
-          textDirection: TextDirection.rtl,
+          // A numeric reference reads left-to-right in every locale; the old
+          // forced RTL floated the colon under the English UI.
+          textDirection: TextDirection.ltr,
         ),
         title: Text(
           hit.textImlaei,
