@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/domain/app_theme.dart';
+import 'package:quran_yahdi/core/theme/app_theme_controller.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
@@ -140,4 +142,51 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('الإعدادات'), findsOneWidget);
   });
+
+  testWidgets('the dark-mode note follows the appearance picker',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1600);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final theme = AppThemeController(_ThemeSource(AppThemeMode.dark));
+    addTearDown(theme.dispose);
+    await theme.load();
+
+    final cubit = SettingsCubit(
+      settings: settings,
+      city: CityRepository(db: db, loader: () async => [cairoCity.toJson()]),
+      prayer: FakePrayerTimeService(),
+      scheduler: scheduler,
+    );
+    addTearDown(cubit.close);
+    await cubit.start();
+    await pumpAppHost(
+      tester,
+      wrap: (app) =>
+          BlocProvider<SettingsCubit>.value(value: cubit, child: app),
+      home: SettingsScreen(theme: theme),
+    );
+
+    expect(find.text('الوضع الليلي من إعدادات جهازك'), findsNothing,
+        reason: 'the user picked dark; the picker above owns the truth');
+
+    await theme.setMode(AppThemeMode.system);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    expect(find.text('الوضع الليلي من إعدادات جهازك'), findsOneWidget);
+  });
+}
+
+class _ThemeSource implements AppThemeSource {
+  _ThemeSource(this.mode);
+
+  AppThemeMode mode;
+
+  @override
+  Future<AppThemeMode> load() async => mode;
+
+  @override
+  Future<void> save(AppThemeMode value) async => mode = value;
 }
