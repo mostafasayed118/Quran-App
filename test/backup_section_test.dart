@@ -60,6 +60,20 @@ BackupDocument craftedDoc() => BackupDocument(
       ),
     );
 
+/// A backup that matches an empty database: the preview has no lines.
+BackupDocument emptyDoc() => BackupDocument(
+      exportedAt: DateTime(2026, 10, 19),
+      schemaVersion: 2,
+      data: const BackupData(
+        bookmarks: [],
+        lastReadAyahId: null,
+        khatma: [],
+        prayerLog: [],
+        tasbih: null,
+        settings: {},
+      ),
+    );
+
 /// Bounded pumps: drift futures + dialog/snackbar animations advance on
 /// explicit pumps only (no pumpAndSettle on a live DB, per the wave brief).
 Future<void> settle(WidgetTester tester) async {
@@ -165,6 +179,33 @@ void main() {
     expect(await db.select(db.bookmarks).get(), isEmpty);
     expect(await db.select(db.prayerLog).get(), isEmpty);
     expect(rescheduleCalls, 0);
+  });
+
+  testWidgets('a backup that changes nothing says so and disables merge',
+      (tester) async {
+    await pumpSection(
+      tester,
+      pickBytes: () async => utf8.encode(encode(emptyDoc())),
+    );
+
+    await tester.tap(find.text('استيراد البيانات'));
+    await settle(tester);
+
+    expect(find.text('مراجعة الاستيراد'), findsOneWidget);
+    expect(
+      find.text('لا توجد تغييرات — النسخة مطابقة لبياناتك الحالية'),
+      findsOneWidget,
+    );
+    final merge = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'دمج'),
+    );
+    expect(merge.onPressed, isNull);
+
+    await tester.tap(find.text('إلغاء'));
+    await settle(tester);
+
+    expect(find.text('مراجعة الاستيراد'), findsNothing);
+    expect(service.applies, 0);
   });
 
   testWidgets('merge applies the document and shows the success copy',

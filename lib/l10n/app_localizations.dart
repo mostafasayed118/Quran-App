@@ -1598,6 +1598,12 @@ abstract class AppLocalizations {
   /// **'مراجعة الاستيراد'**
   String get backupPreviewTitle;
 
+  /// No description provided for @backupPreviewNothing.
+  ///
+  /// In ar, this message translates to:
+  /// **'لا توجد تغييرات — النسخة مطابقة لبياناتك الحالية'**
+  String get backupPreviewNothing;
+
   /// No description provided for @backupMerge.
   ///
   /// In ar, this message translates to:

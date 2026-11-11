@@ -846,6 +846,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupPreviewTitle => 'Review import';
 
   @override
+  String get backupPreviewNothing =>
+      'No changes - this backup matches your current data';
+
+  @override
   String get backupMerge => 'Merge';
 
   @override

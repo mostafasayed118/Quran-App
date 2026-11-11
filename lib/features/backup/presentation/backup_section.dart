@@ -191,6 +191,7 @@ class _PreviewDialog extends StatelessWidget {
       if (summary.rejectedEntries > 0)
         loc.backupPreviewRejected(loc.number(summary.rejectedEntries)),
     ];
+    if (lines.isEmpty) lines.add(loc.backupPreviewNothing);
     return AlertDialog(
       title: Text(loc.backupPreviewTitle),
       content: Column(
@@ -213,10 +214,12 @@ class _PreviewDialog extends StatelessWidget {
           child: Text(loc.cancel),
         ),
         FilledButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            onMerge();
-          },
+          onPressed: summary.isEmpty
+              ? null
+              : () {
+                  Navigator.of(context).pop();
+                  onMerge();
+                },
           child: Text(loc.backupMerge),
         ),
       ],

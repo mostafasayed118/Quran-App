@@ -524,6 +524,7 @@
   "backupExport": "تصدير البيانات",
   "backupImport": "استيراد البيانات",
   "backupPreviewTitle": "مراجعة الاستيراد",
+  "backupPreviewNothing": "لا توجد تغييرات — النسخة مطابقة لبياناتك الحالية",
   "backupMerge": "دمج",
   "backupExportSuccess": "تم تصدير البيانات",
   "backupImportSuccess": "تم استيراد البيانات ودمجها",
