@@ -35,6 +35,7 @@ class HadithCubit extends Cubit<HadithState> {
       appLog('hadith position load failed',
           name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
     }
+    _browseOffset = offset;
     await _load(offset);
   }
 
@@ -51,6 +52,10 @@ class HadithCubit extends Cubit<HadithState> {
   bool _bookmarksOnly = false;
   bool _paging = false;
 
+  /// The last browse page (not a search result, not the bookmarks filter).
+  /// Clearing a search or leaving bookmarks returns here instead of page 0.
+  int _browseOffset = 0;
+
   /// Searches the installed pack; an empty query restores the browse pages.
   Future<void> search(String value) {
     final query = value.trim();
@@ -60,7 +65,8 @@ class HadithCubit extends Cubit<HadithState> {
   }
 
   /// Clears the search and returns to the saved browse position.
-  Future<void> clearSearch() => search('');
+  Future<void> clearSearch() =>
+      _load(_browseOffset, query: '', bookmarksOnly: false);
 
   /// Shows only the bookmarked hadiths (one page).
   Future<void> showBookmarks() {
@@ -69,12 +75,9 @@ class HadithCubit extends Cubit<HadithState> {
     return _load(0, query: '', bookmarksOnly: true);
   }
 
-  /// Returns to the browse pages.
-  Future<void> showBrowse() {
-    _query = '';
-    _bookmarksOnly = false;
-    return _load(0, query: '', bookmarksOnly: false);
-  }
+  /// Returns to the browse pages at the saved position.
+  Future<void> showBrowse() =>
+      _load(_browseOffset, query: '', bookmarksOnly: false);
 
   /// Toggles [number] in the bookmarked set and persists it.
   Future<void> toggleBookmark(int number) async {
@@ -186,6 +189,7 @@ class HadithCubit extends Cubit<HadithState> {
         bookmarked: _bookmarked,
       ));
       if (!only && q.isEmpty) {
+        _browseOffset = effectiveOffset;
         try {
           await _positions?.save(_packId, effectiveOffset);
         } on Object catch (error, stackTrace) {
