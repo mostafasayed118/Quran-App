@@ -40,6 +40,9 @@ sealed class DuasState with _$DuasState {
     required List<String> categories,
     required List<DuaEntry> entries,
     @Default(null) String? selectedCategory,
+
+    /// Arabic category key -> English label, for the English locale chips.
+    @Default(<String, String>{}) Map<String, String> categoryLabels,
   }) = DuasInView;
 
   const factory DuasState.ruqyah({

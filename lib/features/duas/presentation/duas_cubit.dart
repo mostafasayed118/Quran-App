@@ -53,7 +53,14 @@ class DuasCubit extends Cubit<DuasState> {
       final categories = results[1] as List<String>;
       if (isClosed || seq != _viewSeq) return;
       _allDuas = entries;
-      emit(DuasState.duas(categories: categories, entries: entries));
+      emit(DuasState.duas(
+        categories: categories,
+        entries: entries,
+        categoryLabels: {
+          for (final entry in entries)
+            if (entry.categoryEn.isNotEmpty) entry.categoryAr: entry.categoryEn,
+        },
+      ));
     } on Object catch (error, stackTrace) {
       appLog('duas load failed',
           name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
@@ -152,6 +159,7 @@ class DuasCubit extends Cubit<DuasState> {
                 if (entry.categoryAr == category) entry,
             ],
       selectedCategory: category,
+      categoryLabels: state.categoryLabels,
     ));
   }
 }

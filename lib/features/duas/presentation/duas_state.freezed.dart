@@ -156,7 +156,7 @@ extension DuasStatePatterns on DuasState {
     TResult Function(DuasTab tab)? loading,
     TResult Function(DuasTab tab)? failed,
     TResult Function(List<String> categories, List<DuaEntry> entries,
-            String? selectedCategory)?
+            String? selectedCategory, Map<String, String> categoryLabels)?
         duas,
     TResult Function(List<RuqyahResolved> entries)? ruqyah,
     required TResult orElse(),
@@ -168,7 +168,8 @@ extension DuasStatePatterns on DuasState {
       case DuasFailed() when failed != null:
         return failed(_that.tab);
       case DuasInView() when duas != null:
-        return duas(_that.categories, _that.entries, _that.selectedCategory);
+        return duas(_that.categories, _that.entries, _that.selectedCategory,
+            _that.categoryLabels);
       case RuqyahInView() when ruqyah != null:
         return ruqyah(_that.entries);
       case _:
@@ -194,7 +195,7 @@ extension DuasStatePatterns on DuasState {
     required TResult Function(DuasTab tab) loading,
     required TResult Function(DuasTab tab) failed,
     required TResult Function(List<String> categories, List<DuaEntry> entries,
-            String? selectedCategory)
+            String? selectedCategory, Map<String, String> categoryLabels)
         duas,
     required TResult Function(List<RuqyahResolved> entries) ruqyah,
   }) {
@@ -205,7 +206,8 @@ extension DuasStatePatterns on DuasState {
       case DuasFailed():
         return failed(_that.tab);
       case DuasInView():
-        return duas(_that.categories, _that.entries, _that.selectedCategory);
+        return duas(_that.categories, _that.entries, _that.selectedCategory,
+            _that.categoryLabels);
       case RuqyahInView():
         return ruqyah(_that.entries);
     }
@@ -228,7 +230,7 @@ extension DuasStatePatterns on DuasState {
     TResult? Function(DuasTab tab)? loading,
     TResult? Function(DuasTab tab)? failed,
     TResult? Function(List<String> categories, List<DuaEntry> entries,
-            String? selectedCategory)?
+            String? selectedCategory, Map<String, String> categoryLabels)?
         duas,
     TResult? Function(List<RuqyahResolved> entries)? ruqyah,
   }) {
@@ -239,7 +241,8 @@ extension DuasStatePatterns on DuasState {
       case DuasFailed() when failed != null:
         return failed(_that.tab);
       case DuasInView() when duas != null:
-        return duas(_that.categories, _that.entries, _that.selectedCategory);
+        return duas(_that.categories, _that.entries, _that.selectedCategory,
+            _that.categoryLabels);
       case RuqyahInView() when ruqyah != null:
         return ruqyah(_that.entries);
       case _:
@@ -386,9 +389,11 @@ class DuasInView implements DuasState {
   const DuasInView(
       {required List<String> categories,
       required List<DuaEntry> entries,
-      this.selectedCategory = null})
+      this.selectedCategory = null,
+      Map<String, String> categoryLabels = const <String, String>{}})
       : _categories = categories,
-        _entries = entries;
+        _entries = entries,
+        _categoryLabels = categoryLabels;
 
   final List<String> _categories;
   List<String> get categories {
@@ -407,6 +412,17 @@ class DuasInView implements DuasState {
   @JsonKey()
   final String? selectedCategory;
 
+  /// Arabic category key -> English label, for the English locale chips.
+  final Map<String, String> _categoryLabels;
+
+  /// Arabic category key -> English label, for the English locale chips.
+  @JsonKey()
+  Map<String, String> get categoryLabels {
+    if (_categoryLabels is EqualUnmodifiableMapView) return _categoryLabels;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_categoryLabels);
+  }
+
   /// Create a copy of DuasState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -423,7 +439,9 @@ class DuasInView implements DuasState {
                 .equals(other.categories, _categories) &&
             const DeepCollectionEquality().equals(other.entries, _entries) &&
             (identical(other.selectedCategory, selectedCategory) ||
-                other.selectedCategory == selectedCategory));
+                other.selectedCategory == selectedCategory) &&
+            const DeepCollectionEquality()
+                .equals(other.categoryLabels, _categoryLabels));
   }
 
   @override
@@ -432,12 +450,13 @@ class DuasInView implements DuasState {
         runtimeType,
         const DeepCollectionEquality().hash(_categories),
         const DeepCollectionEquality().hash(_entries),
-        selectedCategory);
+        selectedCategory,
+        const DeepCollectionEquality().hash(_categoryLabels));
   }
 
   @override
   String toString() {
-    return 'DuasState.duas(categories: $categories, entries: $entries, selectedCategory: $selectedCategory)';
+    return 'DuasState.duas(categories: $categories, entries: $entries, selectedCategory: $selectedCategory, categoryLabels: $categoryLabels)';
   }
 }
 
@@ -451,7 +470,8 @@ abstract mixin class $DuasInViewCopyWith<$Res>
   $Res call(
       {List<String> categories,
       List<DuaEntry> entries,
-      String? selectedCategory});
+      String? selectedCategory,
+      Map<String, String> categoryLabels});
 }
 
 /// @nodoc
@@ -468,6 +488,7 @@ class _$DuasInViewCopyWithImpl<$Res> implements $DuasInViewCopyWith<$Res> {
     Object? categories = null,
     Object? entries = null,
     Object? selectedCategory = freezed,
+    Object? categoryLabels = null,
   }) {
     return _then(DuasInView(
       categories: null == categories
@@ -482,6 +503,10 @@ class _$DuasInViewCopyWithImpl<$Res> implements $DuasInViewCopyWith<$Res> {
           ? _self.selectedCategory
           : selectedCategory // ignore: cast_nullable_to_non_nullable
               as String?,
+      categoryLabels: null == categoryLabels
+          ? _self._categoryLabels
+          : categoryLabels // ignore: cast_nullable_to_non_nullable
+              as Map<String, String>,
     ));
   }
 }

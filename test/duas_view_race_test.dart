@@ -93,6 +93,25 @@ void main() {
     );
   });
 
+  test('the state carries the English category labels', () async {
+    final cubit = DuasCubit(
+      duas: DuaRepository(
+          loader: () async => [
+                {
+                  'id': 'd1',
+                  'categoryAr': 'المنزل',
+                  'categoryEn': 'Home',
+                  'text': 'دعاء',
+                },
+              ]),
+      ruqyah: RuqyahRepository(loader: () async => const []),
+      ayahs: _NoAyahs(),
+    );
+    addTearDown(cubit.close);
+    await cubit.showDuas();
+    expect((cubit.state as DuasInView).categoryLabels['المنزل'], 'Home');
+  });
+
   test('a second tap while ruqyah is loading does not restart it', () async {
     final gate = Completer<void>();
     var loads = 0;
