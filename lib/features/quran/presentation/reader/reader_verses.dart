@@ -59,6 +59,16 @@ class _VersesListState extends State<_VersesList> {
     _positions.itemPositions.addListener(_reportFirstVisible);
   }
 
+  /// Which ayah has its action row open. One at a time: opening another closes
+  /// the previous one, and tapping the open card again closes it. The row used
+  /// to render on every verse, which spent roughly 40% of the reader's height
+  /// on chrome (2026-11-13 UI audit, finding U-1).
+  int? _openAyahId;
+
+  void _toggleActions(int ayahId) {
+    setState(() => _openAyahId = _openAyahId == ayahId ? null : ayahId);
+  }
+
   @override
   void dispose() {
     _positions.itemPositions.removeListener(_reportFirstVisible);
@@ -108,6 +118,8 @@ class _VersesListState extends State<_VersesList> {
             bookmarked: bookmarked,
             fontScale: state.fontScale,
             lineHeight: state.lineHeight,
+            actionsOpen: _openAyahId == ayah.id,
+            onTap: () => _toggleActions(ayah.id),
             onToggle: () =>
                 toggleAyahBookmark(context, cubit, ayah.id, bookmarked),
           ),
@@ -124,6 +136,8 @@ class _AyahCard extends StatelessWidget {
     required this.bookmarked,
     required this.fontScale,
     required this.lineHeight,
+    required this.actionsOpen,
+    required this.onTap,
     required this.onToggle,
   });
 
@@ -132,6 +146,8 @@ class _AyahCard extends StatelessWidget {
   final bool bookmarked;
   final double fontScale;
   final double lineHeight;
+  final bool actionsOpen;
+  final VoidCallback onTap;
   final VoidCallback onToggle;
 
   @override
@@ -151,41 +167,46 @@ class _AyahCard extends StatelessWidget {
           width: bookmarked ? 1.4 : 1,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        textDirection: TextDirection.rtl,
-        children: [
-          // With Unicode text the SelectionArea owns the long-press (that is
-          // how a selection starts). Only the glyph fallback needs the
-          // copy-on-long-press shortcut, because selection there is invalid.
-          Builder(
-            builder: (context) {
-              final unicode = ayah.textUnicode;
-              final text = ayah.displayText;
-              final widget = Text(
-                text,
-                style: AppTheme.hafsAyah.copyWith(
-                  fontSize: AppTheme.hafsAyah.fontSize! * fontScale,
-                  height: lineHeight,
-                ),
-                textAlign: TextAlign.center,
-                textDirection: TextDirection.rtl,
-              );
-              if (unicode != null) return widget;
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onLongPress: () => copyAyahText(context, ayah),
-                child: widget,
-              );
-            },
-          ),
-          _AyahActions(
-            ayah: ayah,
-            surahName: surahName,
-            bookmarked: bookmarked,
-            onToggle: onToggle,
-          ),
-        ],
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          textDirection: TextDirection.rtl,
+          children: [
+            // With Unicode text the SelectionArea owns the long-press (that is
+            // how a selection starts). Only the glyph fallback needs the
+            // copy-on-long-press shortcut, because selection there is invalid.
+            Builder(
+              builder: (context) {
+                final unicode = ayah.textUnicode;
+                final text = ayah.displayText;
+                final widget = Text(
+                  text,
+                  style: AppTheme.hafsAyah.copyWith(
+                    fontSize: AppTheme.hafsAyah.fontSize! * fontScale,
+                    height: lineHeight,
+                  ),
+                  textAlign: TextAlign.center,
+                  textDirection: TextDirection.rtl,
+                );
+                if (unicode != null) return widget;
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onLongPress: () => copyAyahText(context, ayah),
+                  child: widget,
+                );
+              },
+            ),
+            _AyahActions(
+              ayah: ayah,
+              surahName: surahName,
+              bookmarked: bookmarked,
+              open: actionsOpen,
+              onToggle: onToggle,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -196,12 +217,14 @@ class _AyahActions extends StatelessWidget {
     required this.ayah,
     required this.surahName,
     required this.bookmarked,
+    required this.open,
     required this.onToggle,
   });
 
   final Verse ayah;
   final String surahName;
   final bool bookmarked;
+  final bool open;
   final VoidCallback onToggle;
 
   @override
@@ -221,29 +244,46 @@ class _AyahActions extends StatelessWidget {
           semanticsLabel: loc.ayahNumberLabel(loc.number(ayah.numberInSurah)),
         ),
         const Spacer(),
-        IconButton(
-          tooltip: loc.ayahSheetTitle,
-          icon: const Icon(Icons.menu_book_outlined),
-          onPressed: () => showAppSheet<void>(
-            context: context,
-            isScrollControlled: true,
-            builder: (_) => AyahSheet(
-              surahId: ayah.surahId,
-              surahName: surahName,
-              ayah: ayah.numberInSurah,
-            ),
-          ),
+        // Only the buttons collapse; the ayah number is part of reading and
+        // stays visible (the 2.0 probe reads its semantics label).
+        AnimatedSize(
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          alignment: AlignmentDirectional.centerEnd,
+          child: open
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      tooltip: loc.ayahSheetTitle,
+                      icon: const Icon(Icons.menu_book_outlined),
+                      onPressed: () => showAppSheet<void>(
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) => AyahSheet(
+                          surahId: ayah.surahId,
+                          surahName: surahName,
+                          ayah: ayah.numberInSurah,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip:
+                          bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
+                      icon: Icon(
+                        bookmarked ? Icons.bookmark : Icons.bookmark_border,
+                        color: bookmarked ? colors.secondary : null,
+                      ),
+                      onPressed: onToggle,
+                    ),
+                    _CopyAyahButton(ayah: ayah),
+                    _ShareAyahButton(ayah: ayah, surahName: surahName),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
-        IconButton(
-          tooltip: bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
-          icon: Icon(
-            bookmarked ? Icons.bookmark : Icons.bookmark_border,
-            color: bookmarked ? colors.secondary : null,
-          ),
-          onPressed: onToggle,
-        ),
-        _CopyAyahButton(ayah: ayah),
-        _ShareAyahButton(ayah: ayah, surahName: surahName),
       ],
     );
   }

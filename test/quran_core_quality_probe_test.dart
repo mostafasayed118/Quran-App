@@ -227,6 +227,12 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
+    await tester.ensureVisible(find.text('الم').first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.tap(find.text('الم').first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byIcon(Icons.menu_book_outlined).first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));

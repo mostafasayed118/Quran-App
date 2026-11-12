@@ -77,8 +77,14 @@ void main() {
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
-    expect(find.byTooltip('مشاركة الآية'), findsWidgets,
-        reason: 'one share button per verse card (share_plus affordance)');
-    expect(find.byIcon(Icons.share_outlined), findsWidgets);
+    // The action row stays closed until the verse is tapped (UI-1).
+    expect(find.byTooltip('مشاركة الآية'), findsNothing);
+    await tester.tap(find.text('الم').first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+
+    expect(find.byTooltip('مشاركة الآية'), findsOneWidget,
+        reason: 'the open verse carries the share_plus affordance');
+    expect(find.byIcon(Icons.share_outlined), findsOneWidget);
   });
 }
