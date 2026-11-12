@@ -195,14 +195,11 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       await _applyTuning();
       if (isClosed || episode != _episode) return;
       if (state is! PlaybackLoading) return;
-      emit(PlaybackState.playing(
-        reciterName: _reciterName,
-        surahNumber: surahNumber,
-        surahName: surahName,
+      emit(state.toPlaying(
         duration: _lastDuration,
-        speed: _speed,
-        repeatMode: _repeatMode,
-        sleepTimer: _sleepTimerDuration,
+        speedOverride: _speed,
+        repeatModeOverride: _repeatMode,
+        sleepTimerOverride: _sleepTimerDuration,
       ));
     } on Object catch (error, stackTrace) {
       appLog('playback load failed',
@@ -414,16 +411,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
             name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
       }
       if (isClosed) return;
-      emit(PlaybackState.paused(
-        reciterName: state.reciterName,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
-        position: state.position,
-        duration: state.duration,
-        speed: state.speed,
-        repeatMode: state.repeatMode,
-        sleepTimer: null,
-      ));
+      emit(state.toPaused(clearSleepTimer: true));
     } else if (state is PlaybackPaused) {
       emit(state.copyWith(sleepTimer: null));
     }
@@ -514,16 +502,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         return;
       }
       if (isClosed || episode != _episode) return;
-      emit(PlaybackState.paused(
-        reciterName: state.reciterName,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
-        position: state.position,
-        duration: state.duration,
-        speed: state.speed,
-        repeatMode: state.repeatMode,
-        sleepTimer: state.sleepTimer,
-      ));
+      emit(state.toPaused());
     } else if (state is PlaybackPaused) {
       try {
         await _service.resume();
@@ -534,16 +513,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         return;
       }
       if (isClosed || episode != _episode) return;
-      emit(PlaybackState.playing(
-        reciterName: state.reciterName,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
-        position: state.position,
-        duration: state.duration,
-        speed: state.speed,
-        repeatMode: state.repeatMode,
-        sleepTimer: state.sleepTimer,
-      ));
+      emit(state.toPlaying());
     }
   }
 
@@ -656,38 +626,21 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     if (isClosed || _externalAudioActive) return;
     final state = this.state;
     if (playing && state is PlaybackLoading && state.reciterName != null) {
-      emit(PlaybackState.playing(
-        reciterName: state.reciterName!,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
+      emit(state.toPlaying(
         duration: _lastDuration,
-        speed: _speed,
-        repeatMode: _repeatMode,
-        sleepTimer: _sleepTimerDuration,
+        speedOverride: _speed,
+        repeatModeOverride: _repeatMode,
+        sleepTimerOverride: _sleepTimerDuration,
       ));
     } else if (playing && state is PlaybackPaused) {
       final controls = _controlsOf(state);
-      emit(PlaybackState.playing(
-        reciterName: state.reciterName,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
-        position: state.position,
-        duration: state.duration,
-        speed: controls.speed,
-        repeatMode: controls.repeatMode,
-        sleepTimer: controls.sleepTimer,
+      emit(state.toPlaying(
+        speedOverride: controls.speed,
+        repeatModeOverride: controls.repeatMode,
+        sleepTimerOverride: controls.sleepTimer,
       ));
     } else if (!playing && state is PlaybackPlaying) {
-      emit(PlaybackState.paused(
-        reciterName: state.reciterName,
-        surahNumber: state.surahNumber,
-        surahName: state.surahName,
-        position: state.position,
-        duration: state.duration,
-        speed: state.speed,
-        repeatMode: state.repeatMode,
-        sleepTimer: state.sleepTimer,
-      ));
+      emit(state.toPaused());
     }
   }
 
