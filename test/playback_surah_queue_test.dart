@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
@@ -19,6 +20,13 @@ int? _number(PlaybackState state) => switch (state) {
       _ => null,
     };
 
+String? _name(PlaybackState state) => switch (state) {
+      PlaybackPlaying(:final surahName) => surahName,
+      PlaybackPaused(:final surahName) => surahName,
+      PlaybackLoading(:final surahName) => surahName,
+      _ => null,
+    };
+
 void main() {
   test('next/previous walk the reciter surah list, not 1..114', () async {
     final db = newTestDb();
@@ -32,6 +40,21 @@ void main() {
             surahTotal: 3,
           ),
         );
+    for (final (id, name) in [
+      (1, 'الفاتحة'),
+      (3, 'آل عمران'),
+      (7, 'الأعراف')
+    ]) {
+      await db.into(db.surahs).insert(SurahsCompanion.insert(
+            id: Value(id),
+            nameAr: name,
+            nameEn: name,
+            revelationType: 'makkah',
+            ayahCount: 7,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ));
+    }
     final row = (await ReciterRepository(db).byId('51-53'))!;
     final cubit = PlaybackCubit(
       service: FakePlaybackService(),
@@ -40,17 +63,20 @@ void main() {
         db,
         audioRootResolver: () async => Directory.systemTemp,
       ),
+      surahNames: ReciterRepository(db),
     );
     addTearDown(cubit.close);
 
     await cubit.playReciter(row.toInfo(), 1);
     expect(_number(cubit.state), 1);
+    expect(_name(cubit.state), 'الفاتحة');
     expect(cubit.hasNextSurah, isTrue);
     expect(cubit.hasPreviousSurah, isFalse);
 
     await cubit.nextSurah();
     expect(_number(cubit.state), 3,
         reason: 'surah 2 is not in this reciter\'s list');
+    expect(_name(cubit.state), 'آل عمران');
 
     await cubit.nextSurah();
     expect(_number(cubit.state), 7);

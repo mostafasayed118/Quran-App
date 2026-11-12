@@ -11,6 +11,7 @@ import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
 import 'reciter_mapping.dart';
 import 'reciter_source.dart';
+import 'surah_name_source.dart';
 
 /// Featured reciters pinned by PM from the verified 2026-10-15 mp3quran dump
 /// (all حفص مرتل, 114 surahs each). Never extend without a PM grant.
@@ -93,7 +94,8 @@ const recitersApiEndpoint = 'https://mp3quran.net/api/v3/reciters?language=ar';
 const selectedMoshafKey = 'selected_moshaf_row';
 
 /// Keeps the reciter catalog in sync with the remote API and the local database.
-class ReciterRepository implements ReciterSource, ReciterInfoSource {
+class ReciterRepository
+    implements ReciterSource, ReciterInfoSource, SurahNameSource {
   ReciterRepository(
     this._db, {
     Dio? client,

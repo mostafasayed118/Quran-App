@@ -287,7 +287,13 @@ class _ReadyView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(state.surahName),
+        // A long surah name at textScale 2.0 would ellipsize in a 360 dp bar;
+        // scale it down instead so the full name stays readable.
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(state.surahName),
+        ),
         actions: [ReaderActions(state: state)],
       ),
       body: ReaderView(state: state),

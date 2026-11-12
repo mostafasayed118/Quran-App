@@ -161,5 +161,13 @@ void main() {
     expect(find.byTooltip('حجم الخط'), findsNothing);
     expect(find.byTooltip('وضع المصحف'), findsNothing);
     expect(find.byTooltip('الانتقال إلى صفحة'), findsOneWidget);
+    // The title scales down instead of ellipsizing in the narrow bar.
+    expect(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.byType(FittedBox),
+      ),
+      findsOneWidget,
+    );
   });
 }
