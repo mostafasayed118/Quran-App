@@ -36,14 +36,18 @@ powershell -File tools\build_release.ps1 -Target appbundle
 # or: -Target apk -SplitPerAbi
 ```
 
-The wrapper reads `QURAN_VERSION_POLICY_PUBLIC_KEY`, falls back to
-`tools/version-policy-public.txt`, and **fails** if both are empty. The same
-public key must be present in every release artifact that ships the update
-gate (APK and AAB). The private key is never needed to build.
+The wrapper is the **only** store lane. It reads
+`QURAN_VERSION_POLICY_PUBLIC_KEY`, falls back to `tools/version-policy-public.txt`,
+and **fails** if both are empty; it also sets `PUBLISH_RELEASE=true`, so a
+machine without `android/key.properties` fails the build instead of emitting a
+debug-signed artifact. The same public key must be present in every release
+artifact that ships the update gate (APK and AAB). The private key is never
+needed to build.
 
 A direct `flutter build --release` that bypasses the wrapper still compiles,
-but the gate stays off (unsigned policies are rejected in release). Treat
-such an artifact as a local-only check; never use it for a store upload.
+but it is a **local-only check**: the gate stays off (no key, so unsigned
+policies are rejected) and `PUBLISH_RELEASE` is unset (no signing guard).
+Never use such an artifact for a store upload.
 
 Code behavior:
 

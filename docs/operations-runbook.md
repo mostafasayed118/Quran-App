@@ -60,8 +60,10 @@ Google’s terms; it is not an app-owned data channel.
   `targetSdk 36`); Flutter is pinned to 3.47.5 in `.fvmrc` and CI.
 - The release keystore lives outside the repo; `android/key.properties` is gitignored. CI has
   no keystore, so CI artifacts are `debug-signed-*` and must never be uploaded to Play.
-- Store-bound builds use `$env:PUBLISH_RELEASE="true"; flutter build appbundle --release`
-  (PowerShell); a missing key fails the build by design.
+- Store-bound builds use `tools/build_release.ps1 -Target appbundle`, which injects the
+  version-policy public key **and** sets `PUBLISH_RELEASE=true`; a missing keystore then
+  fails the build by design. A bare `flutter build appbundle --release` is a local-only
+  check: no policy key (update gate off) and no signing guard.
 - There are no remote feature flags. The **one** remotely-controlled behavior is the
   **force-update policy**: `GET https://quranyahdi.pages.dev/version.json` at launch
   (`lib/features/update/data/version_policy_service.dart`). It fails open — missing/malformed/404/slow → the app
@@ -140,4 +142,4 @@ Adding one is an owner decision that requires a privacy-policy and Data-safety u
 
 ---
 
-**Last updated:** 2026-11-09 (version policy / force-update gate + one-shot In-App Review disclosed) · **Applies to:** versionCode 2004 and later
+**Last updated:** 2026-11-12 (store lane = `tools/build_release.ps1`; versionCode record corrected) · **Applies to:** versionCode 4 and later

@@ -120,8 +120,8 @@ Until all six are done and the owner signs off, crash investigation is **Play vi
 | Artifact | Size | Signer | applicationId | versionName | versionCode | Permissions (aapt) |
 |---|---|---|---|---|---|---|
 | `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` | 44.7 MB | `CN=Mostafa Sayed` SHA-256 `db7ffef4…c4685` | `com.mostafasayed.quranyahdi` | `1.0.0` | **2004** (split: base 4 + ABI offset) | INTERNET · WAKE_LOCK · FOREGROUND_SERVICE(+MEDIA_PLAYBACK) · ACCESS_COARSE_LOCATION · SCHEDULE_EXACT_ALARM · RECEIVE_BOOT_COMPLETED · VIBRATE · POST_NOTIFICATIONS |
-| `…/app-armeabi-v7a-release.apk` | 42.7 MB | same cert | same | same | same | same set (aapt on arm64; armeabi-v7a structurally identical) |
-| `…/app-x86_64-release.apk` | 46.2 MB | same cert | same | same | same | n/a checked (x86_64 = emulator dev lane only) |
+| `…/app-armeabi-v7a-release.apk` | 42.7 MB | same cert | same | same | base `4` + its own ABI offset | same set (aapt on arm64; armeabi-v7a structurally identical) |
+| `…/app-x86_64-release.apk` | 46.2 MB | same cert | same | same | base `4` + its own ABI offset | n/a checked (x86_64 = emulator dev lane only) |
 | `build/app/outputs/bundle/release/app-release.aab` | 89.2 MB | `CN=Mostafa Sayed` (same serial, `keytool -printcert -jarfile` verified) | same | same | `4` | n/a (AAB verified by jar/keytool cert + Play inspection) |
 
 SHA-256 (final artifacts, built from the fully tested tree): arm64-v8a APK `18A9EB38…F4F7828A` · AAB `DF2E3E0C…D7525686`. Built this session **twice**: first after the release-readiness implementation (hashes superseded), then rebuilt after the architecture-guard fix so the published hashes match the tree that passed `flutter analyze` (0 issues) and the full suite.

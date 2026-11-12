@@ -102,7 +102,7 @@ Primary source: `docs/store/data-safety-form-answers.md` (permission census + li
 
 ## 6. Release checklist
 
-- [ ] Set `PUBLISH_RELEASE=true` (or `-PpublishRelease=true`) for the store-bound build — without it the Gradle build stays debug-signed by design; with it and no keystore the build **fails** instead of shipping a debug-signed artifact.
+- [ ] Build the store artifact with `tools\build_release.ps1 -Target appbundle` — it sets `PUBLISH_RELEASE=true` itself (or set the flag yourself with `-PpublishRelease=true`). Without it the Gradle build stays debug-signed by design; with it and no keystore the build **fails** instead of shipping a debug-signed artifact.
 - [ ] Build the bundle: `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`.
 - [ ] Verify the signer before upload: `keytool -printcert -jarfile app-release.aab` on the AAB; expect `CN=Mostafa Sayed, OU=Quran Yahdi, O=Quran Yahdi, L=Cairo, ST=Cairo, C=EG` and `SHA256 DB:7F:FE:…:46:85`. (`jarsigner -verify` reports "not signed in JarInputStream" on these bundles — a known JAR-stream quirk, not an unsigned bundle; the `META-INF/*.RSA` + `keytool` output is the reliable check.)nd record the certificate SHA-256.
 - [ ] Confirm the versionCode rule: the uploaded code **must exceed every versionCode previously uploaded to any track**. Current build is `1.0.0+3` → versionCode `3`; nothing on this branch is published, but the earlier `+2`/`+1` builds may already sit on a track — **re-check the highest versionCode in Play Console before every upload** and bump `pubspec.yaml` again if `3` is not strictly greater.
