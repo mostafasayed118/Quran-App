@@ -94,6 +94,15 @@ class VersionGate extends ChangeNotifier {
         if (_verdict == null) return;
         return;
       }
+      if (!policy.isPlausibleFor(_installed!)) {
+        // A typo such as 99.0.0 must not wall every install; an implausible
+        // jump is ignored until a human corrects the published document.
+        appLog(
+          'version policy rejected: min_supported is implausible',
+          name: 'quran_yahdi/version-gate',
+        );
+        return;
+      }
       _latest = policy.latest;
       final verdict = policy.verdictFor(_installed!);
       if (verdict == _verdict) return;

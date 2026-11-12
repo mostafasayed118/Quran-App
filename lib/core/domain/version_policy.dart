@@ -134,6 +134,26 @@ class VersionPolicy {
     );
   }
 
+  /// Whether this policy is a plausible next step from [installed].
+  ///
+  /// Signing makes the document authentic, but the owner can still publish a
+  /// typo such as `99.0.0` and wall every install. A jump is accepted only
+  /// within one major version and [maxMinorAhead] minors; anything further is
+  /// treated as malformed (the gate ignores it and stays fail-open) until a
+  /// human corrects the document.
+  bool isPlausibleFor(AppVersion installed, {int maxMinorAhead = 2}) {
+    if (minSupported.major > installed.major + 1) return false;
+    if (minSupported.major == installed.major &&
+        minSupported.minor > installed.minor + maxMinorAhead) {
+      return false;
+    }
+    if (minSupported.major == installed.major + 1 &&
+        minSupported.minor > maxMinorAhead) {
+      return false;
+    }
+    return true;
+  }
+
   /// The verdict for [installed]; never null, never throws.
   VersionVerdict verdictFor(AppVersion installed) {
     if (installed.compareTo(minSupported) < 0) {
