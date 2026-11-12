@@ -47,45 +47,78 @@ None observed in the capture set.
   the sheet content and the share affordance are all still checked. A new test pins
   closed-by-default and tap-to-close.
 
-### 2. Home breaks down at textScale 2.0
+### 2. textScale 2.0 — CORRECTED 2026-11-13: no defect found
 
-- **Evidence:** `scale2-home`. The grid tiles keep their square aspect, so the labels wrap to
-  two lines and clip; the second row is cut mid-card and the bottom navigation is pushed off
-  the visible column.
-- **Not a crash** — no overflow stripes — but a reader who raises the system font size to 2.0
-  sees a home screen that cannot be scanned.
-- **Fix:** let the tile grow with the text (intrinsic height or a `mainAxisExtent` derived from
-  the text scale) and clamp the label to two lines with an ellipsis only after that.
+- **Original claim (from a thumbnail):** "home breaks down at 2.0 — tiles clip, labels wrap unevenly,
+  the bottom navigation is pushed off".
+- **Measured at full resolution on the device:** the tiles **grow** with the text, the labels wrap
+  cleanly, nothing overflows, and the section rhythm survives. The reader shows three ayahs at
+  2.0 with full text; settings rows grow without clipping; the duas chip row is a
+  `SingleChildScrollView` (`duas_screen.dart:95`) so its edge cut is a scroll, not an overflow.
+- **Verdict:** the original finding was wrong and is withdrawn. No code change.
 
 ---
 
 ## P2 — Polish
 
-### 3. The prayer countdown's digits collide
+### 3. The prayer countdown's digits sit tight — and tracking cannot fix it
 
-- **Evidence:** `light/01-home`, the `_LiveCountdown` value. The Arabic-Indic `٢`/`٣` pairs
-  visually merge.
-- **Verified as a font property, not a rendering bug:** the same string renders identically in
-  Chrome with the app's own `Cairo-Bold.ttf`, so Flutter is faithful. It is a legibility risk
-  at store-screenshot size.
-- **Fix options:** a small `letterSpacing` **on the numerals only** (2–3 px) or a numeral-first
-  font for this one widget. The first is a one-line change; the second is a design decision.
+- **Evidence:** `light/01-home`, `scale2-home`. Arabic-Indic pairs (`٢٢`, `٣٣`, `٤٠`) read as
+  single shapes at 30 px and worse at 2.0.
+- **Verified as a font property:** the same string renders identically in Chrome with the app's
+  own `Cairo-Bold.ttf`, so Flutter is faithful.
+- **Tracking is a dead end — tested, not assumed:** `letterSpacing` 2.5 and 5 change nothing,
+  in Chrome or in Flutter, because spacing is not applied inside an Arabic script run.
+- **Remaining options:** swap the numerals' font for this one widget, or compose the countdown
+  from per-digit `Text` widgets with explicit gaps. Both are design decisions, not a fix.
 
-### 4. Settings inverts its own hierarchy on the time rows
+### 4. Settings hierarchy — WITHDRAWN 2026-11-13
 
-- **Evidence:** `light/16-settings`, `scale2-settings`. Rows like *وقت التذكير* / *وقت تذكير
-  الورد* render the label at title size and the value (٠٦:٣٠ / ٢٠:٠٠) at caption size in a
-  muted tone — the value a user opens the screen to change is the least prominent element.
-- **Fix:** same size step as the other rows (label + trailing value at body size), or make the
-  value a tappable chip.
+- **Original claim:** the time rows render the value at caption size so the thing users open the
+  screen to change is the least prominent element.
+- **Measured:** at 1.0 and at 2.0 the trailing value sits a full step below the label in every
+  row, and the time rows match the shape of *اللغة / العربية* and *المظهر / حسب النظام*. The
+  claim was read from a thumbnail and does not survive the full-resolution capture.
+- **No code change.**
 
-### 5. Azkar and Duas tab strips are cramped
+### 5. Azkar/Duas tab strips — WITHDRAWN 2026-11-13
 
-- **Evidence:** `light/11-duas`, `light/05-azkar`. Three to four long Arabic labels in a
-  segmented strip that already fills the width at scale 1.0.
-- **Not measured at 2.0** — this is the screen most likely to break there, which is why UI-2
-  should probe it first.
-- **Fix:** scrollable tabs, or shorten the labels to one word each.
+- **Original claim:** the strips are cramped and would break at 2.0.
+- **Measured at 2.0:** the two main tabs fit; the category chips live in a
+  `SingleChildScrollView` (`duas_screen.dart:95`), so the cut at the edge is a scroll, not an
+  overflow. No clipping, no stripes.
+- **No code change.**
+
+---
+
+## Contrast measurements — measured, not eyeballed
+
+WCAG 2.2, computed from the theme tokens (`lib/core/theme/app_colors.dart`).
+
+| Pair | Ratio | Need | Verdict |
+|---|---|---|---|
+| LIGHT ink / page | 11.74 | 4.5 | pass |
+| LIGHT ink / card | 13.97 | 4.5 | pass |
+| LIGHT `goldText` / card | 5.81 | 4.5 | pass |
+| LIGHT `onEmeraldTint` / tint | 9.79 | 4.5 | pass |
+| LIGHT `primaryBeige` / emerald (filled button) | 5.07 | 4.5 | pass |
+| **LIGHT `gold` / card** | **2.12** | **3.0** | **fail** |
+| LIGHT `gold` / page | 1.78 | 3.0 | fail |
+| LIGHT `gold` / tile | 1.67 | 3.0 | fail |
+| DARK onSurface / surface | 12.92 | 4.5 | pass |
+| DARK onSurface / background | 14.38 | 4.5 | pass |
+| DARK `gold` (the dark `secondary`) / surface | 7.73 | 3.0 | pass |
+| DARK mushaf ink / card top | 11.85 | 4.5 | pass |
+| DARK mushaf muted / card top | 8.51 | 4.5 | pass |
+
+**The failure is real and systemic:** `secondary` is gold in the light scheme, and all sixteen
+uses of `colors.secondary` are *meaningful* — favourite, done, aligned, bookmarked, the qibla
+ring and needle. Excluding decoration does not rescue it; the state colour itself is below the
+3:1 floor on every cream surface.
+
+**Fix applied (UI-5):** a new `AppColors.goldStrong` (`#B06F18`) becomes the light `secondary`.
+Measured: **4.02 on the card, 3.38 on the page, 3.15 on the tiles** — all above 3:1, hue intact.
+Dark keeps `gold` (7.73). `goldText` (the light text role) is unchanged.
 
 ---
 
@@ -110,10 +143,13 @@ test pins the current interaction.
 
 ## Proposed waves
 
-| Wave | Scope | Size | Blocker |
+| Wave | Scope | Size | Status |
 |---|---|---|---|
-| **UI-1** | Reader: reveal actions on tap; unfreeze `reader_ayah_copy_test` | M | Owner ruling on the frozen test |
-| **UI-2** | textScale 2.0: home tiles grow, then re-probe every screen at 2.0 | M | — |
-| **UI-3** | Settings hierarchy + Azkar/Duas tab strips | S | — |
-| **UI-4** | Countdown numerals + section-cut polish | S | Font decision |
-| **UI-5** | Dark-mode contrast sweep with measured pairs on every surface | M | — |
+| **UI-1** | Reader: reveal actions on tap | M | **DONE** (owner ruling on the frozen test) |
+| **UI-2** | textScale 2.0 re-probe | S | **DONE — nothing to fix**; finding withdrawn |
+| **UI-3** | Settings hierarchy + tab strips | S | **DONE — nothing to fix**; both withdrawn |
+| **UI-4** | Countdown numerals | S | Open — needs a font/layout decision, not tracking |
+| **UI-5** | Dark-mode contrast sweep with measured pairs | M | **DONE** — light `secondary` failed 3:1 on every cream surface; `goldStrong` fixes it. Dark passed everywhere |
+
+**Lesson recorded:** four of the five findings were judged from a contact sheet. Three did not
+survive full-resolution inspection. The capture set is the evidence; the thumbnail is not.

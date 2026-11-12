@@ -7,6 +7,12 @@ abstract final class AppColors {
   static const emeraldDark = Color(0xFF2E5244);
   static const emeraldLight = Color(0xFFE4EEE9);
   static const gold = Color(0xFFE3A53E);
+
+  /// The light-theme `secondary`. [gold] is a light accent: used as a state
+  /// colour on the cream surfaces it measures 1.7–2.1:1, below the 3:1 floor
+  /// for meaningful graphics. This keeps the hue and clears 3:1 on the card,
+  /// the page and the tiles (4.0 / 3.4 / 3.2 measured 2026-11-13).
+  static const goldStrong = Color(0xFFB06F18);
   static const goldText = Color(0xFF8A5A14);
   static const goldLight = Color(0xFFF7EAD2);
   static const pageBackground = Color(0xFFEFE9DA);
