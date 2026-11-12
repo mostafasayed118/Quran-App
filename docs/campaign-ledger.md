@@ -1362,3 +1362,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Architecture note:** the first M8 cut imported `app_database.dart` into the presentation cubit; `architecture_presentation_drift_test` caught it before the push and the fix was folded into `8d4ea50` (orphan rows are built inside the existing `try` where the drift rows are inferred).
 - **Status:** **8 High + 23 Medium + 23 of 24 Low** fixed; **L20** rule-deferred. No owner-gated finding remains open.
 
+
+### 2026-11-12 (close) — Device-pass follow-ups: reader title scale + playback surah name — MERGED ON MAIN
+
+- **Owner ask:** «L1 لسه ناقص تجميليًا … M21 عرض … نحل دول كمان» after the 2026-11-12 release device pass.
+- **Wave:** branch `wave/device-followups` → PR **#36**, merge `70afc5e`, **2 commits**. Gates at `e677967`: format **810/0** · analyze **0** · suite **1592/1592**; CI **43213675908 success** (analyze-test; release-artifact skipped on PR). Main CI `43215091430` success (analyze + release).
+- **L1 `b1cfd81`:** the full reader title is wrapped in a scale-down `FittedBox`; at 360 dp / 2.0 it shows the full **الفاتحة** instead of `الفا...` (device screenshot).
+- **M21 `e677967`:** added a `SurahNameSource` port (implemented by `ReciterRepository`), resolved the name before next/previous and when `playReciter` gets none; the sheet now shows **البقرة / إبراهيم** instead of `Surah N`. The queue test seeds three surahs and pins the names.
+- **Device re-verification (release, `70afc5e`, A16_API36):** L1 full title; M21 name البقرة; a 6-surah reciter stepped **يوسف 12 → إبراهيم 14** (13 skipped); **L5** verified via copy/paste (`1:1`, `27:30`); **L7** wird went `٠/٦٠٤` → `٣/٦٠٤` after scrolling Al-Baqarah. M22 was attempted with `/data` at ~5 MB mid-download (no crash), but the ENOSPC strip did not surface before cleanup; it stays covered by the unit/cubit/widget tests.
+- **Evidence:** `device-e2e-waves-4b-6.md` + 19 screenshots + UI dumps outside the repo.
+- **Frozen tests:** none edited in this wave.
