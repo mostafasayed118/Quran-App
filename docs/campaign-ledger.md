@@ -1372,3 +1372,16 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Device re-verification (release, `70afc5e`, A16_API36):** L1 full title; M21 name البقرة; a 6-surah reciter stepped **يوسف 12 → إبراهيم 14** (13 skipped); **L5** verified via copy/paste (`1:1`, `27:30`); **L7** wird went `٠/٦٠٤` → `٣/٦٠٤` after scrolling Al-Baqarah. M22 was attempted with `/data` at ~5 MB mid-download (no crash), but the ENOSPC strip did not surface before cleanup; it stays covered by the unit/cubit/widget tests.
 - **Evidence:** `device-e2e-waves-4b-6.md` + 19 screenshots + UI dumps outside the repo.
 - **Frozen tests:** none edited in this wave.
+
+### 2026-11-12 (open) — P1 structural hardening: guards, playback state, shared test harness — ON `wave/p1-structural`, UNPUSHED
+
+- **Owner asks:** «كمل شغل» → the recommended wave → «GO» (commit window) → «GO» (1C-wide) → «GO» (commit).
+- **Branch:** `wave/p1-structural` on top of `5cbff09` (the signed-policy wave, `wave/version-policy-hardening`). **No push** — `origin/main` is still `1be3d01`.
+- **1A architecture `55a0c04`:** the feature-data guard now rejects every `package:flutter/` + `dart:ui` import against an exact, reasoned allowlist, with a core/domain purity guard beside it; `resetDependenciesForTest` resets the version + onboarding gates; the settings reminder ports arrive from the route (no `GetIt` in `build`); `ReviewEligibility` is the production predicate and the dead gate getters are gone; the backup pick/share seams moved to `backup_platform.dart` so the cubit no longer imports `backup_io.dart`; `_backfillNorm` writes pending rows only; the workspace master width uses `AppBreakpoints`.
+- **1D `f2b568f`:** seven hand-spelled `PlaybackState.playing/paused` rebuilds became `toPlaying`/`toPaused` + 5 transition tests; `StateMessage` is now the one layout behind `EmptyState` and `ErrorView`; the home-widget receiver contract is pinned in `security_platform_config_test`.
+- **1C-lite `db04d95`:** one `FakePrayerTimeService` (re-exported from the two historical entry points so existing relative importers keep working) and one silent `FakePlaybackService` base + `ControllablePlaybackService` subclass replace four hand-written copies.
+- **1C-wide `c303b4c`:** 72 raw `MaterialApp` blocks in 57 files now build through `appShell(...)`. `test/test_harness_guard_test.dart` freezes the 41 remaining files (16 routed harnesses that own a `GoRouter`, 25 with their own MediaQuery `builder`/delegates/args) and fails on both a new raw `MaterialApp` and a stale entry — the list may only shrink. Proven non-vacuous: a planted probe file made the guard fail, then was removed. Net +404/−978.
+- **Gates at `c303b4c`:** format **812/0** · analyze **0** · suite **1618/1618** (1616 + the 2 guard tests).
+- **Frozen tests:** none edited. The only test edits are the harness swap (no assertions touched), the fake merge, and three new pins (playback transitions, app-widget receiver, harness allowlist).
+- **Carried forward:** 1B — split `lib/app/router.dart` (732 lines, `_postShellRoutes` ~450) plus the 17 files at or above 400 lines.
+
