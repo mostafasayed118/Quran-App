@@ -1351,3 +1351,14 @@ Format: newest entries appended at the bottom. Every entry = independently verif
   - **L20 rule-deferred:** `QadaCubit.clear` and `TasbihState.reachedTarget` have no UI user but are pinned by Class A tests; the owner ruled to keep them (no code change).
 - **Process note:** commit-message files written with `Set-Content -Encoding UTF8` produced a BOM on two 4B subjects; fixed before push by rewriting the messages with `-Encoding ascii`. Use ASCII for message files.
 - **Carried forward:** M8 (catalog-removed packs), M15 (tasbih hydration), M21 (reciter next/prev set) remain owner-gated. Status after this window: **8 High closed** (Waves 1/2), **20 of 23 Medium closed** (Waves 3/4A/4B; M8/M15/M21 open), **23 of 24 Low fixed** (4B + 5A + 5B), with **L20 rule-deferred** by the owner.
+
+### 2026-11-11 (close) — Wave 6: the last three Medium findings — MERGED ON MAIN
+
+- **Owner rulings:** M8 «اعرض صف + حذف» · M15 «اطلب النقرة وطبّقها بعد الجلب» · M21 «امشِ على قائمة القارئ».
+- **Wave:** branch `wave/medium-6` → PR **#35**, merge `a5dc718`, **3 commits**. Gates at `744e9a4`: format **809/0** · analyze **0** · suite **1592/1592**; CI `43203583504`.
+- **M8 `8d4ea50`:** an installed pack dropped from the catalog stayed invisible (rows came from the catalog) and its file could not be deleted. `load` appends an `orphan` row built from the registry (stored title/kind), the row shows the localized "no longer in the catalog - you can delete it" hint, and a successful uninstall drops the row (no catalog entry to reinstall from). Cubit test.
+- **M15 `9ce65e9`:** a tap before hydration wrote `(1, 33)` and erased the stored session. Pre-hydration taps are queued and applied on top of the stored count in one save; a reset/target change during hydration still wins and drops the queue. **Owner-approved Class A edit:** `tasbih_hydration_race_test` now expects 41 + 1 = 42, one save.
+- **M21 `744e9a4`:** `nextSurah`/`previousSurah` added +/-1 inside 1..114, so a reciter serving a subset could jump to a surah they do not have. Parse `surahList` into a queue at play time, step inside it, keep the 1..114 fallback, and drive the sheet buttons from `hasNextSurah`/`hasPreviousSurah`. Two tests.
+- **Architecture note:** the first M8 cut imported `app_database.dart` into the presentation cubit; `architecture_presentation_drift_test` caught it before the push and the fix was folded into `8d4ea50` (orphan rows are built inside the existing `try` where the drift rows are inferred).
+- **Status:** **8 High + 23 Medium + 23 of 24 Low** fixed; **L20** rule-deferred. No owner-gated finding remains open.
+
