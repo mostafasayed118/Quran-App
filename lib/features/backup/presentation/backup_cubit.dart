@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
-import '../data/backup_io.dart';
 import '../data/backup_service.dart';
 import '../domain/backup_models.dart';
+import 'backup_platform.dart';
 import 'backup_state.dart';
 
 /// Backup & restore surface: export shares the encoded JSON file through the
@@ -43,7 +43,7 @@ class BackupCubit extends Cubit<BackupState> {
       final json = await _service.exportJson();
       // On export the encoded JSON is measured before it is shared: the app
       // must never emit a file its own importer would reject.
-      if (exceedsBackupLimit(json)) {
+      if (_service.exceedsLimit(json)) {
         throw const BackupTooLarge();
       }
       await _shareJson(json);
@@ -73,11 +73,11 @@ class BackupCubit extends Cubit<BackupState> {
         emit(const BackupState.idle());
         return;
       }
-      if (bytes.length > kBackupMaxBytes) {
+      if (bytes.length > _service.maxImportBytes) {
         emit(const BackupState.invalidFile());
         return;
       }
-      final result = await decodeBackup(bytes);
+      final result = await _service.decodeImport(bytes);
       if (isClosed) return;
       if (result is BackupDecodeFailure &&
           result.reason == BackupDecodeFailureReason.encrypted) {
@@ -121,9 +121,9 @@ class BackupCubit extends Cubit<BackupState> {
     emit(const BackupState.idle(busy: true));
     try {
       final json = await _service.exportJson();
-      final encrypted = await encryptBackupJsonInIsolate(json, passphrase);
+      final encrypted = await _service.encryptForExport(json, passphrase);
       // Never emit a file this app's own importer would reject.
-      if (exceedsBackupLimit(encrypted)) {
+      if (_service.exceedsLimit(encrypted)) {
         throw const BackupTooLarge();
       }
       await _shareJson(encrypted);
@@ -146,7 +146,7 @@ class BackupCubit extends Cubit<BackupState> {
     if (isClosed || bytes == null) return;
     emit(const BackupState.idle(busy: true));
     try {
-      final result = await decodeBackup(bytes, passphrase: passphrase);
+      final result = await _service.decodeImport(bytes, passphrase: passphrase);
       if (isClosed) return;
       if (result is! BackupDecodeSuccess) {
         _pendingEncryptedBytes = null;

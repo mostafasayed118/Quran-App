@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
@@ -51,10 +50,10 @@ class SettingsScreen extends StatelessWidget {
   /// The appearance switch, wired the same way. Null keeps its row out.
   final AppThemeController? theme;
 
-  /// Reminder-health readout seam, resolved from the service locator when a
-  /// host does not pass one. Optional twice over on purpose: the frozen
-  /// settings test builds `const SettingsScreen()` with nothing but a cubit
-  /// provider, and a missing readout must never break that screen.
+  /// Reminder-health readout seam, passed by the host that owns the ports.
+  /// Optional on purpose: the frozen settings test builds
+  /// `const SettingsScreen()` with nothing but a cubit provider, and a missing
+  /// readout must never break that screen.
   final ReminderDiagnostics? reminderDiagnostics;
 
   /// The last plan write's outcome (the binding owns it). Null keeps the
@@ -278,18 +277,11 @@ class _SettingsList extends StatelessWidget {
     if (defaultTargetPlatform != TargetPlatform.android) {
       return const SizedBox.shrink();
     }
-    final diagnostics = reminderDiagnostics ??
-        (GetIt.I.isRegistered<ReminderDiagnostics>()
-            ? GetIt.I<ReminderDiagnostics>()
-            : null);
+    final diagnostics = reminderDiagnostics;
     if (diagnostics == null) return const SizedBox.shrink();
-    final applyHealth = reminderApplyHealth ??
-        (GetIt.I.isRegistered<ReminderApplyHealth>()
-            ? GetIt.I<ReminderApplyHealth>()
-            : null);
     return _ReminderReliabilitySection(
       diagnostics: diagnostics,
-      applyHealth: applyHealth,
+      applyHealth: reminderApplyHealth,
     );
   }
 }

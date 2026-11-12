@@ -14,6 +14,7 @@ import '../core/domain/prayer_times.dart';
 import '../core/domain/pre_adhan_canceller.dart';
 import '../core/domain/quran_limits.dart';
 import '../core/domain/ramadan_calendar.dart';
+import '../core/domain/reminder_diagnostics.dart';
 import '../core/domain/reminders.dart';
 import '../core/domain/store_listing.dart';
 import '../core/domain/version_policy.dart';
@@ -558,6 +559,15 @@ abstract final class AppRouter {
                 backupSection: const BackupSection(),
                 locale: getIt<AppLocaleController>(),
                 theme: getIt<AppThemeController>(),
+                // Resolved at route construction, not from SettingsScreen's
+                // build(); tests that never configure the locator get null and
+                // the screen simply omits the advisory readout.
+                reminderDiagnostics: getIt.isRegistered<ReminderDiagnostics>()
+                    ? getIt<ReminderDiagnostics>()
+                    : null,
+                reminderApplyHealth: getIt.isRegistered<ReminderApplyHealth>()
+                    ? getIt<ReminderApplyHealth>()
+                    : null,
               ),
             ),
           ),

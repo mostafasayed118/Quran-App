@@ -31,12 +31,6 @@ class VersionGate extends ChangeNotifier {
   /// The cached verdict; null until the first read lands.
   VersionVerdict? get verdict => _verdict;
 
-  /// The resolved installed version; null until attached.
-  AppVersion? get installed => _installed;
-
-  /// True while a policy read is in flight (for diagnostics only).
-  bool get isLoading => _loading;
-
   /// True when an *optional* update is available and not yet dismissed for
   /// this recommendation. Never true when the verdict is [VersionVerdict.updateRequired].
   bool get shouldShowRecommendedPrompt {
@@ -150,7 +144,9 @@ class VersionGate extends ChangeNotifier {
   }
 
   /// Test seam: reset every cached value (never called in production).
-  @visibleForTesting
+  ///
+  /// Public so `resetDependenciesForTest` can clear the router's static gate
+  /// without an ignore or a second test-only accessor.
   void reset() {
     _source = null;
     _ackStore = null;

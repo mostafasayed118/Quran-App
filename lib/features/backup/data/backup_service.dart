@@ -8,6 +8,7 @@ import '../../../core/db/app_database.dart';
 import '../../../core/utils/app_log.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
+import 'backup_io.dart';
 import 'backup_merger.dart';
 
 /// Result of a completed [BackupService.apply] — the preview-identical
@@ -59,6 +60,26 @@ class BackupService {
   static const int _batchThreshold = 64;
 
   int get _threshold => _batchThresholdOverride ?? _batchThreshold;
+
+  /// Decodes an import through the fail-closed guards.
+  ///
+  /// The cubit calls this instead of importing `backup_io.dart`; the worker
+  /// isolate, size cap and codec stay behind the feature's data seam.
+  Future<BackupDecodeResult> decodeImport(
+    Uint8List bytes, {
+    String? passphrase,
+  }) =>
+      decodeBackup(bytes, passphrase: passphrase);
+
+  /// Encrypts an export on a worker isolate.
+  Future<String> encryptForExport(String json, String passphrase) =>
+      encryptBackupJsonInIsolate(json, passphrase);
+
+  /// Whether [text] exceeds the import size cap.
+  bool exceedsLimit(String text) => exceedsBackupLimit(text);
+
+  /// The largest import file accepted.
+  int get maxImportBytes => kBackupMaxBytes;
 
   /// Gathers every backed-up entity in one read transaction and encodes the
   /// versioned document (settings filtered to the whitelist).

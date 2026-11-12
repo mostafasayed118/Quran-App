@@ -91,7 +91,13 @@ class ReviewService {
   Future<void> maybeRequestAfterOnboarding() async {
     if (_requestedInProcess) return;
     try {
-      if (await _readRequested()) {
+      final eligibility = ReviewEligibility(
+        // The only caller is the onboarding-completion seam, so completion is
+        // true by construction; keeping the predicate explicit is the point.
+        onboardingCompleted: true,
+        alreadyRequested: await _readRequested(),
+      );
+      if (!eligibility.shouldRequest) {
         _requestedInProcess = true;
         return;
       }

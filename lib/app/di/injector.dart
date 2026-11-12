@@ -441,4 +441,9 @@ void _registerOnboardingAndSettings(AppDatabase db) {
 @visibleForTesting
 void resetDependenciesForTest() {
   _configured = false;
+  // The router owns two static gates that outlive the locator. Reset them
+  // here so a test that discards the graph cannot inherit a verdict or an
+  // onboarding state from the previous test.
+  AppRouter.versionGate.reset();
+  AppRouter.onboardingGate.reset();
 }
