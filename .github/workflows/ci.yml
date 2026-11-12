@@ -22,6 +22,13 @@ jobs:
           # formatter as the dev box, or the gate measures the SDK, not the code.
           flutter-version: 3.47.5
       - run: flutter pub get
+      # `pub get` silently rewrites the lock when the committed one cannot be
+      # satisfied by the pinned SDK, and nothing downstream notices: the
+      # dependabot drift bump landed a lock demanding test_api 0.7.14, which
+      # Flutter 3.47.5's flutter_test pins to exactly 0.7.12, and CI stayed
+      # green while every local `pub get` produced a different lock.
+      - name: pubspec.lock is reproducible on the pinned SDK
+        run: git diff --exit-code -- pubspec.lock
       - run: flutter gen-l10n
       - run: dart run build_runner build --delete-conflicting-outputs
       # Committed generated sources must be current. Without this, a hand-edited
