@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'qada_source.dart';
 
 /// Stores the missed-fast dates as one JSON array in the settings table.
@@ -17,26 +18,19 @@ class QadaRepository implements QadaSource {
 
   final AppDatabase _db;
 
-  @override
-  Future<List<DateTime>> loadMissed() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    return _decode(row?.value);
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> saveMissed(List<DateTime> dates) async {
-    final normalized = normalize(dates);
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: jsonEncode([
-              for (final date in normalized) _encodeDate(date),
-            ]),
-          ),
-        );
-  }
+  Future<List<DateTime>> loadMissed() async =>
+      _decode(await _settings.read(key));
+
+  @override
+  Future<void> saveMissed(List<DateTime> dates) => _settings.write(
+        key,
+        jsonEncode([
+          for (final date in normalize(dates)) _encodeDate(date),
+        ]),
+      );
 
   /// Date-only, de-duplicated, ascending.
   static List<DateTime> normalize(Iterable<DateTime> dates) {

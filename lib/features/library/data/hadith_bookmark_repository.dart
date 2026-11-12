@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'hadith_personal.dart';
 
 /// Stores the hadith bookmarks as one JSON object in the settings table.
@@ -12,6 +13,8 @@ class HadithBookmarkRepository implements HadithBookmarkSource {
   static const key = 'hadith_bookmarks_v1';
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
   Future<Set<int>> load(String packId) async {
@@ -31,10 +34,7 @@ class HadithBookmarkRepository implements HadithBookmarkSource {
   }
 
   Future<Map<String, Set<int>>> _readAll() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    final raw = row?.value;
+    final raw = await _settings.read(key);
     if (raw == null || raw.isEmpty) return <String, Set<int>>{};
     try {
       final decoded = jsonDecode(raw);
@@ -55,15 +55,11 @@ class HadithBookmarkRepository implements HadithBookmarkSource {
     }
   }
 
-  Future<void> _writeAll(Map<String, Set<int>> all) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: jsonEncode(<String, dynamic>{
-              for (final entry in all.entries)
-                entry.key: (entry.value.toList()..sort()),
-            }),
-          ),
-        );
-  }
+  Future<void> _writeAll(Map<String, Set<int>> all) => _settings.write(
+        key,
+        jsonEncode(<String, dynamic>{
+          for (final entry in all.entries)
+            entry.key: (entry.value.toList()..sort()),
+        }),
+      );
 }

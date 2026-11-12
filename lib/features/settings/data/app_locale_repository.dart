@@ -1,4 +1,5 @@
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/app_locale.dart';
 
 /// Stores the language preference in the local settings table.
@@ -14,21 +15,13 @@ class AppLocaleRepository implements AppLocaleSource {
 
   final AppDatabase _db;
 
-  @override
-  Future<AppLanguage> load() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    return AppLanguage.fromCode(row?.value);
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> save(AppLanguage language) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: language.code,
-          ),
-        );
-  }
+  Future<AppLanguage> load() async =>
+      AppLanguage.fromCode(await _settings.read(key));
+
+  @override
+  Future<void> save(AppLanguage language) =>
+      _settings.write(key, language.code);
 }

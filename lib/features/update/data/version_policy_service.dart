@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/version_policy.dart';
 import '../../../core/domain/version_policy_source.dart';
 import '../../../core/utils/canonical_json.dart';
@@ -82,6 +83,8 @@ class VersionPolicyService implements VersionPolicySource, VersionPolicyCache {
   static const int maxPolicyBytes = 64 * 1024;
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
   final Dio _client;
   final DateTime Function() _clock;
   final String _publicKeyB64;
@@ -230,34 +233,15 @@ class VersionPolicyService implements VersionPolicySource, VersionPolicyCache {
   bool _hasRequiredExpiry(VersionPolicy policy) =>
       _publicKeyB64.isEmpty || policy.expiresAt != null;
 
-  Future<DateTime?> _readCachedAt() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(versionPolicyCacheAtKey)))
-        .getSingleOrNull();
-    return DateTime.tryParse(row?.value ?? '');
-  }
+  Future<DateTime?> _readCachedAt() async =>
+      DateTime.tryParse(await _settings.read(versionPolicyCacheAtKey) ?? '');
 
   @override
-  Future<String?> read() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(versionPolicyCacheKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  Future<String?> read() => _settings.read(versionPolicyCacheKey);
 
   @override
-  Future<void> write(String rawJson) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: versionPolicyCacheKey,
-            value: rawJson,
-          ),
-        );
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: versionPolicyCacheAtKey,
-            value: _clock().toUtc().toIso8601String(),
-          ),
-        );
-  }
+  Future<void> write(String rawJson) => _settings.writeAll({
+        versionPolicyCacheKey: rawJson,
+        versionPolicyCacheAtKey: _clock().toUtc().toIso8601String(),
+      });
 }

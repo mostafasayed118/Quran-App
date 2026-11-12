@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'bookmark_meta.dart';
 
 /// Stores bookmark folders and notes as one JSON object in the settings table.
@@ -16,26 +17,22 @@ class BookmarkMetaRepository implements BookmarkMetaSource {
 
   final AppDatabase _db;
 
-  @override
-  Future<Map<int, BookmarkMetaEntry>> load() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    return _decode(row?.value);
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> save(Map<int, BookmarkMetaEntry> entries) async {
+  Future<Map<int, BookmarkMetaEntry>> load() async =>
+      _decode(await _settings.read(key));
+
+  @override
+  Future<void> save(Map<int, BookmarkMetaEntry> entries) {
     final normalized = normalize(entries);
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: jsonEncode(<String, dynamic>{
-              for (final entry in normalized.entries)
-                '${entry.key}': entry.value.toJson(),
-            }),
-          ),
-        );
+    return _settings.write(
+      key,
+      jsonEncode(<String, dynamic>{
+        for (final entry in normalized.entries)
+          '${entry.key}': entry.value.toJson(),
+      }),
+    );
   }
 
   /// Trims every entry and drops entries with no folder and no note.

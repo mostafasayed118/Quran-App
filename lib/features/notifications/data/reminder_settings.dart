@@ -1,4 +1,5 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/db/settings_store.dart';
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_config.dart';
@@ -34,6 +35,8 @@ class ReminderSettings
   final PrayerConfigSource? _prayerConfig;
   final PreAdhanCanceller? _preAdhanCanceller;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   /// Optional for the same reason as `PrayerReminderSettingsPort`: existing
   /// constructions and test fakes predate the adhan picker and must keep
   /// compiling. Absent, every plan carries no adhan and the OS default sound
@@ -41,90 +44,44 @@ class ReminderSettings
   final AdhanPreferences? _adhanPrefs;
 
   @override
-  Future<bool> azkarEnabled() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(azkarReminderEnabledKey)))
-        .getSingleOrNull();
-    return row?.value == 'true';
-  }
+  Future<bool> azkarEnabled() async =>
+      (await _settings.read(azkarReminderEnabledKey)) == 'true';
 
   @override
-  Future<String?> azkarTimeHm() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(azkarReminderTimeKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  Future<String?> azkarTimeHm() => _settings.read(azkarReminderTimeKey);
 
   @override
-  Future<void> setAzkarEnabled(bool enabled) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: azkarReminderEnabledKey,
-            value: enabled ? 'true' : 'false',
-          ),
-        );
-  }
+  Future<void> setAzkarEnabled(bool enabled) =>
+      _settings.write(azkarReminderEnabledKey, enabled ? 'true' : 'false');
 
   @override
-  Future<void> setAzkarTime(String hm) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(key: azkarReminderTimeKey, value: hm),
-        );
-  }
+  Future<void> setAzkarTime(String hm) =>
+      _settings.write(azkarReminderTimeKey, hm);
 
   @override
-  Future<bool> wirdEnabled() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(wirdReminderEnabledKey)))
-        .getSingleOrNull();
-    return row?.value == 'true';
-  }
+  Future<bool> wirdEnabled() async =>
+      (await _settings.read(wirdReminderEnabledKey)) == 'true';
 
   @override
-  Future<String?> wirdTimeHm() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(wirdReminderTimeKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  Future<String?> wirdTimeHm() => _settings.read(wirdReminderTimeKey);
 
   @override
-  Future<void> setWirdEnabled(bool enabled) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: wirdReminderEnabledKey,
-            value: enabled ? 'true' : 'false',
-          ),
-        );
-  }
+  Future<void> setWirdEnabled(bool enabled) =>
+      _settings.write(wirdReminderEnabledKey, enabled ? 'true' : 'false');
 
   @override
-  Future<void> setWirdTime(String hm) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(key: wirdReminderTimeKey, value: hm),
-        );
-  }
+  Future<void> setWirdTime(String hm) =>
+      _settings.write(wirdReminderTimeKey, hm);
 
   /// Missing row means ENABLED, so every existing install keeps the prayer
   /// reminder it had before the toggle existed.
   @override
-  Future<bool> prayerEnabled() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(prayerReminderEnabledKey)))
-        .getSingleOrNull();
-    return row?.value != 'false';
-  }
+  Future<bool> prayerEnabled() async =>
+      (await _settings.read(prayerReminderEnabledKey)) != 'false';
 
   @override
-  Future<void> setPrayerEnabled(bool enabled) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: prayerReminderEnabledKey,
-            value: enabled ? 'true' : 'false',
-          ),
-        );
-  }
+  Future<void> setPrayerEnabled(bool enabled) =>
+      _settings.write(prayerReminderEnabledKey, enabled ? 'true' : 'false');
 
   /// The shared (re)planning path (boot, prayer times, settings) — the
   /// notifications engine composes the plan; this class only owns the

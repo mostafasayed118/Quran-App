@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/city.dart';
 import '../../../core/utils/arabic_search.dart';
 import '../../../core/utils/cached_loader.dart';
@@ -20,6 +21,8 @@ class CityRepository implements CitySource {
         _loader = loader;
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
   late final CachedLoader<List<City>> _cities = CachedLoader(_load);
@@ -85,12 +88,7 @@ class CityRepository implements CitySource {
   static double _toRadians(double degrees) => degrees * math.pi / 180.0;
 
   /// Raw JSON of the stored selected city, or null when none is stored.
-  Future<String?> selectedCityJson() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(selectedCityKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  Future<String?> selectedCityJson() => _settings.read(selectedCityKey);
 
   @override
   Future<City?> selectedCity() async {
@@ -120,12 +118,6 @@ class CityRepository implements CitySource {
   }
 
   @override
-  Future<void> select(City city) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: selectedCityKey,
-            value: jsonEncode(city.toJson()),
-          ),
-        );
-  }
+  Future<void> select(City city) =>
+      _settings.write(selectedCityKey, jsonEncode(city.toJson()));
 }

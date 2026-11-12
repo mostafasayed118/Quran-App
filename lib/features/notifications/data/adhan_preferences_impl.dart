@@ -1,4 +1,5 @@
 import 'package:quran_yahdi/core/db/app_database.dart';
+import 'package:quran_yahdi/core/db/settings_store.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/adhan_preferences.dart';
 
@@ -12,6 +13,8 @@ class AdhanPreferencesImpl implements AdhanPreferences {
   AdhanPreferencesImpl(this._db);
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
   Future<String> adhanId() async => adhanById(await _read(adhanIdKey)).id;
@@ -32,16 +35,9 @@ class AdhanPreferencesImpl implements AdhanPreferences {
   Future<void> setFajrAdhanId(String? id) => _write(adhanFajrIdKey, id ?? '');
 
   Future<String?> _read(String key) async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(key)))
-        .getSingleOrNull();
-    final value = row?.value;
+    final value = await _settings.read(key);
     return (value == null || value.isEmpty) ? null : value;
   }
 
-  Future<void> _write(String key, String value) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(key: key, value: value),
-        );
-  }
+  Future<void> _write(String key, String value) => _settings.write(key, value);
 }
