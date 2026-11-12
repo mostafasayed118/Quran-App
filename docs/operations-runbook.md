@@ -80,6 +80,20 @@ Google’s terms; it is not an app-owned data channel.
   `SettingsTable` keys (`review_requested`, `version_update_prompt_ack`) and one cache
   (`version_policy_cache`); all three are deliberately outside the backup whitelist.
 
+### Version-policy signing (2026-11-12)
+
+- Release builds must include the Ed25519 public key via
+  `tools/build_release.ps1`; the wrapper refuses to build without it. A release
+  build with no key rejects every policy and leaves the update gate off.
+- The private seed lives outside the repository and is never committed.
+- A signed policy requires `expires_at`; the app rejects an implausible
+  `min_supported` and a cache older than 30 days.
+- The gate is **dormant** until a signed `version.json` is published; publish
+  only after the key-bearing build is live and use the sequence in
+  `docs/version-policy-signing.md`.
+- Play App Signing is not active until the first Play upload; add the Google
+  app-signing SHA-256 to `assetlinks.json` before that upload.
+
 ## 4. Incident escalation
 
 | Severity | Example | First action | Owner action |

@@ -51,6 +51,7 @@ app.*.map.json
 .env.*
 *.jks
 *.keystore
+*.seed
 
 
 # Adhan source masters (128k originals). Only the 64k encodes in assets/audio/adhan ship.

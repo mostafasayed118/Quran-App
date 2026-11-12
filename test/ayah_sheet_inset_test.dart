@@ -3,14 +3,13 @@ import 'dart:io';
 
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/library/presentation/ayah_sheet/library_sheet.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
+
+import 'support/host.dart';
 
 Future<dynamic> _syncDecode(String path) async =>
     jsonDecode(File(path).readAsStringSync());
@@ -62,38 +61,28 @@ void main() {
     tester.view.viewPadding = const FakeViewPadding(bottom: kInset);
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      home: Scaffold(
-        body: Builder(
-          builder: (context) => Center(
-            child: FilledButton(
-              onPressed: () => showModalBottomSheet<void>(
-                context: context,
-                useSafeArea: true,
-                isScrollControlled: true,
-                showDragHandle: true,
-                builder: (_) => AyahSheet(
-                  surahId: 1,
-                  surahName: 'الفاتحة',
-                  ayah: 1,
-                  downloader: downloader,
-                ),
+    await tester.pumpWidget(appShell(
+        home: Scaffold(
+      body: Builder(
+        builder: (context) => Center(
+          child: FilledButton(
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              useSafeArea: true,
+              isScrollControlled: true,
+              showDragHandle: true,
+              builder: (_) => AyahSheet(
+                surahId: 1,
+                surahName: 'الفاتحة',
+                ayah: 1,
+                downloader: downloader,
               ),
-              child: const Text('open'),
             ),
+            child: const Text('open'),
           ),
         ),
       ),
-    ));
+    )));
 
     await tester.tap(find.text('open'));
     await tester.pump();

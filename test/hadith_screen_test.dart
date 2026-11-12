@@ -4,16 +4,13 @@ import 'dart:io';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/library/data/pack_downloader.dart';
 import 'package:quran_yahdi/features/library/presentation/hadith/hadith_cubit.dart';
 import 'package:quran_yahdi/features/library/presentation/hadith/hadith_screen.dart';
 import 'package:quran_yahdi/features/library/presentation/hadith/hadith_state.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/host.dart';
 
@@ -239,21 +236,11 @@ void main() {
       );
       addTearDown(cubit.close);
       await cubit.start();
-      await tester.pumpWidget(MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: BlocProvider<HadithCubit>.value(
-          value: cubit,
-          child: const HadithScreen(),
-        ),
-      ));
+      await tester.pumpWidget(appShell(
+          home: BlocProvider<HadithCubit>.value(
+        value: cubit,
+        child: const HadithScreen(),
+      )));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));

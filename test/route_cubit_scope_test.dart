@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/routing/route_cubit_scope.dart';
 
+import 'support/host.dart';
+
 class _FakeCubit extends Cubit<int> {
   _FakeCubit(this.id) : super(0);
 
@@ -55,9 +57,8 @@ class _Harness extends StatelessWidget {
 }
 
 Widget _app(Object identity, List<_FakeCubit> cubits, List<int> started) =>
-    MaterialApp(
-      home: _Harness(identity: identity, cubits: cubits, started: started),
-    );
+    appShell(
+        home: _Harness(identity: identity, cubits: cubits, started: started));
 
 void main() {
   testWidgets('creates and starts the cubit exactly once', (tester) async {
@@ -100,7 +101,7 @@ void main() {
     await tester.pumpWidget(_app('route', cubits, started));
     expect(cubits.single.closed, isFalse);
 
-    await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+    await tester.pumpWidget(appShell(home: const SizedBox.shrink()));
 
     expect(cubits.single.closed, isTrue);
   });

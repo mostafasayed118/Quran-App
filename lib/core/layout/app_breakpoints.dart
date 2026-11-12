@@ -25,6 +25,12 @@ abstract final class AppBreakpoints {
   /// A narrow form: onboarding, zakat, prayer settings.
   static const double formMaxWidth = 640;
 
+  /// The list-detail master pane on an expanded window.
+  static const double masterWidth = 340;
+
+  /// The master pane below [expanded], where the detail pane needs more room.
+  static const double compactMasterWidth = 300;
+
   /// Grids may use more width before they read as a stretched phone.
   static const double gridMaxWidth = 1000;
 

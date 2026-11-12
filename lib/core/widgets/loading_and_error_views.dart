@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_spacing.dart';
-import '../theme/app_theme.dart';
+import 'state_message.dart';
 
 /// Centered progress indicator for a route-level load.
 class LoadingView extends StatelessWidget {
@@ -34,33 +33,12 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final canRetry = onRetry != null && retryLabel != null;
-    return Center(
-      // Scrollable so a 2.0 text scale on a short window cannot overflow.
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon ?? Icons.cloud_off_outlined,
-              size: 40,
-              color: colors.onSurfaceVariant,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: AppTheme.bodyText.copyWith(color: colors.onSurface),
-            ),
-            if (canRetry) ...[
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton(onPressed: onRetry, child: Text(retryLabel!)),
-            ],
-          ],
-        ),
-      ),
+    return StateMessage(
+      message: message,
+      icon: icon ?? Icons.cloud_off_outlined,
+      actionLabel: canRetry ? retryLabel : null,
+      onAction: canRetry ? onRetry : null,
     );
   }
 }

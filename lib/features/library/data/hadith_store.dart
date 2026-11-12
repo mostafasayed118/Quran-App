@@ -141,8 +141,11 @@ class HadithStore {
       variables: [Variable.withString(packId)],
     ).getSingle();
     if (pending.read<int>('c') == 0) return;
+    // Only the pending rows: the count above gates this path, but selecting
+    // the whole pack would rewrite every already-normalized row on each open.
     final rows = await _db.customSelect(
-      'SELECT ordinal, body FROM hadith_entries WHERE pack_id = ?',
+      "SELECT ordinal, body FROM hadith_entries "
+      "WHERE pack_id = ? AND body != '' AND norm = ''",
       variables: [Variable.withString(packId)],
     ).get();
     await _db.transaction(() async {

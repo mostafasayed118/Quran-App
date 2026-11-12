@@ -3,17 +3,15 @@ import 'dart:io';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/downloads/downloads_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 void main() {
@@ -67,18 +65,7 @@ void main() {
     await tester.pumpWidget(
       BlocProvider<DownloadsCubit>.value(
         value: cubit,
-        child: MaterialApp(
-          locale: const Locale('ar'),
-          supportedLocales: const [Locale('ar'), Locale('en')],
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          theme: AppTheme.light,
-          home: const DownloadsScreen(),
-        ),
+        child: appShell(home: const DownloadsScreen()),
       ),
     );
     await tester.pumpAndSettle(const Duration(milliseconds: 100),

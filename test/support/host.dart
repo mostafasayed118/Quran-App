@@ -9,6 +9,10 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 /// theme, l10n delegates). [wrap] applies around the MaterialApp so cubit
 /// providers keep their original topology (wrap-outside vs inside [home]);
 /// [textScale] non-null mirrors the text-scale probes' MediaQuery builder.
+///
+/// Build test apps through this (or [pumpAppHost]); a raw `MaterialApp` in a
+/// test is caught by `test/test_harness_guard_test.dart`, whose allowlist only
+/// shrinks.
 Widget appShell({
   required Widget home,
   Locale locale = const Locale('ar'),

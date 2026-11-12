@@ -14,7 +14,27 @@ const Set<String> allowedFeatureEdges = {
   'quran->recitation',
 };
 
+/// Feature data files that legitimately need a Flutter platform API.
+///
+/// This is deliberately an exact, reasoned set rather than a global exception:
+/// a new Flutter import in `features/*/data` must be added here consciously
+/// (and the live/allowlist equality test will fail if it is not).
+const Map<String, String> featureDataFlutterAllowlist = {
+  'lib/features/notifications/data/notifications_binding.dart':
+      'owns the local-notifications platform channel and ChangeNotifier',
+  'lib/features/notifications/data/reminder_diagnostics_channel.dart':
+      'Android method-channel adapter for the reminder diagnostics port',
+  'lib/features/quran/data/uthmani_text_source.dart':
+      'loads the bundled asset through rootBundle',
+  'lib/features/update/data/review_service.dart':
+      'wraps the in_app_review platform plugin',
+  'lib/features/update/data/version_policy_service.dart':
+      'reads kReleaseMode to reject unsigned policies in release builds',
+};
+
 final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
+final _flutterImportRe =
+    RegExp(r"""import\s+['"](?:package:flutter/|dart:ui)""");
 
 /// Resolves an import target to a `lib/`-relative posix path; null for
 /// non-local (dart:/foreign package) imports.
@@ -91,6 +111,30 @@ Set<String> liveFeatureEdges(Map<String, String> sources) {
   }
   return edges;
 }
+
+/// Feature data files importing any `package:flutter/*` or `dart:ui` API.
+Set<String> liveFlutterImportsInFeatureData(Map<String, String> sources) => {
+      for (final entry in sources.entries)
+        if (RegExp(r'^lib/features/[a-z_]+/data/').hasMatch(entry.key) &&
+            _flutterImportRe.hasMatch(entry.value))
+          entry.key,
+    };
+
+/// [liveFlutterImportsInFeatureData] minus the reasoned allowlist.
+List<String> flutterImportsInFeatureData(
+  Map<String, String> sources, {
+  Set<String> allowlist = const {},
+}) =>
+    liveFlutterImportsInFeatureData(sources).difference(allowlist).toList()
+      ..sort();
+
+/// `lib/core/domain` is the pure, platform-free layer.
+List<String> flutterImportsInCoreDomain(Map<String, String> sources) => [
+      for (final entry in sources.entries)
+        if (entry.key.startsWith('lib/core/domain/') &&
+            _flutterImportRe.hasMatch(entry.value))
+          entry.key,
+    ]..sort();
 
 void main() {
   final sources = <String, String>{};
@@ -230,17 +274,49 @@ void main() {
     expect(liveFeatureEdges(planted), {'quran->library'});
   });
 
-  test('feature data layers stay Flutter-free', () {
-    final offenders = <String>[];
-    sources.forEach((rel, src) {
-      if (!RegExp(r'^lib/features/[a-z_]+/data/').hasMatch(rel)) return;
-      if (_importRe
-          .allMatches(src)
-          .any((m) => m.group(1) == 'package:flutter/material.dart')) {
-        offenders.add(rel);
-      }
-    });
-    expect(offenders, isEmpty,
-        reason: 'data-layer files must not import flutter/material');
+  test('feature data layers stay Flutter-free outside the allowlist', () {
+    expect(
+      flutterImportsInFeatureData(
+        sources,
+        allowlist: featureDataFlutterAllowlist.keys.toSet(),
+      ),
+      isEmpty,
+      reason: 'a new data-layer Flutter import needs a reasoned entry in '
+          'featureDataFlutterAllowlist (prefer a core port or a platform '
+          'adapter outside data/)',
+    );
+  });
+
+  test('the feature-data Flutter allowlist is exactly the live exceptions', () {
+    expect(
+      liveFlutterImportsInFeatureData(sources),
+      featureDataFlutterAllowlist.keys.toSet(),
+      reason: 'the allowlist is the exact set of data-layer Flutter imports; '
+          'delete stale permissions and account for every new one',
+    );
+  });
+
+  test('the Flutter-free detector catches package:flutter and dart:ui', () {
+    const planted = <String, String>{
+      'lib/features/foo/data/services.dart':
+          "import 'package:flutter/services.dart';",
+      'lib/features/foo/data/ui.dart': "import 'dart:ui';",
+    };
+    expect(
+      flutterImportsInFeatureData(planted),
+      containsAll(<String>[
+        'lib/features/foo/data/services.dart',
+        'lib/features/foo/data/ui.dart',
+      ]),
+    );
+  });
+
+  test('core/domain stays Flutter-free', () {
+    expect(
+      flutterImportsInCoreDomain(sources),
+      isEmpty,
+      reason: 'lib/core/domain/ is the pure port layer; a Flutter dependency '
+          'belongs in an adapter outside it',
+    );
   });
 }

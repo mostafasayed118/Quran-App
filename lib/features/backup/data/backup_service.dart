@@ -8,7 +8,10 @@ import '../../../core/db/app_database.dart';
 import '../../../core/utils/app_log.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
+import 'backup_io.dart';
 import 'backup_merger.dart';
+
+part 'backup_apply_plan.dart';
 
 /// Result of a completed [BackupService.apply] — the preview-identical
 /// summary plus whether the injected reschedule hook ran after the commit.
@@ -59,6 +62,26 @@ class BackupService {
   static const int _batchThreshold = 64;
 
   int get _threshold => _batchThresholdOverride ?? _batchThreshold;
+
+  /// Decodes an import through the fail-closed guards.
+  ///
+  /// The cubit calls this instead of importing `backup_io.dart`; the worker
+  /// isolate, size cap and codec stay behind the feature's data seam.
+  Future<BackupDecodeResult> decodeImport(
+    Uint8List bytes, {
+    String? passphrase,
+  }) =>
+      decodeBackup(bytes, passphrase: passphrase);
+
+  /// Encrypts an export on a worker isolate.
+  Future<String> encryptForExport(String json, String passphrase) =>
+      encryptBackupJsonInIsolate(json, passphrase);
+
+  /// Whether [text] exceeds the import size cap.
+  bool exceedsLimit(String text) => exceedsBackupLimit(text);
+
+  /// The largest import file accepted.
+  int get maxImportBytes => kBackupMaxBytes;
 
   /// Gathers every backed-up entity in one read transaction and encodes the
   /// versioned document (settings filtered to the whitelist).
@@ -362,40 +385,4 @@ class BackupService {
     await (_db.update(_db.khatmaProgress)..where((t) => t.id.equals(rowId)))
         .write(values);
   }
-}
-
-class _ApplyPlan {
-  const _ApplyPlan({
-    required this.bookmarks,
-    required this.lastRead,
-    required this.khatma,
-    required this.prayerLog,
-    required this.tasbih,
-    required this.settings,
-    required this.khatmaRowId,
-  });
-
-  final BookmarkMerge bookmarks;
-  final LastReadMerge lastRead;
-  final KhatmaMerge khatma;
-  final PrayerLogMerge prayerLog;
-  final TasbihMerge tasbih;
-  final SettingsMerge settings;
-
-  /// Row id of the existing single khatma row (update-in-place target).
-  final int? khatmaRowId;
-
-  BackupSummary get summary => BackupSummary(
-        newBookmarks: bookmarks.newCount,
-        mergedPrayerDays: prayerLog.mergedDays,
-        planReplaced: khatma.replaced,
-        tasbihCountDelta: tasbih.countDelta,
-        tasbihChanged: tasbih.changed,
-        lastReadChanged: lastRead.changed,
-        settingsKeysApplied: settings.appliedCount,
-        rejectedEntries: bookmarks.rejected + khatma.rejected,
-      );
-
-  bool get reminderRelevantChanged =>
-      settings.toWrite.keys.any(kBackupReminderRelevantKeys.contains);
 }

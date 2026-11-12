@@ -9,6 +9,8 @@ import 'package:quran_yahdi/features/hijri/presentation/hijri_cubit.dart';
 import 'package:quran_yahdi/features/hijri/presentation/hijri_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
+
 void main() {
   testWidgets('grid renders today with a dual label; jump chip highlights',
       (tester) async {
@@ -17,18 +19,7 @@ void main() {
     await cubit.start();
     await tester.pumpWidget(BlocProvider<HijriCubit>.value(
       value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const HijriScreen(),
-      ),
+      child: appShell(home: const HijriScreen()),
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

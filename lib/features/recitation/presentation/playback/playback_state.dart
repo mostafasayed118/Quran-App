@@ -72,3 +72,91 @@ sealed class PlaybackState with _$PlaybackState {
 /// Compatibility alias for the frozen suite: the pre-merge name of the
 /// "not ready" state (it and the loading state are one state now).
 typedef PlaybackInitial = PlaybackLoading;
+
+/// Field-preserving transitions between the play/pause variants.
+///
+/// Freezed generates `copyWith` per variant, not on the sealed union, so the
+/// cubit used to spell out all eight fields at every transition. These helpers
+/// are the one place that mapping lives; an added field cannot be forgotten at
+/// a call site.
+extension PlaybackStateTransitions on PlaybackState {
+  /// Converts a loading or paused state to playing.
+  ///
+  /// A loading state without a pending track (the idle state) is returned
+  /// unchanged. The optional overrides are used when the cubit's in-memory
+  /// controls are newer than the state's snapshot.
+  PlaybackState toPlaying({
+    Duration? duration,
+    double? speedOverride,
+    PlaybackRepeatMode? repeatModeOverride,
+    Duration? sleepTimerOverride,
+  }) =>
+      switch (this) {
+        PlaybackLoading(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName
+        )
+            when reciterName != null =>
+          PlaybackState.playing(
+            reciterName: reciterName,
+            surahNumber: surahNumber,
+            surahName: surahName,
+            duration: duration ?? Duration.zero,
+            speed: speedOverride ?? 1.0,
+            repeatMode: repeatModeOverride ?? PlaybackRepeatMode.off,
+            sleepTimer: sleepTimerOverride,
+          ),
+        PlaybackPaused(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName,
+          :final position,
+          :final duration,
+          :final speed,
+          :final repeatMode,
+          :final sleepTimer,
+        ) =>
+          PlaybackState.playing(
+            reciterName: reciterName,
+            surahNumber: surahNumber,
+            surahName: surahName,
+            position: position,
+            duration: duration,
+            speed: speedOverride ?? speed,
+            repeatMode: repeatModeOverride ?? repeatMode,
+            sleepTimer: sleepTimerOverride ?? sleepTimer,
+          ),
+        _ => this,
+      };
+
+  /// Converts a playing state to paused, or clears a paused state's timer.
+  ///
+  /// [clearSleepTimer] is the sleep-timer-fired case; every other transition
+  /// preserves the timer.
+  PlaybackState toPaused({bool clearSleepTimer = false}) => switch (this) {
+        PlaybackPlaying(
+          :final reciterName,
+          :final surahNumber,
+          :final surahName,
+          :final position,
+          :final duration,
+          :final speed,
+          :final repeatMode,
+          :final sleepTimer,
+        ) =>
+          PlaybackState.paused(
+            reciterName: reciterName,
+            surahNumber: surahNumber,
+            surahName: surahName,
+            position: position,
+            duration: duration,
+            speed: speed,
+            repeatMode: repeatMode,
+            sleepTimer: clearSleepTimer ? null : sleepTimer,
+          ),
+        PlaybackPaused() when clearSleepTimer =>
+          (this as PlaybackPaused).copyWith(sleepTimer: null),
+        _ => this,
+      };
+}

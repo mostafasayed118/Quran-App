@@ -129,7 +129,8 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
   }
 
   /// Clears the cache and the attached source (tests only).
-  @visibleForTesting
+  ///
+  /// Public so `resetDependenciesForTest` can clear the router's static gate.
   void reset() {
     _source = null;
     _completed = null;

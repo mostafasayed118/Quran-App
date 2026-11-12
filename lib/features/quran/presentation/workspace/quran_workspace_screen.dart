@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/layout/app_breakpoints.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -76,8 +77,9 @@ class _QuranWorkspaceScreenState extends State<QuranWorkspaceScreen>
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final width = MediaQuery.sizeOf(context).width;
-    final masterWidth = width >= 1024 ? 340.0 : 300.0;
+    final masterWidth = AppBreakpoints.isExpanded(context)
+        ? AppBreakpoints.masterWidth
+        : AppBreakpoints.compactMasterWidth;
     final selection = _selection;
 
     return PopScope(

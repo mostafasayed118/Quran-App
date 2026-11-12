@@ -9,24 +9,13 @@ import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 
+import 'support/fake_prayer_time_service.dart';
 import 'support/fakes.dart';
 import 'support/test_db.dart';
 
-class FakePrayerTimeService implements PrayerTimeService {
-  PrayerChoice? nextResult;
-  bool throwOnNext = false;
-
-  @override
-  List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) =>
-      throw UnimplementedError();
-
-  @override
-  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) {
-    if (throwOnNext) throw StateError('prayer service down');
-    return nextResult ??
-        PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 16, 4, 45));
-  }
-}
+// The home suite is the historical entry point for this double; keep the
+// relative importers working while the definition lives in test/support.
+export 'support/fake_prayer_time_service.dart' show FakePrayerTimeService;
 
 void main() {
   late AppDatabase db;

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/bookmark_meta.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmark_meta_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmarks_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmarks_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 class _TeardownSafeAyahRepository extends AyahRepository {
@@ -70,18 +68,7 @@ void main() {
         BlocProvider<BookmarksCubit>.value(value: bookmarks),
         BlocProvider<BookmarkMetaCubit>.value(value: meta),
       ],
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const BookmarksScreen(showMeta: true),
-      ),
+      child: appShell(home: const BookmarksScreen(showMeta: true)),
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

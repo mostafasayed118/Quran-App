@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 class _ThrowingSearchRepo extends CityRepository {
@@ -60,34 +58,24 @@ void main() {
     await cubit.start();
     await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
       value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => Center(
-              child: TextButton(
-                onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute<void>(
-                    builder: (_) => BlocProvider<CityPickerCubit>.value(
-                      value: cubit,
-                      child: const CityPickerScreen(),
-                    ),
+      child: appShell(
+          home: Scaffold(
+        body: Builder(
+          builder: (context) => Center(
+            child: TextButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => BlocProvider<CityPickerCubit>.value(
+                    value: cubit,
+                    child: const CityPickerScreen(),
                   ),
                 ),
-                child: const Text('OPEN'),
               ),
+              child: const Text('OPEN'),
             ),
           ),
         ),
-      ),
+      )),
     ));
 
     await tester.tap(find.text('OPEN'));
@@ -121,18 +109,7 @@ void main() {
     await cubit.start();
     await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
       value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const CityPickerScreen(),
-      ),
+      child: appShell(home: const CityPickerScreen()),
     ));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));

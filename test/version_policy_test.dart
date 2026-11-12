@@ -119,6 +119,48 @@ void main() {
     });
   });
 
+  group('isPlausibleFor', () {
+    test('accepts a same-major minor jump within the window', () {
+      const policy = VersionPolicy(
+        minSupported: AppVersion(1, 2, 0),
+        latest: AppVersion(1, 4, 0),
+      );
+      expect(policy.isPlausibleFor(const AppVersion(1, 0, 0)), isTrue);
+    });
+
+    test('rejects a same-major jump beyond the window', () {
+      const policy = VersionPolicy(
+        minSupported: AppVersion(1, 10, 0),
+        latest: AppVersion(1, 10, 0),
+      );
+      expect(policy.isPlausibleFor(const AppVersion(1, 0, 0)), isFalse);
+    });
+
+    test('accepts a one-major upgrade', () {
+      const policy = VersionPolicy(
+        minSupported: AppVersion(2, 0, 0),
+        latest: AppVersion(2, 0, 0),
+      );
+      expect(policy.isPlausibleFor(const AppVersion(1, 0, 0)), isTrue);
+    });
+
+    test('rejects an implausible two-major jump', () {
+      const policy = VersionPolicy(
+        minSupported: AppVersion(99, 0, 0),
+        latest: AppVersion(99, 0, 0),
+      );
+      expect(policy.isPlausibleFor(const AppVersion(1, 0, 0)), isFalse);
+    });
+
+    test('allows an older minimum (no lockout risk)', () {
+      const policy = VersionPolicy(
+        minSupported: AppVersion(0, 9, 0),
+        latest: AppVersion(1, 0, 0),
+      );
+      expect(policy.isPlausibleFor(const AppVersion(1, 0, 0)), isTrue);
+    });
+  });
+
   group('verdicts', () {
     const policy = VersionPolicy(
       minSupported: AppVersion(1, 2, 0),

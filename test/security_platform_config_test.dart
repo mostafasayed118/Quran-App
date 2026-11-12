@@ -29,6 +29,21 @@ void main() {
     expect(RegExp('domain="file"').allMatches(rules).length, 2);
   });
 
+  test('the home-widget receiver keeps the home_widget contract', () {
+    final manifest = _read('android/app/src/main/AndroidManifest.xml');
+    final receiver = RegExp(
+      r'<receiver\s+android:name="com\.mostafasayed\.quranyahdi\.QuranYahdiWidgetProvider"[\s\S]*?</receiver>',
+    ).firstMatch(manifest)?.group(0);
+    expect(receiver, isNotNull);
+    // The launcher/system delivers APPWIDGET_UPDATE from another UID, so the
+    // provider is exported (the home_widget 0.10.0 example does the same). It
+    // reads app-private preferences and exposes no other IPC surface, so it
+    // carries no permission and no non-widget action.
+    expect(receiver, contains('android:exported="true"'));
+    expect(receiver, contains('android.appwidget.action.APPWIDGET_UPDATE'));
+    expect(receiver, isNot(contains('android:permission=')));
+  });
+
   test('CI is least-privilege, gated, SHA-pinned, and honestly named', () {
     final ci = _read('.github/workflows/ci.yml');
     expect(ci, contains('permissions:'));
