@@ -5,6 +5,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/review_prompt.dart';
 
 /// Settings-table key for the one-shot review marker. Deliberately outside
@@ -81,6 +82,8 @@ class ReviewService {
   final Future<void> Function(Duration) _delayer;
   final Duration _delay;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   bool _requestedInProcess = false;
 
   /// Whether the one-shot request has already happened (this process or a
@@ -132,19 +135,8 @@ class ReviewService {
     }
   }
 
-  Future<bool> _readRequested() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(reviewRequestedKey)))
-        .getSingleOrNull();
-    return row?.value == 'true';
-  }
+  Future<bool> _readRequested() async =>
+      (await _settings.read(reviewRequestedKey)) == 'true';
 
-  Future<void> _writeRequested() async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: reviewRequestedKey,
-            value: 'true',
-          ),
-        );
-  }
+  Future<void> _writeRequested() => _settings.write(reviewRequestedKey, 'true');
 }

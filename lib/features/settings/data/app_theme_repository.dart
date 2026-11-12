@@ -1,4 +1,5 @@
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/app_theme.dart';
 
 /// Stores the appearance preference in the local settings table.
@@ -14,21 +15,12 @@ class AppThemeRepository implements AppThemeSource {
 
   final AppDatabase _db;
 
-  @override
-  Future<AppThemeMode> load() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    return AppThemeMode.fromCode(row?.value);
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> save(AppThemeMode mode) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: mode.code,
-          ),
-        );
-  }
+  Future<AppThemeMode> load() async =>
+      AppThemeMode.fromCode(await _settings.read(key));
+
+  @override
+  Future<void> save(AppThemeMode mode) => _settings.write(key, mode.code);
 }

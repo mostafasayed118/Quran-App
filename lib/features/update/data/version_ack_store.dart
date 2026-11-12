@@ -2,6 +2,7 @@ import 'package:in_app_review/in_app_review.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/store_listing.dart';
 import '../../../core/domain/version_ack_store.dart';
 
@@ -16,23 +17,14 @@ class DriftVersionAckStore implements VersionAckStore {
 
   final AppDatabase _db;
 
-  @override
-  Future<String?> read() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(versionUpdatePromptAckKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> write(String latest) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: versionUpdatePromptAckKey,
-            value: latest,
-          ),
-        );
-  }
+  Future<String?> read() => _settings.read(versionUpdatePromptAckKey);
+
+  @override
+  Future<void> write(String latest) =>
+      _settings.write(versionUpdatePromptAckKey, latest);
 }
 
 /// The store id used in the public Play listing.

@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../domain/reciter_info.dart';
 import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
@@ -106,6 +107,8 @@ class ReciterRepository
         _catalogTimeout = catalogTimeout ?? const Duration(seconds: 20);
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
   final Dio _client;
   final String _endpoint;
 
@@ -276,22 +279,11 @@ class ReciterRepository
   }
 
   @override
-  Future<void> selectMoshaf(String rowId) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: selectedMoshafKey,
-            value: rowId,
-          ),
-        );
-  }
+  Future<void> selectMoshaf(String rowId) =>
+      _settings.write(selectedMoshafKey, rowId);
 
   @override
-  Future<String?> loadSelectedMoshaf() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(selectedMoshafKey)))
-        .getSingleOrNull();
-    return row?.value;
-  }
+  Future<String?> loadSelectedMoshaf() => _settings.read(selectedMoshafKey);
 
   @override
   Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {

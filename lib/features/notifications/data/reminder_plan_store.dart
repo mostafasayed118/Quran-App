@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 
 /// The plan the OS already holds: its fingerprint plus the exact-alarm mode
 /// it was written with (the mode is part of "already applied").
@@ -41,12 +42,11 @@ class DriftReminderPlanStore implements ReminderPlanStore {
 
   final AppDatabase _db;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   @override
   Future<ReminderPlanSnapshot?> read() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    final raw = row?.value;
+    final raw = await _settings.read(key);
     if (raw == null || raw.isEmpty) return null;
     try {
       final decoded = jsonDecode(raw);
@@ -61,22 +61,14 @@ class DriftReminderPlanStore implements ReminderPlanStore {
   }
 
   @override
-  Future<void> write(ReminderPlanSnapshot snapshot) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: jsonEncode({
-              'fingerprint': snapshot.fingerprint,
-              'exact': snapshot.exact,
-            }),
-          ),
-        );
-  }
+  Future<void> write(ReminderPlanSnapshot snapshot) => _settings.write(
+        key,
+        jsonEncode({
+          'fingerprint': snapshot.fingerprint,
+          'exact': snapshot.exact,
+        }),
+      );
 
   @override
-  Future<void> clear() async {
-    await (_db.delete(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .go();
-  }
+  Future<void> clear() => _settings.remove(key);
 }

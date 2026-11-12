@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'hadith_personal.dart';
 
 /// Stores the last browse offset per pack as one JSON object.
@@ -12,6 +13,8 @@ class HadithPositionRepository implements HadithPositionSource {
   static const key = 'hadith_positions_v1';
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
   Future<int> load(String packId) async {
@@ -27,19 +30,11 @@ class HadithPositionRepository implements HadithPositionSource {
     } else {
       all[packId] = offset;
     }
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: key,
-            value: jsonEncode(all),
-          ),
-        );
+    await _settings.write(key, jsonEncode(all));
   }
 
   Future<Map<String, int>> _readAll() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
-    final raw = row?.value;
+    final raw = await _settings.read(key);
     if (raw == null || raw.isEmpty) return <String, int>{};
     try {
       final decoded = jsonDecode(raw);

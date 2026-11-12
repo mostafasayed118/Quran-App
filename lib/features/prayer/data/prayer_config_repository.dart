@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/prayer_config.dart';
 
 /// Persists the prayer calculation preferences in the settings table.
@@ -12,6 +13,8 @@ class PrayerConfigRepository implements PrayerConfigSource {
   PrayerConfigRepository(this._db);
 
   final AppDatabase _db;
+
+  late final SettingsStore _settings = SettingsStore(_db);
   final StreamController<PrayerConfig> _changes =
       StreamController<PrayerConfig>.broadcast();
   PrayerConfig _current = PrayerConfig.egyptian;
@@ -25,22 +28,15 @@ class PrayerConfigRepository implements PrayerConfigSource {
   @override
   Future<PrayerConfig> load() async {
     try {
-      final rows = await (_db.select(_db.settingsTable)
-            ..where((t) => t.key.isIn(
-                  [
-                    PrayerConfig.methodKey,
-                    PrayerConfig.madhabKey,
-                    PrayerConfig.enabledPrayersKey,
-                    PrayerConfig.preAdhanMinutesKey,
-                    PrayerConfig.fajrFollowUpKey,
-                    PrayerConfig.adjustmentsKey,
-                    PrayerConfig.highLatitudeKey,
-                  ],
-                )))
-          .get();
-      final values = <String, String>{
-        for (final row in rows) row.key: row.value,
-      };
+      final values = await _settings.readAll([
+        PrayerConfig.methodKey,
+        PrayerConfig.madhabKey,
+        PrayerConfig.enabledPrayersKey,
+        PrayerConfig.preAdhanMinutesKey,
+        PrayerConfig.fajrFollowUpKey,
+        PrayerConfig.adjustmentsKey,
+        PrayerConfig.highLatitudeKey,
+      ]);
       final loaded = PrayerConfig.fromJson(values);
       if (loaded != _current) {
         _current = loaded;
@@ -56,50 +52,16 @@ class PrayerConfigRepository implements PrayerConfigSource {
 
   @override
   Future<void> save(PrayerConfig config) async {
-    await _db.transaction(() async {
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.methodKey,
-              value: config.method.name,
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.madhabKey,
-              value: config.madhab.name,
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.enabledPrayersKey,
-              value:
-                  config.enabledPrayers.map((prayer) => prayer.name).join(','),
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.preAdhanMinutesKey,
-              value: '${config.preAdhanMinutes}',
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.fajrFollowUpKey,
-              value: config.fajrFollowUp ? 'true' : 'false',
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.adjustmentsKey,
-              value: config.toJson()[PrayerConfig.adjustmentsKey] ?? '',
-            ),
-          );
-      await _db.into(_db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(
-              key: PrayerConfig.highLatitudeKey,
-              value: config.highLatitude.name,
-            ),
-          );
+    await _settings.writeAll(<String, String>{
+      PrayerConfig.methodKey: config.method.name,
+      PrayerConfig.madhabKey: config.madhab.name,
+      PrayerConfig.enabledPrayersKey:
+          config.enabledPrayers.map((prayer) => prayer.name).join(','),
+      PrayerConfig.preAdhanMinutesKey: '${config.preAdhanMinutes}',
+      PrayerConfig.fajrFollowUpKey: config.fajrFollowUp ? 'true' : 'false',
+      PrayerConfig.adjustmentsKey:
+          config.toJson()[PrayerConfig.adjustmentsKey] ?? '',
+      PrayerConfig.highLatitudeKey: config.highLatitude.name,
     });
     _current = config;
     _changes.add(config);

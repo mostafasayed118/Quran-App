@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'azkar_saved_state.dart';
 
 /// Stores [AzkarSavedState] in the settings table.
@@ -20,6 +21,8 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
 
   final AppDatabase _db;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   /// Tail of the progress write chain.
   ///
   /// A save is a read-modify-write over ONE JSON row: two overlapping saves
@@ -30,12 +33,7 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
 
   @override
   Future<AzkarSavedState> load() async {
-    final rows = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.isIn([progressKey, favoritesKey])))
-        .get();
-    final byKey = {
-      for (final row in rows) row.key: row.value,
-    };
+    final byKey = await _settings.readAll([progressKey, favoritesKey]);
     final progress = _decodeProgress(byKey[progressKey]);
     return AzkarSavedState(
       day: progress.day,
@@ -57,10 +55,7 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
       } on Object {
         // A failed earlier write must not block this one.
       }
-      final row = await (_db.select(_db.settingsTable)
-            ..where((setting) => setting.key.equals(progressKey)))
-          .getSingleOrNull();
-      final stored = _decodeProgress(row?.value);
+      final stored = _decodeProgress(await _settings.read(progressKey));
       // A new day starts a fresh set: yesterday's counters must not ride along.
       final counts = stored.day == day
           ? <String, List<int>>{...stored.counts}
@@ -79,11 +74,7 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
   Future<void> saveFavorites(Set<String> favorites) =>
       _write(favoritesKey, jsonEncode(favorites.toList()));
 
-  Future<void> _write(String key, String value) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(key: key, value: value),
-        );
-  }
+  Future<void> _write(String key, String value) => _settings.write(key, value);
 
   static ({String day, Map<String, List<int>> counts}) _decodeProgress(
     String? raw,

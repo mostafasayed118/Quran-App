@@ -1,4 +1,5 @@
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import 'reader_layout_source.dart';
 import 'reader_settings_source.dart';
 
@@ -24,12 +25,11 @@ class ReaderSettingsRepository
 
   final AppDatabase _db;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   @override
   Future<double> loadFontScale() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(fontScaleKey)))
-        .getSingleOrNull();
-    final parsed = double.tryParse(row?.value ?? '');
+    final parsed = double.tryParse(await _settings.read(fontScaleKey) ?? '');
     if (parsed == null) return 1;
     return _clampScale(parsed);
   }
@@ -41,10 +41,7 @@ class ReaderSettingsRepository
 
   @override
   Future<double> loadLineHeight() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(lineHeightKey)))
-        .getSingleOrNull();
-    final parsed = double.tryParse(row?.value ?? '');
+    final parsed = double.tryParse(await _settings.read(lineHeightKey) ?? '');
     if (parsed == null) return defaultLineHeight;
     return _clampLineHeight(parsed);
   }
@@ -54,11 +51,7 @@ class ReaderSettingsRepository
     await _write(lineHeightKey, '${_clampLineHeight(lineHeight)}');
   }
 
-  Future<void> _write(String key, String value) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(key: key, value: value),
-        );
-  }
+  Future<void> _write(String key, String value) => _settings.write(key, value);
 
   static double _clampScale(double value) {
     if (value < 0.8) return 0.8;

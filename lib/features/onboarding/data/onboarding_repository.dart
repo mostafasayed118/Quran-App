@@ -1,4 +1,5 @@
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 import '../../../core/domain/onboarding_status.dart';
 
 /// Stores the first-run flag in the local settings table.
@@ -12,21 +13,12 @@ class OnboardingRepository implements OnboardingStatusSource {
 
   final AppDatabase _db;
 
-  @override
-  Future<bool> isCompleted() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(completedKey)))
-        .getSingleOrNull();
-    return row?.value == 'true';
-  }
+  late final SettingsStore _settings = SettingsStore(_db);
 
   @override
-  Future<void> markCompleted() async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: completedKey,
-            value: 'true',
-          ),
-        );
-  }
+  Future<bool> isCompleted() async =>
+      (await _settings.read(completedKey)) == 'true';
+
+  @override
+  Future<void> markCompleted() => _settings.write(completedKey, 'true');
 }

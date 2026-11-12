@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/settings_store.dart';
 
 const tasbihStateKey = 'tasbih_state';
 
@@ -21,14 +22,14 @@ class TasbihRepository {
 
   final AppDatabase _db;
 
+  late final SettingsStore _settings = SettingsStore(_db);
+
   /// The stored counter, or null when the user never used tasbih.
   Future<TasbihSnapshot?> load() async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.equals(tasbihStateKey)))
-        .getSingleOrNull();
-    if (row == null) return null;
+    final raw = await _settings.read(tasbihStateKey);
+    if (raw == null) return null;
     try {
-      final json = jsonDecode(row.value) as Map<String, dynamic>;
+      final json = jsonDecode(raw) as Map<String, dynamic>;
       return TasbihSnapshot(
         count: (json['count'] as num).toInt(),
         target: (json['target'] as num).toInt(),
@@ -39,12 +40,8 @@ class TasbihRepository {
   }
 
   /// Stores [count] and [target] as the tasbih counter.
-  Future<void> save(int count, int target) async {
-    await _db.into(_db.settingsTable).insertOnConflictUpdate(
-          SettingsTableCompanion.insert(
-            key: tasbihStateKey,
-            value: jsonEncode({'count': count, 'target': target}),
-          ),
-        );
-  }
+  Future<void> save(int count, int target) => _settings.write(
+        tasbihStateKey,
+        jsonEncode({'count': count, 'target': target}),
+      );
 }
