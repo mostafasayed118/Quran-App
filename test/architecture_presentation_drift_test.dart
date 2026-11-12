@@ -48,8 +48,8 @@ void main() {
 
     expect(readers, allowedPresentationDriftReaders,
         reason: 'a presentation file must not read drift rows directly — go '
-            'through the feature\'s data/ layer. The two pinned files are '
-            'frozen-test compatibility shims; a third needs its own ruling.');
+            'through the feature\'s data/ layer. The pinned set is empty on '
+            'purpose; adding a file needs its own ruling and reason here.');
   });
 
   test('the scan actually reads the tree', () {

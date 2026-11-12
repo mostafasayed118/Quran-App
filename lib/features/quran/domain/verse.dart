@@ -30,6 +30,9 @@ String stripAyahEndMarker(String text) {
 bool _isMarkerSeparator(int rune) =>
     rune == 0x20 || rune == 0x200E || rune == 0x200F;
 
+/// One ayah as the reader renders it: display text with the trailing
+/// verse-end marker already stripped ([displayUthmani]), plus the navigation
+/// coordinates (surah, ayah number, juz, page).
 class Verse {
   const Verse({
     required this.id,

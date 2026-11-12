@@ -2,12 +2,25 @@
 
 > **Remediation landed (2026-11-10).** This report is the snapshot taken at
 > `6e0ff45` with a dirty working tree. The wave it produced is merged on `main`
-> as `7635a29` (PR #26) — see the close-out in `docs/campaign-ledger.md`. Every
-> High finding and every Medium except the deferred list at the bottom of that
-> entry is closed; the deferred items are: the `update/` cubit question, FTS5
+> as `7635a29` (PR #26) — see the close-out in `docs/campaign-ledger.md`.
+> Every High finding is closed, and most Mediums with it. The deferred list is
+> at the bottom of that ledger entry: the `update/` cubit question, FTS5
 > `content=''`, `directives_ordering`, `_postShellRoutes`/`player_sheet` splits,
-> and the folder-bookmarks N+1 (port widening). Scores and counts below are the
-> pre-fix baseline and are kept unchanged on purpose.
+> and the folder-bookmarks N+1 (port widening).
+>
+> **Correction (2026-11-12): five Mediums were only partially closed and were
+> never on the deferred list** — (a) there was no positive rule for what may
+> live in `lib/app/` → closed in the W3 wave by the `appLayerFiles` pin in
+> `test/architecture_guard_test.dart`; (b) the last service-locator read in
+> presentation stays by decision — `library_sheet.dart` resolves
+> `PackDownloader` in `initState`, and threading it through three widget layers
+> would cost more than the seam is worth (the constructor already accepts an
+> injected instance); (c) the composition root's gate ownership: the test leak
+> is fixed, the inversion is kept; (d) the settings-table repository
+> duplication grew from 8 to 15 and needs its own wave; (e) the test-file
+> duplication (48 relative cross-test imports, 17 near-duplicate pairs) is
+> untouched. Scores and counts below are the pre-fix baseline and are kept
+> unchanged on purpose.
 
 **Mode:** read-only. **No file inside the repository was created, edited or deleted.**
 **Scope:** `lib/`, `test/`, `android/`, `ios/`, `web/public/`, `tools/`, governance docs.
