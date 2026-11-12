@@ -8,6 +8,7 @@ import '../../../../core/domain/quran_limits.dart';
 import '../../data/audio_downloader.dart';
 import '../../data/reciter_info_source.dart';
 import '../../data/reciter_repository.dart' show surahAudioUrl;
+import '../../data/surah_name_source.dart';
 import '../../domain/reciter_info.dart';
 import '../../playback/background_init_guard.dart';
 import '../../playback/playback_service.dart';
@@ -29,9 +30,11 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     required AudioDownloader downloader,
     bool Function()? backgroundActive,
     Stream<AdhanPlaybackState>? adhanStates,
+    SurahNameSource? surahNames,
   })  : _service = service,
         _reciters = reciters,
         _downloader = downloader,
+        _surahNames = surahNames,
         _backgroundActive = backgroundActive ?? _probeBackgroundInit,
         super(const PlaybackState.initial()) {
     _adhanSub = adhanStates?.listen(_onAdhanState, onError: _onStreamError);
@@ -40,6 +43,9 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   final PlaybackService _service;
   final ReciterInfoSource _reciters;
   final AudioDownloader _downloader;
+
+  /// Optional catalog lookup for the track title on next/previous.
+  final SurahNameSource? _surahNames;
 
   /// Decides how a failed load is labelled: `true` (background audio is up)
   /// → [PlaybackFailureKind.network], `false` (background audio is known to
@@ -113,10 +119,27 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// [surahName] is the display name when the caller knows it; the player
   /// shows it instead of a bare number.
   Future<void> playReciter(ReciterInfo reciter, int surahNumber,
-      {String surahName = ''}) {
+      {String surahName = ''}) async {
     _useQueue(reciter.surahList);
-    return _start(reciter.id, reciter.reciterName, reciter.server, surahNumber,
-        surahName);
+    final name =
+        surahName.isNotEmpty ? surahName : await _resolveName(surahNumber);
+    if (isClosed) return;
+    await _start(
+        reciter.id, reciter.reciterName, reciter.server, surahNumber, name);
+  }
+
+  /// The Arabic name of [surahNumber], or an empty string when unavailable.
+  Future<String> _resolveName(int surahNumber) async {
+    final source = _surahNames;
+    if (source == null) return '';
+    try {
+      final names = await source.surahNamesFor([surahNumber]);
+      return names[surahNumber] ?? '';
+    } on Object catch (error, stackTrace) {
+      appLog('surah name lookup failed',
+          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      return '';
+    }
   }
 
   /// Parses the reciter's comma-separated surah list into a queue.
@@ -313,7 +336,9 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   Future<void> _skipTo(int delta) async {
     final target = _stepTarget(delta);
     if (target == null || _rowId.isEmpty) return;
-    await _start(_rowId, _reciterName, _server, target, '');
+    final name = await _resolveName(target);
+    if (isClosed) return;
+    await _start(_rowId, _reciterName, _server, target, name);
   }
 
   /// The surah [delta] steps away in the reciter's list, or null at an edge.

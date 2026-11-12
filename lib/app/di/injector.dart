@@ -245,6 +245,7 @@ void _registerRecitation(
         reciters: getIt<ReciterRepository>(),
         downloader: getIt<AudioDownloader>(),
         adhanStates: getIt<AdhanPlayer>().state,
+        surahNames: getIt<ReciterRepository>(),
       ));
 }
 
