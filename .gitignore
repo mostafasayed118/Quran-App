@@ -56,3 +56,10 @@ app.*.map.json
 
 # Adhan source masters (128k originals). Only the 64k encodes in assets/audio/adhan ship.
 _adhan_masters/
+
+# Owner-local notes and per-device generated tooling (AGENTS.md §2: never staged)
+INSTRUCTIONS.md
+.opencode/plugins/entire-external.ts
+
+# Owner design explorations for the web campaign (ledger 2026-11-01: never staged)
+web/design-concepts/
