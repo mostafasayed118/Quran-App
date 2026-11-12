@@ -4,7 +4,7 @@
 > permission census of the codebase. Evidence-or-silence rule: every answer below cites its
 > source fact. Anything not citable would be flagged `OPEN-FOR-OWNER` — there are none.
 
-Last updated: 2026-11-09 (force-update policy fetch + In-App Review dependency disclosed) · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+4 (artifact versionCode 2004 — see PERF-13/owner note in `docs/release-readiness-audit.md`)
+Last updated: 2026-11-12 (versionCode record corrected; no data-flow change) · App: Quran Yahdi (`com.mostafasayed.quranyahdi`) · v1.0.0+4 (versionCode `4`; the `2004` seen on split APKs is Flutter's per-ABI offset)
 
 ## 1. Permission census (run live against the code)
 

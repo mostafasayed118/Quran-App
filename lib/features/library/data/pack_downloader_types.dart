@@ -1,5 +1,7 @@
 part of 'pack_downloader.dart';
 
+/// A pack install/read failure with a developer-facing message. Presentation
+/// maps it to localized copy; [message] is never shown to the user.
 class PackFailure implements Exception {
   PackFailure(this.message);
 

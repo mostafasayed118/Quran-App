@@ -32,6 +32,33 @@ const Map<String, String> featureDataFlutterAllowlist = {
       'reads kReleaseMode to reject unsigned policies in release builds',
 };
 
+/// The EXACT set of files that may live in `lib/app/`, and why each one does.
+///
+/// `lib/app/` is the composition root: bootstrap, router, DI wiring, the two
+/// router-facing gates, and the background-reminder glue. It is not a home for
+/// feature logic — the 2026-11-10 audit found persistence adapters that had
+/// drifted in here. Adding a file is an architecture decision: pin it with its
+/// reason, never let this set grow to match the tree.
+const Map<String, String> appLayerFiles = {
+  'lib/app/app.dart': 'root widget: theme, locale and router wiring',
+  'lib/app/app_shell.dart': 'the shell that hosts the bottom navigation',
+  'lib/app/bootstrap.dart': 'startup sequence that runs behind the first frame',
+  'lib/app/di/injector.dart': 'composition-root facade and test reset',
+  'lib/app/di/injector_app_registrations.dart': 'app-level registrations',
+  'lib/app/di/injector_feature_registrations.dart': 'feature registrations',
+  'lib/app/onboarding_gate.dart': 'router-facing first-run redirect',
+  'lib/app/reminder_background_task.dart': 'WorkManager entry point',
+  'lib/app/reminder_plan_freshness.dart': 'guards a redundant reminder re-plan',
+  'lib/app/route_observer.dart': 'navigation observer',
+  'lib/app/router.dart': 'route table',
+  'lib/app/routes/read_routes.dart': 'reading route group (part)',
+  'lib/app/routes/recitation_routes.dart': 'recitation route group (part)',
+  'lib/app/routes/settings_routes.dart': 'settings route group (part)',
+  'lib/app/routes/worship_routes.dart': 'worship route group (part)',
+  'lib/app/splash_screen.dart': 'first-frame splash',
+  'lib/app/version_gate.dart': 'router-facing force-update redirect',
+};
+
 final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
 final _flutterImportRe =
     RegExp(r"""import\s+['"](?:package:flutter/|dart:ui)""");
@@ -251,6 +278,18 @@ void main() {
             'feature->feature edges. Unpinned live edges: $missing. '
             'Dead permissions to delete: $dead. A new edge is an architecture '
             'decision — edit this test deliberately.');
+  });
+
+  test('lib/app holds only the pinned files', () {
+    final live = sources.keys.where((f) => f.startsWith('lib/app/')).toSet();
+    final unpinned = live.difference(appLayerFiles.keys.toSet()).toList()
+      ..sort();
+    final stale = appLayerFiles.keys.toSet().difference(live).toList()..sort();
+    expect(appLayerFiles.keys.toSet(), live,
+        reason: '`lib/app/` is the composition root, not a home for feature '
+            'logic. Unpinned files: $unpinned. Stale entries to delete: $stale. '
+            'Adding a file here is an architecture decision — pin it with its '
+            'reason deliberately.');
   });
 
   test('presentation never imports another feature\'s data', () {

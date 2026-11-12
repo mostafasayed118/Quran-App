@@ -72,7 +72,7 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 
 ## Screenshot checklist — captured candidates
 
-> REL-1 status (updated 2026-10-28): all 11 captures **are committed** at `docs/store/screenshots/` at **1080×2160**, all re-shot from the signed `1.0.0+3` build (APK, `x86_64` on a Pixel 9 Pro emulator set to 1080×2160). Re-capture only if the UI changes.
+> REL-1 status (updated 2026-11-12): all 11 captures **are committed** at `docs/store/screenshots/` at **1080×2160**, re-shot from the signed `1.0.0+4` release build (universal APK, `x86_64` on an Android 16 / API 36 emulator at 1080×2160 @ 420 dpi). Re-capture only if the UI changes.
 
 - [x] `01-home.png` — Home: next-prayer hero + continue reading + feature grid (most important — first slot)
 - [x] `02-index.png` — Surah index with search field
@@ -88,4 +88,4 @@ Privacy matters: no accounts, no ads, no tracking, no data collection — everyt
 
 Specs: phone (portrait) 16:9 or 9:16, no real personal data in frame, light theme preferred.
 
-> 2026-10-28 status: all 11 candidates re-shot from the signed `1.0.0+3` build on a Pixel 9 Pro emulator at **1080×2160** (a 2:1 crop, Play-compliant); the 2026-10-18 real-device set was replaced wholesale. Final picks and ordering belong to the owner.
+> 2026-11-12 status: all 11 candidates re-shot from the signed `1.0.0+4` release build (HEAD `388b50d`) on an Android 16 emulator at **1080×2160** (2:1, Play-compliant), flattened to 24-bit PNG with no alpha. The 2026-10-28 set was replaced wholesale — the UI had drifted (city on the next-prayer card, sectioned home grid, bottom navigation, the reader's per-ayah action row, the ayah sheet's tafsir tab). Final picks and ordering belong to the owner.
