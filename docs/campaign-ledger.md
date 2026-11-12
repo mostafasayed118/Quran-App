@@ -1410,5 +1410,18 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Deviation:** one commit used `git add -A test` where the standing rule is explicit pathspecs only. The staged set was verified to be exactly the 59 intended files before the commit; every other commit used explicit pathspecs.
 - **Privacy incident (remediated):** `.entire` was syncing checkpoint refs — `prompt.txt` + `full.jsonl`, i.e. full agent transcripts — to this **public** origin (15 refs on the remote, redaction packs = 0). The CLI now targets the private `mostafasayed118/quran-app-checkpoints` through gitignored `.entire/settings.local.json` (`entire status` confirms the dedicated remote); all 15 refs were copied there with identical SHAs, verified one by one, and then deleted from origin (origin `refs/entire/*` = 0, re-checked after a no-op push ran the hook). **Residual risk:** GitHub keeps deleted refs' objects fetchable by SHA until it runs GC, so a recorded SHA may still resolve until then.
 
+### 2026-11-12 (merge) — 1B tail + accepted risk on the last two files — MERGED ON MAIN (PR #38)
+
+- **Owner ruling:** «A) نوثّقهم accepted-risk (15 من 17 تحت الـ cap) ونقفل الموجة».
+- **Wave:** `wave/1b-tail` from `83b5412` → PR **#38**, merge **`b72abcf`**, **2 commits**; branch deleted on origin.
+- **`6bbd70a` audio_downloader 570 → 363:** the `downloads` table, its rows' file lifecycle, the audio-root-scoped delete and the startup reconcile moved into `DownloadRegistry` (191 lines). The transfer loop stays in `AudioDownloader`; every public member keeps its signature, `audioFolderName` included (two tests read it), and `downloads_cubit` is untouched. The transport types moved to the `audio_download_types.dart` part.
+- **`7e5fe44` pack_downloader 612 → 243:** the stream/verify/promote/register pipeline became `_PackInstaller` (387) in a part of the same library, so the private sniff/digest/byte-counter helpers stay in scope and every method body moved **verbatim**; the size cap and the pinned-hash check sit beside it in `pack_integrity.dart` (25). `PackDownloader` keeps the single-flight gate, the progress map/broadcast, `uninstall` and the read API.
+- **Accepted risk (owner decision, recorded here):** two files stay above 400 raw lines and were deliberately not split.
+  - `playback_cubit.dart` **675** — one state machine: every method touches `_episode`/`_rowId`/`_server`/`_surahNumbers`/`_speed`/`_repeatMode`/`_sleepTimer`/`_externalAudioActive`, and the `_episode` guard is what keeps the stream callbacks race-safe. Splitting it rewrites logic rather than moving it.
+  - `notifications_binding.dart` **651** — permissions, boot, chunked plan application and the pre-adhan cancel, all against the plugin. A partial extraction still lands near 460; a real one is a three-class rework of the most platform-sensitive file in the app.
+  - Rationale: the 400-line rule is a smell detector, not a target; for a single cohesive responsibility the split costs more in callback plumbing than it buys. **Audit count: 17 files ≥400 → 2.**
+- **Gates at `7e5fe44`:** format **846/0** · analyze **0** · suite **1618/1618**; CI **`43264299435` success** (analyze-test 7m2s). Targeted: audio/downloads 22 files **71/71**, pack/library/hadith/translation/tafsir 33 files **143/143**. No frozen test edited; no public signature changed.
+
+
 
 
