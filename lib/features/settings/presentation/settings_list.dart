@@ -1,5 +1,7 @@
 part of 'settings_screen.dart';
 
+/// The settings list: the three reminder switches, their times, the permission
+/// hint, the reminder-health readout and the (host-composed) backup section.
 class _SettingsList extends StatelessWidget {
   const _SettingsList({
     required this.prayerEnabled,
@@ -179,12 +181,3 @@ class _SettingsList extends StatelessWidget {
     );
   }
 }
-
-/// The «موثوقية التذكيرات» readout: one row per reason the OS may suppress a
-/// prayer/azkar reminder, each carrying the system screen that fixes it.
-///
-/// Reads on mount and again on every resume — Android 14 lets the user revoke
-/// exact alarms from the system settings, so a cached boot-time verdict would
-/// be wrong exactly when it matters. A healthy device sees no section at all;
-/// an unreadable battery state shows the "check it yourself" instruction
-/// instead of a verdict the device never produced.

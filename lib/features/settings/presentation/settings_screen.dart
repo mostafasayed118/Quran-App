@@ -107,6 +107,3 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 }
-
-/// The settings list: the three reminder switches, their times, the permission
-/// hint, the reminder-health readout and the (host-composed) backup section.

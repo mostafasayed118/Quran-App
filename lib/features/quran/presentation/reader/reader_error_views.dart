@@ -1,5 +1,6 @@
 part of 'reader_screen.dart';
 
+/// The reader failure body, shared by the full route and the workspace pane.
 class ReaderErrorBody extends StatelessWidget {
   /// Creates the failure body for [state].
   const ReaderErrorBody({super.key, required this.state});
@@ -48,7 +49,3 @@ class _ReaderErrorView extends StatelessWidget {
     );
   }
 }
-
-/// The reader body: basmala, verse list or mushaf pager, and the selection
-/// layer. No Scaffold and no mini player, so the workspace pane can mount it
-/// beside the master list.

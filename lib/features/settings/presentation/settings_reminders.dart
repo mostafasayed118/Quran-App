@@ -1,5 +1,13 @@
 part of 'settings_screen.dart';
 
+/// The «موثوقية التذكيرات» readout: one row per reason the OS may suppress a
+/// prayer/azkar reminder, each carrying the system screen that fixes it.
+///
+/// Reads on mount and again on every resume — Android 14 lets the user revoke
+/// exact alarms from the system settings, so a cached boot-time verdict would
+/// be wrong exactly when it matters. A healthy device sees no section at all;
+/// an unreadable battery state shows the "check it yourself" instruction
+/// instead of a verdict the device never produced.
 class _ReminderReliabilitySection extends StatefulWidget {
   const _ReminderReliabilitySection({
     required this.diagnostics,
@@ -206,5 +214,3 @@ class _ReminderTimeTile extends StatelessWidget {
     await onPicked(formatHm(_asDateTime(picked), arabicIndic: false));
   }
 }
-
-/// The stored 'H:mm' value as a clock time; null when it is missing or malformed.

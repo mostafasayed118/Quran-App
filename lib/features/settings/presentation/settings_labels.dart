@@ -1,5 +1,6 @@
 part of 'settings_screen.dart';
 
+/// The stored 'H:mm' value as a clock time; null when it is missing or malformed.
 TimeOfDay? _parseHm(String hm) {
   final hm24 = parseHourMinute(hm);
   if (hm24 == null) return null;

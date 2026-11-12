@@ -118,8 +118,3 @@ class _TimesListState extends State<_TimesList> with WidgetsBindingObserver {
     );
   }
 }
-
-/// What comes after today's last prayer.
-///
-/// Without it the panel went silent after Isha while Home advertised
-/// tomorrow's Fajr — two screens disagreeing about the same fact.

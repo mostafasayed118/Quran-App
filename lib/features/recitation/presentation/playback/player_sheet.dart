@@ -260,9 +260,3 @@ class _PlayerSheetState extends State<_PlayerSheet> {
     );
   }
 }
-
-/// Seek slider plus its two clock labels.
-///
-/// The pair travels together and sits flush inside the parent column; the
-/// inner `Column` is `min` so the parent lays out exactly as it did when the
-/// two were siblings.

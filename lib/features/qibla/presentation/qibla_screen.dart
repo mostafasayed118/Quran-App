@@ -199,6 +199,3 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
     );
   }
 }
-
-/// Ring, ticks, cardinal letters and the qibla marker.
-///

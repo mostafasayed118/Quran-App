@@ -59,5 +59,3 @@ bool readerShellShouldRebuild(ReaderState previous, ReaderState current) {
   return previous.copyWith(bookmarkedAyahIds: current.bookmarkedAyahIds) !=
       current;
 }
-
-/// The reader failure body, shared by the full route and the workspace pane.

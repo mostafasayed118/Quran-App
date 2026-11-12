@@ -1,5 +1,8 @@
 part of 'reader_screen.dart';
 
+/// The reader body: basmala, verse list or mushaf pager, and the selection
+/// layer. No Scaffold and no mini player, so the workspace pane can mount it
+/// beside the master list.
 class ReaderView extends StatelessWidget {
   /// Creates the body for [state].
   const ReaderView({super.key, required this.state});

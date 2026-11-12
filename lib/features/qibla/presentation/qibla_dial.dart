@@ -1,5 +1,7 @@
 part of 'qibla_screen.dart';
 
+/// Ring, ticks, cardinal letters and the qibla marker.
+///
 /// The letters and the marker rotate with the live heading so the dial answers
 /// "where is north from here?" and not just "which way is up". Without them
 /// the ring was decoration and the only reference was the arrow itself.

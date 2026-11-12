@@ -11,13 +11,6 @@ import 'downloads_state.dart';
 
 part 'downloads_models.dart';
 
-/// One installed download with its display names resolved.
-///
-/// A read-side projection, not cubit state: the list is rebuilt from the
-/// downloader on every read, so it never needs to ride the freezed state.
-/// [reciterName] and [surahName] are empty when the catalog cannot resolve
-/// them; the screen owns the localized fallback.
-
 /// The downloads screen: the per-surah download queue and the done rows.
 class DownloadsCubit extends Cubit<DownloadsState> {
   /// Creates the cubit with the downloader and the reciter catalog.

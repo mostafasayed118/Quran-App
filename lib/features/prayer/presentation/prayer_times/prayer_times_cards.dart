@@ -1,5 +1,9 @@
 part of 'prayer_times_screen.dart';
 
+/// What comes after today's last prayer.
+///
+/// Without it the panel went silent after Isha while Home advertised
+/// tomorrow's Fajr — two screens disagreeing about the same fact.
 class _TomorrowNote extends StatelessWidget {
   const _TomorrowNote({
     required this.name,

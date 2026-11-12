@@ -1,5 +1,11 @@
 part of 'downloads_cubit.dart';
 
+/// One installed download with its display names resolved.
+///
+/// A read-side projection, not cubit state: the list is rebuilt from the
+/// downloader on every read, so it never needs to ride the freezed state.
+/// [reciterName] and [surahName] are empty when the catalog cannot resolve
+/// them; the screen owns the localized fallback.
 class InstalledDownload {
   /// Creates one row of the installed list.
   const InstalledDownload({
