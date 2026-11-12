@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -8,52 +7,23 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
-import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/mini_player_bar.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 
+import 'support/controllable_playback_service.dart';
 import 'support/host.dart';
 import 'support/test_db.dart';
-
-class FakePlaybackService implements PlaybackService {
-  final playing = StreamController<bool>.broadcast();
-  final positionCtrl = StreamController<Duration>.broadcast();
-  final durationCtrl = StreamController<Duration?>.broadcast();
-
-  final List<PlaybackSource> loaded = <PlaybackSource>[];
-
-  @override
-  Stream<bool> playingStream() => playing.stream;
-
-  @override
-  Stream<Duration> positionStream() => positionCtrl.stream;
-
-  @override
-  Stream<Duration?> durationStream() => durationCtrl.stream;
-
-  @override
-  Future<void> loadAndPlay(PlaybackSource source) async => loaded.add(source);
-
-  @override
-  Future<void> pause() async {}
-
-  @override
-  Future<void> resume() async {}
-
-  @override
-  Future<void> stop() async {}
-}
 
 void main() {
   late AppDatabase db;
   late Directory tempRoot;
-  late FakePlaybackService fake;
+  late ControllablePlaybackService fake;
   late PlaybackCubit cubit;
 
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_mini_player_test');
-    fake = FakePlaybackService();
+    fake = ControllablePlaybackService();
     cubit = PlaybackCubit(
       service: fake,
       reciters: ReciterRepository(db),

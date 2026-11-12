@@ -6,20 +6,12 @@ import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 
+import 'support/fake_prayer_time_service.dart';
 import 'support/fakes.dart';
 import 'support/test_db.dart';
 
-class FakePrayerTimeService implements PrayerTimeService {
-  List<PrayerChoice>? todayResult;
-  PrayerChoice? nextResult;
-
-  @override
-  List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) =>
-      todayResult!;
-
-  @override
-  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) => nextResult!;
-}
+// Historical entry point for the prayer-time double; see the home suite.
+export 'support/fake_prayer_time_service.dart' show FakePrayerTimeService;
 
 const dubaiCity = City(
   id: 'dubai',

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -10,49 +9,13 @@ import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_state.dart';
 
+import 'support/controllable_playback_service.dart';
 import 'support/test_db.dart';
-
-class FakePlaybackService implements PlaybackService {
-  final playing = StreamController<bool>.broadcast();
-  final positionCtrl = StreamController<Duration>.broadcast();
-  final durationCtrl = StreamController<Duration?>.broadcast();
-
-  final List<PlaybackSource> loaded = <PlaybackSource>[];
-  Object? loadError;
-  int pauseCount = 0;
-  int resumeCount = 0;
-  int stopCount = 0;
-
-  @override
-  Stream<bool> playingStream() => playing.stream;
-
-  @override
-  Stream<Duration> positionStream() => positionCtrl.stream;
-
-  @override
-  Stream<Duration?> durationStream() => durationCtrl.stream;
-
-  @override
-  Future<void> loadAndPlay(PlaybackSource source) async {
-    final error = loadError;
-    if (error != null) throw error;
-    loaded.add(source);
-  }
-
-  @override
-  Future<void> pause() async => pauseCount += 1;
-
-  @override
-  Future<void> resume() async => resumeCount += 1;
-
-  @override
-  Future<void> stop() async => stopCount += 1;
-}
 
 void main() {
   late AppDatabase db;
   late Directory tempRoot;
-  late FakePlaybackService service;
+  late ControllablePlaybackService service;
   late PlaybackCubit cubit;
 
   setUp(() async {
@@ -100,7 +63,7 @@ void main() {
     return file.path;
   }
 
-  PlaybackCubit buildCubit(FakePlaybackService fake) => PlaybackCubit(
+  PlaybackCubit buildCubit(ControllablePlaybackService fake) => PlaybackCubit(
         service: fake,
         reciters: ReciterRepository(db),
         downloader:
@@ -111,7 +74,7 @@ void main() {
       () async {
     final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
     final seededPath = await seedDownload(row.id, 1);
-    service = FakePlaybackService();
+    service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
     await cubit.playSurah(row, 1);
@@ -125,7 +88,7 @@ void main() {
   test('playSurah streams the server URL when nothing is downloaded', () async {
     final row = await seedRow(
         id: '55-55', name: 'ماهر المعيقلي', server: 'https://s.example/a');
-    service = FakePlaybackService();
+    service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
     await cubit.playSurah(row, 2);
@@ -138,7 +101,7 @@ void main() {
   test('service failure lands in Failed(network) and keeps state resettable',
       () async {
     final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    service = FakePlaybackService()..loadError = StateError('boom');
+    service = ControllablePlaybackService()..loadError = StateError('boom');
     cubit = buildCubit(service);
 
     await cubit.playSurah(row, 1);
@@ -153,7 +116,7 @@ void main() {
       () async {
     await seedRow(id: '55-55', name: 'ماهر المعيقلي');
     final featured = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    service = FakePlaybackService();
+    service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
     await cubit.playDefaultForSurah(3);
@@ -164,7 +127,7 @@ void main() {
 
   test('close() unbinds the service streams', () async {
     final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    service = FakePlaybackService();
+    service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
     await cubit.playSurah(row, 1);
@@ -178,7 +141,7 @@ void main() {
 
   test('toggle pauses and resumes', () async {
     final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    service = FakePlaybackService();
+    service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
     await cubit.playSurah(row, 1);
