@@ -61,7 +61,7 @@ None observed in the capture set.
 
 ## P2 — Polish
 
-### 3. The prayer countdown's digits sit tight — and tracking cannot fix it
+### 3. The prayer countdown's digits sit tight — ACCEPTED AS-IS 2026-11-13
 
 - **Evidence:** `light/01-home`, `scale2-home`. Arabic-Indic pairs (`٢٢`, `٣٣`, `٤٠`) read as
   single shapes at 30 px and worse at 2.0.
@@ -69,8 +69,15 @@ None observed in the capture set.
   own `Cairo-Bold.ttf`, so Flutter is faithful.
 - **Tracking is a dead end — tested, not assumed:** `letterSpacing` 2.5 and 5 change nothing,
   in Chrome or in Flutter, because spacing is not applied inside an Arabic script run.
-- **Remaining options:** swap the numerals' font for this one widget, or compose the countdown
-  from per-digit `Text` widgets with explicit gaps. Both are design decisions, not a fix.
+- **A font swap is a dead end too — tested:** `me_quran`, the only other bundled family,
+  renders Arabic-Indic digits as boxed glyphs (screenshot in the session log), unusable for UI
+  numerals.
+- **The only remaining option** is composing the countdown from one `Text` per digit with
+  explicit gaps. That would break `home_dashboard_visual_test:116` (`find.text('٠٠:٠٠:٠٠')`)
+  and `:118-123` (exactly one `Text` matching the clock) — a frozen Class A pin — for a
+  cosmetic delta on text that is already legible.
+- **Verdict: accepted.** Revisit only if the countdown ever carries a decision (e.g. a
+  full-screen prayer view), where a purpose-built numeral layout earns its cost.
 
 ### 4. Settings hierarchy — WITHDRAWN 2026-11-13
 
@@ -135,9 +142,14 @@ Dark keeps `gold` (7.73). `goldText` (the light text role) is unchanged.
 ## Verdict
 
 The design argument is clear: a calm, cream-and-green reading app where gold means "the sacred
-text". The single change that would improve the product most is **#1** — getting the reader's
-buttons out of the way — and it is exactly the change that needs your ruling because a frozen
-test pins the current interaction.
+text". The single change that improved the product most was **#1** — getting the reader's
+buttons out of the way — and it landed in UI-1 after the owner unfroze the test that pinned the
+old interaction.
+
+**Pass result:** one behavioural improvement (the reader), one measurable accessibility fix
+(the light gold accent), and three findings withdrawn after full-resolution inspection. The
+app was in better shape than the first read suggested; that is worth saying plainly rather than
+manufacturing fixes to fill a list.
 
 ---
 
@@ -148,7 +160,7 @@ test pins the current interaction.
 | **UI-1** | Reader: reveal actions on tap | M | **DONE** (owner ruling on the frozen test) |
 | **UI-2** | textScale 2.0 re-probe | S | **DONE — nothing to fix**; finding withdrawn |
 | **UI-3** | Settings hierarchy + tab strips | S | **DONE — nothing to fix**; both withdrawn |
-| **UI-4** | Countdown numerals | S | Open — needs a font/layout decision, not tracking |
+| **UI-4** | Countdown numerals | S | **CLOSED — accepted as-is**: tracking and font-swap both tested and dead; per-digit layout costs a frozen test for a cosmetic delta |
 | **UI-5** | Dark-mode contrast sweep with measured pairs | M | **DONE** — light `secondary` failed 3:1 on every cream surface; `goldStrong` fixes it. Dark passed everywhere |
 
 **Lesson recorded:** four of the five findings were judged from a contact sheet. Three did not
