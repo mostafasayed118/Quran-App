@@ -123,6 +123,9 @@ void main() {
     await pumpReader(tester);
     final clipboard = captureClipboard(tester);
 
+    await tester.tap(find.text('آيَةٌ 1'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
@@ -173,6 +176,9 @@ void main() {
     expect(ayah.style?.fontFamily, AppTheme.hafsAyah.fontFamily);
 
     final clipboard = captureClipboard(tester);
+    await tester.tap(find.textContaining('\uE8DB').first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
@@ -224,5 +230,25 @@ void main() {
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(pageLabel(), contains('٣'));
+  });
+
+  testWidgets('the action row is closed until the verse is tapped',
+      (tester) async {
+    await pumpReader(tester);
+
+    expect(find.byIcon(Icons.copy_outlined), findsNothing,
+        reason: 'the row must not spend the reader height on chrome');
+    expect(find.byIcon(Icons.menu_book_outlined), findsNothing);
+
+    await tester.tap(find.text('آيَةٌ 1'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    expect(find.byIcon(Icons.copy_outlined), findsOneWidget);
+
+    await tester.tap(find.text('آيَةٌ 1'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    expect(find.byIcon(Icons.copy_outlined), findsNothing,
+        reason: 'tapping the open verse again closes it');
   });
 }

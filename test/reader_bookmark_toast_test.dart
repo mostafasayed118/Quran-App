@@ -105,6 +105,9 @@ void main() {
       (tester) async {
     await pumpReader(tester);
 
+    await tester.tap(find.text('الم').first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     await tester.tap(find.byIcon(Icons.bookmark_border).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

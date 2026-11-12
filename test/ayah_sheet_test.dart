@@ -338,6 +338,9 @@ void main() {
         ),
       );
 
+      await tester.tap(find.text('بسم الله الرحمن الرحيم').first);
+      await tester.pumpAndSettle(const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
       await tester.tap(find.byIcon(Icons.menu_book_outlined));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
