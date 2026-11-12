@@ -30,6 +30,13 @@ class TasbihCubit extends Cubit<TasbihState> {
   /// True once the user changed the counter; hydration must not overwrite it.
   bool _userMutated = false;
 
+  /// True once the stored snapshot has been applied (or failed).
+  bool _hydrated = false;
+
+  /// Taps that arrived before hydration; applied on top of the stored count so
+  /// they neither erase the saved session nor get lost.
+  int _pendingTaps = 0;
+
   /// Completes when the stored snapshot has been applied (or failed).
   Future<void> get loaded => _loaded.future;
 
@@ -47,6 +54,19 @@ class TasbihCubit extends Cubit<TasbihState> {
       appLog('tasbih load failed',
           name: 'quran_yahdi/tasbih', error: error, stackTrace: stackTrace);
     } finally {
+      final pending = _pendingTaps;
+      _pendingTaps = 0;
+      _hydrated = true;
+      // A reset/target change that landed during hydration already wrote a
+      // fresh session; queued taps belong to the old one and are dropped.
+      if (pending > 0 && !isClosed && !_userMutated) {
+        final current = state;
+        if (current is TasbihReady) {
+          final count = current.count + pending;
+          emit(TasbihState.ready(count: count, target: current.target));
+          await _save(count, current.target);
+        }
+      }
       if (!_loaded.isCompleted) {
         _loaded.complete();
       }
@@ -56,8 +76,13 @@ class TasbihCubit extends Cubit<TasbihState> {
   /// Counts one tap and persists the new count.
   ///
   /// [TasbihState.reachedTarget] flips exactly on the target count, not
-  /// beyond it.
+  /// beyond it. A tap before hydration is queued and applied on top of the
+  /// stored count instead of writing over an empty state.
   Future<void> increment() async {
+    if (!_hydrated) {
+      _pendingTaps++;
+      return;
+    }
     _userMutated = true;
     final state = this.state;
     if (state is! TasbihReady) return;

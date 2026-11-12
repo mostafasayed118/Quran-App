@@ -45,11 +45,33 @@ class LibraryCubit extends Cubit<LibraryState> {
   /// A failure emits the failed state (the error is logged, never raised as
   /// an unhandled async error).
   Future<void> load() async {
-    final List<LibraryPackInfo> packs;
+    final List<LibraryPackInfo> catalogPacks;
+    final List<LibraryPackInfo> orphans;
     final Set<String> installed;
     try {
-      packs = await _catalog.packs();
+      catalogPacks = await _catalog.packs();
       final rows = await _downloader.installedPacks();
+      final catalogIds = {for (final pack in catalogPacks) pack.id};
+      // An installed row whose catalog entry vanished must stay visible:
+      // hiding it also hid the only delete affordance for its file. Built
+      // here so the presentation layer never names the drift row type.
+      orphans = <LibraryPackInfo>[
+        for (final row in rows)
+          if (!catalogIds.contains(row.packId))
+            LibraryPackInfo(
+              id: row.packId,
+              kind: LibraryPackKind.values
+                      .where((kind) => kind.name == row.kind)
+                      .firstOrNull ??
+                  LibraryPackKind.tafsir,
+              language: row.language,
+              titleAr: row.title,
+              titleEn: row.title,
+              approxSizeMb: row.sizeMb,
+              version: row.version,
+              orphan: true,
+            ),
+      ];
       installed = {for (final row in rows) row.packId};
     } on Object catch (error, stackTrace) {
       appLog('library load failed',
@@ -60,7 +82,7 @@ class LibraryCubit extends Cubit<LibraryState> {
     }
     if (isClosed) return;
     emit(LibraryState.ready(
-      packs: packs,
+      packs: [...catalogPacks, ...orphans],
       installed: installed,
       // A route that re-enters while an app-scoped install is still running
       // must show the current bytes, not a reset 0 %.
@@ -140,7 +162,19 @@ class LibraryCubit extends Cubit<LibraryState> {
     if (isClosed) return;
     final ready = state;
     if (ready is! LibraryReady) return;
-    emit(ready.copyWith(installed: {...ready.installed}..remove(packId)));
+    final wasOrphan =
+        ready.packs.any((pack) => pack.id == packId && pack.orphan);
+    emit(ready.copyWith(
+      installed: {...ready.installed}..remove(packId),
+      // An orphan has no catalog entry to reinstall from: drop its row too,
+      // otherwise the row would offer an install that cannot work.
+      packs: wasOrphan
+          ? [
+              for (final pack in ready.packs)
+                if (pack.id != packId) pack,
+            ]
+          : ready.packs,
+    ));
   }
 
   /// Clears the failure recorded for [packId] (the user dismissed it).

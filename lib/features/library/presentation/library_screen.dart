@@ -220,10 +220,12 @@ class _PackRow extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     // Size + English title only: the pack's `version` is an upstream commit
     // SHA (a 40-char hex id) and means nothing to the reader.
-    final subtitle = loc.libraryPackSubtitle(
-      loc.libraryPackSize(loc.digits(pack.approxSizeMb.toString())),
-      pack.titleEn,
-    );
+    final subtitle = pack.orphan
+        ? loc.libraryPackUnavailable
+        : loc.libraryPackSubtitle(
+            loc.libraryPackSize(loc.digits(pack.approxSizeMb.toString())),
+            pack.titleEn,
+          );
 
     return ListTile(
       title: Text(

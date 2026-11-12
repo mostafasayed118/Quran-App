@@ -1196,6 +1196,12 @@ abstract class AppLocalizations {
   /// **'تعذّر التنزيل'**
   String get libraryFailed;
 
+  /// No description provided for @libraryPackUnavailable.
+  ///
+  /// In ar, this message translates to:
+  /// **'مثبتة على جهازك، لكنها لم تعد في الكتالوج — يمكنك حذفها.'**
+  String get libraryPackUnavailable;
+
   /// No description provided for @libraryRetry.
   ///
   /// In ar, this message translates to:

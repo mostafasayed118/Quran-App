@@ -621,6 +621,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryFailed => 'Download failed';
 
   @override
+  String get libraryPackUnavailable =>
+      'Installed on your device but no longer in the catalog - you can delete it.';
+
+  @override
   String get libraryRetry => 'Retry';
 
   @override
