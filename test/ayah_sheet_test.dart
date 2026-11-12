@@ -26,6 +26,8 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/fake_playback_service.dart';
 
+import 'support/host.dart';
+
 /// FakeAsync-safe pack decoder: isolate completions never arrive under the
 /// widget-test zone, so these tests use the PackDownloader decoder seam.
 Future<dynamic> _syncDecode(String path) async =>
@@ -189,18 +191,7 @@ void main() {
     });
 
     Future<void> pumpLocales(WidgetTester tester, Widget child) async {
-      await tester.pumpWidget(MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: child,
-      ));
+      await tester.pumpWidget(appShell(home: child));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
     }

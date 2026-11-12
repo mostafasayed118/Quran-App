@@ -1,18 +1,14 @@
 import 'package:drift/drift.dart' show Value;
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
 import 'package:quran_yahdi/features/duas/presentation/duas_cubit.dart';
 import 'package:quran_yahdi/features/duas/presentation/duas_screen.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/host.dart';
 import 'support/test_db.dart';
@@ -139,18 +135,7 @@ void main() {
     await cubit.start();
     await tester.pumpWidget(BlocProvider<DuasCubit>.value(
       value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const DuasScreen(),
-      ),
+      child: appShell(home: const DuasScreen()),
     ));
     await tester.pump();
     await tester.pump();

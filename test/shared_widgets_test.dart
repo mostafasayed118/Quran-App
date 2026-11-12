@@ -6,9 +6,11 @@ import 'package:quran_yahdi/core/widgets/download_progress.dart';
 import 'package:quran_yahdi/core/widgets/empty_state.dart';
 import 'package:quran_yahdi/core/widgets/search_field.dart';
 
+import 'support/host.dart';
+
 void main() {
   Future<void> pump(WidgetTester tester, Widget child) =>
-      tester.pumpWidget(MaterialApp(home: Scaffold(body: child)));
+      tester.pumpWidget(appShell(home: Scaffold(body: child)));
 
   testWidgets('ArabicBadge renders the coin with primary ring styling',
       (tester) async {

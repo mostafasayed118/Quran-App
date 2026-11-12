@@ -1,17 +1,14 @@
 import 'dart:ui' show CheckedState;
 
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
 import 'package:quran_yahdi/features/tracker/presentation/tracker_cubit.dart';
 import 'package:quran_yahdi/features/tracker/presentation/tracker_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 void main() {
@@ -29,18 +26,7 @@ void main() {
     await cubit.start();
     await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
       value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const TrackerScreen(),
-      ),
+      child: appShell(home: const TrackerScreen()),
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

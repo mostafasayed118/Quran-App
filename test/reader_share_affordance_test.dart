@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_cubit.dart';
@@ -14,9 +12,9 @@ import 'package:quran_yahdi/features/quran/presentation/reader/reader_screen.dar
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/fake_playback_service.dart';
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 class _TeardownSafeAyahRepository extends AyahRepository {
@@ -74,18 +72,7 @@ void main() {
         BlocProvider<ReaderCubit>.value(value: cubit),
         BlocProvider<PlaybackCubit>.value(value: playbackCubit),
       ],
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const ReaderScreen(),
-      ),
+      child: appShell(home: const ReaderScreen()),
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

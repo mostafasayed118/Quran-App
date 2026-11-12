@@ -3,19 +3,17 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/recitation/playback/playback_service.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/mini_player_bar.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_cubit.dart';
 import 'package:quran_yahdi/features/recitation/presentation/playback/playback_state.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import 'support/fake_playback_service.dart';
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 class _FakePlaybackService extends FakePlaybackService {
@@ -99,18 +97,7 @@ void main() {
       providers: [
         BlocProvider<PlaybackCubit>.value(value: cubit),
       ],
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        home: const Scaffold(bottomSheet: MiniPlayerBar()),
-      ),
+      child: appShell(home: const Scaffold(bottomSheet: MiniPlayerBar())),
     ));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));

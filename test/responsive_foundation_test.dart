@@ -6,6 +6,8 @@ import 'package:quran_yahdi/core/widgets/app_content_frame.dart';
 import 'package:quran_yahdi/core/widgets/app_sheet.dart';
 import 'package:quran_yahdi/core/widgets/search_field.dart';
 
+import 'support/host.dart';
+
 void main() {
   testWidgets('below the measure the child is not wrapped', (tester) async {
     tester.view.physicalSize = const Size(360, 800);
@@ -13,8 +15,8 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
+      appShell(
+        home: const Scaffold(
           body: AppContentFrame(
             child: SizedBox(
               key: Key('body'),
@@ -36,8 +38,8 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
+      appShell(
+        home: const Scaffold(
           body: AppContentFrame(
             child: SizedBox(
               key: Key('body'),
@@ -61,16 +63,15 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: AppContentFrame(
-            child: ListView(
-              key: const Key('list'),
-              children: const [SizedBox(height: 40)],
-            ),
+      appShell(
+          home: Scaffold(
+        body: AppContentFrame(
+          child: ListView(
+            key: const Key('list'),
+            children: const [SizedBox(height: 40)],
           ),
         ),
-      ),
+      )),
     );
 
     final rect = tester.getRect(find.byKey(const Key('list')));
@@ -85,25 +86,24 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Builder(
-            builder: (context) => Center(
-              child: ElevatedButton(
-                onPressed: () => showAppSheet<void>(
-                  context: context,
-                  builder: (_) => const SizedBox(
-                    key: Key('sheet-content'),
-                    height: 120,
-                    width: double.infinity,
-                  ),
+      appShell(
+          home: Scaffold(
+        body: Builder(
+          builder: (context) => Center(
+            child: ElevatedButton(
+              onPressed: () => showAppSheet<void>(
+                context: context,
+                builder: (_) => const SizedBox(
+                  key: Key('sheet-content'),
+                  height: 120,
+                  width: double.infinity,
                 ),
-                child: const Text('open'),
               ),
+              child: const Text('open'),
             ),
           ),
         ),
-      ),
+      )),
     );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
@@ -118,14 +118,13 @@ void main() {
   testWidgets('the shared search field follows the ambient direction',
       (tester) async {
     Future<void> pump(TextDirection direction) {
-      return tester.pumpWidget(MaterialApp(
-        home: Directionality(
-          textDirection: direction,
-          child: Scaffold(
-            body: SearchField(hint: 'search', onChanged: (_) {}),
-          ),
+      return tester.pumpWidget(appShell(
+          home: Directionality(
+        textDirection: direction,
+        child: Scaffold(
+          body: SearchField(hint: 'search', onChanged: (_) {}),
         ),
-      ));
+      )));
     }
 
     await pump(TextDirection.rtl);
@@ -148,36 +147,35 @@ void main() {
     addTearDown(tester.view.reset);
 
     const nestedKey = Key('nested-navigator');
-    await tester.pumpWidget(MaterialApp(
-      home: Row(
-        children: [
-          SizedBox(
-            width: 300,
-            child: Navigator(
-              key: nestedKey,
-              onGenerateRoute: (_) => MaterialPageRoute(
-                builder: (_) => Scaffold(
-                  body: Builder(
-                    builder: (context) => ElevatedButton(
-                      onPressed: () => showAppSheet<void>(
-                        context: context,
-                        builder: (_) => const SizedBox(
-                          key: Key('sheet-content'),
-                          height: 100,
-                          width: double.infinity,
-                        ),
+    await tester.pumpWidget(appShell(
+        home: Row(
+      children: [
+        SizedBox(
+          width: 300,
+          child: Navigator(
+            key: nestedKey,
+            onGenerateRoute: (_) => MaterialPageRoute(
+              builder: (_) => Scaffold(
+                body: Builder(
+                  builder: (context) => ElevatedButton(
+                    onPressed: () => showAppSheet<void>(
+                      context: context,
+                      builder: (_) => const SizedBox(
+                        key: Key('sheet-content'),
+                        height: 100,
+                        width: double.infinity,
                       ),
-                      child: const Text('open'),
                     ),
+                    child: const Text('open'),
                   ),
                 ),
               ),
             ),
           ),
-          const Expanded(child: SizedBox()),
-        ],
-      ),
-    ));
+        ),
+        const Expanded(child: SizedBox()),
+      ],
+    )));
 
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle(const Duration(milliseconds: 100),

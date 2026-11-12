@@ -3,9 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/widgets/error_strip.dart';
 
+import 'support/host.dart';
+
 void main() {
   Future<void> pump(WidgetTester tester, Widget child) =>
-      tester.pumpWidget(MaterialApp(home: Scaffold(body: child)));
+      tester.pumpWidget(appShell(home: Scaffold(body: child)));
 
   testWidgets('retry action fires and dismiss fires on close', (tester) async {
     var retries = 0;

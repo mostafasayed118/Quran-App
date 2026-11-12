@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/features/update/presentation/update_gate_screen.dart';
-import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-Widget _pump({required bool mandatory}) => MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      home: UpdateGateScreen(
-        mandatory: mandatory,
-        onOpenStore: () async => true,
-        onLater: () async {},
-      ),
-    );
+import 'support/host.dart';
+
+Widget _pump({required bool mandatory}) => appShell(
+        home: UpdateGateScreen(
+      mandatory: mandatory,
+      onOpenStore: () async => true,
+      onLater: () async {},
+    ));
 
 void main() {
   testWidgets('mandatory mode hides the back affordance and the Later button',

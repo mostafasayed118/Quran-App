@@ -3,13 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/core/widgets/lifecycle_ticker.dart';
 
-/// Pumps the ticker alone: it needs no theme, l10n or database, and the tick
-/// count is the only observable under test.
+import 'support/host.dart';
+
+/// Pumps the ticker inside the shared shell: no database is involved and the
+/// tick count is the only observable under test.
 Future<void> pumpTicker(WidgetTester tester) {
   return tester.pumpWidget(
-    MaterialApp(
-      home: LifecycleTicker(builder: (context, tick) => Text('tick:$tick')),
-    ),
+    appShell(
+        home: LifecycleTicker(builder: (context, tick) => Text('tick:$tick'))),
   );
 }
 

@@ -7,6 +7,7 @@ import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_cubit.dart';
 import 'package:quran_yahdi/features/quran/presentation/reader/reader_route_scope.dart';
 
+import 'support/host.dart';
 import 'support/test_db.dart';
 
 class _CountingReaderCubit extends ReaderCubit {
@@ -53,25 +54,24 @@ void main() {
     var closed = 0;
 
     Widget host(int surah) {
-      return MaterialApp(
-        home: Scaffold(
-          body: ReaderRouteScope(
-            surah: surah,
-            ayah: 0,
-            create: () {
-              created++;
-              return _CountingReaderCubit(
-                ayahRepository: AyahRepository(db),
-                lastReadRepository: LastReadRepository(db),
-                surah: surah,
-                onStart: () => started++,
-                onClose: () => closed++,
-              );
-            },
-            child: const SizedBox.shrink(),
-          ),
+      return appShell(
+          home: Scaffold(
+        body: ReaderRouteScope(
+          surah: surah,
+          ayah: 0,
+          create: () {
+            created++;
+            return _CountingReaderCubit(
+              ayahRepository: AyahRepository(db),
+              lastReadRepository: LastReadRepository(db),
+              surah: surah,
+              onStart: () => started++,
+              onClose: () => closed++,
+            );
+          },
+          child: const SizedBox.shrink(),
         ),
-      );
+      ));
     }
 
     await tester.pumpWidget(host(1));
