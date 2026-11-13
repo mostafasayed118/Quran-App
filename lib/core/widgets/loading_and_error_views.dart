@@ -3,12 +3,33 @@ import 'package:flutter/material.dart';
 import 'state_message.dart';
 
 /// Centered progress indicator for a route-level load.
+///
+/// The ring holds invisible for the first 160 ms of a 320 ms implicit fade.
+/// On this app the data behind a route is a local database or a bundled asset,
+/// so most loads finish inside a frame or two; painting the ring immediately
+/// turned those into a flicker. A slow load still gets a visible indicator — it
+/// fades in instead of popping. Keeping it an implicit animation (rather than a
+/// timer that reveals it) means there is nothing to cancel, the indicator stays
+/// in the tree for tests, and a load that completes early simply never paints.
 class LoadingView extends StatelessWidget {
   const LoadingView({super.key});
 
+  /// Total length of the implicit fade; the first half is the invisible hold.
+  static const Duration _fade = Duration(milliseconds: 320);
+  static const Interval _hold = Interval(0.5, 1, curve: Curves.easeOut);
+
   @override
   Widget build(BuildContext context) {
-    return const Center(child: CircularProgressIndicator());
+    return Center(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: _fade,
+        curve: _hold,
+        builder: (context, opacity, child) =>
+            Opacity(opacity: opacity, child: child),
+        child: const CircularProgressIndicator(),
+      ),
+    );
   }
 }
 
