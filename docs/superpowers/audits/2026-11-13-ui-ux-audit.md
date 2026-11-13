@@ -152,6 +152,25 @@ Dark keeps `gold` (7.73). `goldText` (the light text role) is unchanged.
 
 ---
 
+## Pass 3 — editorial chrome (2026-11-13)
+
+The first two passes hunted defects and converged. This pass changes the **design direction of
+shared chrome** instead: two widgets that appear on nearly every screen.
+
+| Change | Reach | Why |
+|---|---|---|
+| `AppBarTheme.shape` gains a 1 px bottom hairline | **all 36 screens** | The bar was a flat cream strip bleeding into a cream page with no boundary. A hairline is structure, not elevation — the same reason the cards use borders rather than shadows. |
+| `SectionHeader` carries a rule from the label to the end of its row | **7 headers**: home ×3, settings→backup, reciters, reciter packs, adhan picker | A labelled group that stops mid-air reads as a stray caption; a ruled one reads as a page division. |
+
+Verified at 1:1 on the device, before and after: the header rule is clearly visible in the
+crop, and the bar's line closes the top of every page. Dark mode uses `darkHairline`, so the
+treatment holds in both themes.
+
+No text changed, no colour token changed, no layout dimension changed — the two edits are
+`app_theme.dart` (one `shape:` block) and `section_header.dart` (the row's trailing rule).
+
+---
+
 ## P3 — Preference
 
 ### 6. Home's "المزيد" section begins mid-row
@@ -187,6 +206,7 @@ saying plainly rather than manufacturing fixes to fill a list.
 | **UI-3** | Settings hierarchy + tab strips | S | **DONE — nothing to fix**; both withdrawn |
 | **UI-4** | Countdown numerals | S | **CLOSED — accepted as-is**: tracking and font-swap both tested and dead; per-digit layout costs a frozen test for a cosmetic delta |
 | **UI-5** | Dark-mode contrast sweep with measured pairs | M | **DONE** — light `secondary` failed 3:1 on every cream surface; `goldStrong` fixes it. Dark passed everywhere |
+| **UI-6** | Editorial chrome: app-bar hairline + ruled section headers | S | **DONE** — 1:1 before/after verified on device, both themes |
 
 **Lesson recorded:** four of the five findings were judged from a contact sheet. Three did not
 survive full-resolution inspection. The capture set is the evidence; the thumbnail is not.

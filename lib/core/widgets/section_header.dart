@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
@@ -27,6 +28,9 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final ruleColor = Theme.of(context).brightness == Brightness.light
+        ? AppColors.hairline
+        : AppColors.darkHairline;
     return Padding(
       padding: EdgeInsetsDirectional.fromSTEB(
         inset,
@@ -45,7 +49,7 @@ class SectionHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
-          Expanded(
+          Flexible(
             child: Text(
               title,
               style: AppTheme.sectionLabel.copyWith(
@@ -53,7 +57,18 @@ class SectionHeader extends StatelessWidget {
               ),
             ),
           ),
-          if (trailing != null) trailing!,
+          // The rule carries the section to the end of its row. A labelled
+          // group that stops mid-air reads as a stray caption; a ruled one
+          // reads as a page division — the same reason the app uses hairlines
+          // instead of a second surface tone.
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Container(height: 1, color: ruleColor),
+          ),
+          if (trailing != null) ...[
+            const SizedBox(width: AppSpacing.sm),
+            trailing!,
+          ],
         ],
       ),
     );
