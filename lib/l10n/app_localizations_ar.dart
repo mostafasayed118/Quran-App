@@ -1121,6 +1121,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hadithSearchHint => 'ابحث في الأحاديث';
 
   @override
+  String get clearSearch => 'مسح البحث';
+
+  @override
   String get hadithSearchEmpty => 'لا توجد نتائج';
 
   @override

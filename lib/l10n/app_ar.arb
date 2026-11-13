@@ -738,6 +738,7 @@
   },
   "hadithEmpty": "لا توجد أحاديث في هذه الحزمة",
   "hadithSearchHint": "ابحث في الأحاديث",
+  "clearSearch": "مسح البحث",
   "hadithSearchEmpty": "لا توجد نتائج",
   "hadithBookmarks": "الأحاديث المحفوظة",
   "hadithNoBookmarks": "لا توجد أحاديث محفوظة",

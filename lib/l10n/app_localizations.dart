@@ -2066,6 +2066,12 @@ abstract class AppLocalizations {
   /// **'ابحث في الأحاديث'**
   String get hadithSearchHint;
 
+  /// No description provided for @clearSearch.
+  ///
+  /// In ar, this message translates to:
+  /// **'مسح البحث'**
+  String get clearSearch;
+
   /// No description provided for @hadithSearchEmpty.
   ///
   /// In ar, this message translates to:

@@ -116,6 +116,7 @@ class _SearchBarState extends State<_SearchBar> {
           suffixIcon: _controller.text.isEmpty
               ? null
               : IconButton(
+                  tooltip: loc.clearSearch,
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                     _controller.clear();
