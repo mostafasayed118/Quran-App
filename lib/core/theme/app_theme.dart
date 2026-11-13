@@ -24,6 +24,10 @@ abstract final class AppTheme {
       fontSize: AppType.quranVerse,
       height: AppType.quranHeight);
 
+  /// The verse card's ayah number; the reader multiplies it by its own scale.
+  static const TextStyle ayahNumber =
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.ayahNumber);
+
   /// Bold Latin-font row title used by the reciter lists.
   static const TextStyle rowTitle = TextStyle(
     fontFamily: QuranFonts.ui,
