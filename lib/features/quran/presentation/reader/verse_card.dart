@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/verse.dart';
@@ -36,7 +37,7 @@ class VerseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final text = ayah.displayText;
-    final fontSize = text.length > 400 ? 18.0 : 22.0;
+    final fontSize = text.length > 400 ? AppType.title : AppType.titleLarge;
     final host = Uri.parse(
       webSurahUrl(ayah.surahId, ayah.numberInSurah),
     ).host;
@@ -82,7 +83,7 @@ class VerseCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.mushafCardInk,
                       fontFamily: QuranFonts.ui,
-                      fontSize: 14,
+                      fontSize: AppType.body,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -108,7 +109,7 @@ class VerseCard extends StatelessWidget {
               style: const TextStyle(
                 color: AppColors.mushafCardAccent,
                 fontFamily: QuranFonts.meQuran,
-                fontSize: 16,
+                fontSize: AppType.bodyLarge,
               ),
             ),
             const SizedBox(height: 18),
@@ -123,7 +124,7 @@ class VerseCard extends StatelessWidget {
                   style: TextStyle(
                     color: AppColors.mushafCardMuted,
                     fontFamily: QuranFonts.ui,
-                    fontSize: 10,
+                    fontSize: AppType.shareFooter,
                     letterSpacing: 0.4,
                   ),
                 ),
@@ -136,7 +137,7 @@ class VerseCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.mushafCardMuted,
                       fontFamily: QuranFonts.ui,
-                      fontSize: 10,
+                      fontSize: AppType.shareFooter,
                     ),
                   ),
                 ),

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_radius.dart';
 import '../core/theme/app_theme.dart';
+import '../core/theme/app_type.dart';
 import '../l10n/app_localizations.dart';
 
 /// Full-screen brand moment shown at boot on top of the routed app.
@@ -250,7 +251,7 @@ class _SplashContent extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: QuranFonts.ui,
                       fontWeight: FontWeight.bold,
-                      fontSize: 26,
+                      fontSize: AppType.splashWordmark,
                       height: 1.2,
                       letterSpacing: -.2,
                       color: heading,
@@ -281,7 +282,7 @@ class _SplashContent extends StatelessWidget {
                   l10n.splashTagline,
                   style: TextStyle(
                     fontFamily: QuranFonts.ui,
-                    fontSize: 11,
+                    fontSize: AppType.micro,
                     letterSpacing: .3,
                     color: footer,
                   ),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_type.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/format_bytes.dart';
 import '../../../core/utils/insets.dart';
@@ -287,7 +288,8 @@ class _PackRow extends StatelessWidget {
         if (installed && progress == null)
           Text(
             loc.libraryInstalled,
-            style: TextStyle(color: AppTheme.goldText(context), fontSize: 12),
+            style: TextStyle(
+                color: AppTheme.goldText(context), fontSize: AppType.caption),
           ),
         if (installed && pack.kind == LibraryPackKind.hadith)
           IconButton(

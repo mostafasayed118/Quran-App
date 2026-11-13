@@ -88,12 +88,14 @@ class _MushafPagerState extends State<_MushafPager> {
                     TextSpan(children: spans),
                     style: unicode
                         ? AppTheme.hafsAyah.copyWith(
-                            fontSize: 22 * widget.state.fontScale,
+                            fontSize:
+                                AppType.quranMushaf * widget.state.fontScale,
                             height: widget.state.lineHeight,
                           )
                         : TextStyle(
                             fontFamily: QuranFonts.quran,
-                            fontSize: 22 * widget.state.fontScale,
+                            fontSize:
+                                AppType.quranMushaf * widget.state.fontScale,
                             height: widget.state.lineHeight,
                           ),
                     textAlign: TextAlign.center,

@@ -5,6 +5,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -17,22 +18,22 @@ import 'asma_state.dart';
 
 const TextStyle _gridNameArStyle = TextStyle(
   fontFamily: QuranFonts.meQuran,
-  fontSize: 22,
+  fontSize: AppType.headline,
 );
 
 const TextStyle _sheetNameArStyle = TextStyle(
   fontFamily: QuranFonts.meQuran,
-  fontSize: 40,
+  fontSize: AppType.timerLarge,
 );
 
 const TextStyle _sheetMeaningArStyle = TextStyle(
   fontFamily: QuranFonts.meQuran,
-  fontSize: 16,
+  fontSize: AppType.bodyLarge,
   height: 1.7,
 );
 
 TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(
-      fontSize: 18,
+      fontSize: AppType.title,
       fontWeight: FontWeight.bold,
       color: colors.primary,
     );

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
@@ -166,7 +167,7 @@ class _ReciterRow extends StatelessWidget {
       onTap: () => context.push(reciterSurahsPath(reciter.id)),
       leading: ArabicBadge(
         initial,
-        textStyle: const TextStyle(fontSize: 16),
+        textStyle: const TextStyle(fontSize: AppType.bodyLarge),
       ),
       title: Text(
         showTitle ? reciter.reciterName : reciter.moshafName,

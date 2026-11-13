@@ -238,7 +238,7 @@ class _AyahActions extends StatelessWidget {
           loc.ornateBrackets(loc.number(ayah.numberInSurah)),
           style: TextStyle(
             fontFamily: QuranFonts.meQuran,
-            fontSize: 16,
+            fontSize: AppType.bodyLarge,
             color: AppTheme.goldText(context),
           ),
           semanticsLabel: loc.ayahNumberLabel(loc.number(ayah.numberInSurah)),

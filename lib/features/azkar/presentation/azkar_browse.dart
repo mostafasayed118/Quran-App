@@ -158,7 +158,7 @@ class _SearchHitTile extends StatelessWidget {
           textAlign: TextAlign.right,
           style: const TextStyle(
             fontFamily: QuranFonts.meQuran,
-            fontSize: 16,
+            fontSize: AppType.bodyLarge,
             height: 1.8,
           ),
         ),
@@ -199,7 +199,7 @@ class _CollectionTile extends StatelessWidget {
             Text(
               loc.azkarItemsCount(loc.number(collection.items.length)),
               style: TextStyle(
-                fontSize: 12,
+                fontSize: AppType.caption,
                 color: colors.onSurfaceVariant,
               ),
             ),
