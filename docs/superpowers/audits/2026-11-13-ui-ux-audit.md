@@ -98,6 +98,29 @@ None observed in the capture set.
 
 ---
 
+## Second sweep — systematic checks (2026-11-13, pass 2)
+
+A second pass asked the same "extensive" question. Instead of more thumbnails, it ran greppable,
+countable checks over all 36 screens.
+
+| Check | Method | Result |
+|---|---|---|
+| Raw `Color(0x…)` outside `core/theme` | grep | **7**, all inside `splash_screen.dart` — a deliberately painted artwork screen. No token bypass elsewhere. |
+| `EdgeInsets.only(left:/right:)` | grep | **0**. RTL is direction-aware throughout. |
+| Icon-only buttons without a tooltip | scan of every `IconButton(` | **1** — the hadith search clear button. **Fixed**: `clearSearch` added to AR + EN and wired as its tooltip. |
+| `letterSpacing` | grep | 4 uses; three in the splash wordmark and one in `verse_card.dart:125` — **both Latin**. No Arabic tracking violation. |
+| Loading / error / empty coverage | all 36 `*_screen.dart` | Complete wherever data can be absent. The one gap the grep suggested (`bookmarks_screen`) delegates to `bookmarks_body.dart:55-64`, which has all three. |
+| Design-token adoption | count | **298** `AppSpacing` uses vs **4** raw `EdgeInsets.all(<n>)`; **16** `AppRadius` uses vs **14** raw radii. |
+| RTL affordance | device + source | The reciter row's leading badge sits on the **right** in RTL, as it should. The 50% contact sheet made it look left — the thumbnail lied a second time. |
+
+**The one open inconsistency:** 14 raw corner radii remain (`10`, `11`, `14`, `16`, `24`, `99`,
+plus a local `cardRadius = 30`), two of which pass a **spacing** token into `circular()`. Seven
+of them map onto existing tokens with zero pixel change; the rest are off-scale values that
+would shift by 1–2 px. Left as a documented follow-up: adopting tokens is maintenance, not a
+UX improvement, and it does not earn a wave on its own.
+
+---
+
 ## Contrast measurements — measured, not eyeballed
 
 WCAG 2.2, computed from the theme tokens (`lib/core/theme/app_colors.dart`).
@@ -147,9 +170,11 @@ buttons out of the way — and it landed in UI-1 after the owner unfroze the tes
 old interaction.
 
 **Pass result:** one behavioural improvement (the reader), one measurable accessibility fix
-(the light gold accent), and three findings withdrawn after full-resolution inspection. The
-app was in better shape than the first read suggested; that is worth saying plainly rather than
-manufacturing fixes to fill a list.
+(the light gold accent), one labelled control (the hadith search clear), and three findings
+withdrawn after full-resolution inspection. A second systematic sweep — raw colours, RTL
+insets, icon-button labels, tracking, state coverage, token adoption — found nothing else that
+survives verification. The app was in better shape than the first read suggested; that is worth
+saying plainly rather than manufacturing fixes to fill a list.
 
 ---
 

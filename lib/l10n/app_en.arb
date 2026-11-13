@@ -717,6 +717,7 @@
   },
   "hadithEmpty": "No hadith in this pack",
   "hadithSearchHint": "Search hadiths",
+  "clearSearch": "Clear search",
   "hadithSearchEmpty": "No results",
   "hadithBookmarks": "Saved hadiths",
   "hadithNoBookmarks": "No saved hadiths",
