@@ -131,7 +131,7 @@ class _Last7Row extends StatelessWidget {
                         ).weekday %
                         7],
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: AppType.micro,
                       color: i == 0 ? colors.primary : colors.outline,
                     ),
                   ),

@@ -259,7 +259,7 @@ class _HadithVerseRow extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 15, height: 1.8),
+              style: const TextStyle(fontSize: AppType.bodyLarge, height: 1.8),
               textDirection: direction,
             ),
           ),

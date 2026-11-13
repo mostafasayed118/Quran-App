@@ -133,7 +133,7 @@ class _DuasView extends StatelessWidget {
                   return DuaCard(
                     text: entry.text,
                     fontFamily: QuranFonts.meQuran,
-                    fontSize: 17,
+                    fontSize: AppType.title,
                     height: 1.8,
                     count: entry.count,
                     reference: entry.reference,
@@ -227,7 +227,7 @@ class DuaCard extends StatelessWidget {
                 citationText,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppType.caption,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.goldText(context),
                 ),

@@ -157,7 +157,8 @@ class _AssetTile extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               return SingleChildScrollView(
-                child: Text(text, style: const TextStyle(fontSize: 13)),
+                child: Text(text,
+                    style: const TextStyle(fontSize: AppType.caption)),
               );
             },
           ),

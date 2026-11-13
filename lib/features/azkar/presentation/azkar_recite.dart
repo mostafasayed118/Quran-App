@@ -114,7 +114,7 @@ class _ZikrLine extends StatelessWidget {
             // for Quran text (its word spacing and kashida suit a page).
             style: const TextStyle(
               fontFamily: QuranFonts.ui,
-              fontSize: 17,
+              fontSize: AppType.title,
               height: 2.1,
             ),
           ),

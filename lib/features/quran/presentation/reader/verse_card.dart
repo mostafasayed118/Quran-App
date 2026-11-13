@@ -69,7 +69,7 @@ class VerseCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.mushafCardAccent,
                       fontFamily: QuranFonts.ui,
-                      fontSize: 13,
+                      fontSize: AppType.caption,
                       fontWeight: FontWeight.w700,
                     ),
                   ),

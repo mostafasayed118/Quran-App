@@ -46,7 +46,7 @@ abstract final class AppTheme {
 
   static const TextStyle heroTitle = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 21,
+    fontSize: AppType.headline,
     fontWeight: FontWeight.bold,
     height: AppType.heroHeight,
   );
@@ -60,21 +60,21 @@ abstract final class AppTheme {
 
   static const TextStyle sectionLabel = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 13,
+    fontSize: AppType.body,
     fontWeight: FontWeight.bold,
     height: AppType.labelHeight,
   );
 
   static const TextStyle caption = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 13,
+    fontSize: AppType.caption,
     height: AppType.bodyHeight,
   );
 
   /// The one body-paragraph style shared by the state views.
   static const TextStyle bodyText = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 15,
+    fontSize: AppType.bodyLarge,
     height: AppType.relaxedHeight,
   );
 

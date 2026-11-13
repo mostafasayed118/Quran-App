@@ -262,7 +262,7 @@ class _SplashContent extends StatelessWidget {
                     'QURAN YAHDI',
                     style: TextStyle(
                       fontFamily: QuranFonts.ui,
-                      fontSize: 10.5,
+                      fontSize: AppType.caption,
                       letterSpacing: 4.2,
                       color: accent.withValues(alpha: .85),
                     ),

@@ -56,7 +56,7 @@ class TasbihScreen extends StatelessWidget {
                         loc.azkarDone,
                         style: TextStyle(
                           color: AppTheme.goldText(context),
-                          fontSize: 13,
+                          fontSize: AppType.caption,
                         ),
                       ),
                   ],
@@ -146,7 +146,7 @@ class _DialFace extends StatelessWidget {
         Text(
           '${loc.tasbihTarget}: ${loc.number(ready.target)}',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppType.caption,
             color: colors.onPrimaryContainer,
           ),
         ),

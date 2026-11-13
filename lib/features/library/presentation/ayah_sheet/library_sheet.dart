@@ -193,7 +193,7 @@ class _SheetHeader extends StatelessWidget {
             '$surahName ${loc.ornateBrackets(loc.number(ayah))}',
             style: TextStyle(
               fontFamily: QuranFonts.meQuran,
-              fontSize: 15,
+              fontSize: AppType.bodyLarge,
               color: AppTheme.goldText(context),
             ),
             textDirection: TextDirection.rtl,

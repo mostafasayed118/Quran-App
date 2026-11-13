@@ -189,7 +189,7 @@ class _CollectionTile extends StatelessWidget {
           collection.nameAr,
           style: const TextStyle(
             fontFamily: QuranFonts.meQuran,
-            fontSize: 19,
+            fontSize: AppType.titleLarge,
           ),
         ),
         subtitle: Text(collection.nameEn),

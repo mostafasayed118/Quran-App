@@ -157,7 +157,7 @@ class _MonthNavBar extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: AppType.bodyLarge,
             ),
           ),
         ),
@@ -234,7 +234,7 @@ class _DayCell extends StatelessWidget {
             Text(
               loc.number(cell.hDay),
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: AppType.bodyLarge,
                 fontWeight: FontWeight.w700,
               ),
             ),

@@ -7,27 +7,10 @@ import 'package:quran_yahdi/core/theme/app_type.dart';
 ///
 /// The list may only shrink: Task 2 removes the sub-11 entries, Task 3 the
 /// five 1 px-adjacent values, and the final task leaves it empty.
-const _exemptFiles = <String>{
-  'lib/app/splash_screen.dart',
-  'lib/features/azkar/presentation/azkar_browse.dart',
-  'lib/features/azkar/presentation/azkar_recite.dart',
-  'lib/features/duas/presentation/duas_screen.dart',
-  'lib/features/hijri/presentation/hijri_screen.dart',
-  'lib/features/library/presentation/ayah_sheet/library_sheet.dart',
-  'lib/features/library/presentation/hadith/hadith_screen.dart',
-  'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart',
-  'lib/features/qibla/presentation/qibla_dial.dart',
-  'lib/features/quran/presentation/reader/verse_card.dart',
-  'lib/features/recitation/presentation/playback/mini_player_bar.dart',
-  'lib/features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart',
-  'lib/features/settings/presentation/licenses_screen.dart',
-  'lib/features/tasbih/presentation/tasbih_screen.dart',
-  'lib/features/tracker/presentation/tracker_cards.dart',
-  'lib/features/zakat/presentation/zakat_screen.dart',
-};
+const _exemptFiles = <String>{};
 
 /// The off-ladder values those files still use. Shrinks with `_exemptFiles`.
-final _offLadderValues = <double>{10, 10.5, 13, 15, 17, 19, 21};
+final _offLadderValues = <double>{};
 
 /// A bare literal only: computed sizes (`AppType.x * scale`) are not matches.
 final _numericSize = RegExp(r'fontSize:\s*(\d+(?:\.\d+)?)\s*[,)]');

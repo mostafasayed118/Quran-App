@@ -20,7 +20,7 @@ const TextStyle _amountStyle = TextStyle(
   fontWeight: FontWeight.bold,
 );
 
-const TextStyle _lineLabelStyle = TextStyle(fontSize: 13);
+const TextStyle _lineLabelStyle = TextStyle(fontSize: AppType.caption);
 
 const TextStyle _lineValueStyle = TextStyle(
   fontWeight: FontWeight.bold,
