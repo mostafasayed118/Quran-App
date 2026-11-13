@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/next_prayer_focus.dart';
 import 'package:quran_yahdi/core/domain/prayer_name.dart';
