@@ -158,7 +158,7 @@ abstract final class AppTheme {
           bodyMedium: base.bodyMedium?.copyWith(
             fontSize: AppType.body,
             fontWeight: FontWeight.w400,
-            height: 1.45,
+            height: AppType.bodyHeight,
           ),
           bodySmall: base.bodySmall?.copyWith(
             fontSize: AppType.caption,
@@ -176,7 +176,7 @@ abstract final class AppTheme {
           labelSmall: base.labelSmall?.copyWith(
             fontSize: AppType.micro,
             fontWeight: FontWeight.w400,
-            height: 1.35,
+            height: AppType.labelHeight,
           ),
         )
         .apply(
