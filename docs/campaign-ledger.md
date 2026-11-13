@@ -1456,3 +1456,13 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Gates at `84a3f8df`:** format **849/0** · analyze **0** · suite **1628/1628**; CI **`43329611197` success** on the PR. Both changes verified on the device at 1.0 and 2.0.
 - **Lesson recorded in the audit:** four of the five original findings were judged from a contact sheet; three did not survive. The capture is the evidence; the thumbnail is not.
 
+### 2026-11-13 (e755acc7) — UI pass 2: one labelled control + the convergence record — e755acc7D ON MAIN (PR #43)
+
+- **Scope:** one commit on `wave/ui-pass-2` from `f846b049`; e755acc7 **`e755acc7`**. A second UI sweep that used greppable, countable checks over all **36** screens instead of another contact-sheet read.
+- **`621e429a` — a11y:** the hadith search field's clear (×) button was the app's **only** icon-only control without a label; a screen reader announced a bare button. `clearSearch` (`مسح البحث` / `Clear search`) added to both ARB files, the generated localizations regenerated, and the tooltip wired.
+- **Sweep results, all measured** (recorded in `docs/superpowers/audits/2026-11-13-ui-ux-audit.md`): **7** raw `Color(0x…)` — every one inside the splash artwork; **0** `EdgeInsets.only(left/right:)`; **1** unlabelled icon button (fixed here); **4** `letterSpacing` uses, all Latin, so no Arabic tracking violation; loading/error/empty coverage complete across 36 screens (the one grep-suggested gap, `bookmarks_screen`, delegates to `bookmarks_body.dart:55-64`, which has all three); design tokens **298** `AppSpacing` vs **4** raw values and **16** `AppRadius` vs **14** raw radii.
+- **Left as documented follow-up:** the 14 raw radii (plus a local `cardRadius = 30`). Seven map onto existing tokens at **zero pixel change**; the rest are off-scale and would shift 1–2 px. Adopting tokens here is maintenance, not a UX change, and does not earn a wave on its own.
+- **Process note:** the commit was first made directly on `main` (unpushed) and then moved to a wave branch before the push, per the branch policy.
+- **Gates at `621e429a`:** format **849/0** · analyze **0** · suite **1628/1628**; CI **`43337305886` success** on the PR.
+- **Convergence:** three audit passes have now produced two UX changes (reader density, light gold accent) and one a11y fix, with **three findings withdrawn** and nothing else surviving verification. The remaining work in this area is design decisions (theme hue, per-screen redesigns, new surfaces) or the store lane — not defects.
+
