@@ -1495,4 +1495,12 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Rejected on evidence:** adding `shimmer` or `skeletonizer`. `shimmer 4.0.0` is a paint effect that requires a hand-built placeholder per screen (thirty duplicated layouts) and now pulls the standalone `material_ui` package into a tree that is entirely `package:flutter/material.dart`; `skeletonizer 3.0.0` derives the skeleton from the real layout but needs fake data per list screen, and with local loads it would animate the same flash. Neither is worth a dependency grant here.
 - **Gates at `25528e0b`:** format **853/0** · analyze **0** · suite **1632/1632** (1630 + 2 for the schedule test); CI **`43507419412` success** on the PR. `test_harness_guard_test` stayed green by building the test through `test/support/host.dart` rather than a raw `MaterialApp`.
 - **Evidence note:** the schedule is pinned in a widget test, not eyeballed on a device; a one-frame flash is not reliably observable in a screen recording.
+### 2026-11-13 (follow-up) — the device A/B the widget test could not give
 
+- **Device:** Infinix X6882 (`13372704AR007777`), **light theme forced** for the measurement (`cmd uimode night no`), debug builds only. The owner's release install and its data were not touched.
+- **Method:** from the surah index, `input tap` on البقرة, then `screencap` immediately — the adb round trip lands about 150 ms after the tap. Metric: emerald (`#3E6B58`, the ring colour) pixels in a 220×220 box at the screen centre.
+- **Before (`626a9073`, rebuilt in debug):** **24 / 190 / 257 px** across three opens — a spinner arc painted on an otherwise blank body. Three for three.
+- **After (`49bd6a79`):** **0 / 0 / 0 px**. The same moment is blank; the ring is still inside its 160 ms hold.
+- **Positive control:** on a genuinely slow load (first-run home after `pm clear`) the ring **does** appear — frame at 8.8 s of a 60 fps screen recording. The fix delays the paint, it does not remove it.
+- **Release build (installed 2026-11-01, pre-fix):** the reader rendered content before the first capture, so the flash is not reproducible in release on this device. The user-visible defect is confined to slower loads; the fix costs nothing there and removes the paint on fast ones.
+- **Unchanged:** `test/loading_view_test.dart` remains the deterministic proof of the schedule; the device run only adds the end-to-end confirmation.
