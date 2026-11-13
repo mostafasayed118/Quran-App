@@ -161,7 +161,7 @@ class _AyahCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: bookmarked ? colors.secondary : Theme.of(context).dividerColor,
           width: bookmarked ? 1.4 : 1,

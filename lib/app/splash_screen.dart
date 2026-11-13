@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
+import '../core/theme/app_radius.dart';
 import '../core/theme/app_theme.dart';
 import '../l10n/app_localizations.dart';
 
@@ -186,7 +187,7 @@ class _SplashContent extends StatelessWidget {
                                     .withValues(alpha: ringAlpha1),
                                 width: 1.6,
                               ),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
                           ),
                         ),
@@ -201,7 +202,7 @@ class _SplashContent extends StatelessWidget {
                                     .withValues(alpha: ringAlpha2),
                                 width: 1.6,
                               ),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
                           ),
                         ),
@@ -324,7 +325,7 @@ class _LoadingTrack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(99),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
         child: SizedBox(
           width: width,
           height: 3,
