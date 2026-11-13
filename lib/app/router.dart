@@ -8,6 +8,7 @@ import '../core/domain/ayah_batch_lookup.dart';
 import '../core/domain/ayah_lookup.dart';
 import '../core/domain/city.dart';
 import '../core/domain/last_read.dart';
+import '../core/domain/next_prayer_focus.dart';
 import '../core/domain/onboarding_status.dart';
 import '../core/domain/prayer_config.dart';
 import '../core/domain/prayer_times.dart';
@@ -60,6 +61,7 @@ import '../features/prayer/data/city_repository.dart';
 import '../features/prayer/data/location_service.dart';
 import '../features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import '../features/prayer/presentation/city_picker/city_picker_screen.dart';
+import '../features/prayer/presentation/countdown/next_prayer_countdown_screen.dart';
 import '../features/prayer/presentation/prayer_config/prayer_config_cubit.dart';
 import '../features/prayer/presentation/prayer_config/prayer_config_screen.dart';
 import '../features/prayer/presentation/prayer_month/prayer_month_cubit.dart';
@@ -230,6 +232,14 @@ abstract final class AppRouter {
             identity: AppRoutes.juzIndex,
             start: (cubit) => cubit.start(),
             child: const JuzIndexScreen(),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.nextPrayerCountdown,
+          builder: (_, state) => NextPrayerCountdownScreen(
+            focus: state.extra is NextPrayerFocus
+                ? state.extra! as NextPrayerFocus
+                : null,
           ),
         ),
         GoRoute(

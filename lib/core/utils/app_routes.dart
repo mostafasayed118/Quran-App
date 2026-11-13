@@ -20,6 +20,7 @@ abstract final class AppRoutes {
   static const librarySearch = '/library/search';
   static const hadith = '/library/hadith';
   static const prayerTimes = '/prayer-times';
+  static const nextPrayerCountdown = '/prayer-times/next';
   static const prayerSettings = '/prayer-times/settings';
   static const prayerMonth = '/prayer-times/month';
   static const cityPicker = '/prayer-times/city';

@@ -318,7 +318,15 @@ class _TodayPanel extends StatelessWidget {
             ),
           ],
           InkWell(
-            onTap: () => context.push(AppRoutes.prayerTimes),
+            onTap: () => context.push(
+              AppRoutes.nextPrayerCountdown,
+              extra: NextPrayerFocus(
+                prayer: prayer.name,
+                time: prayer.time,
+                cityName: prayer.cityName,
+                timezone: timezone,
+              ),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: _PrayerBody(

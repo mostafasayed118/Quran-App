@@ -121,7 +121,25 @@ UX improvement, and it does not earn a wave on its own.
 
 ---
 
-## Contrast measurements — measured, not eyeballed
+## Pass 4 — the next-prayer focus view (2026-11-13)
+
+U-4 was accepted because the countdown's digits sit tight and every cheap fix was a dead end.
+The honest resolution was the one the finding itself named: **give the clock a surface where a
+purpose-built layout earns its cost.**
+
+| Piece | Detail |
+|---|---|
+| Route | `/prayer-times/next`, opened from the home panel's prayer row (the row used to jump straight to the times list; the times list is still one tap away from the new screen, and the bottom tab still goes there directly). |
+| Payload | `NextPrayerFocus` in `core/domain` — a feature-to-feature type would break the architecture guard. |
+| The clock | `formatDurationHms` still produces the string; the screen lays it out **one box per digit** with explicit gaps, so the pairs cannot collide at any text scale. The whole clock is one `Semantics` label, so a screen reader reads `٠١:٠٢:٠٣` rather than eight glyphs. |
+| The card | **Untouched.** The home card keeps its single `Text` and `home_dashboard_visual_test` keeps its pin — the premium layout lives on the surface that can afford it. |
+| Empty state | A route opened without a payload (deep link, restoration) explains and still offers the times list. |
+
+Two widget tests: the focus view renders the prayer, the city, the CTA and a clock whose
+semantics label matches `HH:MM:SS`; the payload-less route renders no clock.
+
+---
+
 
 WCAG 2.2, computed from the theme tokens (`lib/core/theme/app_colors.dart`).
 
@@ -208,6 +226,7 @@ saying plainly rather than manufacturing fixes to fill a list.
 | **UI-4** | Countdown numerals | S | **CLOSED — accepted as-is**: tracking and font-swap both tested and dead; per-digit layout costs a frozen test for a cosmetic delta |
 | **UI-5** | Dark-mode contrast sweep with measured pairs | M | **DONE** — light `secondary` failed 3:1 on every cream surface; `goldStrong` fixes it. Dark passed everywhere |
 | **UI-6** | Editorial chrome: app-bar hairline + ruled section headers | S | **DONE** — 1:1 before/after verified on device, both themes |
+| **UI-7** | The next-prayer focus view: one box per digit, one semantics label | M | **DONE** — home panel → `/prayer-times/next`; the card keeps its pinned single `Text` |
 
 **Lesson recorded:** four of the five findings were judged from a contact sheet. Three did not
 survive full-resolution inspection. The capture set is the evidence; the thumbnail is not.
