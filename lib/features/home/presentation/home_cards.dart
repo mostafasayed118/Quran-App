@@ -90,8 +90,12 @@ class _ContinueReadingCard extends StatelessWidget {
   }
 }
 
-class _NextPrayerCard extends StatelessWidget {
-  const _NextPrayerCard({
+/// The next-prayer body: label, name, wall-clock time, city and countdown.
+///
+/// Extracted from the old card so [_TodayPanel] can place it inside one
+/// surface with the continue-reading row.
+class _PrayerBody extends StatelessWidget {
+  const _PrayerBody({
     required this.prayer,
     this.timezone,
     this.cityNameEn,
@@ -105,106 +109,90 @@ class _NextPrayerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    return Card(
-      margin: EdgeInsets.zero,
-      color: colors.primaryContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.lgAll,
-        side: BorderSide(color: colors.primary.withValues(alpha: 0.18)),
-      ),
-      child: InkWell(
-        borderRadius: AppRadius.lgAll,
-        onTap: () => context.push(AppRoutes.prayerTimes),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const _IconBadge(icon: Icons.schedule, gold: true),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      loc.nextPrayer,
-                      style: AppTheme.caption.copyWith(
-                        color: colors.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
-                  const _Chevron(),
-                ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const _IconBadge(icon: Icons.schedule, gold: true),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                loc.nextPrayer,
+                style: AppTheme.caption.copyWith(
+                  color: colors.onPrimaryContainer,
+                ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          prayer.name.label(loc),
-                          style: AppTheme.heroTitle
-                              .copyWith(color: colors.onPrimaryContainer),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        // Time and city travel together so the block reads
-                        // "name, at this time, in this place" at a glance.
-                        Wrap(
-                          spacing: AppSpacing.xs,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              formatHm(
-                                cityWallClock(prayer.time, timezone),
-                                arabicIndic: loc.usesArabicIndicDigits,
-                              ),
-                              style: AppTheme.caption.copyWith(
-                                color: colors.onPrimaryContainer,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Icon(
-                              Icons.location_on_outlined,
-                              size: 13,
-                              color: colors.onPrimaryContainer
-                                  .withValues(alpha: 0.7),
-                            ),
-                            Text(
-                              loc.localeName == 'ar'
-                                  ? prayer.cityName
-                                  : (cityNameEn ?? prayer.cityName),
-                              style: AppTheme.caption.copyWith(
-                                color: colors.onPrimaryContainer
-                                    .withValues(alpha: 0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  // The countdown is the one number that moves; it gets the
-                  // opposite side of the card so the eye can find it without
-                  // scanning. It only scales down when a 2.0 text scale would
-                  // otherwise break the row.
-                  Flexible(
-                    flex: 4,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: AlignmentDirectional.centerStart,
-                      child: _LiveCountdown(target: prayer.time),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+            ),
+            const _Chevron(),
+          ],
         ),
-      ),
+        const SizedBox(height: AppSpacing.md),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    prayer.name.label(loc),
+                    style: AppTheme.heroTitle
+                        .copyWith(color: colors.onPrimaryContainer),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  // Time and city travel together so the block reads
+                  // "name, at this time, in this place" at a glance.
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        formatHm(
+                          cityWallClock(prayer.time, timezone),
+                          arabicIndic: loc.usesArabicIndicDigits,
+                        ),
+                        style: AppTheme.caption.copyWith(
+                          color: colors.onPrimaryContainer,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 13,
+                        color: colors.onPrimaryContainer.withValues(alpha: 0.7),
+                      ),
+                      Text(
+                        loc.localeName == 'ar'
+                            ? prayer.cityName
+                            : (cityNameEn ?? prayer.cityName),
+                        style: AppTheme.caption.copyWith(
+                          color:
+                              colors.onPrimaryContainer.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            // The countdown is the one number that moves; it gets the
+            // opposite side of the card so the eye can find it without
+            // scanning. It only scales down when a 2.0 text scale would
+            // otherwise break the row.
+            Flexible(
+              flex: 4,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: AlignmentDirectional.centerStart,
+                child: _LiveCountdown(target: prayer.time),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -274,6 +262,123 @@ class _NoCityCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// The home's focal panel: what you were reading and the prayer that is
+/// coming, on one surface with a hairline between them.
+///
+/// Two equal cards made the first screen read as a list of unrelated blocks.
+/// One panel with an internal division gives the page a single anchor without
+/// demoting either action — the editorial move the section headers already use.
+class _TodayPanel extends StatelessWidget {
+  const _TodayPanel({
+    required this.lastRead,
+    required this.prayer,
+    this.timezone,
+    this.cityNameEn,
+  });
+
+  final LastReadCard? lastRead;
+  final NextPrayerCard prayer;
+  final String? timezone;
+  final String? cityNameEn;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final lastRead = this.lastRead;
+    return Card(
+      margin: EdgeInsets.zero,
+      color: colors.primaryContainer,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: AppRadius.lgAll,
+        side: BorderSide(color: colors.primary.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (lastRead != null) ...[
+            InkWell(
+              onTap: () => context.push(quranReaderPath(
+                surah: lastRead.surahId,
+                ayah: lastRead.ayahNumber,
+              )),
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: _ContinueRow(lastRead: lastRead),
+              ),
+            ),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: colors.onPrimaryContainer.withValues(alpha: 0.12),
+            ),
+          ],
+          InkWell(
+            onTap: () => context.push(AppRoutes.prayerTimes),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: _PrayerBody(
+                prayer: prayer,
+                timezone: timezone,
+                cityNameEn: cityNameEn,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The continue-reading line inside [_TodayPanel].
+class _ContinueRow extends StatelessWidget {
+  const _ContinueRow({required this.lastRead});
+
+  final LastReadCard lastRead;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final chevron = Directionality.of(context) == TextDirection.rtl
+        ? Icons.chevron_left
+        : Icons.chevron_right;
+    return Row(
+      children: [
+        const _IconBadge(icon: Icons.menu_book_rounded),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                lastRead.surahName,
+                style: AppTheme.meQuranHead.copyWith(
+                  color: colors.onPrimaryContainer,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                loc.continueReadingAyah(loc.number(lastRead.ayahNumber)),
+                style: AppTheme.caption.copyWith(
+                  color: colors.onPrimaryContainer.withValues(alpha: 0.75),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Icon(
+          chevron,
+          color: colors.onPrimaryContainer.withValues(alpha: 0.6),
+        ),
+      ],
     );
   }
 }

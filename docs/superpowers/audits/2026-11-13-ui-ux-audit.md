@@ -161,6 +161,7 @@ shared chrome** instead: two widgets that appear on nearly every screen.
 |---|---|---|
 | `AppBarTheme.shape` gains a 1 px bottom hairline | **all 36 screens** | The bar was a flat cream strip bleeding into a cream page with no boundary. A hairline is structure, not elevation — the same reason the cards use borders rather than shadows. |
 | `SectionHeader` carries a rule from the label to the end of its row | **7 headers**: home ×3, settings→backup, reciters, reciter packs, adhan picker | A labelled group that stops mid-air reads as a stray caption; a ruled one reads as a page division. |
+| The home's two hero cards become **one "today" panel** with a hairline between the rows | the first screen and the store's first screenshot | Two equal cards made the page read as a list of unrelated blocks. One panel with an internal division gives the screen a single anchor without demoting either action — and it is compact enough that the third tile row is no longer cut by the navigation bar. |
 
 Verified at 1:1 on the device, before and after: the header rule is clearly visible in the
 crop, and the bar's line closes the top of every page. Dark mode uses `darkHairline`, so the
