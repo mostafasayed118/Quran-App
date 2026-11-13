@@ -219,6 +219,14 @@ abstract final class AppTheme {
             isLight ? AppColors.emeraldDark : AppColors.darkOnSurface,
         centerTitle: true,
         systemOverlayStyle: AppSystemUi.overlayStyle(brightness),
+        // A one-pixel hairline is what separates the bar from the page without
+        // adding a shadow or a second surface tone. Structure, not elevation.
+        shape: Border(
+          bottom: BorderSide(
+            color: isLight ? AppColors.hairline : AppColors.darkHairline,
+            width: 1,
+          ),
+        ),
       ),
       cardTheme: CardThemeData(
         color: colorScheme.surface,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/domain/next_prayer_focus.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/routing/route_observer.dart';
@@ -171,18 +172,20 @@ class _HomeScreenState extends State<HomeScreen>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (lastRead != null)
-                        _ContinueReadingCard(lastRead: lastRead),
-                      if (lastRead != null)
-                        const SizedBox(height: AppSpacing.sm),
                       if (nextPrayer != null)
-                        _NextPrayerCard(
+                        _TodayPanel(
+                          lastRead: lastRead,
                           prayer: nextPrayer,
                           timezone: cityTimezone,
                           cityNameEn: cityNameEn,
                         )
-                      else
+                      else ...[
+                        if (lastRead != null)
+                          _ContinueReadingCard(lastRead: lastRead),
+                        if (lastRead != null)
+                          const SizedBox(height: AppSpacing.sm),
                         const _NoCityCard(),
+                      ],
                       SectionHeader(title: loc.homeSectionQuran, inset: 0),
                       const _ServiceGrid(services: _quranServices),
                       SectionHeader(title: loc.homeSectionWorship, inset: 0),

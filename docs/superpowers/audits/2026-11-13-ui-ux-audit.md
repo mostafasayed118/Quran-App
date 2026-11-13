@@ -121,7 +121,25 @@ UX improvement, and it does not earn a wave on its own.
 
 ---
 
-## Contrast measurements — measured, not eyeballed
+## Pass 4 — the next-prayer focus view (2026-11-13)
+
+U-4 was accepted because the countdown's digits sit tight and every cheap fix was a dead end.
+The honest resolution was the one the finding itself named: **give the clock a surface where a
+purpose-built layout earns its cost.**
+
+| Piece | Detail |
+|---|---|
+| Route | `/prayer-times/next`, opened from the home panel's prayer row (the row used to jump straight to the times list; the times list is still one tap away from the new screen, and the bottom tab still goes there directly). |
+| Payload | `NextPrayerFocus` in `core/domain` — a feature-to-feature type would break the architecture guard. |
+| The clock | `formatDurationHms` still produces the string; the screen lays it out **one box per digit** with explicit gaps, so the pairs cannot collide at any text scale. The whole clock is one `Semantics` label, so a screen reader reads `٠١:٠٢:٠٣` rather than eight glyphs. |
+| The card | **Untouched.** The home card keeps its single `Text` and `home_dashboard_visual_test` keeps its pin — the premium layout lives on the surface that can afford it. |
+| Empty state | A route opened without a payload (deep link, restoration) explains and still offers the times list. |
+
+Two widget tests: the focus view renders the prayer, the city, the CTA and a clock whose
+semantics label matches `HH:MM:SS`; the payload-less route renders no clock.
+
+---
+
 
 WCAG 2.2, computed from the theme tokens (`lib/core/theme/app_colors.dart`).
 
@@ -149,6 +167,26 @@ ring and needle. Excluding decoration does not rescue it; the state colour itsel
 **Fix applied (UI-5):** a new `AppColors.goldStrong` (`#B06F18`) becomes the light `secondary`.
 Measured: **4.02 on the card, 3.38 on the page, 3.15 on the tiles** — all above 3:1, hue intact.
 Dark keeps `gold` (7.73). `goldText` (the light text role) is unchanged.
+
+---
+
+## Pass 3 — editorial chrome (2026-11-13)
+
+The first two passes hunted defects and converged. This pass changes the **design direction of
+shared chrome** instead: two widgets that appear on nearly every screen.
+
+| Change | Reach | Why |
+|---|---|---|
+| `AppBarTheme.shape` gains a 1 px bottom hairline | **all 36 screens** | The bar was a flat cream strip bleeding into a cream page with no boundary. A hairline is structure, not elevation — the same reason the cards use borders rather than shadows. |
+| `SectionHeader` carries a rule from the label to the end of its row | **7 headers**: home ×3, settings→backup, reciters, reciter packs, adhan picker | A labelled group that stops mid-air reads as a stray caption; a ruled one reads as a page division. |
+| The home's two hero cards become **one "today" panel** with a hairline between the rows | the first screen and the store's first screenshot | Two equal cards made the page read as a list of unrelated blocks. One panel with an internal division gives the screen a single anchor without demoting either action — and it is compact enough that the third tile row is no longer cut by the navigation bar. |
+
+Verified at 1:1 on the device, before and after: the header rule is clearly visible in the
+crop, and the bar's line closes the top of every page. Dark mode uses `darkHairline`, so the
+treatment holds in both themes.
+
+No text changed, no colour token changed, no layout dimension changed — the two edits are
+`app_theme.dart` (one `shape:` block) and `section_header.dart` (the row's trailing rule).
 
 ---
 
@@ -187,6 +225,8 @@ saying plainly rather than manufacturing fixes to fill a list.
 | **UI-3** | Settings hierarchy + tab strips | S | **DONE — nothing to fix**; both withdrawn |
 | **UI-4** | Countdown numerals | S | **CLOSED — accepted as-is**: tracking and font-swap both tested and dead; per-digit layout costs a frozen test for a cosmetic delta |
 | **UI-5** | Dark-mode contrast sweep with measured pairs | M | **DONE** — light `secondary` failed 3:1 on every cream surface; `goldStrong` fixes it. Dark passed everywhere |
+| **UI-6** | Editorial chrome: app-bar hairline + ruled section headers | S | **DONE** — 1:1 before/after verified on device, both themes |
+| **UI-7** | The next-prayer focus view: one box per digit, one semantics label | M | **DONE** — home panel → `/prayer-times/next`; the card keeps its pinned single `Text` |
 
 **Lesson recorded:** four of the five findings were judged from a contact sheet. Three did not
 survive full-resolution inspection. The capture set is the evidence; the thumbnail is not.
