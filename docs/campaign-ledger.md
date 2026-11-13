@@ -1485,3 +1485,14 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Gates at `605713c3`:** format **0** · analyze **0** · suite **1630/1630**; CI **`43496649693` success** on the PR.
 - **Process note:** the commit was made directly on `main` and moved to a wave branch before the push — the same correction as UI pass 2. Twice is a habit; the branch must be cut first.
 
+### 2026-11-13 (4eaf46cb) — Loading pass: no spinner flash on fast loads — 4eaf46cbD ON MAIN (PR #46)
+
+- **Scope:** one commit on `wave/loading-no-flash` from `626a9073`; 4eaf46cb **`4eaf46cb`**, branch deleted on origin.
+- **The defect:** `LoadingView` is the body of **thirty routes**, and every one painted a centered spinner immediately. The data behind a route here is a local drift database or a bundled asset, so the load usually finishes in a frame or two — the ring flashed and vanished. Motion the eye catches, information it does not get.
+- **`25528e0b`:** the ring now holds **invisible for the first 160 ms** of a 320 ms implicit fade (`TweenAnimationBuilder` + `Interval(0.5, 1, curve: Curves.easeOut)`), then fades in. A fast load never paints it; a slow one gets a soft entrance instead of a pop. The indicator stays in the tree, so `find.byType(CircularProgressIndicator)` and assistive technology still see a loading state — only the paint is held back.
+- **Why an animation and not a delayed reveal:** a `Timer` left pending fails `flutter_test` and would have forced an edit to `hadith_state_views_test`, a **Class A** pin. The `Interval` hold gives the same schedule with nothing to cancel and no test touched.
+- **Left alone on purpose:** the seven inline 20 px spinners (quran search, bookmarks pagination, the "my location" button, mini-player buffering, downloads, share sheet, licenses). They answer a direct tap or track real progress and should appear immediately.
+- **Rejected on evidence:** adding `shimmer` or `skeletonizer`. `shimmer 4.0.0` is a paint effect that requires a hand-built placeholder per screen (thirty duplicated layouts) and now pulls the standalone `material_ui` package into a tree that is entirely `package:flutter/material.dart`; `skeletonizer 3.0.0` derives the skeleton from the real layout but needs fake data per list screen, and with local loads it would animate the same flash. Neither is worth a dependency grant here.
+- **Gates at `25528e0b`:** format **853/0** · analyze **0** · suite **1632/1632** (1630 + 2 for the schedule test); CI **`43507419412` success** on the PR. `test_harness_guard_test` stayed green by building the test through `test/support/host.dart` rather than a raw `MaterialApp`.
+- **Evidence note:** the schedule is pinned in a widget test, not eyeballed on a device; a one-frame flash is not reliably observable in a screen recording.
+
