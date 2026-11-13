@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
+import '../theme/app_radius.dart';
 
 /// RTL-aligned search input with the shared filled-pill decoration.
 class SearchField extends StatelessWidget {
@@ -37,7 +37,7 @@ class SearchField extends StatelessWidget {
             .secondary
             .withValues(alpha: AppColors.fieldTintAlpha),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.md),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           borderSide: BorderSide.none,
         ),
       ),

@@ -54,7 +54,7 @@ class _RecitingCard extends StatelessWidget {
       child: Card(
         color: done ? colors.surfaceContainerHighest : null,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.md),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           onTap: done
               ? null
               : () {

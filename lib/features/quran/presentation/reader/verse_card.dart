@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/deep_links.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -42,14 +44,14 @@ class VerseCard extends StatelessWidget {
       textDirection: TextDirection.rtl,
       child: Container(
         width: width,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             colors: [AppColors.mushafCardTop, AppColors.mushafCardBottom],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
           ),
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
               color: AppColors.mushafCardAccent.withValues(alpha: 0.35)),
         ),
