@@ -154,6 +154,39 @@ and the system text scale to the **largest allowed** value (2.0), and capture
 at 360 dp width on the phone. The **same entry, scale and width** are used for
 the before and after pair; record them with the shots.
 
+## W2 worst-case entries (chosen before the session)
+
+Selected by programmatic maximum text length from the shipped data on
+2026-11-15, before any screenshot. The entries are fixed; if one is not
+reachable, record why and take the next entry **by the same maximum-length
+rule**, chosen before the shot — not by appearance.
+
+| screen | entry | length | note |
+|---|---|---|---|
+| duas | `d26` — دعاء الهم والحزن (`الهم والكرب`) | 409 chars | longest `text` in `assets/data/duas.json` |
+| azkar | `collections[id=evening].items[0]` — «أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ…» | 454 chars | the **recite** surface (`dhikrHeight`), not the collection list |
+| asma | `n=76` — الْبَاطِنُ / «العالم بالخفايا الذي لا يبلغه إدراك» | 35 chars | longest `meaningAr`; the grid card's text |
+| hadith | `ara-bukhari` #2731 | 14,114 chars | longest `text` in the pinned pack edition (`df57907…`) |
+
+- The hadith pack is `ara-bukhari` (catalog v1.2, edition `df57907…`, 9.4 MB).
+  Install it **before** the before shot; it is app data, not a new build.
+- Text scale 2.0 and 360 dp width apply to every entry; the same entry is used
+  for before and after.
+
+## Shipped build identity (before shots)
+
+The before shots must come from the installed **release 2006**. The matching
+local artifact is `build/app/outputs/flutter-apk/app-release.apk`:
+
+- package `com.mostafasayed.quranyahdi`, versionCode **2006**;
+- size 49,660,720 bytes, built 2026-11-14 18:04;
+- SHA-256 `28e4cc65e8853e2da1aaa7dd1827faf3055332375b2e68fcae274552873e8ce6`.
+
+The APK does not embed the source SHA. Record the installed version and this
+artifact hash at capture; if the source SHA is not recoverable from the
+artifact, say so — do not substitute the current `main` SHA as if it were the
+build's source.
+
 ## Device session order (W2 + deferred periods)
 
 1. On the shipped `fixed` build: capture the W2 **before** shots on the
