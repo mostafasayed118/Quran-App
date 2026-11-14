@@ -57,6 +57,10 @@ void main() {
     );
   });
 
+  test('pins the shipped follow-up offsets', () {
+    expect(kFajrFollowUpMinutes, <int>[5, 10]);
+  });
+
   test('enabling it adds exactly two bounded nudges after Fajr', () {
     final plan = planPrayerHorizon(
       now: now,
@@ -71,9 +75,16 @@ void main() {
           reminder,
     ]..sort((a, b) => a.fireAt.compareTo(b.fireAt));
 
-    expect(followUps, hasLength(2));
+    expect(followUps, hasLength(kFajrFollowUpMinutes.length));
     expect(followUps[0].fireAt, DateTime(2026, 11, 6, 4, 50));
     expect(followUps[1].fireAt, DateTime(2026, 11, 6, 4, 55));
+    expect(
+      followUps.map(
+        (reminder) =>
+            reminder.fireAt.difference(DateTime(2026, 11, 6, 4, 45)).inMinutes,
+      ),
+      kFajrFollowUpMinutes,
+    );
     expect(followUps[0].title, 'Fajr reminder');
     expect(followUps[0].payload, prayerReminderPayload);
   });

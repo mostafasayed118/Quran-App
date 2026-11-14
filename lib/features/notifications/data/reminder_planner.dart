@@ -71,9 +71,18 @@ int preAdhanAlarmId(DateTime day, PrayerName name) {
 /// Reserved id block for the optional Fajr follow-up nudges.
 const int _horizonFajrFollowUpBase = 3000;
 
-/// The [index]-th follow-up of Fajr on [day]: 0 = +5 min, 1 = +10 min.
+/// The Fajr follow-up nudges, in minutes after the adhan.
+///
+/// The planner iterates this list; a third nudge is a one-line change here, and
+/// [fajrFollowUpAlarmId] reads the same length for its bound.
+const List<int> kFajrFollowUpMinutes = <int>[5, 10];
+
+/// The [index]-th follow-up of Fajr on [day], at [kFajrFollowUpMinutes].
 int fajrFollowUpAlarmId(DateTime day, int index) {
-  assert(index >= 0 && index < 2, 'the Fajr follow-up is two nudges');
+  assert(
+    index >= 0 && index < kFajrFollowUpMinutes.length,
+    'the Fajr follow-up index must be in kFajrFollowUpMinutes',
+  );
   return _horizonFajrFollowUpBase + _horizonSlot(day) * 10 + index;
 }
 
@@ -272,8 +281,10 @@ List<ScheduledReminder> planPrayerHorizon({
       // passed can still have a +10 nudge ahead.
       final followUpTitle = texts.fajrFollowUpTitle;
       if (followUpTitle != null && choice.name == PrayerName.fajr) {
-        for (var i = 0; i < 2; i++) {
-          final fireAt = choice.time.add(Duration(minutes: 5 * (i + 1)));
+        for (var i = 0; i < kFajrFollowUpMinutes.length; i++) {
+          final fireAt = choice.time.add(
+            Duration(minutes: kFajrFollowUpMinutes[i]),
+          );
           if (!fireAt.isAfter(now)) continue;
           out.add(
             ScheduledReminder(
