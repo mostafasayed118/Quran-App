@@ -53,7 +53,8 @@ class _TomorrowNote extends StatelessWidget {
                         arabicIndic: loc.usesArabicIndicDigits,
                       ),
                     ),
-                    style: AppTheme.cardTitle.copyWith(fontSize: 15),
+                    style: AppTheme.cardTitle
+                        .copyWith(fontSize: AppType.bodyLarge),
                   ),
                   if (remaining != null) ...[
                     const SizedBox(height: 2),

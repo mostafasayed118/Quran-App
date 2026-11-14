@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -15,15 +16,15 @@ import 'zakat_state.dart';
 const int _amountDecimals = 2;
 
 const TextStyle _amountStyle = TextStyle(
-  fontSize: 28,
+  fontSize: AppType.stat,
   fontWeight: FontWeight.bold,
 );
 
-const TextStyle _lineLabelStyle = TextStyle(fontSize: 13);
+const TextStyle _lineLabelStyle = TextStyle(fontSize: AppType.caption);
 
 const TextStyle _lineValueStyle = TextStyle(
   fontWeight: FontWeight.bold,
-  fontSize: 14,
+  fontSize: AppType.body,
 );
 
 class ZakatScreen extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_system_ui.dart';
+import 'app_type.dart';
 
 abstract final class QuranFonts {
   static const quran = 'HafsSmart';
@@ -12,19 +13,25 @@ abstract final class QuranFonts {
 
 abstract final class AppTheme {
   static const TextStyle meQuranHead =
-      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 20);
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.titleLarge);
 
   /// City and degree headings rendered in the meQuran face.
   static const TextStyle meQuranTitle =
-      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: 18);
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.title);
 
-  static const TextStyle hafsAyah =
-      TextStyle(fontFamily: QuranFonts.quran, fontSize: 24, height: 2);
+  static const TextStyle hafsAyah = TextStyle(
+      fontFamily: QuranFonts.quran,
+      fontSize: AppType.quranVerse,
+      height: AppType.quranHeight);
+
+  /// The verse card's ayah number; the reader multiplies it by its own scale.
+  static const TextStyle ayahNumber =
+      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.ayahNumber);
 
   /// Bold Latin-font row title used by the reciter lists.
   static const TextStyle rowTitle = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 16,
+    fontSize: AppType.bodyLarge,
     fontWeight: FontWeight.bold,
   );
 
@@ -36,43 +43,43 @@ abstract final class AppTheme {
   /// size and colour for hierarchy instead of a weight the font cannot draw.
   static const TextStyle heroValue = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 30,
+    fontSize: AppType.heroValue,
     fontWeight: FontWeight.bold,
-    height: 1.15,
+    height: AppType.displayHeight,
   );
 
   static const TextStyle heroTitle = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 21,
+    fontSize: AppType.headline,
     fontWeight: FontWeight.bold,
-    height: 1.25,
+    height: AppType.heroHeight,
   );
 
   static const TextStyle cardTitle = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 16,
+    fontSize: AppType.bodyLarge,
     fontWeight: FontWeight.bold,
-    height: 1.35,
+    height: AppType.cardHeight,
   );
 
   static const TextStyle sectionLabel = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 13,
+    fontSize: AppType.body,
     fontWeight: FontWeight.bold,
-    height: 1.4,
+    height: AppType.labelHeight,
   );
 
   static const TextStyle caption = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 13,
-    height: 1.5,
+    fontSize: AppType.caption,
+    height: AppType.bodyHeight,
   );
 
   /// The one body-paragraph style shared by the state views.
   static const TextStyle bodyText = TextStyle(
     fontFamily: QuranFonts.ui,
-    fontSize: 15,
-    height: 1.6,
+    fontSize: AppType.bodyLarge,
+    height: AppType.relaxedHeight,
   );
 
   /// Shared content padding for tappable list rows.
@@ -85,7 +92,7 @@ abstract final class AppTheme {
           : AppColors.gold;
 
   static TextStyle mutedFootnote(BuildContext context) => TextStyle(
-        fontSize: 11,
+        fontSize: AppType.micro,
         color: Theme.of(context).colorScheme.onSurfaceVariant,
       );
 
@@ -121,55 +128,55 @@ abstract final class AppTheme {
     return base
         .copyWith(
           headlineMedium: base.headlineMedium?.copyWith(
-            fontSize: 28,
+            fontSize: AppType.stat,
             fontWeight: FontWeight.w700,
           ),
           headlineSmall: base.headlineSmall?.copyWith(
-            fontSize: 24,
+            fontSize: AppType.headlineLarge,
             fontWeight: FontWeight.w700,
           ),
           titleLarge: base.titleLarge?.copyWith(
-            fontSize: 22,
+            fontSize: AppType.headline,
             // AppBar titles stay regular: the app's headers are already
             // centered and heavy enough; bolding every one of them is a
             // restyle, not a consistency fix.
             fontWeight: FontWeight.w400,
           ),
           titleMedium: base.titleMedium?.copyWith(
-            fontSize: 16,
+            fontSize: AppType.bodyLarge,
             fontWeight: FontWeight.w700,
           ),
           titleSmall: base.titleSmall?.copyWith(
-            fontSize: 14,
+            fontSize: AppType.body,
             fontWeight: FontWeight.w700,
           ),
           bodyLarge: base.bodyLarge?.copyWith(
-            fontSize: 16,
+            fontSize: AppType.bodyLarge,
             fontWeight: FontWeight.w400,
-            height: 1.5,
+            height: AppType.bodyHeight,
           ),
           bodyMedium: base.bodyMedium?.copyWith(
-            fontSize: 14,
+            fontSize: AppType.body,
             fontWeight: FontWeight.w400,
-            height: 1.45,
+            height: AppType.bodyHeight,
           ),
           bodySmall: base.bodySmall?.copyWith(
-            fontSize: 12,
+            fontSize: AppType.caption,
             fontWeight: FontWeight.w400,
-            height: 1.4,
+            height: AppType.labelHeight,
           ),
           labelLarge: base.labelLarge?.copyWith(
-            fontSize: 14,
+            fontSize: AppType.body,
             fontWeight: FontWeight.w400,
           ),
           labelMedium: base.labelMedium?.copyWith(
-            fontSize: 12,
+            fontSize: AppType.caption,
             fontWeight: FontWeight.w400,
           ),
           labelSmall: base.labelSmall?.copyWith(
-            fontSize: 11,
+            fontSize: AppType.micro,
             fontWeight: FontWeight.w400,
-            height: 1.35,
+            height: AppType.labelHeight,
           ),
         )
         .apply(
@@ -258,8 +265,8 @@ abstract final class AppTheme {
         backgroundColor: colorScheme.surface,
         contentTextStyle: TextStyle(
           fontFamily: QuranFonts.ui,
-          fontSize: 14,
-          height: 1.6,
+          fontSize: AppType.body,
+          height: AppType.relaxedHeight,
           color: colorScheme.onSurface,
         ),
         actionTextColor: isLight ? AppColors.goldText : AppColors.gold,

@@ -86,7 +86,7 @@ class _DialPainter extends CustomPainter {
         text: TextSpan(
           text: entry.$2,
           style: TextStyle(
-            fontSize: 10.5,
+            fontSize: AppType.micro,
             fontWeight: FontWeight.bold,
             color: entry.$1 == 0 ? colors.primary : colors.onSurfaceVariant,
             fontFamily: AppTheme.sectionLabel.fontFamily,

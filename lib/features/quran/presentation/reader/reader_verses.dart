@@ -203,6 +203,7 @@ class _AyahCard extends StatelessWidget {
               surahName: surahName,
               bookmarked: bookmarked,
               open: actionsOpen,
+              fontScale: fontScale,
               onToggle: onToggle,
             ),
           ],
@@ -218,6 +219,7 @@ class _AyahActions extends StatelessWidget {
     required this.surahName,
     required this.bookmarked,
     required this.open,
+    required this.fontScale,
     required this.onToggle,
   });
 
@@ -225,25 +227,31 @@ class _AyahActions extends StatelessWidget {
   final String surahName;
   final bool bookmarked;
   final bool open;
+
+  /// The reader's own size setting; the number tracks the ayah text.
+  final double fontScale;
+
   final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    return Row(
-      textDirection: TextDirection.rtl,
+    // A Wrap, not a Row: at fontScale 2.0 x textScaler 2.0 the badge and the
+    // four 48 dp buttons cannot share 320 dp, so the buttons drop to a second
+    // line and the card grows inside the scroll list. The badge never shrinks.
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
           loc.ornateBrackets(loc.number(ayah.numberInSurah)),
-          style: TextStyle(
-            fontFamily: QuranFonts.meQuran,
-            fontSize: 16,
+          style: AppTheme.ayahNumber.copyWith(
+            fontSize: AppTheme.ayahNumber.fontSize! * fontScale,
             color: AppTheme.goldText(context),
           ),
           semanticsLabel: loc.ayahNumberLabel(loc.number(ayah.numberInSurah)),
         ),
-        const Spacer(),
         // Only the buttons collapse; the ayah number is part of reading and
         // stays visible (the 2.0 probe reads its semantics label).
         AnimatedSize(

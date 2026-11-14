@@ -3,6 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/theme/app_type.dart';
 import '../../../core/utils/insets.dart';
 import '../../../core/widgets/app_content_frame.dart';
 import '../../../core/widgets/section_header.dart';
@@ -103,7 +104,7 @@ class _InfoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(text, style: const TextStyle(fontSize: 14)),
+      title: Text(text, style: const TextStyle(fontSize: AppType.body)),
     );
   }
 }
@@ -125,7 +126,7 @@ class _AssetTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(title, style: const TextStyle(fontSize: 14)),
+      title: Text(title, style: const TextStyle(fontSize: AppType.body)),
       subtitle: Text(action),
       trailing: Icon(
         Directionality.of(context) == TextDirection.rtl
@@ -156,7 +157,8 @@ class _AssetTile extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               return SingleChildScrollView(
-                child: Text(text, style: const TextStyle(fontSize: 13)),
+                child: Text(text,
+                    style: const TextStyle(fontSize: AppType.caption)),
               );
             },
           ),

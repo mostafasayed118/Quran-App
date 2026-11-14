@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/utils/pager_icons.dart';
 import '../../../../core/widgets/app_content_frame.dart';
@@ -156,7 +157,7 @@ class _MonthNavBar extends StatelessWidget {
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: AppType.bodyLarge,
             ),
           ),
         ),
@@ -233,14 +234,14 @@ class _DayCell extends StatelessWidget {
             Text(
               loc.number(cell.hDay),
               style: const TextStyle(
-                fontSize: 15,
+                fontSize: AppType.bodyLarge,
                 fontWeight: FontWeight.w700,
               ),
             ),
             Text(
               loc.number(cell.gDay),
               style: TextStyle(
-                fontSize: 11,
+                fontSize: AppType.micro,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),

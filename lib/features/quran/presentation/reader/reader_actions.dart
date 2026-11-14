@@ -31,7 +31,7 @@ class ReaderView extends StatelessWidget {
                     loc.basmala,
                     style: TextStyle(
                       fontFamily: QuranFonts.meQuran,
-                      fontSize: 22,
+                      fontSize: AppType.headline,
                       color: AppTheme.goldText(context),
                     ),
                     textDirection: TextDirection.rtl,

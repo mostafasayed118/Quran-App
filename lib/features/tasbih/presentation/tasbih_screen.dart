@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/app_toast.dart';
@@ -55,7 +56,7 @@ class TasbihScreen extends StatelessWidget {
                         loc.azkarDone,
                         style: TextStyle(
                           color: AppTheme.goldText(context),
-                          fontSize: 13,
+                          fontSize: AppType.caption,
                         ),
                       ),
                   ],
@@ -135,7 +136,7 @@ class _DialFace extends StatelessWidget {
             child: Text(
               loc.number(ready.count),
               style: TextStyle(
-                fontSize: 56,
+                fontSize: AppType.counter,
                 fontWeight: FontWeight.bold,
                 color: colors.onPrimaryContainer,
               ),
@@ -145,7 +146,7 @@ class _DialFace extends StatelessWidget {
         Text(
           '${loc.tasbihTarget}: ${loc.number(ready.target)}',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: AppType.caption,
             color: colors.onPrimaryContainer,
           ),
         ),

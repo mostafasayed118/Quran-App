@@ -6,6 +6,7 @@ import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/arabic_numbers.dart';
 import '../../../../core/utils/city_clock.dart';
@@ -83,7 +84,7 @@ class _FocusHeader extends StatelessWidget {
           textAlign: TextAlign.center,
           style: AppTheme.heroTitle.copyWith(
             color: colors.onSurface,
-            fontSize: 40,
+            fontSize: AppType.timerLarge,
           ),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -162,7 +163,7 @@ class _DigitClock extends StatelessWidget {
                               ':',
                               style: AppTheme.heroTitle.copyWith(
                                 color: colors.onSurfaceVariant,
-                                fontSize: 34,
+                                fontSize: AppType.countdownDigit,
                               ),
                             ),
                           )
@@ -173,7 +174,7 @@ class _DigitClock extends StatelessWidget {
                               rune,
                               style: AppTheme.heroTitle.copyWith(
                                 color: colors.onSurface,
-                                fontSize: 44,
+                                fontSize: AppType.timerHuge,
                                 height: 1.1,
                               ),
                             ),

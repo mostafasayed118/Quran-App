@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
@@ -132,7 +133,7 @@ class _DuasView extends StatelessWidget {
                   return DuaCard(
                     text: entry.text,
                     fontFamily: QuranFonts.meQuran,
-                    fontSize: 17,
+                    fontSize: AppType.title,
                     height: 1.8,
                     count: entry.count,
                     reference: entry.reference,
@@ -173,7 +174,7 @@ class _RuqyahView extends StatelessWidget {
               // Quranic quotations keep the mushaf face; the supplication
               // prose reads in the UI face.
               fontFamily: entry.isQuran ? QuranFonts.quran : QuranFonts.ui,
-              fontSize: entry.isQuran ? 18 : 16,
+              fontSize: entry.isQuran ? AppType.title : AppType.bodyLarge,
               height: entry.isQuran ? 2.0 : 2.1,
               citation: citation == null
                   ? null
@@ -226,7 +227,7 @@ class DuaCard extends StatelessWidget {
                 citationText,
                 textAlign: TextAlign.right,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: AppType.caption,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.goldText(context),
                 ),
@@ -247,7 +248,7 @@ class DuaCard extends StatelessWidget {
                   loc.duaRepeat(loc.number(repeatCount)),
                   textAlign: TextAlign.right,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: AppType.caption,
                     color: colors.onSurfaceVariant,
                   ),
                 ),

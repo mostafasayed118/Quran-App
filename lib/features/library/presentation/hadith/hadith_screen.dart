@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/widgets/app_content_frame.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_pane.dart';
@@ -248,7 +249,7 @@ class _HadithVerseRow extends StatelessWidget {
                   fit: BoxFit.scaleDown,
                   child: Text(
                     loc.number(number),
-                    style: const TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: AppType.caption),
                   ),
                 ),
               ),
@@ -258,7 +259,7 @@ class _HadithVerseRow extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 15, height: 1.8),
+              style: const TextStyle(fontSize: AppType.bodyLarge, height: 1.8),
               textDirection: direction,
             ),
           ),

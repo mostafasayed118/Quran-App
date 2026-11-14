@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/error_strip.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -165,7 +166,8 @@ class _TrackInfo extends StatelessWidget {
           loc.nowPlaying(reciterName),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          style: const TextStyle(
+              fontWeight: FontWeight.bold, fontSize: AppType.caption),
         ),
         Text(
           surahName.isEmpty

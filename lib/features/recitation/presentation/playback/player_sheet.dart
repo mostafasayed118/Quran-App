@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
 import '../../../../core/widgets/app_sheet.dart';
 import '../../../../l10n/app_localizations.dart';
@@ -213,7 +214,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: AppType.bodyLarge,
                   ),
                 ),
                 const SizedBox(height: 2),
