@@ -194,9 +194,9 @@ abstract final class AppTheme {
       primary: isLight ? AppColors.emerald : AppColors.emeraldLight,
       onPrimary: isLight ? AppColors.cardBackground : AppColors.ink,
       secondary: isLight ? AppColors.goldStrong : AppColors.gold,
-      // Gold is a light accent: white on it is ~2.2:1. Ink keeps the token
-      // usable if a component ever puts text on `secondary`.
-      onSecondary: AppColors.ink,
+      // Gold is a light accent: ink on it measures 3.47:1 in the light theme,
+      // so white is used for text on a gold fill (5.0:1). Dark keeps the ink.
+      onSecondary: isLight ? AppColors.cardBackground : AppColors.ink,
       surface: isLight ? AppColors.cardBackground : AppColors.darkSurface,
       onSurface: isLight ? AppColors.ink : AppColors.darkOnSurface,
       // The generated container roles are cool mint; the brand highlight is a

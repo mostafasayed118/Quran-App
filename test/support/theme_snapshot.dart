@@ -10,7 +10,8 @@ const Map<String, Map<String, Color>> shippedThemeRoles = {
     'primary': Color(0xFF3E6B58),
     'onPrimary': Color(0xFFFFFDF7),
     'secondary': Color(0xFFB06F18),
-    'onSecondary': Color(0xFF232D28),
+    // intended delta (W0.2): white on the light gold, 3.47 -> 5.0.
+    'onSecondary': Color(0xFFFFFDF7),
     'surface': Color(0xFFFFFDF7),
     'onSurface': Color(0xFF232D28),
     'onSurfaceVariant': Color(0xFF404944),
