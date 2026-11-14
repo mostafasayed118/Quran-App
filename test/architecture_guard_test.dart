@@ -47,6 +47,8 @@ const Map<String, String> appLayerFiles = {
   'lib/app/di/injector_app_registrations.dart': 'app-level registrations',
   'lib/app/di/injector_feature_registrations.dart': 'feature registrations',
   'lib/app/onboarding_gate.dart': 'router-facing first-run redirect',
+  'lib/app/prayer_period_controller.dart':
+      'derives the prayer period for the chrome and re-arms its boundary timer',
   'lib/app/reminder_background_task.dart': 'WorkManager entry point',
   'lib/app/reminder_plan_freshness.dart': 'guards a redundant reminder re-plan',
   'lib/app/route_observer.dart': 'navigation observer',

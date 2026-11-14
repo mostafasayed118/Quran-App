@@ -127,6 +127,16 @@ void _registerPrayerAndNotifications(
   getIt.registerLazySingleton<CityRepository>(
       () => CityRepository(db: db, loader: citiesLoader ?? _emptyCitiesLoader));
   getIt.registerLazySingleton<CitySource>(() => getIt<CityRepository>());
+  // The chrome's period source. It reads the same ports the prayer screen
+  // does, and listens to the concrete repository's change signal (the port
+  // deliberately has none: eighteen test fakes implement it).
+  getIt.registerLazySingleton<PrayerPeriodController>(
+      () => PrayerPeriodController(
+            city: getIt<CitySource>(),
+            times: getIt<PrayerTimesPort>(),
+            config: getIt<PrayerConfigSource>(),
+            cityChanges: getIt<CityRepository>().changes,
+          ));
 }
 
 void _registerWorship(

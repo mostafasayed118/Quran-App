@@ -16,6 +16,7 @@ import 'package:quran_yahdi/features/ramadan/data/qada_repository.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'package:quran_yahdi/features/settings/data/app_locale_repository.dart';
 import 'package:quran_yahdi/features/settings/data/app_theme_repository.dart';
+import 'package:quran_yahdi/features/settings/data/prayer_skin_repository.dart';
 import 'package:quran_yahdi/features/tasbih/data/tasbih_repository.dart';
 
 /// Inventory pin (Class B): **every user preference the app persists must be
@@ -31,6 +32,7 @@ void main() {
   const deviceScopedKeys = <String>{
     AppLocaleRepository.key,
     AppThemeRepository.key,
+    PrayerSkinRepository.key,
     OnboardingRepository.completedKey,
   };
 
@@ -140,6 +142,7 @@ void main() {
       AzkarSavedStateRepository.progressKey,
       AzkarSavedStateRepository.favoritesKey,
       selectedMoshafKey,
+      PrayerSkinRepository.key,
     ]) {
       expect(kBackupReminderRelevantKeys, isNot(contains(key)));
     }

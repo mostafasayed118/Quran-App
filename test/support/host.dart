@@ -8,7 +8,9 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 /// Canonical MaterialApp shell shared by widget tests (locale ar/en, app
 /// theme, l10n delegates). [wrap] applies around the MaterialApp so cubit
 /// providers keep their original topology (wrap-outside vs inside [home]);
-/// [textScale] non-null mirrors the text-scale probes' MediaQuery builder.
+/// [textScale] non-null mirrors the text-scale probes' MediaQuery builder;
+/// [theme] replaces the shipped light theme (prayer-palette tests), so the
+/// app stays the single place that builds a MaterialApp.
 ///
 /// Build test apps through this (or [pumpAppHost]); a raw `MaterialApp` in a
 /// test is caught by `test/test_harness_guard_test.dart`, whose allowlist only
@@ -17,6 +19,7 @@ Widget appShell({
   required Widget home,
   Locale locale = const Locale('ar'),
   double? textScale,
+  ThemeData? theme,
   Widget Function(Widget app)? wrap,
 }) {
   final app = MaterialApp(
@@ -28,7 +31,7 @@ Widget appShell({
       GlobalWidgetsLocalizations.delegate,
       GlobalCupertinoLocalizations.delegate,
     ],
-    theme: AppTheme.light,
+    theme: theme ?? AppTheme.light,
     builder: textScale == null
         ? null
         : (context, child) => MediaQuery(
@@ -48,11 +51,18 @@ Future<void> pumpAppHost(
   required Widget home,
   Locale locale = const Locale('ar'),
   double? textScale,
+  ThemeData? theme,
   Widget Function(Widget app)? wrap,
   bool settle = true,
 }) async {
   await tester.pumpWidget(
-    appShell(home: home, locale: locale, textScale: textScale, wrap: wrap),
+    appShell(
+      home: home,
+      locale: locale,
+      textScale: textScale,
+      theme: theme,
+      wrap: wrap,
+    ),
   );
   if (settle) {
     await tester.pumpAndSettle(

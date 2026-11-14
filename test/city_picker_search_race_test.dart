@@ -46,6 +46,9 @@ class GatedCityRepository implements CityRepository {
 
   @override
   Future<City> nearestTo(double lat, double lng) async => _cairo;
+
+  @override
+  Stream<City> get changes => const Stream<City>.empty();
 }
 
 void main() {

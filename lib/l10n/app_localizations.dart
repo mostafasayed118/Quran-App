@@ -344,6 +344,24 @@ abstract class AppLocalizations {
   /// **'غامق'**
   String get themeDark;
 
+  /// No description provided for @settingsPrayerSkin.
+  ///
+  /// In ar, this message translates to:
+  /// **'مظهر الصلاة'**
+  String get settingsPrayerSkin;
+
+  /// No description provided for @prayerSkinFixed.
+  ///
+  /// In ar, this message translates to:
+  /// **'ثابت — المظهر الحالي'**
+  String get prayerSkinFixed;
+
+  /// No description provided for @prayerSkinFollow.
+  ///
+  /// In ar, this message translates to:
+  /// **'يتبع الصلاة — الألوان فقط'**
+  String get prayerSkinFollow;
+
   /// No description provided for @recitations.
   ///
   /// In ar, this message translates to:

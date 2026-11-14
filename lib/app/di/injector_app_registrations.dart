@@ -54,6 +54,14 @@ void _registerOnboardingAndSettings(AppDatabase db) {
   // and the settings row shows the current choice.
   getIt.registerLazySingleton<AppThemeController>(
       () => AppThemeController(getIt<AppThemeSource>()));
+  getIt.registerLazySingleton<PrayerSkinRepository>(
+      () => PrayerSkinRepository(db));
+  getIt.registerLazySingleton<PrayerSkinSource>(
+      () => getIt<PrayerSkinRepository>());
+  // The prayer skin is opt-in and device-scoped: the root reads it behind the
+  // first frame, and the settings row flips it.
+  getIt.registerLazySingleton<PrayerSkinController>(
+      () => PrayerSkinController(getIt<PrayerSkinSource>()));
 }
 
 /// Clears the one-time guard so a test can build a fresh graph.

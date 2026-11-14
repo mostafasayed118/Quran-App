@@ -26,6 +26,9 @@ List<RouteBase> _settingsRoutes() => [
               backupSection: const BackupSection(),
               locale: getIt<AppLocaleController>(),
               theme: getIt<AppThemeController>(),
+              skin: getIt.isRegistered<PrayerSkinController>()
+                  ? getIt<PrayerSkinController>()
+                  : null,
               // Resolved at route construction, not from SettingsScreen's
               // build(); tests that never configure the locator get null and
               // the screen simply omits the advisory readout.
