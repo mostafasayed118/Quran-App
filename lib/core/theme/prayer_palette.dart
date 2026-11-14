@@ -77,10 +77,12 @@ class PrayerPalette {
   ///
   /// A modal sheet defaults to `surfaceContainerLow`; at [surface] it would be
   /// the exact fill of a card beneath it, with nothing but the scrim between
-  /// them. The tile tone at 40% keeps the sheet in the period family while
-  /// separating it from the card it covers.
+  /// them. The device pass measured the 40% tile blend at **1.047:1** on the
+  /// isha dark palette — under the pre-declared 1.06 bar — so it is 60%, which
+  /// clears 1.06 on all twelve (worst 1.073:1) and stays a wash rather than a
+  /// second surface.
   Color get sheetSurface =>
-      Color.alphaBlend(tile.withValues(alpha: 0.40), surface);
+      Color.alphaBlend(tile.withValues(alpha: 0.60), surface);
 }
 
 /// The twelve palettes, one per prayer and brightness.

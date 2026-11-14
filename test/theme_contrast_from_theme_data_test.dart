@@ -85,7 +85,7 @@ void main() {
         final ratio = _ratio(colors.surfaceContainerLow, colors.surface);
         expect(
           ratio,
-          greaterThan(1.03),
+          greaterThan(1.06),
           reason: '$label sheet/card is ${ratio.toStringAsFixed(3)}:1',
         );
       });

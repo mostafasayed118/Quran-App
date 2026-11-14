@@ -172,7 +172,7 @@ used; `AnimatedTheme` fades the swap.
       11.36 — 0 missed vsync in all.
 - [x] **Sheet separation (closed in W2.4):** `surfaceContainerLow` — the role a modal
       sheet actually reads — equals `surface`, i.e. the exact fill of the card it
-      covers. It now carries `alphaBlend(tile 40%, surface)` (and so does
+      covers. It now carries `alphaBlend(tile 60%, surface)` (and so does
       `surfaceContainer`); `surfaceContainerHigh` (dialogs) stays `tile`. Pinned by the
       palette contrast test (ratio > 1.03) and a widget test that opens a real sheet in
       a light and a dark period. Dialog screenshots taken on device in both brightnesses;
@@ -211,7 +211,7 @@ used; `AnimatedTheme` fades the swap.
 | Risk | Mitigation |
 |---|---|
 | A role the widgets read slips back to the seed | the seed-leak test |
-| `surfaceContainer == surface` makes sheets blend into cards | `surfaceContainerLow` carries a 40% tile blend; contrast test (ratio > 1.03) + a real-sheet widget test; device screenshot |
+| `surfaceContainer == surface` makes sheets blend into cards | `surfaceContainerLow` carries a 60% tile blend; contrast test (ratio > 1.06) + a real-sheet widget test; device screenshot |
 | gold text on a gold container (4.78 margin) | never for small text; the rule is in `docs/design/prayer-skin.md` |
 | The 400 ms lerp on a low-end device | profile timeline, budget stated per refresh rate |
 | Period edge cases (midnight, no sunrise, DST) | the six boundary tests |

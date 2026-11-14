@@ -24,7 +24,9 @@ Derived roles (getters on `PrayerPalette`, never copied hex):
 - `errorContainer` = error 12% over surface; `onErrorContainer` light = black 22%
   over `error` (so retuning `error` moves the container and label together).
 - `appBar` = primary 6% over page.
-- `sheetSurface` = tile 40% over surface.
+- `sheetSurface` = tile 60% over surface (the device pass measured the 40%
+  blend at 1.047:1 on isha dark, under the pre-declared 1.06 bar; 60% clears
+  1.06 on all twelve, worst 1.073:1).
 
 ## Rules
 

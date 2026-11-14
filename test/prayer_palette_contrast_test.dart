@@ -81,13 +81,15 @@ void main() {
 
       test('$label separates a sheet from a card', () {
         // A modal sheet defaults to `surfaceContainerLow`; at `surface` it is
-        // the exact fill of the card it covers.
+        // the exact fill of the card it covers. The 1.06 floor is the bar the
+        // device pass was judged against (the 40% blend measured 1.047 on isha
+        // dark, so it was raised to 60%).
         expect(palette.sheetSurface, isNot(palette.surface));
         expect(palette.sheetSurface, isNot(palette.tile));
         final ratio = _ratio(palette.sheetSurface, palette.surface);
         expect(
           ratio,
-          greaterThan(1.03),
+          greaterThan(1.06),
           reason: '$label sheet/surface is ${ratio.toStringAsFixed(3)}:1',
         );
       });
