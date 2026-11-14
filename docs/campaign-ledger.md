@@ -1526,3 +1526,10 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **CI:** PR **`43533492944` success** · merge **`43534435259` success** · ledger **`43534518213` success**.
 - **At the tip:** the 12-rung ladder, the four component tokens, the ayah number at 28 × `fontScale`, the `Wrap` actions row, the line-height floors, the guard with empty allowlists, the 320/360/411 matrix and the fixed-export test are all on `main`.
 - **Nothing was deferred:** the only rejected item is fluid type by width (rejected by design), and the only skipped abstraction is `AdaptiveListRow` (measured unnecessary — the probe is the gate).
+
+### 2026-11-14 — Branch retirement: two stale remote branches — DONE
+
+- **`feat/wave-a-b`** (`7180507`): **fully merged** into `main` (`git branch -r --merged origin/main`), 286 commits behind, **0 ahead** — deleted with nothing to preserve.
+- **`pilot/jiro-solra-hero`** (`1801888`): one unmerged commit — `feat(web): redesign the landing hero with stats and ornaments` (2026-10-25, `LandingPage.astro` +377/−22 + `strings.ts` +14). That file **no longer exists on `main`**: the web restructured around `HomeHeritage.astro`, whose `.stats` block already carries the idea. Cherry-picking would be a 385-line conflict against a deleted file, so the branch was retired.
+- **Preserved, not lost:** the commit is pinned by the annotated tag **`archive/pilot-jiro-solra-hero`** → `1801888f` (pushed to origin). Recover with `git switch -c <name> archive/pilot-jiro-solra-hero`.
+- **Remote heads now:** `main` + five `dependabot/*` heads (PR #5, the TypeScript 7 bump, is one of them).
