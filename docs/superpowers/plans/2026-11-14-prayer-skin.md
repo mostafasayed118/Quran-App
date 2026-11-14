@@ -162,29 +162,37 @@ used; `AnimatedTheme` fades the swap.
 
 **Task 3.1 — device leg**
 
-- [ ] `flutter run --profile` on the Infinix (state the panel's refresh rate; the budget
-      is `1000/refresh` ms — 16 ms at 60 Hz).
-- [ ] Timeline: no frame over the budget during the 400 ms transition **and in the 1 s
-      after it settles**, measured on a **long-list screen** (the reader index or azkar),
-      not only the home.
+- [x] Device build on the Infinix: a **release** APK (owner certificate, `--build-number=2006`)
+      because a profile APK is debug-signed and cannot install over the owner-signed release
+      without uninstalling it. The layer presented at **90 Hz** during interaction
+      (SurfaceFlinger header 11.11 ms); budget = 1000/refresh.
+- [x] Timeline: no frame over the budget during the 400 ms transition **and in the 1 s
+      after it settles**, measured on the city-picker long list and the surah index.
+      125-frame windows: fixed 11.52 max, follow swap 11.63, timer boundary 11.52, idle
+      11.36 — 0 missed vsync in all.
 - [x] **Sheet separation (closed in W2.4):** `surfaceContainerLow` — the role a modal
       sheet actually reads — equals `surface`, i.e. the exact fill of the card it
       covers. It now carries `alphaBlend(tile 40%, surface)` (and so does
       `surfaceContainer`); `surfaceContainerHigh` (dialogs) stays `tile`. Pinned by the
       palette contrast test (ratio > 1.03) and a widget test that opens a real sheet in
-      a light and a dark period. The device screenshot remains the visual gate.
-- [ ] Toggle copy check (AR + EN): "ثابت" must read as the current theme; "يتبع الصلاة"
-      must say that **only the colours** change.
+      a light and a dark period. Dialog screenshots taken on device in both brightnesses;
+      the chrome-sheet screenshot is still open.
+- [x] Toggle copy check (AR + EN): "ثابت — المظهر الحالي" / "Fixed — the current theme"
+      and "يتبع الصلاة — الألوان فقط" / "Follow the prayer — colours only"; verified on
+      the device row and in the picker.
 - [ ] Screenshots: home over the six periods; reader/mushaf/share card unchanged.
-- [ ] Record the results in the ledger entry.
+      **Partial:** maghrib and isha captured on device (the only periods reachable at
+      the session clock; the shell cannot set the device time).
+- [x] Record the results in the ledger entry.
 
 **Task 3.2 — docs, ledger, CI**
 
-- [ ] `docs/design/prayer-skin.md`: the palettes, the rules, the rollback. Include the
+- [x] `docs/design/prayer-skin.md`: the palettes, the rules, the rollback. Include the
       reader rule (the wrapper + the toast following its caller's theme, so a reader
       toast is neutral and a chrome toast takes the palette).
-- [ ] Ledger close-out (append-only), full gates at the tip, CI on the PR.
-- [ ] **No push without owner GO.**
+- [x] Ledger close-out (append-only), full gates at the tip. **CI on the PR** follows the
+      push window.
+- [x] **No push without owner GO** — the branch is local, 16 commits ahead.
 
 ## 4) Acceptance
 
