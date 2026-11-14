@@ -29,7 +29,7 @@ const TextStyle _sheetNameArStyle = TextStyle(
 const TextStyle _sheetMeaningArStyle = TextStyle(
   fontFamily: QuranFonts.meQuran,
   fontSize: AppType.bodyLarge,
-  height: 1.7,
+  height: AppType.scriptureTightHeight,
 );
 
 TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(

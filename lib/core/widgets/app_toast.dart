@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_type.dart';
 
 /// The three intents a confirmation toast can carry.
 enum ToastTone {
@@ -188,7 +189,7 @@ class _ToastBody extends StatelessWidget {
               color: colors.onSurface,
               // Arabic script needs the extra leading; 1.45 clips the
               // diacritics on a two-line message.
-              height: 1.6,
+              height: AppType.relaxedHeight,
             ),
           ),
         ),

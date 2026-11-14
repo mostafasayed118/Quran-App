@@ -260,8 +260,8 @@ class _SplashContent extends StatelessWidget {
                       fontFamily: QuranFonts.ui,
                       fontWeight: FontWeight.bold,
                       fontSize: AppType.splashWordmark,
-                      height: 1.2,
-                      letterSpacing: -.2,
+                      height: AppType.splashWordmarkHeight,
+                      letterSpacing: AppType.splashWordmarkTracking,
                       color: heading,
                     ),
                   ),
@@ -271,7 +271,7 @@ class _SplashContent extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: QuranFonts.ui,
                       fontSize: AppType.caption,
-                      letterSpacing: 4.2,
+                      letterSpacing: AppType.splashTaglineTracking,
                       color: accent.withValues(alpha: AppColors.splashAccent),
                     ),
                   ),
@@ -291,7 +291,7 @@ class _SplashContent extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: QuranFonts.ui,
                     fontSize: AppType.micro,
-                    letterSpacing: .3,
+                    letterSpacing: AppType.splashFooterTracking,
                     color: footer,
                   ),
                 ),

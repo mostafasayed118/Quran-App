@@ -115,7 +115,7 @@ class _ZikrLine extends StatelessWidget {
             style: const TextStyle(
               fontFamily: QuranFonts.ui,
               fontSize: AppType.title,
-              height: 2.1,
+              height: AppType.dhikrHeight,
             ),
           ),
         ),

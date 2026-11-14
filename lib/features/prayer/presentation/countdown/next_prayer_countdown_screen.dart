@@ -175,7 +175,7 @@ class _DigitClock extends StatelessWidget {
                               style: AppTheme.heroTitle.copyWith(
                                 color: colors.onSurface,
                                 fontSize: AppType.timerHuge,
-                                height: 1.1,
+                                height: AppType.timerHeight,
                               ),
                             ),
                           ),

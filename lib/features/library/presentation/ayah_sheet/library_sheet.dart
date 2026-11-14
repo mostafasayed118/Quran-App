@@ -245,8 +245,10 @@ class _SheetPane extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 entry.text,
-                style:
-                    const TextStyle(fontSize: AppType.bodyLarge, height: 1.9),
+                style: const TextStyle(
+                  fontSize: AppType.bodyLarge,
+                  height: AppType.scriptureLooseHeight,
+                ),
                 // The shipped translation is English; forcing RTL puts its
                 // punctuation and parentheses on the wrong side.
                 textDirection: isArabicText(entry.text)

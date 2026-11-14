@@ -6,41 +6,27 @@
 /// so the map only ever shrinks. An empty map means the wave closed.
 library;
 
-// 53 residual literals in 47 buckets.
+// 40 residual literals in 34 buckets.
 const Map<String, int> designTokenBaseline = <String, int>{
-  'lib/app/splash_screen.dart|lineHeight|1.2': 1,
   'lib/app/splash_screen.dart|stroke|1.6': 2,
-  'lib/app/splash_screen.dart|tracking|-0.2': 1,
-  'lib/app/splash_screen.dart|tracking|0.3': 1,
-  'lib/app/splash_screen.dart|tracking|4.2': 1,
   'lib/core/widgets/app_toast.dart|iconSize|18.0': 1,
-  'lib/core/widgets/app_toast.dart|lineHeight|1.6': 1,
   'lib/core/widgets/error_strip.dart|iconSize|18.0': 1,
   'lib/core/widgets/service_tile.dart|iconSize|22.0': 1,
   'lib/core/widgets/state_message.dart|iconSize|40.0': 1,
-  'lib/features/asma/presentation/asma_screen.dart|lineHeight|1.7': 1,
   'lib/features/asma/presentation/asma_screen.dart|radius|14.0': 2,
-  'lib/features/azkar/presentation/azkar_browse.dart|lineHeight|1.8': 1,
   'lib/features/azkar/presentation/azkar_recite.dart|iconSize|20.0': 1,
-  'lib/features/azkar/presentation/azkar_recite.dart|lineHeight|2.1': 1,
   'lib/features/backup/presentation/backup_section.dart|iconSize|16.0': 1,
   'lib/features/hijri/presentation/hijri_screen.dart|radius|10.0': 1,
   'lib/features/hijri/presentation/hijri_screen.dart|stroke|1.4': 1,
   'lib/features/home/presentation/home_cards.dart|iconSize|13.0': 1,
   'lib/features/home/presentation/home_cards.dart|iconSize|22.0': 1,
-  'lib/features/library/presentation/ayah_sheet/library_sheet.dart|lineHeight|1.9':
-      1,
   'lib/features/library/presentation/ayah_sheet/library_sheet.dart|radius|28.0':
-      1,
-  'lib/features/library/presentation/hadith/hadith_screen.dart|lineHeight|1.8':
       1,
   'lib/features/onboarding/presentation/onboarding_screen.dart|iconSize|20.0':
       1,
   'lib/features/prayer/presentation/countdown/next_prayer_countdown_screen.dart|iconSize|16.0':
       1,
   'lib/features/prayer/presentation/countdown/next_prayer_countdown_screen.dart|iconSize|48.0':
-      1,
-  'lib/features/prayer/presentation/countdown/next_prayer_countdown_screen.dart|lineHeight|1.1':
       1,
   'lib/features/prayer/presentation/prayer_times/forbidden_windows_section.dart|iconSize|18.0':
       1,
@@ -54,8 +40,6 @@ const Map<String, int> designTokenBaseline = <String, int>{
   'lib/features/qibla/presentation/qibla_dial_widget.dart|iconSize|72.0': 1,
   'lib/features/quran/presentation/bookmarks/bookmarks_folder_chips.dart|iconSize|16.0':
       1,
-  'lib/features/quran/presentation/reader/verse_card.dart|lineHeight|2.0': 1,
-  'lib/features/quran/presentation/reader/verse_card.dart|tracking|0.4': 1,
   'lib/features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart|iconSize|20.0':
       1,
   'lib/features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart|radius|11.0':

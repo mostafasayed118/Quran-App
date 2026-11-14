@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/theme/app_alphas.dart';
 import 'package:quran_yahdi/core/theme/app_colors.dart';
+import 'package:quran_yahdi/core/theme/app_type.dart';
 
 /// Pins every token introduced by the W1 wave to the literal it replaced.
 ///
@@ -42,5 +43,20 @@ void main() {
     expect(AppColors.splashRing2Dark, 0.18);
     expect(AppColors.splashAccent, 0.85);
     expect(AppColors.splashCardBorder, 0.16);
+  });
+
+  test('type metrics keep the shipped line heights and tracking', () {
+    expect(AppType.scriptureHeight, 1.8);
+    expect(AppType.scriptureLooseHeight, 1.9);
+    expect(AppType.scriptureTightHeight, 1.7);
+    expect(AppType.dhikrHeight, 2.1);
+    expect(AppType.timerHeight, 1.1);
+    expect(AppType.splashWordmarkHeight, 1.2);
+    expect(AppType.relaxedHeight, 1.6);
+    expect(AppType.quranHeight, 2.0);
+    expect(AppType.splashWordmarkTracking, -0.2);
+    expect(AppType.splashTaglineTracking, 4.2);
+    expect(AppType.splashFooterTracking, 0.3);
+    expect(AppType.shareFooterTracking, 0.4);
   });
 }
