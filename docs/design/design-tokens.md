@@ -39,6 +39,23 @@ the first edit and shrank to empty; the guard now fails on any new hit.
 `copyWith` case, fires on a synthetic source and that token references and a
 transparent gradient stop pass.
 
+### Call-site proof
+
+The value test proves `token == shipped literal`; it does not prove the call
+site received the right token. `tool/design_token_diff_audit.dart [base]` pairs
+every removed literal with the token added at the same site, by role (alpha,
+opacity, line height, tracking, icon, radius, stroke, hex), resolves the token
+from `lib/core/theme/`, and fails on a mismatch or an unpaired change.
+
+At the wave tip: **89 pairs, 0 failed, 0 unresolved**. A negative control that
+swapped `metaInk` for `dividerOnTint` at two sites produced two FAIL lines
+(`0.7 -> dividerOnTint = 0.12`), so the check is not vacuous. The audit also
+found six splash alpha values assigned to locals (`glowAlpha`, `ringAlpha1`,
+`ringAlpha2`) that the file census never listed.
+
+The repository has **no golden tests** (`matchesGoldenFile` has zero matches),
+so this diff audit plus the value pins are the pixel-equivalence evidence.
+
 ### What the guard does not catch
 
 It is a textual ratchet, not an AST proof. Computed literals such as

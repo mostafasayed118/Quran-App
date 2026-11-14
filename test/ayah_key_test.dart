@@ -27,4 +27,12 @@ void main() {
     expect(AyahKey.surahOf(0), 0);
     expect(AyahKey.ayahOf(0), 0);
   });
+
+  test('negative input keeps the old operator behavior', () {
+    // The inline code was `key ~/ 1000` and `key % 1000`; these pins keep a
+    // future validation change from silently throwing at the pack boundary.
+    expect(AyahKey.surahOf(-1), 0);
+    expect(AyahKey.ayahOf(-1), 999);
+    expect(AyahKey.encode(-1, 5), -995);
+  });
 }
