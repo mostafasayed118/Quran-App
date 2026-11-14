@@ -31,6 +31,7 @@ void main() {
     expect(AppAlphas.metaInk, 0.70);
     expect(AppAlphas.secondaryInk, 0.75);
     expect(AppAlphas.iconMuted, 0.60);
+    expect(AppAlphas.completedFade, 0.80);
   });
 
   test('splash alphas keep the shipped values', () {

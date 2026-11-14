@@ -39,4 +39,7 @@ abstract final class AppAlphas {
 
   /// A trailing glyph that supports a row without competing with it (0.60).
   static const double iconMuted = 0.60;
+
+  /// Child opacity for a completed dhikr row (0.80); 1 is fully opaque.
+  static const double completedFade = 0.80;
 }

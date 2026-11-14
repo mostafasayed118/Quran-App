@@ -28,7 +28,8 @@ final class DesignTokenViolation {
   /// One-based source line.
   final int line;
 
-  /// `hex`, `alpha`, `lineHeight`, `tracking`, `iconSize`, `radius`, `stroke`.
+  /// `hex`, `alpha`, `lineHeight`, `tracking`, `opacity`, `iconSize`,
+  /// `radius`, `stroke`.
   final String kind;
 
   /// Canonical literal, e.g. `0xFF042C25`, `0.1`, `1.8`, `18.0`.
@@ -106,6 +107,17 @@ List<DesignTokenViolation> scanSource(String path, String source) {
     add(match.start, 'tracking', _number(match.group(1)!).toString());
   }
 
+  for (final match in _opacityExpression.allMatches(source)) {
+    final expression = match.group(1)!;
+    final expressionOffset = match.start + match.group(0)!.indexOf(expression);
+    for (final number in _bareNumber.allMatches(expression)) {
+      final value = _number(number.group(1)!);
+      // 1 is identity (no fade), not a design value.
+      if (value == 1) continue;
+      add(expressionOffset + number.start, 'opacity', value.toString());
+    }
+  }
+
   for (final start in _styleStarts(source)) {
     final block = _blockAt(source, start);
     for (final height in _lineHeight.allMatches(block)) {
@@ -156,6 +168,7 @@ final _bareNumber = RegExp(
 final _tracking = RegExp(
   r'\bletterSpacing:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
 );
+final _opacityExpression = RegExp(r'\bopacity:\s*([^)]*)\)');
 final _lineHeight = RegExp(
   r'\bheight:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
 );

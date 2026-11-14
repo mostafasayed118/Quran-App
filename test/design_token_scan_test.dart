@@ -16,6 +16,7 @@ const f = Icon(Icons.check, size: 18);
 final g = BorderRadius.circular(14);
 final h = BorderSide(color: c, width: 1.5);
 final i = color.withValues(alpha: dark ? .42 : .55);
+final j = Opacity(opacity: done ? .8 : 1);
 ''';
 
     final hits = scanSource('lib/x.dart', source);
@@ -32,6 +33,7 @@ final i = color.withValues(alpha: dark ? .42 : .55);
         'stroke:1.5',
         'alpha:0.42',
         'alpha:0.55',
+        'opacity:0.8',
       ],
     );
   });
@@ -45,6 +47,8 @@ final d = colors.primary.withValues(alpha: AppAlphas.chipTint);
 final e = BorderRadius.circular(AppRadius.md);
 final f = BorderSide(color: c, width: AppStrokes.emphasis);
 final g = colors.primary.withValues(alpha: dark ? a : b);
+final h = Opacity(opacity: AppAlphas.completedFade);
+final i = Opacity(opacity: 1);
 ''';
 
     expect(scanSource('lib/x.dart', source), isEmpty);

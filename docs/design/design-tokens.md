@@ -26,9 +26,9 @@ The census is now **0 hits in 0 buckets**.
 ## The ratchet
 
 `tool/design_token_scan.dart` walks paren-balanced `TextStyle`, `StrutStyle`,
-`.copyWith`, `Icon(`, `BorderSide`/`Border.all` and `withValues(alpha:)`
-blocks (including ternary alpha expressions). `tool/design_token_census.dart`
-prints the map.
+`.copyWith`, `Icon(`, `BorderSide`/`Border.all`, `withValues(alpha:)` and
+`opacity:` blocks (including ternary alpha/opacity expressions).
+`tool/design_token_census.dart` prints the map.
 
 `test/design_token_guard_test.dart` compares the tree to
 `test/fixtures/design_token_baseline.dart` with exact map equality, so a new
@@ -51,7 +51,7 @@ token source), and `test/`/`tool/` are out of scope.
 | file | tokens |
 |---|---|
 | `lib/core/theme/app_colors.dart` | `splashCard`, `splashGlowMint`, `splashGlowGold`, `splashShadowWarm`, `splashShadowCool`; splash alpha roles (footer, corner, glow, rings, accent, card border) |
-| `lib/core/theme/app_alphas.dart` | `chipTint .10`, `dividerOnTint .12`, `outlineFaint .18`, `secondaryTile .14`, `errorTint .35`, `accentRule .35`, `accentRuleSoft .25`, `metaInk .70`, `secondaryInk .75`, `iconMuted .60` |
+| `lib/core/theme/app_alphas.dart` | `chipTint .10`, `dividerOnTint .12`, `outlineFaint .18`, `secondaryTile .14`, `errorTint .35`, `accentRule .35`, `accentRuleSoft .25`, `metaInk .70`, `secondaryInk .75`, `iconMuted .60`, `completedFade .80` |
 | `lib/core/theme/app_type.dart` | `dhikrHeight 2.1`, `scriptureHeight 1.8`, `scriptureLooseHeight 1.9`, `scriptureTightHeight 1.7`, `timerHeight 1.1`, `splashWordmarkHeight 1.2`, and four tracking roles |
 | `lib/core/theme/app_icon_size.dart` | `inline 13`, `dot 14`, `sm 16`, `md 18`, `lg 20`, `xl 22`, `state 40`, `hero 48`, `dial 72`, `gate 84` |
 | `lib/core/theme/app_strokes.dart` | `emphasis 1.4`, `selection 1.5`, `ring 1.6`, `accent 3` |
