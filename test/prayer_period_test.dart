@@ -470,5 +470,50 @@ void main() {
       await pumpEventQueue();
       expect(armed?.isActive, isTrue);
     });
+
+    test('without a city stream start still computes', () async {
+      final controller = PrayerPeriodController(
+        city: city,
+        times: times,
+        config: config,
+        now: () => clock,
+        schedule: (delay, fire) {
+          timers.add((delay: delay, fire: fire));
+          return Timer(const Duration(days: 3650), () {});
+        },
+      );
+      addTearDown(controller.dispose);
+
+      controller.start();
+      await pumpEventQueue();
+
+      expect(controller.period, PrayerName.sunrise);
+      expect(timers, hasLength(1));
+    });
+
+    test('dispose cancels the city subscription', () async {
+      final events = StreamController<City>.broadcast();
+      addTearDown(events.close);
+      final controller = PrayerPeriodController(
+        city: city,
+        times: times,
+        config: config,
+        cityChanges: events.stream,
+        now: () => clock,
+        schedule: (delay, fire) => Timer(const Duration(days: 3650), () {}),
+      );
+
+      controller.start();
+      await pumpEventQueue();
+      expect(events.hasListener, isTrue);
+
+      controller.dispose();
+
+      expect(events.hasListener, isFalse);
+      // A late event after dispose reaches nobody (no throw, no rebuild).
+      events.add(_tokyo);
+      await pumpEventQueue();
+      expect(controller.period, PrayerName.sunrise);
+    });
   });
 }
