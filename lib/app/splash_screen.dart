@@ -110,7 +110,6 @@ class _SplashContent extends StatelessWidget {
     final glowAlpha = dark ? .13 : .20;
     final ringAlpha1 = dark ? .35 : .22;
     final ringAlpha2 = dark ? .18 : .11;
-    const card = Color(0xFF042C25); // matches the glyph artwork background
 
     return ExcludeSemantics(
       child: ColoredBox(
@@ -123,7 +122,7 @@ class _SplashContent extends StatelessWidget {
               top: -64,
               right: -64,
               child: _CornerGlow(
-                color: const Color(0xFFA8F3C6).withValues(
+                color: AppColors.splashGlowMint.withValues(
                   alpha: dark ? .07 : .10,
                 ),
               ),
@@ -132,7 +131,7 @@ class _SplashContent extends StatelessWidget {
               bottom: -64,
               left: -64,
               child: _CornerGlow(
-                color: const Color(0xFFFFE088).withValues(
+                color: AppColors.splashGlowGold.withValues(
                   alpha: dark ? .07 : .10,
                 ),
               ),
@@ -169,9 +168,9 @@ class _SplashContent extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                const Color(0xFFFFE088)
+                                AppColors.splashGlowGold
                                     .withValues(alpha: glowAlpha),
-                                const Color(0xFFFFE088).withValues(alpha: 0),
+                                AppColors.splashGlowGold.withValues(alpha: 0),
                               ],
                               stops: const <double>[0, .72],
                             ),
@@ -211,7 +210,7 @@ class _SplashContent extends StatelessWidget {
                           width: cardSize,
                           height: cardSize,
                           decoration: BoxDecoration(
-                            color: card,
+                            color: AppColors.splashCard,
                             borderRadius: BorderRadius.circular(cardRadius),
                             border: dark
                                 ? Border.all(
@@ -221,12 +220,12 @@ class _SplashContent extends StatelessWidget {
                                 : null,
                             boxShadow: const [
                               BoxShadow(
-                                color: Color(0x6600281A),
+                                color: AppColors.splashShadowWarm,
                                 blurRadius: 26,
                                 offset: Offset(0, 16),
                               ),
                               BoxShadow(
-                                color: Color(0x5922321D),
+                                color: AppColors.splashShadowCool,
                                 blurRadius: 12,
                                 offset: Offset(0, 6),
                               ),

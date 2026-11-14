@@ -6,15 +6,10 @@
 /// so the map only ever shrinks. An empty map means the wave closed.
 library;
 
-// 76 residual literals in 66 buckets.
+// 69 residual literals in 61 buckets.
 const Map<String, int> designTokenBaseline = <String, int>{
   'lib/app/splash_screen.dart|alpha|0.16': 1,
   'lib/app/splash_screen.dart|alpha|0.85': 1,
-  'lib/app/splash_screen.dart|hex|0x5922321D': 1,
-  'lib/app/splash_screen.dart|hex|0x6600281A': 1,
-  'lib/app/splash_screen.dart|hex|0xFF042C25': 1,
-  'lib/app/splash_screen.dart|hex|0xFFA8F3C6': 1,
-  'lib/app/splash_screen.dart|hex|0xFFFFE088': 3,
   'lib/app/splash_screen.dart|lineHeight|1.2': 1,
   'lib/app/splash_screen.dart|stroke|1.6': 2,
   'lib/app/splash_screen.dart|tracking|-0.2': 1,
