@@ -280,8 +280,13 @@ The rule for all three: **never solve an overflow by shrinking type, clamping th
 | **Tight metadata rows.** 19 rows carry a `trailing:`. Fifteen are **fixed-size** (icon, check, `IconButton`, status chip) and can never overflow — they need no work. Four carry **text** that grows: the reciter count, the reminder time, the azkar item count, and the prayer-config summary. A 320 dp reciter row gives the title ~152 dp at 1.0 and ~98 dp at 2.0. | **Classify first, then stack only the text ones.** Fixed-size trailing stays untouched. For a text trailing: at `textScaler.scale(16) / 16 >= AppType.stackAt` (1.5, one token) render `Row(leading, Expanded(Column(title, subtitle, metadata)))` instead of `ListTile(trailing: …)`. Where the metadata is truly secondary (reciter count), moving it into the subtitle permanently is the stronger option and removes the branch. Title always `Expanded`; `minHeight: 48`, never a fixed height. Extract `AdaptiveListRow` in Task 6 — four rows already share the shape. | Task 6: primary label `RenderParagraph.didExceedMaxLines == false`, no exception, every tappable ≥ 48, at 320/360/411 × 1.0/1.3/2.0. |
 | **Fixed 360 share card.** Its PNG is captured at 2×; if the footer or number grows, the card gets taller, and a long host could ellipsize. | The card keeps **fixed export sizes from the ladder**, independent of the reader's `fontScale`; the host already carries `overflow: ellipsis`; the height is intrinsic (no fixed box). | Tasks 2–3: worst-case export test — 400+ char ayah, long surah name, long host → `toImage(pixelRatio: 2)` is **720 px wide**, height recorded, ayah `didExceedMaxLines == false`. |
 
-**The three helpers every probe uses** (in `test/support/type_probe.dart`, Task 6):
+**Measured outcome (2026-11-14):** the reciter-shaped row probe at 320 dp × 2.0
+shows `ListTile` grows and the title is **not** truncated
+(`didExceedMaxLines == false`), so no `AdaptiveListRow` was extracted — the
+plan's threshold was three rows needing it and zero do. The probe stays as the
+regression gate.
 
+**The three helpers every probe uses** (in `test/support/type_probe.dart`, Task 6):
 ```dart
 void expectNoOverflow(WidgetTester tester) =>
     expect(tester.takeException(), isNull);

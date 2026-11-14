@@ -1504,3 +1504,18 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Positive control:** on a genuinely slow load (first-run home after `pm clear`) the ring **does** appear — frame at 8.8 s of a 60 fps screen recording. The fix delays the paint, it does not remove it.
 - **Release build (installed 2026-11-01, pre-fix):** the reader rendered content before the first capture, so the flash is not reproducible in release on this device. The user-visible defect is confined to slower loads; the fix costs nothing there and removes the paint on fast ones.
 - **Unchanged:** `test/loading_view_test.dart` remains the deterministic proof of the schedule; the device run only adds the end-to-end confirmation.
+
+### 2026-11-14 (wave) — Typography scale: 12 rungs + 4 component tokens — BRANCH `wave/type-scale` (no push yet)
+
+- **Scope:** five code commits from `2b6f2481`, plus `docs/superpowers/plans/2026-11-14-typography-scale.md` and `docs/design/typography.md`.
+- **Why:** 79 `fontSize:` sites, 22 distinct sizes, 9 below the 12 floor, 32 off the ladder — and the ayah number was the only size in the reader that ignored the reader's own setting (16 fixed while the text was 24 × `fontScale`).
+- **`4a657e99` — the scale, zero pixels:** `AppType` (12 rungs + four component tokens + three Quran aliases) and the first migration. A script compared the `fontSize` multiset of all 22 touched files before/after: **70 sites, every value preserved**.
+- **`ea1bb8d9` — fold:** 10 → `shareFooter`/`micro`, 10.5 → 11/12, 13 → 12/14, 15 → 16, 17 → 18, 19 → 20, 21 → 22. The splash wordmark (26), home hero (30) and countdown digit (34) stayed as component tokens, so the deliberate 2 px redesigns never happened.
+- **`64832e11` — the ayah number:** 16 fixed → `AppTheme.ayahNumber` (28) × `fontScale`; the actions row became a `Wrap` because at 2.0 × 2.0 the 112 dp badge plus 192 dp of buttons cannot share 272 dp. Pinned at 28/56 and at the 320 dp worst case.
+- **`fe954c9d` — line heights:** `labelSmall` 1.35 → 1.4, `bodyMedium` 1.45 → 1.5; reading surfaces and display heights untouched.
+- **`4d415115` — probes:** `type_probe` helpers (overflow, silent truncation, 48 dp), the **320/360/411 × 1.0/1.3/2.0** matrix on the shared surfaces, and the fixed-export test (720 px PNG, no lost text).
+- **Guard:** `test/typography_guard_test.dart` — no numeric `fontSize` outside `lib/core/theme`, no off-ladder value, only `w400`/`w700`, no tracking on a Quran family. The allowlists start and end **empty**.
+- **Measured decision:** the reciter-shaped row holds at 320 dp × 2.0 without truncation (`didExceedMaxLines` false), so no `AdaptiveListRow` was extracted — the plan's threshold was three rows needing it and zero do. The probe stays as the gate.
+- **Device:** the ayah number is visibly 28 on the Infinix (vs 16 on the previous build); the 56 case is pinned by `ayah_number_size_test`.
+- **Gates at the tip:** format **0** · analyze **0** · suite **1677/1677 (1632 + 45)**.
+- **Not pushed:** the branch waits for the owner's GO.
