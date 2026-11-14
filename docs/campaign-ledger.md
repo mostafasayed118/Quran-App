@@ -1573,3 +1573,11 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Shipped-theme deltas (intended, each its own commit, recorded in the fixture):** light `onSecondary` ink → white (3.47 → 5.0); dark `secondaryContainer` `#F7EAD2` → `#3B3821` (the 28 dp hadith badge at `hadith_screen.dart:243` had 1.09:1 text).
 - **Device state at close:** phone on release `2006` (same owner certificate, data kept), `fixed`, Cairo, system dark, `svc power stayon` false. The AVD was shut down.
 - **Open follow-ups:** none merge-blocking. The sheet is now visually verified on an emulator, not on the phone panel; a phone screenshot remains a nice-to-have at the next device pass.
+
+### 2026-11-14 (device pass) — Phone-panel sheet screenshots — DONE (follow-up to PR #56)
+
+- **Why:** the sheet decision was taken on the `Test_Android` AVD; the phone panel could render differently. The phone was reachable again, so the shot was taken there before calling the pass closed.
+- **Route, no data wipe:** the phone's **release** install has an active khatma plan, and the wird setup sheet only renders with no plan (the UI offers reset only in the completed state). The **debug** app (`com.mostafasayed.quranyahdi.debug`, separate id, its own data) had no plan, so a fresh arm64 debug build was installed over it: home → settings → skin **follow** → tracker → **ابدأ ختمة** → the setup sheet. No `pm clear` anywhere.
+- **Evidence (pixels, isha palette):** light mode — sheet `#E9ECF6` above a scrimmed card `#6D6D70`; dark mode — sheet `#1A2039` above `#060810`. Both equal the **60%** `sheetSurface` blend for isha (the 40% values were `#EFF0F9` / `#181E35`), so the panel shows the same role the tests pin.
+- **Not closed by this pass:** the four periods (fajr, sunrise, dhuhr, asr) were not captured on the phone. The shell cannot set the phone clock (`date: Operation not permitted`; `auto_time` off), and every city lands within ~20 minutes of Cairo, so the period cannot be moved by city selection. Their gate stays the 48 `ThemeData` assertions plus the 48 token-level ones.
+- **State at close:** the debug app was returned to `fixed`, appearance `غامق` as it was; the phone is on the **release** app, `fixed`, Cairo, system dark. The release app's own data was never touched.
