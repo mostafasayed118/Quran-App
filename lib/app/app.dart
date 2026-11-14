@@ -169,54 +169,61 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
 
   @override
   Widget build(BuildContext context) {
-    final follows = _skin.followsPrayer;
-    final period = follows ? _period.period : null;
     return ListenableBuilder(
+      // The skin and the period are read INSIDE the builder. A
+      // ListenableBuilder re-runs only its builder, never the enclosing
+      // `build`, so values captured out here would freeze at the last root
+      // build — the period stays null and the palette never lands (found on a
+      // device: the settings row said "follow" while the chrome stayed
+      // shipped). `_period` is always in the merge because membership cannot
+      // depend on a value read outside; the controller is stopped while fixed,
+      // so it does not notify.
       listenable: Listenable.merge(<Listenable>[
         _locale,
         _theme,
         _skin,
-        // Only while following: a boundary must not rebuild the tree when the
-        // skin is fixed.
-        if (follows) _period,
+        _period,
       ]),
-      builder: (context, _) => MaterialApp.router(
-        onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-        theme: chromeTheme(
-          shipped: AppTheme.light,
-          followsPrayer: follows,
-          period: period,
-        ),
-        darkTheme: chromeTheme(
-          shipped: AppTheme.dark,
-          followsPrayer: follows,
-          period: period,
-        ),
-        themeMode: _theme.themeMode,
-        locale: _locale.locale,
-        // Arabic stays the default (AppLanguage.arabic); English is opt-in from
-        // the settings row, and the EN ARB is a full mirror of the AR template.
-        supportedLocales: kSupportedLocales,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        // A boundary change fades over 400 ms instead of flipping: every
-        // `Theme.of` dependent rebuilds per frame for that window, once per
-        // prayer (measured on a device in the profile build).
-        builder: (context, child) => AnimatedTheme(
-          data: Theme.of(context),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOut,
-          child: AnnotatedRegion<SystemUiOverlayStyle>(
+      builder: (context, _) {
+        final follows = _skin.followsPrayer;
+        final period = follows ? _period.period : null;
+        return MaterialApp.router(
+          onGenerateTitle: (context) => AppLocalizations.of(context).appName,
+          theme: chromeTheme(
+            shipped: AppTheme.light,
+            followsPrayer: follows,
+            period: period,
+          ),
+          darkTheme: chromeTheme(
+            shipped: AppTheme.dark,
+            followsPrayer: follows,
+            period: period,
+          ),
+          themeMode: _theme.themeMode,
+          // MaterialApp already animates a theme change over this duration and
+          // curve. A second `AnimatedTheme` in the builder chains two lerps: the
+          // widget test showed the target arriving after ~900 ms instead of
+          // 400 ms. One owner, one fade.
+          themeAnimationDuration: const Duration(milliseconds: 400),
+          themeAnimationCurve: Curves.easeInOut,
+          locale: _locale.locale,
+          // Arabic stays the default (AppLanguage.arabic); English is opt-in
+          // from the settings row, and the EN ARB is a full mirror of the AR
+          // template.
+          supportedLocales: kSupportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
             value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
             child: SplashScreen(child: child!),
           ),
-        ),
-        routerConfig: AppRouter.router,
-      ),
+          routerConfig: AppRouter.router,
+        );
+      },
     );
   }
 }

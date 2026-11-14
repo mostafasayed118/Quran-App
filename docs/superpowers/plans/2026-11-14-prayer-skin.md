@@ -149,8 +149,10 @@ used; `AnimatedTheme` fades the swap.
 
 - [x] `app.dart`: pick `forPrayer(period, brightness)` only when the flag is `follow` and
       the brightness is resolved; otherwise the shipped getters.
-- [x] `builder: (context, child) => AnimatedTheme(data: Theme.of(context),
-      duration: 400 ms, curve: easeInOut, child: child!)`.
+- [x] `MaterialApp.themeAnimationDuration: 400 ms` + `themeAnimationCurve:
+      easeInOut` (MaterialApp already owns a theme animation; wrapping the
+      builder in a second `AnimatedTheme` chains two lerps — the widget test
+      measured the target at ~900 ms — so the single owner is used).
 - [x] Settings toggle "المظهر: ثابت / يتبع الصلاة" with additive AR/EN keys.
 - [x] Tests: `fixed` after `follow` returns the exact shipped theme; a period change swaps
       the theme; the reader route keeps the neutral palette.
