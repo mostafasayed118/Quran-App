@@ -205,8 +205,14 @@ abstract final class AppTheme {
           isLight ? AppColors.emeraldTintLight : AppColors.emeraldTintDark,
       onPrimaryContainer:
           isLight ? AppColors.onEmeraldTintLight : AppColors.onEmeraldTintDark,
-      secondaryContainer: AppColors.goldLight,
-      onSecondaryContainer: AppColors.goldText,
+      // The light container is a pale gold; on a dark surface that same pale
+      // fill left the 28 dp hadith badge with `onSurface` text at 1.09:1.
+      // Dark uses a dark gold wash and a gold label instead.
+      secondaryContainer: isLight
+          ? AppColors.goldLight
+          : Color.alphaBlend(
+              AppColors.gold.withValues(alpha: 0.18), AppColors.darkSurface),
+      onSecondaryContainer: isLight ? AppColors.goldText : AppColors.gold,
       // Grouping surfaces (grid tiles, inset panels) read as warm paper, not
       // as the neutral grey the seed generates.
       surfaceContainerHighest:
