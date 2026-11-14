@@ -1,4 +1,4 @@
-# Prayer Skin — Implementation Plan
+﻿# Prayer Skin — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
 > (recommended) or superpowers:executing-plans to implement this plan task-by-task.
@@ -92,25 +92,25 @@ used; `AnimatedTheme` fades the swap.
       in the getter from the `error` token, **never a copied hex**, so editing `error`
       moves the container and the label together), `appBar`
       (`alphaBlend(primary 6%, page)`).
-- [ ] Add the 12 constants from the reviewed table.
-- [ ] Write the contrast test with `Color.computeLuminance()` covering every pair in §2.
-- [ ] Gates. Commit: `feat(theme): the twelve prayer palettes + their contrast gate`.
+- [x] Add the 12 constants from the reviewed table.
+- [x] Write the contrast test with `Color.computeLuminance()` covering every pair in §2.
+- [x] Gates. Commit: `feat(theme): the twelve prayer palettes + their contrast gate`.
 
 **Task 1.2 — the second theme path**
 
 **Files:** `lib/core/theme/app_theme.dart`, create `test/theme_equivalence_test.dart`,
 `test/theme_seed_leak_test.dart`
 
-- [ ] Add `_theme(brightness, [palette])`, `forPrayer`, the two caches and
+- [x] Add `_theme(brightness, [palette])`, `forPrayer`, the two caches and
       `clearPrayerCache`.
-- [ ] Null path: no palette, no `surfaceContainer*`/`inverse*` overrides, `onSecondary`
+- [x] Null path: no palette, no `surfaceContainer*`/`inverse*` overrides, `onSecondary`
       unchanged (the 0.2 fix already landed).
-- [ ] Palette path: every role in the integration map, including `surfaceTint: primary`,
+- [x] Palette path: every role in the integration map, including `surfaceTint: primary`,
       `errorContainer`, `onErrorContainer`, `inverseSurface`, the surface family.
-- [ ] Equivalence test: `_theme(brightness, null)` equals the 0.1 fixture.
-- [ ] Seed-leak test: for each palette, each read role equals its token **and**
+- [x] Equivalence test: `_theme(brightness, null)` equals the 0.1 fixture.
+- [x] Seed-leak test: for each palette, each read role equals its token **and**
       `surfaceTint == primary`.
-- [ ] Gates. Commit: `feat(theme): a palette path that leaves the shipped theme alone`.
+- [x] Gates. Commit: `feat(theme): a palette path that leaves the shipped theme alone`.
 
 ### W2 — Behavior
 
@@ -119,10 +119,10 @@ used; `AnimatedTheme` fades the swap.
 **Files:** create `lib/core/domain/prayer_skin.dart`, the source + settings impl,
 `test/prayer_skin_source_test.dart`
 
-- [ ] `PrayerSkinMode { fixed, follow }` (persisted codes), default `fixed`.
-- [ ] Source + settings-backed impl; a failed read keeps `fixed`.
-- [ ] Confirm the key is **not** in the backup whitelist (the pin test stays green).
-- [ ] Gates. Commit: `feat(settings): an opt-in prayer skin flag, fixed by default`.
+- [x] `PrayerSkinMode { fixed, follow }` (persisted codes), default `fixed`.
+- [x] Source + settings-backed impl; a failed read keeps `fixed`.
+- [x] Confirm the key is **not** in the backup whitelist (the pin test stays green).
+- [x] Gates. Commit: `feat(settings): an opt-in prayer skin flag, fixed by default`.
 
 **Task 2.2 — the period controller**
 
@@ -130,31 +130,31 @@ used; `AnimatedTheme` fades the swap.
 `lib/core/presentation/prayer_period_controller.dart` (or the app layer),
 `test/prayer_period_test.dart`
 
-- [ ] `PrayerPeriod` window function: six explicit markers, absolute `DateTime`s, the isha
+- [x] `PrayerPeriod` window function: six explicit markers, absolute `DateTime`s, the isha
       window using the **next day's fajr**, no-sunrise → fajr extends to dhuhr, and the
       last-known-isha hold just after midnight.
-- [ ] Controller: a timer to the next boundary; after each firing recompute the next
+- [x] Controller: a timer to the next boundary; after each firing recompute the next
       boundary `> now`; recompute on `resumed`, on `timeZoneOffset` change and on plan
       change.
-- [ ] Tests: normal day, isha→fajr midnight crossing, DST jump, timezone change,
+- [x] Tests: normal day, isha→fajr midnight crossing, DST jump, timezone change,
       high-latitude rule, no-sunrise, a **plan/city change mid-transition** (two rapid
       changes must settle on the last plan), and a **resume after hours** (the device slept
       across several boundaries — jump straight to the correct period, never walk each).
-- [ ] Gates. Commit: `feat(theme): derive the prayer period from the plan, safely`.
+- [x] Gates. Commit: `feat(theme): derive the prayer period from the plan, safely`.
 
 **Task 2.3 — wiring + the toggle**
 
 **Files:** `lib/app/app.dart`, `lib/features/settings/presentation/...`, `lib/l10n/*.arb`
 (+ generated), `test/prayer_skin_widget_test.dart`
 
-- [ ] `app.dart`: pick `forPrayer(period, brightness)` only when the flag is `follow` and
+- [x] `app.dart`: pick `forPrayer(period, brightness)` only when the flag is `follow` and
       the brightness is resolved; otherwise the shipped getters.
-- [ ] `builder: (context, child) => AnimatedTheme(data: Theme.of(context),
+- [x] `builder: (context, child) => AnimatedTheme(data: Theme.of(context),
       duration: 400 ms, curve: easeInOut, child: child!)`.
-- [ ] Settings toggle "المظهر: ثابت / يتبع الصلاة" with additive AR/EN keys.
-- [ ] Tests: `fixed` after `follow` returns the exact shipped theme; a period change swaps
+- [x] Settings toggle "المظهر: ثابت / يتبع الصلاة" with additive AR/EN keys.
+- [x] Tests: `fixed` after `follow` returns the exact shipped theme; a period change swaps
       the theme; the reader route keeps the neutral palette.
-- [ ] Gates. Commit: `feat(settings): let the chrome follow the prayer`.
+- [x] Gates. Commit: `feat(settings): let the chrome follow the prayer`.
 
 ### W3 — Verification and close-out
 
@@ -165,10 +165,12 @@ used; `AnimatedTheme` fades the swap.
 - [ ] Timeline: no frame over the budget during the 400 ms transition **and in the 1 s
       after it settles**, measured on a **long-list screen** (the reader index or azkar),
       not only the home.
-- [ ] **`surfaceContainer` criterion:** screenshots of a dialog and a bottom sheet above a
-      card, in a light period and a dark one. If the separation is not visible, the
-      pre-decided fallback is `surfaceContainer = alphaBlend(tile 40%, surface)` instead of
-      `surface`.
+- [x] **Sheet separation (closed in W2.4):** `surfaceContainerLow` — the role a modal
+      sheet actually reads — equals `surface`, i.e. the exact fill of the card it
+      covers. It now carries `alphaBlend(tile 40%, surface)` (and so does
+      `surfaceContainer`); `surfaceContainerHigh` (dialogs) stays `tile`. Pinned by the
+      palette contrast test (ratio > 1.03) and a widget test that opens a real sheet in
+      a light and a dark period. The device screenshot remains the visual gate.
 - [ ] Toggle copy check (AR + EN): "ثابت" must read as the current theme; "يتبع الصلاة"
       must say that **only the colours** change.
 - [ ] Screenshots: home over the six periods; reader/mushaf/share card unchanged.
@@ -176,7 +178,9 @@ used; `AnimatedTheme` fades the swap.
 
 **Task 3.2 — docs, ledger, CI**
 
-- [ ] `docs/design/prayer-skin.md`: the palettes, the rules, the rollback.
+- [ ] `docs/design/prayer-skin.md`: the palettes, the rules, the rollback. Include the
+      reader rule (the wrapper + the toast following its caller's theme, so a reader
+      toast is neutral and a chrome toast takes the palette).
 - [ ] Ledger close-out (append-only), full gates at the tip, CI on the PR.
 - [ ] **No push without owner GO.**
 
@@ -197,7 +201,7 @@ used; `AnimatedTheme` fades the swap.
 | Risk | Mitigation |
 |---|---|
 | A role the widgets read slips back to the seed | the seed-leak test |
-| `surfaceContainer == surface` makes sheets blend into cards | device pass on a sheet + dialog; the hairline is the separator |
+| `surfaceContainer == surface` makes sheets blend into cards | `surfaceContainerLow` carries a 40% tile blend; contrast test (ratio > 1.03) + a real-sheet widget test; device screenshot |
 | gold text on a gold container (4.78 margin) | never for small text; the rule is in `docs/design/prayer-skin.md` |
 | The 400 ms lerp on a low-end device | profile timeline, budget stated per refresh rate |
 | Period edge cases (midnight, no sunrise, DST) | the six boundary tests |
