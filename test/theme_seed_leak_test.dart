@@ -80,10 +80,10 @@ void main() {
             reason: 'appBarInk');
         expect(_hex(theme.dividerTheme.color!), _hex(palette.hairline),
             reason: 'divider');
-        expect(_hex(scheme.surfaceContainer), _hex(palette.surface),
+        expect(_hex(scheme.surfaceContainer), _hex(palette.sheetSurface),
             reason: 'dialog surface');
-        expect(_hex(scheme.surfaceContainerLow), _hex(palette.surface),
-            reason: 'low sheet surface');
+        expect(_hex(scheme.surfaceContainerLow), _hex(palette.sheetSurface),
+            reason: 'bottom-sheet surface must differ from a card fill');
         expect(_hex(scheme.surfaceContainerHigh), _hex(palette.tile),
             reason: 'high sheet surface');
         expect(_hex(scheme.inverseSurface), _hex(palette.ink),

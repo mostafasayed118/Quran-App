@@ -272,9 +272,12 @@ abstract final class AppTheme {
       // the token moves the container and the label together.
       errorContainer: palette?.errorContainer,
       onErrorContainer: palette?.onErrorContainer,
-      // The surface family Material dialogs and sheets read.
-      surfaceContainer: palette?.surface,
-      surfaceContainerLow: palette?.surface,
+      // The surface family Material dialogs and sheets read. Dialogs take
+      // High (the tile tone, distinct from a card); sheets take Low, whose
+      // fill would equal the card at `surface`, so it carries the 40% tile
+      // blend instead.
+      surfaceContainer: palette?.sheetSurface,
+      surfaceContainerLow: palette?.sheetSurface,
       surfaceContainerHigh: palette?.tile,
       // A raw SnackBar must not fall back to a seeded inverse.
       inverseSurface: palette?.ink,

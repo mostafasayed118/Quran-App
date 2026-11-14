@@ -85,26 +85,260 @@ void main() {
     });
   });
 
-  testWidgets('the reader keeps the shipped palette under a skin theme',
-      (tester) async {
-    late ThemeData seen;
-    await tester.pumpWidget(
-      // The widget only reads an inherited Theme, so no app shell is needed;
-      // the palette sits above it exactly as the root would place it.
-      Theme(
-        data: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
-        child: NeutralReadingTheme(
-          child: Builder(
-            builder: (context) {
-              seen = Theme.of(context);
-              return const SizedBox.shrink();
-            },
+  group('the reader stays neutral', () {
+    for (final (name, brightness) in const [
+      (PrayerName.fajr, Brightness.dark),
+      (PrayerName.sunrise, Brightness.light),
+      (PrayerName.isha, Brightness.light),
+    ]) {
+      testWidgets('${name.name}/${brightness.name} resolves the shipped roles',
+          (tester) async {
+        late ThemeData seen;
+        await pumpAppHost(
+          tester,
+          theme: AppTheme.forPrayer(name, brightness),
+          home: NeutralReadingTheme(
+            child: Builder(
+              builder: (context) {
+                seen = Theme.of(context);
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+        );
+
+        expect(themeRoles(seen), shippedThemeRoles[brightness.name]);
+      });
+    }
+
+    testWidgets(
+        'a brightness change while the reader is open swaps to that '
+        'shipped theme', (tester) async {
+      final brightness = ValueNotifier(Brightness.light);
+      addTearDown(brightness.dispose);
+      late ThemeData seen;
+      await tester.pumpWidget(
+        ValueListenableBuilder<Brightness>(
+          valueListenable: brightness,
+          builder: (_, value, __) => Theme(
+            data: AppTheme.forPrayer(PrayerName.fajr, value),
+            child: NeutralReadingTheme(
+              child: Builder(
+                builder: (context) {
+                  seen = Theme.of(context);
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
           ),
         ),
-      ),
-    );
+      );
+      expect(themeRoles(seen), shippedThemeRoles['light']);
 
-    expect(themeRoles(seen), shippedThemeRoles['light']);
+      brightness.value = Brightness.dark;
+      await tester.pump();
+
+      expect(themeRoles(seen), shippedThemeRoles['dark']);
+    });
+
+    testWidgets('a dialog opened from the reader captures the neutral theme',
+        (tester) async {
+      late ThemeData dialogTheme;
+      await pumpAppHost(
+        tester,
+        theme: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
+        home: NeutralReadingTheme(
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => Center(
+                child: TextButton(
+                  onPressed: () => showDialog<void>(
+                    context: context,
+                    builder: (dialogContext) {
+                      dialogTheme = Theme.of(dialogContext);
+                      return const AlertDialog(content: Text('dialog'));
+                    },
+                  ),
+                  child: const Text('open dialog'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open dialog'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+
+      expect(themeRoles(dialogTheme), shippedThemeRoles['light']);
+      final dialogMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(AlertDialog),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(
+        dialogMaterial.color?.toARGB32(),
+        AppTheme.light.colorScheme.surfaceContainerHigh.toARGB32(),
+      );
+    });
+
+    testWidgets('a modal sheet opened from the reader is neutral and separated',
+        (tester) async {
+      late ThemeData sheetTheme;
+      await pumpAppHost(
+        tester,
+        theme: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
+        home: NeutralReadingTheme(
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => Center(
+                child: TextButton(
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    builder: (sheetContext) {
+                      sheetTheme = Theme.of(sheetContext);
+                      return const SizedBox(height: 80);
+                    },
+                  ),
+                  child: const Text('open sheet'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('open sheet'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+
+      expect(themeRoles(sheetTheme), shippedThemeRoles['light']);
+      final sheetMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(BottomSheet),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      // Neutral sheet: the shipped role, and not the card fill it covers.
+      expect(
+        sheetMaterial.color?.toARGB32(),
+        AppTheme.light.colorScheme.surfaceContainerLow.toARGB32(),
+      );
+      expect(
+        sheetMaterial.color?.toARGB32(),
+        isNot(AppTheme.light.colorScheme.surface.toARGB32()),
+      );
+    });
+
+    testWidgets('a raw SnackBar in the reader uses the neutral snackbar theme',
+        (tester) async {
+      await pumpAppHost(
+        tester,
+        theme: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
+        home: NeutralReadingTheme(
+          child: Scaffold(
+            body: Builder(
+              builder: (context) => Center(
+                child: TextButton(
+                  onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('raw')),
+                  ),
+                  child: const Text('raw toast'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('raw toast'));
+      await tester.pump();
+
+      final material = tester.widget<Material>(
+        find
+            .descendant(
+                of: find.byType(SnackBar), matching: find.byType(Material))
+            .first,
+      );
+      expect(
+        material.color?.toARGB32(),
+        AppTheme.light.colorScheme.surface.toARGB32(),
+      );
+
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+    });
+  });
+
+  group('the chrome sheet', () {
+    testWidgets('is separated from a card in a light and a dark period',
+        (tester) async {
+      for (final (name, brightness) in const [
+        (PrayerName.dhuhr, Brightness.light),
+        (PrayerName.isha, Brightness.dark),
+      ]) {
+        final palette = PrayerPalettes.of(name, brightness);
+        await pumpAppHost(
+          tester,
+          theme: AppTheme.forPrayer(name, brightness),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => Center(
+                child: TextButton(
+                  onPressed: () => showModalBottomSheet<void>(
+                    context: context,
+                    builder: (_) => const SizedBox(height: 80),
+                  ),
+                  child: const Text('chrome sheet'),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('chrome sheet'));
+        await tester.pumpAndSettle(
+          const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate,
+          const Duration(seconds: 10),
+        );
+
+        final material = tester.widget<Material>(
+          find
+              .descendant(
+                of: find.byType(BottomSheet),
+                matching: find.byType(Material),
+              )
+              .first,
+        );
+        final fill = material.color!;
+        expect(fill.toARGB32(), palette.sheetSurface.toARGB32());
+        expect(fill.toARGB32(), isNot(palette.surface.toARGB32()));
+
+        await tester.tapAt(const Offset(8, 8)); // Dismiss the sheet.
+        await tester.pumpAndSettle(
+          const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate,
+          const Duration(seconds: 10),
+        );
+      }
+    });
   });
 
   group('the settings row', () {

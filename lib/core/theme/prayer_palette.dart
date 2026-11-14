@@ -72,6 +72,15 @@ class PrayerPalette {
 
   /// The chrome bar: the page tinted 6% toward the period primary.
   Color get appBar => Color.alphaBlend(primary.withValues(alpha: 0.06), page);
+
+  /// The raised panels a sheet or a navigation bar paints.
+  ///
+  /// A modal sheet defaults to `surfaceContainerLow`; at [surface] it would be
+  /// the exact fill of a card beneath it, with nothing but the scrim between
+  /// them. The tile tone at 40% keeps the sheet in the period family while
+  /// separating it from the card it covers.
+  Color get sheetSurface =>
+      Color.alphaBlend(tile.withValues(alpha: 0.40), surface);
 }
 
 /// The twelve palettes, one per prayer and brightness.

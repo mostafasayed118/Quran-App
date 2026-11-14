@@ -78,6 +78,19 @@ void main() {
               '$label ${entry.key}/surface');
         }
       });
+
+      test('$label separates a sheet from a card', () {
+        // A modal sheet defaults to `surfaceContainerLow`; at `surface` it is
+        // the exact fill of the card it covers.
+        expect(palette.sheetSurface, isNot(palette.surface));
+        expect(palette.sheetSurface, isNot(palette.tile));
+        final ratio = _ratio(palette.sheetSurface, palette.surface);
+        expect(
+          ratio,
+          greaterThan(1.03),
+          reason: '$label sheet/surface is ${ratio.toStringAsFixed(3)}:1',
+        );
+      });
     }
   }
 }
