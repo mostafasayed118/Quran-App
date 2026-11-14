@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:quran_yahdi/core/domain/prayer_name.dart';
+import 'package:quran_yahdi/core/theme/app_theme.dart';
+import 'package:quran_yahdi/core/theme/prayer_palette.dart';
 import 'package:quran_yahdi/core/widgets/app_toast.dart';
+import 'package:quran_yahdi/core/widgets/neutral_reading_theme.dart';
 
 import 'support/host.dart';
 
@@ -119,6 +123,62 @@ void main() {
     await tester.pump();
 
     expect(undone, isTrue);
+
+    await _drain(tester);
+  });
+
+  testWidgets('a toast raised from the reader is neutral', (tester) async {
+    await pumpAppHost(
+      tester,
+      theme: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
+      home: NeutralReadingTheme(
+        child: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: TextButton(
+                onPressed: () => AppToast.show(context, 'copied'),
+                child: const Text('reader toast'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('reader toast'));
+    await tester.pump();
+
+    final snack = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(
+      snack.backgroundColor?.toARGB32(),
+      AppTheme.light.colorScheme.surface.toARGB32(),
+    );
+
+    await _drain(tester);
+  });
+
+  testWidgets('a toast raised by the chrome takes the palette', (tester) async {
+    final palette = PrayerPalettes.of(PrayerName.isha, Brightness.light);
+    await pumpAppHost(
+      tester,
+      theme: AppTheme.forPrayer(PrayerName.isha, Brightness.light),
+      home: Scaffold(
+        body: Builder(
+          builder: (context) => Center(
+            child: TextButton(
+              onPressed: () => AppToast.show(context, 'copied'),
+              child: const Text('chrome toast'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('chrome toast'));
+    await tester.pump();
+
+    final snack = tester.widget<SnackBar>(find.byType(SnackBar));
+    expect(snack.backgroundColor?.toARGB32(), palette.surface.toARGB32());
 
     await _drain(tester);
   });

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
-import '../theme/app_theme.dart';
 
 /// The three intents a confirmation toast can carry.
 enum ToastTone {
@@ -49,6 +48,10 @@ abstract final class AppToast {
     showOn(
       messenger,
       message,
+      // The toast belongs to the surface that raised it: a reader pinned to
+      // the shipped theme raises a neutral toast even when the chrome follows
+      // the prayer.
+      theme: Theme.of(context),
       tone: tone,
       icon: icon,
       actionLabel: actionLabel,
@@ -59,9 +62,13 @@ abstract final class AppToast {
 
   /// The post-`await` form: capture the messenger before suspending, then
   /// present without touching a possibly-unmounted [BuildContext].
+  ///
+  /// [theme] is the caller's theme when it is still known; otherwise the
+  /// messenger's (the chrome) is used.
   static void showOn(
     ScaffoldMessengerState messenger,
     String message, {
+    ThemeData? theme,
     ToastTone tone = ToastTone.info,
     IconData? icon,
     String? actionLabel,
@@ -69,12 +76,12 @@ abstract final class AppToast {
     Duration? duration,
   }) {
     if (!messenger.mounted) return;
-    final context = messenger.context;
-    final colors = Theme.of(context).colorScheme;
-    final isLight = Theme.of(context).brightness == Brightness.light;
-    final accent = _accentOf(context, tone);
+    final resolved = theme ?? Theme.of(messenger.context);
+    final colors = resolved.colorScheme;
+    final isLight = resolved.brightness == Brightness.light;
+    final accent = _accentOf(resolved, tone);
     final width = math.min(
-      MediaQuery.sizeOf(context).width - AppSpacing.lg * 2,
+      MediaQuery.sizeOf(messenger.context).width - AppSpacing.lg * 2,
       _maxWidth,
     );
 
@@ -87,6 +94,7 @@ abstract final class AppToast {
             tone: tone,
             icon: icon,
             accent: accent,
+            theme: resolved,
           ),
           // A fixed width keeps the toast a card on every form factor; the
           // Scaffold still lifts it above the navigation bar and mini player.
@@ -123,11 +131,12 @@ abstract final class AppToast {
   ///
   /// Gold is a light accent (~1.9:1 on paper), so [ToastTone.info] uses the
   /// darkened `goldText` in light mode and the bright gold in dark mode.
-  static Color _accentOf(BuildContext context, ToastTone tone) =>
-      switch (tone) {
-        ToastTone.success => Theme.of(context).colorScheme.primary,
-        ToastTone.error => Theme.of(context).colorScheme.error,
-        ToastTone.info => AppTheme.goldText(context),
+  static Color _accentOf(ThemeData theme, ToastTone tone) => switch (tone) {
+        ToastTone.success => theme.colorScheme.primary,
+        ToastTone.error => theme.colorScheme.error,
+        ToastTone.info => theme.brightness == Brightness.light
+            ? AppColors.goldText
+            : AppColors.gold,
       };
 }
 
@@ -137,16 +146,18 @@ class _ToastBody extends StatelessWidget {
     required this.tone,
     required this.icon,
     required this.accent,
+    required this.theme,
   });
 
   final String message;
   final ToastTone tone;
   final IconData? icon;
   final Color accent;
+  final ThemeData theme;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final colors = theme.colorScheme;
     return Row(
       children: [
         // The glyph restates the tone; screen readers already get the message
@@ -173,12 +184,12 @@ class _ToastBody extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: colors.onSurface,
-                  // Arabic script needs the extra leading; 1.45 clips the
-                  // diacritics on a two-line message.
-                  height: 1.6,
-                ),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurface,
+              // Arabic script needs the extra leading; 1.45 clips the
+              // diacritics on a two-line message.
+              height: 1.6,
+            ),
           ),
         ),
       ],
