@@ -139,17 +139,36 @@ The unified rung is accepted only if **none** of the four screens (`asma`,
 **before** the "after" shot is opened, so the bar cannot move with the
 impression.
 
+**If nothing fails, the default is to keep the shipped values.** Passing
+(a)–(d) is permission to change, not a reason. The roles stay
+`scriptureTightHeight` (asma), `scriptureHeight` (duas/azkar/hadith),
+`scriptureLooseHeight` (ayah sheet) and `dhikrHeight` (the long recitation
+prose). Folding all of them onto one `1.8` is accepted only if the worst-case
+captures show a **clear reading gain** that the shipped value does not have —
+not merely that no screen broke.
+
+**Worst-case capture, not the first screen.** For each of the four screens,
+open the **longest text** in that category (longest dua, longest hadith,
+longest dhikr, the longest asma explanation), set the app's font/reader size
+and the system text scale to the **largest allowed** value (2.0), and capture
+at 360 dp width on the phone. The **same entry, scale and width** are used for
+the before and after pair; record them with the shots.
+
 ## Device session order (W2 + deferred periods)
 
 1. On the shipped `fixed` build: capture the W2 **before** shots on the
-   physical phone.
-2. Build W2 and capture **after** at the same width and theme.
+   physical phone **before any new build**. Record the date, the installed
+   version (`2006`), the source SHA if the artifact exposes it (otherwise say
+   it is not recoverable — do not substitute the current `main` SHA), the
+   chosen entry, the text scale and the width.
+2. Build W2 and capture **after** with the same entry, scale, width and theme.
 3. Switch to `follow` and capture the four periods two minutes after each
    adhan (card + dialog + bottom sheet).
 4. Restore `fixed` after isha and record it in the ledger.
 
 `fixed` is not swapped between sessions, so the before/after pair and the
-period pass do not contaminate each other.
+period pass do not contaminate each other. W2 is not opened as a branch until
+this session is scheduled; no half-done W2 branch.
 
 ## Device note
 
