@@ -1534,3 +1534,11 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Preserved, not lost:** the commit was already pinned by the owner's annotated tag **`archive/pilot-jiro-solra-hero-2026-10-25`** → `1801888f` (message: *"Archived before deleting the branch: unique web landing-hero redesign (1801888), superseded by 5132abe (heritage landing). Keep for history."*). The tag was local-only; this wave pushed it to origin and dropped the temporary lightweight tag created during the cleanup. Recover with `git switch -c <name> archive/pilot-jiro-solra-hero-2026-10-25`.
 - **Dependabot heads, same session:** four **merged** PRs had left their branches behind — `#11` (`@astrojs/check` 0.9.12), `#23` (`@types/node` 26.6.6), `#15` (drift 2.35.4), `#8` (freezed 4.0.3) — all four deleted. `dependabot/npm_and_yarn/web/typescript-7.0.2` stays on purpose: **PR #5 is open**, Flutter `analyze-test` is green, the two **web gates are red** (TypeScript 7 is a breaking major) — awaiting the close-or-migrate decision.
 - **Remote heads now:** `main` + the TypeScript-7 head only.
+
+### 2026-11-14 — TypeScript pinned to 6, PR #5 closed — MERGED (PR #51)
+
+- **Why:** TypeScript 7 is a breaking major (the native port) — `astro check` cannot load it, so both web `gates` jobs fail on PR #5 while the Flutter `analyze-test` passes. A migration, not a bump.
+- **Change:** `web/package.json` `^6.0.3` → **`~6.0.3`** (the lock still resolves **6.0.3**); `.github/dependabot.yml` ignores `version-update:semver-major` for `typescript`, with the removal procedure in the comment beside it.
+- **Dependency chain (disclosed):** the pin PR was first blocked by an **unrelated** `npm audit` finding — moderate advisory in `astro` ≤ 7.4.6 (GHSA-r3h5-4585-7x3w). The green dependabot patch **PR #50** (`astro` 7.4.5 → 7.4.10) merged first as the unblock; #51 then took main and the audit passed.
+- **Verified:** `npm ci` clean · `npm run check` (`astro check`) **0 errors** over 144 files · CI `web-gates` **`43539295279` success** and `ci` **`43539295318` success** on #51.
+- **Follow-up:** PR #5 closed with the reason and its branch deleted. Deleting the ignore rule is the first step of the TS 7 migration.
