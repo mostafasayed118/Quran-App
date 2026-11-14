@@ -439,5 +439,36 @@ void main() {
 
       await controller.refresh(); // Must not throw or notify.
     });
+
+    test('stop cancels the timer and keeps the period; start re-arms it',
+        () async {
+      Timer? armed;
+      final controller = PrayerPeriodController(
+        city: city,
+        times: times,
+        config: config,
+        cityChanges: cityChanges.stream,
+        now: () => clock,
+        schedule: (delay, fire) {
+          armed = Timer(const Duration(days: 3650), () {});
+          return armed!;
+        },
+      );
+      addTearDown(controller.dispose);
+
+      controller.start();
+      await pumpEventQueue();
+      expect(controller.period, PrayerName.sunrise);
+      expect(armed?.isActive, isTrue);
+
+      controller.stop();
+      controller.stop(); // Idempotent.
+      expect(armed?.isActive, isFalse);
+      expect(controller.period, PrayerName.sunrise); // The last period is kept.
+
+      controller.start();
+      await pumpEventQueue();
+      expect(armed?.isActive, isTrue);
+    });
   });
 }

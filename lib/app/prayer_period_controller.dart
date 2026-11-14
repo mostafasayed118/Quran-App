@@ -64,6 +64,7 @@ class PrayerPeriodController extends ChangeNotifier {
   /// Idempotent: the app root calls it once per `follow` selection, and the
   /// subscriptions are only created the first time.
   void start() {
+    if (_disposed) return;
     _configSubscription ??= _config.changes.listen(
       (_) => unawaited(refresh()),
     );
@@ -71,6 +72,19 @@ class PrayerPeriodController extends ChangeNotifier {
       (_) => unawaited(refresh()),
     );
     unawaited(refresh());
+  }
+
+  /// Stops observing and cancels the timer, keeping the last period.
+  ///
+  /// Used when the skin is `fixed`: the palette is unused then, so no boundary
+  /// work should run. [start] re-arms it when the user opts in.
+  void stop() {
+    _timer?.cancel();
+    _timer = null;
+    unawaited(_configSubscription?.cancel());
+    _configSubscription = null;
+    unawaited(_citySubscription?.cancel());
+    _citySubscription = null;
   }
 
   /// Recomputes the period and re-arms the timer.

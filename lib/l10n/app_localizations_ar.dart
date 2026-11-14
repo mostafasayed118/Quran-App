@@ -142,6 +142,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get themeDark => 'غامق';
 
   @override
+  String get settingsPrayerSkin => 'مظهر الصلاة';
+
+  @override
+  String get prayerSkinFixed => 'ثابت — المظهر الحالي';
+
+  @override
+  String get prayerSkinFollow => 'يتبع الصلاة — الألوان فقط';
+
+  @override
   String get recitations => 'التلاوات';
 
   @override

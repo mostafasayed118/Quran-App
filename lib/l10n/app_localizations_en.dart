@@ -142,6 +142,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDark => 'Dark';
 
   @override
+  String get settingsPrayerSkin => 'Prayer skin';
+
+  @override
+  String get prayerSkinFixed => 'Fixed — the current theme';
+
+  @override
+  String get prayerSkinFollow => 'Follow the prayer — colours only';
+
+  @override
   String get recitations => 'Recitations';
 
   @override

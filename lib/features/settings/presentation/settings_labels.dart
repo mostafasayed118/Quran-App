@@ -22,6 +22,16 @@ String _themeLabel(AppLocalizations loc, AppThemeMode mode) => switch (mode) {
       AppThemeMode.dark => loc.themeDark,
     };
 
+/// The label for the current prayer-skin choice.
+///
+/// Each label carries its own promise: `fixed` names the theme the user sees
+/// today, `follow` says that only the colours move.
+String _prayerSkinLabel(AppLocalizations loc, PrayerSkinMode mode) =>
+    switch (mode) {
+      PrayerSkinMode.fixed => loc.prayerSkinFixed,
+      PrayerSkinMode.follow => loc.prayerSkinFollow,
+    };
+
 /// Offers the three appearance modes; the controller applies and persists the
 /// pick, and the app root repaints immediately.
 /// Shared radio-option dialog body for the single-choice settings pickers.
@@ -74,6 +84,22 @@ Future<void> _pickTheme(
     values: AppThemeMode.values,
     current: controller.mode,
     label: (mode) => _themeLabel(loc, mode),
+    apply: controller.setMode,
+  );
+}
+
+/// Offers `fixed` / `follow`; the choice applies immediately and persists.
+Future<void> _pickPrayerSkin(
+  BuildContext context,
+  AppLocalizations loc,
+  PrayerSkinController controller,
+) async {
+  await _pickFromList<PrayerSkinMode>(
+    context: context,
+    title: loc.settingsPrayerSkin,
+    values: PrayerSkinMode.values,
+    current: controller.mode,
+    label: (mode) => _prayerSkinLabel(loc, mode),
     apply: controller.setMode,
   );
 }

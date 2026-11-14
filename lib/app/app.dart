@@ -5,19 +5,35 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
+import '../core/domain/prayer_name.dart';
 import '../core/domain/reminder_diagnostics.dart';
 import '../core/domain/reminders.dart';
 import '../core/l10n/app_locale_controller.dart';
 import '../core/theme/app_system_ui.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_theme_controller.dart';
+import '../core/theme/prayer_skin_controller.dart';
 import '../features/library/data/pack_downloader.dart';
 import '../l10n/app_localizations.dart';
 import 'bootstrap.dart';
 import 'di/injector.dart';
+import 'prayer_period_controller.dart';
 import 'reminder_plan_freshness.dart';
 import 'router.dart';
 import 'splash_screen.dart';
+
+/// The chrome theme for [shipped] under the prayer skin.
+///
+/// `fixed` (or a period that has not been computed yet) returns [shipped]
+/// **unchanged** — the rollback path is the identity, not a rebuilt theme.
+ThemeData chromeTheme({
+  required ThemeData shipped,
+  required bool followsPrayer,
+  required PrayerName? period,
+}) {
+  if (!followsPrayer || period == null) return shipped;
+  return AppTheme.forPrayer(period, shipped.brightness);
+}
 
 class QuranYahdiApp extends StatefulWidget {
   const QuranYahdiApp({super.key});
@@ -36,6 +52,13 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   /// `MaterialApp.themeMode` (system until the stored choice lands).
   late final AppThemeController _theme = getIt<AppThemeController>();
 
+  /// The opt-in prayer skin. `fixed` until the stored choice lands.
+  late final PrayerSkinController _skin = getIt<PrayerSkinController>();
+
+  /// Which period it is, when the skin follows the prayer. No timer runs while
+  /// the skin is `fixed`.
+  late final PrayerPeriodController _period = getIt<PrayerPeriodController>();
+
   /// The day/zone the current plan belongs to, plus the last observed
   /// exact-alarm grant (a grant change alters the schedule MODE).
   final ReminderPlanFreshness _planFreshness = ReminderPlanFreshness();
@@ -45,6 +68,10 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // The boundary timer only runs when the skin follows the prayer, so it is
+    // started/stopped with the flag (and re-armed on a settings flip).
+    _skin.addListener(_syncPrayerSkin);
+    _syncPrayerSkin();
     // Establish the grant baseline so the first resume does not re-plan for
     // nothing; a change is what matters.
     unawaited(_syncAlarmGrant());
@@ -52,8 +79,18 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
 
   @override
   void dispose() {
+    _skin.removeListener(_syncPrayerSkin);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  /// Starts or stops the period source with the flag.
+  void _syncPrayerSkin() {
+    if (_skin.followsPrayer) {
+      _period.start();
+    } else {
+      _period.stop();
+    }
   }
 
   @override
@@ -68,6 +105,9 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
         }
       case AppLifecycleState.resumed:
         _refreshRemindersIfStale();
+        // The device may have slept across several boundaries (or the user
+        // travelled): recompute instead of trusting the pending timer.
+        if (_skin.followsPrayer) unawaited(_period.refresh());
       case AppLifecycleState.inactive:
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
@@ -129,12 +169,29 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
 
   @override
   Widget build(BuildContext context) {
+    final follows = _skin.followsPrayer;
+    final period = follows ? _period.period : null;
     return ListenableBuilder(
-      listenable: Listenable.merge(<Listenable>[_locale, _theme]),
+      listenable: Listenable.merge(<Listenable>[
+        _locale,
+        _theme,
+        _skin,
+        // Only while following: a boundary must not rebuild the tree when the
+        // skin is fixed.
+        if (follows) _period,
+      ]),
       builder: (context, _) => MaterialApp.router(
         onGenerateTitle: (context) => AppLocalizations.of(context).appName,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
+        theme: chromeTheme(
+          shipped: AppTheme.light,
+          followsPrayer: follows,
+          period: period,
+        ),
+        darkTheme: chromeTheme(
+          shipped: AppTheme.dark,
+          followsPrayer: follows,
+          period: period,
+        ),
         themeMode: _theme.themeMode,
         locale: _locale.locale,
         // Arabic stays the default (AppLanguage.arabic); English is opt-in from
@@ -146,9 +203,17 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        builder: (context, child) => AnnotatedRegion<SystemUiOverlayStyle>(
-          value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
-          child: SplashScreen(child: child!),
+        // A boundary change fades over 400 ms instead of flipping: every
+        // `Theme.of` dependent rebuilds per frame for that window, once per
+        // prayer (measured on a device in the profile build).
+        builder: (context, child) => AnimatedTheme(
+          data: Theme.of(context),
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+          child: AnnotatedRegion<SystemUiOverlayStyle>(
+            value: AppSystemUi.overlayStyle(Theme.of(context).brightness),
+            child: SplashScreen(child: child!),
+          ),
         ),
         routerConfig: AppRouter.router,
       ),
