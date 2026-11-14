@@ -170,6 +170,12 @@ rule**, chosen before the shot — not by appearance.
 
 - The hadith pack is `ara-bukhari` (catalog v1.2, edition `df57907…`, 9.4 MB).
   Install it **before** the before shot; it is app data, not a new build.
+- Installing the pack is **additive**: it writes one file under the app's
+  support directory and one registry row; it does not clear app data, the
+  reader/bookmarks, or other packs. Reinstalling the same id replaces only that
+  pack's file. Removal after the session: Library → the pack's trash icon →
+  confirm (this calls `uninstall(packId)` and removes only this pack). Record
+  the pack id and whether it was removed.
 - Text scale 2.0 and 360 dp width apply to every entry; the same entry is used
   for before and after.
 
@@ -202,6 +208,17 @@ build's source.
 `fixed` is not swapped between sessions, so the before/after pair and the
 period pass do not contaminate each other. W2 is not opened as a branch until
 this session is scheduled; no half-done W2 branch.
+
+## Capture conditions (same for before and after)
+
+- **Brightness:** disable auto-brightness and set one fixed level; record it
+  and restore the previous setting after the session.
+- **Orientation:** portrait.
+- **Theme:** the same light/dark mode on both sides. Dark and light change how
+  diacritics read, so capture **both themes** if time allows; if only one is
+  captured, record which one and why.
+- **Period:** on `fixed` the prayer period does not change the theme, but
+  record it in the package anyway.
 
 ## Device note
 
