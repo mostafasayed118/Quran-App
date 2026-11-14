@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../tool/design_token_scan.dart';
+import '../tools/design_token_scan.dart';
 import 'fixtures/design_token_baseline.dart';
 
 /// The ratchet for design literals.

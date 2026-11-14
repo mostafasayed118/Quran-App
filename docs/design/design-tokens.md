@@ -25,10 +25,10 @@ The census is now **0 hits in 0 buckets**.
 
 ## The ratchet
 
-`tool/design_token_scan.dart` walks paren-balanced `TextStyle`, `StrutStyle`,
+`tools/design_token_scan.dart` walks paren-balanced `TextStyle`, `StrutStyle`,
 `.copyWith`, `Icon(`, `BorderSide`/`Border.all`, `withValues(alpha:)` and
 `opacity:` blocks (including ternary alpha/opacity expressions).
-`tool/design_token_census.dart` prints the map.
+`tools/design_token_census.dart` prints the map.
 
 `test/design_token_guard_test.dart` compares the tree to
 `test/fixtures/design_token_baseline.dart` with exact map equality, so a new
@@ -42,7 +42,7 @@ transparent gradient stop pass.
 ### Call-site proof
 
 The value test proves `token == shipped literal`; it does not prove the call
-site received the right token. `tool/design_token_diff_audit.dart [base]` pairs
+site received the right token. `tools/design_token_diff_audit.dart [base]` pairs
 every removed literal with the token added at the same site, by role (alpha,
 opacity, line height, tracking, icon, radius, stroke, hex), resolves the token
 from `lib/core/theme/`, and fails on a mismatch or an unpaired change.
@@ -61,7 +61,16 @@ so this diff audit plus the value pins are the pixel-equivalence evidence.
 It is a textual ratchet, not an AST proof. Computed literals such as
 `height: 1.8 + x`, `size: 18 * scale` or `Color.fromARGB(...)` are not
 matched. The `lib/core/theme/` directory is the explicit exception (it is the
-token source), and `test/`/`tool/` are out of scope.
+token source), and `test/`/`tools/` are out of scope.
+
+The opacity rule is broader than the constructor that exposed the gap: it
+reads **any** `opacity:` expression, so `Opacity`, `AnimatedOpacity` and
+`FadeTransition` with a numeric literal are covered. What remains outside is
+anything the text cannot see: a value held in a local
+(`final fade = 0.4; … opacity: fade`), a `ColorFiltered` colour whose alpha is
+not a `Color(0x…)` or a `withValues` call, and any new opacity mechanism that
+does not spell `opacity:`. Extend the scanner when such a site appears; do not
+widen the regex blindly.
 
 ## Tokens added
 
@@ -113,6 +122,34 @@ list, not merely that two reminders exist.
    values; fold them into `md 12` / `lg 16` by role. `sheet 28` stays.
 4. **Muted ink.** `metaInk 0.70` and `secondaryInk 0.75` play the same
    apparent role on tinted cards. Unify only with screenshots.
+
+## W2 decision criteria (written before the screenshots)
+
+**Scripture line height.** A screen keeps its shipped value if, at 1.0 and 2.0
+text scale on a 360 dp surface, any of these is true:
+
+- (a) a diacritic is clipped at the top or bottom of its line box;
+- (b) marks from two consecutive lines touch or overlap;
+- (c) the paragraph touches the adjacent rule or card edge;
+- (d) the baseline gap reads visibly tighter than the shipped screenshot at the
+  same width.
+
+The unified rung is accepted only if **none** of the four screens (`asma`,
+`duas`, `azkar`, `hadith`) fails (a)–(d). The verdict is written per screen
+**before** the "after" shot is opened, so the bar cannot move with the
+impression.
+
+## Device session order (W2 + deferred periods)
+
+1. On the shipped `fixed` build: capture the W2 **before** shots on the
+   physical phone.
+2. Build W2 and capture **after** at the same width and theme.
+3. Switch to `follow` and capture the four periods two minutes after each
+   adhan (card + dialog + bottom sheet).
+4. Restore `fixed` after isha and record it in the ledger.
+
+`fixed` is not swapped between sessions, so the before/after pair and the
+period pass do not contaminate each other.
 
 ## Device note
 

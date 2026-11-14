@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../tool/design_token_scan.dart';
+import '../tools/design_token_scan.dart';
 
 /// Proves the scanner sees every literal form the guard claims to cover,
 /// including the multi-line and `copyWith` cases a line regex would miss.
