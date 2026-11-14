@@ -161,15 +161,18 @@ class _PrayerBody extends StatelessWidget {
                       Icon(
                         Icons.location_on_outlined,
                         size: 13,
-                        color: colors.onPrimaryContainer.withValues(alpha: 0.7),
+                        color: colors.onPrimaryContainer.withValues(
+                          alpha: AppAlphas.metaInk,
+                        ),
                       ),
                       Text(
                         loc.localeName == 'ar'
                             ? prayer.cityName
                             : (cityNameEn ?? prayer.cityName),
                         style: AppTheme.caption.copyWith(
-                          color:
-                              colors.onPrimaryContainer.withValues(alpha: 0.7),
+                          color: colors.onPrimaryContainer.withValues(
+                            alpha: AppAlphas.metaInk,
+                          ),
                         ),
                       ),
                     ],
@@ -295,7 +298,9 @@ class _TodayPanel extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: AppRadius.lgAll,
-        side: BorderSide(color: colors.primary.withValues(alpha: 0.18)),
+        side: BorderSide(
+          color: colors.primary.withValues(alpha: AppAlphas.outlineFaint),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -314,7 +319,9 @@ class _TodayPanel extends StatelessWidget {
             Divider(
               height: 1,
               thickness: 1,
-              color: colors.onPrimaryContainer.withValues(alpha: 0.12),
+              color: colors.onPrimaryContainer.withValues(
+                alpha: AppAlphas.dividerOnTint,
+              ),
             ),
           ],
           InkWell(
@@ -375,7 +382,9 @@ class _ContinueRow extends StatelessWidget {
               Text(
                 loc.continueReadingAyah(loc.number(lastRead.ayahNumber)),
                 style: AppTheme.caption.copyWith(
-                  color: colors.onPrimaryContainer.withValues(alpha: 0.75),
+                  color: colors.onPrimaryContainer.withValues(
+                    alpha: AppAlphas.secondaryInk,
+                  ),
                 ),
               ),
             ],
@@ -384,7 +393,9 @@ class _ContinueRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         Icon(
           chevron,
-          color: colors.onPrimaryContainer.withValues(alpha: 0.6),
+          color: colors.onPrimaryContainer.withValues(
+            alpha: AppAlphas.iconMuted,
+          ),
         ),
       ],
     );

@@ -31,7 +31,7 @@ class _TomorrowNote extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: colors.primary.withValues(alpha: 0.10),
+                color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -102,7 +102,7 @@ class _CityCard extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: colors.primary.withValues(alpha: 0.10),
+                  color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -157,7 +157,7 @@ class _PrayerRow extends StatelessWidget {
     final isSunrise = entry.name == PrayerName.sunrise;
     final foreground = isNext ? colors.onPrimaryContainer : colors.onSurface;
     final muted = isNext
-        ? colors.onPrimaryContainer.withValues(alpha: 0.75)
+        ? colors.onPrimaryContainer.withValues(alpha: AppAlphas.secondaryInk)
         : colors.onSurfaceVariant;
 
     return Container(

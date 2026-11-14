@@ -178,7 +178,7 @@ class _CalibrationHint extends StatelessWidget {
         vertical: AppSpacing.sm,
       ),
       decoration: BoxDecoration(
-        color: colors.errorContainer.withValues(alpha: 0.35),
+        color: colors.errorContainer.withValues(alpha: AppAlphas.errorTint),
         borderRadius: AppRadius.mdAll,
       ),
       child: Row(
@@ -219,7 +219,7 @@ class _AlignmentHint extends StatelessWidget {
             vertical: AppSpacing.sm,
           ),
           decoration: BoxDecoration(
-            color: colors.secondary.withValues(alpha: 0.14),
+            color: colors.secondary.withValues(alpha: AppAlphas.secondaryTile),
             borderRadius: AppRadius.pillAll,
           ),
           child: Row(

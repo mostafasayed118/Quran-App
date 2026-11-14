@@ -8,6 +8,7 @@ import '../../../../core/domain/city.dart';
 import '../../../../core/domain/prayer_name.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/theme/app_alphas.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_alphas.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -54,7 +55,9 @@ class VerseCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
-              color: AppColors.mushafCardAccent.withValues(alpha: 0.35)),
+              color: AppColors.mushafCardAccent.withValues(
+            alpha: AppAlphas.accentRule,
+          )),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -115,7 +118,9 @@ class VerseCard extends StatelessWidget {
             const SizedBox(height: 18),
             Container(
                 height: 1,
-                color: AppColors.mushafCardAccent.withValues(alpha: 0.25)),
+                color: AppColors.mushafCardAccent.withValues(
+                  alpha: AppAlphas.accentRuleSoft,
+                )),
             const SizedBox(height: 10),
             Row(
               children: [

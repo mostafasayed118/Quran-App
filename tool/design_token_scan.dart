@@ -91,11 +91,15 @@ List<DesignTokenViolation> scanSource(String path, String source) {
     add(match.start, 'hex', '0x${match.group(1)!.toUpperCase()}');
   }
 
-  for (final match in _alpha.allMatches(source)) {
-    final value = _number(match.group(1)!);
-    // A zero alpha is a gradient stop (fully transparent end), not a role.
-    if (value == 0) continue;
-    add(match.start, 'alpha', value.toString());
+  for (final match in _alphaExpression.allMatches(source)) {
+    final expression = match.group(1)!;
+    final expressionOffset = match.start + match.group(0)!.indexOf(expression);
+    for (final number in _bareNumber.allMatches(expression)) {
+      final value = _number(number.group(1)!);
+      // A zero alpha is a gradient stop (fully transparent end), not a role.
+      if (value == 0) continue;
+      add(expressionOffset + number.start, 'alpha', value.toString());
+    }
   }
 
   for (final match in _tracking.allMatches(source)) {
@@ -145,8 +149,9 @@ List<DesignTokenViolation> scanSource(String path, String source) {
 }
 
 final _hex = RegExp(r'Color\(0x([0-9A-Fa-f]{6,8})\)');
-final _alpha = RegExp(
-  r'withValues\(\s*alpha:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*\)',
+final _alphaExpression = RegExp(r'withValues\(\s*alpha:\s*([^)]*)\)');
+final _bareNumber = RegExp(
+  r'(?<![\w.])(-?(?:\d+(?:\.\d+)?|\.\d+))(?![\w.])',
 );
 final _tracking = RegExp(
   r'\bletterSpacing:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',

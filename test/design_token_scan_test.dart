@@ -15,6 +15,7 @@ const e = StrutStyle(height: 2.0);
 const f = Icon(Icons.check, size: 18);
 final g = BorderRadius.circular(14);
 final h = BorderSide(color: c, width: 1.5);
+final i = color.withValues(alpha: dark ? .42 : .55);
 ''';
 
     final hits = scanSource('lib/x.dart', source);
@@ -29,6 +30,8 @@ final h = BorderSide(color: c, width: 1.5);
         'iconSize:18.0',
         'radius:14.0',
         'stroke:1.5',
+        'alpha:0.42',
+        'alpha:0.55',
       ],
     );
   });
@@ -41,6 +44,7 @@ const c = Icon(Icons.check, size: AppIconSize.md);
 final d = colors.primary.withValues(alpha: AppAlphas.chipTint);
 final e = BorderRadius.circular(AppRadius.md);
 final f = BorderSide(color: c, width: AppStrokes.emphasis);
+final g = colors.primary.withValues(alpha: dark ? a : b);
 ''';
 
     expect(scanSource('lib/x.dart', source), isEmpty);

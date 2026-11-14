@@ -104,12 +104,16 @@ class _SplashContent extends StatelessWidget {
     final bg = dark ? AppColors.darkBackground : AppColors.pageBackground;
     final heading = dark ? AppColors.darkOnSurface : AppColors.emeraldDark;
     final accent = dark ? AppColors.gold : AppColors.goldText;
-    final footer = (dark ? AppColors.darkOnSurface : AppColors.ink)
-        .withValues(alpha: dark ? .42 : .55);
+    final footer = (dark ? AppColors.darkOnSurface : AppColors.ink).withValues(
+      alpha: dark ? AppColors.splashFooterDark : AppColors.splashFooterLight,
+    );
     final track = dark ? AppColors.darkHairline : AppColors.hairline;
-    final glowAlpha = dark ? .13 : .20;
-    final ringAlpha1 = dark ? .35 : .22;
-    final ringAlpha2 = dark ? .18 : .11;
+    final glowAlpha =
+        dark ? AppColors.splashGlowDark : AppColors.splashGlowLight;
+    final ringAlpha1 =
+        dark ? AppColors.splashRing1Dark : AppColors.splashRing1Light;
+    final ringAlpha2 =
+        dark ? AppColors.splashRing2Dark : AppColors.splashRing2Light;
 
     return ExcludeSemantics(
       child: ColoredBox(
@@ -123,7 +127,9 @@ class _SplashContent extends StatelessWidget {
               right: -64,
               child: _CornerGlow(
                 color: AppColors.splashGlowMint.withValues(
-                  alpha: dark ? .07 : .10,
+                  alpha: dark
+                      ? AppColors.splashCornerDark
+                      : AppColors.splashCornerLight,
                 ),
               ),
             ),
@@ -132,7 +138,9 @@ class _SplashContent extends StatelessWidget {
               left: -64,
               child: _CornerGlow(
                 color: AppColors.splashGlowGold.withValues(
-                  alpha: dark ? .07 : .10,
+                  alpha: dark
+                      ? AppColors.splashCornerDark
+                      : AppColors.splashCornerLight,
                 ),
               ),
             ),
@@ -214,8 +222,9 @@ class _SplashContent extends StatelessWidget {
                             borderRadius: BorderRadius.circular(cardRadius),
                             border: dark
                                 ? Border.all(
-                                    color:
-                                        AppColors.gold.withValues(alpha: .16),
+                                    color: AppColors.gold.withValues(
+                                      alpha: AppColors.splashCardBorder,
+                                    ),
                                   )
                                 : null,
                             boxShadow: const [
@@ -263,7 +272,7 @@ class _SplashContent extends StatelessWidget {
                       fontFamily: QuranFonts.ui,
                       fontSize: AppType.caption,
                       letterSpacing: 4.2,
-                      color: accent.withValues(alpha: .85),
+                      color: accent.withValues(alpha: AppColors.splashAccent),
                     ),
                   ),
                   const SizedBox(height: 42),

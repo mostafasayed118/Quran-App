@@ -6,10 +6,8 @@
 /// so the map only ever shrinks. An empty map means the wave closed.
 library;
 
-// 69 residual literals in 61 buckets.
+// 53 residual literals in 47 buckets.
 const Map<String, int> designTokenBaseline = <String, int>{
-  'lib/app/splash_screen.dart|alpha|0.16': 1,
-  'lib/app/splash_screen.dart|alpha|0.85': 1,
   'lib/app/splash_screen.dart|lineHeight|1.2': 1,
   'lib/app/splash_screen.dart|stroke|1.6': 2,
   'lib/app/splash_screen.dart|tracking|-0.2': 1,
@@ -18,7 +16,6 @@ const Map<String, int> designTokenBaseline = <String, int>{
   'lib/core/widgets/app_toast.dart|iconSize|18.0': 1,
   'lib/core/widgets/app_toast.dart|lineHeight|1.6': 1,
   'lib/core/widgets/error_strip.dart|iconSize|18.0': 1,
-  'lib/core/widgets/service_tile.dart|alpha|0.1': 1,
   'lib/core/widgets/service_tile.dart|iconSize|22.0': 1,
   'lib/core/widgets/state_message.dart|iconSize|40.0': 1,
   'lib/features/asma/presentation/asma_screen.dart|lineHeight|1.7': 1,
@@ -29,11 +26,6 @@ const Map<String, int> designTokenBaseline = <String, int>{
   'lib/features/backup/presentation/backup_section.dart|iconSize|16.0': 1,
   'lib/features/hijri/presentation/hijri_screen.dart|radius|10.0': 1,
   'lib/features/hijri/presentation/hijri_screen.dart|stroke|1.4': 1,
-  'lib/features/home/presentation/home_cards.dart|alpha|0.12': 1,
-  'lib/features/home/presentation/home_cards.dart|alpha|0.18': 1,
-  'lib/features/home/presentation/home_cards.dart|alpha|0.6': 1,
-  'lib/features/home/presentation/home_cards.dart|alpha|0.7': 2,
-  'lib/features/home/presentation/home_cards.dart|alpha|0.75': 1,
   'lib/features/home/presentation/home_cards.dart|iconSize|13.0': 1,
   'lib/features/home/presentation/home_cards.dart|iconSize|22.0': 1,
   'lib/features/library/presentation/ayah_sheet/library_sheet.dart|lineHeight|1.9':
@@ -52,24 +44,16 @@ const Map<String, int> designTokenBaseline = <String, int>{
       1,
   'lib/features/prayer/presentation/prayer_times/forbidden_windows_section.dart|iconSize|18.0':
       1,
-  'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart|alpha|0.1':
-      2,
-  'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart|alpha|0.75':
-      1,
   'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart|iconSize|18.0':
       3,
   'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart|iconSize|20.0':
       1,
   'lib/features/prayer/presentation/prayer_times/prayer_times_cards.dart|stroke|3.0':
       1,
-  'lib/features/qibla/presentation/qibla_dial.dart|alpha|0.14': 1,
-  'lib/features/qibla/presentation/qibla_dial.dart|alpha|0.35': 1,
   'lib/features/qibla/presentation/qibla_dial.dart|iconSize|18.0': 3,
   'lib/features/qibla/presentation/qibla_dial_widget.dart|iconSize|72.0': 1,
   'lib/features/quran/presentation/bookmarks/bookmarks_folder_chips.dart|iconSize|16.0':
       1,
-  'lib/features/quran/presentation/reader/verse_card.dart|alpha|0.25': 1,
-  'lib/features/quran/presentation/reader/verse_card.dart|alpha|0.35': 1,
   'lib/features/quran/presentation/reader/verse_card.dart|lineHeight|2.0': 1,
   'lib/features/quran/presentation/reader/verse_card.dart|tracking|0.4': 1,
   'lib/features/recitation/presentation/reciter_surahs/reciter_surahs_screen.dart|iconSize|20.0':

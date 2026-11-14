@@ -64,6 +64,20 @@ abstract final class AppColors {
   static const splashShadowWarm = Color(0x6600281A);
   static const splashShadowCool = Color(0x5922321D);
 
+  // --- splash role alphas ---
+  static const double splashFooterLight = 0.55;
+  static const double splashFooterDark = 0.42;
+  static const double splashCornerLight = 0.10;
+  static const double splashCornerDark = 0.07;
+  static const double splashGlowLight = 0.20;
+  static const double splashGlowDark = 0.13;
+  static const double splashRing1Light = 0.22;
+  static const double splashRing1Dark = 0.35;
+  static const double splashRing2Light = 0.11;
+  static const double splashRing2Dark = 0.18;
+  static const double splashAccent = 0.85;
+  static const double splashCardBorder = 0.16;
+
   static const double badgeTintAlpha = 0.12;
   static const double fieldTintAlpha = 0.08;
   static const double mutedSurfaceAlpha = 0.5;
