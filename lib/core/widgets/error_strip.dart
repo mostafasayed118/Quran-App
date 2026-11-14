@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_icon_size.dart';
+
 /// Dismissible inline error banner with an optional retry action.
 class ErrorStrip extends StatelessWidget {
   const ErrorStrip(
@@ -32,7 +34,7 @@ class ErrorStrip extends StatelessWidget {
         top: false,
         child: ListTile(
           dense: true,
-          leading: icon == null ? null : Icon(icon, size: 18),
+          leading: icon == null ? null : Icon(icon, size: AppIconSize.md),
           title: Text(
             message,
             maxLines: 2,

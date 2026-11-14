@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/theme/app_icon_size.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -175,7 +176,7 @@ class _StepCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsetsDirectional.only(end: 6),
                       child: Icon(Icons.check_circle,
-                          color: colors.secondary, size: 20),
+                          color: colors.secondary, size: AppIconSize.lg),
                     ),
                   if (actionLabel != null)
                     Flexible(

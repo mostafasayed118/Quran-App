@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_icon_size.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_strokes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/format_bytes.dart';
@@ -248,10 +251,14 @@ class _SurahDownloadRow extends StatelessWidget {
               height: 38,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                border: Border.all(color: colors.secondary, width: 1.5),
-                borderRadius: BorderRadius.circular(11),
+                border: Border.all(
+                  color: colors.secondary,
+                  width: AppStrokes.selection,
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.selection),
               ),
-              child: Icon(Icons.check, color: colors.secondary, size: 20),
+              child: Icon(Icons.check,
+                  color: colors.secondary, size: AppIconSize.lg),
             ),
             IconButton(
               tooltip: AppLocalizations.of(context).libraryDelete,

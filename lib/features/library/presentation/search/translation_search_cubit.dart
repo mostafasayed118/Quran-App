@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
+import '../../../../core/domain/ayah_key.dart';
 import '../../../../core/utils/arabic_search.dart';
 import '../../data/translation_search_source.dart';
 import 'translation_search_state.dart';
@@ -60,8 +61,8 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
         for (final entry in index.entries) {
           final text = entry.value;
           _entries.add(_Entry(
-            surah: entry.key ~/ 1000,
-            ayah: entry.key % 1000,
+            surah: AyahKey.surahOf(entry.key),
+            ayah: AyahKey.ayahOf(entry.key),
             text: text,
             prepared: prepareQuery(text),
           ));

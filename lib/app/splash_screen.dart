@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_radius.dart';
+import '../core/theme/app_strokes.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_type.dart';
 import '../l10n/app_localizations.dart';
@@ -104,13 +105,16 @@ class _SplashContent extends StatelessWidget {
     final bg = dark ? AppColors.darkBackground : AppColors.pageBackground;
     final heading = dark ? AppColors.darkOnSurface : AppColors.emeraldDark;
     final accent = dark ? AppColors.gold : AppColors.goldText;
-    final footer = (dark ? AppColors.darkOnSurface : AppColors.ink)
-        .withValues(alpha: dark ? .42 : .55);
+    final footer = (dark ? AppColors.darkOnSurface : AppColors.ink).withValues(
+      alpha: dark ? AppColors.splashFooterDark : AppColors.splashFooterLight,
+    );
     final track = dark ? AppColors.darkHairline : AppColors.hairline;
-    final glowAlpha = dark ? .13 : .20;
-    final ringAlpha1 = dark ? .35 : .22;
-    final ringAlpha2 = dark ? .18 : .11;
-    const card = Color(0xFF042C25); // matches the glyph artwork background
+    final glowAlpha =
+        dark ? AppColors.splashGlowDark : AppColors.splashGlowLight;
+    final ringAlpha1 =
+        dark ? AppColors.splashRing1Dark : AppColors.splashRing1Light;
+    final ringAlpha2 =
+        dark ? AppColors.splashRing2Dark : AppColors.splashRing2Light;
 
     return ExcludeSemantics(
       child: ColoredBox(
@@ -123,8 +127,10 @@ class _SplashContent extends StatelessWidget {
               top: -64,
               right: -64,
               child: _CornerGlow(
-                color: const Color(0xFFA8F3C6).withValues(
-                  alpha: dark ? .07 : .10,
+                color: AppColors.splashGlowMint.withValues(
+                  alpha: dark
+                      ? AppColors.splashCornerDark
+                      : AppColors.splashCornerLight,
                 ),
               ),
             ),
@@ -132,8 +138,10 @@ class _SplashContent extends StatelessWidget {
               bottom: -64,
               left: -64,
               child: _CornerGlow(
-                color: const Color(0xFFFFE088).withValues(
-                  alpha: dark ? .07 : .10,
+                color: AppColors.splashGlowGold.withValues(
+                  alpha: dark
+                      ? AppColors.splashCornerDark
+                      : AppColors.splashCornerLight,
                 ),
               ),
             ),
@@ -169,9 +177,9 @@ class _SplashContent extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                const Color(0xFFFFE088)
+                                AppColors.splashGlowGold
                                     .withValues(alpha: glowAlpha),
-                                const Color(0xFFFFE088).withValues(alpha: 0),
+                                AppColors.splashGlowGold.withValues(alpha: 0),
                               ],
                               stops: const <double>[0, .72],
                             ),
@@ -186,7 +194,7 @@ class _SplashContent extends StatelessWidget {
                               border: Border.all(
                                 color: AppColors.gold
                                     .withValues(alpha: ringAlpha1),
-                                width: 1.6,
+                                width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
@@ -201,7 +209,7 @@ class _SplashContent extends StatelessWidget {
                               border: Border.all(
                                 color: AppColors.gold
                                     .withValues(alpha: ringAlpha2),
-                                width: 1.6,
+                                width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
@@ -211,22 +219,23 @@ class _SplashContent extends StatelessWidget {
                           width: cardSize,
                           height: cardSize,
                           decoration: BoxDecoration(
-                            color: card,
+                            color: AppColors.splashCard,
                             borderRadius: BorderRadius.circular(cardRadius),
                             border: dark
                                 ? Border.all(
-                                    color:
-                                        AppColors.gold.withValues(alpha: .16),
+                                    color: AppColors.gold.withValues(
+                                      alpha: AppColors.splashCardBorder,
+                                    ),
                                   )
                                 : null,
                             boxShadow: const [
                               BoxShadow(
-                                color: Color(0x6600281A),
+                                color: AppColors.splashShadowWarm,
                                 blurRadius: 26,
                                 offset: Offset(0, 16),
                               ),
                               BoxShadow(
-                                color: Color(0x5922321D),
+                                color: AppColors.splashShadowCool,
                                 blurRadius: 12,
                                 offset: Offset(0, 6),
                               ),
@@ -252,8 +261,8 @@ class _SplashContent extends StatelessWidget {
                       fontFamily: QuranFonts.ui,
                       fontWeight: FontWeight.bold,
                       fontSize: AppType.splashWordmark,
-                      height: 1.2,
-                      letterSpacing: -.2,
+                      height: AppType.splashWordmarkHeight,
+                      letterSpacing: AppType.splashWordmarkTracking,
                       color: heading,
                     ),
                   ),
@@ -263,8 +272,8 @@ class _SplashContent extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: QuranFonts.ui,
                       fontSize: AppType.caption,
-                      letterSpacing: 4.2,
-                      color: accent.withValues(alpha: .85),
+                      letterSpacing: AppType.splashTaglineTracking,
+                      color: accent.withValues(alpha: AppColors.splashAccent),
                     ),
                   ),
                   const SizedBox(height: 42),
@@ -283,7 +292,7 @@ class _SplashContent extends StatelessWidget {
                   style: TextStyle(
                     fontFamily: QuranFonts.ui,
                     fontSize: AppType.micro,
-                    letterSpacing: .3,
+                    letterSpacing: AppType.splashFooterTracking,
                     color: footer,
                   ),
                 ),

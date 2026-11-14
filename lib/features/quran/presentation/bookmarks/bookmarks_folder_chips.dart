@@ -23,7 +23,8 @@ class _FolderChips extends StatelessWidget {
               child: GestureDetector(
                 onLongPress: () => _folderActions(context, folder),
                 child: ActionChip(
-                  avatar: const Icon(Icons.folder_outlined, size: 16),
+                  avatar:
+                      const Icon(Icons.folder_outlined, size: AppIconSize.sm),
                   label: Text(folder),
                   onPressed: () => context.push(bookmarksFolderPath(folder)),
                 ),

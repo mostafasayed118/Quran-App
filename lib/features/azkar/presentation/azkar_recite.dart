@@ -50,7 +50,7 @@ class _RecitingCard extends StatelessWidget {
     return Opacity(
       // 0.45 dropped the completed body text to ~2.6:1. 0.8 keeps a clear
       // "done" affordance while the text remains readable.
-      opacity: done ? 0.8 : 1,
+      opacity: done ? AppAlphas.completedFade : 1,
       child: Card(
         color: done ? colors.surfaceContainerHighest : null,
         child: InkWell(
@@ -115,7 +115,7 @@ class _ZikrLine extends StatelessWidget {
             style: const TextStyle(
               fontFamily: QuranFonts.ui,
               fontSize: AppType.title,
-              height: 2.1,
+              height: AppType.dhikrHeight,
             ),
           ),
         ),
@@ -129,7 +129,7 @@ class _ZikrLine extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: done
-              ? const Icon(Icons.check, size: 20)
+              ? const Icon(Icons.check, size: AppIconSize.lg)
               : Text(
                   loc.number(remaining),
                   style: TextStyle(

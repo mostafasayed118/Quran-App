@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_strokes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
@@ -91,7 +92,7 @@ class _TasbihDial extends StatelessWidget {
         curve: Curves.easeOut,
         child: Material(
           shape: CircleBorder(
-            side: BorderSide(color: colors.primary, width: 3),
+            side: BorderSide(color: colors.primary, width: AppStrokes.accent),
           ),
           color: colors.primaryContainer,
           child: InkWell(

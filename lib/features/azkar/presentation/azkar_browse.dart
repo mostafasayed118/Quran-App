@@ -159,7 +159,7 @@ class _SearchHitTile extends StatelessWidget {
           style: const TextStyle(
             fontFamily: QuranFonts.meQuran,
             fontSize: AppType.bodyLarge,
-            height: 1.8,
+            height: AppType.scriptureHeight,
           ),
         ),
         subtitle: Text(

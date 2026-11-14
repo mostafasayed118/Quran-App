@@ -31,12 +31,12 @@ class _TomorrowNote extends StatelessWidget {
               width: 34,
               height: 34,
               decoration: BoxDecoration(
-                color: colors.primary.withValues(alpha: 0.10),
+                color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.nights_stay_outlined,
-                size: 18,
+                size: AppIconSize.md,
                 color: colors.primary,
               ),
             ),
@@ -102,12 +102,12 @@ class _CityCard extends StatelessWidget {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: colors.primary.withValues(alpha: 0.10),
+                  color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.location_on_outlined,
-                  size: 18,
+                  size: AppIconSize.md,
                   color: colors.primary,
                 ),
               ),
@@ -157,7 +157,7 @@ class _PrayerRow extends StatelessWidget {
     final isSunrise = entry.name == PrayerName.sunrise;
     final foreground = isNext ? colors.onPrimaryContainer : colors.onSurface;
     final muted = isNext
-        ? colors.onPrimaryContainer.withValues(alpha: 0.75)
+        ? colors.onPrimaryContainer.withValues(alpha: AppAlphas.secondaryInk)
         : colors.onSurfaceVariant;
 
     return Container(
@@ -165,7 +165,10 @@ class _PrayerRow extends StatelessWidget {
           ? BoxDecoration(
               color: colors.primaryContainer,
               border: BorderDirectional(
-                start: BorderSide(color: colors.primary, width: 3),
+                start: BorderSide(
+                  color: colors.primary,
+                  width: AppStrokes.accent,
+                ),
               ),
             )
           : null,
@@ -180,12 +183,14 @@ class _PrayerRow extends StatelessWidget {
           if (isNext)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-              child: Icon(Icons.schedule, size: 20, color: foreground),
+              child:
+                  Icon(Icons.schedule, size: AppIconSize.lg, color: foreground),
             )
           else if (isSunrise)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-              child: Icon(Icons.wb_sunny_outlined, size: 18, color: muted),
+              child: Icon(Icons.wb_sunny_outlined,
+                  size: AppIconSize.md, color: muted),
             ),
           Expanded(
             child: Column(

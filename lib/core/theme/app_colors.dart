@@ -52,6 +52,32 @@ abstract final class AppColors {
   static const mushafCardAccent = Color(0xFFD9B45B);
   static const mushafCardMuted = Color(0xFFB9C9C0);
 
+  /// The boot splash's brand palette.
+  ///
+  /// Fixed in both themes: the native splash and the Flutter overlay must hand
+  /// off without a seam, so these are brand constants, not theme roles. They
+  /// were the only raw literals outside this file; the alpha roles that pair
+  /// with them live in the splash block below.
+  static const splashCard = Color(0xFF042C25);
+  static const splashGlowMint = Color(0xFFA8F3C6);
+  static const splashGlowGold = Color(0xFFFFE088);
+  static const splashShadowWarm = Color(0x6600281A);
+  static const splashShadowCool = Color(0x5922321D);
+
+  // --- splash role alphas ---
+  static const double splashFooterLight = 0.55;
+  static const double splashFooterDark = 0.42;
+  static const double splashCornerLight = 0.10;
+  static const double splashCornerDark = 0.07;
+  static const double splashGlowLight = 0.20;
+  static const double splashGlowDark = 0.13;
+  static const double splashRing1Light = 0.22;
+  static const double splashRing1Dark = 0.35;
+  static const double splashRing2Light = 0.11;
+  static const double splashRing2Dark = 0.18;
+  static const double splashAccent = 0.85;
+  static const double splashCardBorder = 0.16;
+
   static const double badgeTintAlpha = 0.12;
   static const double fieldTintAlpha = 0.08;
   static const double mutedSurfaceAlpha = 0.5;

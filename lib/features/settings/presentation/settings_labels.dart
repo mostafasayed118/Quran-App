@@ -58,7 +58,7 @@ Future<T?> _pickFromList<T>({
                   current == value
                       ? Icons.radio_button_checked
                       : Icons.radio_button_unchecked,
-                  size: 20,
+                  size: AppIconSize.lg,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(label(value)),

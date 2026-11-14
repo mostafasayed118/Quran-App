@@ -124,6 +124,38 @@ abstract final class AppType {
   /// The Quran's line box.
   static const double quranHeight = 2.0;
 
+  /// Long-form dhikr prose set in the UI face.
+  static const double dhikrHeight = 2.1;
+
+  /// A scripture paragraph on a reading surface (duas, azkar, hadith).
+  static const double scriptureHeight = 1.8;
+
+  /// The ayah sheet's looser scripture paragraph.
+  static const double scriptureLooseHeight = 1.9;
+
+  /// The asma grid's tighter scripture line.
+  static const double scriptureTightHeight = 1.7;
+
+  /// The countdown's focus line.
+  static const double timerHeight = 1.1;
+
+  /// The boot wordmark's line box.
+  static const double splashWordmarkHeight = 1.2;
+
+  // --- tracking -----------------------------------------------------------
+
+  /// The boot wordmark's optical tightening.
+  static const double splashWordmarkTracking = -0.2;
+
+  /// The spaced Latin tagline under the wordmark.
+  static const double splashTaglineTracking = 4.2;
+
+  /// The boot footer's quiet tracking.
+  static const double splashFooterTracking = 0.3;
+
+  /// The share card's Latin footer.
+  static const double shareFooterTracking = 0.4;
+
   // --- weights ------------------------------------------------------------
 
   /// The only weights Cairo ships. Anything else renders as 400.

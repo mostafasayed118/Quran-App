@@ -35,7 +35,8 @@ class _WirdCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.menu_book, size: 18, color: colors.primary),
+                Icon(Icons.menu_book,
+                    size: AppIconSize.md, color: colors.primary),
                 const SizedBox(width: AppSpacing.sm),
                 Text(loc.wirdTitle, style: AppTheme.rowTitle),
               ],

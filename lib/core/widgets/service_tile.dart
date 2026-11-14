@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_alphas.dart';
+import '../theme/app_icon_size.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
@@ -47,10 +49,11 @@ class ServiceTile extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: colors.primary.withValues(alpha: 0.10),
+                    color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(icon, size: 22, color: colors.primary),
+                  child:
+                      Icon(icon, size: AppIconSize.xl, color: colors.primary),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(

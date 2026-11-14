@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/domain/next_prayer_focus.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/l10n/prayer_names.dart';
+import '../../../../core/theme/app_icon_size.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
@@ -101,7 +102,7 @@ class _FocusHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Icon(
               Icons.location_on_outlined,
-              size: 16,
+              size: AppIconSize.sm,
               color: colors.onSurfaceVariant,
             ),
             const SizedBox(width: AppSpacing.xs),
@@ -175,7 +176,7 @@ class _DigitClock extends StatelessWidget {
                               style: AppTheme.heroTitle.copyWith(
                                 color: colors.onSurface,
                                 fontSize: AppType.timerHuge,
-                                height: 1.1,
+                                height: AppType.timerHeight,
                               ),
                             ),
                           ),
@@ -207,7 +208,8 @@ class _MissingFocus extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
-        Icon(Icons.schedule, size: 48, color: colors.onSurfaceVariant),
+        Icon(Icons.schedule,
+            size: AppIconSize.hero, color: colors.onSurfaceVariant),
         const SizedBox(height: AppSpacing.md),
         Text(
           message,

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
@@ -29,7 +30,7 @@ const TextStyle _sheetNameArStyle = TextStyle(
 const TextStyle _sheetMeaningArStyle = TextStyle(
   fontFamily: QuranFonts.meQuran,
   fontSize: AppType.bodyLarge,
-  height: 1.7,
+  height: AppType.scriptureTightHeight,
 );
 
 TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(
@@ -190,13 +191,13 @@ class _NameCell extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.panel),
       onTap: () => context.read<AsmaCubit>().select(name),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: colors.surfaceContainerHighest
               .withValues(alpha: AppColors.mutedSurfaceAlpha),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.panel),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

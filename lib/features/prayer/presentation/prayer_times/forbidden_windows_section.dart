@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/domain/prayer_name.dart';
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_icon_size.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/arabic_numbers.dart';
@@ -70,7 +71,7 @@ class ForbiddenWindowsSection extends StatelessWidget {
             children: [
               Icon(
                 Icons.do_not_disturb_on_outlined,
-                size: 18,
+                size: AppIconSize.md,
                 color: colors.onSurfaceVariant,
               ),
               const SizedBox(width: AppSpacing.xs),
