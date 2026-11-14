@@ -113,7 +113,9 @@ List<RouteBase> _readerRoutes() => [
               surah: surah,
               ayah: ayah,
               create: () => _createReader(surah, ayah),
-              child: const ReaderScreen(),
+              // The skin is chrome-only: the reader (and the sheets it opens,
+              // which capture this inherited theme) never sees a palette.
+              child: const NeutralReadingTheme(child: ReaderScreen()),
             ),
           );
         },

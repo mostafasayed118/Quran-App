@@ -9,6 +9,7 @@ import 'package:quran_yahdi/core/utils/app_log.dart';
 import '../../../core/domain/adhan_catalog.dart';
 import '../../../core/domain/app_locale.dart';
 import '../../../core/domain/app_theme.dart';
+import '../../../core/domain/prayer_skin.dart';
 import '../../../core/domain/reminder_diagnostics.dart';
 import '../../../core/domain/reminders.dart';
 import '../../../core/l10n/app_locale_controller.dart';
@@ -16,6 +17,7 @@ import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_theme_controller.dart';
+import '../../../core/theme/prayer_skin_controller.dart';
 import '../../../core/utils/app_routes.dart';
 import '../../../core/utils/arabic_numbers.dart';
 import '../../../core/utils/hour_minute.dart';
@@ -39,6 +41,7 @@ class SettingsScreen extends StatelessWidget {
     this.backupSection,
     this.locale,
     this.theme,
+    this.skin,
     this.reminderDiagnostics,
     this.reminderApplyHealth,
   });
@@ -53,6 +56,9 @@ class SettingsScreen extends StatelessWidget {
 
   /// The appearance switch, wired the same way. Null keeps its row out.
   final AppThemeController? theme;
+
+  /// The opt-in prayer skin, wired the same way. Null keeps its row out.
+  final PrayerSkinController? skin;
 
   /// Reminder-health readout seam, passed by the host that owns the ports.
   /// Optional on purpose: the frozen settings test builds
@@ -98,6 +104,7 @@ class SettingsScreen extends StatelessWidget {
                 backupSection: backupSection,
                 locale: locale,
                 theme: theme,
+                skin: skin,
                 reminderDiagnostics: reminderDiagnostics,
                 reminderApplyHealth: reminderApplyHealth,
               ),

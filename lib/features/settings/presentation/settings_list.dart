@@ -14,6 +14,7 @@ class _SettingsList extends StatelessWidget {
     required this.backupSection,
     required this.locale,
     required this.theme,
+    required this.skin,
     required this.reminderDiagnostics,
     required this.reminderApplyHealth,
   });
@@ -28,6 +29,7 @@ class _SettingsList extends StatelessWidget {
   final Widget? backupSection;
   final AppLocaleController? locale;
   final AppThemeController? theme;
+  final PrayerSkinController? skin;
   final ReminderDiagnostics? reminderDiagnostics;
   final ReminderApplyHealth? reminderApplyHealth;
 
@@ -60,6 +62,20 @@ class _SettingsList extends StatelessWidget {
               title: Text(loc.settingsTheme),
               subtitle: Text(_themeLabel(loc, appearance.mode)),
               onTap: () => unawaited(_pickTheme(context, loc, appearance)),
+            ),
+          ),
+          const Divider(height: 1),
+        ],
+        if (skin case final skin?) ...[
+          ListenableBuilder(
+            listenable: skin,
+            builder: (context, _) => ListTile(
+              // Sits right under the appearance row: the skin recolours the
+              // chrome, it does not change the light/dark choice.
+              leading: const Icon(Icons.palette_outlined),
+              title: Text(loc.settingsPrayerSkin),
+              subtitle: Text(_prayerSkinLabel(loc, skin.mode)),
+              onTap: () => unawaited(_pickPrayerSkin(context, loc, skin)),
             ),
           ),
           const Divider(height: 1),

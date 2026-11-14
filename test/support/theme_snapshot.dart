@@ -1,0 +1,68 @@
+/// The shipped theme's roles, captured on `684ab3d9` **before** the prayer-skin
+/// work (the printer test was deleted after this file was written).
+///
+/// One intended delta: `light.onSecondary` becomes `0xFFFFFDF7` in W0.2 (white
+/// on the light gold, 3.47 -> 5.0). Every other value must stay identical.
+const Map<String, Map<String, int>> shippedThemeRoles = {
+  'light': {
+    'primary': 0xFF3E6B58,
+    'onPrimary': 0xFFFFFDF7,
+    'secondary': 0xFFB06F18,
+    // intended delta (W0.2): white on the light gold, 3.47 -> 5.0.
+    'onSecondary': 0xFFFFFDF7,
+    'surface': 0xFFFFFDF7,
+    'onSurface': 0xFF232D28,
+    'onSurfaceVariant': 0xFF404944,
+    'primaryContainer': 0xFFDCE8E1,
+    'onPrimaryContainer': 0xFF1E3A30,
+    'secondaryContainer': 0xFFF7EAD2,
+    'onSecondaryContainer': 0xFF8A5A14,
+    'surfaceContainerHighest': 0xFFE6E2D4,
+    'outline': 0xFF707973,
+    'error': 0xFFBA1A1A,
+    'errorContainer': 0xFFFFDAD6,
+    'surfaceTint': 0xFF1C6B50,
+    'onError': 0xFFFFFFFF,
+    'onErrorContainer': 0xFF93000A,
+    'inverseSurface': 0xFF2C322E,
+    'onInverseSurface': 0xFFECF2ED,
+    'surfaceContainerLowest': 0xFFFFFFFF,
+    'surfaceContainerLow': 0xFFEFF5F0,
+    'surfaceContainerHigh': 0xFFE4EAE4,
+    'outlineVariant': 0xFFBFC9C2,
+    'appBarBackground': 0xFFF1EAD7,
+    'appBarForeground': 0xFF2E5244,
+    'scaffoldBackground': 0xFFEFE9DA,
+  },
+  'dark': {
+    'primary': 0xFFE4EEE9,
+    'onPrimary': 0xFF232D28,
+    'secondary': 0xFFE3A53E,
+    'onSecondary': 0xFF232D28,
+    'surface': 0xFF16201B,
+    'onSurface': 0xFFE8E2D2,
+    'onSurfaceVariant': 0xFFBFC9C2,
+    'primaryContainer': 0xFF1E2F27,
+    'onPrimaryContainer': 0xFFD7E7DD,
+    // intended delta: the light gold container left the dark hadith badge
+    // (28 dp, `onSurface` text) at 1.09:1. Dark now uses a dark gold wash.
+    'secondaryContainer': 0xFF3B3821,
+    'onSecondaryContainer': 0xFFE3A53E,
+    'surfaceContainerHighest': 0xFF1A251F,
+    'outline': 0xFF89938D,
+    'error': 0xFFFFB4AB,
+    'errorContainer': 0xFF93000A,
+    'surfaceTint': 0xFF8BD5B5,
+    'onError': 0xFF690005,
+    'onErrorContainer': 0xFFFFDAD6,
+    'inverseSurface': 0xFFDEE4DF,
+    'onInverseSurface': 0xFF2C322E,
+    'surfaceContainerLowest': 0xFF0A0F0D,
+    'surfaceContainerLow': 0xFF171D1A,
+    'surfaceContainerHigh': 0xFF252B28,
+    'outlineVariant': 0xFF404944,
+    'appBarBackground': 0xFF16201B,
+    'appBarForeground': 0xFFE8E2D2,
+    'scaffoldBackground': 0xFF101410,
+  },
+};
