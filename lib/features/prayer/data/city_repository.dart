@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 
@@ -26,6 +27,14 @@ class CityRepository implements CitySource {
   final Future<List<Map<String, dynamic>>> Function() _loader;
 
   late final CachedLoader<List<City>> _cities = CachedLoader(_load);
+
+  /// Emits the new city after every successful [select].
+  ///
+  /// Lives on the concrete repository, not on the `CitySource` port: the port
+  /// has eighteen test fakes, and only the app-level consumers (the prayer
+  /// skin) need the signal.
+  Stream<City> get changes => _changes.stream;
+  final StreamController<City> _changes = StreamController<City>.broadcast();
 
   Future<List<City>> _all() {
     return _cities.load();
@@ -118,6 +127,8 @@ class CityRepository implements CitySource {
   }
 
   @override
-  Future<void> select(City city) =>
-      _settings.write(selectedCityKey, jsonEncode(city.toJson()));
+  Future<void> select(City city) async {
+    await _settings.write(selectedCityKey, jsonEncode(city.toJson()));
+    if (!_changes.isClosed) _changes.add(city);
+  }
 }
