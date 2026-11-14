@@ -102,7 +102,8 @@ void main() {
         _hex(paletteTheme.colorScheme.surfaceTint),
         reason: 'MaterialApp did not receive the palette theme');
     final followed = Theme.of(tester.element(find.byType(SplashScreen)));
-    final palette = PrayerPalettes.of(computed, followed.brightness);    expect(_hex(followed.colorScheme.surfaceTint), _hex(palette.primary));
+    final palette = PrayerPalettes.of(computed, followed.brightness);
+    expect(_hex(followed.colorScheme.surfaceTint), _hex(palette.primary));
     expect(
       _hex(followed.colorScheme.onSurfaceVariant),
       _hex(palette.muted),
