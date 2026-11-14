@@ -39,8 +39,10 @@ Derived roles (getters on `PrayerPalette`, never copied hex):
   opened from the reader capture that theme (`InheritedTheme.capture`).
 - **A toast carries the theme that raised it** (`AppToast.show` captures
   `Theme.of(caller)`): a toast raised in the reader is neutral, a toast raised
-  by the chrome takes the palette. The post-await `showOn` form keeps the
-  messenger's (chrome) theme, which is what it always used.
+  by the chrome takes the palette. **The same toast looking different on two
+  screens is intended, not a bug** — the screen that raised it owns the colours.
+  The post-await `showOn` form keeps the messenger's (chrome) theme, which is
+  what it always used.
 - **Surface roles:** `surfaceContainerHigh` (dialogs) = tile;
   `surfaceContainer` and `surfaceContainerLow` (sheets, navigation bars) =
   `sheetSurface`. At `surface` a modal sheet was the exact fill of the card it

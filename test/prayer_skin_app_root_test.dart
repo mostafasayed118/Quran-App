@@ -86,6 +86,15 @@ void main() {
         await Future<void>.delayed(const Duration(milliseconds: 10));
       }
     });
+    // Mid-lerp the brightness must not wobble: a palette swap never changes it,
+    // so the splash's `Theme.of(context).brightness` read stays stable for the
+    // whole transition.
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(
+      Theme.of(tester.element(find.byType(SplashScreen))).brightness,
+      Brightness.light,
+      reason: 'brightness moved during a palette swap',
+    );
     // One frame applies the new theme and starts MaterialApp's 400 ms lerp;
     // the next frames finish it.
     await tester.pump(const Duration(milliseconds: 600));
