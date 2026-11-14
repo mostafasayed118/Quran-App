@@ -6,6 +6,13 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # TypeScript 7 is a breaking major (the native port). `astro check`
+    # cannot load it, so `npm run gates` fails; the pin stays `~6.0.3`
+    # until the Astro toolchain supports 7. Delete this ignore with that
+    # migration (owner decision 2026-11-14).
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
   # The SHA-pinned workflow actions: Dependabot proposes the next pinned SHA.
   - package-ecosystem: github-actions
     directory: /
