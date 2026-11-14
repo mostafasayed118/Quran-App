@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../domain/prayer_name.dart';
 import 'app_colors.dart';
 import 'app_radius.dart';
 import 'app_system_ui.dart';
 import 'app_type.dart';
+import 'prayer_palette.dart';
 
 abstract final class QuranFonts {
   static const quran = 'HafsSmart';
@@ -111,6 +113,29 @@ abstract final class AppTheme {
   static ThemeData get light => _light;
   static ThemeData get dark => _dark;
 
+  static final Map<PrayerName, ThemeData> _lightByPeriod = {};
+  static final Map<PrayerName, ThemeData> _darkByPeriod = {};
+
+  /// The chrome for [name] at [brightness] (prayer skin on).
+  ///
+  /// Cached per `(PrayerName, brightness)`: the root build reads it on every
+  /// rebuild, and a `ThemeData` plus a seeded `ColorScheme` is not cheap.
+  static ThemeData forPrayer(PrayerName name, Brightness brightness) {
+    final cache =
+        brightness == Brightness.light ? _lightByPeriod : _darkByPeriod;
+    return cache.putIfAbsent(
+      name,
+      () => _theme(brightness, PrayerPalettes.of(name, brightness)),
+    );
+  }
+
+  /// Clears the per-period cache (tests; a future editable palette).
+  @visibleForTesting
+  static void clearPrayerCache() {
+    _lightByPeriod.clear();
+    _darkByPeriod.clear();
+  }
+
   /// The app's type ramp, in the slots Material components already read.
   ///
   /// Two constraints shape it:
@@ -186,59 +211,99 @@ abstract final class AppTheme {
         );
   }
 
-  static ThemeData _theme(Brightness brightness) {
+  static ThemeData _theme(Brightness brightness, [PrayerPalette? palette]) {
     final isLight = brightness == Brightness.light;
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: AppColors.emerald,
+      // The seed moves with the period so every generated role (tertiary,
+      // scrim tint, …) stays in the same family; the roles the app reads are
+      // overridden below.
+      seedColor: palette?.primary ?? AppColors.emerald,
       brightness: brightness,
-      primary: isLight ? AppColors.emerald : AppColors.emeraldLight,
-      onPrimary: isLight ? AppColors.cardBackground : AppColors.ink,
-      secondary: isLight ? AppColors.goldStrong : AppColors.gold,
+      primary: palette?.primary ??
+          (isLight ? AppColors.emerald : AppColors.emeraldLight),
+      onPrimary: palette?.onPrimary ??
+          (isLight ? AppColors.cardBackground : AppColors.ink),
+      secondary:
+          palette?.gold ?? (isLight ? AppColors.goldStrong : AppColors.gold),
       // Gold is a light accent: ink on it measures 3.47:1 in the light theme,
       // so white is used for text on a gold fill (5.0:1). Dark keeps the ink.
-      onSecondary: isLight ? AppColors.cardBackground : AppColors.ink,
-      surface: isLight ? AppColors.cardBackground : AppColors.darkSurface,
-      onSurface: isLight ? AppColors.ink : AppColors.darkOnSurface,
+      onSecondary: palette?.onGold ??
+          (isLight ? AppColors.cardBackground : AppColors.ink),
+      // `fromSeed` derives `surfaceTint` from the *generated* primary, not the
+      // override above; an elevated dialog would otherwise take the seeded
+      // tone instead of the period's.
+      surfaceTint: palette?.primary,
+      surface: palette?.surface ??
+          (isLight ? AppColors.cardBackground : AppColors.darkSurface),
+      onSurface:
+          palette?.ink ?? (isLight ? AppColors.ink : AppColors.darkOnSurface),
       // The generated container roles are cool mint; the brand highlight is a
       // warm emerald wash. Both pairings stay above 9:1.
-      primaryContainer:
-          isLight ? AppColors.emeraldTintLight : AppColors.emeraldTintDark,
-      onPrimaryContainer:
-          isLight ? AppColors.onEmeraldTintLight : AppColors.onEmeraldTintDark,
+      primaryContainer: palette?.tint ??
+          (isLight ? AppColors.emeraldTintLight : AppColors.emeraldTintDark),
+      onPrimaryContainer: palette?.onTint ??
+          (isLight
+              ? AppColors.onEmeraldTintLight
+              : AppColors.onEmeraldTintDark),
       // The light container is a pale gold; on a dark surface that same pale
       // fill left the 28 dp hadith badge with `onSurface` text at 1.09:1.
       // Dark uses a dark gold wash and a gold label instead.
-      secondaryContainer: isLight
-          ? AppColors.goldLight
-          : Color.alphaBlend(
-              AppColors.gold.withValues(alpha: 0.18), AppColors.darkSurface),
-      onSecondaryContainer: isLight ? AppColors.goldText : AppColors.gold,
+      secondaryContainer: palette?.secondaryContainer ??
+          (isLight
+              ? AppColors.goldLight
+              : Color.alphaBlend(AppColors.gold.withValues(alpha: 0.18),
+                  AppColors.darkSurface)),
+      onSecondaryContainer: palette?.onSecondaryContainer ??
+          (isLight ? AppColors.goldText : AppColors.gold),
       // Grouping surfaces (grid tiles, inset panels) read as warm paper, not
       // as the neutral grey the seed generates.
       surfaceContainerHighest:
-          isLight ? AppColors.tileLight : AppColors.tileDark,
+          palette?.tile ?? (isLight ? AppColors.tileLight : AppColors.tileDark),
+      // These four are generated from the seed unless overridden; with a
+      // period seed the chrome would drift off-token.
+      onSurfaceVariant: palette?.muted,
+      outline: palette?.hairline,
+      outlineVariant: palette?.hairline,
+      error: palette?.error,
+      onError: palette == null
+          ? null
+          : (isLight ? AppColors.cardBackground : AppColors.ink),
+      // Derived in the palette from its own `error` (a 12% wash), so editing
+      // the token moves the container and the label together.
+      errorContainer: palette?.errorContainer,
+      onErrorContainer: palette?.onErrorContainer,
+      // The surface family Material dialogs and sheets read.
+      surfaceContainer: palette?.surface,
+      surfaceContainerLow: palette?.surface,
+      surfaceContainerHigh: palette?.tile,
+      // A raw SnackBar must not fall back to a seeded inverse.
+      inverseSurface: palette?.ink,
+      onInverseSurface: palette?.surface,
     );
+    final page = palette?.page ??
+        (isLight ? AppColors.pageBackground : AppColors.darkBackground);
+    final hairline = palette?.hairline ??
+        (isLight ? AppColors.hairline : AppColors.darkHairline);
+    final appBar = palette?.appBar ??
+        (isLight ? AppColors.primaryBeige : AppColors.darkSurface);
+    final appBarInk = palette?.ink ??
+        (isLight ? AppColors.emeraldDark : AppColors.darkOnSurface);
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: _textTheme(colorScheme),
-      scaffoldBackgroundColor:
-          isLight ? AppColors.pageBackground : AppColors.darkBackground,
+      scaffoldBackgroundColor: page,
       fontFamily: QuranFonts.ui,
       appBarTheme: AppBarTheme(
-        backgroundColor:
-            isLight ? AppColors.primaryBeige : AppColors.darkSurface,
-        foregroundColor:
-            isLight ? AppColors.emeraldDark : AppColors.darkOnSurface,
+        backgroundColor: appBar,
+        foregroundColor: appBarInk,
         centerTitle: true,
         systemOverlayStyle: AppSystemUi.overlayStyle(brightness),
         // A one-pixel hairline is what separates the bar from the page without
         // adding a shadow or a second surface tone. Structure, not elevation.
         shape: Border(
-          bottom: BorderSide(
-            color: isLight ? AppColors.hairline : AppColors.darkHairline,
-            width: 1,
-          ),
+          bottom: BorderSide(color: hairline, width: 1),
         ),
       ),
       cardTheme: CardThemeData(
@@ -246,9 +311,7 @@ abstract final class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.lgAll,
-          side: BorderSide(
-            color: isLight ? AppColors.hairline : AppColors.darkHairline,
-          ),
+          side: BorderSide(color: hairline),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -257,7 +320,7 @@ abstract final class AppTheme {
         ),
       ),
       dividerTheme: DividerThemeData(
-        color: isLight ? AppColors.hairline : AppColors.darkHairline,
+        color: hairline,
         thickness: 1,
         // `space` is left at the Material default: untouched screens
         // (settings, licenses) use a bare `Divider()` for section spacing.
@@ -275,13 +338,12 @@ abstract final class AppTheme {
           height: AppType.relaxedHeight,
           color: colorScheme.onSurface,
         ),
-        actionTextColor: isLight ? AppColors.goldText : AppColors.gold,
+        actionTextColor: palette?.goldText ??
+            (isLight ? AppColors.goldText : AppColors.gold),
         elevation: 3,
         shape: RoundedRectangleBorder(
           borderRadius: AppRadius.mdAll,
-          side: BorderSide(
-            color: isLight ? AppColors.hairline : AppColors.darkHairline,
-          ),
+          side: BorderSide(color: hairline),
         ),
       ),
     );
