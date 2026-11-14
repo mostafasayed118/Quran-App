@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 
+import '../../../core/domain/ayah_key.dart';
+
 /// Read side of the offline library packs: the bounded projection cache, the
 /// per-pack ayah indexes, and the translation/tafsir/hadith read API.
 ///
@@ -58,8 +60,6 @@ class PackReader {
   /// The chain swallows errors, so a failed decode never wedges the queue.
   Future<void> _decodeQueue = Future<void>.value();
 
-  static int _ayahKey(int surah, int ayah) => surah * 1000 + ayah;
-
   /// Cache key holding [packId]'s projection for one [surah]; the bare packId
   /// key holds the full-pack projection.
   static String _cacheKey(String packId, int? surah) =>
@@ -85,7 +85,7 @@ class PackReader {
           text.isEmpty) {
         continue;
       }
-      index[_ayahKey(entrySurah.toInt(), ayah.toInt())] = text;
+      index[AyahKey.encode(entrySurah.toInt(), ayah.toInt())] = text;
     }
     return index;
   }
@@ -329,7 +329,7 @@ class PackReader {
   Future<String?> translationFor(String packId, int surah, int ayah) async {
     final index = await _load(packId, 'quran', surah: surah);
     if (index is! Map<int, String>) return null;
-    return index[_ayahKey(surah, ayah)];
+    return index[AyahKey.encode(surah, ayah)];
   }
 
   /// The whole translation index of [packId] (`surah * 1000 + ayah` → text).
@@ -351,7 +351,7 @@ class PackReader {
       index = await _load(packId, 'quran', surah: surah);
     }
     if (index is! Map<int, String>) return null;
-    return index[_ayahKey(surah, ayah)];
+    return index[AyahKey.encode(surah, ayah)];
   }
 
   /// A paged window of an installed hadith pack:
