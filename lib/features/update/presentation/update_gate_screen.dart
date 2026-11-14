@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/app_toast.dart';
@@ -68,7 +69,7 @@ class UpdateGateScreen extends StatelessWidget {
               children: [
                 Icon(
                   Icons.system_update_rounded,
-                  size: 84,
+                  size: AppIconSize.gate,
                   color: AppTheme.goldText(context),
                 ),
                 const SizedBox(height: AppSpacing.lg),

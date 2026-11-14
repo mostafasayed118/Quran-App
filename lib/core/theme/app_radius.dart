@@ -25,6 +25,21 @@ abstract final class AppRadius {
   /// Fully round: pills, badges, toggle-shaped buttons.
   static const double pill = 999;
 
+  /// Inset panel and input surface (14).
+  ///
+  /// A shipped component value, not a new rung: the asma tiles and the zakat
+  /// field use it. W2 candidate to fold into [lg].
+  static const double panel = 14;
+
+  /// Hijri day cell (10). W2 candidate to fold into [md].
+  static const double dayCell = 10;
+
+  /// Reciter selection check (11). W2 candidate to fold into [md].
+  static const double selection = 11;
+
+  /// Bottom-sheet top corners (28). Matches the modal sheet's shipped shape.
+  static const double sheet = 28;
+
   static const BorderRadius smAll = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius mdAll = BorderRadius.all(Radius.circular(md));
   static const BorderRadius lgAll = BorderRadius.all(Radius.circular(lg));

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_icon_size.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_type.dart';
@@ -173,7 +174,7 @@ class _ToastBody extends StatelessWidget {
             ),
             child: Icon(
               icon ?? _defaultIcon,
-              size: 18,
+              size: AppIconSize.md,
               color: accent,
             ),
           ),

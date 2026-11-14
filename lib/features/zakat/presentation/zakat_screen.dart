@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_strokes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
@@ -240,7 +242,7 @@ class _Field extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.panel),
       borderSide: BorderSide(color: colors.outlineVariant),
     );
     return Padding(
@@ -262,7 +264,10 @@ class _Field extends StatelessWidget {
           border: border,
           enabledBorder: border,
           focusedBorder: border.copyWith(
-            borderSide: BorderSide(color: colors.primary, width: 1.4),
+            borderSide: BorderSide(
+              color: colors.primary,
+              width: AppStrokes.emphasis,
+            ),
           ),
         ),
         onChanged: onChanged,

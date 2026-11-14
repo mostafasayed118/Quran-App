@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_strokes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
 import '../../../../core/utils/insets.dart';
@@ -220,11 +222,11 @@ class _DayCell extends StatelessWidget {
           color: cell.isToday
               ? Theme.of(context).colorScheme.primaryContainer
               : Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppRadius.dayCell),
           border: cell.isToday
               ? Border.all(
                   color: Theme.of(context).colorScheme.primary,
-                  width: 1.4,
+                  width: AppStrokes.emphasis,
                 )
               : null,
         ),

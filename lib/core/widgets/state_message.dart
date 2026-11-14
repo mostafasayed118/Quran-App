@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_icon_size.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
 
@@ -35,7 +36,8 @@ class StateMessage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 40, color: colors.onSurfaceVariant),
+              Icon(icon,
+                  size: AppIconSize.state, color: colors.onSurfaceVariant),
               const SizedBox(height: AppSpacing.md),
             ],
             Text(

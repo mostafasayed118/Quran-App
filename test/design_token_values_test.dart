@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/theme/app_alphas.dart';
 import 'package:quran_yahdi/core/theme/app_colors.dart';
+import 'package:quran_yahdi/core/theme/app_icon_size.dart';
+import 'package:quran_yahdi/core/theme/app_radius.dart';
+import 'package:quran_yahdi/core/theme/app_strokes.dart';
 import 'package:quran_yahdi/core/theme/app_type.dart';
 
 /// Pins every token introduced by the W1 wave to the literal it replaced.
@@ -58,5 +61,29 @@ void main() {
     expect(AppType.splashTaglineTracking, 4.2);
     expect(AppType.splashFooterTracking, 0.3);
     expect(AppType.shareFooterTracking, 0.4);
+  });
+
+  test('icon sizes keep the shipped values', () {
+    expect(AppIconSize.inline, 13);
+    expect(AppIconSize.dot, 14);
+    expect(AppIconSize.sm, 16);
+    expect(AppIconSize.md, 18);
+    expect(AppIconSize.lg, 20);
+    expect(AppIconSize.xl, 22);
+    expect(AppIconSize.state, 40);
+    expect(AppIconSize.hero, 48);
+    expect(AppIconSize.dial, 72);
+    expect(AppIconSize.gate, 84);
+  });
+
+  test('radii and strokes keep the shipped values', () {
+    expect(AppRadius.panel, 14);
+    expect(AppRadius.dayCell, 10);
+    expect(AppRadius.selection, 11);
+    expect(AppRadius.sheet, 28);
+    expect(AppStrokes.emphasis, 1.4);
+    expect(AppStrokes.selection, 1.5);
+    expect(AppStrokes.ring, 1.6);
+    expect(AppStrokes.accent, 3);
   });
 }

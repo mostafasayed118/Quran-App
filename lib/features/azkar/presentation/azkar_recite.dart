@@ -129,7 +129,7 @@ class _ZikrLine extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: done
-              ? const Icon(Icons.check, size: 20)
+              ? const Icon(Icons.check, size: AppIconSize.lg)
               : Text(
                   loc.number(remaining),
                   style: TextStyle(

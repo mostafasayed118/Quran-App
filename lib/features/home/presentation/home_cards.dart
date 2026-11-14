@@ -33,7 +33,7 @@ class _IconBadge extends StatelessWidget {
         color: tint.withValues(alpha: AppColors.badgeTintAlpha),
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, color: tint, size: 22),
+      child: Icon(icon, color: tint, size: AppIconSize.xl),
     );
   }
 }
@@ -160,7 +160,7 @@ class _PrayerBody extends StatelessWidget {
                       ),
                       Icon(
                         Icons.location_on_outlined,
-                        size: 13,
+                        size: AppIconSize.inline,
                         color: colors.onPrimaryContainer.withValues(
                           alpha: AppAlphas.metaInk,
                         ),

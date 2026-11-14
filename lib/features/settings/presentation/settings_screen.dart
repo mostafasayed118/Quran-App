@@ -14,6 +14,7 @@ import '../../../core/domain/reminder_diagnostics.dart';
 import '../../../core/domain/reminders.dart';
 import '../../../core/l10n/app_locale_controller.dart';
 import '../../../core/l10n/app_localizations_digits.dart';
+import '../../../core/theme/app_icon_size.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_theme_controller.dart';

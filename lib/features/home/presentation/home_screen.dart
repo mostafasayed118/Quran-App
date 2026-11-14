@@ -10,6 +10,7 @@ import '../../../../core/l10n/prayer_names.dart';
 import '../../../../core/routing/route_observer.dart';
 import '../../../../core/theme/app_alphas.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_icon_size.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';

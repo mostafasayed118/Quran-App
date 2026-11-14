@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../core/theme/app_colors.dart';
 import '../core/theme/app_radius.dart';
+import '../core/theme/app_strokes.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/app_type.dart';
 import '../l10n/app_localizations.dart';
@@ -193,7 +194,7 @@ class _SplashContent extends StatelessWidget {
                               border: Border.all(
                                 color: AppColors.gold
                                     .withValues(alpha: ringAlpha1),
-                                width: 1.6,
+                                width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),
@@ -208,7 +209,7 @@ class _SplashContent extends StatelessWidget {
                               border: Border.all(
                                 color: AppColors.gold
                                     .withValues(alpha: ringAlpha2),
-                                width: 1.6,
+                                width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
                             ),

@@ -117,7 +117,7 @@ class _Last7Row extends StatelessWidget {
                 children: [
                   Icon(
                     last7[i] ? Icons.circle : Icons.circle_outlined,
-                    size: 14,
+                    size: AppIconSize.dot,
                     color: last7[i] ? colors.primary : colors.outline,
                   ),
                   const SizedBox(height: 2),
@@ -157,7 +157,7 @@ class _StreakChip extends StatelessWidget {
       child: Chip(
         avatar: Icon(
           Icons.local_fire_department,
-          size: 16,
+          size: AppIconSize.sm,
           color: Theme.of(context).colorScheme.secondary,
         ),
         label: Text(

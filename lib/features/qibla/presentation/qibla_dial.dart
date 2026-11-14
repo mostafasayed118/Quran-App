@@ -137,7 +137,8 @@ class _CityTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(Icons.location_on_outlined, size: 18, color: colors.primary),
+        Icon(Icons.location_on_outlined,
+            size: AppIconSize.md, color: colors.primary),
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
@@ -183,7 +184,8 @@ class _CalibrationHint extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.explore_off_outlined, size: 18, color: colors.error),
+          Icon(Icons.explore_off_outlined,
+              size: AppIconSize.md, color: colors.error),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
@@ -226,7 +228,7 @@ class _AlignmentHint extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(Icons.check_circle,
-                  size: 18, color: AppTheme.goldText(context)),
+                  size: AppIconSize.md, color: AppTheme.goldText(context)),
               const SizedBox(width: AppSpacing.xs),
               Flexible(
                 child: Text(

@@ -89,7 +89,7 @@ class _DialState extends State<_Dial> {
                     duration: const Duration(milliseconds: 180),
                     child: Icon(
                       Icons.navigation,
-                      size: 72,
+                      size: AppIconSize.dial,
                       color: widget.aligned ? colors.secondary : colors.primary,
                     ),
                   ),

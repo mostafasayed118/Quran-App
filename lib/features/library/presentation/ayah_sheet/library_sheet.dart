@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/app_localizations_digits.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_type.dart';
@@ -108,7 +109,7 @@ class _AyahSheetView extends StatelessWidget {
           child: Material(
             color: colors.surface,
             borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(28),
+              top: Radius.circular(AppRadius.sheet),
             ),
             clipBehavior: Clip.antiAlias,
             // The modal route's useSafeArea only protects top/left/right;
