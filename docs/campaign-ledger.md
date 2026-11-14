@@ -1543,7 +1543,7 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Verified:** `npm ci` clean · `npm run check` (`astro check`) **0 errors** over 144 files · CI `web-gates` **`43539295279` success** and `ci` **`43539295318` success** on #51.
 - **Follow-up:** PR #5 closed with the reason and its branch deleted. Deleting the ignore rule is the first step of the TS 7 migration.
 
-### 2026-11-14 (wave) — Prayer skin: six period palettes, opt-in — BRANCH `wave/prayer-skin` (no push yet)
+### 2026-11-14 (wave) — Prayer skin: six period palettes, opt-in — BRANCH `wave/prayer-skin` (draft PR #56)
 
 - **Scope:** 15 commits from `684ab3d9`, plus the plan (`docs/superpowers/plans/2026-11-14-prayer-skin.md`) and `docs/design/prayer-skin.md`. `fixed` is the default; `follow` changes colours only.
 - **Rollback first:** `test/support/theme_snapshot.dart` was captured from the pre-change tree (a throwaway printer was deleted after it ran) and stores **ARGB ints** (`Color.alphaBlend` keeps float channels, so `Color` equality failed on rounding). 27 roles per brightness. Two intended W0 deltas, each its own commit and recorded in the fixture: light `onSecondary` ink → white (3.47 → 5.0), dark `secondaryContainer` pale gold → `alphaBlend(gold 18%, darkSurface)` (the 28 dp hadith badge had 1.09:1 text).
@@ -1559,4 +1559,4 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Device state (disclosed):** a locally built **release 2006** (same owner certificate `db7ffef4…`, data kept) is installed over the owner's 2004; the app was left in `fixed` (the shipped default), system dark, Cairo. `svc power stayon` restored to false.
 - **Gates at the tip:** format **0** · analyze **0** · suite **1815/1815**.
 - **Not verified here:** the six-period screenshot sweep (the shell cannot set the device time — `date: Operation not permitted`, `auto_time` off; only maghrib and isha were reachable at the session clock) and a device screenshot of a chrome bottom sheet (its role is pinned by the contrast test plus a widget test that reads the rendered `Material` colour in both brightnesses).
-- **Not pushed:** the branch waits for the owner's GO.
+- **Pushed:** `c14c17a4` → `wave/prayer-skin`; `ls-remote` matches. PR **#56** (draft) carries the two open **merge conditions**: the twelve-palette sweep (covers fajr/sunrise/dhuhr/asr) and a device screenshot of a chrome bottom sheet before the 40% blend is ratified. CI on the pushed tip: `43617879010` **success** (analyze-test; `release-artifact` skipped on a PR as designed, Cloudflare Pages pass).
