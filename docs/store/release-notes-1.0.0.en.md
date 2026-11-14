@@ -12,3 +12,10 @@ First release of Quran Yahdi — your complete offline Quran companion:
 • Azkar, tasbih, duas, ruqyah & the 99 names of Allah
 • Prayer tracker, zakat calculator, Hijri calendar & reminders
 • Translations & hadith via in-app installable packs
+
+> Internal note (not part of the store body): two shipped-theme contrast fixes
+> landed after the first-release copy — white on the light gold (3.47 → 5.0) and
+> the dark gold container behind the hadith number (1.09 → 9.16). If a user
+> reports a small colour change in a gold badge or gold text, that is intended;
+> mention it as "contrast improvements to gold accents" in the next published
+> What's new.

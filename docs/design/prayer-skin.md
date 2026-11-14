@@ -79,6 +79,13 @@ Derived roles (getters on `PrayerPalette`, never copied hex):
   the time on this device (`date: Operation not permitted`) and `auto_time` is
   off. On-device screenshots cover the periods reachable at the session's wall
   clock (maghrib, isha).
-- No device screenshot of a chrome bottom sheet; its role is pinned by the
-  contrast test and a widget test that reads the rendered `Material` colour in
-  both brightnesses.
+- The chrome sheet was verified on the **`Test_Android` AVD**, not on the phone
+  panel (the phone's wird sheet needs a no-plan state, i.e. wiping its data).
+  The AVD and the Infinix can differ in brightness and colour profile.
+- The sheet/card separation is **1.0726:1 at worst** — a mathematical floor, not
+  a visual judgement. The modal scrim and the elevation shadow do more of the
+  separation than the fill. On a dim panel it may still read as close; the rule
+  then is to **raise the 1.06 threshold** (and the tile alpha with it) in a
+  separate commit, never to tune the alpha by eye.
+- The phone-panel pass still owes: the sheet (light + dark) and the four
+  periods that were never captured on real hardware (fajr, sunrise, dhuhr, asr).
