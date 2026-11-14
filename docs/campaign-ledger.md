@@ -1519,3 +1519,10 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Device:** the ayah number is visibly 28 on the Infinix (vs 16 on the previous build); the 56 case is pinned by `ayah_number_size_test`.
 - **Gates at the tip:** format **0** · analyze **0** · suite **1677/1677 (1632 + 45)**.
 - **Not pushed:** the branch waits for the owner's GO.
+
+### 2026-11-14 (merge) — Typography scale landed on main — e0d8fda3D (PR #47)
+
+- **Merge `e0d8fda3`** (`wave/type-scale`, seven commits from `2b6f2481`); branch deleted on origin.
+- **CI:** PR **`43533492944` success** · merge **`__435334929442__` success** on `main`.
+- **At the tip:** the 12-rung ladder, the four component tokens, the ayah number at 28 × `fontScale`, the `Wrap` actions row, the line-height floors, the guard with empty allowlists, the 320/360/411 matrix and the fixed-export test are all on `main`.
+- **Nothing was deferred:** the only rejected item is fluid type by width (rejected by design), and the only skipped abstraction is `AdaptiveListRow` (measured unnecessary — the probe is the gate).
