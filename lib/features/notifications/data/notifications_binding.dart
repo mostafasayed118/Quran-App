@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
@@ -10,6 +12,20 @@ import 'package:quran_yahdi/features/notifications/data/reminder_plan_store.dart
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
     show preAdhanReminderId, reminderAlarmIds, shouldRequestBootPermission;
 import 'package:timezone/timezone.dart' as tz;
+
+/// The kernel boot id, readable by the app on Android (verified on the
+/// A16 emulator with the debug app's UID). `/proc/uptime` is NOT readable and
+/// was rejected as a stamp. Null on platforms without the file: a null stamp
+/// is never trusted across processes, so the cost is one re-apply per process.
+String? _readBootId() {
+  try {
+    final value =
+        File('/proc/sys/kernel/random/boot_id').readAsStringSync().trim();
+    return value.isEmpty ? null : value;
+  } on Object {
+    return null;
+  }
+}
 
 /// The ONE file that touches the flutter_local_notifications plugin (W7b
 /// headless law): planned reminders arrive as plain data and UI texts arrive
@@ -48,8 +64,10 @@ class NotificationsBinding extends ChangeNotifier
   NotificationsBinding({
     FlutterLocalNotificationsPlugin? plugin,
     ReminderPlanStore? store,
+    String? Function()? bootId,
   })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
-        _store = store;
+        _store = store,
+        _bootId = bootId ?? _readBootId;
 
   static const String channelId = 'quran_yahdi_reminders';
 
@@ -67,6 +85,14 @@ class NotificationsBinding extends ChangeNotifier
   /// Persists the applied plan across process starts (the 15-minute
   /// background isolate builds a new binding every run).
   final ReminderPlanStore? _store;
+
+  /// Identifies the running boot; null when the platform does not expose one.
+  ///
+  /// A row in [_store] says "already on the OS" only while this value matches
+  /// the one recorded with the plan. Android drops every alarm at reboot, so a
+  /// restored fingerprint from a previous boot would otherwise suppress the
+  /// re-schedule that the boot path exists for.
+  final String? Function() _bootId;
 
   bool _ready = false;
   NotificationDetails? _details;
@@ -581,7 +607,11 @@ class NotificationsBinding extends ChangeNotifier
       _appliedExact = exact;
       _setApplyFailed(false);
       await _store?.write(
-        ReminderPlanSnapshot(fingerprint: fingerprint, exact: exact),
+        ReminderPlanSnapshot(
+          fingerprint: fingerprint,
+          exact: exact,
+          bootId: _bootId(),
+        ),
       );
     } on Object catch (error, stackTrace) {
       // Best-effort: a failed schedule must not crash the caller, but it can

@@ -7,13 +7,24 @@ import '../../../core/db/settings_store.dart';
 /// it was written with (the mode is part of "already applied").
 class ReminderPlanSnapshot {
   /// Creates the snapshot for [fingerprint] and [exact].
-  const ReminderPlanSnapshot({required this.fingerprint, required this.exact});
+  const ReminderPlanSnapshot({
+    required this.fingerprint,
+    required this.exact,
+    this.bootId,
+  });
 
   /// The deterministic plan fingerprint.
   final String fingerprint;
 
   /// Whether the alarms were written with exact scheduling.
   final bool exact;
+
+  /// The boot the snapshot was written on, when the platform exposes one.
+  ///
+  /// A plan is only "already on the OS" while the same boot is alive; Android
+  /// drops every alarm at reboot. A null value (old snapshot or a platform
+  /// without the stamp) must not be trusted across processes.
+  final String? bootId;
 }
 
 /// Persists [ReminderPlanSnapshot] so a new process (or the background
@@ -53,8 +64,13 @@ class DriftReminderPlanStore implements ReminderPlanStore {
       if (decoded is! Map) return null;
       final fingerprint = decoded['fingerprint'];
       final exact = decoded['exact'];
+      final bootId = decoded['bootId'];
       if (fingerprint is! String || exact is! bool) return null;
-      return ReminderPlanSnapshot(fingerprint: fingerprint, exact: exact);
+      return ReminderPlanSnapshot(
+        fingerprint: fingerprint,
+        exact: exact,
+        bootId: bootId is String && bootId.isNotEmpty ? bootId : null,
+      );
     } on Object {
       return null;
     }
@@ -66,6 +82,7 @@ class DriftReminderPlanStore implements ReminderPlanStore {
         jsonEncode({
           'fingerprint': snapshot.fingerprint,
           'exact': snapshot.exact,
+          'bootId': snapshot.bootId,
         }),
       );
 
