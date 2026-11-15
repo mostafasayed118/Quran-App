@@ -14,7 +14,7 @@ subproject and iOS were not audited.
 | 1 | A reboot clears every alarm, and the persisted plan fingerprint suppresses the re-arm | critical | A | **merged** (`991da562`, PR #58) |
 | 1b | Force-stop clears the alarms without changing the boot id; the plan is still trusted | high | open | **open — first follow-up** |
 | 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | **merged** (`991da562`, PR #58) |
-| 3 | The mandatory update gate clips its only action at 320 dp, textScale 2.0 (Cairo: 40 px overflow, button ends at y=656) | high | B | **fixed** (Wave B PR) |
+| 3 | The mandatory update gate clips its only action at 320 dp, textScale 2.0 (Cairo: 40 px overflow, button ends at y=656) | high | B | **merged** (`23eee01e`, PR #59) |
 | 4 | Countdown digit boxes are 34 dp vs 44 sp text | medium (latent) | B | **closed — not reproducible**: with Cairo at 2.0 the glyph is 26.5 px inside a 34 dp box at both 320 and 360; the 28/29 px came from the widget-test font. Reopen only if the font or the supported scale changes |
 | 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | queued |
 | 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | queued |
@@ -25,7 +25,7 @@ subproject and iOS were not audited.
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | queued |
-| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **fixed** (Wave B PR; device TalkBack pass pending) |
+| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); device TalkBack pass pending |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
 | 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | queued |
@@ -145,6 +145,16 @@ defect.
 Cairo, tap-after-scroll). `test/adhan_picker_semantics_test.dart` and
 `test/azkar_count_semantics_test.dart` pin the announcements; the device
 TalkBack walk is still pending.
+
+**Decision (2026-11-15, owner-visible):** the azkar counter carries **no
+`liveRegion`**. It is announced when the row is focused, not on every tap — a
+live region on a counter that changes per tap would talk over the user. The
+spoken check is the pending TalkBack walk, not a test.
+
+**Probe self-check:** `test/update_gate_scale_probe_test.dart` now measures the
+app's own display style and fails if the ambient font is the test font (88.0 px)
+instead of Cairo (26.5 px), so the overflow assertions can never silently
+measure the wrong font.
 
 ## Wave plan (owner-ordered)
 
