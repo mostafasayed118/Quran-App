@@ -21,14 +21,14 @@ subproject and iOS were not audited.
 | 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
 | 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | queued |
 | 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **merged** (`7ef6b4a9`, PR #60): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
-| 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | queued |
-| 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
-| 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
-| 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | queued |
+| 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | **fixed** (Wave D PR): the toggled ids are replayed over the read instead of overwriting it; both add and remove directions are covered |
+| 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | **fixed** (Wave D PR): writes are serialized and each computes from the last saved list; a failure reverts to it, not to a pre-mutation snapshot |
+| 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **fixed** (Wave D PR): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
+| 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **not proven**: the cubit already drops duplicate reports, so the writes are one last-read + one wird advance per **distinct leading ayah** (a fling past N cards costs N pairs), not per frame and not 150–300 per fling. No device frame measurement was possible (phone disconnected); recorded instead of changed on faith |
 | 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
-| 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | queued |
+| 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | **hardened** (Wave D PR): the UI-isolate block measured 51 ms for one pack / 120 ms for three on a **desktop host, JIT, pre-fix path** (~3 frames at 60 Hz, not device-measured); the normalization now runs through `Isolate.run`, with the runner injectable for tests |
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
 | 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | queued |
 | 20 | README says 1450 tests; the suite is 1877+ | low | E | queued |
@@ -243,6 +243,55 @@ post-fix debug build re-armed from **0 → 30** alarms with no interaction, whil
 the pre-fix release build stayed at **0** — the defect and the fix side by side.
 Installing release **2008** (owner cert, `install -r`, `firstInstallTime`
 unchanged) took the release **0 → 32**; its own reboot leg is still unmeasured.
+
+## Wave D record
+
+Branch `wave/d-races-perf`, cut from `7548a710`.
+
+| Commit | Role | Red evidence |
+|---|---|---|
+| `67c6fe82` | feat: shared `SerialQueue` + tests | — |
+| `491300cc` | test: azkar favourite during hydration | added favourite lost (`Set[]`), removed one resurrected |
+| `86271d85` | fix: replay touched ids over the read | 4/4 green |
+| `7dcb6f28` | test: qada overlapping saves | two saves in flight; the failed day rode along in the next write |
+| `269b812c` | fix: serialize writes, compute from `_confirmed` | 3/3 green |
+| `6897c004` | test: splash frames after dismissal | `hasScheduledFrame` stayed true |
+| `df83e712` | fix: stop the bar at dismissal | green |
+| `08f2b979` | fix: translation preparation off the UI isolate | measured, not a failing test |
+
+**#10** — the stored read is a snapshot from when it started; a toggle that
+lands during it is newer. The cubit records the toggled collection ids and
+replays their **final membership** over the read, so an added favourite
+survives and a removed one is not resurrected; untouched favourites and
+counters still come from the stored state. Opening a collection before
+hydration already waits for the read (the existing test pins the untouched
+counter case).
+
+**#11** — writes go through one `SerialQueue`; every task recomputes its list
+from the last **saved** list, so two saves cannot land out of order and a failed
+save is not carried into the next write. A failure repaints only when it is the
+newest mutation, from `_confirmed`. Tests: A fails/B succeeds → `[d2]`; A
+succeeds/B fails → `[d1]`.
+
+**#12** — `SplashScreen` wraps the whole app, so its State outlives the overlay.
+The bar's `repeat()` kept a ticker alive; the probe pumps past hold+fade and
+asserts `hasScheduledFrame` is false, which fails on the pre-fix code.
+
+**#13 — not proven, no code.** `ReaderCubit.onVisibleAyah` drops duplicate
+reports (`ayahId == _lastVisibleAyahId`), and `open` waits for hydration, so the
+cost is one last-read write + one wird advance per **distinct leading ayah** —
+a fling past N cards costs N pairs, not a write per frame and not the 150–300
+the finding implied. A device frame measurement was not possible (phone
+disconnected); recorded as not proven rather than changed on faith.
+
+**#17 — measured, then fixed.** `prepareQuery` over every entry measured **51 ms
+for one pack (6,236 entries) and 120 ms for three** on a desktop host — several
+dropped frames on a phone. The normalization now runs through `Isolate.run`
+(injectable for tests). Class A harness: the screen test injects a synchronous
+runner because a real isolate future does not settle inside a `testWidgets`
+body; assertions unchanged.
+
+**Gates at the tip:** format 0 · analyze 0 · suite **1925/1925**.
 
 ## Wave plan (owner-ordered)
 
