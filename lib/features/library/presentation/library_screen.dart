@@ -224,7 +224,8 @@ class _PackRow extends StatelessWidget {
     final subtitle = pack.orphan
         ? loc.libraryPackUnavailable
         : loc.libraryPackSubtitle(
-            loc.libraryPackSize(loc.digits(pack.approxSizeMb.toString())),
+            loc.libraryPackSize(
+                loc.digits(formatMegabytesValue(pack.approxSizeMb))),
             pack.titleEn,
           );
 
