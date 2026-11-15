@@ -276,6 +276,14 @@
     }
   },
   "azkarDone": "تم بحمد الله",
+  "azkarRemainingCount": "باقي {count}",
+  "@azkarRemainingCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "azkarRestart": "إعادة العد",
   "azkarFavoriteAdd": "إضافة إلى المفضلة",
   "azkarFavoriteRemove": "إزالة من المفضلة",

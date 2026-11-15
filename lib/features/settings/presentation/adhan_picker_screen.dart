@@ -157,25 +157,31 @@ class _AdhanRow extends StatelessWidget {
     final label = title ?? track!.nameAr;
     final subtitle = track?.nameEn;
 
-    return ListTile(
-      leading: onTogglePreview == null
-          ? null
-          : IconButton(
-              icon: Icon(
-                previewing
-                    ? Icons.stop_circle_outlined
-                    : Icons.play_circle_outline,
-              ),
-              tooltip: previewing ? loc.adhanStopPreview : loc.adhanPreview,
-              onPressed: onTogglePreview,
-            ),
-      title: Text(label),
-      subtitle: subtitle == null ? null : Text(subtitle),
-      trailing: Icon(
-        selected ? Icons.check_circle : Icons.circle_outlined,
-        color: selected ? colors.primary : colors.outlineVariant,
+    return MergeSemantics(
+      child: Semantics(
+        selected: selected,
+        inMutuallyExclusiveGroup: true,
+        child: ListTile(
+          leading: onTogglePreview == null
+              ? null
+              : IconButton(
+                  icon: Icon(
+                    previewing
+                        ? Icons.stop_circle_outlined
+                        : Icons.play_circle_outline,
+                  ),
+                  tooltip: previewing ? loc.adhanStopPreview : loc.adhanPreview,
+                  onPressed: onTogglePreview,
+                ),
+          title: Text(label),
+          subtitle: subtitle == null ? null : Text(subtitle),
+          trailing: Icon(
+            selected ? Icons.check_circle : Icons.circle_outlined,
+            color: selected ? colors.primary : colors.outlineVariant,
+          ),
+          onTap: onSelect,
+        ),
       ),
-      onTap: onSelect,
     );
   }
 }

@@ -269,6 +269,14 @@
     }
   },
   "azkarDone": "Done",
+  "azkarRemainingCount": "Remaining: {count}",
+  "@azkarRemainingCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "azkarRestart": "Start over",
   "azkarFavoriteAdd": "Add to favourites",
   "azkarFavoriteRemove": "Remove from favourites",

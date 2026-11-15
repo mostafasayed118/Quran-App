@@ -914,6 +914,12 @@ abstract class AppLocalizations {
   /// **'تم بحمد الله'**
   String get azkarDone;
 
+  /// No description provided for @azkarRemainingCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'باقي {count}'**
+  String azkarRemainingCount(String count);
+
   /// No description provided for @azkarRestart.
   ///
   /// In ar, this message translates to:

@@ -463,6 +463,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get azkarDone => 'Done';
 
   @override
+  String azkarRemainingCount(String count) {
+    return 'Remaining: $count';
+  }
+
+  @override
   String get azkarRestart => 'Start over';
 
   @override

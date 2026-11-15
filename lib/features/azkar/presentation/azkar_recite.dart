@@ -120,23 +120,29 @@ class _ZikrLine extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.sm),
-        Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: done ? colors.secondary : colors.primaryContainer,
-            shape: BoxShape.circle,
-          ),
-          child: done
-              ? const Icon(Icons.check, size: AppIconSize.lg)
-              : Text(
-                  loc.number(remaining),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: colors.onPrimaryContainer,
+        Semantics(
+          label: done
+              ? loc.azkarDone
+              : loc.azkarRemainingCount(loc.number(remaining)),
+          excludeSemantics: true,
+          child: Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: done ? colors.secondary : colors.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: done
+                ? const Icon(Icons.check, size: AppIconSize.lg)
+                : Text(
+                    loc.number(remaining),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: colors.onPrimaryContainer,
+                    ),
                   ),
-                ),
+          ),
         ),
       ],
     );
