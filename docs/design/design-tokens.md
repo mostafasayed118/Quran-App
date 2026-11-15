@@ -114,10 +114,9 @@ list, not merely that two reminders exist.
 1. **Spacing rhythm.** 39 `SizedBox` gaps and 14 `EdgeInsets` use values off
    the 4 dp scale (`2 / 6 / 10 / 14 / 18 / 20 / 22 / 26`). Snapping them is a
    ≤2 dp change in ~30 places; do it screen by screen with screenshots.
-2. **Scripture line height.** `1.7` (asma), `1.8` (duas, azkar, hadith),
-   `1.9` (ayah sheet), `2.1` (azkar recite). This is a **reading** decision:
-   Arabic diacritics change with the line box. Capture before/after on the
-   four screens; do not approve it from a table.
+2. **Scripture line height — closed 2026-11-15: keep.** `1.7` (asma), `1.8`
+   (duas, azkar browse, hadith), `1.9` (ayah sheet), `2.1` (azkar recite). The
+   1.8 unification was tested and rejected — see the result section below.
 3. **Radii.** `panel 14`, `dayCell 10`, `selection 11` are shipped component
    values; fold them into `md 12` / `lg 16` by role. `sheet 28` stays.
 4. **Muted ink.** `metaInk 0.70` and `secondaryInk 0.75` play the same
@@ -192,6 +191,30 @@ The APK does not embed the source SHA. Record the installed version and this
 artifact hash at capture; if the source SHA is not recoverable from the
 artifact, say so — do not substitute the current `main` SHA as if it were the
 build's source.
+
+## W2 line-height session — result: keep (2026-11-15)
+
+The 1.8 unification was tested on the x86_64 emulator at 360 dp / 2.0 text
+scale, light and dark, with the pre-declared entries: `d26`, azkar
+`evening[0]`, asma `n=76`, Bukhari `#2731`.
+
+| screen | shipped | candidate | measurement | decision |
+|---|---:|---:|---|---|
+| duas | 1.8 | 1.8 | text region **0 changed px** (light) / 4 of 1,322,496 (dark, render noise) | keep 1.8 (control) |
+| azkar | 2.1 | 1.8 | line gaps 206.5→179.5, 196.5→169.5, 181→154 px (~13% tighter; 1.8/2.1 = 0.857) | **keep 2.1** — criterion (d) |
+| asma | 1.7 | 1.8 | sheet meaning slightly looser; no clipping/overlap | keep 1.7 — no reading gain |
+| hadith | 1.8 | 1.8 | internal line gaps identical; edges differ only by the scroll offset | keep 1.8 (control) |
+
+**Decision:** keep the shipped roles (`scriptureTightHeight` 1.7,
+`scriptureHeight` 1.8, `dhikrHeight` 2.1). The unification is rejected; no code
+change. The candidate branch `wave/w2-line-height` was deleted and `main`
+returned clean.
+
+**Known limits:** the measurement is on the x86_64 emulator, not the Infinix;
+Arabic shaping may differ slightly on the phone. Only 2.0 scale was captured;
+if the question is reopened, capture 1.0 and 1.3 as well. The before/after
+artifacts differ in versionCode (4004 vs 2007) and signing; neither affects
+rendering. The 4-pixel dark difference in the duas control is render noise.
 
 ## Device session order (W2 + deferred periods)
 

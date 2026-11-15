@@ -1591,3 +1591,11 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Zero pixel change:** no theme value, palette, layout metric, line height, alpha, icon, radius, stroke or duration changed; no APK rebuild. The phone stays release `2006`, `fixed`.
 - **CI:** PR run `43641305445` **success** (analyze-test 8m15s; release-artifact skipped on a PR as designed, Cloudflare Pages pass). Main run `43642081210`: **success** (analyze-test 9.2 min, release-artifact 8.5 min — debug-signed artifacts as designed).
 - **Open:** W2 (line-height first; the accept/reject bar and the device session order are pre-declared in `docs/design/design-tokens.md`; then spacing per screen; then radii and muted ink) and the deferred four-period device pass (`fajr`/`sunrise`/`dhuhr`/`asr`), combined in one physical-phone session: W2 before on `fixed` → build → after → `follow` for the four periods → `fixed` after isha.
+
+### 2026-11-15 (W2 line-height) — CLOSED: keep all shipped values
+
+- **Session:** emulator `A16_API36` (x86_64), 360 dp, font scale 2.0, portrait, Arabic/Cairo, `fixed`, light + dark. Before: CI x64 release from `4e6a465c` (versionCode 4004, debug-signed); after: local x64 release from the candidate branch (versionCode 2007, owner cert). App data was recreated after the signature change; entries, scale, width and theme were identical.
+- **Result:** duas control **0 changed px** (light) / 4 of 1,322,496 (dark, render noise); hadith internal line gaps identical; azkar line gaps **~13% tighter** (206.5→179.5, 196.5→169.5, 181→154 px) — criterion (d) fired; asma 1.8 was slightly looser with no reading gain.
+- **Decision:** **keep** `scriptureTightHeight` 1.7, `scriptureHeight` 1.8, `dhikrHeight` 2.1. No code change; candidate branch deleted; `main` clean.
+- **Limits:** x86_64 emulator, not the phone; 2.0 scale only; before/after versionCode/signing differ with no rendering effect. Reopen with 1.0/1.3 if unification is reconsidered.
+- **Still open:** the four periods on the phone (96-assertion gate). Spacing/radii/muted-ink W2 items stay deferred.
