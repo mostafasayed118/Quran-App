@@ -62,6 +62,36 @@ void main() {
     );
   });
 
+  test('a valid header with a truncated body is kept (decision)', () async {
+    const sqliteHeader = <int>[
+      0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, //
+      0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33, 0x00,
+    ];
+    // A real header with a body that is not a database: the shape a process
+    // kill mid-write used to produce. The header check cannot tell it apart,
+    // and the decision is to keep it (never destroy a possibly-populated file)
+    // rather than run an integrity check on every boot.
+    final truncated = <int>[...sqliteHeader, 0, 1, 2, 3, 4];
+    await target.writeAsBytes(truncated);
+
+    await copyDbAssetIfAbsent(
+      target: target,
+      assetKey: 'asset',
+      loadAsset: _mustNotLoad,
+    );
+
+    expect(hasSqliteHeader(target), isTrue);
+    expect(await target.readAsBytes(), truncated,
+        reason: 'a valid header is kept as-is: no silent replacement');
+    expect(
+      dir.listSync().whereType<File>().where(
+            (f) => f.path.contains('.corrupt-'),
+          ),
+      isEmpty,
+      reason: 'a possibly-populated file is never moved aside automatically',
+    );
+  });
+
   test('a file that is not SQLite is moved aside and replaced', () async {
     await target.writeAsString('not a database');
 
