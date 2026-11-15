@@ -254,9 +254,13 @@ class NotificationsBinding extends ChangeNotifier
     }
     try {
       final saved = await _store?.read();
-      if (saved != null) {
-        // A plan applied before this process started is already on the OS;
-        // the in-memory value wins only when this binding has a newer one.
+      final bootId = _bootId();
+      // A plan applied earlier in THIS boot is still on the OS. Android drops
+      // every alarm at reboot (the manifest intentionally ships no plugin boot
+      // receiver), so a snapshot from a previous boot must never suppress the
+      // re-schedule the boot path exists for. A null stamp (old snapshot, or a
+      // platform without the kernel file) is not trusted either.
+      if (saved != null && bootId != null && saved.bootId == bootId) {
         _appliedPlan ??= saved.fingerprint;
         _appliedExact ??= saved.exact;
       }
