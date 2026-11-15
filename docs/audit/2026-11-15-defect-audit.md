@@ -11,9 +11,9 @@ subproject and iOS were not audited.
 
 | # | Finding | Severity | Wave | Status |
 |---|---|---|---|---|
-| 1 | A reboot clears every alarm, and the persisted plan fingerprint suppresses the re-arm | critical | A | fixed in the Wave A PR |
-| 1b | Force-stop clears the alarms without changing the boot id; the plan is still trusted | high | open | **open — tracked here** |
-| 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | fixed in the Wave A PR |
+| 1 | A reboot clears every alarm, and the persisted plan fingerprint suppresses the re-arm | critical | A | **merged** (`991da562`, PR #58) |
+| 1b | Force-stop clears the alarms without changing the boot id; the plan is still trusted | high | open | **open — first follow-up** |
+| 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | **merged** (`991da562`, PR #58) |
 | 3 | Mandatory update gate overflows at textScale 2.0; the update button is clipped (probe: 424 px) | high | B | queued |
 | 4 | Countdown digit boxes are 34 dp vs 44 sp text; digits overlap at 2.0 (probe: 28/29 px) | high | B | queued |
 | 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | queued |
@@ -123,3 +123,17 @@ lost reminders.
 
 Each wave follows the same discipline: a test that fails first, the fix, full
 gates, and a draft PR. No merge without owner review.
+
+## Follow-ups (in order)
+
+1. **#1b force-stop** — same defect from the other side: the user gets no
+   reminders and no signal. Needs a decision on the signal (ApplicationExitInfo
+   vs one foreground re-arm).
+2. **Infinix X6882 boot-id check** — pending; the emulator is not the phone.
+   If the file is unreadable there, the fix degrades to one re-apply per
+   process (safe, not the goal).
+3. **Wave B** — 3, 4, 14 (text-scale overflow and TalkBack), with a permanent
+   probe at 360×640, scale 2.0 so they cannot come back.
+4. **Wave C** — 6, 5, 9.
+5. **Wave D** — 10, 11, 12, 13, 17.
+6. **Wave E** — 8, 16, 15, 19, 20, 7, 18.
