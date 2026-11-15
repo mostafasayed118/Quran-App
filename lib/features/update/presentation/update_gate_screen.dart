@@ -65,37 +65,57 @@ class UpdateGateScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.xl),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.system_update_rounded,
-                  size: AppIconSize.gate,
-                  color: AppTheme.goldText(context),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                // The copy scrolls; the action never does. A blocking gate whose
+                // only exit is pushed off screen at a large text scale is a dead
+                // end, so the button stays pinned and the content centers only
+                // while it fits.
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.system_update_rounded,
+                            size: AppIconSize.gate,
+                            color: AppTheme.goldText(context),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            body,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text(
-                  body,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge,
-                ),
-                const Spacer(),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                    ),
                     onPressed: () => _openStore(context),
                     child: Text(loc.updateNow),
                   ),
                 ),
                 if (!mandatory)
                   TextButton(
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, 48),
+                    ),
                     onPressed: () => _dismissRecommended(context),
                     child: Text(loc.updateLater),
                   ),
