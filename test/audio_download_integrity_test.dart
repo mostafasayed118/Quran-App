@@ -77,6 +77,7 @@ void main() {
       () async {
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
+    await File('${part.path}.validator').writeAsString('"v1"');
     final ranges = <String?>[];
 
     final downloader = await serve((req, call) async {
@@ -134,5 +135,59 @@ void main() {
 
     await file.writeAsBytes(<int>[1]);
     expect(await downloader.isDownloaded(_rowId, 1), isTrue);
+  });
+
+  test('a 200 answer to a validated resume rewrites from zero', () async {
+    final part = await partFile(1);
+    // A prefix that must not survive: 40 bytes of 0xFF, not the payload.
+    await part.writeAsBytes(Uint8List(40)..fillRange(0, 40, 0xFF));
+    await File('${part.path}.validator').writeAsString('"old"');
+    String? ifRange;
+
+    final downloader = await serve((req, _) async {
+      ifRange = req.headers.value(HttpHeaders.ifRangeHeader);
+      // The validator no longer matches: the host serves the whole file.
+      req.response.statusCode = HttpStatus.ok;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        ..set(HttpHeaders.etagHeader, '"new"')
+        ..contentLength = _payload.length;
+      req.response.add(_payload);
+      await req.response.close();
+    });
+
+    final file = await downloader.downloadSurah(
+      reciter: await (db.select(db.reciters)).getSingle(),
+      surahNumber: 1,
+    );
+
+    expect(ifRange, '"old"');
+    expect(await file.readAsBytes(), _payload,
+        reason: 'a 200 body must replace the stale prefix, never be appended');
+  });
+
+  test('a prefix with no validator is discarded before the request', () async {
+    final part = await partFile(1);
+    await part.writeAsBytes(Uint8List(40));
+    String? range;
+
+    final downloader = await serve((req, _) async {
+      range = req.headers.value(HttpHeaders.rangeHeader);
+      req.response.statusCode = HttpStatus.ok;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        ..contentLength = _payload.length;
+      req.response.add(_payload);
+      await req.response.close();
+    });
+
+    final file = await downloader.downloadSurah(
+      reciter: await (db.select(db.reciters)).getSingle(),
+      surahNumber: 1,
+    );
+
+    expect(range, isNull,
+        reason: 'an unverifiable prefix must not be offered back');
+    expect(await file.readAsBytes(), _payload);
   });
 }

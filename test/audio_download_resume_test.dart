@@ -78,10 +78,13 @@ void main() {
         '${folder.path}${Platform.pathSeparator}${surahAudioFileName(surah)}.part');
   }
 
-  test('a stored prefix resumes with a Range request (206)', () async {
+  test('a stored prefix with a validator resumes with Range + If-Range',
+      () async {
     String? range;
+    String? ifRange;
     final downloader = await serve((req, _) async {
       range = req.headers.value(HttpHeaders.rangeHeader);
+      ifRange = req.headers.value(HttpHeaders.ifRangeHeader);
       req.response.statusCode = HttpStatus.partialContent;
       req.response.headers
         ..contentType = ContentType('audio', 'mpeg')
@@ -93,6 +96,7 @@ void main() {
 
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
+    await File('${part.path}.validator').writeAsString('"v1"');
 
     final file = await downloader.downloadSurah(
       reciter: await reciter(),
@@ -100,6 +104,8 @@ void main() {
     );
 
     expect(range, 'bytes=40-', reason: 'the prefix must be offered back');
+    expect(ifRange, '"v1"',
+        reason: 'the stored validator proves the remote did not change');
     expect(await file.length(), 100);
     expect(await file.readAsBytes(), _payload);
     expect(await part.exists(), isFalse, reason: 'the part is promoted');
@@ -161,6 +167,7 @@ void main() {
 
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
+    await File('${part.path}.validator').writeAsString('"v1"');
 
     final file = await downloader.downloadSurah(
       reciter: await reciter(),
@@ -215,27 +222,44 @@ void main() {
   });
 
   test(
-      'a 206 with an unknown total (bytes N-M/*) resumes without a false '
-      'oversize failure', () async {
-    final downloader = await serve((req, _) async {
-      req.response.statusCode = HttpStatus.partialContent;
-      req.response.headers
-        ..contentType = ContentType('audio', 'mpeg')
-        // No total: the host does not know the full size.
-        ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/*')
-        ..contentLength = 60;
-      req.response.add(_payload.sublist(40));
-      await req.response.close();
-    });
+      'a 206 with an unknown total (bytes N-M/*) drops the prefix and '
+      'restarts from zero', () async {
+    final ranges = <String?>[];
+    final downloader = await serve(
+      (req, call) async {
+        ranges.add(req.headers.value(HttpHeaders.rangeHeader));
+        if (call == 1) {
+          req.response.statusCode = HttpStatus.partialContent;
+          req.response.headers
+            ..contentType = ContentType('audio', 'mpeg')
+            // No total: the host does not know the full size.
+            ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/*')
+            ..contentLength = 60;
+          req.response.add(_payload.sublist(40));
+        } else {
+          req.response.statusCode = HttpStatus.ok;
+          req.response.headers
+            ..contentType = ContentType('audio', 'mpeg')
+            ..contentLength = _payload.length;
+          req.response.add(_payload);
+        }
+        await req.response.close();
+      },
+      retryDelay: Duration.zero,
+    );
 
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
+    await File('${part.path}.validator').writeAsString('"v1"');
 
     final file = await downloader.downloadSurah(
       reciter: await reciter(),
       surahNumber: 1,
     );
 
+    expect(ranges, <String?>['bytes=40-', null],
+        reason: 'an unknown total cannot be verified, so the retry asks for '
+            'the whole file');
     expect(await file.readAsBytes(), _payload);
   });
 
