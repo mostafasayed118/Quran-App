@@ -54,7 +54,14 @@ void main() {
 
   test('an existing target never touches the worker', () async {
     final target = File(p.join(tempDir.path, 'quran_yahdi.sqlite'));
-    await target.writeAsBytes(bytes);
+    // Only a file that is a SQLite database is kept; the fixture carries the
+    // real 16-byte magic, so no repair (and no worker call) must happen.
+    const sqliteHeader = <int>[
+      0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, //
+      0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33, 0x00,
+    ];
+    final existing = <int>[...sqliteHeader, ...bytes];
+    await target.writeAsBytes(existing);
     var workerCalls = 0;
 
     await writeAssetOffUiIsolate(
@@ -68,6 +75,6 @@ void main() {
     );
 
     expect(workerCalls, 0);
-    expect(await target.readAsBytes(), bytes);
+    expect(await target.readAsBytes(), existing);
   });
 }
