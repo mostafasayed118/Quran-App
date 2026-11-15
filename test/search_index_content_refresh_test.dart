@@ -125,6 +125,21 @@ void main() {
     final db = AppDatabase(NativeDatabase(copy));
     addTearDown(db.close);
 
+    // The asset's own content stamp must match the content it ships with and
+    // the app constant. A regenerated asset that forgets the stamp (or stamps
+    // the wrong version) would otherwise make a fresh install skip a rebuild
+    // over an index built from different content.
+    final rows =
+        await db.customSelect('SELECT key, value FROM settings_table').get();
+    final settings = {
+      for (final row in rows) row.read<String>('key'): row.read<String>('value')
+    };
+    expect(settings[kSearchIndexContentKey], settings[kContentVersionKey],
+        reason: 'the asset stamps the version its index was built from');
+    expect(settings[kContentVersionKey], '$kContentVersion',
+        reason: 'a regenerated asset must be stamped with the current content');
+    expect(settings[kSearchIndexVersionKey], '$kContentVersion');
+
     await ensureQuranSearchIndex(
       db,
       run: <R>(_) => throw StateError('the shipped index must not rebuild'),
