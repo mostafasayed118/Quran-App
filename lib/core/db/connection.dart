@@ -16,17 +16,87 @@ import 'search_index.dart';
 
 const dbAssetKey = 'assets/db/quran.sqlite';
 
+/// The 16-byte magic every SQLite database starts with.
+const List<int> _sqliteMagic = <int>[
+  0x53, 0x51, 0x4C, 0x69, 0x74, 0x65, 0x20, 0x66, //
+  0x6F, 0x72, 0x6D, 0x61, 0x74, 0x20, 0x33, 0x00,
+];
+
+/// Whether [file] starts with the SQLite header.
+///
+/// Only the header is checked: a truncated copy of a real database keeps its
+/// header, so this cannot tell "truncated" from "intact". That case is
+/// deliberately NOT auto-repaired (an integrity check on every boot is slow and
+/// can fail for reasons other than corruption); it is covered by the atomic
+/// write below, which stops new truncated files from being produced.
+@visibleForTesting
+bool hasSqliteHeader(File file) {
+  RandomAccessFile? handle;
+  try {
+    handle = file.openSync();
+    final header = handle.readSync(_sqliteMagic.length);
+    if (header.length != _sqliteMagic.length) return false;
+    for (var i = 0; i < _sqliteMagic.length; i++) {
+      if (header[i] != _sqliteMagic[i]) return false;
+    }
+    return true;
+  } on Object {
+    return false;
+  } finally {
+    handle?.closeSync();
+  }
+}
+
+/// Moves a file that is not a SQLite database out of the way.
+///
+/// The name carries the moment it was moved and never overwrites an earlier
+/// aside: a collision gets a numeric suffix. The caller logs the returned path
+/// so the file is not silently lost.
+@visibleForTesting
+Future<File> moveDbAside(File target, {DateTime? now}) async {
+  final moment = (now ?? DateTime.now())
+      .toIso8601String()
+      .replaceAll(RegExp(r'[:.]'), '-');
+  var aside = File('${target.path}.corrupt-$moment');
+  var suffix = 1;
+  while (aside.existsSync()) {
+    aside = File('${target.path}.corrupt-$moment-$suffix');
+    suffix++;
+  }
+  await target.rename(aside.path);
+  return aside;
+}
+
+/// Copies the bundled database to [target], atomically.
+///
+/// A target that is not SQLite at all (a half-written file from an interrupted
+/// copy, or a foreign file) is moved aside and replaced; a valid SQLite target
+/// — with or without user rows — is never touched.
 @visibleForTesting
 Future<void> copyDbAssetIfAbsent({
   required File target,
   required String assetKey,
   required Future<ByteData> Function(String) loadAsset,
+  DateTime? now,
 }) async {
-  if (target.existsSync()) return;
+  if (target.existsSync()) {
+    if (hasSqliteHeader(target)) return;
+    final aside = await moveDbAside(target, now: now);
+    appLog('db file was not SQLite; moved aside',
+        name: 'quran_yahdi/db', error: aside.path);
+  }
   await target.parent.create(recursive: true);
   final data = await loadAsset(assetKey);
   final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-  await target.writeAsBytes(bytes, flush: true);
+  // Write beside the target and rename: a process kill mid-write must never
+  // leave a half-written database that the next boot would trust.
+  final part = File('${target.path}.part');
+  try {
+    await part.writeAsBytes(bytes, flush: true);
+    await part.rename(target.path);
+  } finally {
+    if (part.existsSync()) await part.delete();
+  }
 }
 
 /// Re-seeds the two content tables (`surahs`/`ayahs`) from the bundled asset
@@ -137,7 +207,12 @@ Future<void> writeAssetOffUiIsolate(
   Future<ByteData> Function(String assetKey)? loadAsset,
   Duration timeout = _workerAssetTimeout,
 }) async {
-  if (target.existsSync()) return;
+  if (target.existsSync()) {
+    if (hasSqliteHeader(target)) return;
+    final aside = await moveDbAside(target);
+    appLog('db file was not SQLite; moved aside',
+        name: 'quran_yahdi/db', error: aside.path);
+  }
   if (workerLoad != null) {
     try {
       final bytes = await workerLoad().timeout(timeout);
