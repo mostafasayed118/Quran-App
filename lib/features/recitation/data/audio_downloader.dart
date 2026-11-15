@@ -95,6 +95,7 @@ class AudioDownloader {
     Uri start, {
     CancelToken? cancelToken,
     int rangeFrom = 0,
+    String? ifRange,
   }) async {
     return followTrustedRedirects(
       dio: _dio,
@@ -103,9 +104,14 @@ class AudioDownloader {
       devLogName: 'quran_yahdi/recitation',
       cancelToken: cancelToken,
       // Re-sent on every hop on purpose: a CDN redirect must not silently
-      // turn a resume into a full download.
+      // turn a resume into a full download. `If-Range` carries the validator
+      // of the bytes already stored, so a host whose file changed answers 200
+      // with the whole file instead of 206 over a stale prefix.
       headers: rangeFrom > 0
-          ? <String, Object>{HttpHeaders.rangeHeader: 'bytes=$rangeFrom-'}
+          ? <String, Object>{
+              HttpHeaders.rangeHeader: 'bytes=$rangeFrom-',
+              if (ifRange != null) HttpHeaders.ifRangeHeader: ifRange,
+            }
           : null,
       resolveNext: (current, location) {
         final next = current.resolve(location);
@@ -196,11 +202,22 @@ class AudioDownloader {
   }) async {
     final target = await _targetFile(reciter.id, surahNumber);
     final part = File('${target.path}.part');
+    final validatorFile = File('${part.path}.validator');
     final url = surahAudioUrl(reciter.server, surahNumber);
     final host = Uri.parse(url).host;
     var resumeFrom = 0;
+    String? ifRange;
     if (!_hostsWithoutRange.contains(host) && await part.exists()) {
       resumeFrom = await part.length();
+      if (resumeFrom > 0) {
+        ifRange = await _readValidator(validatorFile);
+        if (ifRange == null) {
+          // A prefix with no validator cannot be proven to belong to the file
+          // the host serves now, so it is not appended to: start over.
+          await _discardPart(part, validatorFile);
+          resumeFrom = 0;
+        }
+      }
     }
     await _registry.mark(reciter.id, surahNumber, DownloadStatus.downloading,
         resumeFrom, target.path);
@@ -209,6 +226,7 @@ class AudioDownloader {
         Uri.parse(url),
         cancelToken: cancelToken,
         rangeFrom: resumeFrom,
+        ifRange: ifRange,
       );
       final contentType =
           res.headers.value(Headers.contentTypeHeader)?.toLowerCase().trim();
@@ -231,7 +249,7 @@ class AudioDownloader {
           if (start != resumeFrom) {
             // The host resumed somewhere else: the prefix is unusable, so
             // discard it and let the retry start over.
-            await part.delete();
+            await _discardPart(part, validatorFile);
             throw DownloadFailure('host returned an unexpected range start');
           }
           append = true;
@@ -241,7 +259,7 @@ class AudioDownloader {
             // `bytes N-M/*`: the host will not state the full size, so the
             // appended file can never be verified. Drop the prefix and let the
             // retry request the whole file, which returns a known length.
-            await part.delete();
+            await _discardPart(part, validatorFile);
             throw DownloadFailure('host returned a range without a total size');
           }
           total = resolvedTotal;
@@ -250,6 +268,16 @@ class AudioDownloader {
           // attempt does not waste a round-trip, and start from zero.
           _hostsWithoutRange.add(host);
         }
+      }
+      // Persist the validator before the body: if the process dies mid-body,
+      // the next attempt can prove the remote did not change. A 200 means the
+      // validator did not match (or a fresh start), so the old one is replaced.
+      final responseValidator = res.headers.value(HttpHeaders.etagHeader) ??
+          res.headers.value(HttpHeaders.lastModifiedHeader);
+      if (responseValidator != null) {
+        await validatorFile.writeAsString(responseValidator, flush: true);
+      } else if (!append && await validatorFile.exists()) {
+        await validatorFile.delete();
       }
       final throttle = ProgressThrottle();
       final body = res.data;
@@ -276,6 +304,7 @@ class AudioDownloader {
         await sink.close();
       }
       final promoted = await _promotePart(part, target);
+      if (await validatorFile.exists()) await validatorFile.delete();
       final size = await promoted.length();
       await _registry.mark(
           reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
@@ -287,7 +316,7 @@ class AudioDownloader {
       // other failure keeps it as resume material.
       if (cancelled ||
           (error is DioException && error.response?.statusCode == 416)) {
-        if (await part.exists()) await part.delete();
+        await _discardPart(part, validatorFile);
       }
       await _registry.mark(
           reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
@@ -302,6 +331,23 @@ class AudioDownloader {
   static int? _rangeStart(String? value) {
     final match = RegExp(r'bytes\s+(\d+)-').firstMatch(value ?? '');
     return match == null ? null : int.tryParse(match.group(1)!);
+  }
+
+  /// The validator stored beside a part file, or null when there is none.
+  static Future<String?> _readValidator(File file) async {
+    try {
+      if (!await file.exists()) return null;
+      final value = (await file.readAsString()).trim();
+      return value.isEmpty ? null : value;
+    } on Object {
+      return null;
+    }
+  }
+
+  /// Drops a prefix and its validator together.
+  static Future<void> _discardPart(File part, File validator) async {
+    if (await part.exists()) await part.delete();
+    if (await validator.exists()) await validator.delete();
   }
 
   /// The complete size of a `Content-Range: bytes <start>-<end>/<total>` header.
