@@ -4,6 +4,7 @@ import 'dart:ui' show DartPluginRegistrant;
 import 'package:flutter/widgets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
+import 'package:quran_yahdi/core/utils/city_clock.dart';
 import 'package:workmanager/workmanager.dart';
 
 import '../core/domain/city.dart';
@@ -151,7 +152,10 @@ Future<void> updateHomeWidgetFromState() async {
       appName: loc.appName,
       label: loc.nextPrayer,
       prayer: next.name.label(loc),
-      time: formatHm(next.time, arabicIndic: loc.usesArabicIndicDigits),
+      time: formatHm(
+        cityWallClock(next.time, city.timezone),
+        arabicIndic: loc.usesArabicIndicDigits,
+      ),
       city: city.nameAr,
     );
   } on Object catch (error, stackTrace) {
