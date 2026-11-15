@@ -1637,3 +1637,16 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Device (Infinix X6882, Android 14, 2026-11-15):** `boot_id` readable by the app UID with SELinux enforcing (`/proc/uptime` denied). A real `adb reboot` changed the boot id (`2724423c…` → `926e43be…`) and left **0** alarms; the post-fix debug build then re-armed to **30** `RTC_WAKEUP` with no interaction, while the pre-fix release build stayed at **0** — defect and fix side by side. Release **2008** (owner cert `db7ffef4…`, `install -r`, `firstInstallTime` unchanged) took the release **0 → 32**.
 - **Wave B device item closed here:** TalkBack on the phone showed `selected=false` on the pre-fix build and `selected=true` on the post-fix build, with the azkar card's `content-desc` ending in «باقي ١».
 - **Open:** #1b force-stop; the release app's own reboot pass (phone disconnected before it); remove the debug app (30 alarms) from the daily phone — **mandatory order:** read `reminder_plan_v1` from its DB first (the DB is deleted with the app), then uninstall.
+
+### 2026-11-15/16 (defect audit Wave D) — MERGED — PR #61
+
+- **Merge:** fast-forward, no merge commit — `main` `7548a710` → **`fbe78581`**, **9 commits**, 12 files, +580/−31. Branch `wave/d-races-perf` deleted after CI.
+- **Why:** findings 10 (azkar favourite during hydration), 11 (overlapping qada saves), 12 (splash ticker), 13 (reader writes), 17 (translation prep on the UI isolate).
+- **Test-first:** `491300cc` (added favourite lost, removed one resurrected) → `86271d85`; `7dcb6f28` (two saves in flight, the failed day rode along) → `269b812c`; `6897c004` (`hasScheduledFrame` true after the overlay) → `df83e712`; `67c6fe82` the shared `SerialQueue`; `08f2b979` search (measured, no failing test).
+- **#10:** toggled ids are replayed over the stored read (final membership), so both directions hold; untouched favourites and counters still come from the read.
+- **#11:** one `SerialQueue`; each write recomputes from the **last saved** list; failures revert to `_confirmed` only when they are the newest mutation. Tests: A fails/B succeeds → `[d2]`; A succeeds/B fails → `[d1]`. `prayer_config_cubit` and `azkar_saved_state_repository` untouched (not in the diff).
+- **#12:** the looping bar is stopped when the fade completes; the probe pumps past hold+fade and asserts no scheduled frame (true on the pre-fix code).
+- **#13 — not proven, no code:** `onVisibleAyah` already drops duplicates and `open` waits for hydration, so a fling past N cards costs N last-read + wird pairs, not a write per frame and not 150–300. Device frame measurement was impossible (phone disconnected).
+- **#17 — hardened, not a device-proven bug:** the UI-isolate block measured **51 ms** for one pack (6,236 entries) and **120 ms** for three on a **desktop host with `dart run` (JIT), pre-fix path** (~3 frames at 60 Hz). The normalization now runs through `Isolate.run` with an injectable runner; Class A harness in `translation_search_screen_test.dart` (helper + 4 `prepare:` lines, assertions unchanged).
+- **Gates at the tip (`fbe78581`):** format **0** · analyze **0** · suite **1925/1925**; CI analyze-test 8m42s and Cloudflare Pages green.
+- **Open:** #1b force-stop; the release app's own reboot pass; the debug-app removal (read `reminder_plan_v1` first); Wave E (8, 16, 15, 19, 20, 7, 18).

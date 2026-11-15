@@ -21,14 +21,14 @@ subproject and iOS were not audited.
 | 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
 | 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | queued |
 | 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **merged** (`7ef6b4a9`, PR #60): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
-| 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | **fixed** (Wave D PR): the toggled ids are replayed over the read instead of overwriting it; both add and remove directions are covered |
-| 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | **fixed** (Wave D PR): writes are serialized and each computes from the last saved list; a failure reverts to it, not to a pre-mutation snapshot |
-| 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **fixed** (Wave D PR): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
+| 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | **merged** (`fbe78581`, PR #61): the toggled ids are replayed over the read instead of overwriting it; both add and remove directions are covered |
+| 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | **merged** (`fbe78581`, PR #61): writes are serialized and each computes from the last saved list; a failure reverts to it, not to a pre-mutation snapshot |
+| 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **merged** (`fbe78581`, PR #61): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **not proven**: the cubit already drops duplicate reports, so the writes are one last-read + one wird advance per **distinct leading ayah** (a fling past N cards costs N pairs), not per frame and not 150–300 per fling. No device frame measurement was possible (phone disconnected); recorded instead of changed on faith |
 | 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
-| 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | **hardened** (Wave D PR): the UI-isolate block measured 51 ms for one pack / 120 ms for three on a **desktop host, JIT, pre-fix path** (~3 frames at 60 Hz, not device-measured); the normalization now runs through `Isolate.run`, with the runner injectable for tests |
+| 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | **hardened, merged** (`fbe78581`, PR #61): the UI-isolate block measured 51 ms for one pack / 120 ms for three on a **desktop host, JIT, pre-fix path** (~3 frames at 60 Hz, not device-measured); the normalization now runs through `Isolate.run`, with the runner injectable for tests |
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
 | 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | queued |
 | 20 | README says 1450 tests; the suite is 1877+ | low | E | queued |
@@ -246,7 +246,8 @@ unchanged) took the release **0 → 32**; its own reboot leg is still unmeasured
 
 ## Wave D record
 
-Branch `wave/d-races-perf`, cut from `7548a710`.
+Branch `wave/d-races-perf`, cut from `7548a710`. **Merged** as `fbe78581`
+(PR #61), fast-forward: 9 commits, 12 files, +580/−31; branch deleted after CI.
 
 | Commit | Role | Red evidence |
 |---|---|---|
@@ -291,7 +292,8 @@ dropped frames on a phone. The normalization now runs through `Isolate.run`
 runner because a real isolate future does not settle inside a `testWidgets`
 body; assertions unchanged.
 
-**Gates at the tip:** format 0 · analyze 0 · suite **1925/1925**.
+**Gates at the tip:** format 0 · analyze 0 · suite **1925/1925**; CI
+`analyze-test` 8m42s and Cloudflare Pages green.
 
 ## Wave plan (owner-ordered)
 
