@@ -67,7 +67,8 @@ void main() {
         reason: 'house tap-target floor');
   });
 
-  testWidgets('320x640 at textScale 2.0: the copy scrolls, the action still taps',
+  testWidgets(
+      '320x640 at textScale 2.0: the copy scrolls, the action still taps',
       (tester) async {
     var opened = 0;
     await _pumpAtFloor(
@@ -82,14 +83,16 @@ void main() {
 
     // A reader must be able to reach the whole copy and still press the action;
     // geometry alone is not proof of a reachable CTA.
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(0, -200));
+    await tester.drag(
+        find.byType(SingleChildScrollView), const Offset(0, -200));
     await tester.pump();
 
     await tester.tap(find.widgetWithText(FilledButton, 'حدّث الآن'));
     await tester.pump();
 
     expect(opened, 1,
-        reason: 'a pinned action must stay hit-testable while the copy scrolls');
+        reason:
+            'a pinned action must stay hit-testable while the copy scrolls');
   });
 
   testWidgets('360x640 at textScale 2.0: both recommended actions reachable',
