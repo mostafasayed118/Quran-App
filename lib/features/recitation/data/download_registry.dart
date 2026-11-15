@@ -149,7 +149,11 @@ class DownloadRegistry {
   Future<bool> isDownloaded(String rowId, int surahNumber) async {
     final row = await _doneRow(rowId, surahNumber);
     if (row == null) return false;
-    return File(row.path).exists();
+    final file = File(row.path);
+    if (!await file.exists()) return false;
+    // A zero-byte file is a failed write that an older build could promote as
+    // "done"; the queue must fetch it again instead of playing silence.
+    return await file.length() > 0;
   }
 
   /// Path of the downloaded file, or null when it is not downloaded.

@@ -236,10 +236,15 @@ class AudioDownloader {
           }
           append = true;
           received = resumeFrom;
-          // `bytes N-M/*` means the host did not state the full size: keep it
-          // unknown (0) so the completeness/oversize checks are skipped rather
-          // than comparing a full-file offset against a remaining length.
-          total = _totalFromContentRange(contentRange) ?? 0;
+          final resolvedTotal = _totalFromContentRange(contentRange);
+          if (resolvedTotal == null) {
+            // `bytes N-M/*`: the host will not state the full size, so the
+            // appended file can never be verified. Drop the prefix and let the
+            // retry request the whole file, which returns a known length.
+            await part.delete();
+            throw DownloadFailure('host returned a range without a total size');
+          }
+          total = resolvedTotal;
         } else {
           // The host ignored the Range header: remember it so the next
           // attempt does not waste a round-trip, and start from zero.
