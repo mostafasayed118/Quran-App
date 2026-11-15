@@ -4,9 +4,17 @@ import '../utils/arabic_search.dart';
 import 'app_database.dart';
 import 'content_version.dart';
 
-/// Row key in the settings table stamping which content version the derived
-/// Quran search index was built from.
+/// Row key in the settings table stamping the index *format* version the
+/// derived index was built with (the app constant).
 const String kSearchIndexVersionKey = 'search_index_version';
+
+/// Row key stamping the **installed content version** the index was built from.
+///
+/// Read from the database, not from the build constant: a content refresh that
+/// failed on the first boot after an update must not leave the index marked as
+/// current. Absent on installs that predate this key; such an install rebuilds
+/// once and then stamps it.
+const String kSearchIndexContentKey = 'search_index_content_version';
 
 /// FTS5 virtual table DDL for Quran text search.
 ///
@@ -40,16 +48,30 @@ typedef IsolateRunner = Future<R> Function<R>(R Function() computation);
 
 /// Builds the derived `ayah_search` index when it is missing or stale.
 ///
-/// The index is rebuilt content, never user data: it is safe to drop and
-/// recreate on any content change. Boot calls this behind the first frame;
-/// a failure logs and leaves the previous index in place.
+/// Two stamps guard the rebuild:
+/// - [kSearchIndexVersionKey] is the index *format/algorithm* version (the app
+///   constant). An app update that changes the projection rebuilds.
+/// - [kSearchIndexContentKey] is the **installed content version** the index
+///   was built from. It is read from the database, never from the build
+///   constant: a refresh that failed on the first boot after an update leaves
+///   the old content installed, and a later successful refresh must rebuild
+///   the index even though the app constant did not move.
+///
+/// An install that only has the format stamp (every user before this change)
+/// has no content stamp, so it rebuilds once and then stamps both.
 Future<void> ensureQuranSearchIndex(
   AppDatabase db, {
   IsolateRunner? run,
 }) async {
   await ensureAyahSearchSchema(db);
+  final installed = await db.installedContentVersion();
   final stamp = await _indexStamp(db);
-  if (stamp == kContentVersion && await _hasIndexedRows(db)) return;
+  final contentStamp = await _contentStamp(db);
+  if (stamp == kContentVersion &&
+      contentStamp == installed &&
+      await _hasIndexedRows(db)) {
+    return;
+  }
   await rebuildQuranSearchIndex(db, run: run);
 }
 
@@ -99,6 +121,7 @@ Future<void> rebuildQuranSearchIndex(
   IsolateRunner? run,
 }) async {
   await ensureAyahSearchSchema(db);
+  final installed = await db.installedContentVersion();
   final rows = await db.customSelect('SELECT id, text_imlaei FROM ayahs').get();
   // Only plain records cross the isolate boundary: drift QueryRows are not a
   // stable transfer type.
@@ -122,6 +145,10 @@ Future<void> rebuildQuranSearchIndex(
       'INSERT OR REPLACE INTO settings_table(key, value) VALUES (?, ?)',
       [kSearchIndexVersionKey, '$kContentVersion'],
     );
+    await db.customStatement(
+      'INSERT OR REPLACE INTO settings_table(key, value) VALUES (?, ?)',
+      [kSearchIndexContentKey, '$installed'],
+    );
   });
 }
 
@@ -130,6 +157,15 @@ Future<int> _indexStamp(AppDatabase db) async {
         ..where((s) => s.key.equals(kSearchIndexVersionKey)))
       .getSingleOrNull();
   return int.tryParse(row?.value ?? '') ?? 0;
+}
+
+/// The content version the index was built from; null on an install that only
+/// has the format stamp (a rebuild is due).
+Future<int?> _contentStamp(AppDatabase db) async {
+  final row = await (db.select(db.settingsTable)
+        ..where((s) => s.key.equals(kSearchIndexContentKey)))
+      .getSingleOrNull();
+  return row == null ? null : int.tryParse(row.value);
 }
 
 Future<bool> _hasIndexedRows(AppDatabase db) async {
