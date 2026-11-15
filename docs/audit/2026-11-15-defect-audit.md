@@ -16,11 +16,11 @@ subproject and iOS were not audited.
 | 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | **merged** (`991da562`, PR #58) |
 | 3 | The mandatory update gate clips its only action at 320 dp, textScale 2.0 (Cairo: 40 px overflow, button ends at y=656) | high | B | **merged** (`23eee01e`, PR #59) |
 | 4 | Countdown digit boxes are 34 dp vs 44 sp text | medium (latent) | B | **closed — not reproducible**: with Cairo at 2.0 the glyph is 26.5 px inside a 34 dp box at both 320 and 360; the 28/29 px came from the widget-test font. Reopen only if the font or the supported scale changes |
-| 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | queued |
-| 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | queued |
+| 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | **fixed** (Wave C PR): a stored validator is sent as `If-Range`; a 206 with no total, or a prefix with no validator, is dropped and refetched; a zero-byte file is not "done". Live probe: the CDN answers 206 for a matching validator and 200 with the full body for a wrong one |
+| 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | **fixed** (Wave C PR): the fallback writes atomically, and a target whose header is not SQLite is moved to a timestamped aside and replaced; a valid DB is never touched. A truncated file that still has a valid header is **not** auto-repaired (decision) |
 | 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
 | 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | queued |
-| 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | queued |
+| 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **fixed** (Wave C PR): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
 | 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | queued |
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
@@ -155,6 +155,62 @@ spoken check is the pending TalkBack walk, not a test.
 app's own display style and fails if the ambient font is the test font (88.0 px)
 instead of Cairo (26.5 px), so the overflow assertions can never silently
 measure the wrong font.
+
+## Wave C record
+
+Branch `wave/c-data-integrity`, cut from `2115c882`.
+
+| Commit | Role | Red evidence |
+|---|---|---|
+| `b13d18b4` | test: content refresh | the index still held `'النص القديم'` |
+| `e708128c` | fix: two stamps | — |
+| `c4442830` | test: asset stamp pin | — |
+| `7fa9647e` | fix(db): atomic fallback + non-SQLite repair | the old code kept `'not a database'` and `'garbage'` |
+| `c06c97f3` | test(db): fixture header (Class A) | — |
+| `c70a334c` | test: unverified resume + empty done file | one request only; `isDownloaded` true on an empty file |
+| `4a0318d6` | fix: unknown total → restart; zero-byte not done | — |
+| `0fa916b8` | test: If-Range | `If-Range` null; `bytes=40-` offered with no validator |
+| `0780dc7d` | fix: If-Range + validator sidecar | — |
+
+**#9 — what the audit got wrong and what landed.** The boot order is
+`_ensureContentCurrentOffUiIsolate(db, dir)` then `_ensureSearchIndex(db)`
+(`connection.dart:229-230`), and the refresh **swallows** its failure — so the
+index builds after the *attempt*, not after success. The index now stamps the
+**installed content version read from the DB** next to the format stamp, so an
+index built from old content is rebuilt when the refresh later completes. An
+install with only the format stamp rebuilds once; the shipped asset carries the
+content stamp, and a test pins the asset's stamp to
+`content_version == kContentVersion`, so a regenerated asset cannot ship a
+mismatched index silently. Production passes no runner (`connection.dart:240`)
+→ `Isolate.run`; the test proves the injected runner is used by the rebuild and
+not by the skip.
+
+**#6 — scope and decisions.** The primary mobile path was already atomic
+(`.part` → rename). The fallback (`copyDbAssetIfAbsent`) is the path reached
+when the worker reply is lost — documented in the code as observed on Android 16
+— and it wrote directly with `exists → skip`. It is now atomic, and a target
+whose first 16 bytes are not SQLite is moved to `<path>.corrupt-<timestamp>`
+(never overwriting an earlier aside; the path is logged) and replaced. A valid
+database, with user rows, is never touched. **Decision:** a truncated file that
+still carries a valid header is **not** auto-repaired — an integrity check on
+every boot is slow and can fail for reasons other than corruption, and the
+atomic write stops new ones; reopen with a measured `quick_check` if a real
+device ever reports one.
+
+**#5 — evidence and decisions.** Live probe against `cdn.mp3quran.net` (3 files,
+2 servers): `Range: bytes=0-99` → **206** with `Content-Range` and an ETag;
+`If-Range` with the matching ETag → **206**; with a wrong ETag → **200** and the
+whole body. The validator is stored beside the `.part`, written before the body
+so a mid-body kill stays resumable, refreshed on a 200 and deleted with the
+part. A prefix with no validator is discarded before the request; a 206 that
+does not state the total is discarded and refetched whole; `isDownloaded`
+requires a non-empty file. Class A (disclosed in the PR): two fixtures gained a
+real SQLite header, two resume fixtures gained a validator, and the
+unknown-total pin now asserts the owner's decision (drop + refetch) instead of
+the old append.
+
+**Gates at the tip (`0780dc7d`):** format **0** · analyze **0** · suite
+**1912/1912**.
 
 ## Wave plan (owner-ordered)
 
