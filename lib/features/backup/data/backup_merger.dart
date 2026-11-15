@@ -1,4 +1,4 @@
-import '../../../core/utils/date_only.dart';
+﻿import '../../../core/utils/date_only.dart';
 import '../domain/backup_models.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
@@ -215,10 +215,16 @@ TasbihMerge mergeTasbih({
 
 /// Result of merging imported settings.
 class SettingsMerge {
-  const SettingsMerge(this.toWrite);
+  const SettingsMerge(
+    this.toWrite, {
+    this.skippedDocuments = const <String>{},
+  });
 
   /// Settings that differ from the stored ones and must be written.
   final Map<String, String> toWrite;
+
+  /// Document keys whose imported JSON was invalid and was therefore skipped.
+  final Set<String> skippedDocuments;
 
   int get appliedCount => toWrite.length;
 }

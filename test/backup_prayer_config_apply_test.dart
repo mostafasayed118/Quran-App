@@ -81,7 +81,7 @@ void main() {
         reason: 'the transaction committed before the hook ran');
   });
 
-  test('an imported font scale and azkar state are written without a re-plan',
+  test('an imported font scale is written; daily azkar progress is export-only',
       () async {
     final db = newTestDb();
     var reschedules = 0;
@@ -97,8 +97,14 @@ void main() {
 
     expect(outcome.rescheduled, isFalse);
     expect(reschedules, 0);
-    expect(outcome.summary.settingsKeysApplied, 2);
+    expect(outcome.summary.settingsKeysApplied, 1,
+        reason: 'azkar progress is one day of counters, not a date-keyed '
+            'document, so it is exported but never imported');
     expect(await ReaderSettingsRepository(db).loadFontScale(), 1.4);
+    final progress = await (db.select(db.settingsTable)
+          ..where((s) => s.key.equals(backupKeyAzkarProgress)))
+        .getSingleOrNull();
+    expect(progress, isNull);
   });
 
   test('a key outside the whitelist is ignored, never written', () async {
