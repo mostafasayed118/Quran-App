@@ -102,7 +102,8 @@ Set<int> reminderAlarmIds() => <int>{
           _horizonPreAdhanBase + slot * 10 + i,
         ],
       for (var slot = 0; slot < reminderHorizonDays; slot++)
-        for (var i = 0; i < 2; i++) _horizonFajrFollowUpBase + slot * 10 + i,
+        for (var i = 0; i < kFajrFollowUpMinutes.length; i++)
+          _horizonFajrFollowUpBase + slot * 10 + i,
     };
 
 /// Tap payloads: cold/warm notification taps carry these tags so the app
