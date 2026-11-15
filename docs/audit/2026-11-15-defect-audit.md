@@ -18,20 +18,20 @@ subproject and iOS were not audited.
 | 4 | Countdown digit boxes are 34 dp vs 44 sp text | medium (latent) | B | **closed — not reproducible**: with Cairo at 2.0 the glyph is 26.5 px inside a 34 dp box at both 320 and 360; the 28/29 px came from the widget-test font. Reopen only if the font or the supported scale changes |
 | 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | **merged** (`7ef6b4a9`, PR #60): a stored validator is sent as `If-Range`; a 206 with no total, or a prefix with no validator, is dropped and refetched; a zero-byte file is not "done". Live probe: the CDN answers 206 for a matching validator and 200 with the full body for a wrong one |
 | 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | **merged** (`7ef6b4a9`, PR #60): the fallback writes atomically, and a target whose header is not SQLite is moved to a timestamped aside and replaced; a valid DB is never touched. A truncated file that still has a valid header is **not** auto-repaired (decision) |
-| 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
-| 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | queued |
+| 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | **fixed** (Wave E PR): the background refresh formats the instant with `cityWallClock(…, city.timezone)`; the in-app path already did. A red test pins 13:30Z → ١٥:٣٠ in Africa/Cairo |
+| 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | **fixed** (Wave E PR, latent): both the planner and the clear set read the configured length; a test pins that every configured index is covered |
 | 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **merged** (`7ef6b4a9`, PR #60): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
 | 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | **merged** (`fbe78581`, PR #61): the toggled ids are replayed over the read instead of overwriting it; both add and remove directions are covered |
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | **merged** (`fbe78581`, PR #61): writes are serialized and each computes from the last saved list; a failure reverts to it, not to a pre-mutation snapshot |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **merged** (`fbe78581`, PR #61): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **not proven**: the cubit already drops duplicate reports, so the writes are one last-read + one wird advance per **distinct leading ayah** (a fling past N cards costs N pairs), not per frame and not 150–300 per fling. No device frame measurement was possible (phone disconnected); recorded instead of changed on faith |
 | 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
-| 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
-| 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
+| 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | **not closed**: the test only uses UTC instants and never names a local zone, but on a UTC host `DateTime(y,m,d+1)` and `+24h` are equivalent, so an in-process test cannot catch the regression; it needs a TZ-controlled runner. No code change |
+| 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | **fixed** (Wave E PR): the four id constants are pinned to 1–4 |
 | 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | **hardened, merged** (`fbe78581`, PR #61): the UI-isolate block measured 51 ms for one pack / 120 ms for three on a **desktop host, JIT, pre-fix path** (~3 frames at 60 Hz, not device-measured); the normalization now runs through `Isolate.run`, with the runner injectable for tests |
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
-| 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | queued |
-| 20 | README says 1450 tests; the suite is 1877+ | low | E | queued |
+| 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | **fixed** (Wave E PR): `formatMegabytesValue` keeps a whole MB whole and a fraction to one decimal |
+| 20 | README says 1450 tests; the suite is 1877+ | low | E | **fixed** (Wave E PR): refreshed to the current suite count |
 
 ## Open finding 1b — force-stop vs. the boot id
 
@@ -304,6 +304,44 @@ body; assertions unchanged.
 **Gates at the tip:** format 0 · analyze 0 · suite **1925/1925**; CI
 `analyze-test` 8m42s and Cloudflare Pages green.
 
+## Wave E record
+
+Branch `wave/e-polish`, cut from `aefdfd98`.
+
+| Commit | Role | Red evidence |
+|---|---|---|
+| `b70c30f4` | fix: Fajr follow-up bound | latent — the list has two entries, so a third is the failing case |
+| `80f95a3f` | fix: whole-megabyte pack label | the row rendered `٢.٠ م.ب` |
+| `ff8ee91a` | test: reserved ids pinned to 1–4 | — |
+| `17f80cd1` | test: 400-day streak cap | expected 401, actual 400 |
+| `503eafd7` | fix: wide lookback + range query | 7/7 |
+| `e41dd9f1` | test: background widget clock | `١٣:٣٠` instead of `١٥:٣٠` |
+| `c1cfe503` | fix: `cityWallClock` in the background refresh | green |
+
+**#8** was latent by construction: `reminderAlarmIds()` iterated a hard-coded
+two while `kFajrFollowUpMinutes` drives the planner. Both now read the same
+length, and a test pins that every configured index is covered.
+
+**#18's fix exposed a second defect:** `markedDaysRange` built an `IN` list with
+one SQL parameter per day in the window, so widening the lookback failed every
+tracker test ("too many SQL variables"). It now uses a range predicate
+(`day >= start AND day <= today`); the lookback is a century-long storage bound,
+not a product cap.
+
+**#7** — the in-app card already converted with `cityWallClock`; only the
+background refresh formatted the raw instant, so a widget refreshed by the
+worker showed the device clock. A red test pins 13:30Z → `١٥:٣٠` in
+`Africa/Cairo`.
+
+**#15 — not closed.** The existing DST test only uses UTC instants and never
+names a local zone. On a UTC host `DateTime(y, m, d + 1)` and `+24 h` are
+equivalent, so no in-process test can catch the regression; it needs a
+TZ-controlled runner. Recorded with no code change.
+
+**#20** — the README count moved from 1450 to **1931**.
+
+**Gates at the tip:** format **0** · analyze **0** · suite **1931/1931**.
+
 ## Wave plan (owner-ordered)
 
 | Wave | Items |
@@ -329,5 +367,6 @@ gates, and a draft PR. No merge without owner review.
 3. **Wave B** — done (3, 4, 14), with the permanent probe at 320/360 and scale
    2.0 and the TalkBack walk on the emulator and the Infinix.
 4. **Wave C** — done (6, 5, 9), merged with the regenerated asset.
-5. **Wave D** — 10, 11, 12, 13, 17.
-6. **Wave E** — 8, 16, 15, 19, 20, 7, 18.
+5. **Wave D** — done (10, 11, 12, 17); 13 recorded as not proven.
+6. **Wave E** — done except #15: 8, 16, 19, 20, 7, 18 fixed; #15 needs a
+   TZ-controlled test runner before it can be closed.
