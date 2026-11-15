@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
@@ -11,6 +12,15 @@ import 'translation_search_state.dart';
 /// Resolves a surah id to its Arabic name; null when unknown.
 typedef SurahNameResolver = Future<String?> Function(int surahId);
 
+/// Runs the entry preparation off the UI isolate (tests inject a runner).
+typedef PrepareRunner = Future<R> Function<R>(R Function() computation);
+
+/// Normalizes every `(key, text)` pair; a top-level function so the closure
+/// sent to the isolate captures only sendable values.
+List<(int, String, String)> _prepareEntries(List<(int, String)> pairs) => [
+      for (final (key, text) in pairs) (key, text, prepareQuery(text)),
+    ];
+
 /// Searches every installed translation pack locally.
 ///
 /// The packs are loaded once at [start]; a query is a normalized substring
@@ -21,14 +31,17 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
     required TranslationSearchSource source,
     required SurahNameResolver surahName,
     Duration debounce = const Duration(milliseconds: 300),
+    PrepareRunner? prepare,
   })  : _source = source,
         _surahName = surahName,
         _debounceDuration = debounce,
+        _prepare = prepare ?? Isolate.run,
         super(const TranslationSearchState.loading());
 
   final TranslationSearchSource _source;
   final SurahNameResolver _surahName;
   final Duration _debounceDuration;
+  final PrepareRunner _prepare;
   final List<_Entry> _entries = <_Entry>[];
 
   /// Surah names are static content; resolve each id at most once per cubit
@@ -56,17 +69,24 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
         return;
       }
       _entries.clear();
+      final pairs = <(int, String)>[];
       for (final id in ids) {
         final index = await _source.translationIndex(id);
         for (final entry in index.entries) {
-          final text = entry.value;
-          _entries.add(_Entry(
-            surah: AyahKey.surahOf(entry.key),
-            ayah: AyahKey.ayahOf(entry.key),
-            text: text,
-            prepared: prepareQuery(text),
-          ));
+          pairs.add((entry.key, entry.value));
         }
+      }
+      // Normalizing every entry of every installed pack measured 51 ms for one
+      // pack and 120 ms for three on a desktop host; on a phone that is
+      // several dropped frames, so it runs off the UI isolate.
+      final prepared = await _prepare(() => _prepareEntries(pairs));
+      for (final (key, text, preparedText) in prepared) {
+        _entries.add(_Entry(
+          surah: AyahKey.surahOf(key),
+          ayah: AyahKey.ayahOf(key),
+          text: text,
+          prepared: preparedText,
+        ));
       }
       if (!isClosed) {
         emit(const TranslationSearchState.ready(hasPacks: true));

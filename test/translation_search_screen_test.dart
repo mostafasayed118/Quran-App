@@ -20,6 +20,8 @@ class _Source implements TranslationSearchSource {
       indexes[packId] ?? const <int, String>{};
 }
 
+Future<R> _syncPrepare<R>(R Function() computation) async => computation();
+
 Widget _app(TranslationSearchCubit cubit) => BlocProvider.value(
       value: cubit,
       child: const MaterialApp(
@@ -41,6 +43,7 @@ void main() {
       }),
       surahName: (id) async => 'الفاتحة',
       debounce: Duration.zero,
+      prepare: _syncPrepare,
     );
     addTearDown(cubit.close);
     await cubit.start();
@@ -63,6 +66,7 @@ void main() {
       source: _Source(const {}),
       surahName: (id) async => null,
       debounce: Duration.zero,
+      prepare: _syncPrepare,
     );
     addTearDown(cubit.close);
     await cubit.start();
@@ -83,6 +87,7 @@ void main() {
       }),
       surahName: (id) async => 'الفاتحة',
       debounce: Duration.zero,
+      prepare: _syncPrepare,
     );
     addTearDown(cubit.close);
     await cubit.start();
@@ -107,6 +112,7 @@ void main() {
       }),
       surahName: (id) async => 'الفاتحة',
       debounce: Duration.zero,
+      prepare: _syncPrepare,
     );
     addTearDown(cubit.close);
     await cubit.start();
