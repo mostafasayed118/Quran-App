@@ -11,7 +11,12 @@ import 'tracker_state.dart';
 
 /// The tracker screen: today's prayer marks, the streak and the khatma card.
 class TrackerCubit extends Cubit<TrackerState> {
-  static const int _streakLookbackDays = 400;
+  /// How far back the streak walk reads.
+  ///
+  /// This is a storage bound, not a product cap: 100 years of daily rows is a
+  /// few tens of thousands of small rows, and the previous 400-day window
+  /// silently truncated a longer streak.
+  static const int _streakLookbackDays = 36500;
   static const int _last7DayCount = 7;
   static const int _streakGraceDays = 1;
 

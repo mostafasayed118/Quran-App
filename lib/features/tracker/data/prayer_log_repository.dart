@@ -57,22 +57,23 @@ class PrayerLogRepository {
   }
 
   /// Days with at least one marked prayer, from [fromInclusive] going [daysBack] days back.
+  ///
+  /// A range predicate, not an `IN` over every day in the window: a wide
+  /// lookback would otherwise build thousands of SQL parameters and hit the
+  /// engine's variable limit.
   Future<List<DateTime>> markedDaysRange(
       DateTime fromInclusive, int daysBack) async {
     final from = dateOnly(fromInclusive);
-    final days = <DateTime>[
-      for (var i = 0; i < daysBack; i++)
-        DateTime(from.year, from.month, from.day - i),
-    ];
-    final rows =
-        await (_db.select(_db.prayerLog)..where((p) => p.day.isIn(days))).get();
-    final marked = <String>{
+    final start = DateTime(from.year, from.month, from.day - (daysBack - 1));
+    final rows = await (_db.select(_db.prayerLog)
+          ..where((p) => p.day.isBiggerOrEqualValue(start))
+          ..where((p) => p.day.isSmallerOrEqualValue(from)))
+        .get();
+    final marked = <DateTime>{
       for (final row in rows)
-        if (trackerDayFromRow(row).anyMarked) dayKey(row.day),
-    };
-    return [
-      for (final day in days)
-        if (marked.contains(dayKey(day))) day,
-    ];
+        if (trackerDayFromRow(row).anyMarked) dateOnly(row.day),
+    }.toList()
+      ..sort((a, b) => b.compareTo(a));
+    return marked;
   }
 }

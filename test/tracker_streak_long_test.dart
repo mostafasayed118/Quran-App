@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:quran_yahdi/core/db/app_database.dart';
 import 'package:quran_yahdi/features/tracker/data/prayer_log_repository.dart';
 import 'package:quran_yahdi/features/tracker/presentation/tracker_cubit.dart';
 import 'package:quran_yahdi/features/tracker/presentation/tracker_state.dart';
