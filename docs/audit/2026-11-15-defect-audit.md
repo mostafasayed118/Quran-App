@@ -16,11 +16,11 @@ subproject and iOS were not audited.
 | 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | **merged** (`991da562`, PR #58) |
 | 3 | The mandatory update gate clips its only action at 320 dp, textScale 2.0 (Cairo: 40 px overflow, button ends at y=656) | high | B | **merged** (`23eee01e`, PR #59) |
 | 4 | Countdown digit boxes are 34 dp vs 44 sp text | medium (latent) | B | **closed — not reproducible**: with Cairo at 2.0 the glyph is 26.5 px inside a 34 dp box at both 320 and 360; the 28/29 px came from the widget-test font. Reopen only if the font or the supported scale changes |
-| 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | **fixed** (Wave C PR): a stored validator is sent as `If-Range`; a 206 with no total, or a prefix with no validator, is dropped and refetched; a zero-byte file is not "done". Live probe: the CDN answers 206 for a matching validator and 200 with the full body for a wrong one |
-| 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | **fixed** (Wave C PR): the fallback writes atomically, and a target whose header is not SQLite is moved to a timestamped aside and replaced; a valid DB is never touched. A truncated file that still has a valid header is **not** auto-repaired (decision) |
+| 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | **merged** (`7ef6b4a9`, PR #60): a stored validator is sent as `If-Range`; a 206 with no total, or a prefix with no validator, is dropped and refetched; a zero-byte file is not "done". Live probe: the CDN answers 206 for a matching validator and 200 with the full body for a wrong one |
+| 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | **merged** (`7ef6b4a9`, PR #60): the fallback writes atomically, and a target whose header is not SQLite is moved to a timestamped aside and replaced; a valid DB is never touched. A truncated file that still has a valid header is **not** auto-repaired (decision) |
 | 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
 | 8 | `reminderAlarmIds()` uses `i < 2` instead of `kFajrFollowUpMinutes.length` | medium (latent) | E | queued |
-| 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **fixed** (Wave C PR): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
+| 9 | Search index stamps `kContentVersion` even when the content refresh failed | medium (latent) | C | **merged** (`7ef6b4a9`, PR #60): two stamps — index format and **installed content** — with a one-time rebuild for installs that lack the content stamp |
 | 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | queued |
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
@@ -64,12 +64,22 @@ snapshot (not recommended).
 ## Verification notes
 
 - **Boot id readability:** verified on the `A16_API36` emulator (Android 16)
-  with the debug app's UID: `/proc/sys/kernel/random/boot_id` is readable;
-  `/proc/uptime` returns `Permission denied`. The Infinix X6882 (Android 14)
-  check is **pending** — the phone was not connected during the session. If the
-  file is unreadable on a device, the provider returns null and the binding
-  re-applies on every process; `test/reminder_plan_persistence_test.dart`
-  covers that fallback and asserts one schedule per id, not duplicates.
+  and on the **Infinix X6882 (Android 14, SELinux Enforcing)** with the app's
+  own UID (`run-as`): `/proc/sys/kernel/random/boot_id` is readable
+  (`2724423c-af34-4233-8782-9420d9c98240` before the last reboot), while
+  `/proc/uptime` returns `Permission denied`. If the file were unreadable, the
+  provider would return null and the binding would re-apply on every process;
+  `test/reminder_plan_persistence_test.dart` covers that fallback and asserts
+  one schedule per id, not duplicates.
+- **Device re-arm evidence (Infinix, 2026-11-15):** a debug build cut after the
+  fix was launched after a real `adb reboot` (boot id changed to
+  `926e43be-c180-409e-aed0-5a58f17e3d3e`) with **0 alarms** on the device; it
+  re-armed to **30** `RTC_WAKEUP` alarms with no user interaction. The owner's
+  release build was still the pre-fix code and stayed at **0** after the same
+  reboot — the defect reproduced live. Installing release **2008** (owner cert,
+  `install -r`, `firstInstallTime` unchanged) and launching it took the release
+  from **0 → 32** alarms. The release's own *reboot* leg is still unmeasured —
+  the phone disconnected before a second reboot.
 - **Class A edit 1** — `test/reminder_plan_persistence_test.dart` (behaviour
   pin): two setup lines changed, assertions untouched.
   - before: `NotificationsBinding(store: store)`
@@ -158,6 +168,10 @@ but the accessibility tree TalkBack reads is exactly the one above. **No
 `liveRegion` is set**, so the count is read when the row is focused, not on
 every tap.
 
+**Infinix X6882 A/B (2026-11-15):** the pre-fix debug build exposed
+`selected=false` on the adhan row; the post-fix build exposed **`selected=true`**,
+and the azkar card's merged `content-desc` ended with **«باقي ١»** on the phone.
+
 **Probe self-check:** `test/update_gate_scale_probe_test.dart` now measures the
 app's own display style and fails if the ambient font is the test font (88.0 px)
 instead of Cairo (26.5 px), so the overflow assertions can never silently
@@ -165,7 +179,9 @@ measure the wrong font.
 
 ## Wave C record
 
-Branch `wave/c-data-integrity`, cut from `2115c882`.
+Branch `wave/c-data-integrity`, cut from `2115c882`. **Merged** as
+`7ef6b4a9` (PR #60), fast-forward from `2115c882`: 14 commits, 12 files,
++797/−45; branch deleted after CI.
 
 | Commit | Role | Red evidence |
 |---|---|---|
@@ -216,8 +232,17 @@ real SQLite header, two resume fixtures gained a validator, and the
 unknown-total pin now asserts the owner's decision (drop + refetch) instead of
 the old append.
 
-**Gates at the tip (`0780dc7d`):** format **0** · analyze **0** · suite
-**1912/1912**.
+**Gates at the final tip (`7ef6b4a9`):** format **0** · analyze **0** · suite
+**1913/1913**; CI `analyze-test`, `db-drift`, `data-drift` and `gates` green.
+The asset was regenerated with `tools/build_quran_db.dart` after `db-drift`
+rejected the manual stamp.
+
+**Device (Infinix X6882, 2026-11-15):** `boot_id` readable by the app UID with
+SELinux enforcing (`/proc/uptime` denied). After a real `adb reboot` the
+post-fix debug build re-armed from **0 → 30** alarms with no interaction, while
+the pre-fix release build stayed at **0** — the defect and the fix side by side.
+Installing release **2008** (owner cert, `install -r`, `firstInstallTime`
+unchanged) took the release **0 → 32**; its own reboot leg is still unmeasured.
 
 ## Wave plan (owner-ordered)
 
@@ -237,11 +262,13 @@ gates, and a draft PR. No merge without owner review.
 1. **#1b force-stop** — same defect from the other side: the user gets no
    reminders and no signal. Needs a decision on the signal (ApplicationExitInfo
    vs one foreground re-arm).
-2. **Infinix X6882 boot-id check** — pending; the emulator is not the phone.
-   If the file is unreadable there, the fix degrades to one re-apply per
-   process (safe, not the goal).
-3. **Wave B** — 3, 4, 14 (text-scale overflow and TalkBack), with a permanent
-   probe at 360×640, scale 2.0 so they cannot come back.
-4. **Wave C** — 6, 5, 9.
+2. **Release reboot leg** — the Infinix proved the re-arm on a post-fix debug
+   build (0 → 30 after a real reboot) and the release app re-armed after
+   installing 2008 (0 → 32); the release's own reboot pass is still unmeasured
+   because the phone disconnected. Also remove the debug app (30 alarms) from
+   the daily phone.
+3. **Wave B** — done (3, 4, 14), with the permanent probe at 320/360 and scale
+   2.0 and the TalkBack walk on the emulator and the Infinix.
+4. **Wave C** — done (6, 5, 9), merged with the regenerated asset.
 5. **Wave D** — 10, 11, 12, 13, 17.
 6. **Wave E** — 8, 16, 15, 19, 20, 7, 18.
