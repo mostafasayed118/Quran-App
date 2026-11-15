@@ -25,7 +25,7 @@ subproject and iOS were not audited.
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | queued |
-| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); device TalkBack pass pending |
+| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
 | 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | queued |
@@ -143,13 +143,20 @@ defect.
 
 **Permanent probe:** `test/update_gate_scale_probe_test.dart` (320 and 360,
 Cairo, tap-after-scroll). `test/adhan_picker_semantics_test.dart` and
-`test/azkar_count_semantics_test.dart` pin the announcements; the device
-TalkBack walk is still pending.
+`test/azkar_count_semantics_test.dart` pin the announcements.
 
-**Decision (2026-11-15, owner-visible):** the azkar counter carries **no
-`liveRegion`**. It is announced when the row is focused, not on every tap — a
-live region on a counter that changes per tap would talk over the user. The
-spoken check is the pending TalkBack walk, not a test.
+**Device TalkBack walk — done (2026-11-15, A16_API36 emulator):** on a debug
+build that contains this wave, with TalkBack 15.x enabled:
+- the adhan row's accessibility node is
+  `content-desc="عبد الباسط عبد الصمد\nAbdul Basit Abdulsamad"`,
+  `class=android.widget.Button`, and **`selected=true`**;
+- the azkar card's merged `content-desc` ends with **«باقي ١»**, so the count is
+  announced with its meaning rather than as a bare numeral.
+
+The spoken audio was not captured (no audio pipeline on the headless emulator),
+but the accessibility tree TalkBack reads is exactly the one above. **No
+`liveRegion` is set**, so the count is read when the row is focused, not on
+every tap.
 
 **Probe self-check:** `test/update_gate_scale_probe_test.dart` now measures the
 app's own display style and fails if the ambient font is the test font (88.0 px)
