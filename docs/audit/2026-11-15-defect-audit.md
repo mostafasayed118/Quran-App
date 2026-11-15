@@ -14,8 +14,8 @@ subproject and iOS were not audited.
 | 1 | A reboot clears every alarm, and the persisted plan fingerprint suppresses the re-arm | critical | A | **merged** (`991da562`, PR #58) |
 | 1b | Force-stop clears the alarms without changing the boot id; the plan is still trusted | high | open | **open — first follow-up** |
 | 2 | Backup merge replaces whole document settings (notes, folders, hadith bookmarks, qada, favourites) | critical | A | **merged** (`991da562`, PR #58) |
-| 3 | Mandatory update gate overflows at textScale 2.0; the update button is clipped (probe: 424 px) | high | B | queued |
-| 4 | Countdown digit boxes are 34 dp vs 44 sp text; digits overlap at 2.0 (probe: 28/29 px) | high | B | queued |
+| 3 | The mandatory update gate clips its only action at 320 dp, textScale 2.0 (Cairo: 40 px overflow, button ends at y=656) | high | B | **fixed** (Wave B PR) |
+| 4 | Countdown digit boxes are 34 dp vs 44 sp text | medium (latent) | B | **closed — not reproducible**: with Cairo at 2.0 the glyph is 26.5 px inside a 34 dp box at both 320 and 360; the 28/29 px came from the widget-test font. Reopen only if the font or the supported scale changes |
 | 5 | Audio resume accepts any 206 without a validator; `total == 0` skips the only size check | high | C | queued |
 | 6 | First-boot DB copy fallback is non-atomic and `exists → skip` makes a truncated DB permanent | high | C | queued |
 | 7 | Home-screen widget uses the device time zone; the app uses the selected city's | medium | E | queued |
@@ -25,7 +25,7 @@ subproject and iOS were not audited.
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | queued |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | queued |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | queued |
-| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | queued |
+| 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **fixed** (Wave B PR; device TalkBack pass pending) |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | queued |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | queued |
 | 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | queued |
@@ -110,6 +110,41 @@ Gates on the Wave A tip: `flutter analyze` 0 issues, `dart format` clean,
 read is still pending (phone was not connected); the null fallback is covered
 by a test, so an unreadable file degrades to one re-apply per process, not to
 lost reminders.
+
+## Wave B record
+
+Branch `wave/b-a11y-scale`, cut from `6029d555`.
+
+| Commit | Role | Red evidence |
+|---|---|---|
+| `7afe552f` | test: update gate at **320×640**, textScale 2.0, Cairo loaded | 2 failures — `RenderFlex overflowed by 40 pixels`, CTA ends at y=656 |
+| `93fd40f1` | fix: pin the CTA, scroll the copy, 48 dp actions | 5/5 green |
+| `24d5f6b7` | test: adhan `isSelected` + azkar count label | 2 failures — `isSelected` false; label is the dhikr text only |
+| `33eb5d89` | fix: merged row semantics + count label (new AR/EN string) | targeted 13/13 green |
+
+**Finding 4 was a false positive and no code changed for it.** The audit's
+28/29 px came from the **widget-test font**, which draws every glyph at full em
+width; the app ships Cairo. Measured with Cairo at textScale 2.0: the digit's
+intrinsic width is **26.5 px** inside the existing 34 dp box at both 320 and
+360, the row fits, and the before/after renders are pixel-identical. The
+proposed box/FittedBox change was reverted rather than shipped as a fix for a
+defect that does not reproduce.
+
+**The same trap hit finding 3's numbers:** "424 px at 360" was the test font.
+With Cairo the gate fits at 360 and overflows by **40 px at 320**, which is a
+supported floor in this repo (the adhan picker probe uses 320). That is the
+size and the number the probe now uses.
+
+**Rule adopted:** a text-scale probe that asserts a shipped screen survives
+must load the bundled font; the default test font is wider than any shipping
+font and turns every screen into a false overflow. It is still useful as a
+conservative stress test, but its failures are not evidence of a user-visible
+defect.
+
+**Permanent probe:** `test/update_gate_scale_probe_test.dart` (320 and 360,
+Cairo, tap-after-scroll). `test/adhan_picker_semantics_test.dart` and
+`test/azkar_count_semantics_test.dart` pin the announcements; the device
+TalkBack walk is still pending.
 
 ## Wave plan (owner-ordered)
 
