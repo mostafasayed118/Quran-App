@@ -44,6 +44,14 @@ class AzkarCubit extends Cubit<AzkarState> {
   /// decremented while its write was still in flight.
   bool _hydrated = false;
 
+  /// Favourites the user toggled while the stored read was pending.
+  ///
+  /// The read is a snapshot taken when it started; a tap that lands during it
+  /// is newer than that snapshot. Replaying the tapped ids' final membership
+  /// over the read keeps both directions: an added favourite survives, and a
+  /// favourite the user removed does not come back.
+  final Set<String> _touchedFavorites = <String>{};
+
   /// Loads the collections, emits the browsing state, then hydrates the saved
   /// counters and favorites.
   ///
@@ -76,9 +84,22 @@ class AzkarCubit extends Cubit<AzkarState> {
     final saved = await _readSavedState();
     if (isClosed) return;
     _hydrated = true;
+    final favorites = <String>{...saved.favorites};
+    for (final id in _touchedFavorites) {
+      if (_saved.favorites.contains(id)) {
+        favorites.add(id);
+      } else {
+        favorites.remove(id);
+      }
+    }
+    _touchedFavorites.clear();
     _saved = saved.day == _today
-        ? saved
-        : AzkarSavedState(favorites: saved.favorites);
+        ? AzkarSavedState(
+            day: saved.day,
+            remaining: saved.remaining,
+            favorites: favorites,
+          )
+        : AzkarSavedState(favorites: favorites);
     final state = this.state;
     if (state is AzkarBrowsing) {
       emit(state.copyWith(
@@ -182,6 +203,7 @@ class AzkarCubit extends Cubit<AzkarState> {
   /// Pins or unpins [collectionId]; pinned collections sort first.
   void toggleFavorite(String collectionId) {
     if (isClosed) return;
+    _touchedFavorites.add(collectionId);
     final favorites = <String>{..._saved.favorites};
     if (!favorites.remove(collectionId)) favorites.add(collectionId);
     _saved = AzkarSavedState(
