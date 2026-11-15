@@ -53,7 +53,12 @@ class _SplashScreenState extends State<SplashScreen>
     _holdTimer = Timer(SplashScreen.hold, () {
       unawaited(
         _fade.reverse().then((_) {
-          if (mounted) setState(() => _dismissed = true);
+          if (!mounted) return;
+          // The overlay is removed below, and this State lives for the whole
+          // app (it wraps the routed child), so the looping bar must be
+          // stopped or its ticker schedules frames forever.
+          _bar.stop();
+          setState(() => _dismissed = true);
         }),
       );
     });
