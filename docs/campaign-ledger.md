@@ -1650,3 +1650,11 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **#17 — hardened, not a device-proven bug:** the UI-isolate block measured **51 ms** for one pack (6,236 entries) and **120 ms** for three on a **desktop host with `dart run` (JIT), pre-fix path** (~3 frames at 60 Hz). The normalization now runs through `Isolate.run` with an injectable runner; Class A harness in `translation_search_screen_test.dart` (helper + 4 `prepare:` lines, assertions unchanged).
 - **Gates at the tip (`fbe78581`):** format **0** · analyze **0** · suite **1925/1925**; CI analyze-test 8m42s and Cloudflare Pages green.
 - **Open:** #1b force-stop; the release app's own reboot pass; the debug-app removal (read `reminder_plan_v1` first); Wave E (8, 16, 15, 19, 20, 7, 18).
+
+### 2026-11-16 (device close-out) — Infinix X6882, no code change
+
+- **Boot id, from the app's own store:** the debug app's `reminder_plan_v1` row carried `"bootId":"926e43be-c180-409e-aed0-5a58f17e3d3e"` — the real kernel value, so the reader returned a value on Android 14 (SELinux enforcing), not the null fallback.
+- **Debug app removed** only after that snapshot was copied and read (the mandated order); the package list now holds the release app only.
+- **Release 2008 reboot leg:** 37 alarms → **0** after a second `adb reboot` (boot id `fad1f68d-7a1d-46b2-a0ad-14327d54b010`) → **37** after launching the app, with no unlock and no user action.
+- **#1b observed live:** hours after the release had 32 alarms, the same boot showed **0** with no reboot and no update; only launching the app re-armed them (37). That is the force-stop/OEM class, still uncovered by the Wave A fix.
+- **Device state at close:** release 2008 (owner cert), 37 alarms, debug package uninstalled.

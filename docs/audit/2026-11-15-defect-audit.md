@@ -67,19 +67,28 @@ snapshot (not recommended).
   and on the **Infinix X6882 (Android 14, SELinux Enforcing)** with the app's
   own UID (`run-as`): `/proc/sys/kernel/random/boot_id` is readable
   (`2724423c-af34-4233-8782-9420d9c98240` before the last reboot), while
-  `/proc/uptime` returns `Permission denied`. If the file were unreadable, the
+  `/proc/uptime` returns `Permission denied`. The debug app's persisted
+  `reminder_plan_v1` row carried the **actual value**
+  (`"bootId":"926e43be-c180-409e-aed0-5a58f17e3d3e"`), so the binding stored a
+  real id on the phone — not the null fallback. If the file were unreadable, the
   provider would return null and the binding would re-apply on every process;
   `test/reminder_plan_persistence_test.dart` covers that fallback and asserts
   one schedule per id, not duplicates.
-- **Device re-arm evidence (Infinix, 2026-11-15):** a debug build cut after the
-  fix was launched after a real `adb reboot` (boot id changed to
+- **Device re-arm evidence (Infinix, 2026-11-15/16):** a debug build cut after
+  the fix was launched after a real `adb reboot` (boot id changed to
   `926e43be-c180-409e-aed0-5a58f17e3d3e`) with **0 alarms** on the device; it
   re-armed to **30** `RTC_WAKEUP` alarms with no user interaction. The owner's
   release build was still the pre-fix code and stayed at **0** after the same
   reboot — the defect reproduced live. Installing release **2008** (owner cert,
   `install -r`, `firstInstallTime` unchanged) and launching it took the release
-  from **0 → 32** alarms. The release's own *reboot* leg is still unmeasured —
-  the phone disconnected before a second reboot.
+  from **0 → 32** alarms. The release's own reboot leg was then measured:
+  37 alarms → **0** after a second reboot (boot id `fad1f68d-7a1d-46b2-a0ad-14327d54b010`)
+  → **37** after launching release 2008. The debug app was removed **after**
+  reading its snapshot, as required.
+- **#1b live observation (2026-11-16):** hours after the release had 32 alarms,
+  the same boot showed **0** — with no reboot and no app update. Only launching
+  the app re-armed them (37). That is the force-stop/OEM class the finding
+  describes, observed on the owner's phone; the fix does not cover it.
 - **Class A edit 1** — `test/reminder_plan_persistence_test.dart` (behaviour
   pin): two setup lines changed, assertions untouched.
   - before: `NotificationsBinding(store: store)`
@@ -313,11 +322,10 @@ gates, and a draft PR. No merge without owner review.
 1. **#1b force-stop** — same defect from the other side: the user gets no
    reminders and no signal. Needs a decision on the signal (ApplicationExitInfo
    vs one foreground re-arm).
-2. **Release reboot leg** — the Infinix proved the re-arm on a post-fix debug
-   build (0 → 30 after a real reboot) and the release app re-armed after
-   installing 2008 (0 → 32); the release's own reboot pass is still unmeasured
-   because the phone disconnected. Also remove the debug app (30 alarms) from
-   the daily phone.
+2. **Release reboot leg — done (2026-11-16):** release 2008 went 37 → 0 after a
+   reboot and back to 37 on launch; the debug app was removed after its
+   snapshot was read. What remains open is the **alarm loss without a reboot**
+   (0 alarms observed hours later on the same boot), which belongs to #1b.
 3. **Wave B** — done (3, 4, 14), with the permanent probe at 320/360 and scale
    2.0 and the TalkBack walk on the emulator and the Infinix.
 4. **Wave C** — done (6, 5, 9), merged with the regenerated asset.
