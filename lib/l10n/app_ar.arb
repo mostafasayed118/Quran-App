@@ -596,6 +596,15 @@
       }
     }
   },
+  "backupMergeKeepsExisting": "الدمج لا يستبدل بياناتك الموجودة.",
+  "backupPreviewSkippedDocuments": "تم تخطي {count} مستندًا غير صالح",
+  "@backupPreviewSkippedDocuments": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "backupPreviewRejected": "تم تجاهل {count} عنصرًا غير صالح",
   "@backupPreviewRejected": {
     "placeholders": {

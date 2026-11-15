@@ -1904,6 +1904,18 @@ abstract class AppLocalizations {
   /// **'{count} إعداد'**
   String backupPreviewSettings(String count);
 
+  /// No description provided for @backupMergeKeepsExisting.
+  ///
+  /// In ar, this message translates to:
+  /// **'الدمج لا يستبدل بياناتك الموجودة.'**
+  String get backupMergeKeepsExisting;
+
+  /// No description provided for @backupPreviewSkippedDocuments.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم تخطي {count} مستندًا غير صالح'**
+  String backupPreviewSkippedDocuments(String count);
+
   /// No description provided for @backupPreviewRejected.
   ///
   /// In ar, this message translates to:

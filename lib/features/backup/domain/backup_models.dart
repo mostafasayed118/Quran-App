@@ -180,6 +180,7 @@ class BackupSummary {
     required this.lastReadChanged,
     required this.settingsKeysApplied,
     this.rejectedEntries = 0,
+    this.skippedSettingsDocuments = 0,
   });
 
   /// New bookmarks a merge would add (existing rows stay).
@@ -205,6 +206,12 @@ class BackupSummary {
 
   /// Imported bookmark/khatma rows rejected by the id/range guards.
   final int rejectedEntries;
+
+  /// Document settings whose imported JSON was invalid and were skipped.
+  ///
+  /// Nothing is applied from those documents; the local value stays. The
+  /// preview surfaces the count so the merge is not silent about it.
+  final int skippedSettingsDocuments;
 
   /// True when the import changed nothing at all.
   bool get isEmpty =>

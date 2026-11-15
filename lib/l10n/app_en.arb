@@ -575,6 +575,15 @@
       }
     }
   },
+  "backupMergeKeepsExisting": "Merge does not overwrite your existing data.",
+  "backupPreviewSkippedDocuments": "Skipped {count} invalid document(s)",
+  "@backupPreviewSkippedDocuments": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
   "backupPreviewRejected": "Skipped {count} invalid entries",
   "@backupPreviewRejected": {
     "placeholders": {

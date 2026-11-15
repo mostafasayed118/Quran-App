@@ -168,6 +168,7 @@ void main() {
     await settle(tester);
 
     expect(find.text('مراجعة الاستيراد'), findsOneWidget);
+    expect(find.text('الدمج لا يستبدل بياناتك الموجودة.'), findsOneWidget);
     expect(find.text('٣ علامة جديدة'), findsOneWidget);
     expect(find.text('٢ يوم عبادات'), findsOneWidget);
 

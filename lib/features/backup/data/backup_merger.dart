@@ -1,4 +1,6 @@
-﻿import '../../../core/utils/date_only.dart';
+import 'dart:convert';
+
+import '../../../core/utils/date_only.dart';
 import '../domain/backup_models.dart';
 import 'backup_codec.dart';
 import 'backup_inventory.dart';
@@ -214,6 +216,18 @@ TasbihMerge mergeTasbih({
 }
 
 /// Result of merging imported settings.
+/// Settings whose value is a JSON document holding many user entries.
+///
+/// A scalar setting is import-wins, but replacing one of these documents
+/// wholesale would delete the entries the other device never had. They merge
+/// entry-by-entry instead, with the local entry winning on a collision.
+const Set<String> _documentSettings = <String>{
+  backupKeyBookmarkMeta,
+  backupKeyHadithBookmarks,
+  backupKeyQadaMissedFasts,
+  backupKeyAzkarFavorites,
+};
+
 class SettingsMerge {
   const SettingsMerge(
     this.toWrite, {
@@ -224,6 +238,9 @@ class SettingsMerge {
   final Map<String, String> toWrite;
 
   /// Document keys whose imported JSON was invalid and was therefore skipped.
+  ///
+  /// The local document is kept; the preview surfaces the count so the user
+  /// knows the file carried something the app could not read.
   final Set<String> skippedDocuments;
 
   int get appliedCount => toWrite.length;
@@ -231,17 +248,133 @@ class SettingsMerge {
 
 /// Whitelist-filtered import-wins: only whitelisted keys present in the file
 /// are written, and only when the value actually differs.
+///
+/// Document keys are the exception to "import-wins": they union per entry so a
+/// merge can never erase notes, folders, bookmarks, recorded fasts, or azkar
+/// favourites that the file did not carry. Export-only keys are ignored.
 SettingsMerge mergeSettings({
   required Map<String, String> existing,
   required Map<String, String> imported,
 }) {
   final toWrite = <String, String>{};
+  final skipped = <String>{};
   for (final entry in imported.entries) {
     if (!kBackupSettingsWhitelist.contains(entry.key)) continue;
-    if (existing[entry.key] == entry.value) continue;
-    toWrite[entry.key] = entry.value;
+    if (kBackupExportOnlyKeys.contains(entry.key)) continue;
+    final current = existing[entry.key];
+    if (_documentSettings.contains(entry.key)) {
+      if (entry.value.isEmpty) continue;
+      if (!_isValidDocument(entry.key, entry.value)) {
+        skipped.add(entry.key);
+        continue;
+      }
+    }
+    final merged = _mergeSettingValue(entry.key, current, entry.value);
+    if (merged == null || merged == current) continue;
+    toWrite[entry.key] = merged;
   }
-  return SettingsMerge(Map<String, String>.unmodifiable(toWrite));
+  return SettingsMerge(
+    Map<String, String>.unmodifiable(toWrite),
+    skippedDocuments: Set<String>.unmodifiable(skipped),
+  );
+}
+
+bool _isValidDocument(String key, String raw) {
+  switch (key) {
+    case backupKeyBookmarkMeta:
+    case backupKeyHadithBookmarks:
+      return _jsonObject(raw) != null;
+    case backupKeyQadaMissedFasts:
+    case backupKeyAzkarFavorites:
+      return _jsonArray(raw) != null;
+    default:
+      return true;
+  }
+}
+
+String? _mergeSettingValue(String key, String? current, String imported) {
+  if (!_documentSettings.contains(key)) return imported;
+  if (current == null || current.isEmpty) return imported;
+  if (imported.isEmpty) return null;
+  switch (key) {
+    case backupKeyBookmarkMeta:
+      return _mergeJsonObjects(current, imported);
+    case backupKeyHadithBookmarks:
+      return _mergeHadithBookmarks(current, imported);
+    case backupKeyQadaMissedFasts:
+    case backupKeyAzkarFavorites:
+      return _mergeStringCollections(current, imported);
+    default:
+      return imported;
+  }
+}
+
+Map<String, Object?>? _jsonObject(String raw) {
+  try {
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map) return null;
+    return decoded.cast<String, Object?>();
+  } on Object {
+    return null;
+  }
+}
+
+List<Object?>? _jsonArray(String raw) {
+  try {
+    final decoded = jsonDecode(raw);
+    return decoded is List ? decoded.cast<Object?>() : null;
+  } on Object {
+    return null;
+  }
+}
+
+/// Bookmark notes/folders: one JSON object keyed by ayah id.
+String? _mergeJsonObjects(String current, String imported) {
+  final existing = _jsonObject(current);
+  final incoming = _jsonObject(imported);
+  if (existing == null) return imported;
+  if (incoming == null) return null;
+  return jsonEncode(<String, Object?>{...incoming, ...existing});
+}
+
+/// Hadith bookmarks: `{packId: [numbers]}`, unioned per pack.
+String? _mergeHadithBookmarks(String current, String imported) {
+  final existing = _jsonObject(current);
+  final incoming = _jsonObject(imported);
+  if (existing == null) return imported;
+  if (incoming == null) return null;
+  final merged = <String, Object?>{};
+  final packs = <String>{...existing.keys, ...incoming.keys};
+  for (final pack in packs) {
+    final numbers = <int>{};
+    for (final source in <Object?>[existing[pack], incoming[pack]]) {
+      if (source is! List) continue;
+      for (final number in source) {
+        if (number is int && number >= 0) numbers.add(number);
+      }
+    }
+    if (numbers.isNotEmpty) {
+      merged[pack] = numbers.toList()..sort();
+    }
+  }
+  return jsonEncode(merged);
+}
+
+/// Date lists and favourite ids: a JSON array of strings, unioned.
+String? _mergeStringCollections(String current, String imported) {
+  final existing = _jsonArray(current);
+  final incoming = _jsonArray(imported);
+  if (existing == null) return imported;
+  if (incoming == null) return null;
+  final values = <String>{
+    for (final value in existing)
+      if (value is String && value.isNotEmpty) value,
+    for (final value in incoming)
+      if (value is String && value.isNotEmpty) value,
+  }.toList()
+    ..sort();
+  if (values.isEmpty) return null;
+  return jsonEncode(values);
 }
 
 /// Per-entity summary of a plan (preview counts and apply outcome) lives in

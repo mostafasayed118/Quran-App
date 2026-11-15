@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/l10n/app_localizations_digits.dart';
 import '../../../core/theme/app_icon_size.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../core/widgets/section_header.dart';
@@ -189,6 +190,9 @@ class _PreviewDialog extends StatelessWidget {
       if (summary.tasbihChanged) loc.backupPreviewTasbih,
       if (summary.settingsKeysApplied > 0)
         loc.backupPreviewSettings(loc.number(summary.settingsKeysApplied)),
+      if (summary.skippedSettingsDocuments > 0)
+        loc.backupPreviewSkippedDocuments(
+            loc.number(summary.skippedSettingsDocuments)),
       if (summary.rejectedEntries > 0)
         loc.backupPreviewRejected(loc.number(summary.rejectedEntries)),
     ];
@@ -199,6 +203,11 @@ class _PreviewDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            loc.backupMergeKeepsExisting,
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: AppSpacing.sm),
           for (final line in lines)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),

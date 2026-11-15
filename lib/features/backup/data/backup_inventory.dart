@@ -129,6 +129,13 @@ const Set<String> kBackupSettingsWhitelist = {
   backupKeyAdhanFajrId,
 };
 
+/// Keys the export carries but the import never applies.
+///
+/// `azkar_progress_v1` is one day's counters (`{day, counts}`), not a
+/// date-keyed document. Merging it would mix a previous day into today, so it
+/// stays in the file for inspection but is deliberately not imported.
+const Set<String> kBackupExportOnlyKeys = <String>{backupKeyAzkarProgress};
+
 /// Keys whose change needs a reminder re-plan after apply — mirrors the boot
 /// scheduler inputs (city, azkar/wird settings and the whole prayer
 /// configuration; see `scheduleReminders`).

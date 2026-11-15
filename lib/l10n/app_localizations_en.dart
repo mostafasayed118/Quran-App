@@ -1017,6 +1017,15 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get backupMergeKeepsExisting =>
+      'Merge does not overwrite your existing data.';
+
+  @override
+  String backupPreviewSkippedDocuments(String count) {
+    return 'Skipped $count invalid document(s)';
+  }
+
+  @override
   String backupPreviewRejected(String count) {
     return 'Skipped $count invalid entries';
   }

@@ -1014,6 +1014,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get backupMergeKeepsExisting => 'الدمج لا يستبدل بياناتك الموجودة.';
+
+  @override
+  String backupPreviewSkippedDocuments(String count) {
+    return 'تم تخطي $count مستندًا غير صالح';
+  }
+
+  @override
   String backupPreviewRejected(String count) {
     return 'تم تجاهل $count عنصرًا غير صالح';
   }

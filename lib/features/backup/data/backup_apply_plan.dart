@@ -30,6 +30,7 @@ class _ApplyPlan {
         lastReadChanged: lastRead.changed,
         settingsKeysApplied: settings.appliedCount,
         rejectedEntries: bookmarks.rejected + khatma.rejected,
+        skippedSettingsDocuments: settings.skippedDocuments.length,
       );
 
   bool get reminderRelevantChanged =>
