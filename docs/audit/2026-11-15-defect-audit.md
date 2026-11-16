@@ -86,11 +86,24 @@ count with the plan on `resumed` and re-apply when it is short, or read
   **33** (`force=true`); a normal resume leaves 33 with `alive=true` (no
   re-arm); `am kill` leaves the 33 alarms untouched — only force-stop clears
   them.
+- Infinix X6882 (Android 14 / API 34) evidence, 2026-11-16, debug build of the
+  fix with the emulator's 33-alarm DB seeded into the debug app's data dir:
+  **33 baseline → `am force-stop` → 0 → relaunch → 33**; `ApplicationExitInfo`
+  reported `reason=10 (USER REQUESTED) subreason=21 (FORCE STOP)`. The clean
+  proof: after that relaunch the persisted snapshot already carried the
+  phone's own boot id (`fad1f68d-…`) and the same plan fingerprint, so neither
+  the boot-id mismatch nor a fingerprint change could explain the re-arm —
+  only the probe/exit-reason path did. A normal Home→relaunch left 33 too.
+  The app UID can read `/proc/sys/kernel/random/boot_id` on this device.
+- **`am kill` differs by OEM:** on the A16 emulator a background-process kill
+  left all 33 alarms; on the Infinix X6882 it cleared them (33 → 0) while the
+  process stayed alive and produced no new `ApplicationExitInfo` (the visible
+  `reason=10` entries were stale force-stops). The probe still recovers on the
+  next open (0 → 33 on relaunch), but this is why `ApplicationExitInfo` alone
+  cannot be the primary signal.
 - **Inherent limit (recorded):** after a force stop the app is silent until it
   is opened once. Closing that gap needs a boot/package-replaced receiver or an
   external monitor, a separate decision that adds a permission and native code.
-- **Still pending:** the same probe on the Infinix (phone disconnected at the
-  time of the emulator run).
 
 **Candidate fixes (next wave):**
 1. A small Android method channel returning
