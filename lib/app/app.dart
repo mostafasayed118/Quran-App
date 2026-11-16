@@ -120,10 +120,11 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   /// exact-alarm permission changed.
   void _refreshRemindersIfStale() {
     final now = DateTime.now();
-    if (_planFreshness.needsReplan(now)) {
-      _planFreshness.mark(now);
-      unawaited(_rescheduleGuarded('resume'));
-    }
+    // Re-plan on every resume: a plan fingerprint cannot see alarms that were
+    // cleared while the process was alive (force stop, an OEM freeze). The
+    // binding probes the OS and only re-arms when the alarms are missing.
+    _planFreshness.mark(now);
+    unawaited(_rescheduleGuarded('resume'));
     unawaited(_syncAlarmGrant());
   }
 

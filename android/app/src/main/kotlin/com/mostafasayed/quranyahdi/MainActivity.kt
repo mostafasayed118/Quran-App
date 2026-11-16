@@ -1,6 +1,8 @@
 package com.mostafasayed.quranyahdi
 
+import android.app.ActivityManager
 import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +10,7 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
+import com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver
 import com.ryanheise.audioservice.AudioServiceActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -45,6 +48,17 @@ class MainActivity : AudioServiceActivity() {
                 )
 
                 "openExactAlarmSettings" -> result.success(openExactAlarmSettings())
+
+                "alarmExists" -> {
+                    val id = call.argument<Int>("id")
+                    if (id == null) {
+                        result.error("bad_args", "id is required", null)
+                    } else {
+                        result.success(alarmExists(id))
+                    }
+                }
+
+                "lastExitReason" -> result.success(lastExitReason())
 
                 else -> result.notImplemented()
             }
@@ -84,6 +98,49 @@ class MainActivity : AudioServiceActivity() {
     }
 
     private fun packageUri(): Uri = Uri.parse("package:$packageName")
+
+    /**
+     * Whether the notification plugin's scheduled alarm for [id] is still
+     * registered with `AlarmManager`.
+     *
+     * The identity of the plugin's `PendingIntent` is the request code (the
+     * notification id), the receiver component and an intent with no action
+     * or data (see `FlutterLocalNotificationsPlugin#getBroadcastPendingIntent`
+     * in flutter_local_notifications 22.3.2). `FLAG_NO_CREATE` therefore
+     * returns null exactly when the OS no longer holds the alarm.
+     *
+     * This is deliberately a probe, not a scheduling path: it never creates
+     * the PendingIntent.
+     */
+    private fun alarmExists(id: Int): Boolean {
+        val intent = Intent(this, ScheduledNotificationReceiver::class.java)
+        val pending = PendingIntent.getBroadcast(
+            this,
+            id,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        )
+        return pending != null
+    }
+
+    /**
+     * The reason the previous process ended, as `ApplicationExitInfo` reports
+     * it (API 30+); null below that or when the ROM cannot answer.
+     */
+    private fun lastExitReason(): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return null
+        return try {
+            val activityManager =
+                getSystemService(Context.ACTIVITY_SERVICE) as? ActivityManager
+            activityManager
+                ?.getHistoricalProcessExitReasons(packageName, 0, 1)
+                ?.firstOrNull()
+                ?.reason
+                ?.toString()
+        } catch (error: Exception) {
+            null
+        }
+    }
 
     /**
      * Opens a system screen; false when the ROM ships no activity for it (the

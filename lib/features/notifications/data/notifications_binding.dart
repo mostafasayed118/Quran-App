@@ -7,6 +7,7 @@ import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
+import 'package:quran_yahdi/core/platform/reminder_alarm_probe.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_plan_store.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart'
@@ -65,9 +66,11 @@ class NotificationsBinding extends ChangeNotifier
     FlutterLocalNotificationsPlugin? plugin,
     ReminderPlanStore? store,
     String? Function()? bootId,
+    ReminderAlarmProbe? alarmProbe,
   })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
         _store = store,
-        _bootId = bootId ?? _readBootId;
+        _bootId = bootId ?? _readBootId,
+        _alarmProbe = alarmProbe;
 
   static const String channelId = 'quran_yahdi_reminders';
 
@@ -93,6 +96,14 @@ class NotificationsBinding extends ChangeNotifier
   /// restored fingerprint from a previous boot would otherwise suppress the
   /// re-schedule that the boot path exists for.
   final String? Function() _bootId;
+
+  /// Asks the OS whether a scheduled alarm still exists (null in tests).
+  final ReminderAlarmProbe? _alarmProbe;
+
+  /// Set when the previous process ended in a way that clears alarms (force
+  /// stop or an OEM kill). Cleared only after a successful apply, so a failed
+  /// apply does not swallow the signal.
+  bool _forceNextApply = false;
 
   bool _ready = false;
   NotificationDetails? _details;
@@ -234,6 +245,7 @@ class NotificationsBinding extends ChangeNotifier
       _playAdhanLabel = loc.adhanPlayAction;
       _ready = true;
       _setApplyFailed(false);
+      _forceNextApply = await _previousExitClearedAlarms();
     } on Object catch (error, stackTrace) {
       _ready = false;
       _initFailed = true;
@@ -536,6 +548,49 @@ class NotificationsBinding extends ChangeNotifier
     );
   }
 
+  /// True when the previous process ended in a way that clears the alarms.
+  ///
+  /// This is a helper signal, not the primary one: it is read once at `init`,
+  /// so a force stop while this process stays alive is invisible to it, and
+  /// some OEMs report a different reason. The live probe is the backstop.
+  Future<bool> _previousExitClearedAlarms() async {
+    final probe = _alarmProbe;
+    if (probe == null) return false;
+    try {
+      final reason = await probe.lastExitReason();
+      // ApplicationExitInfo: 10 USER_REQUESTED (force stop), 11 USER_STOPPED,
+      // 13 OTHER (an OEM kill).
+      return reason == '10' || reason == '11' || reason == '13';
+    } on Object {
+      return false;
+    }
+  }
+
+  /// True while the OS still holds the next scheduled alarms.
+  ///
+  /// Two upcoming alarms are sampled rather than one: the nearest can be gone
+  /// legitimately (its time passed, a pre-adhan was cancelled). A probe error
+  /// counts as "missing" — unknown is re-armed, which is idempotent.
+  Future<bool> _alarmsStillScheduled(List<ScheduledReminder> reminders) async {
+    final probe = _alarmProbe;
+    if (probe == null) return true;
+    final now = DateTime.now();
+    final upcoming = reminders.where((r) => r.fireAt.isAfter(now)).toList()
+      ..sort((a, b) => a.fireAt.compareTo(b.fireAt));
+    for (final reminder in upcoming.take(2)) {
+      try {
+        if (!await probe.alarmExists(reminder.id)) return false;
+      } on Object catch (error, stackTrace) {
+        appLog('reminder alarm probe failed',
+            name: 'quran_yahdi/reminders',
+            error: error.runtimeType,
+            stackTrace: stackTrace);
+        return false;
+      }
+    }
+    return true;
+  }
+
   /// Cancels the previous reminder alarms and schedules [reminders].
   ///
   /// The clear is TARGETED: only the ids the planner owns are cancelled.
@@ -558,7 +613,17 @@ class NotificationsBinding extends ChangeNotifier
           AndroidFlutterLocalNotificationsPlugin>();
       final exact = await android?.canScheduleExactNotifications() ?? false;
       final fingerprint = planFingerprint(reminders);
-      if (fingerprint == _appliedPlan && exact == _appliedExact) return;
+      if (_forceNextApply) {
+        appLog('reminder rearm',
+            name: 'quran_yahdi/reminders', error: 'exit-reason');
+      } else if (fingerprint == _appliedPlan && exact == _appliedExact) {
+        // The fingerprint is only trustworthy while the OS still holds the
+        // alarms; force stop clears them without changing anything the
+        // fingerprint can see.
+        if (await _alarmsStillScheduled(reminders)) return;
+        appLog('reminder rearm',
+            name: 'quran_yahdi/reminders', error: 'alive-check');
+      }
       final mode = exact
           ? AndroidScheduleMode.exactAllowWhileIdle
           : AndroidScheduleMode.inexactAllowWhileIdle;
@@ -607,6 +672,9 @@ class NotificationsBinding extends ChangeNotifier
         _setApplyFailed(true);
         return;
       }
+      // Only a successful apply consumes the forced re-arm; a failed one
+      // keeps the signal for the next attempt.
+      _forceNextApply = false;
       _appliedPlan = fingerprint;
       _appliedExact = exact;
       _setApplyFailed(false);
