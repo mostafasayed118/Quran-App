@@ -63,4 +63,33 @@ void main() {
     expect(entries.single.ayah.surahId, 2);
     expect(entries.single.ayah.numberInSurah, 3);
   });
+
+  test('ayahsByIds batches past a host-parameter ceiling', () async {
+    // The DB rejects any statement binding more than 3 variables, emulating
+    // Android's 999-variable SQLite limit on a host with a larger one. 7 ids
+    // must therefore be split into <=3-sized IN lists or the query throws.
+    final limited = newLimitedVarDb(limit: 3);
+    final ids = List<int>.generate(7, (i) => i + 100);
+    await limited.batch((b) => b.insertAll(
+          limited.ayahs,
+          [
+            for (final id in ids)
+              AyahsCompanion.insert(
+                id: Value(id),
+                surahId: 2,
+                numberInSurah: id - 99,
+                juz: 1,
+                page: 2,
+                textUthmani: 'آية',
+                textImlaei: 'آية',
+              ),
+          ],
+        ));
+    final batched = AyahRepository(limited, maxSqlVariables: 3);
+
+    final found = await batched.ayahsByIds(ids);
+
+    expect(found, hasLength(ids.length));
+    expect(found.map((a) => a.id).toSet(), ids.toSet());
+  });
 }

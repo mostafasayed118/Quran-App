@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/sql_batching.dart';
 import '../../../core/utils/arabic_search.dart';
 import 'pack_reader.dart';
 
@@ -19,11 +20,16 @@ class HadithStore {
     this._db, {
     required Future<String?> Function(String packId) packPath,
     Future<dynamic> Function(String path)? fileDecoder,
+    int? maxSqlVariables,
   })  : _packPath = packPath,
-        _fileDecoder = fileDecoder;
+        _fileDecoder = fileDecoder,
+        _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
 
   final AppDatabase _db;
   final Future<String?> Function(String packId) _packPath;
+
+  /// IN-list batch size; injectable to force several batches in a test.
+  final int _maxSqlVariables;
   final Future<dynamic> Function(String path)? _fileDecoder;
 
   /// Rows per insert batch: small enough to keep the argument list bounded,
@@ -117,20 +123,30 @@ class HadithStore {
     if (numbers.isEmpty) return const <(int, String)>[];
     await _ensureTable();
     await _ensureImported(packId);
-    final placeholders = List<String>.filled(numbers.length, '?').join(',');
-    final rows = await _db.customSelect(
-      'SELECT number, body FROM hadith_entries '
-      'WHERE pack_id = ? AND number IN ($placeholders) ORDER BY ordinal',
-      variables: [
-        Variable.withString(packId),
-        for (final number in numbers) Variable.withInt(number),
-      ],
-    ).get();
-    return <(int, String)>[
-      for (final row in rows)
-        if (row.read<int>('number') >= 0)
-          (row.read<int>('number'), row.read<String>('body')),
-    ];
+    // A bookmark set can exceed SQLite's host-parameter limit; batch the IN
+    // lists and re-merge by ordinal so book order survives the split.
+    final ordered = <(int, int, String)>[];
+    final sorted = numbers.toList()..sort();
+    for (final batch in sqlBatches(sorted, size: _maxSqlVariables)) {
+      final placeholders = List<String>.filled(batch.length, '?').join(',');
+      final rows = await _db.customSelect(
+        'SELECT ordinal, number, body FROM hadith_entries '
+        'WHERE pack_id = ? AND number IN ($placeholders) ORDER BY ordinal',
+        variables: [
+          Variable.withString(packId),
+          for (final number in batch) Variable.withInt(number),
+        ],
+      ).get();
+      for (final row in rows) {
+        final number = row.read<int>('number');
+        if (number >= 0) {
+          ordered.add(
+              (row.read<int>('ordinal'), number, row.read<String>('body')));
+        }
+      }
+    }
+    ordered.sort((a, b) => a.$1.compareTo(b.$1));
+    return [for (final row in ordered) (row.$2, row.$3)];
   }
 
   /// Fills `norm` for rows imported before the search column existed.

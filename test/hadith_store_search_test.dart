@@ -50,6 +50,29 @@ void main() {
     expect(items.map((e) => e.$1), [1, 3]);
   });
 
+  test('byNumbers batches past a host-parameter ceiling in book order',
+      () async {
+    // The DB throws on any statement with >4 variables (Android's 999 ceiling
+    // emulated on a larger-limit host): pack_id plus 3 batched numbers. 7
+    // numbers must split, then re-merge by ordinal, or it throws / loses order.
+    final db = newLimitedVarDb(limit: 4);
+    final local = HadithStore(
+      db,
+      packPath: (_) async => null,
+      maxSqlVariables: 3,
+    );
+    final numbers = List<int>.generate(7, (i) => i + 1);
+    await local.importProjection(
+      'big',
+      [for (final n in numbers) (n, 'حديث $n')],
+    );
+
+    final items = await local.byNumbers('big', numbers.toSet());
+
+    expect(items, hasLength(numbers.length));
+    expect(items.map((e) => e.$1).toList(), numbers);
+  });
+
   test('a pre-search row is backfilled before matching', () async {
     final db = newTestDb();
     final local = HadithStore(db, packPath: (_) async => null);

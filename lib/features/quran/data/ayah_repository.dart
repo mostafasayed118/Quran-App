@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
+import '../../../core/db/sql_batching.dart';
 import '../../../core/domain/ayah_batch_lookup.dart';
 import '../../../core/utils/app_log.dart';
 import 'ayah_source.dart';
@@ -12,10 +13,16 @@ export 'bookmark_pager.dart'
 
 /// Reads ayahs and bookmarks from the local database.
 class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
-  AyahRepository(this._db, {BookmarkMetaSource? meta}) : _meta = meta;
+  AyahRepository(this._db, {BookmarkMetaSource? meta, int? maxSqlVariables})
+      : _meta = meta,
+        _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
 
   final AppDatabase _db;
   final BookmarkMetaSource? _meta;
+
+  /// The IN-list batch size. Injectable so a test can force several batches
+  /// without needing a thousand rows on a host with a larger SQLite limit.
+  final int _maxSqlVariables;
 
   @override
   Future<List<Ayah>> surahAyahs(int surahId) {
@@ -41,9 +48,17 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   /// The per-id loop this replaces cost one serialized background-isolate
   /// round-trip per bookmark; a folder with fifty of them opened slowly.
   @override
-  Future<List<Ayah>> ayahsByIds(List<int> ids) {
-    if (ids.isEmpty) return Future<List<Ayah>>.value(const <Ayah>[]);
-    return (_db.select(_db.ayahs)..where((a) => a.id.isIn(ids))).get();
+  Future<List<Ayah>> ayahsByIds(List<int> ids) async {
+    if (ids.isEmpty) return const <Ayah>[];
+    // One folder can hold more bookmarks than SQLite's host-parameter limit.
+    // Batch the IN lists and concatenate; the caller sorts the result, so
+    // cross-batch order is irrelevant.
+    final result = <Ayah>[];
+    for (final batch in sqlBatches(ids, size: _maxSqlVariables)) {
+      result.addAll(
+          await (_db.select(_db.ayahs)..where((a) => a.id.isIn(batch))).get());
+    }
+    return result;
   }
 
   /// Ordered range of ayahs for ruqyah references (W4 mirror query).
