@@ -101,6 +101,23 @@ count with the plan on `resumed` and re-apply when it is short, or read
   `reason=10` entries were stale force-stops). The probe still recovers on the
   next open (0 → 33 on relaunch), but this is why `ApplicationExitInfo` alone
   cannot be the primary signal.
+- **Probe-alone proof (Infinix, 2026-11-16):** a diagnostic debug build with a
+  `--dart-define` that disables the `ApplicationExitInfo` helper signal and a
+  per-resume counter written to a file (app's documents dir), connected over
+  **wireless adb** (the USB link kept re-enumerating to `unauthorized`):
+  - `am force-stop` → relaunch (cold boot) → the counter recorded
+    `APPLY force=false match=true` → `PROBE 1 -> false` → `alive-check`, and the
+    alarms went 0 → **33**. With the helper disabled, only the probe could have
+    re-armed them — **the probe alone is sufficient**.
+  - A normal Home→relaunch left 33, and the counter recorded only
+    `APPLY … match=true`, `PROBE 1 -> true`, `PROBE 1043 -> true` and **no
+    re-arm line** — zero re-arms, measured on the device (not just the unit
+    test). A `install -r` of the diagnostic APK without a following force-stop
+    can leave the process already foregrounded, so `am start` alone does not
+    fire a cold boot; the 0-alarm baseline seen in one attempt was that state,
+    not a probe failure.
+  - The diagnostic defines/counter were reverted before the gates; the shipped
+    code is unchanged by this verification.
 - **Inherent limit (recorded):** after a force stop the app is silent until it
   is opened once. Closing that gap needs a boot/package-replaced receiver or an
   external monitor, a separate decision that adds a permission and native code.
