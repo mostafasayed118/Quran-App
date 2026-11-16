@@ -32,6 +32,8 @@ subproject and iOS were not audited.
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
 | 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | **fixed** (Wave E PR): `formatMegabytesValue` keeps a whole MB whole and a fraction to one decimal |
 | 20 | README says 1450 tests; the suite is 1877+ | low | E | **fixed** (Wave E PR): refreshed to the current suite count |
+| 21 | A folder with more than 999 bookmarks builds an `IN` list of that many SQL variables (`ayahsByIds`) | low (latent, post-audit) | — | **recorded, not fixed**: needs a power user past the engine limit; found by the Wave E sweep |
+| 22 | More than 999 hadith bookmarks build the same kind of `IN` list (`hadith_store.byNumbers`) | low (latent, post-audit) | — | **recorded, not fixed**: same bound |
 
 ## Open finding 1b — force-stop vs. the boot id
 
@@ -342,6 +344,30 @@ TZ-controlled runner. Recorded with no code change.
 
 **Gates at the tip:** format **0** · analyze **0** · suite **1931/1931**.
 
+**Merge:** `d07f6820` (PR #62), fast-forward from `aefdfd98`: 9 commits,
+13 files, +228/−26. CI `analyze-test` 6m21s green.
+
+**#15 — why it stays open.** The alternatives were tried on paper: `withClock`
+controls `DateTime.now()` but not the process time zone, and the `timezone`
+package can build `TZDateTime` values without changing what `DateTime(...)`
+means locally. On a UTC host the two arithmetic forms are equivalent, so no
+in-process test can catch the regression; it needs a runner started with a
+TZ-controlled environment. Filed as the first item of the next wave.
+
+**IN-list sweep (owner-requested).** The unbounded one was `markedDaysRange`
+(fixed). Two more **latent** user-sized lists remain, recorded as findings 21
+and 22: `ayah_repository.ayahsByIds` fed by one folder's bookmark ids, and
+`hadith_store.byNumbers` fed by the hadith bookmarks. Both need >999 entries in
+one lookup to hit the engine limit, so they are recorded, not fixed. The other
+`isIn` uses are bounded (settings whitelist, reciter rows, ≤114 surah ids,
+paged hadith numbers).
+
+**#18 user-visible change:** a streak that was silently capped at 400 now
+continues past it — intended, and worth a release-note line.
+
+**Accounting (2026-11-16):** 17 fixed, 1 withdrawn as a false positive (#4), 2
+not proven (#13, #15), 1 open (#1b), 2 latent added by the sweep (21, 22).
+
 ## Wave plan (owner-ordered)
 
 | Wave | Items |
@@ -357,16 +383,17 @@ gates, and a draft PR. No merge without owner review.
 
 ## Follow-ups (in order)
 
-1. **#1b force-stop** — same defect from the other side: the user gets no
-   reminders and no signal. Needs a decision on the signal (ApplicationExitInfo
-   vs one foreground re-arm).
-2. **Release reboot leg — done (2026-11-16):** release 2008 went 37 → 0 after a
-   reboot and back to 37 on launch; the debug app was removed after its
-   snapshot was read. What remains open is the **alarm loss without a reboot**
-   (0 alarms observed hours later on the same boot), which belongs to #1b.
-3. **Wave B** — done (3, 4, 14), with the permanent probe at 320/360 and scale
-   2.0 and the TalkBack walk on the emulator and the Infinix.
-4. **Wave C** — done (6, 5, 9), merged with the regenerated asset.
-5. **Wave D** — done (10, 11, 12, 17); 13 recorded as not proven.
-6. **Wave E** — done except #15: 8, 16, 19, 20, 7, 18 fixed; #15 needs a
-   TZ-controlled test runner before it can be closed.
+1. **#1b — diagnosis first, then a decision.** The live evidence is that 32
+   alarms disappeared on the same boot with no update and no reboot; only an
+   app launch re-armed them. Before any code: establish what clears them
+   (force-stop, an OEM battery manager, or the app itself), because a blind
+   re-arm on every start is exactly what the owner rejected. Candidate signals
+   after the diagnosis: inspect the real alarms when the app opens, or re-arm
+   on `resumed` when the live count is lower than the plan.
+2. **#15 — first item of the next wave.** The DST test is vacuous on a UTC
+   host; `withClock`/`timezone` do not change `DateTime`'s local zone, so a
+   TZ-controlled runner is required. Until then it stays open by name.
+3. **Latent IN lists (21, 22)** — a folder or hadith bookmark set past ~999
+   entries; recorded, not fixed.
+4. **Waves A–E** — merged; 13 and 15 are the only remaining not-proven items,
+   and #1b is the only live defect.

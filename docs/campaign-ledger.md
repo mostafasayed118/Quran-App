@@ -1658,3 +1658,17 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Release 2008 reboot leg:** 37 alarms → **0** after a second `adb reboot` (boot id `fad1f68d-7a1d-46b2-a0ad-14327d54b010`) → **37** after launching the app, with no unlock and no user action.
 - **#1b observed live:** hours after the release had 32 alarms, the same boot showed **0** with no reboot and no update; only launching the app re-armed them (37). That is the force-stop/OEM class, still uncovered by the Wave A fix.
 - **Device state at close:** release 2008 (owner cert), 37 alarms, debug package uninstalled.
+
+### 2026-11-16 (defect audit Wave E) — MERGED — PR #62
+
+- **Merge:** fast-forward, no merge commit — `main` `aefdfd98` → **`d07f6820`**, **9 commits**, 13 files, +228/−26. Branch `wave/e-polish` deleted after CI.
+- **Why:** findings 7 (widget clock), 8 (Fajr follow-up bound), 16 (id pins), 19 (pack label), 20 (README), 18 (streak cap); 15 stays open.
+- **Test-first:** `17f80cd1` (401 vs 400) → `503eafd7`; `e41dd9f1` (١٣:٣٠ vs ١٥:٣٠) → `c1cfe503`; `b70c30f4` and `80f95a3f` are structural/latent fixes; `ff8ee91a` the id pin; `2a298d88` README; `d07f6820` the audit record.
+- **#18 exposed a second defect:** `markedDaysRange` built an `IN` list with one SQL parameter per day in the window, so a wide lookback failed every tracker test ("too many SQL variables"). It now uses a range predicate (`day >= start AND day <= today`); the lookback is a century-long storage bound, not a product cap.
+- **#18 user-visible:** a streak that was silently capped at 400 now continues past it — intended, worth a release-note line.
+- **#7:** the in-app card already converted with `cityWallClock`; only the background refresh formatted the raw instant, so a worker-refreshed widget showed the device clock.
+- **#15 — open by name:** the DST test only uses UTC instants; `withClock`/`timezone` do not change `DateTime`'s local zone, so a TZ-controlled runner is required. First item of the next wave.
+- **IN-list sweep (owner-requested):** the unbounded one was `markedDaysRange` (fixed). Two latent user-sized lists recorded as findings 21/22 (`ayahsByIds` fed by one folder's bookmarks; `hadith_store.byNumbers` fed by hadith bookmarks); the rest are bounded.
+- **Accounting:** **17 fixed**, **1 withdrawn** as a false positive (#4), **2 not proven** (#13, #15), **1 open** (#1b), **2 latent** added by the sweep (21, 22).
+- **Gates at the tip (`d07f6820`):** format **0** · analyze **0** · suite **1931/1931**; CI analyze-test 6m21s green.
+- **Next:** **#1b diagnosis first** — what cleared 32 alarms on the same boot; no re-arm code before that answer.
