@@ -1,0 +1,41 @@
+import 'package:flutter/services.dart';
+
+/// What the OS currently holds for the scheduled reminders.
+///
+/// The binding trusts a plan fingerprint within one boot, but an external
+/// clear (force stop, an OEM battery manager) removes the alarms without
+/// changing anything the fingerprint can see. This probe asks the platform
+/// whether a given notification id still has its `PendingIntent` registered.
+abstract interface class ReminderAlarmProbe {
+  /// True when the OS still holds the alarm with [notificationId].
+  ///
+  /// Throws when the platform cannot answer; the caller treats that as
+  /// "unknown" and re-arms, which is safe because a re-arm is idempotent.
+  Future<bool> alarmExists(int notificationId);
+
+  /// The reason the previous process ended, as the platform reports it, or
+  /// null when the platform cannot tell.
+  Future<String?> lastExitReason();
+}
+
+/// The production bridge to the Android diagnostics channel.
+class PlatformReminderAlarmProbe implements ReminderAlarmProbe {
+  /// Creates the probe over the app's diagnostics channel.
+  const PlatformReminderAlarmProbe();
+
+  static const MethodChannel channel =
+      MethodChannel('quran_yahdi/reminder_diagnostics');
+
+  @override
+  Future<bool> alarmExists(int notificationId) async {
+    final exists = await channel.invokeMethod<bool>(
+      'alarmExists',
+      <String, Object?>{'id': notificationId},
+    );
+    return exists ?? false;
+  }
+
+  @override
+  Future<String?> lastExitReason() =>
+      channel.invokeMethod<String>('lastExitReason');
+}
