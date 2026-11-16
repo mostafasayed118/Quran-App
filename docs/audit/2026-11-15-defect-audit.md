@@ -54,6 +54,24 @@ which is a separate decision.
 changing the plan re-arms the alarms. Reinstalling the app also clears the
 snapshot (not recommended).
 
+**Reproduced on the emulator (2026-11-16, A16_API36, debug build from
+`85fb1b17`):** baseline **35** `RTC_WAKEUP` alarms → `am force-stop` → **0** →
+re-launch → **0 after 30 s**. The process starts, the home loads, but the
+restored snapshot's fingerprint still matches the plan, so `_applyPlan` returns
+without scheduling. Toggling the prayer reminder off and on re-arms to 35.
+
+**Why the phone recovered once:** the earlier 32 → 0 → 37 sequence happened
+after hours, when the next-prayer window had moved, so the new plan's
+fingerprint differed and `_applyPlan` re-armed. The recovery is incidental to
+the fingerprint changing, not a detection of the cleared alarms.
+
+**Diagnosis conclusion:** the same-boot snapshot trust is what suppresses the
+re-arm; any external clear (force-stop, OEM freeze, a battery manager) leaves
+the user with zero reminders until the plan changes or a setting is touched.
+The fix needs a different signal, e.g. compare the OS's pending notification
+count with the plan on `resumed` and re-apply when it is short, or read
+`ApplicationExitInfo`; it is not a blind re-arm on every open.
+
 **Candidate fixes (next wave):**
 1. A small Android method channel returning
    `ApplicationExitInfo.getHistoricalProcessExitReasons()` and forcing one
