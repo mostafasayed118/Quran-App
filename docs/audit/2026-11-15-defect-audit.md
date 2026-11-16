@@ -72,6 +72,26 @@ The fix needs a different signal, e.g. compare the OS's pending notification
 count with the plan on `resumed` and re-apply when it is short, or read
 `ApplicationExitInfo`; it is not a blind re-arm on every open.
 
+**Fix and its verified behaviour (branch `wave/1b-alarm-probe`):**
+
+- The binding probes two upcoming alarms through `PendingIntent.getBroadcast(
+  FLAG_NO_CREATE)` with the plugin's exact identity (request code = the
+  notification id, `ScheduledNotificationReceiver`, no action/data — read from
+  `flutter_local_notifications` 22.3.2), and re-applies when either is gone.
+  A `MissingPluginException` (a background isolate has no channel) skips the
+  probe; any other probe failure re-arms.
+- `ApplicationExitInfo` (10/11/13) is a helper signal read at `init`; the
+  forced re-arm is consumed only by a successful apply.
+- Emulator evidence (A16, debug build): 33 alarms → `am force-stop` → relaunch
+  **33** (`force=true`); a normal resume leaves 33 with `alive=true` (no
+  re-arm); `am kill` leaves the 33 alarms untouched — only force-stop clears
+  them.
+- **Inherent limit (recorded):** after a force stop the app is silent until it
+  is opened once. Closing that gap needs a boot/package-replaced receiver or an
+  external monitor, a separate decision that adds a permission and native code.
+- **Still pending:** the same probe on the Infinix (phone disconnected at the
+  time of the emulator run).
+
 **Candidate fixes (next wave):**
 1. A small Android method channel returning
    `ApplicationExitInfo.getHistoricalProcessExitReasons()` and forcing one
