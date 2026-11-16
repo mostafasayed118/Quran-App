@@ -33,6 +33,7 @@ import 'package:quran_yahdi/core/domain/version_ack_store.dart';
 import 'package:quran_yahdi/core/domain/version_policy_source.dart';
 import 'package:quran_yahdi/core/l10n/app_locale_controller.dart';
 import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
+import 'package:quran_yahdi/core/platform/reminder_alarm_probe.dart';
 import 'package:quran_yahdi/core/theme/app_theme_controller.dart';
 import 'package:quran_yahdi/core/theme/prayer_skin_controller.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';

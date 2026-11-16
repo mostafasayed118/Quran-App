@@ -107,8 +107,10 @@ void _registerPrayerAndNotifications(
       () => getIt<ReminderSettings>());
   getIt.registerLazySingleton<ReminderRescheduler>(
       () => getIt<ReminderSettings>());
-  getIt.registerLazySingleton<NotificationsBinding>(
-      () => NotificationsBinding(store: getIt<ReminderPlanStore>()));
+  getIt.registerLazySingleton<NotificationsBinding>(() => NotificationsBinding(
+        store: getIt<ReminderPlanStore>(),
+        alarmProbe: const PlatformReminderAlarmProbe(),
+      ));
   getIt.registerLazySingleton<ReminderPlanStore>(
       () => DriftReminderPlanStore(getIt<AppDatabase>()));
   getIt.registerLazySingleton<PreAdhanCanceller>(

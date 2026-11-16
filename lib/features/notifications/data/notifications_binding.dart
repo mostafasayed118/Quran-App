@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/pre_adhan_canceller.dart';
@@ -580,6 +581,11 @@ class NotificationsBinding extends ChangeNotifier
     for (final reminder in upcoming.take(2)) {
       try {
         if (!await probe.alarmExists(reminder.id)) return false;
+      } on MissingPluginException {
+        // A background isolate (the scheduled worker) has no MainActivity to
+        // answer the channel: absence of the channel is not evidence that the
+        // alarms are gone, so it must not force a re-arm.
+        return true;
       } on Object catch (error, stackTrace) {
         appLog('reminder alarm probe failed',
             name: 'quran_yahdi/reminders',
