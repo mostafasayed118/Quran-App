@@ -24,7 +24,7 @@ subproject and iOS were not audited.
 | 10 | Azkar favourite tapped during the cold-start hydration is overwritten by the read | medium | D | **merged** (`fbe78581`, PR #61): the toggled ids are replayed over the read instead of overwriting it; both add and remove directions are covered |
 | 11 | Overlapping qada saves revert to a snapshot older than a newer committed save | medium | D | **merged** (`fbe78581`, PR #61): writes are serialized and each computes from the last saved list; a failure reverts to it, not to a pre-mutation snapshot |
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **merged** (`fbe78581`, PR #61): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
-| 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **not proven**: the cubit already drops duplicate reports, so the writes are one last-read + one wird advance per **distinct leading ayah** (a fling past N cards costs N pairs), not per frame and not 150–300 per fling. No device frame measurement was possible (phone disconnected); recorded instead of changed on faith |
+| 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **closed — not a defect**: the cubit drops duplicate reports (one write per distinct leading ayah, not per frame), the DB runs on a background isolate (`connection.dart:296`), so no write blocks a UI frame. A burst test (30 callbacks / 7 ayahs) pins end-state = 7; no code change |
 | 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
 | 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | **fixed** (CI step): `analyze-test` now runs `prayer_time_service_dst_test.dart` under `TZ=Africa/Cairo`, so the 25-hour DST-end day exercises the guard instead of collapsing to UTC arithmetic. Non-vacuity proven (reverting `nextPrayerAfter` to `+Duration(days:1)` fails both assertions under that zone). No Dart code change |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | **fixed** (Wave E PR): the four id constants are pinned to 1–4 |
@@ -32,8 +32,8 @@ subproject and iOS were not audited.
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
 | 19 | Library shows pack size "٢.٠ م.ب" (double `toString`) | low | E | **fixed** (Wave E PR): `formatMegabytesValue` keeps a whole MB whole and a fraction to one decimal |
 | 20 | README says 1450 tests; the suite is 1877+ | low | E | **fixed** (Wave E PR): refreshed to the current suite count |
-| 21 | A folder with more than 999 bookmarks builds an `IN` list of that many SQL variables (`ayahsByIds`) | low (latent, post-audit) | — | **recorded, not fixed**: needs a power user past the engine limit; found by the Wave E sweep |
-| 22 | More than 999 hadith bookmarks build the same kind of `IN` list (`hadith_store.byNumbers`) | low (latent, post-audit) | — | **recorded, not fixed**: same bound |
+| 21 | A folder with more than 999 bookmarks builds an `IN` list of that many SQL variables (`ayahsByIds`) | low (latent, post-audit) | — | **fixed**: IN lists split into 999-sized batches; a `QueryInterceptor` test emulating Android's 999-variable ceiling fails with "too many SQL variables" if batching is disabled |
+| 22 | More than 999 hadith bookmarks build the same kind of `IN` list (`hadith_store.byNumbers`) | low (latent, post-audit) | — | **fixed**: same batching, with re-merge by ordinal so book order survives; same non-vacuous ceiling test |
 
 ## Open finding 1b — force-stop vs. the boot id
 
@@ -491,3 +491,55 @@ probe. This proves the CI step would catch a real regression.
 2/2 pass; full gates re-run on the branch; CI `analyze-test` (incl. the new
 Cairo step) green before merge. Merge is PM/owner-gated — this wave does not
 merge `main`.
+
+---
+
+## Final close-out (wave `wave/remaining-trio`, 2026-11-16)
+
+### #21 / #22 — IN-list ceiling — FIXED
+
+`AyahRepository.ayahsByIds` and `HadithStore.byNumbers` split their `IN` lists
+into batches of 999 (`kMaxSqlVariables`, `core/db/sql_batching.dart`); `byNumbers`
+re-merges by `ordinal` so book order survives the split. The batch size is an
+injectable constructor argument for tests. A `QueryInterceptor`
+(`newLimitedVarDb`) throws on any statement over a small variable count,
+emulating Android's `SQLITE_MAX_VARIABLE_NUMBER = 999` on this host's larger
+SQLite. With batching disabled, both tests fail with "too many SQL variables" —
+they are non-vacuous, not result-only checks.
+
+### #13 — reader write jank — CLOSED, NOT A DEFECT
+
+The finding's premise (a write per frame / 150–300 per fling) was wrong:
+`ReaderCubit.onVisibleAyah` drops repeated reports of the same leading ayah, so
+the cost is one write per DISTINCT ayah. More importantly, the DB is opened via
+`NativeDatabase.createInBackground` (`core/db/connection.dart:296`) — every SQL
+statement runs on a background isolate, so no per-ayah write can block a UI
+frame. `test/reader_visible_ayah_burst_test.dart` drives 30 callbacks across 7
+ayahs and pins the final marker. No production code changed: there is no
+frame-blocking path to fix.
+
+### #1b inherent limit — ACCEPTED, NO RECEIVER
+
+The silent-until-first-open gap after a **force stop** cannot be closed from
+inside the app, so no boot/package-replaced receiver was added:
+
+- The app already declares `RECEIVE_BOOT_COMPLETED` and depends on `workmanager`,
+  whose library-declared boot receiver rebuilds the reminder window from the DB
+  on a normal reboot — that is finding #1's fix. There is no missing receiver
+  for the reboot case.
+- Force stop puts the app in Android's **stopped state** (since API 3.1).
+  Stopped apps receive **no implicit broadcasts**, including `BOOT_COMPLETED`,
+  until the user launches them. A new `BOOT_COMPLETED` /
+  `MY_PACKAGE_REPLACED` receiver would therefore not fire in the exact case it
+  is meant to fix, and would be dead code plus an extra permission.
+- The only mechanisms that can survive a force stop are external to the app
+  (a separate always-running monitor, or the user opening the app). Both are
+  out of this app's scope.
+
+The fix already lands on the first foreground open — that is the maximum
+reachable without an external monitor. Recorded as an accepted platform limit,
+not a pending code item.
+
+**Wave accounting:** #21/#22 fixed, #13 closed as not-a-defect, #1b limit
+accepted. No production behavior changed for #13/#1b; the only runtime change
+is the two batched lookups.
