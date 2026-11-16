@@ -42,6 +42,13 @@ jobs:
       - run: flutter analyze
       - run: dart format --output=none --set-exit-if-changed lib test tools
       - run: flutter test
+      # The DST regression test computes in the HOST time zone. On the UTC
+      # runner, `DateTime(y,m,d+1)` and `+24h` are equivalent, so the test is
+      # vacuous there and cannot catch a regression. Run it once with Cairo's
+      # zone so a 25-hour DST-end day actually exercises the guard. Scoped to
+      # this one file so a UTC assumption elsewhere in the suite is untouched.
+      - name: DST regression (Africa/Cairo host)
+        run: TZ=Africa/Cairo flutter test test/prayer_time_service_dst_test.dart
 
   # DEBUG-SIGNED ARTIFACTS ONLY. This job is gated on analyze-test and its
   # outputs are deliberately named `debug-signed-*`: android/key.properties is

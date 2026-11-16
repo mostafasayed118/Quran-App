@@ -26,7 +26,7 @@ subproject and iOS were not audited.
 | 12 | Splash progress controller repeats for the app lifetime | medium (battery) | D | **merged** (`fbe78581`, PR #61): the looping bar is stopped when the overlay is dismissed; the probe checks that no frame is scheduled after the fade |
 | 13 | Reader writes last-read + wird pointers for every ayah crossing the viewport | medium (jank) | D | **not proven**: the cubit already drops duplicate reports, so the writes are one last-read + one wird advance per **distinct leading ayah** (a fling past N cards costs N pairs), not per frame and not 150–300 per fling. No device frame measurement was possible (phone disconnected); recorded instead of changed on faith |
 | 14 | Adhan selection and azkar count are not announced to TalkBack | medium (a11y) | B | **merged** (`23eee01e`, PR #59); **TalkBack verified** on the A16 emulator (row `selected=true`; card ends with «باقي ١») |
-| 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | **not closed**: the test only uses UTC instants and never names a local zone, but on a UTC host `DateTime(y,m,d+1)` and `+24h` are equivalent, so an in-process test cannot catch the regression; it needs a TZ-controlled runner. No code change |
+| 15 | The DST regression test is vacuous on the UTC CI host | medium (test gap) | E | **fixed** (CI step): `analyze-test` now runs `prayer_time_service_dst_test.dart` under `TZ=Africa/Cairo`, so the 25-hour DST-end day exercises the guard instead of collapsing to UTC arithmetic. Non-vacuity proven (reverting `nextPrayerAfter` to `+Duration(days:1)` fails both assertions under that zone). No Dart code change |
 | 16 | Frozen notification ids 1–4 are not pinned numerically | medium (test gap) | E | **fixed** (Wave E PR): the four id constants are pinned to 1–4 |
 | 17 | Translation search normalizes every installed pack on the UI isolate | medium (jank/memory) | D | **hardened, merged** (`fbe78581`, PR #61): the UI-isolate block measured 51 ms for one pack / 120 ms for three on a **desktop host, JIT, pre-fix path** (~3 frames at 60 Hz, not device-measured); the normalization now runs through `Isolate.run`, with the runner injectable for tests |
 | 18 | Tracker streak silently caps at 400 days | low | E | queued |
@@ -465,3 +465,29 @@ gates, and a draft PR. No merge without owner review.
    entries; recorded, not fixed.
 4. **Waves A–E** — merged; 13 and 15 are the only remaining not-proven items,
    and #1b is the only live defect.
+
+---
+
+## #15 close-out (wave `wave/dst-ci-tz`, 2026-11-16)
+
+**Fix:** `.github/workflows/ci.yml` — the `analyze-test` job now runs
+`flutter test test/prayer_time_service_dst_test.dart` with `TZ=Africa/Cairo`
+in addition to the normal UTC suite. The step is scoped to that one file, so a
+UTC assumption elsewhere is untouched. No Dart code changed.
+
+**Why the runner, not an in-process test:** `withClock` controls `DateTime.now()`
+but not the process time zone, and the `timezone` package builds `TZDateTime`
+without changing what `DateTime(y,m,d)` means locally. A TZ-controlled runner
+is the only way to make the host-zone arithmetic meaningful.
+
+**Non-vacuity proof (host already on Egypt TZ):** temporarily reverting
+`nextPrayerAfter` from `DateTime(day.year, day.month, day.day + 1)` back to
+`day.add(const Duration(days: 1))` made **both** assertions in
+`prayer_time_service_dst_test.dart` fail on the 2026-10-29 DST-end day; the
+current code makes both pass. The change was reverted immediately after the
+probe. This proves the CI step would catch a real regression.
+
+**Verification:** local `flutter test test/prayer_time_service_dst_test.dart`
+2/2 pass; full gates re-run on the branch; CI `analyze-test` (incl. the new
+Cairo step) green before merge. Merge is PM/owner-gated — this wave does not
+merge `main`.
