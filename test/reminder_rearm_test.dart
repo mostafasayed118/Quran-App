@@ -17,12 +17,16 @@ class _Probe implements ReminderAlarmProbe {
 
   bool exists = true;
   bool throws = false;
+  bool throwsMissingPlugin = false;
   String? exitReason;
   int probes = 0;
 
   @override
   Future<bool> alarmExists(int notificationId) async {
     probes++;
+    if (throwsMissingPlugin) {
+      throw MissingPluginException('no channel in a background isolate');
+    }
     if (throws) throw StateError('probe failed');
     return exists;
   }
@@ -42,6 +46,18 @@ class _MemoryStore implements ReminderPlanStore {
 
   @override
   Future<void> clear() async => snapshot = null;
+}
+
+class _ThrowingWriteStore implements ReminderPlanStore {
+  @override
+  Future<ReminderPlanSnapshot?> read() async => null;
+
+  @override
+  Future<void> write(ReminderPlanSnapshot next) async =>
+      throw StateError('store write failed');
+
+  @override
+  Future<void> clear() async {}
 }
 
 ScheduledReminder _reminder(int id) => ScheduledReminder(
@@ -88,8 +104,8 @@ void main() {
   int zonedCalls() => calls.where((c) => c.method == 'zonedSchedule').length;
 
   Future<NotificationsBinding> build({
-    required _Probe probe,
-    required _MemoryStore store,
+    required ReminderAlarmProbe probe,
+    required ReminderPlanStore store,
   }) async {
     final binding = NotificationsBinding(
       plugin: FlutterLocalNotificationsPlugin(),
@@ -170,5 +186,58 @@ void main() {
     await healthy.scheduleAll(plan);
     expect(zonedCalls(), baseline + 2,
         reason: 'the flag is consumed by the successful apply');
+  });
+
+  test('a MissingPluginException from the probe is not a rearm', () async {
+    // Expected behaviour before the fix: PASS. A background isolate has no
+    // MainActivity to answer the channel, so absence of a reply is not
+    // evidence that the alarms are gone.
+    final plan = [_reminder(1000), _reminder(1003)];
+    final probe = _Probe();
+    final binding = await build(probe: probe, store: _MemoryStore());
+    await binding.scheduleAll(plan);
+    final first = zonedCalls();
+
+    probe.throwsMissingPlugin = true;
+    await binding.scheduleAll(plan);
+
+    expect(zonedCalls(), first,
+        reason:
+            'no MainActivity in a background isolate must not force a rearm');
+  });
+
+  test('a null alarmExists reply throws instead of meaning "missing"',
+      () async {
+    // Expected behaviour before the fix: FAIL. Old code returns false via
+    // `exists ?? false`, silently conflating "unknown" with "missing".
+    const probeChannel = MethodChannel('quran_yahdi/reminder_diagnostics');
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(probeChannel, (call) async => null);
+    addTearDown(() {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(probeChannel, null);
+    });
+
+    await expectLater(
+      const PlatformReminderAlarmProbe().alarmExists(1000),
+      throwsA(isA<StateError>()),
+    );
+  });
+
+  test('a failed store write keeps the plan re-appliable', () async {
+    // Expected behaviour before the fix: FAIL. Old code clears the rearm flag
+    // and stores the fingerprint before the write, so a throwing write leaves
+    // in-memory state claiming "applied" and the next identical plan no-ops.
+    final plan = [_reminder(1000), _reminder(1003)];
+    final binding = await build(probe: _Probe(), store: _ThrowingWriteStore());
+
+    await binding.scheduleAll(plan);
+    final first = zonedCalls();
+    expect(first, 2);
+
+    await binding.scheduleAll(plan);
+
+    expect(zonedCalls(), first + 2,
+        reason: 'a failed plan write must leave the signal for retry');
   });
 }
