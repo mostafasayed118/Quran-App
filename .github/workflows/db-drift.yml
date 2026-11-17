@@ -7,7 +7,7 @@ name: db-drift
 # It runs on Windows because that is the platform that produces the committed
 # artifact, so the comparison has one fewer variable (the platform SQLite
 # build). The generator was proven byte-identical across three runs on Windows
-# (SHA-256 9EC04B54…1C2DA846, 4,173,824 B).
+# (SHA-256 9EC04B54…1C2DA846, 5,574,656 B).
 
 on:
   push:

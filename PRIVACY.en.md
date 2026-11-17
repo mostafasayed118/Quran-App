@@ -34,7 +34,7 @@ Everything the app stores stays **on your device only**, inside the app's privat
 - Your bookmarks and last-read position.
 - The audio files and text packs you downloaded.
 - Your worship-tracker and tasbih logs.
-- You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process. That backup file is an unencrypted JSON file, so store and share it with care.
+- You can manually export your data to a file from Settings; the file goes only to the destination you choose — nothing is sent to any server in the process. Backups may be exported as plain JSON or protected with a passphrase (AES-256-GCM); if you choose the encrypted option, keep the passphrase safe. Store and share either file with care.
 
 Uninstalling the app permanently deletes all of it. We keep no copy.
 
