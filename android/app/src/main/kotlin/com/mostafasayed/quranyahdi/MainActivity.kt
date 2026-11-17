@@ -36,10 +36,23 @@ class MainActivity : AudioServiceActivity() {
             REMINDER_DIAGNOSTICS_CHANNEL,
         ).setMethodCallHandler { call, result ->
             when (call.method) {
-                "notificationsEnabled" ->
-                    result.success(NotificationManagerCompat.from(this).areNotificationsEnabled())
+                "notificationsEnabled" -> {
+                    try {
+                        result.success(
+                            NotificationManagerCompat.from(this).areNotificationsEnabled(),
+                        )
+                    } catch (error: Exception) {
+                        result.error("probe_failed", error.message, null)
+                    }
+                }
 
-                "exactAlarmsAllowed" -> result.success(exactAlarmsAllowed())
+                "exactAlarmsAllowed" -> {
+                    try {
+                        result.success(exactAlarmsAllowed())
+                    } catch (error: Exception) {
+                        result.error("probe_failed", error.message, null)
+                    }
+                }
 
                 "batteryOptimizationIgnored" -> result.success(batteryOptimizationIgnored())
 
@@ -54,7 +67,15 @@ class MainActivity : AudioServiceActivity() {
                     if (id == null) {
                         result.error("bad_args", "id is required", null)
                     } else {
-                        result.success(alarmExists(id))
+                        // Always reply: a native throw before `result` leaves
+                        // Dart's invokeMethod waiting forever and the apply
+                        // guard stuck. An error is treated as "unknown" and
+                        // re-armed on the Dart side, which is idempotent.
+                        try {
+                            result.success(alarmExists(id))
+                        } catch (error: Exception) {
+                            result.error("probe_failed", error.message, null)
+                        }
                     }
                 }
 
