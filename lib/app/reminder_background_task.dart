@@ -145,7 +145,7 @@ Future<void> updateHomeWidgetFromState() async {
     if (city == null) return;
     final next = getIt<PrayerTimesPort>().nextPrayer(
       city.coordinates,
-      DateTime.now(),
+      cityWallClock(DateTime.now(), city.timezone),
     );
     final loc = platformLocalizations();
     await getIt<HomeWidgetUpdater>().update(

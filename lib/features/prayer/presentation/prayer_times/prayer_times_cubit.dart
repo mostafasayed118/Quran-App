@@ -6,6 +6,7 @@ import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
+import 'package:quran_yahdi/core/utils/city_clock.dart';
 
 import 'prayer_times_state.dart';
 
@@ -98,7 +99,9 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
       emit(const PrayerTimesState.ready());
       return;
     }
-    final now = _clock();
+    // Use the city's calendar day (real instant preserved) so "today's
+    // prayers" and the next prayer stay correct when device TZ != city TZ.
+    final now = cityWallClock(_clock(), selected.timezone);
     final next = _prayer.nextPrayer(selected.coordinates, now);
     final entries = <PrayerEntry>[
       for (final choice in _prayer.today(selected.coordinates, now))

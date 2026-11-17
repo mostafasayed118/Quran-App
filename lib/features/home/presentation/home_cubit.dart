@@ -116,7 +116,12 @@ class HomeCubit extends Cubit<HomeState> {
   Future<NextPrayerCard?> _loadNextPrayerCard() async {
     final selected = await _city.selectedCity();
     if (selected == null) return null;
-    final next = _prayer.nextPrayer(selected.coordinates, DateTime.now());
+    // Build the schedule from the city's calendar date, not the device's:
+    // near midnight the two differ and the device date is up to 24 h off.
+    // cityWallClock keeps the real instant (for the isAfter comparison) while
+    // giving the city's year/month/day (for the day the schedule is built for).
+    final cityNow = cityWallClock(DateTime.now(), selected.timezone);
+    final next = _prayer.nextPrayer(selected.coordinates, cityNow);
     return (
       name: next.name,
       time: next.time,

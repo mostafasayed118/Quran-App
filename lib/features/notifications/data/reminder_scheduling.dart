@@ -7,6 +7,7 @@ import 'package:quran_yahdi/core/l10n/app_localizations_digits.dart';
 import 'package:quran_yahdi/core/l10n/platform_localizations.dart';
 import 'package:quran_yahdi/core/l10n/prayer_names.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
+import 'package:quran_yahdi/core/utils/city_clock.dart';
 
 import 'reminder_planner.dart';
 
@@ -31,7 +32,11 @@ Future<List<ScheduledReminder>> scheduleReminders({
 }) async {
   try {
     final selected = await city.selectedCity();
-    final nowLocal = now ?? DateTime.now();
+    // The plan's calendar day must come from the selected city's zone: near
+    // midnight the device date can be a day off. cityWallClock preserves the
+    // real instant (all isAfter/difference checks stay correct) while giving
+    // the city's year/month/day to the prayer calculation.
+    final nowLocal = cityWallClock(now ?? DateTime.now(), selected?.timezone);
     final todayPrayers = selected == null
         ? const <PrayerChoice>[]
         : prayer.today(selected.coordinates, nowLocal);
