@@ -6,6 +6,12 @@ import 'package:quran_yahdi/core/domain/prayer_name.dart';
 
 void main() {
   group('catalog integrity', () {
+    test('ships only the sped-up Madinah adhan', () {
+      expect(kAdhanCatalog, hasLength(1));
+      expect(kAdhanCatalog.single.id, 'madinah_ejaz215_x125');
+      expect(kDefaultAdhanId, 'madinah_ejaz215_x125');
+    });
+
     test('ids are unique, lowercase and raw-resource safe', () {
       final ids = kAdhanCatalog.map((track) => track.id).toList();
       expect(ids.toSet().length, ids.length, reason: 'ids must be unique');
@@ -57,34 +63,35 @@ void main() {
     });
 
     test('a known id resolves to itself', () {
-      final second = kAdhanCatalog[1];
-      expect(adhanById(second.id).id, second.id);
+      final shipped = kAdhanCatalog.first;
+      expect(adhanById(shipped.id).id, shipped.id);
     });
 
-    test('fajr takes the override, other prayers take the global', () {
+    test('fajr and other prayers resolve to the single shipped voice', () {
+      final id = kDefaultAdhanId;
       expect(
         adhanIdForPrayer(
           prayer: PrayerName.fajr,
-          globalId: 'omar_hisham',
-          fajrId: 'khushu',
+          globalId: id,
+          fajrId: id,
         ),
-        'khushu',
+        id,
       );
       expect(
         adhanIdForPrayer(
           prayer: PrayerName.fajr,
-          globalId: 'omar_hisham',
+          globalId: id,
           fajrId: null,
         ),
-        'omar_hisham',
+        id,
       );
       expect(
         adhanIdForPrayer(
           prayer: PrayerName.isha,
-          globalId: 'omar_hisham',
-          fajrId: 'khushu',
+          globalId: id,
+          fajrId: id,
         ),
-        'omar_hisham',
+        id,
       );
     });
 
@@ -92,10 +99,10 @@ void main() {
       expect(
         adhanIdForPrayer(
           prayer: PrayerName.fajr,
-          globalId: 'omar_hisham',
+          globalId: kDefaultAdhanId,
           fajrId: 'removed_in_a_future_build',
         ),
-        'omar_hisham',
+        kDefaultAdhanId,
       );
     });
   });

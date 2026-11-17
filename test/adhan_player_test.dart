@@ -49,34 +49,35 @@ void main() {
   test('playing the adhan stops recitation first', () async {
     final player = build();
 
-    await player.play('khushu');
+    await player.play('madinah_ejaz215_x125');
 
     expect(log, [
       'control:stop',
-      'control:play:assets/audio/adhan/khushu.m4a',
+      'control:play:assets/audio/adhan/madinah_ejaz215_x125.m4a',
     ]);
   });
 
   test('preview plays the clip, not the full adhan', () async {
     final player = build();
 
-    await player.preview('khushu');
+    await player.preview('madinah_ejaz215_x125');
 
-    expect(log.last, 'control:play:assets/audio/adhan/clips/khushu_clip.m4a');
+    expect(log.last,
+        'control:play:assets/audio/adhan/clips/madinah_ejaz215_x125_clip.m4a');
   });
 
   test('a second preview replaces the first instead of stacking', () async {
     final player = build();
 
-    await player.preview('khushu');
-    await player.preview('omar_hisham');
+    await player.preview('madinah_ejaz215_x125');
+    await player.preview('madinah_ejaz215_x125');
 
     // One stop per preview: the first audition is silenced before the second
     // starts, so the two never mix.
     expect(log.where((entry) => entry == 'control:stop'), hasLength(2));
     expect(
       log.last,
-      'control:play:assets/audio/adhan/clips/omar_hisham_clip.m4a',
+      'control:play:assets/audio/adhan/clips/madinah_ejaz215_x125_clip.m4a',
     );
   });
 
@@ -85,14 +86,15 @@ void main() {
     final gate = Completer<bool>();
     final player = build(ready: () => gate.future);
 
-    final pending = player.play('khushu');
+    final pending = player.play('madinah_ejaz215_x125');
     await Future<void>.delayed(Duration.zero);
     expect(log, isEmpty, reason: 'must not touch audio before readiness');
 
     gate.complete(true);
     await pending;
 
-    expect(log.last, 'control:play:assets/audio/adhan/khushu.m4a');
+    expect(
+        log.last, 'control:play:assets/audio/adhan/madinah_ejaz215_x125.m4a');
   });
 
   test('a plugin that hangs does not queue the request forever', () async {
@@ -104,7 +106,9 @@ void main() {
       readyTimeout: const Duration(milliseconds: 20),
     );
 
-    await player.play('khushu').timeout(const Duration(seconds: 2));
+    await player
+        .play('madinah_ejaz215_x125')
+        .timeout(const Duration(seconds: 2));
 
     expect(log, isEmpty);
     expect(player.stateNow.status, AdhanPlaybackStatus.idle);
@@ -115,7 +119,7 @@ void main() {
     final player = build();
     control.failNext = true;
 
-    await expectLater(player.play('khushu'), completes);
+    await expectLater(player.play('madinah_ejaz215_x125'), completes);
 
     expect(player.stateNow.status, AdhanPlaybackStatus.idle);
   });
@@ -123,7 +127,7 @@ void main() {
   test('a plugin that never became ready leaves the player idle', () async {
     final player = build(ready: () async => false);
 
-    await player.play('khushu');
+    await player.play('madinah_ejaz215_x125');
 
     expect(log, isEmpty);
     expect(player.stateNow.status, AdhanPlaybackStatus.idle);

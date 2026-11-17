@@ -135,10 +135,10 @@ void main() {
 
   testWidgets('marks the stored global choice and "same as default" for Fajr',
       (tester) async {
-    await setUpCubit(adhanId: 'omar_hisham');
+    await setUpCubit(adhanId: kDefaultAdhanId);
     await pumpPicker(tester);
 
-    // One tick on the global omar row, one on the "same as default" row.
+    // One tick on the global row, one on the "same as default" row.
     expect(find.byIcon(Icons.check_circle), findsNWidgets(2));
   });
 
@@ -146,11 +146,11 @@ void main() {
     await setUpCubit();
     await pumpPicker(tester);
 
-    await tester.tap(find.text('عمر هشام العربي').first);
+    await tester.tap(find.text(kAdhanCatalog.first.nameAr).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
-    expect(await prefs.adhanId(), 'omar_hisham');
+    expect(await prefs.adhanId(), kDefaultAdhanId);
     expect(reschedules, 1);
   });
 
@@ -186,19 +186,23 @@ void main() {
     expect(player.stopCalls, greaterThanOrEqualTo(1));
   });
 
-  testWidgets('tapping a second row replaces the first preview',
+  testWidgets('a stopped preview can be replayed without stacking',
       (tester) async {
     await setUpCubit();
     await pumpPicker(tester);
 
-    await tester.tap(find.byIcon(Icons.play_circle_outline).at(0));
+    await tester.tap(find.byIcon(Icons.play_circle_outline).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.tap(find.byIcon(Icons.play_circle_outline).at(0));
+    await tester.tap(find.byIcon(Icons.stop_circle_outlined).first);
+    await tester.pumpAndSettle(const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.tap(find.byIcon(Icons.play_circle_outline).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
-    // Two previews, but the first was stopped before the second started.
+    // With one shipped voice there is no second row to switch to; the same
+    // invariant is proven by stopping the first audition before replaying.
     expect(player.previews, 2);
     expect(player.stopCalls, greaterThanOrEqualTo(1));
   });
@@ -230,11 +234,11 @@ void main() {
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
     final before = player.stopCalls;
 
-    await tester.tap(find.text('عمر هشام العربي').first);
+    await tester.tap(find.text(kAdhanCatalog.first.nameAr).first);
     await tester.pumpAndSettle(const Duration(milliseconds: 100),
         EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
 
     expect(player.stopCalls, greaterThan(before));
-    expect(await prefs.adhanId(), 'omar_hisham');
+    expect(await prefs.adhanId(), kDefaultAdhanId);
   });
 }

@@ -959,6 +959,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get licensesAudio => 'التلاوات الصوتية — mp3quran.net';
 
   @override
+  String get licensesAdhan => 'أذان المسجد النبوي (ejaz215) — CC BY 3.0';
+
+  @override
+  String get licensesAdhanTerms => 'الإسناد والتعديلات (تسريع 1.25×)';
+
+  @override
   String get licensesFontsSection => 'الخطوط';
 
   @override

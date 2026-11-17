@@ -1,0 +1,23 @@
+Adhan audio — attribution and licence
+=====================================
+
+Source file: "33937 ejaz215 call-to-prayer-from-the-prophet-s-mo.ogg"
+Source page: https://commons.wikimedia.org/wiki/File:33937_ejaz215_call-to-prayer-from-the-prophet-s-mo.ogg
+Uploader / credited creator: ejaz215 (uploaded 18 October 2014)
+Licence: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+Licence URL: https://creativecommons.org/licenses/by/3.0/
+Retrieved: 2026-11-16
+
+Changes made by this application
+--------------------------------
+- playback speed increased to 1.25x (ffmpeg atempo=1.25), baked into the file
+  so the Android notification sound and the full playback match;
+- re-encoded to 64 kbit/s mono AAC at 44.1 kHz;
+- a 25-second notification clip was cut from the beginning with a 2-second
+  fade-out and copied to Android res/raw for the notification channel.
+
+The modified audio is distributed under the same CC BY 3.0 terms.
+
+Exact attribution to reproduce in app listings or credits:
+"Adhan from Masjid an-Nabawi (Madinah) by ejaz215, CC BY 3.0; modified:
+1.25x speed, re-encoded to mono AAC, trimmed to 25 s."

@@ -9,6 +9,15 @@ import 'support/host.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // The adhan attribution tile lengthens the list; a default 800x600 surface
+  // leaves the fonts section unmounted in a ListView.
+  Future<void> pumpTallLicenses(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await pumpAppHost(tester, home: const LicensesScreen());
+  }
+
   test('the HafsSmart EULA asset ships with the app', () async {
     final text =
         await rootBundle.loadString('assets/licenses/HafsSmart-EULA.txt');
@@ -33,7 +42,7 @@ void main() {
 
   testWidgets('the screen lists the shipped content and font sources',
       (tester) async {
-    await pumpAppHost(tester, home: const LicensesScreen());
+    await pumpTallLicenses(tester);
     expect(find.text('التراخيص والمصادر'), findsOneWidget);
     expect(find.textContaining('QuranEnc.com'), findsOneWidget);
     expect(find.textContaining('بيكثال'), findsOneWidget);
@@ -44,10 +53,10 @@ void main() {
 
   testWidgets('opening the HafsSmart terms shows the embedded EULA',
       (tester) async {
-    await pumpAppHost(tester, home: const LicensesScreen());
+    await pumpTallLicenses(tester);
 
-    // The list grew with the Tanzil attribution tile, so the fonts section is
-    // below the fold on the 800x600 test surface.
+    // The attribution tiles lengthen the list; the tall surface keeps the
+    // fonts section mounted for the tap.
     await tester.ensureVisible(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));
     await tester.pump();
     await tester.tap(find.text('عرض اتفاقية ترخيص خط Hafs Smart'));

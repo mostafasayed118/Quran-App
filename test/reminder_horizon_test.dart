@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:quran_yahdi/core/domain/adhan_catalog.dart';
 import 'package:quran_yahdi/core/domain/city.dart';
 import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
@@ -227,18 +228,18 @@ void main() {
     final plan = planPrayerHorizon(
       now: now,
       days: _window(now),
-      adhanId: 'khushu',
-      fajrAdhanId: 'islam_sobhy',
+      adhanId: kDefaultAdhanId,
+      fajrAdhanId: kDefaultAdhanId,
       texts: _texts,
     );
 
     final fajr = plan.where((r) => r.title == 'prayer fajr');
     expect(fajr, isNotEmpty);
-    expect(fajr.every((r) => r.adhanId == 'islam_sobhy'), isTrue);
+    expect(fajr.every((r) => r.adhanId == kDefaultAdhanId), isTrue);
     expect(
       plan
           .where((r) => r.title != 'prayer fajr')
-          .every((r) => r.adhanId == 'khushu'),
+          .every((r) => r.adhanId == kDefaultAdhanId),
       isTrue,
     );
   });

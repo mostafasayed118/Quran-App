@@ -21,6 +21,8 @@ class LicensesScreen extends StatelessWidget {
   static const String _meQuranTerms = 'assets/licenses/me_quran-terms.txt';
   static const String _cairoOfl = 'assets/fonts/Cairo-OFL.txt';
   static const String _tanzilTerms = 'assets/licenses/tanzil-quran-uthmani.txt';
+  static const String _adhanAttribution =
+      'assets/licenses/adhan-attribution.txt';
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,12 @@ class LicensesScreen extends StatelessWidget {
                 icon: Icons.library_books_outlined, text: loc.licensesBukhari),
             _InfoTile(icon: Icons.spa_outlined, text: loc.licensesAzkar),
             _InfoTile(icon: Icons.headphones_outlined, text: loc.licensesAudio),
+            _AssetTile(
+              icon: Icons.notifications_active_outlined,
+              title: loc.licensesAdhan,
+              action: loc.licensesAdhanTerms,
+              asset: _adhanAttribution,
+            ),
             SectionHeader(title: loc.licensesFontsSection),
             _AssetTile(
               icon: Icons.font_download_outlined,

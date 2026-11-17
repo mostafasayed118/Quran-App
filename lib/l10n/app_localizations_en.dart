@@ -962,6 +962,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get licensesAudio => 'Recitation audio — mp3quran.net';
 
   @override
+  String get licensesAdhan => 'Madinah adhan (ejaz215) — CC BY 3.0';
+
+  @override
+  String get licensesAdhanTerms => 'Attribution and changes (1.25x speed)';
+
+  @override
   String get licensesFontsSection => 'Fonts';
 
   @override

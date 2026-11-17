@@ -14,8 +14,8 @@ void main() {
 
     test('a selected track persists and round-trips', () async {
       final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
-      await prefs.setAdhanId('omar_hisham');
-      expect(await prefs.adhanId(), 'omar_hisham');
+      await prefs.setAdhanId(kDefaultAdhanId);
+      expect(await prefs.adhanId(), kDefaultAdhanId);
     });
 
     test('an unknown stored id resolves to the default', () async {
@@ -33,13 +33,13 @@ void main() {
 
     test('a stored override round-trips', () async {
       final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
-      await prefs.setFajrAdhanId('khushu');
-      expect(await prefs.fajrAdhanId(), 'khushu');
+      await prefs.setFajrAdhanId(kDefaultAdhanId);
+      expect(await prefs.fajrAdhanId(), kDefaultAdhanId);
     });
 
     test('clearing the override restores "same as default"', () async {
       final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
-      await prefs.setFajrAdhanId('khushu');
+      await prefs.setFajrAdhanId(kDefaultAdhanId);
       await prefs.setFajrAdhanId(null);
       expect(await prefs.fajrAdhanId(), isNull);
     });
@@ -55,10 +55,10 @@ void main() {
   group('isolation', () {
     test('the global and fajr choices are stored independently', () async {
       final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
-      await prefs.setAdhanId('islam_sobhy');
+      await prefs.setAdhanId(kDefaultAdhanId);
       expect(await prefs.fajrAdhanId(), isNull);
-      await prefs.setFajrAdhanId('khushu');
-      expect(await prefs.adhanId(), 'islam_sobhy');
+      await prefs.setFajrAdhanId(kDefaultAdhanId);
+      expect(await prefs.adhanId(), kDefaultAdhanId);
     });
   });
 }

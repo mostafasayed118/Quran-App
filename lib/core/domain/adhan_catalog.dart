@@ -2,9 +2,11 @@ import 'prayer_name.dart';
 
 /// One bundled adhan recording.
 ///
-/// The catalog is DATA, not code: the shipping set is still subject to rights
-/// clearance (REL-03), so a reciter must be droppable by deleting two asset
-/// files and one entry here, with no change anywhere else.
+/// The catalog is DATA, not code: the shipping set is one attribution-licensed
+/// recording (CC BY 3.0), so swapping or removing it stays a data change —
+/// delete the asset files and edit one entry here, with no change elsewhere.
+/// The 1.25x speed is baked into the file itself so the Android notification
+/// sound and the full playback match; see `assets/licenses/adhan-attribution.txt`.
 ///
 /// Reciter names live in the data rather than in ARB, following the same
 /// precedent as the city catalog (`selected_city` stores `nameAr`/`nameEn`):
@@ -49,63 +51,15 @@ class AdhanTrack {
 }
 
 /// The reciter a fresh install starts with.
-const String kDefaultAdhanId = 'abdulbasit_abdulsamad';
+const String kDefaultAdhanId = 'madinah_ejaz215_x125';
 
 /// Every bundled adhan, in picker order (the default first).
 const List<AdhanTrack> kAdhanCatalog = <AdhanTrack>[
   AdhanTrack(
     id: kDefaultAdhanId,
-    nameAr: 'عبد الباسط عبد الصمد',
-    nameEn: 'Abdul Basit Abdulsamad',
-    durationSeconds: 224,
-  ),
-  AdhanTrack(
-    id: 'ali_ahmed_mulla',
-    nameAr: 'علي أحمد ملا (الحرم المكي)',
-    nameEn: 'Ali Ahmed Mulla (Makkah)',
-    durationSeconds: 205,
-  ),
-  AdhanTrack(
-    id: 'omar_hisham',
-    nameAr: 'عمر هشام العربي',
-    nameEn: 'Omar Hisham Al Arabi',
-    durationSeconds: 180,
-  ),
-  AdhanTrack(
-    id: 'mohamed_qassas',
-    nameAr: 'محمد مروان قصاص',
-    nameEn: 'Mohamed Marwan Qassas',
-    durationSeconds: 227,
-  ),
-  AdhanTrack(
-    id: 'khushu',
-    nameAr: 'أذان تخشع له القلوب',
-    nameEn: 'A Heart-Softening Adhan',
-    durationSeconds: 211,
-  ),
-  AdhanTrack(
-    id: 'mohamed_tarek',
-    nameAr: 'محمد طارق',
-    nameEn: 'Mohamed Tarek',
-    durationSeconds: 172,
-  ),
-  AdhanTrack(
-    id: 'islam_sobhy',
-    nameAr: 'إسلام صبحي',
-    nameEn: 'Islam Sobhy',
-    durationSeconds: 172,
-  ),
-  AdhanTrack(
-    id: 'nasser_alqatami_1',
-    nameAr: 'ناصر القطامي (١)',
-    nameEn: 'Nasser Al-Qatami (1)',
-    durationSeconds: 128,
-  ),
-  AdhanTrack(
-    id: 'nasser_alqatami_2',
-    nameAr: 'ناصر القطامي (٢)',
-    nameEn: 'Nasser Al-Qatami (2)',
-    durationSeconds: 135,
+    nameAr: 'أذان المسجد النبوي — المدينة',
+    nameEn: 'Madinah (Masjid an-Nabawi) — 1.25x',
+    durationSeconds: 149,
   ),
 ];
 

@@ -1808,6 +1808,18 @@ abstract class AppLocalizations {
   /// **'التلاوات الصوتية — mp3quran.net'**
   String get licensesAudio;
 
+  /// No description provided for @licensesAdhan.
+  ///
+  /// In ar, this message translates to:
+  /// **'أذان المسجد النبوي (ejaz215) — CC BY 3.0'**
+  String get licensesAdhan;
+
+  /// No description provided for @licensesAdhanTerms.
+  ///
+  /// In ar, this message translates to:
+  /// **'الإسناد والتعديلات (تسريع 1.25×)'**
+  String get licensesAdhanTerms;
+
   /// No description provided for @licensesFontsSection.
   ///
   /// In ar, this message translates to:

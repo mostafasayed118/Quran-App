@@ -56,14 +56,14 @@ void main() {
 
   test('import restores a selected adhan and a fajr override', () async {
     await service.apply(doc(settings: {
-      'adhan_id': 'islam_sobhy',
-      'adhan_fajr_id': 'nasser_alqatami_2',
+      'adhan_id': kDefaultAdhanId,
+      'adhan_fajr_id': kDefaultAdhanId,
     }));
 
-    expect(await settingValue('adhan_id'), 'islam_sobhy');
+    expect(await settingValue('adhan_id'), kDefaultAdhanId);
     final prefs = AdhanPreferencesImpl(db);
-    expect(await prefs.adhanId(), 'islam_sobhy');
-    expect(await prefs.fajrAdhanId(), 'nasser_alqatami_2');
+    expect(await prefs.adhanId(), kDefaultAdhanId);
+    expect(await prefs.fajrAdhanId(), kDefaultAdhanId);
   });
 
   test('an unknown adhan id does not fail the restore', () async {

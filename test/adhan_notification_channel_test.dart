@@ -38,13 +38,13 @@ void main() {
         azkarEnabled: false,
         azkarTimeHm: null,
         texts: _texts,
-        adhanId: 'omar_hisham',
-        fajrAdhanId: 'khushu',
+        adhanId: kDefaultAdhanId,
+        fajrAdhanId: kDefaultAdhanId,
       );
 
       expect(plan, hasLength(1));
       expect(plan.single.id, prayerReminderId);
-      expect(plan.single.adhanId, 'omar_hisham');
+      expect(plan.single.adhanId, kDefaultAdhanId);
     });
 
     test('fajr takes the override', () {
@@ -54,12 +54,12 @@ void main() {
         azkarEnabled: false,
         azkarTimeHm: null,
         texts: _texts,
-        adhanId: 'omar_hisham',
-        fajrAdhanId: 'khushu',
+        adhanId: kDefaultAdhanId,
+        fajrAdhanId: kDefaultAdhanId,
       );
 
       expect(plan.single.fireAt, DateTime(2026, 3, 15, 4, 45));
-      expect(plan.single.adhanId, 'khushu');
+      expect(plan.single.adhanId, kDefaultAdhanId);
     });
 
     test('fajr falls back to the global choice when there is no override', () {
@@ -69,10 +69,10 @@ void main() {
         azkarEnabled: false,
         azkarTimeHm: null,
         texts: _texts,
-        adhanId: 'omar_hisham',
+        adhanId: kDefaultAdhanId,
       );
 
-      expect(plan.single.adhanId, 'omar_hisham');
+      expect(plan.single.adhanId, kDefaultAdhanId);
     });
 
     test('fajr falls back when the override names a track this build lacks',
@@ -83,11 +83,11 @@ void main() {
         azkarEnabled: false,
         azkarTimeHm: null,
         texts: _texts,
-        adhanId: 'omar_hisham',
+        adhanId: kDefaultAdhanId,
         fajrAdhanId: 'removed_in_a_future_build',
       );
 
-      expect(plan.single.adhanId, 'omar_hisham');
+      expect(plan.single.adhanId, kDefaultAdhanId);
     });
 
     test('with no adhan configured the reminder keeps the default channel', () {
@@ -115,11 +115,11 @@ void main() {
       wirdTimeHm: '20:00',
       preAdhanMinutes: 10,
       texts: _texts,
-      adhanId: 'omar_hisham',
-      fajrAdhanId: 'khushu',
+      adhanId: kDefaultAdhanId,
+      fajrAdhanId: kDefaultAdhanId,
     );
 
-    expect(byId(plan, prayerReminderId).adhanId, 'khushu');
+    expect(byId(plan, prayerReminderId).adhanId, kDefaultAdhanId);
     expect(byId(plan, azkarReminderId).adhanId, isNull);
     expect(byId(plan, wirdReminderId).adhanId, isNull);
     expect(byId(plan, preAdhanReminderId).adhanId, isNull);
@@ -135,8 +135,8 @@ void main() {
     });
 
     test('a channel is derived from the track it plays', () {
-      final track = adhanById('khushu');
-      expect(adhanChannelId(track), 'quran_yahdi_adhan_khushu');
+      final track = adhanById(kDefaultAdhanId);
+      expect(adhanChannelId(track), 'quran_yahdi_adhan_$kDefaultAdhanId');
     });
   });
 }
