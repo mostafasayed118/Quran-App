@@ -682,12 +682,9 @@ class NotificationsBinding extends ChangeNotifier
         _setApplyFailed(true);
         return;
       }
-      // Only a successful apply consumes the forced re-arm; a failed one
-      // keeps the signal for the next attempt.
-      _forceNextApply = false;
-      _appliedPlan = fingerprint;
-      _appliedExact = exact;
-      _setApplyFailed(false);
+      // Persist BEFORE consuming the rearm signal: if the write throws, the
+      // in-memory markers must still say "not applied" so the next attempt
+      // retries instead of trusting a fingerprint that never reached disk.
       await _store?.write(
         ReminderPlanSnapshot(
           fingerprint: fingerprint,
@@ -695,6 +692,10 @@ class NotificationsBinding extends ChangeNotifier
           bootId: _bootId(),
         ),
       );
+      _forceNextApply = false;
+      _appliedPlan = fingerprint;
+      _appliedExact = exact;
+      _setApplyFailed(false);
     } on Object catch (error, stackTrace) {
       // Best-effort: a failed schedule must not crash the caller, but it can
       // no longer be silent — the reliability card reads it; logcat only in
