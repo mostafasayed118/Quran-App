@@ -134,9 +134,13 @@ class MainActivity : AudioServiceActivity() {
      * the PendingIntent.
      */
     private fun alarmExists(id: Int): Boolean {
-        val intent = Intent(this, ScheduledNotificationReceiver::class.java)
+        // The plugin builds its PendingIntent with the application context;
+        // use the same one here so an Activity teardown cannot affect the
+        // probe. Identity (id / receiver / no action/data) is unchanged.
+        val context = applicationContext
+        val intent = Intent(context, ScheduledNotificationReceiver::class.java)
         val pending = PendingIntent.getBroadcast(
-            this,
+            context,
             id,
             intent,
             PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,

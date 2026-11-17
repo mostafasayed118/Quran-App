@@ -39,7 +39,13 @@ class PlatformReminderAlarmProbe implements ReminderAlarmProbe {
       'alarmExists',
       <String, Object?>{'id': notificationId},
     );
-    return exists ?? false;
+    // "No verdict" is NOT the same as "alarm missing". Throwing lets the
+    // caller's unknown-handling log it and re-arm; a silent false would
+    // erase that distinction.
+    if (exists == null) {
+      throw StateError('alarmExists returned no verdict for $notificationId');
+    }
+    return exists;
   }
 
   @override

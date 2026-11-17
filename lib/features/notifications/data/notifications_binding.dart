@@ -569,9 +569,10 @@ class NotificationsBinding extends ChangeNotifier
 
   /// True while the OS still holds the next scheduled alarms.
   ///
-  /// Two upcoming alarms are sampled rather than one: the nearest can be gone
-  /// legitimately (its time passed, a pre-adhan was cancelled). A probe error
-  /// counts as "missing" — unknown is re-armed, which is idempotent.
+  /// Two upcoming alarms are sampled, and ANY missing one triggers a rearm —
+  /// there is no tolerance for a single legitimate disappearance. A rearm is
+  /// idempotent, so a spurious rearm is cheap next to a missed reminder. A
+  /// probe error counts as "missing" for the same reason.
   Future<bool> _alarmsStillScheduled(List<ScheduledReminder> reminders) async {
     final probe = _alarmProbe;
     if (probe == null) return true;
@@ -584,7 +585,10 @@ class NotificationsBinding extends ChangeNotifier
       } on MissingPluginException {
         // A background isolate (the scheduled worker) has no MainActivity to
         // answer the channel: absence of the channel is not evidence that the
-        // alarms are gone, so it must not force a re-arm.
+        // alarms are gone, so it must not force a re-arm. Logged so a
+        // foreground registration failure is not silent.
+        appLog('reminder alarm probe unavailable in this isolate',
+            name: 'quran_yahdi/reminders');
         return true;
       } on Object catch (error, stackTrace) {
         appLog('reminder alarm probe failed',
@@ -693,7 +697,8 @@ class NotificationsBinding extends ChangeNotifier
       );
     } on Object catch (error, stackTrace) {
       // Best-effort: a failed schedule must not crash the caller, but it can
-      // no longer be silent — the reliability card and logcat both read it.
+      // no longer be silent — the reliability card reads it; logcat only in
+      // debug/profile builds (appLog is silent in release).
       _setApplyFailed(true);
       appLog(
         'reminder plan apply failed',
