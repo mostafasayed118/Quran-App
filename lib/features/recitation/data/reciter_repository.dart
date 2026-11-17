@@ -7,6 +7,7 @@ import 'package:drift/drift.dart';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/db/settings_store.dart';
+import '../../../core/db/sql_batching.dart';
 import '../domain/reciter_info.dart';
 import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
@@ -272,10 +273,19 @@ class ReciterRepository
   /// resolving a download list). Unknown ids are simply absent from the map.
   Future<Map<String, ReciterRow>> byIds(Set<String> rowIds) async {
     if (rowIds.isEmpty) return const <String, ReciterRow>{};
-    final rows = await (_db.select(_db.reciters)
-          ..where((r) => r.id.isIn(rowIds.toList())))
-        .get();
-    return {for (final r in rows) r.id: r};
+    // One isIn(...) variable per id is unbounded (a downloads list has no
+    // LIMIT). Split below SQLite's host-parameter ceiling and merge; the map
+    // is keyed by id, so batch boundaries cannot change the result.
+    final result = <String, ReciterRow>{};
+    for (final batch in sqlBatches(rowIds.toList())) {
+      final rows = await (_db.select(_db.reciters)
+            ..where((r) => r.id.isIn(batch)))
+          .get();
+      for (final r in rows) {
+        result[r.id] = r;
+      }
+    }
+    return result;
   }
 
   @override
