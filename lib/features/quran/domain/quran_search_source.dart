@@ -37,15 +37,31 @@ const int kQuranSearchMinChars = 2;
 /// Default page size for search paging.
 const int kQuranSearchPageSize = 20;
 
-/// Splits a raw query into normalized search tokens.
+/// Upper bound on query tokens (the legacy substring path binds one SQL
+/// variable per token, so this must stay far below SQLite's 999 cap).
+///
+/// 64 keeps the AND-semantics meaningful even for a pasted ayah while leaving
+/// ample headroom under 999 for the repository's own paging variables. A
+/// query past 64 words is a paste/copy artefact, not a search a human types.
+const int kQuranSearchMaxTokens = 64;
+
+/// Splits a raw query into normalized search tokens, capped at
+/// [kQuranSearchMaxTokens].
 ///
 /// Uses the same normalization as the index build, then drops punctuation so
-/// a pasted ayah with commas or full stops still matches.
+/// a pasted ayah with commas or full stops still matches. The cap is applied
+/// here — before any SQL is built — so the legacy `LIKE ?` chain can never
+/// exceed SQLite's host-parameter ceiling for any input.
 List<String> quranSearchTokens(String query) {
   final normalized = normalizeArabic(query).toLowerCase();
   final words = normalized.replaceAll(_nonSearchChars, ' ').trim();
   if (words.isEmpty) return const [];
-  return [for (final token in words.split(RegExp(r'\s+'))) token];
+  final tokens = <String>[];
+  for (final token in words.split(RegExp(r'\s+'))) {
+    if (tokens.length >= kQuranSearchMaxTokens) break;
+    tokens.add(token);
+  }
+  return tokens;
 }
 
 /// Whether [query] is long enough to run a search for.
