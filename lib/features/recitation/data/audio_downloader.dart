@@ -110,7 +110,7 @@ class AudioDownloader {
       headers: rangeFrom > 0
           ? <String, Object>{
               HttpHeaders.rangeHeader: 'bytes=$rangeFrom-',
-              if (ifRange != null) HttpHeaders.ifRangeHeader: ifRange,
+              HttpHeaders.ifRangeHeader: ?ifRange,
             }
           : null,
       resolveNext: (current, location) {

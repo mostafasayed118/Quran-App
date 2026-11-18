@@ -120,7 +120,7 @@ void main() {
       await tester.pumpWidget(
         ValueListenableBuilder<Brightness>(
           valueListenable: brightness,
-          builder: (_, value, __) => Theme(
+          builder: (_, value, _) => Theme(
             data: AppTheme.forPrayer(PrayerName.fajr, value),
             child: NeutralReadingTheme(
               child: Builder(

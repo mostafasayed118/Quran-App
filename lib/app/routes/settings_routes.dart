@@ -5,7 +5,7 @@ part of '../router.dart';
 List<RouteBase> _settingsRoutes() => [
       GoRoute(
         path: AppRoutes.settings,
-        builder: (_, __) => MultiBlocProvider(
+        builder: (_, _) => MultiBlocProvider(
           providers: [
             BlocProvider<BackupCubit>(
               create: (_) => BackupCubit(service: getIt<BackupService>()),
@@ -44,7 +44,7 @@ List<RouteBase> _settingsRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.adhanPicker,
-        builder: (_, __) => RouteCubitScope<AdhanPickerCubit>(
+        builder: (_, _) => RouteCubitScope<AdhanPickerCubit>(
           create: () => AdhanPickerCubit(
             prefs: getIt<AdhanPreferences>(),
             player: getIt<AdhanPlayer>(),
@@ -63,14 +63,14 @@ List<RouteBase> _settingsRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.principles,
-        builder: (_, __) => const PrinciplesScreen(),
+        builder: (_, _) => const PrinciplesScreen(),
       ),
     ];
 
 List<RouteBase> _onboardingRoutes() => [
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (_, __) => RouteCubitScope<OnboardingCubit>(
+        builder: (_, _) => RouteCubitScope<OnboardingCubit>(
           create: () => OnboardingCubit(
             city: getIt<CitySource>(),
             status: getIt<OnboardingStatusSource>(),
@@ -83,7 +83,7 @@ List<RouteBase> _onboardingRoutes() => [
         routes: [
           GoRoute(
             path: 'city',
-            builder: (_, __) => RouteCubitScope<CityPickerCubit>(
+            builder: (_, _) => RouteCubitScope<CityPickerCubit>(
               create: () => CityPickerCubit(
                 cityRepo: getIt<CityRepository>(),
                 location: getIt<LocationService>(),

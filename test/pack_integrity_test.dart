@@ -57,7 +57,7 @@ Map<String, dynamic> singleEntry({Object? sha256}) => {
       'sourceUrl': 'https://cdn.example/tpin.min.json',
       'approxSizeMb': 1.0,
       'version': '1',
-      if (sha256 != null) 'sha256': sha256,
+      'sha256': ?sha256,
     };
 
 Map<String, dynamic> tafsirEntry(Object? perSurah, {int fileCount = 2}) => {
@@ -70,7 +70,7 @@ Map<String, dynamic> tafsirEntry(Object? perSurah, {int fileCount = 2}) => {
       'fileCount': fileCount,
       'approxSizeMb': 1.0,
       'version': '1',
-      if (perSurah != null) 'sha256PerSurah': perSurah,
+      'sha256PerSurah': ?perSurah,
     };
 
 void main() {

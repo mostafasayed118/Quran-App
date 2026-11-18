@@ -5,7 +5,7 @@ part of '../router.dart';
 List<RouteBase> _prayerRoutes() => [
       GoRoute(
         path: AppRoutes.cityPicker,
-        builder: (_, __) => RouteCubitScope<CityPickerCubit>(
+        builder: (_, _) => RouteCubitScope<CityPickerCubit>(
           create: () => CityPickerCubit(
             cityRepo: getIt<CityRepository>(),
             location: getIt<LocationService>(),
@@ -17,7 +17,7 @@ List<RouteBase> _prayerRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.prayerSettings,
-        builder: (_, __) => RouteCubitScope<PrayerConfigCubit>(
+        builder: (_, _) => RouteCubitScope<PrayerConfigCubit>(
           create: () => PrayerConfigCubit(
             source: getIt<PrayerConfigSource>(),
             preAdhanCanceller: getIt<PreAdhanCanceller>(),
@@ -29,7 +29,7 @@ List<RouteBase> _prayerRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.prayerMonth,
-        builder: (_, __) => RouteCubitScope<PrayerMonthCubit>(
+        builder: (_, _) => RouteCubitScope<PrayerMonthCubit>(
           create: () => PrayerMonthCubit(
             city: getIt<CitySource>(),
             prayer: getIt<PrayerTimesPort>(),
@@ -41,7 +41,7 @@ List<RouteBase> _prayerRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.qibla,
-        builder: (_, __) => RouteCubitScope<QiblaCubit>(
+        builder: (_, _) => RouteCubitScope<QiblaCubit>(
           create: () => QiblaCubit(
             city: getIt<CitySource>(),
             qibla: getIt<QiblaService>(),
@@ -58,7 +58,7 @@ List<RouteBase> _prayerRoutes() => [
 List<RouteBase> _worshipRoutes() => [
       GoRoute(
         path: AppRoutes.tasbih,
-        builder: (_, __) => RouteCubitScope<TasbihCubit>(
+        builder: (_, _) => RouteCubitScope<TasbihCubit>(
           create: () => TasbihCubit(repo: getIt<TasbihRepository>()),
           identity: AppRoutes.tasbih,
           start: (cubit) => cubit.start(),
@@ -67,7 +67,7 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.duas,
-        builder: (_, __) => RouteCubitScope<DuasCubit>(
+        builder: (_, _) => RouteCubitScope<DuasCubit>(
           create: () => DuasCubit(
             duas: getIt<DuaRepository>(),
             ruqyah: getIt<RuqyahRepository>(),
@@ -80,7 +80,7 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.worship,
-        builder: (_, __) => RouteCubitScope<TrackerCubit>(
+        builder: (_, _) => RouteCubitScope<TrackerCubit>(
           create: () => TrackerCubit(
             repo: getIt<PrayerLogRepository>(),
             khatma: getIt<KhatmaRepository>(),
@@ -92,7 +92,7 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.ramadan,
-        builder: (_, __) => RouteCubitScope<RamadanCubit>(
+        builder: (_, _) => RouteCubitScope<RamadanCubit>(
           create: () => RamadanCubit(
             city: getIt<CitySource>(),
             prayer: getIt<PrayerTimesPort>(),
@@ -105,7 +105,7 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.qada,
-        builder: (_, __) => RouteCubitScope<QadaCubit>(
+        builder: (_, _) => RouteCubitScope<QadaCubit>(
           create: () => QadaCubit(source: getIt<QadaSource>()),
           identity: AppRoutes.qada,
           start: (cubit) => cubit.start(),
@@ -114,14 +114,14 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.zakat,
-        builder: (_, __) => BlocProvider<ZakatCubit>(
+        builder: (_, _) => BlocProvider<ZakatCubit>(
           create: (_) => ZakatCubit(),
           child: const ZakatScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.hijri,
-        builder: (_, __) => RouteCubitScope<HijriCubit>(
+        builder: (_, _) => RouteCubitScope<HijriCubit>(
           create: () => HijriCubit(
             service: getIt<HijriService>(),
             offset: getIt<HijriOffsetSource>(),
@@ -134,7 +134,7 @@ List<RouteBase> _worshipRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.asma,
-        builder: (_, __) => RouteCubitScope<AsmaCubit>(
+        builder: (_, _) => RouteCubitScope<AsmaCubit>(
           create: () => AsmaCubit(repository: getIt<AsmaRepository>()),
           identity: AppRoutes.asma,
           start: (cubit) => cubit.start(),

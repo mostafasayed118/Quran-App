@@ -71,7 +71,7 @@ void main() {
             GlobalCupertinoLocalizations.delegate,
           ],
           theme: AppTheme.light,
-          navigatorObservers: [if (observer != null) observer],
+          navigatorObservers: [?observer],
           home: Scaffold(
             body: Builder(
               builder: (context) => Center(

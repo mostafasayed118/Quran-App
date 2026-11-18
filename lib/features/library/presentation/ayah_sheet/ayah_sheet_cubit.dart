@@ -53,11 +53,11 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       emit(AyahSheetState.ready(
         tafsirEntries: [
           for (final entry in tafsirs)
-            if (entry != null) entry,
+            ?entry,
         ],
         translationEntries: [
           for (final entry in translations)
-            if (entry != null) entry,
+            ?entry,
         ],
       ));
     } on Object catch (error, stackTrace) {

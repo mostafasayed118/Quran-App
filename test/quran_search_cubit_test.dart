@@ -43,7 +43,7 @@ class _FakeSource implements QuranSearchSource {
 void main() {
   test('search emits the first page', () async {
     final source = _FakeSource(
-      (_, __) async => _page([1, 2, 3], total: 3, hasMore: false),
+      (_, _) async => _page([1, 2, 3], total: 3, hasMore: false),
     );
     final cubit = QuranSearchCubit(source);
     addTearDown(cubit.close);
@@ -58,7 +58,7 @@ void main() {
 
   test('short query settles without hitting the source', () async {
     final source = _FakeSource(
-      (_, __) async => _page([1], total: 1, hasMore: false),
+      (_, _) async => _page([1], total: 1, hasMore: false),
     );
     final cubit = QuranSearchCubit(source);
     addTearDown(cubit.close);
@@ -95,7 +95,7 @@ void main() {
   test('a stale response cannot overwrite a newer query', () async {
     final stale = Completer<QuranSearchPage>();
     final fresh = Completer<QuranSearchPage>();
-    final source = _FakeSource((query, __) {
+    final source = _FakeSource((query, _) {
       return query == 'قديم' ? stale.future : fresh.future;
     });
     final cubit = QuranSearchCubit(source);
@@ -114,7 +114,7 @@ void main() {
   });
 
   test('failure emits the failed state', () async {
-    final source = _FakeSource((_, __) async => throw StateError('boom'));
+    final source = _FakeSource((_, _) async => throw StateError('boom'));
     final cubit = QuranSearchCubit(source);
     addTearDown(cubit.close);
 

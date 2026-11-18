@@ -46,7 +46,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/home',
-          builder: (_, __) => BlocProvider<HomeCubit>.value(
+          builder: (_, _) => BlocProvider<HomeCubit>.value(
             value: cubit,
             child: const HomeScreen(),
           ),

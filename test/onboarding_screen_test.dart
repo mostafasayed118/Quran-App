@@ -67,10 +67,10 @@ const _cairo = City(
 Widget _host({required Widget home, double? textScale}) {
   final router = GoRouter(
     routes: [
-      GoRoute(path: '/', builder: (_, __) => home),
+      GoRoute(path: '/', builder: (_, _) => home),
       GoRoute(
         path: AppRoutes.onboardingCity,
-        builder: (_, __) => const Scaffold(body: Text('city-picker')),
+        builder: (_, _) => const Scaffold(body: Text('city-picker')),
       ),
     ],
   );

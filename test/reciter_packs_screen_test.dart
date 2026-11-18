@@ -200,14 +200,14 @@ void main() {
       routes: [
         GoRoute(
           path: AppRoutes.recitation,
-          builder: (_, __) => BlocProvider<RecitersCubit>.value(
+          builder: (_, _) => BlocProvider<RecitersCubit>.value(
             value: cubit,
             child: const RecitersScreen(),
           ),
         ),
         GoRoute(
           path: AppRoutes.reciterPacks,
-          builder: (_, __) => const ReciterPacksScreen(),
+          builder: (_, _) => const ReciterPacksScreen(),
         ),
       ],
     );

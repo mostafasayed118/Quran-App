@@ -232,7 +232,7 @@ void main() {
         routes: [
           GoRoute(
             path: '/home',
-            builder: (_, __) => Scaffold(
+            builder: (_, _) => Scaffold(
               body: Builder(
                 builder: (context) => Center(
                   child: FilledButton(
@@ -253,7 +253,7 @@ void main() {
           ),
           GoRoute(
             path: '/library',
-            builder: (_, __) =>
+            builder: (_, _) =>
                 const Scaffold(body: Center(child: Text('library-dest'))),
           ),
         ],

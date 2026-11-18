@@ -197,7 +197,7 @@ abstract final class AppRouter {
       routes: [
         GoRoute(
           path: AppRoutes.home,
-          builder: (_, __) => RouteCubitScope<HomeCubit>(
+          builder: (_, _) => RouteCubitScope<HomeCubit>(
             create: () => HomeCubit(
               lastRead: getIt<LastReadMarker>(),
               ayahs: getIt<AyahLookup>(),
@@ -213,7 +213,7 @@ abstract final class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.quran,
-          builder: (_, __) => RouteCubitScope<SurahIndexCubit>(
+          builder: (_, _) => RouteCubitScope<SurahIndexCubit>(
             create: () => SurahIndexCubit(getIt<SurahSource>()),
             identity: AppRoutes.quran,
             start: (cubit) => cubit.start(),
@@ -229,7 +229,7 @@ abstract final class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.juzIndex,
-          builder: (_, __) => RouteCubitScope<JuzIndexCubit>(
+          builder: (_, _) => RouteCubitScope<JuzIndexCubit>(
             create: () => JuzIndexCubit(source: getIt<JuzIndexSource>()),
             identity: AppRoutes.juzIndex,
             start: (cubit) => cubit.start(),
@@ -246,7 +246,7 @@ abstract final class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.prayerTimes,
-          builder: (_, __) => RouteCubitScope<PrayerTimesCubit>(
+          builder: (_, _) => RouteCubitScope<PrayerTimesCubit>(
             create: () => PrayerTimesCubit(
               prayer: getIt<PrayerTimesPort>(),
               city: getIt<CitySource>(),
@@ -261,7 +261,7 @@ abstract final class AppRouter {
         ),
         GoRoute(
           path: AppRoutes.azkar,
-          builder: (_, __) => RouteCubitScope<AzkarCubit>(
+          builder: (_, _) => RouteCubitScope<AzkarCubit>(
             create: () => AzkarCubit(
               repository: getIt<AzkarRepository>(),
               savedState: getIt<AzkarSavedStateSource>(),

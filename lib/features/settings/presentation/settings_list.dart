@@ -140,7 +140,7 @@ class _SettingsList extends StatelessWidget {
             ),
           ),
         _reminderReliabilitySection(),
-        if (backupSection case final section?) section,
+        ?backupSection,
         ListTile(
           leading: const Icon(Icons.description_outlined),
           title: Text(loc.licensesTitle),

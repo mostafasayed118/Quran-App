@@ -76,14 +76,14 @@ _Harness _buildHarness() {
     routes: [
       GoRoute(
         path: AppRoutes.home,
-        builder: (_, __) => BlocProvider<HomeCubit>.value(
+        builder: (_, _) => BlocProvider<HomeCubit>.value(
           value: cubit,
           child: const HomeScreen(),
         ),
       ),
       GoRoute(
         path: AppRoutes.reader,
-        builder: (_, __) => const Scaffold(body: Text('READER-STUB')),
+        builder: (_, _) => const Scaffold(body: Text('READER-STUB')),
       ),
     ],
   );
@@ -112,32 +112,32 @@ _Harness _buildShellHarness() {
     observers: [appRouteObserver],
     routes: [
       ShellRoute(
-        builder: (_, __, child) => Scaffold(body: child),
+        builder: (_, _, child) => Scaffold(body: child),
         routes: [
           GoRoute(
             path: AppRoutes.home,
-            builder: (_, __) => BlocProvider<HomeCubit>.value(
+            builder: (_, _) => BlocProvider<HomeCubit>.value(
               value: cubit,
               child: const HomeScreen(),
             ),
           ),
           GoRoute(
             path: AppRoutes.quran,
-            builder: (_, __) => const Scaffold(body: Text('QURAN-STUB')),
+            builder: (_, _) => const Scaffold(body: Text('QURAN-STUB')),
           ),
           GoRoute(
             path: AppRoutes.prayerTimes,
-            builder: (_, __) => const Scaffold(body: Text('PRAYER-STUB')),
+            builder: (_, _) => const Scaffold(body: Text('PRAYER-STUB')),
           ),
           GoRoute(
             path: AppRoutes.azkar,
-            builder: (_, __) => const Scaffold(body: Text('AZKAR-STUB')),
+            builder: (_, _) => const Scaffold(body: Text('AZKAR-STUB')),
           ),
         ],
       ),
       GoRoute(
         path: AppRoutes.reader,
-        builder: (_, __) => const Scaffold(body: Text('READER-STUB')),
+        builder: (_, _) => const Scaffold(body: Text('READER-STUB')),
       ),
     ],
   );

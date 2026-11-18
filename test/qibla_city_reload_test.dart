@@ -31,7 +31,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/qibla',
-          builder: (_, __) => BlocProvider<QiblaCubit>.value(
+          builder: (_, _) => BlocProvider<QiblaCubit>.value(
             value: cubit,
             child: const QiblaScreen(),
           ),

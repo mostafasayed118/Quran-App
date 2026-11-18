@@ -60,7 +60,6 @@ linter:
     throw_in_finally: true
     valid_regexps: true
     avoid_init_to_null: true
-    avoid_null_checks_in_equality_operators: true
     no_leading_underscores_for_local_identifiers: true
 
     # --- flutter/idiom ---

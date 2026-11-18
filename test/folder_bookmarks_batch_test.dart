@@ -50,7 +50,7 @@ class _CountingBatch implements AyahBatchLookup {
     lastIds = ids;
     return [
       for (final id in ids)
-        if (rows[id] case final row?) row,
+        ?rows[id],
     ];
   }
 }

@@ -115,14 +115,14 @@ void main() {
       routes: [
         GoRoute(
           path: AppRoutes.settings,
-          builder: (_, __) => BlocProvider<SettingsCubit>.value(
+          builder: (_, _) => BlocProvider<SettingsCubit>.value(
             value: cubit,
             child: const SettingsScreen(),
           ),
         ),
         GoRoute(
           path: AppRoutes.principles,
-          builder: (_, __) => const PrinciplesScreen(),
+          builder: (_, _) => const PrinciplesScreen(),
         ),
       ],
     );

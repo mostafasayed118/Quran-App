@@ -35,7 +35,7 @@ class JuzIndexBody extends StatelessWidget {
         JuzIndexReady(:final juz) => ListView.separated(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
             itemCount: juz.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(height: 1),
             itemBuilder: (context, index) {
               final entry = juz[index];
               return ListTile(

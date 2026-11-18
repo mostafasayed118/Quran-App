@@ -8,7 +8,7 @@ List<RouteBase> _updateAndSearchRoutes() => [
         // The blocking surface for an unsupported install, or the dismissible
         // optional-update prompt. The mode is read from the gate at build time;
         // the screen receives plain callbacks and never imports the DI root.
-        builder: (_, __) {
+        builder: (_, _) {
           final mandatory =
               AppRouter.versionGate.verdict == VersionVerdict.updateRequired;
           return UpdateGateScreen(
@@ -41,9 +41,9 @@ List<RouteBase> _libraryRoutes() => [
         // A degraded boot registers no PackDownloader (it needs a writable
         // root); the hub has nothing to show then, so it goes home instead of
         // throwing on the missing registration.
-        redirect: (_, __) =>
+        redirect: (_, _) =>
             getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
-        builder: (_, __) => RouteCubitScope<LibraryCubit>(
+        builder: (_, _) => RouteCubitScope<LibraryCubit>(
           create: () => LibraryCubit(
             catalog: getIt<CatalogRepository>(),
             downloader: getIt<PackDownloader>(),
@@ -57,7 +57,7 @@ List<RouteBase> _libraryRoutes() => [
         path: AppRoutes.hadith,
         // Same degraded-boot guard as /library (the hadith browser reads
         // packs through the downloader).
-        redirect: (_, __) =>
+        redirect: (_, _) =>
             getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
         builder: (context, state) {
           final pack = state.uri.queryParameters[AppRouteQuery.pack] ?? '';
@@ -76,9 +76,9 @@ List<RouteBase> _libraryRoutes() => [
       ),
       GoRoute(
         path: AppRoutes.librarySearch,
-        redirect: (_, __) =>
+        redirect: (_, _) =>
             getIt.isRegistered<PackDownloader>() ? null : AppRoutes.home,
-        builder: (_, __) => RouteCubitScope<TranslationSearchCubit>(
+        builder: (_, _) => RouteCubitScope<TranslationSearchCubit>(
           create: () => TranslationSearchCubit(
             source: getIt<TranslationSearchSource>(),
             surahName: (id) async =>
@@ -125,7 +125,7 @@ List<RouteBase> _readerRoutes() => [
 List<RouteBase> _bookmarkRoutes() => [
       GoRoute(
         path: AppRoutes.bookmarks,
-        builder: (_, __) => MultiBlocProvider(
+        builder: (_, _) => MultiBlocProvider(
           providers: [
             BlocProvider<BookmarkMetaCubit>(
               create: (_) =>
