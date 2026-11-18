@@ -24,8 +24,9 @@ void main() {
   });
 
   test('data extraction excludes the file domain from both paths', () {
-    final rules =
-        _read('android/app/src/main/res/xml/data_extraction_rules.xml');
+    final rules = _read(
+      'android/app/src/main/res/xml/data_extraction_rules.xml',
+    );
     expect(RegExp('domain="file"').allMatches(rules).length, 2);
   });
 
@@ -58,9 +59,13 @@ void main() {
     expect(ci, isNot(contains('actions/upload-artifact@v4')));
     expect(RegExp(r'actions/checkout@[0-9a-f]{40}').hasMatch(ci), isTrue);
     expect(
-        RegExp(r'subosito/flutter-action@[0-9a-f]{40}').hasMatch(ci), isTrue);
+      RegExp(r'subosito/flutter-action@[0-9a-f]{40}').hasMatch(ci),
+      isTrue,
+    );
     expect(
-        RegExp(r'actions/upload-artifact@[0-9a-f]{40}').hasMatch(ci), isTrue);
+      RegExp(r'actions/upload-artifact@[0-9a-f]{40}').hasMatch(ci),
+      isTrue,
+    );
   });
 
   test('Gradle wrapper is checksum-pinned and not ignored', () {

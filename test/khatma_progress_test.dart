@@ -20,12 +20,14 @@ void main() {
     expect(KhatmaProgress.dailyPagesFor(151), 5);
   });
 
-  test('today range starts at the pointer page and spans the daily portion',
-      () {
-    final p = progress(page: 41, target: 302);
-    expect(p.todayStartPage, 41);
-    expect(p.todayEndPage, 50);
-  });
+  test(
+    'today range starts at the pointer page and spans the daily portion',
+    () {
+      final p = progress(page: 41, target: 302);
+      expect(p.todayStartPage, 41);
+      expect(p.todayEndPage, 50);
+    },
+  );
 
   test('today range clamps to the last page near the end of the mushaf', () {
     final p = progress(page: 600);

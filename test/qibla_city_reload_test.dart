@@ -14,8 +14,7 @@ import 'support/fakes.dart';
 import 'support/test_db.dart';
 
 void main() {
-  testWidgets(
-      'picking a city reloads the qibla bearing instead of leaving the '
+  testWidgets('picking a city reloads the qibla bearing instead of leaving the '
       'empty state on screen', (tester) async {
     final db = newTestDb();
     final city = CityRepository(
@@ -54,34 +53,48 @@ void main() {
     );
     addTearDown(router.dispose);
 
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
 
     await tester.tap(find.text('اختر مدينتك'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('PICK-CITY-STUB'), findsOneWidget);
 
     await tester.tap(find.text('PICK-CITY-STUB'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('PICK-CITY-STUB'), findsNothing);
     expect(find.text('اختر مدينتك'), findsNothing);

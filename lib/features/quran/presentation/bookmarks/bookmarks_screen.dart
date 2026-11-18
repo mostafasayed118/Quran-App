@@ -28,10 +28,7 @@ class BookmarksScreen extends StatelessWidget {
           showMeta: showMeta,
           onBrowseQuran: () => context.push(AppRoutes.quran),
           onSelect: (verse) => context.push(
-            quranReaderPath(
-              surah: verse.surahId,
-              ayah: verse.numberInSurah,
-            ),
+            quranReaderPath(surah: verse.surahId, ayah: verse.numberInSurah),
           ),
         ),
       ),

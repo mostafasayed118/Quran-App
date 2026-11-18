@@ -7,7 +7,10 @@ BackupBookmark bookmark(int ayahId) =>
     BackupBookmark(ayahId: ayahId, createdAt: DateTime(2026, 1, 1));
 
 BackupKhatmaRow khatma(int targetPages, DateTime updatedAt) => BackupKhatmaRow(
-    ayahId: 100, targetPages: targetPages, updatedAt: updatedAt);
+  ayahId: 100,
+  targetPages: targetPages,
+  updatedAt: updatedAt,
+);
 
 BackupPrayerDay day(
   int dom, {
@@ -16,15 +19,14 @@ BackupPrayerDay day(
   bool asr = false,
   bool maghrib = false,
   bool isha = false,
-}) =>
-    BackupPrayerDay(
-      day: DateTime(2026, 5, dom),
-      fajr: fajr,
-      dhuhr: dhuhr,
-      asr: asr,
-      maghrib: maghrib,
-      isha: isha,
-    );
+}) => BackupPrayerDay(
+  day: DateTime(2026, 5, dom),
+  fajr: fajr,
+  dhuhr: dhuhr,
+  asr: asr,
+  maghrib: maghrib,
+  isha: isha,
+);
 
 void main() {
   group('mergeBookmarks', () {

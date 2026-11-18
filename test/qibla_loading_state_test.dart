@@ -19,13 +19,15 @@ void main() {
 
   tearDown(() => db.close());
 
-  test('the cubit starts in loading until the first reload completes',
-      () async {
-    final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
-    addTearDown(cubit.close);
+  test(
+    'the cubit starts in loading until the first reload completes',
+    () async {
+      final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
+      addTearDown(cubit.close);
 
-    expect(cubit.state, isA<QiblaLoading>());
-    await cubit.reload();
-    expect(cubit.state, isA<QiblaReady>());
-  });
+      expect(cubit.state, isA<QiblaLoading>());
+      await cubit.reload();
+      expect(cubit.state, isA<QiblaReady>());
+    },
+  );
 }

@@ -58,7 +58,9 @@ void main() {
       reciters: ReciterRepository(db),
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
     );
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -95,7 +97,9 @@ void main() {
     service.playingCtrl.add(true);
     await Future<void>.delayed(Duration.zero);
     expect(
-        (cubit.state as PlaybackPlaying).duration, const Duration(minutes: 3));
+      (cubit.state as PlaybackPlaying).duration,
+      const Duration(minutes: 3),
+    );
 
     service.loadGate.complete();
     await first;
@@ -107,13 +111,18 @@ void main() {
     final second = cubit.playSurah(row, 2);
     await second;
     expect(cubit.state, isA<PlaybackPlaying>());
-    expect((cubit.state as PlaybackPlaying).duration, Duration.zero,
-        reason: 'a new track must not seed the previous track duration');
+    expect(
+      (cubit.state as PlaybackPlaying).duration,
+      Duration.zero,
+      reason: 'a new track must not seed the previous track duration',
+    );
 
     service.durationCtrl.add(const Duration(minutes: 5));
     await Future<void>.delayed(Duration.zero);
     expect(
-        (cubit.state as PlaybackPlaying).duration, const Duration(minutes: 5));
+      (cubit.state as PlaybackPlaying).duration,
+      const Duration(minutes: 5),
+    );
   });
 
   test('sub-second position ticks do not rebuild the progress row', () async {
@@ -133,7 +142,9 @@ void main() {
     service.positionCtrl.add(const Duration(seconds: 1));
     await Future<void>.delayed(Duration.zero);
     expect(
-        (cubit.state as PlaybackPlaying).position, const Duration(seconds: 1));
+      (cubit.state as PlaybackPlaying).position,
+      const Duration(seconds: 1),
+    );
 
     service.loadGate.complete();
     await pending;

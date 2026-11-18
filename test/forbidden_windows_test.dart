@@ -22,8 +22,10 @@ void main() {
     expect(windows[0].start, fajr);
     expect(windows[0].end, sunrise);
     expect(windows[1].kind, ForbiddenWindowKind.zenith);
-    expect(windows[1].start,
-        dhuhr.subtract(const Duration(minutes: kZenithLeadMinutes)));
+    expect(
+      windows[1].start,
+      dhuhr.subtract(const Duration(minutes: kZenithLeadMinutes)),
+    );
     expect(windows[1].end, dhuhr);
     expect(windows[2].kind, ForbiddenWindowKind.afterAsr);
     expect(windows[2].start, asr);
@@ -40,7 +42,9 @@ void main() {
     );
 
     expect(windows, hasLength(2));
-    expect(windows.map((w) => w.kind),
-        isNot(contains(ForbiddenWindowKind.afterFajr)));
+    expect(
+      windows.map((w) => w.kind),
+      isNot(contains(ForbiddenWindowKind.afterFajr)),
+    );
   });
 }

@@ -26,15 +26,13 @@ class RuqyahResolved {
 
 @freezed
 sealed class DuasState with _$DuasState {
-  const factory DuasState.loading({
-    @Default(DuasTab.duas) DuasTab tab,
-  }) = DuasLoading;
+  const factory DuasState.loading({@Default(DuasTab.duas) DuasTab tab}) =
+      DuasLoading;
 
   /// Load failed (a repository read threw): the screen shows the localized
   /// error pane instead of hanging on [DuasState.loading] forever.
-  const factory DuasState.failed({
-    @Default(DuasTab.duas) DuasTab tab,
-  }) = DuasFailed;
+  const factory DuasState.failed({@Default(DuasTab.duas) DuasTab tab}) =
+      DuasFailed;
 
   const factory DuasState.duas({
     required List<String> categories,
@@ -45,7 +43,6 @@ sealed class DuasState with _$DuasState {
     @Default(<String, String>{}) Map<String, String> categoryLabels,
   }) = DuasInView;
 
-  const factory DuasState.ruqyah({
-    required List<RuqyahResolved> entries,
-  }) = RuqyahInView;
+  const factory DuasState.ruqyah({required List<RuqyahResolved> entries}) =
+      RuqyahInView;
 }

@@ -165,8 +165,10 @@ abstract final class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: AppRoutes.home,
     observers: [appRouteObserver],
-    refreshListenable:
-        Listenable.merge(<Listenable>[onboardingGate, versionGate]),
+    refreshListenable: Listenable.merge(<Listenable>[
+      onboardingGate,
+      versionGate,
+    ]),
     redirect: (_, state) => redirectFor(state.matchedLocation),
     errorBuilder: (context, state) {
       final loc = AppLocalizations.of(context);
@@ -177,10 +179,7 @@ abstract final class AppRouter {
         onAction: () => context.go(AppRoutes.home),
       );
     },
-    routes: [
-      _shellRoute(),
-      ..._postShellRoutes(),
-    ],
+    routes: [_shellRoute(), ..._postShellRoutes()],
   );
 
   static RouteBase _shellRoute() {
@@ -189,10 +188,7 @@ abstract final class AppRouter {
         // The player is an app-level singleton (registered in DI) so the
         // mini player can live above the tabs instead of inside the reader.
         value: getIt<PlaybackCubit>(),
-        child: AppShell(
-          location: state.uri.path,
-          child: child,
-        ),
+        child: AppShell(location: state.uri.path, child: child),
       ),
       routes: [
         GoRoute(
@@ -284,28 +280,28 @@ abstract final class AppRouter {
   /// Split by feature so adding one route is a small edit in a named place
   /// instead of a 410-line method.
   static List<RouteBase> _postShellRoutes() => [
-        ..._updateAndSearchRoutes(),
-        ..._recitationRoutes(),
-        ..._libraryRoutes(),
-        ..._prayerRoutes(),
-        ..._worshipRoutes(),
-        ..._settingsRoutes(),
-        ..._readerRoutes(),
-        ..._onboardingRoutes(),
-        ..._reciterRoutes(),
-        ..._bookmarkRoutes(),
-      ];
+    ..._updateAndSearchRoutes(),
+    ..._recitationRoutes(),
+    ..._libraryRoutes(),
+    ..._prayerRoutes(),
+    ..._worshipRoutes(),
+    ..._settingsRoutes(),
+    ..._readerRoutes(),
+    ..._onboardingRoutes(),
+    ..._reciterRoutes(),
+    ..._bookmarkRoutes(),
+  ];
 }
 
 /// Builds the reader cubit shared by the full route and the workspace pane.
 ReaderCubit _createReader(int surah, int ayah) => ReaderCubit(
-      ayahRepository: getIt<AyahRepository>(),
-      lastReadRepository: getIt<LastReadRepository>(),
-      surahId: surah,
-      initialAyah: ayah,
-      wirdProgress: getIt<KhatmaRepository>(),
-      uthmani: getIt<UthmaniTextSource>(),
-      pageAnchors: getIt<PageAnchorSource>(),
-      settings: getIt<ReaderSettingsSource>(),
-      layout: getIt<ReaderLayoutSource>(),
-    );
+  ayahRepository: getIt<AyahRepository>(),
+  lastReadRepository: getIt<LastReadRepository>(),
+  surahId: surah,
+  initialAyah: ayah,
+  wirdProgress: getIt<KhatmaRepository>(),
+  uthmani: getIt<UthmaniTextSource>(),
+  pageAnchors: getIt<PageAnchorSource>(),
+  settings: getIt<ReaderSettingsSource>(),
+  layout: getIt<ReaderLayoutSource>(),
+);

@@ -36,24 +36,32 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_reader_view');
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'madinah',
-          ayahCount: 1,
-          pagesStart: 2,
-          pagesEnd: 2,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madinah',
+            ayahCount: 1,
+            pagesStart: 2,
+            pagesEnd: 2,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(8),
+            surahId: 2,
+            numberInSurah: 1,
+            juz: 1,
+            page: 2,
+            textUthmani: 'الم',
+            textImlaei: 'الم',
+          ),
+        );
   });
 
   tearDown(() async {
@@ -61,14 +69,17 @@ void main() {
     if (tempRoot.existsSync()) await tempRoot.delete(recursive: true);
   });
 
-  testWidgets('ReaderScreen composes ReaderView and the five actions',
-      (tester) async {
+  testWidgets('ReaderScreen composes ReaderView and the five actions', (
+    tester,
+  ) async {
     await getIt.reset();
-    getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(
-          db,
-          libraryRootResolver: () async => tempRoot,
-          fileDecoder: _syncDecode,
-        ));
+    getIt.registerLazySingleton<PackDownloader>(
+      () => PackDownloader(
+        db,
+        libraryRootResolver: () async => tempRoot,
+        fileDecoder: _syncDecode,
+      ),
+    );
     addTearDown(getIt.reset);
 
     final cubit = ReaderCubit(
@@ -90,16 +101,22 @@ void main() {
     );
     addTearDown(playback.close);
 
-    await tester.pumpWidget(appShell(
+    await tester.pumpWidget(
+      appShell(
         home: MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playback),
-      ],
-      child: const ReaderScreen(),
-    )));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+          providers: [
+            BlocProvider<ReaderCubit>.value(value: cubit),
+            BlocProvider<PlaybackCubit>.value(value: playback),
+          ],
+          child: const ReaderScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(ReaderView), findsOneWidget);
     expect(find.byType(ReaderActions), findsOneWidget);

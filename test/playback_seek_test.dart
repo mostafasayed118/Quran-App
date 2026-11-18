@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/features/recitation/data/audio_downloader.dart';
 import 'package:quran_yahdi/features/recitation/data/reciter_info_source.dart';
@@ -46,8 +46,10 @@ PlaybackCubit _cubitWith(PlaybackService service) {
   return PlaybackCubit(
     service: service,
     reciters: _NoReciters(),
-    downloader: AudioDownloader(db,
-        audioRootResolver: () async => throw StateError('unused')),
+    downloader: AudioDownloader(
+      db,
+      audioRootResolver: () async => throw StateError('unused'),
+    ),
     backgroundActive: () => true,
   );
 }

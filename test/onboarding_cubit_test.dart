@@ -71,12 +71,11 @@ OnboardingCubit _cubit({
   CitySource? city,
   OnboardingStatusSource? status,
   ReminderSchedulerPort? reminders,
-}) =>
-    OnboardingCubit(
-      city: city ?? _City(),
-      status: status ?? _Status(),
-      reminders: reminders ?? _Scheduler(),
-    );
+}) => OnboardingCubit(
+  city: city ?? _City(),
+  status: status ?? _Status(),
+  reminders: reminders ?? _Scheduler(),
+);
 
 void main() {
   test('no city yet: the city step is open', () async {
@@ -121,22 +120,24 @@ void main() {
     expect(scheduler.requests, 1);
   });
 
-  test('a denied or throwing request leaves the step open without crashing',
-      () async {
-    final denied = _Scheduler(granted: false);
-    final cubit = _cubit(reminders: denied);
-    addTearDown(cubit.close);
-    await cubit.start();
-    await cubit.requestReminders();
-    expect((cubit.state as OnboardingReady).remindersGranted, isFalse);
+  test(
+    'a denied or throwing request leaves the step open without crashing',
+    () async {
+      final denied = _Scheduler(granted: false);
+      final cubit = _cubit(reminders: denied);
+      addTearDown(cubit.close);
+      await cubit.start();
+      await cubit.requestReminders();
+      expect((cubit.state as OnboardingReady).remindersGranted, isFalse);
 
-    final throwing = _Scheduler(throwOnRequest: true);
-    final other = _cubit(reminders: throwing);
-    addTearDown(other.close);
-    await other.start();
-    await other.requestReminders();
-    expect((other.state as OnboardingReady).remindersGranted, isFalse);
-  });
+      final throwing = _Scheduler(throwOnRequest: true);
+      final other = _cubit(reminders: throwing);
+      addTearDown(other.close);
+      await other.start();
+      await other.requestReminders();
+      expect((other.state as OnboardingReady).remindersGranted, isFalse);
+    },
+  );
 
   test('finishing stores the flag and emits completed', () async {
     final status = _Status();
@@ -151,17 +152,19 @@ void main() {
     expect(status.completed, isTrue);
   });
 
-  test('a failing flag write still completes, so the card stops nagging',
-      () async {
-    final status = _Status()..throwOnWrite = true;
-    final cubit = _cubit(status: status);
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'a failing flag write still completes, so the card stops nagging',
+    () async {
+      final status = _Status()..throwOnWrite = true;
+      final cubit = _cubit(status: status);
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    await cubit.finish();
+      await cubit.finish();
 
-    expect((cubit.state as OnboardingReady).completed, isTrue);
-  });
+      expect((cubit.state as OnboardingReady).completed, isTrue);
+    },
+  );
 
   test('an unreadable flag counts as completed (never nag)', () async {
     final status = _Status()..throwOnRead = true;

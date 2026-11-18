@@ -30,8 +30,9 @@ class _TeardownSafeAyahRepository extends AyahRepository {
 
 class _FakeUthmani implements UthmaniTextSource {
   @override
-  Future<Map<int, String>> forSurah(int surahId) async =>
-      {for (var i = 1; i <= 2; i++) i: 'آيَةٌ $i'};
+  Future<Map<int, String>> forSurah(int surahId) async => {
+    for (var i = 1; i <= 2; i++) i: 'آيَةٌ $i',
+  };
 }
 
 class _Settings implements ReaderSettingsSource {
@@ -51,18 +52,20 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.batch((batch) => batch.insertAll(db.ayahs, [
-          for (var i = 1; i <= 2; i++)
-            AyahsCompanion.insert(
-              id: Value(100 + i),
-              surahId: 2,
-              numberInSurah: i,
-              juz: 1,
-              page: 2,
-              textUthmani: 'آيَةٌ $i',
-              textImlaei: 'آيَةٌ $i',
-            ),
-        ]));
+    await db.batch(
+      (batch) => batch.insertAll(db.ayahs, [
+        for (var i = 1; i <= 2; i++)
+          AyahsCompanion.insert(
+            id: Value(100 + i),
+            surahId: 2,
+            numberInSurah: i,
+            juz: 1,
+            page: 2,
+            textUthmani: 'آيَةٌ $i',
+            textImlaei: 'آيَةٌ $i',
+          ),
+      ]),
+    );
   });
 
   Future<void> pumpReader(
@@ -89,26 +92,34 @@ void main() {
     final playback = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playback.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playback),
-      ],
-      child: appShell(home: const ReaderScreen(), textScale: textScale),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playback),
+        ],
+        child: appShell(home: const ReaderScreen(), textScale: textScale),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   Text badge(WidgetTester tester) => tester.widget<Text>(find.text('﴿١﴾'));
 
-  testWidgets('the ayah number is 28 and follows the reader scale',
-      (tester) async {
+  testWidgets('the ayah number is 28 and follows the reader scale', (
+    tester,
+  ) async {
     await pumpReader(tester, fontScale: 1.0);
     expect(badge(tester).style?.fontSize, AppType.ayahNumber);
     expect(badge(tester).style?.fontFamily, AppTheme.ayahNumber.fontFamily);
@@ -126,8 +137,11 @@ void main() {
     );
 
     await tester.tap(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     // The four actions are on screen (the app bar has its own IconButtons, so

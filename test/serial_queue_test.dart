@@ -28,16 +28,18 @@ void main() {
     expect(order, <String>['a', 'b']);
   });
 
-  test('a failing task reaches its caller and does not block the next',
-      () async {
-    final queue = SerialQueue();
+  test(
+    'a failing task reaches its caller and does not block the next',
+    () async {
+      final queue = SerialQueue();
 
-    final failed = queue.add<void>(() async => throw StateError('boom'));
-    final next = queue.add(() async => 42);
+      final failed = queue.add<void>(() async => throw StateError('boom'));
+      final next = queue.add(() async => 42);
 
-    await expectLater(failed, throwsStateError);
-    expect(await next, 42);
-  });
+      await expectLater(failed, throwsStateError);
+      expect(await next, 42);
+    },
+  );
 
   test('a failure that is not awaited does not poison the queue', () async {
     final queue = SerialQueue();

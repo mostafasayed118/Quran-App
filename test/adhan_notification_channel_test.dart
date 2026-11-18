@@ -6,13 +6,13 @@ import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 
 List<PrayerChoice> fakeDay() => [
-      PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-      PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-      PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-      PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-      PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-      PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+  PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
+  PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
+  PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
+  PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+];
 
 const ReminderTexts _texts = ReminderTexts(
   prayerTitle: _prayerTitle,
@@ -75,20 +75,22 @@ void main() {
       expect(plan.single.adhanId, kDefaultAdhanId);
     });
 
-    test('fajr falls back when the override names a track this build lacks',
-        () {
-      final plan = planReminders(
-        now: DateTime(2026, 3, 15, 3, 0),
-        todayPrayers: fakeDay(),
-        azkarEnabled: false,
-        azkarTimeHm: null,
-        texts: _texts,
-        adhanId: kDefaultAdhanId,
-        fajrAdhanId: 'removed_in_a_future_build',
-      );
+    test(
+      'fajr falls back when the override names a track this build lacks',
+      () {
+        final plan = planReminders(
+          now: DateTime(2026, 3, 15, 3, 0),
+          todayPrayers: fakeDay(),
+          azkarEnabled: false,
+          azkarTimeHm: null,
+          texts: _texts,
+          adhanId: kDefaultAdhanId,
+          fajrAdhanId: 'removed_in_a_future_build',
+        );
 
-      expect(plan.single.adhanId, kDefaultAdhanId);
-    });
+        expect(plan.single.adhanId, kDefaultAdhanId);
+      },
+    );
 
     test('with no adhan configured the reminder keeps the default channel', () {
       final plan = planReminders(

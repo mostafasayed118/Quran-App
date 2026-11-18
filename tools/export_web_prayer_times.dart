@@ -161,11 +161,18 @@ void main() {
       fail('timezone "$iana" for city "$id" not found in the bundled database');
     }
     final lngImpliedHours = lng / 15.0;
-    final januaryOffset =
-        tz.TZDateTime(loc, startYear, 1, 1, 12).timeZoneOffset;
+    final januaryOffset = tz.TZDateTime(
+      loc,
+      startYear,
+      1,
+      1,
+      12,
+    ).timeZoneOffset;
     if ((januaryOffset.inMinutes / 60.0 - lngImpliedHours).abs() > 3.5) {
-      fail('"$id" -> $iana offset $januaryOffset strays >3.5h from longitude '
-          '$lngImpliedHours — mapping likely wrong');
+      fail(
+        '"$id" -> $iana offset $januaryOffset strays >3.5h from longitude '
+        '$lngImpliedHours — mapping likely wrong',
+      );
     }
 
     final months = <Map<String, Object>>[];
@@ -202,8 +209,10 @@ void main() {
             asr < maghrib &&
             maghrib < isha &&
             fajr - 10 >= 0)) {
-          fail('$id $y-$m-$d ordering broken: '
-              '[$fajr, $sunrise, $dhuhr, $asr, $maghrib, $isha]');
+          fail(
+            '$id $y-$m-$d ordering broken: '
+            '[$fajr, $sunrise, $dhuhr, $asr, $maghrib, $isha]',
+          );
         }
         days.add([fajr, sunrise, dhuhr, asr, maghrib, isha, fajr - 10]);
       }
@@ -240,25 +249,35 @@ void main() {
   }
   if (totalDays != cities.length * expectedDaysPerCity) {
     fail(
-        'expected ${cities.length * expectedDaysPerCity} day rows, got $totalDays');
+      'expected ${cities.length * expectedDaysPerCity} day rows, got $totalDays',
+    );
   }
   final index = jsonEncode({'cities': indexRows});
   File('${outDir.path}/index.json').writeAsStringSync(index);
   totalBytes += index.length;
 
   final sampleCairo = File('${outDir.path}/eg-cairo.json').readAsStringSync();
-  final firstDay = ((((jsonDecode(sampleCairo) as Map)['months'] as List).first
-          as Map)['days'] as List)
-      .first;
-  stdout
-      .writeln('OK: ${cities.length} cities x 24 months ($totalDays day rows)');
-  stdout.writeln('sample eg-cairo 2026-01-01 '
-      '[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak]: $firstDay');
-  stdout.writeln('total bytes: $totalBytes '
-      '(${(totalBytes / 1024 / 1024).toStringAsFixed(2)} MB)');
+  final firstDay =
+      ((((jsonDecode(sampleCairo) as Map)['months'] as List).first
+                  as Map)['days']
+              as List)
+          .first;
+  stdout.writeln(
+    'OK: ${cities.length} cities x 24 months ($totalDays day rows)',
+  );
+  stdout.writeln(
+    'sample eg-cairo 2026-01-01 '
+    '[fajr, sunrise, dhuhr, asr, maghrib, isha, imsak]: $firstDay',
+  );
+  stdout.writeln(
+    'total bytes: $totalBytes '
+    '(${(totalBytes / 1024 / 1024).toStringAsFixed(2)} MB)',
+  );
   stdout.writeln('wrapped-past-midnight isha days: $wrappedIshaDays');
   if (totalBytes > maxTotalBytes) {
-    fail('size guard: $totalBytes bytes exceeds '
-        '${maxTotalBytes ~/ (1024 * 1024)} MB — STOP and report to PM');
+    fail(
+      'size guard: $totalBytes bytes exceeds '
+      '${maxTotalBytes ~/ (1024 * 1024)} MB — STOP and report to PM',
+    );
   }
 }

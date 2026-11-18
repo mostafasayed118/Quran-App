@@ -21,9 +21,9 @@ class HadithStore {
     required Future<String?> Function(String packId) packPath,
     Future<dynamic> Function(String path)? fileDecoder,
     int? maxSqlVariables,
-  })  : _packPath = packPath,
-        _fileDecoder = fileDecoder,
-        _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
+  }) : _packPath = packPath,
+       _fileDecoder = fileDecoder,
+       _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
 
   final AppDatabase _db;
   final Future<String?> Function(String packId) _packPath;
@@ -43,7 +43,10 @@ class HadithStore {
   /// A paged window of an installed hadith pack:
   /// `([ (hadithnumber, text), ... ], hasMore)`.
   Future<(List<(int, String)>, bool)> hadithPage(
-      String packId, int offset, int limit) async {
+    String packId,
+    int offset,
+    int limit,
+  ) async {
     if (offset < 0 || limit <= 0) {
       return (const <(int, String)>[], false);
     }
@@ -58,15 +61,17 @@ class HadithStore {
     if (total == 0 || offset >= total) {
       return (const <(int, String)>[], false);
     }
-    final rows = await _db.customSelect(
-      'SELECT number, body FROM hadith_entries WHERE pack_id = ? '
-      'ORDER BY ordinal LIMIT ? OFFSET ?',
-      variables: [
-        Variable.withString(packId),
-        Variable.withInt(limit),
-        Variable.withInt(offset),
-      ],
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT number, body FROM hadith_entries WHERE pack_id = ? '
+          'ORDER BY ordinal LIMIT ? OFFSET ?',
+          variables: [
+            Variable.withString(packId),
+            Variable.withInt(limit),
+            Variable.withInt(offset),
+          ],
+        )
+        .get();
     final items = <(int, String)>[
       // Malformed source slots keep their ordinal (so hasMore stays exact)
       // but are filtered from the page. Empty text is a valid value: the UI
@@ -95,17 +100,19 @@ class HadithStore {
     await _ensureTable();
     await _ensureImported(packId);
     await _backfillNorm(packId);
-    final rows = await _db.customSelect(
-      'SELECT number, body FROM hadith_entries '
-      'WHERE pack_id = ? AND norm LIKE ? '
-      'ORDER BY ordinal LIMIT ? OFFSET ?',
-      variables: [
-        Variable.withString(packId),
-        Variable.withString('%$prepared%'),
-        Variable.withInt(limit + 1),
-        Variable.withInt(offset),
-      ],
-    ).get();
+    final rows = await _db
+        .customSelect(
+          'SELECT number, body FROM hadith_entries '
+          'WHERE pack_id = ? AND norm LIKE ? '
+          'ORDER BY ordinal LIMIT ? OFFSET ?',
+          variables: [
+            Variable.withString(packId),
+            Variable.withString('%$prepared%'),
+            Variable.withInt(limit + 1),
+            Variable.withInt(offset),
+          ],
+        )
+        .get();
     final hasMore = rows.length > limit;
     final items = <(int, String)>[
       for (final row in rows.take(limit))
@@ -116,10 +123,7 @@ class HadithStore {
   }
 
   /// The stored rows whose hadith numbers are in [numbers], in book order.
-  Future<List<(int, String)>> byNumbers(
-    String packId,
-    Set<int> numbers,
-  ) async {
+  Future<List<(int, String)>> byNumbers(String packId, Set<int> numbers) async {
     if (numbers.isEmpty) return const <(int, String)>[];
     await _ensureTable();
     await _ensureImported(packId);
@@ -129,19 +133,24 @@ class HadithStore {
     final sorted = numbers.toList()..sort();
     for (final batch in sqlBatches(sorted, size: _maxSqlVariables)) {
       final placeholders = List<String>.filled(batch.length, '?').join(',');
-      final rows = await _db.customSelect(
-        'SELECT ordinal, number, body FROM hadith_entries '
-        'WHERE pack_id = ? AND number IN ($placeholders) ORDER BY ordinal',
-        variables: [
-          Variable.withString(packId),
-          for (final number in batch) Variable.withInt(number),
-        ],
-      ).get();
+      final rows = await _db
+          .customSelect(
+            'SELECT ordinal, number, body FROM hadith_entries '
+            'WHERE pack_id = ? AND number IN ($placeholders) ORDER BY ordinal',
+            variables: [
+              Variable.withString(packId),
+              for (final number in batch) Variable.withInt(number),
+            ],
+          )
+          .get();
       for (final row in rows) {
         final number = row.read<int>('number');
         if (number >= 0) {
-          ordered.add(
-              (row.read<int>('ordinal'), number, row.read<String>('body')));
+          ordered.add((
+            row.read<int>('ordinal'),
+            number,
+            row.read<String>('body'),
+          ));
         }
       }
     }
@@ -151,19 +160,23 @@ class HadithStore {
 
   /// Fills `norm` for rows imported before the search column existed.
   Future<void> _backfillNorm(String packId) async {
-    final pending = await _db.customSelect(
-      "SELECT COUNT(*) AS c FROM hadith_entries "
-      "WHERE pack_id = ? AND body != '' AND norm = ''",
-      variables: [Variable.withString(packId)],
-    ).getSingle();
+    final pending = await _db
+        .customSelect(
+          "SELECT COUNT(*) AS c FROM hadith_entries "
+          "WHERE pack_id = ? AND body != '' AND norm = ''",
+          variables: [Variable.withString(packId)],
+        )
+        .getSingle();
     if (pending.read<int>('c') == 0) return;
     // Only the pending rows: the count above gates this path, but selecting
     // the whole pack would rewrite every already-normalized row on each open.
-    final rows = await _db.customSelect(
-      "SELECT ordinal, body FROM hadith_entries "
-      "WHERE pack_id = ? AND body != '' AND norm = ''",
-      variables: [Variable.withString(packId)],
-    ).get();
+    final rows = await _db
+        .customSelect(
+          "SELECT ordinal, body FROM hadith_entries "
+          "WHERE pack_id = ? AND body != '' AND norm = ''",
+          variables: [Variable.withString(packId)],
+        )
+        .get();
     await _db.transaction(() async {
       await _db.batch((batch) {
         for (final row in rows) {
@@ -206,18 +219,19 @@ class HadithStore {
         )
         .getSingleOrNull();
     if (exists == null) return;
-    await _db.customStatement(
-        'DELETE FROM hadith_entries WHERE pack_id = ?', [packId]);
+    await _db.customStatement('DELETE FROM hadith_entries WHERE pack_id = ?', [
+      packId,
+    ]);
   }
 
   Future<void> _ensureImported(String packId) => _runImport(packId, () async {
-        if (await _count(packId) > 0) return;
-        final path = await _packPath(packId);
-        if (path == null) return;
-        final compact = await _decode(path);
-        if (compact == null) return;
-        await _write(packId, compact);
-      });
+    if (await _count(packId) > 0) return;
+    final path = await _packPath(packId);
+    if (path == null) return;
+    final compact = await _decode(path);
+    if (compact == null) return;
+    await _write(packId, compact);
+  });
 
   Future<void> _runImport(String packId, Future<void> Function() action) {
     final pending = _imports[packId];
@@ -241,8 +255,9 @@ class HadithStore {
       "norm TEXT NOT NULL DEFAULT '', "
       'PRIMARY KEY (pack_id, ordinal))',
     );
-    final info =
-        await _db.customSelect('PRAGMA table_info(hadith_entries)').get();
+    final info = await _db
+        .customSelect('PRAGMA table_info(hadith_entries)')
+        .get();
     final hasNorm = info.any((row) => row.read<String>('name') == 'norm');
     if (!hasNorm) {
       await _db.customStatement(
@@ -252,17 +267,21 @@ class HadithStore {
   }
 
   Future<int> _count(String packId) async {
-    final row = await _db.customSelect(
-      'SELECT COUNT(*) AS c FROM hadith_entries WHERE pack_id = ?',
-      variables: [Variable.withString(packId)],
-    ).getSingle();
+    final row = await _db
+        .customSelect(
+          'SELECT COUNT(*) AS c FROM hadith_entries WHERE pack_id = ?',
+          variables: [Variable.withString(packId)],
+        )
+        .getSingle();
     return row.read<int>('c');
   }
 
   Future<void> _write(String packId, List<(int, String)?> compact) async {
     await _db.transaction(() async {
       await _db.customStatement(
-          'DELETE FROM hadith_entries WHERE pack_id = ?', [packId]);
+        'DELETE FROM hadith_entries WHERE pack_id = ?',
+        [packId],
+      );
       for (var start = 0; start < compact.length; start += _importChunk) {
         final end = start + _importChunk < compact.length
             ? start + _importChunk

@@ -29,24 +29,32 @@ void main() {
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'Medinan',
-          ayahCount: 286,
-          pagesStart: 2,
-          pagesEnd: 49,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'Medinan',
+            ayahCount: 286,
+            pagesStart: 2,
+            pagesEnd: 49,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(8),
+            surahId: 2,
+            numberInSurah: 1,
+            juz: 1,
+            page: 2,
+            textUthmani: 'الم',
+            textImlaei: 'الم',
+          ),
+        );
     fake = FakePrayerTimeService();
   });
 
@@ -83,8 +91,10 @@ void main() {
 
   test('seeded city populates the next-prayer card from the service', () async {
     await city.select(cairoCity);
-    fake.nextResult =
-        PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+    fake.nextResult = PrayerChoice(
+      PrayerName.asr,
+      DateTime(2026, 3, 15, 15, 35),
+    );
     final cubit = await build();
     final ready = cubit.state as HomeReady;
     expect(ready.nextPrayer, isNotNull);

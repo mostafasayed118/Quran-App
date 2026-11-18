@@ -11,95 +11,147 @@ class $SurahsTable extends Surahs with TableInfo<$SurahsTable, Surah> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false);
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _nameArMeta = const VerificationMeta('nameAr');
   @override
   late final GeneratedColumn<String> nameAr = GeneratedColumn<String>(
-      'name_ar', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'name_ar',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _nameEnMeta = const VerificationMeta('nameEn');
   @override
   late final GeneratedColumn<String> nameEn = GeneratedColumn<String>(
-      'name_en', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _revelationTypeMeta =
-      const VerificationMeta('revelationType');
+    'name_en',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _revelationTypeMeta = const VerificationMeta(
+    'revelationType',
+  );
   @override
   late final GeneratedColumn<String> revelationType = GeneratedColumn<String>(
-      'revelation_type', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _ayahCountMeta =
-      const VerificationMeta('ayahCount');
+    'revelation_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ayahCountMeta = const VerificationMeta(
+    'ayahCount',
+  );
   @override
   late final GeneratedColumn<int> ayahCount = GeneratedColumn<int>(
-      'ayah_count', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _pagesStartMeta =
-      const VerificationMeta('pagesStart');
+    'ayah_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pagesStartMeta = const VerificationMeta(
+    'pagesStart',
+  );
   @override
   late final GeneratedColumn<int> pagesStart = GeneratedColumn<int>(
-      'pages_start', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _pagesEndMeta =
-      const VerificationMeta('pagesEnd');
+    'pages_start',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pagesEndMeta = const VerificationMeta(
+    'pagesEnd',
+  );
   @override
   late final GeneratedColumn<int> pagesEnd = GeneratedColumn<int>(
-      'pages_end', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'pages_end',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, nameAr, nameEn, revelationType, ayahCount, pagesStart, pagesEnd];
+  List<GeneratedColumn> get $columns => [
+    id,
+    nameAr,
+    nameEn,
+    revelationType,
+    ayahCount,
+    pagesStart,
+    pagesEnd,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'surahs';
   @override
-  VerificationContext validateIntegrity(Insertable<Surah> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Surah> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('name_ar')) {
-      context.handle(_nameArMeta,
-          nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta));
+      context.handle(
+        _nameArMeta,
+        nameAr.isAcceptableOrUnknown(data['name_ar']!, _nameArMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameArMeta);
     }
     if (data.containsKey('name_en')) {
-      context.handle(_nameEnMeta,
-          nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta));
+      context.handle(
+        _nameEnMeta,
+        nameEn.isAcceptableOrUnknown(data['name_en']!, _nameEnMeta),
+      );
     } else if (isInserting) {
       context.missing(_nameEnMeta);
     }
     if (data.containsKey('revelation_type')) {
       context.handle(
+        _revelationTypeMeta,
+        revelationType.isAcceptableOrUnknown(
+          data['revelation_type']!,
           _revelationTypeMeta,
-          revelationType.isAcceptableOrUnknown(
-              data['revelation_type']!, _revelationTypeMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_revelationTypeMeta);
     }
     if (data.containsKey('ayah_count')) {
-      context.handle(_ayahCountMeta,
-          ayahCount.isAcceptableOrUnknown(data['ayah_count']!, _ayahCountMeta));
+      context.handle(
+        _ayahCountMeta,
+        ayahCount.isAcceptableOrUnknown(data['ayah_count']!, _ayahCountMeta),
+      );
     } else if (isInserting) {
       context.missing(_ayahCountMeta);
     }
     if (data.containsKey('pages_start')) {
       context.handle(
-          _pagesStartMeta,
-          pagesStart.isAcceptableOrUnknown(
-              data['pages_start']!, _pagesStartMeta));
+        _pagesStartMeta,
+        pagesStart.isAcceptableOrUnknown(data['pages_start']!, _pagesStartMeta),
+      );
     } else if (isInserting) {
       context.missing(_pagesStartMeta);
     }
     if (data.containsKey('pages_end')) {
-      context.handle(_pagesEndMeta,
-          pagesEnd.isAcceptableOrUnknown(data['pages_end']!, _pagesEndMeta));
+      context.handle(
+        _pagesEndMeta,
+        pagesEnd.isAcceptableOrUnknown(data['pages_end']!, _pagesEndMeta),
+      );
     } else if (isInserting) {
       context.missing(_pagesEndMeta);
     }
@@ -112,20 +164,34 @@ class $SurahsTable extends Surahs with TableInfo<$SurahsTable, Surah> {
   Surah map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Surah(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      nameAr: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name_ar'])!,
-      nameEn: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}name_en'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      nameAr: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_ar'],
+      )!,
+      nameEn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_en'],
+      )!,
       revelationType: attachedDatabase.typeMapping.read(
-          DriftSqlType.string, data['${effectivePrefix}revelation_type'])!,
-      ayahCount: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}ayah_count'])!,
-      pagesStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pages_start'])!,
-      pagesEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}pages_end'])!,
+        DriftSqlType.string,
+        data['${effectivePrefix}revelation_type'],
+      )!,
+      ayahCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah_count'],
+      )!,
+      pagesStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pages_start'],
+      )!,
+      pagesEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pages_end'],
+      )!,
     );
   }
 
@@ -149,14 +215,15 @@ class Surah extends DataClass implements Insertable<Surah> {
 
   /// Last mushaf page of the surah (inclusive).
   final int pagesEnd;
-  const Surah(
-      {required this.id,
-      required this.nameAr,
-      required this.nameEn,
-      required this.revelationType,
-      required this.ayahCount,
-      required this.pagesStart,
-      required this.pagesEnd});
+  const Surah({
+    required this.id,
+    required this.nameAr,
+    required this.nameEn,
+    required this.revelationType,
+    required this.ayahCount,
+    required this.pagesStart,
+    required this.pagesEnd,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -182,8 +249,10 @@ class Surah extends DataClass implements Insertable<Surah> {
     );
   }
 
-  factory Surah.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Surah.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Surah(
       id: serializer.fromJson<int>(json['id']),
@@ -209,23 +278,23 @@ class Surah extends DataClass implements Insertable<Surah> {
     };
   }
 
-  Surah copyWith(
-          {int? id,
-          String? nameAr,
-          String? nameEn,
-          String? revelationType,
-          int? ayahCount,
-          int? pagesStart,
-          int? pagesEnd}) =>
-      Surah(
-        id: id ?? this.id,
-        nameAr: nameAr ?? this.nameAr,
-        nameEn: nameEn ?? this.nameEn,
-        revelationType: revelationType ?? this.revelationType,
-        ayahCount: ayahCount ?? this.ayahCount,
-        pagesStart: pagesStart ?? this.pagesStart,
-        pagesEnd: pagesEnd ?? this.pagesEnd,
-      );
+  Surah copyWith({
+    int? id,
+    String? nameAr,
+    String? nameEn,
+    String? revelationType,
+    int? ayahCount,
+    int? pagesStart,
+    int? pagesEnd,
+  }) => Surah(
+    id: id ?? this.id,
+    nameAr: nameAr ?? this.nameAr,
+    nameEn: nameEn ?? this.nameEn,
+    revelationType: revelationType ?? this.revelationType,
+    ayahCount: ayahCount ?? this.ayahCount,
+    pagesStart: pagesStart ?? this.pagesStart,
+    pagesEnd: pagesEnd ?? this.pagesEnd,
+  );
   Surah copyWithCompanion(SurahsCompanion data) {
     return Surah(
       id: data.id.present ? data.id.value : this.id,
@@ -235,8 +304,9 @@ class Surah extends DataClass implements Insertable<Surah> {
           ? data.revelationType.value
           : this.revelationType,
       ayahCount: data.ayahCount.present ? data.ayahCount.value : this.ayahCount,
-      pagesStart:
-          data.pagesStart.present ? data.pagesStart.value : this.pagesStart,
+      pagesStart: data.pagesStart.present
+          ? data.pagesStart.value
+          : this.pagesStart,
       pagesEnd: data.pagesEnd.present ? data.pagesEnd.value : this.pagesEnd,
     );
   }
@@ -257,7 +327,14 @@ class Surah extends DataClass implements Insertable<Surah> {
 
   @override
   int get hashCode => Object.hash(
-      id, nameAr, nameEn, revelationType, ayahCount, pagesStart, pagesEnd);
+    id,
+    nameAr,
+    nameEn,
+    revelationType,
+    ayahCount,
+    pagesStart,
+    pagesEnd,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -296,12 +373,12 @@ class SurahsCompanion extends UpdateCompanion<Surah> {
     required int ayahCount,
     required int pagesStart,
     required int pagesEnd,
-  })  : nameAr = Value(nameAr),
-        nameEn = Value(nameEn),
-        revelationType = Value(revelationType),
-        ayahCount = Value(ayahCount),
-        pagesStart = Value(pagesStart),
-        pagesEnd = Value(pagesEnd);
+  }) : nameAr = Value(nameAr),
+       nameEn = Value(nameEn),
+       revelationType = Value(revelationType),
+       ayahCount = Value(ayahCount),
+       pagesStart = Value(pagesStart),
+       pagesEnd = Value(pagesEnd);
   static Insertable<Surah> custom({
     Expression<int>? id,
     Expression<String>? nameAr,
@@ -322,14 +399,15 @@ class SurahsCompanion extends UpdateCompanion<Surah> {
     });
   }
 
-  SurahsCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? nameAr,
-      Value<String>? nameEn,
-      Value<String>? revelationType,
-      Value<int>? ayahCount,
-      Value<int>? pagesStart,
-      Value<int>? pagesEnd}) {
+  SurahsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? nameAr,
+    Value<String>? nameEn,
+    Value<String>? revelationType,
+    Value<int>? ayahCount,
+    Value<int>? pagesStart,
+    Value<int>? pagesEnd,
+  }) {
     return SurahsCompanion(
       id: id ?? this.id,
       nameAr: nameAr ?? this.nameAr,
@@ -391,142 +469,208 @@ class $AyahsTable extends Ayahs with TableInfo<$AyahsTable, Ayah> {
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _surahIdMeta =
-      const VerificationMeta('surahId');
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _surahIdMeta = const VerificationMeta(
+    'surahId',
+  );
   @override
   late final GeneratedColumn<int> surahId = GeneratedColumn<int>(
-      'surah_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _numberInSurahMeta =
-      const VerificationMeta('numberInSurah');
+    'surah_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _numberInSurahMeta = const VerificationMeta(
+    'numberInSurah',
+  );
   @override
   late final GeneratedColumn<int> numberInSurah = GeneratedColumn<int>(
-      'number_in_surah', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'number_in_surah',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _juzMeta = const VerificationMeta('juz');
   @override
   late final GeneratedColumn<int> juz = GeneratedColumn<int>(
-      'juz', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'juz',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _pageMeta = const VerificationMeta('page');
   @override
   late final GeneratedColumn<int> page = GeneratedColumn<int>(
-      'page', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _lineStartMeta =
-      const VerificationMeta('lineStart');
+    'page',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lineStartMeta = const VerificationMeta(
+    'lineStart',
+  );
   @override
   late final GeneratedColumn<int> lineStart = GeneratedColumn<int>(
-      'line_start', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _lineEndMeta =
-      const VerificationMeta('lineEnd');
+    'line_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lineEndMeta = const VerificationMeta(
+    'lineEnd',
+  );
   @override
   late final GeneratedColumn<int> lineEnd = GeneratedColumn<int>(
-      'line_end', aliasedName, true,
-      type: DriftSqlType.int, requiredDuringInsert: false);
-  static const VerificationMeta _textUthmaniMeta =
-      const VerificationMeta('textUthmani');
+    'line_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _textUthmaniMeta = const VerificationMeta(
+    'textUthmani',
+  );
   @override
   late final GeneratedColumn<String> textUthmani = GeneratedColumn<String>(
-      'text_uthmani', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _textImlaeiMeta =
-      const VerificationMeta('textImlaei');
+    'text_uthmani',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _textImlaeiMeta = const VerificationMeta(
+    'textImlaei',
+  );
   @override
   late final GeneratedColumn<String> textImlaei = GeneratedColumn<String>(
-      'text_imlaei', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'text_imlaei',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _sajdaMeta = const VerificationMeta('sajda');
   @override
   late final GeneratedColumn<bool> sajda = GeneratedColumn<bool>(
-      'sajda', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("sajda" IN (0, 1))'),
-      defaultValue: const Constant(false));
+    'sajda',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sajda" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
-        id,
-        surahId,
-        numberInSurah,
-        juz,
-        page,
-        lineStart,
-        lineEnd,
-        textUthmani,
-        textImlaei,
-        sajda
-      ];
+    id,
+    surahId,
+    numberInSurah,
+    juz,
+    page,
+    lineStart,
+    lineEnd,
+    textUthmani,
+    textImlaei,
+    sajda,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'ayahs';
   @override
-  VerificationContext validateIntegrity(Insertable<Ayah> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Ayah> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('surah_id')) {
-      context.handle(_surahIdMeta,
-          surahId.isAcceptableOrUnknown(data['surah_id']!, _surahIdMeta));
+      context.handle(
+        _surahIdMeta,
+        surahId.isAcceptableOrUnknown(data['surah_id']!, _surahIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_surahIdMeta);
     }
     if (data.containsKey('number_in_surah')) {
       context.handle(
+        _numberInSurahMeta,
+        numberInSurah.isAcceptableOrUnknown(
+          data['number_in_surah']!,
           _numberInSurahMeta,
-          numberInSurah.isAcceptableOrUnknown(
-              data['number_in_surah']!, _numberInSurahMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_numberInSurahMeta);
     }
     if (data.containsKey('juz')) {
       context.handle(
-          _juzMeta, juz.isAcceptableOrUnknown(data['juz']!, _juzMeta));
+        _juzMeta,
+        juz.isAcceptableOrUnknown(data['juz']!, _juzMeta),
+      );
     } else if (isInserting) {
       context.missing(_juzMeta);
     }
     if (data.containsKey('page')) {
       context.handle(
-          _pageMeta, page.isAcceptableOrUnknown(data['page']!, _pageMeta));
+        _pageMeta,
+        page.isAcceptableOrUnknown(data['page']!, _pageMeta),
+      );
     } else if (isInserting) {
       context.missing(_pageMeta);
     }
     if (data.containsKey('line_start')) {
-      context.handle(_lineStartMeta,
-          lineStart.isAcceptableOrUnknown(data['line_start']!, _lineStartMeta));
+      context.handle(
+        _lineStartMeta,
+        lineStart.isAcceptableOrUnknown(data['line_start']!, _lineStartMeta),
+      );
     }
     if (data.containsKey('line_end')) {
-      context.handle(_lineEndMeta,
-          lineEnd.isAcceptableOrUnknown(data['line_end']!, _lineEndMeta));
+      context.handle(
+        _lineEndMeta,
+        lineEnd.isAcceptableOrUnknown(data['line_end']!, _lineEndMeta),
+      );
     }
     if (data.containsKey('text_uthmani')) {
       context.handle(
+        _textUthmaniMeta,
+        textUthmani.isAcceptableOrUnknown(
+          data['text_uthmani']!,
           _textUthmaniMeta,
-          textUthmani.isAcceptableOrUnknown(
-              data['text_uthmani']!, _textUthmaniMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_textUthmaniMeta);
     }
     if (data.containsKey('text_imlaei')) {
       context.handle(
-          _textImlaeiMeta,
-          textImlaei.isAcceptableOrUnknown(
-              data['text_imlaei']!, _textImlaeiMeta));
+        _textImlaeiMeta,
+        textImlaei.isAcceptableOrUnknown(data['text_imlaei']!, _textImlaeiMeta),
+      );
     } else if (isInserting) {
       context.missing(_textImlaeiMeta);
     }
     if (data.containsKey('sajda')) {
       context.handle(
-          _sajdaMeta, sajda.isAcceptableOrUnknown(data['sajda']!, _sajdaMeta));
+        _sajdaMeta,
+        sajda.isAcceptableOrUnknown(data['sajda']!, _sajdaMeta),
+      );
     }
     return context;
   }
@@ -537,26 +681,46 @@ class $AyahsTable extends Ayahs with TableInfo<$AyahsTable, Ayah> {
   Ayah map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Ayah(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      surahId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}surah_id'])!,
-      numberInSurah: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}number_in_surah'])!,
-      juz: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}juz'])!,
-      page: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}page'])!,
-      lineStart: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}line_start']),
-      lineEnd: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}line_end']),
-      textUthmani: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}text_uthmani'])!,
-      textImlaei: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}text_imlaei'])!,
-      sajda: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}sajda'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      surahId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_id'],
+      )!,
+      numberInSurah: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}number_in_surah'],
+      )!,
+      juz: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}juz'],
+      )!,
+      page: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page'],
+      )!,
+      lineStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line_start'],
+      ),
+      lineEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}line_end'],
+      ),
+      textUthmani: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_uthmani'],
+      )!,
+      textImlaei: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_imlaei'],
+      )!,
+      sajda: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sajda'],
+      )!,
     );
   }
 
@@ -590,17 +754,18 @@ class Ayah extends DataClass implements Insertable<Ayah> {
 
   /// True when the ayah ends with a sajda (prostration) marker.
   final bool sajda;
-  const Ayah(
-      {required this.id,
-      required this.surahId,
-      required this.numberInSurah,
-      required this.juz,
-      required this.page,
-      this.lineStart,
-      this.lineEnd,
-      required this.textUthmani,
-      required this.textImlaei,
-      required this.sajda});
+  const Ayah({
+    required this.id,
+    required this.surahId,
+    required this.numberInSurah,
+    required this.juz,
+    required this.page,
+    this.lineStart,
+    this.lineEnd,
+    required this.textUthmani,
+    required this.textImlaei,
+    required this.sajda,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -640,8 +805,10 @@ class Ayah extends DataClass implements Insertable<Ayah> {
     );
   }
 
-  factory Ayah.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Ayah.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Ayah(
       id: serializer.fromJson<int>(json['id']),
@@ -673,29 +840,29 @@ class Ayah extends DataClass implements Insertable<Ayah> {
     };
   }
 
-  Ayah copyWith(
-          {int? id,
-          int? surahId,
-          int? numberInSurah,
-          int? juz,
-          int? page,
-          Value<int?> lineStart = const Value.absent(),
-          Value<int?> lineEnd = const Value.absent(),
-          String? textUthmani,
-          String? textImlaei,
-          bool? sajda}) =>
-      Ayah(
-        id: id ?? this.id,
-        surahId: surahId ?? this.surahId,
-        numberInSurah: numberInSurah ?? this.numberInSurah,
-        juz: juz ?? this.juz,
-        page: page ?? this.page,
-        lineStart: lineStart.present ? lineStart.value : this.lineStart,
-        lineEnd: lineEnd.present ? lineEnd.value : this.lineEnd,
-        textUthmani: textUthmani ?? this.textUthmani,
-        textImlaei: textImlaei ?? this.textImlaei,
-        sajda: sajda ?? this.sajda,
-      );
+  Ayah copyWith({
+    int? id,
+    int? surahId,
+    int? numberInSurah,
+    int? juz,
+    int? page,
+    Value<int?> lineStart = const Value.absent(),
+    Value<int?> lineEnd = const Value.absent(),
+    String? textUthmani,
+    String? textImlaei,
+    bool? sajda,
+  }) => Ayah(
+    id: id ?? this.id,
+    surahId: surahId ?? this.surahId,
+    numberInSurah: numberInSurah ?? this.numberInSurah,
+    juz: juz ?? this.juz,
+    page: page ?? this.page,
+    lineStart: lineStart.present ? lineStart.value : this.lineStart,
+    lineEnd: lineEnd.present ? lineEnd.value : this.lineEnd,
+    textUthmani: textUthmani ?? this.textUthmani,
+    textImlaei: textImlaei ?? this.textImlaei,
+    sajda: sajda ?? this.sajda,
+  );
   Ayah copyWithCompanion(AyahsCompanion data) {
     return Ayah(
       id: data.id.present ? data.id.value : this.id,
@@ -707,10 +874,12 @@ class Ayah extends DataClass implements Insertable<Ayah> {
       page: data.page.present ? data.page.value : this.page,
       lineStart: data.lineStart.present ? data.lineStart.value : this.lineStart,
       lineEnd: data.lineEnd.present ? data.lineEnd.value : this.lineEnd,
-      textUthmani:
-          data.textUthmani.present ? data.textUthmani.value : this.textUthmani,
-      textImlaei:
-          data.textImlaei.present ? data.textImlaei.value : this.textImlaei,
+      textUthmani: data.textUthmani.present
+          ? data.textUthmani.value
+          : this.textUthmani,
+      textImlaei: data.textImlaei.present
+          ? data.textImlaei.value
+          : this.textImlaei,
       sajda: data.sajda.present ? data.sajda.value : this.sajda,
     );
   }
@@ -733,8 +902,18 @@ class Ayah extends DataClass implements Insertable<Ayah> {
   }
 
   @override
-  int get hashCode => Object.hash(id, surahId, numberInSurah, juz, page,
-      lineStart, lineEnd, textUthmani, textImlaei, sajda);
+  int get hashCode => Object.hash(
+    id,
+    surahId,
+    numberInSurah,
+    juz,
+    page,
+    lineStart,
+    lineEnd,
+    textUthmani,
+    textImlaei,
+    sajda,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -785,12 +964,12 @@ class AyahsCompanion extends UpdateCompanion<Ayah> {
     required String textUthmani,
     required String textImlaei,
     this.sajda = const Value.absent(),
-  })  : surahId = Value(surahId),
-        numberInSurah = Value(numberInSurah),
-        juz = Value(juz),
-        page = Value(page),
-        textUthmani = Value(textUthmani),
-        textImlaei = Value(textImlaei);
+  }) : surahId = Value(surahId),
+       numberInSurah = Value(numberInSurah),
+       juz = Value(juz),
+       page = Value(page),
+       textUthmani = Value(textUthmani),
+       textImlaei = Value(textImlaei);
   static Insertable<Ayah> custom({
     Expression<int>? id,
     Expression<int>? surahId,
@@ -817,17 +996,18 @@ class AyahsCompanion extends UpdateCompanion<Ayah> {
     });
   }
 
-  AyahsCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? surahId,
-      Value<int>? numberInSurah,
-      Value<int>? juz,
-      Value<int>? page,
-      Value<int?>? lineStart,
-      Value<int?>? lineEnd,
-      Value<String>? textUthmani,
-      Value<String>? textImlaei,
-      Value<bool>? sajda}) {
+  AyahsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? surahId,
+    Value<int>? numberInSurah,
+    Value<int>? juz,
+    Value<int>? page,
+    Value<int?>? lineStart,
+    Value<int?>? lineEnd,
+    Value<String>? textUthmani,
+    Value<String>? textImlaei,
+    Value<bool>? sajda,
+  }) {
     return AyahsCompanion(
       id: id ?? this.id,
       surahId: surahId ?? this.surahId,
@@ -905,25 +1085,37 @@ class $BookmarksTable extends Bookmarks
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _ayahIdMeta = const VerificationMeta('ayahId');
   @override
   late final GeneratedColumn<int> ayahId = GeneratedColumn<int>(
-      'ayah_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _createdAtMeta =
-      const VerificationMeta('createdAt');
+    'ayah_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
   @override
   late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-      'created_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   @override
   List<GeneratedColumn> get $columns => [id, ayahId, createdAt];
   @override
@@ -932,22 +1124,28 @@ class $BookmarksTable extends Bookmarks
   String get actualTableName => $name;
   static const String $name = 'bookmarks';
   @override
-  VerificationContext validateIntegrity(Insertable<Bookmark> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Bookmark> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('ayah_id')) {
-      context.handle(_ayahIdMeta,
-          ayahId.isAcceptableOrUnknown(data['ayah_id']!, _ayahIdMeta));
+      context.handle(
+        _ayahIdMeta,
+        ayahId.isAcceptableOrUnknown(data['ayah_id']!, _ayahIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_ayahIdMeta);
     }
     if (data.containsKey('created_at')) {
-      context.handle(_createdAtMeta,
-          createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
     }
     return context;
   }
@@ -958,12 +1156,18 @@ class $BookmarksTable extends Bookmarks
   Bookmark map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Bookmark(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      ayahId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}ayah_id'])!,
-      createdAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      ayahId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah_id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
     );
   }
 
@@ -981,8 +1185,11 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
 
   /// When the bookmark was created (defaults to write time).
   final DateTime createdAt;
-  const Bookmark(
-      {required this.id, required this.ayahId, required this.createdAt});
+  const Bookmark({
+    required this.id,
+    required this.ayahId,
+    required this.createdAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1000,8 +1207,10 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
     );
   }
 
-  factory Bookmark.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Bookmark.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Bookmark(
       id: serializer.fromJson<int>(json['id']),
@@ -1020,10 +1229,10 @@ class Bookmark extends DataClass implements Insertable<Bookmark> {
   }
 
   Bookmark copyWith({int? id, int? ayahId, DateTime? createdAt}) => Bookmark(
-        id: id ?? this.id,
-        ayahId: ayahId ?? this.ayahId,
-        createdAt: createdAt ?? this.createdAt,
-      );
+    id: id ?? this.id,
+    ayahId: ayahId ?? this.ayahId,
+    createdAt: createdAt ?? this.createdAt,
+  );
   Bookmark copyWithCompanion(BookmarksCompanion data) {
     return Bookmark(
       id: data.id.present ? data.id.value : this.id,
@@ -1079,8 +1288,11 @@ class BookmarksCompanion extends UpdateCompanion<Bookmark> {
     });
   }
 
-  BookmarksCompanion copyWith(
-      {Value<int>? id, Value<int>? ayahId, Value<DateTime>? createdAt}) {
+  BookmarksCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ayahId,
+    Value<DateTime>? createdAt,
+  }) {
     return BookmarksCompanion(
       id: id ?? this.id,
       ayahId: ayahId ?? this.ayahId,
@@ -1123,31 +1335,48 @@ class $KhatmaProgressTable extends KhatmaProgress
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
   static const VerificationMeta _ayahIdMeta = const VerificationMeta('ayahId');
   @override
   late final GeneratedColumn<int> ayahId = GeneratedColumn<int>(
-      'ayah_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _targetPagesMeta =
-      const VerificationMeta('targetPages');
+    'ayah_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _targetPagesMeta = const VerificationMeta(
+    'targetPages',
+  );
   @override
   late final GeneratedColumn<int> targetPages = GeneratedColumn<int>(
-      'target_pages', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _updatedAtMeta =
-      const VerificationMeta('updatedAt');
+    'target_pages',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-      'updated_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   @override
   List<GeneratedColumn> get $columns => [id, ayahId, targetPages, updatedAt];
   @override
@@ -1156,30 +1385,39 @@ class $KhatmaProgressTable extends KhatmaProgress
   String get actualTableName => $name;
   static const String $name = 'khatma_progress';
   @override
-  VerificationContext validateIntegrity(Insertable<KhatmaProgressData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<KhatmaProgressData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('ayah_id')) {
-      context.handle(_ayahIdMeta,
-          ayahId.isAcceptableOrUnknown(data['ayah_id']!, _ayahIdMeta));
+      context.handle(
+        _ayahIdMeta,
+        ayahId.isAcceptableOrUnknown(data['ayah_id']!, _ayahIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_ayahIdMeta);
     }
     if (data.containsKey('target_pages')) {
       context.handle(
+        _targetPagesMeta,
+        targetPages.isAcceptableOrUnknown(
+          data['target_pages']!,
           _targetPagesMeta,
-          targetPages.isAcceptableOrUnknown(
-              data['target_pages']!, _targetPagesMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_targetPagesMeta);
     }
     if (data.containsKey('updated_at')) {
-      context.handle(_updatedAtMeta,
-          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
     }
     return context;
   }
@@ -1190,14 +1428,22 @@ class $KhatmaProgressTable extends KhatmaProgress
   KhatmaProgressData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return KhatmaProgressData(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      ayahId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}ayah_id'])!,
-      targetPages: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}target_pages'])!,
-      updatedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      ayahId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah_id'],
+      )!,
+      targetPages: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}target_pages'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
     );
   }
 
@@ -1219,11 +1465,12 @@ class KhatmaProgressData extends DataClass
 
   /// When the plan last moved (defaults to write time).
   final DateTime updatedAt;
-  const KhatmaProgressData(
-      {required this.id,
-      required this.ayahId,
-      required this.targetPages,
-      required this.updatedAt});
+  const KhatmaProgressData({
+    required this.id,
+    required this.ayahId,
+    required this.targetPages,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1243,8 +1490,10 @@ class KhatmaProgressData extends DataClass
     );
   }
 
-  factory KhatmaProgressData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory KhatmaProgressData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return KhatmaProgressData(
       id: serializer.fromJson<int>(json['id']),
@@ -1264,20 +1513,24 @@ class KhatmaProgressData extends DataClass
     };
   }
 
-  KhatmaProgressData copyWith(
-          {int? id, int? ayahId, int? targetPages, DateTime? updatedAt}) =>
-      KhatmaProgressData(
-        id: id ?? this.id,
-        ayahId: ayahId ?? this.ayahId,
-        targetPages: targetPages ?? this.targetPages,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
+  KhatmaProgressData copyWith({
+    int? id,
+    int? ayahId,
+    int? targetPages,
+    DateTime? updatedAt,
+  }) => KhatmaProgressData(
+    id: id ?? this.id,
+    ayahId: ayahId ?? this.ayahId,
+    targetPages: targetPages ?? this.targetPages,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
   KhatmaProgressData copyWithCompanion(KhatmaProgressCompanion data) {
     return KhatmaProgressData(
       id: data.id.present ? data.id.value : this.id,
       ayahId: data.ayahId.present ? data.ayahId.value : this.ayahId,
-      targetPages:
-          data.targetPages.present ? data.targetPages.value : this.targetPages,
+      targetPages: data.targetPages.present
+          ? data.targetPages.value
+          : this.targetPages,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1321,8 +1574,8 @@ class KhatmaProgressCompanion extends UpdateCompanion<KhatmaProgressData> {
     required int ayahId,
     required int targetPages,
     this.updatedAt = const Value.absent(),
-  })  : ayahId = Value(ayahId),
-        targetPages = Value(targetPages);
+  }) : ayahId = Value(ayahId),
+       targetPages = Value(targetPages);
   static Insertable<KhatmaProgressData> custom({
     Expression<int>? id,
     Expression<int>? ayahId,
@@ -1337,11 +1590,12 @@ class KhatmaProgressCompanion extends UpdateCompanion<KhatmaProgressData> {
     });
   }
 
-  KhatmaProgressCompanion copyWith(
-      {Value<int>? id,
-      Value<int>? ayahId,
-      Value<int>? targetPages,
-      Value<DateTime>? updatedAt}) {
+  KhatmaProgressCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ayahId,
+    Value<int>? targetPages,
+    Value<DateTime>? updatedAt,
+  }) {
     return KhatmaProgressCompanion(
       id: id ?? this.id,
       ayahId: ayahId ?? this.ayahId,
@@ -1389,54 +1643,79 @@ class $PrayerLogTable extends PrayerLog
   static const VerificationMeta _dayMeta = const VerificationMeta('day');
   @override
   late final GeneratedColumn<DateTime> day = GeneratedColumn<DateTime>(
-      'day', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+    'day',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _fajrMeta = const VerificationMeta('fajr');
   @override
   late final GeneratedColumn<bool> fajr = GeneratedColumn<bool>(
-      'fajr', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("fajr" IN (0, 1))'),
-      defaultValue: const Constant(false));
+    'fajr',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("fajr" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _dhuhrMeta = const VerificationMeta('dhuhr');
   @override
   late final GeneratedColumn<bool> dhuhr = GeneratedColumn<bool>(
-      'dhuhr', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("dhuhr" IN (0, 1))'),
-      defaultValue: const Constant(false));
+    'dhuhr',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("dhuhr" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _asrMeta = const VerificationMeta('asr');
   @override
   late final GeneratedColumn<bool> asr = GeneratedColumn<bool>(
-      'asr', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("asr" IN (0, 1))'),
-      defaultValue: const Constant(false));
-  static const VerificationMeta _maghribMeta =
-      const VerificationMeta('maghrib');
+    'asr',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("asr" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _maghribMeta = const VerificationMeta(
+    'maghrib',
+  );
   @override
   late final GeneratedColumn<bool> maghrib = GeneratedColumn<bool>(
-      'maghrib', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("maghrib" IN (0, 1))'),
-      defaultValue: const Constant(false));
+    'maghrib',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("maghrib" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _ishaMeta = const VerificationMeta('isha');
   @override
   late final GeneratedColumn<bool> isha = GeneratedColumn<bool>(
-      'isha', aliasedName, false,
-      type: DriftSqlType.bool,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('CHECK ("isha" IN (0, 1))'),
-      defaultValue: const Constant(false));
+    'isha',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("isha" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [day, fajr, dhuhr, asr, maghrib, isha];
   @override
@@ -1445,35 +1724,49 @@ class $PrayerLogTable extends PrayerLog
   String get actualTableName => $name;
   static const String $name = 'prayer_log';
   @override
-  VerificationContext validateIntegrity(Insertable<PrayerLogData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<PrayerLogData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('day')) {
       context.handle(
-          _dayMeta, day.isAcceptableOrUnknown(data['day']!, _dayMeta));
+        _dayMeta,
+        day.isAcceptableOrUnknown(data['day']!, _dayMeta),
+      );
     } else if (isInserting) {
       context.missing(_dayMeta);
     }
     if (data.containsKey('fajr')) {
       context.handle(
-          _fajrMeta, fajr.isAcceptableOrUnknown(data['fajr']!, _fajrMeta));
+        _fajrMeta,
+        fajr.isAcceptableOrUnknown(data['fajr']!, _fajrMeta),
+      );
     }
     if (data.containsKey('dhuhr')) {
       context.handle(
-          _dhuhrMeta, dhuhr.isAcceptableOrUnknown(data['dhuhr']!, _dhuhrMeta));
+        _dhuhrMeta,
+        dhuhr.isAcceptableOrUnknown(data['dhuhr']!, _dhuhrMeta),
+      );
     }
     if (data.containsKey('asr')) {
       context.handle(
-          _asrMeta, asr.isAcceptableOrUnknown(data['asr']!, _asrMeta));
+        _asrMeta,
+        asr.isAcceptableOrUnknown(data['asr']!, _asrMeta),
+      );
     }
     if (data.containsKey('maghrib')) {
-      context.handle(_maghribMeta,
-          maghrib.isAcceptableOrUnknown(data['maghrib']!, _maghribMeta));
+      context.handle(
+        _maghribMeta,
+        maghrib.isAcceptableOrUnknown(data['maghrib']!, _maghribMeta),
+      );
     }
     if (data.containsKey('isha')) {
       context.handle(
-          _ishaMeta, isha.isAcceptableOrUnknown(data['isha']!, _ishaMeta));
+        _ishaMeta,
+        isha.isAcceptableOrUnknown(data['isha']!, _ishaMeta),
+      );
     }
     return context;
   }
@@ -1484,18 +1777,30 @@ class $PrayerLogTable extends PrayerLog
   PrayerLogData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return PrayerLogData(
-      day: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}day'])!,
-      fajr: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}fajr'])!,
-      dhuhr: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}dhuhr'])!,
-      asr: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}asr'])!,
-      maghrib: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}maghrib'])!,
-      isha: attachedDatabase.typeMapping
-          .read(DriftSqlType.bool, data['${effectivePrefix}isha'])!,
+      day: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}day'],
+      )!,
+      fajr: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}fajr'],
+      )!,
+      dhuhr: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}dhuhr'],
+      )!,
+      asr: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}asr'],
+      )!,
+      maghrib: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}maghrib'],
+      )!,
+      isha: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}isha'],
+      )!,
     );
   }
 
@@ -1523,13 +1828,14 @@ class PrayerLogData extends DataClass implements Insertable<PrayerLogData> {
 
   /// Isha marked on [day].
   final bool isha;
-  const PrayerLogData(
-      {required this.day,
-      required this.fajr,
-      required this.dhuhr,
-      required this.asr,
-      required this.maghrib,
-      required this.isha});
+  const PrayerLogData({
+    required this.day,
+    required this.fajr,
+    required this.dhuhr,
+    required this.asr,
+    required this.maghrib,
+    required this.isha,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1553,8 +1859,10 @@ class PrayerLogData extends DataClass implements Insertable<PrayerLogData> {
     );
   }
 
-  factory PrayerLogData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory PrayerLogData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return PrayerLogData(
       day: serializer.fromJson<DateTime>(json['day']),
@@ -1578,21 +1886,21 @@ class PrayerLogData extends DataClass implements Insertable<PrayerLogData> {
     };
   }
 
-  PrayerLogData copyWith(
-          {DateTime? day,
-          bool? fajr,
-          bool? dhuhr,
-          bool? asr,
-          bool? maghrib,
-          bool? isha}) =>
-      PrayerLogData(
-        day: day ?? this.day,
-        fajr: fajr ?? this.fajr,
-        dhuhr: dhuhr ?? this.dhuhr,
-        asr: asr ?? this.asr,
-        maghrib: maghrib ?? this.maghrib,
-        isha: isha ?? this.isha,
-      );
+  PrayerLogData copyWith({
+    DateTime? day,
+    bool? fajr,
+    bool? dhuhr,
+    bool? asr,
+    bool? maghrib,
+    bool? isha,
+  }) => PrayerLogData(
+    day: day ?? this.day,
+    fajr: fajr ?? this.fajr,
+    dhuhr: dhuhr ?? this.dhuhr,
+    asr: asr ?? this.asr,
+    maghrib: maghrib ?? this.maghrib,
+    isha: isha ?? this.isha,
+  );
   PrayerLogData copyWithCompanion(PrayerLogCompanion data) {
     return PrayerLogData(
       day: data.day.present ? data.day.value : this.day,
@@ -1677,14 +1985,15 @@ class PrayerLogCompanion extends UpdateCompanion<PrayerLogData> {
     });
   }
 
-  PrayerLogCompanion copyWith(
-      {Value<DateTime>? day,
-      Value<bool>? fajr,
-      Value<bool>? dhuhr,
-      Value<bool>? asr,
-      Value<bool>? maghrib,
-      Value<bool>? isha,
-      Value<int>? rowid}) {
+  PrayerLogCompanion copyWith({
+    Value<DateTime>? day,
+    Value<bool>? fajr,
+    Value<bool>? dhuhr,
+    Value<bool>? asr,
+    Value<bool>? maghrib,
+    Value<bool>? isha,
+    Value<int>? rowid,
+  }) {
     return PrayerLogCompanion(
       day: day ?? this.day,
       fajr: fajr ?? this.fajr,
@@ -1747,97 +2056,151 @@ class $InstalledPacksTable extends InstalledPacks
   static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
   @override
   late final GeneratedColumn<String> packId = GeneratedColumn<String>(
-      'pack_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'pack_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _kindMeta = const VerificationMeta('kind');
   @override
   late final GeneratedColumn<String> kind = GeneratedColumn<String>(
-      'kind', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _languageMeta =
-      const VerificationMeta('language');
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _languageMeta = const VerificationMeta(
+    'language',
+  );
   @override
   late final GeneratedColumn<String> language = GeneratedColumn<String>(
-      'language', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'language',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
   late final GeneratedColumn<String> title = GeneratedColumn<String>(
-      'title', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _sizeMbMeta = const VerificationMeta('sizeMb');
   @override
   late final GeneratedColumn<double> sizeMb = GeneratedColumn<double>(
-      'size_mb', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _versionMeta =
-      const VerificationMeta('version');
+    'size_mb',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
   @override
   late final GeneratedColumn<String> version = GeneratedColumn<String>(
-      'version', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _installedAtMeta =
-      const VerificationMeta('installedAt');
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _installedAtMeta = const VerificationMeta(
+    'installedAt',
+  );
   @override
   late final GeneratedColumn<DateTime> installedAt = GeneratedColumn<DateTime>(
-      'installed_at', aliasedName, false,
-      type: DriftSqlType.dateTime,
-      requiredDuringInsert: false,
-      defaultValue: currentDateAndTime);
+    'installed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [packId, kind, language, title, sizeMb, version, installedAt];
+  List<GeneratedColumn> get $columns => [
+    packId,
+    kind,
+    language,
+    title,
+    sizeMb,
+    version,
+    installedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'installed_packs';
   @override
-  VerificationContext validateIntegrity(Insertable<InstalledPack> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<InstalledPack> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('pack_id')) {
-      context.handle(_packIdMeta,
-          packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta));
+      context.handle(
+        _packIdMeta,
+        packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_packIdMeta);
     }
     if (data.containsKey('kind')) {
       context.handle(
-          _kindMeta, kind.isAcceptableOrUnknown(data['kind']!, _kindMeta));
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
     } else if (isInserting) {
       context.missing(_kindMeta);
     }
     if (data.containsKey('language')) {
-      context.handle(_languageMeta,
-          language.isAcceptableOrUnknown(data['language']!, _languageMeta));
+      context.handle(
+        _languageMeta,
+        language.isAcceptableOrUnknown(data['language']!, _languageMeta),
+      );
     } else if (isInserting) {
       context.missing(_languageMeta);
     }
     if (data.containsKey('title')) {
       context.handle(
-          _titleMeta, title.isAcceptableOrUnknown(data['title']!, _titleMeta));
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
     } else if (isInserting) {
       context.missing(_titleMeta);
     }
     if (data.containsKey('size_mb')) {
-      context.handle(_sizeMbMeta,
-          sizeMb.isAcceptableOrUnknown(data['size_mb']!, _sizeMbMeta));
+      context.handle(
+        _sizeMbMeta,
+        sizeMb.isAcceptableOrUnknown(data['size_mb']!, _sizeMbMeta),
+      );
     } else if (isInserting) {
       context.missing(_sizeMbMeta);
     }
     if (data.containsKey('version')) {
-      context.handle(_versionMeta,
-          version.isAcceptableOrUnknown(data['version']!, _versionMeta));
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
     } else if (isInserting) {
       context.missing(_versionMeta);
     }
     if (data.containsKey('installed_at')) {
       context.handle(
+        _installedAtMeta,
+        installedAt.isAcceptableOrUnknown(
+          data['installed_at']!,
           _installedAtMeta,
-          installedAt.isAcceptableOrUnknown(
-              data['installed_at']!, _installedAtMeta));
+        ),
+      );
     }
     return context;
   }
@@ -1848,20 +2211,34 @@ class $InstalledPacksTable extends InstalledPacks
   InstalledPack map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return InstalledPack(
-      packId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}pack_id'])!,
-      kind: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}kind'])!,
-      language: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}language'])!,
-      title: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}title'])!,
-      sizeMb: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}size_mb'])!,
-      version: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}version'])!,
-      installedAt: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}installed_at'])!,
+      packId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      language: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}language'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      sizeMb: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}size_mb'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}version'],
+      )!,
+      installedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}installed_at'],
+      )!,
     );
   }
 
@@ -1890,14 +2267,15 @@ class InstalledPack extends DataClass implements Insertable<InstalledPack> {
 
   /// When the pack finished installing (defaults to write time).
   final DateTime installedAt;
-  const InstalledPack(
-      {required this.packId,
-      required this.kind,
-      required this.language,
-      required this.title,
-      required this.sizeMb,
-      required this.version,
-      required this.installedAt});
+  const InstalledPack({
+    required this.packId,
+    required this.kind,
+    required this.language,
+    required this.title,
+    required this.sizeMb,
+    required this.version,
+    required this.installedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1923,8 +2301,10 @@ class InstalledPack extends DataClass implements Insertable<InstalledPack> {
     );
   }
 
-  factory InstalledPack.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory InstalledPack.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return InstalledPack(
       packId: serializer.fromJson<String>(json['packId']),
@@ -1950,23 +2330,23 @@ class InstalledPack extends DataClass implements Insertable<InstalledPack> {
     };
   }
 
-  InstalledPack copyWith(
-          {String? packId,
-          String? kind,
-          String? language,
-          String? title,
-          double? sizeMb,
-          String? version,
-          DateTime? installedAt}) =>
-      InstalledPack(
-        packId: packId ?? this.packId,
-        kind: kind ?? this.kind,
-        language: language ?? this.language,
-        title: title ?? this.title,
-        sizeMb: sizeMb ?? this.sizeMb,
-        version: version ?? this.version,
-        installedAt: installedAt ?? this.installedAt,
-      );
+  InstalledPack copyWith({
+    String? packId,
+    String? kind,
+    String? language,
+    String? title,
+    double? sizeMb,
+    String? version,
+    DateTime? installedAt,
+  }) => InstalledPack(
+    packId: packId ?? this.packId,
+    kind: kind ?? this.kind,
+    language: language ?? this.language,
+    title: title ?? this.title,
+    sizeMb: sizeMb ?? this.sizeMb,
+    version: version ?? this.version,
+    installedAt: installedAt ?? this.installedAt,
+  );
   InstalledPack copyWithCompanion(InstalledPacksCompanion data) {
     return InstalledPack(
       packId: data.packId.present ? data.packId.value : this.packId,
@@ -1975,8 +2355,9 @@ class InstalledPack extends DataClass implements Insertable<InstalledPack> {
       title: data.title.present ? data.title.value : this.title,
       sizeMb: data.sizeMb.present ? data.sizeMb.value : this.sizeMb,
       version: data.version.present ? data.version.value : this.version,
-      installedAt:
-          data.installedAt.present ? data.installedAt.value : this.installedAt,
+      installedAt: data.installedAt.present
+          ? data.installedAt.value
+          : this.installedAt,
     );
   }
 
@@ -2038,12 +2419,12 @@ class InstalledPacksCompanion extends UpdateCompanion<InstalledPack> {
     required String version,
     this.installedAt = const Value.absent(),
     this.rowid = const Value.absent(),
-  })  : packId = Value(packId),
-        kind = Value(kind),
-        language = Value(language),
-        title = Value(title),
-        sizeMb = Value(sizeMb),
-        version = Value(version);
+  }) : packId = Value(packId),
+       kind = Value(kind),
+       language = Value(language),
+       title = Value(title),
+       sizeMb = Value(sizeMb),
+       version = Value(version);
   static Insertable<InstalledPack> custom({
     Expression<String>? packId,
     Expression<String>? kind,
@@ -2066,15 +2447,16 @@ class InstalledPacksCompanion extends UpdateCompanion<InstalledPack> {
     });
   }
 
-  InstalledPacksCompanion copyWith(
-      {Value<String>? packId,
-      Value<String>? kind,
-      Value<String>? language,
-      Value<String>? title,
-      Value<double>? sizeMb,
-      Value<String>? version,
-      Value<DateTime>? installedAt,
-      Value<int>? rowid}) {
+  InstalledPacksCompanion copyWith({
+    Value<String>? packId,
+    Value<String>? kind,
+    Value<String>? language,
+    Value<String>? title,
+    Value<double>? sizeMb,
+    Value<String>? version,
+    Value<DateTime>? installedAt,
+    Value<int>? rowid,
+  }) {
     return InstalledPacksCompanion(
       packId: packId ?? this.packId,
       kind: kind ?? this.kind,
@@ -2142,82 +2524,125 @@ class $DownloadsTable extends Downloads
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
-      hasAutoIncrement: true,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultConstraints:
-          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
-  static const VerificationMeta _reciterIdMeta =
-      const VerificationMeta('reciterId');
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _reciterIdMeta = const VerificationMeta(
+    'reciterId',
+  );
   @override
   late final GeneratedColumn<String> reciterId = GeneratedColumn<String>(
-      'reciter_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _surahIdMeta =
-      const VerificationMeta('surahId');
+    'reciter_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahIdMeta = const VerificationMeta(
+    'surahId',
+  );
   @override
   late final GeneratedColumn<int> surahId = GeneratedColumn<int>(
-      'surah_id', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'surah_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
-      'status', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _bytesMeta = const VerificationMeta('bytes');
   @override
   late final GeneratedColumn<int> bytes = GeneratedColumn<int>(
-      'bytes', aliasedName, false,
-      type: DriftSqlType.int,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
+    'bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _pathMeta = const VerificationMeta('path');
   @override
   late final GeneratedColumn<String> path = GeneratedColumn<String>(
-      'path', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'path',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, reciterId, surahId, status, bytes, path];
+  List<GeneratedColumn> get $columns => [
+    id,
+    reciterId,
+    surahId,
+    status,
+    bytes,
+    path,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'downloads';
   @override
-  VerificationContext validateIntegrity(Insertable<Download> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<Download> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('reciter_id')) {
-      context.handle(_reciterIdMeta,
-          reciterId.isAcceptableOrUnknown(data['reciter_id']!, _reciterIdMeta));
+      context.handle(
+        _reciterIdMeta,
+        reciterId.isAcceptableOrUnknown(data['reciter_id']!, _reciterIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_reciterIdMeta);
     }
     if (data.containsKey('surah_id')) {
-      context.handle(_surahIdMeta,
-          surahId.isAcceptableOrUnknown(data['surah_id']!, _surahIdMeta));
+      context.handle(
+        _surahIdMeta,
+        surahId.isAcceptableOrUnknown(data['surah_id']!, _surahIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_surahIdMeta);
     }
     if (data.containsKey('status')) {
-      context.handle(_statusMeta,
-          status.isAcceptableOrUnknown(data['status']!, _statusMeta));
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
     } else if (isInserting) {
       context.missing(_statusMeta);
     }
     if (data.containsKey('bytes')) {
       context.handle(
-          _bytesMeta, bytes.isAcceptableOrUnknown(data['bytes']!, _bytesMeta));
+        _bytesMeta,
+        bytes.isAcceptableOrUnknown(data['bytes']!, _bytesMeta),
+      );
     }
     if (data.containsKey('path')) {
       context.handle(
-          _pathMeta, path.isAcceptableOrUnknown(data['path']!, _pathMeta));
+        _pathMeta,
+        path.isAcceptableOrUnknown(data['path']!, _pathMeta),
+      );
     } else if (isInserting) {
       context.missing(_pathMeta);
     }
@@ -2230,18 +2655,30 @@ class $DownloadsTable extends Downloads
   Download map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Download(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
-      reciterId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}reciter_id'])!,
-      surahId: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}surah_id'])!,
-      status: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}status'])!,
-      bytes: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}bytes'])!,
-      path: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}path'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      reciterId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reciter_id'],
+      )!,
+      surahId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_id'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      bytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bytes'],
+      )!,
+      path: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}path'],
+      )!,
     );
   }
 
@@ -2268,13 +2705,14 @@ class Download extends DataClass implements Insertable<Download> {
 
   /// Absolute path of the finished file; empty while downloading.
   final String path;
-  const Download(
-      {required this.id,
-      required this.reciterId,
-      required this.surahId,
-      required this.status,
-      required this.bytes,
-      required this.path});
+  const Download({
+    required this.id,
+    required this.reciterId,
+    required this.surahId,
+    required this.status,
+    required this.bytes,
+    required this.path,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2298,8 +2736,10 @@ class Download extends DataClass implements Insertable<Download> {
     );
   }
 
-  factory Download.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Download.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Download(
       id: serializer.fromJson<int>(json['id']),
@@ -2323,21 +2763,21 @@ class Download extends DataClass implements Insertable<Download> {
     };
   }
 
-  Download copyWith(
-          {int? id,
-          String? reciterId,
-          int? surahId,
-          String? status,
-          int? bytes,
-          String? path}) =>
-      Download(
-        id: id ?? this.id,
-        reciterId: reciterId ?? this.reciterId,
-        surahId: surahId ?? this.surahId,
-        status: status ?? this.status,
-        bytes: bytes ?? this.bytes,
-        path: path ?? this.path,
-      );
+  Download copyWith({
+    int? id,
+    String? reciterId,
+    int? surahId,
+    String? status,
+    int? bytes,
+    String? path,
+  }) => Download(
+    id: id ?? this.id,
+    reciterId: reciterId ?? this.reciterId,
+    surahId: surahId ?? this.surahId,
+    status: status ?? this.status,
+    bytes: bytes ?? this.bytes,
+    path: path ?? this.path,
+  );
   Download copyWithCompanion(DownloadsCompanion data) {
     return Download(
       id: data.id.present ? data.id.value : this.id,
@@ -2398,10 +2838,10 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     required String status,
     this.bytes = const Value.absent(),
     required String path,
-  })  : reciterId = Value(reciterId),
-        surahId = Value(surahId),
-        status = Value(status),
-        path = Value(path);
+  }) : reciterId = Value(reciterId),
+       surahId = Value(surahId),
+       status = Value(status),
+       path = Value(path);
   static Insertable<Download> custom({
     Expression<int>? id,
     Expression<String>? reciterId,
@@ -2420,13 +2860,14 @@ class DownloadsCompanion extends UpdateCompanion<Download> {
     });
   }
 
-  DownloadsCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? reciterId,
-      Value<int>? surahId,
-      Value<String>? status,
-      Value<int>? bytes,
-      Value<String>? path}) {
+  DownloadsCompanion copyWith({
+    Value<int>? id,
+    Value<String>? reciterId,
+    Value<int>? surahId,
+    Value<String>? status,
+    Value<int>? bytes,
+    Value<String>? path,
+  }) {
     return DownloadsCompanion(
       id: id ?? this.id,
       reciterId: reciterId ?? this.reciterId,
@@ -2484,13 +2925,21 @@ class $SettingsTableTable extends SettingsTable
   static const VerificationMeta _keyMeta = const VerificationMeta('key');
   @override
   late final GeneratedColumn<String> key = GeneratedColumn<String>(
-      'key', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _valueMeta = const VerificationMeta('value');
   @override
   late final GeneratedColumn<String> value = GeneratedColumn<String>(
-      'value', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'value',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [key, value];
   @override
@@ -2499,19 +2948,25 @@ class $SettingsTableTable extends SettingsTable
   String get actualTableName => $name;
   static const String $name = 'settings_table';
   @override
-  VerificationContext validateIntegrity(Insertable<SettingsTableData> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<SettingsTableData> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('key')) {
       context.handle(
-          _keyMeta, key.isAcceptableOrUnknown(data['key']!, _keyMeta));
+        _keyMeta,
+        key.isAcceptableOrUnknown(data['key']!, _keyMeta),
+      );
     } else if (isInserting) {
       context.missing(_keyMeta);
     }
     if (data.containsKey('value')) {
       context.handle(
-          _valueMeta, value.isAcceptableOrUnknown(data['value']!, _valueMeta));
+        _valueMeta,
+        value.isAcceptableOrUnknown(data['value']!, _valueMeta),
+      );
     } else if (isInserting) {
       context.missing(_valueMeta);
     }
@@ -2524,10 +2979,14 @@ class $SettingsTableTable extends SettingsTable
   SettingsTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return SettingsTableData(
-      key: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}key'])!,
-      value: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}value'])!,
+      key: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}key'],
+      )!,
+      value: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}value'],
+      )!,
     );
   }
 
@@ -2554,14 +3013,13 @@ class SettingsTableData extends DataClass
   }
 
   SettingsTableCompanion toCompanion(bool nullToAbsent) {
-    return SettingsTableCompanion(
-      key: Value(key),
-      value: Value(value),
-    );
+    return SettingsTableCompanion(key: Value(key), value: Value(value));
   }
 
-  factory SettingsTableData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory SettingsTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return SettingsTableData(
       key: serializer.fromJson<String>(json['key']),
@@ -2577,10 +3035,8 @@ class SettingsTableData extends DataClass
     };
   }
 
-  SettingsTableData copyWith({String? key, String? value}) => SettingsTableData(
-        key: key ?? this.key,
-        value: value ?? this.value,
-      );
+  SettingsTableData copyWith({String? key, String? value}) =>
+      SettingsTableData(key: key ?? this.key, value: value ?? this.value);
   SettingsTableData copyWithCompanion(SettingsTableCompanion data) {
     return SettingsTableData(
       key: data.key.present ? data.key.value : this.key,
@@ -2620,8 +3076,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingsTableData> {
     required String key,
     required String value,
     this.rowid = const Value.absent(),
-  })  : key = Value(key),
-        value = Value(value);
+  }) : key = Value(key),
+       value = Value(value);
   static Insertable<SettingsTableData> custom({
     Expression<String>? key,
     Expression<String>? value,
@@ -2634,8 +3090,11 @@ class SettingsTableCompanion extends UpdateCompanion<SettingsTableData> {
     });
   }
 
-  SettingsTableCompanion copyWith(
-      {Value<String>? key, Value<String>? value, Value<int>? rowid}) {
+  SettingsTableCompanion copyWith({
+    Value<String>? key,
+    Value<String>? value,
+    Value<int>? rowid,
+  }) {
     return SettingsTableCompanion(
       key: key ?? this.key,
       value: value ?? this.value,
@@ -2678,48 +3137,84 @@ class $RecitersTable extends Reciters
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
-      'id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _reciterNameMeta =
-      const VerificationMeta('reciterName');
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reciterNameMeta = const VerificationMeta(
+    'reciterName',
+  );
   @override
   late final GeneratedColumn<String> reciterName = GeneratedColumn<String>(
-      'reciter_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _moshafNameMeta =
-      const VerificationMeta('moshafName');
+    'reciter_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _moshafNameMeta = const VerificationMeta(
+    'moshafName',
+  );
   @override
   late final GeneratedColumn<String> moshafName = GeneratedColumn<String>(
-      'moshaf_name', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'moshaf_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _serverMeta = const VerificationMeta('server');
   @override
   late final GeneratedColumn<String> server = GeneratedColumn<String>(
-      'server', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _surahListMeta =
-      const VerificationMeta('surahList');
+    'server',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahListMeta = const VerificationMeta(
+    'surahList',
+  );
   @override
   late final GeneratedColumn<String> surahList = GeneratedColumn<String>(
-      'surah_list', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _surahTotalMeta =
-      const VerificationMeta('surahTotal');
+    'surah_list',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _surahTotalMeta = const VerificationMeta(
+    'surahTotal',
+  );
   @override
   late final GeneratedColumn<int> surahTotal = GeneratedColumn<int>(
-      'surah_total', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'surah_total',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, reciterName, moshafName, server, surahList, surahTotal];
+  List<GeneratedColumn> get $columns => [
+    id,
+    reciterName,
+    moshafName,
+    server,
+    surahList,
+    surahTotal,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
   static const String $name = 'reciters';
   @override
-  VerificationContext validateIntegrity(Insertable<ReciterRow> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<ReciterRow> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
@@ -2729,37 +3224,44 @@ class $RecitersTable extends Reciters
     }
     if (data.containsKey('reciter_name')) {
       context.handle(
+        _reciterNameMeta,
+        reciterName.isAcceptableOrUnknown(
+          data['reciter_name']!,
           _reciterNameMeta,
-          reciterName.isAcceptableOrUnknown(
-              data['reciter_name']!, _reciterNameMeta));
+        ),
+      );
     } else if (isInserting) {
       context.missing(_reciterNameMeta);
     }
     if (data.containsKey('moshaf_name')) {
       context.handle(
-          _moshafNameMeta,
-          moshafName.isAcceptableOrUnknown(
-              data['moshaf_name']!, _moshafNameMeta));
+        _moshafNameMeta,
+        moshafName.isAcceptableOrUnknown(data['moshaf_name']!, _moshafNameMeta),
+      );
     } else if (isInserting) {
       context.missing(_moshafNameMeta);
     }
     if (data.containsKey('server')) {
-      context.handle(_serverMeta,
-          server.isAcceptableOrUnknown(data['server']!, _serverMeta));
+      context.handle(
+        _serverMeta,
+        server.isAcceptableOrUnknown(data['server']!, _serverMeta),
+      );
     } else if (isInserting) {
       context.missing(_serverMeta);
     }
     if (data.containsKey('surah_list')) {
-      context.handle(_surahListMeta,
-          surahList.isAcceptableOrUnknown(data['surah_list']!, _surahListMeta));
+      context.handle(
+        _surahListMeta,
+        surahList.isAcceptableOrUnknown(data['surah_list']!, _surahListMeta),
+      );
     } else if (isInserting) {
       context.missing(_surahListMeta);
     }
     if (data.containsKey('surah_total')) {
       context.handle(
-          _surahTotalMeta,
-          surahTotal.isAcceptableOrUnknown(
-              data['surah_total']!, _surahTotalMeta));
+        _surahTotalMeta,
+        surahTotal.isAcceptableOrUnknown(data['surah_total']!, _surahTotalMeta),
+      );
     } else if (isInserting) {
       context.missing(_surahTotalMeta);
     }
@@ -2772,18 +3274,30 @@ class $RecitersTable extends Reciters
   ReciterRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return ReciterRow(
-      id: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      reciterName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}reciter_name'])!,
-      moshafName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}moshaf_name'])!,
-      server: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}server'])!,
-      surahList: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}surah_list'])!,
-      surahTotal: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}surah_total'])!,
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      reciterName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reciter_name'],
+      )!,
+      moshafName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}moshaf_name'],
+      )!,
+      server: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}server'],
+      )!,
+      surahList: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}surah_list'],
+      )!,
+      surahTotal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}surah_total'],
+      )!,
     );
   }
 
@@ -2805,13 +3319,14 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
 
   /// Number of surahs the moshaf offers.
   final int surahTotal;
-  const ReciterRow(
-      {required this.id,
-      required this.reciterName,
-      required this.moshafName,
-      required this.server,
-      required this.surahList,
-      required this.surahTotal});
+  const ReciterRow({
+    required this.id,
+    required this.reciterName,
+    required this.moshafName,
+    required this.server,
+    required this.surahList,
+    required this.surahTotal,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2835,8 +3350,10 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     );
   }
 
-  factory ReciterRow.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory ReciterRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return ReciterRow(
       id: serializer.fromJson<String>(json['id']),
@@ -2860,32 +3377,35 @@ class ReciterRow extends DataClass implements Insertable<ReciterRow> {
     };
   }
 
-  ReciterRow copyWith(
-          {String? id,
-          String? reciterName,
-          String? moshafName,
-          String? server,
-          String? surahList,
-          int? surahTotal}) =>
-      ReciterRow(
-        id: id ?? this.id,
-        reciterName: reciterName ?? this.reciterName,
-        moshafName: moshafName ?? this.moshafName,
-        server: server ?? this.server,
-        surahList: surahList ?? this.surahList,
-        surahTotal: surahTotal ?? this.surahTotal,
-      );
+  ReciterRow copyWith({
+    String? id,
+    String? reciterName,
+    String? moshafName,
+    String? server,
+    String? surahList,
+    int? surahTotal,
+  }) => ReciterRow(
+    id: id ?? this.id,
+    reciterName: reciterName ?? this.reciterName,
+    moshafName: moshafName ?? this.moshafName,
+    server: server ?? this.server,
+    surahList: surahList ?? this.surahList,
+    surahTotal: surahTotal ?? this.surahTotal,
+  );
   ReciterRow copyWithCompanion(RecitersCompanion data) {
     return ReciterRow(
       id: data.id.present ? data.id.value : this.id,
-      reciterName:
-          data.reciterName.present ? data.reciterName.value : this.reciterName,
-      moshafName:
-          data.moshafName.present ? data.moshafName.value : this.moshafName,
+      reciterName: data.reciterName.present
+          ? data.reciterName.value
+          : this.reciterName,
+      moshafName: data.moshafName.present
+          ? data.moshafName.value
+          : this.moshafName,
       server: data.server.present ? data.server.value : this.server,
       surahList: data.surahList.present ? data.surahList.value : this.surahList,
-      surahTotal:
-          data.surahTotal.present ? data.surahTotal.value : this.surahTotal,
+      surahTotal: data.surahTotal.present
+          ? data.surahTotal.value
+          : this.surahTotal,
     );
   }
 
@@ -2942,12 +3462,12 @@ class RecitersCompanion extends UpdateCompanion<ReciterRow> {
     required String surahList,
     required int surahTotal,
     this.rowid = const Value.absent(),
-  })  : id = Value(id),
-        reciterName = Value(reciterName),
-        moshafName = Value(moshafName),
-        server = Value(server),
-        surahList = Value(surahList),
-        surahTotal = Value(surahTotal);
+  }) : id = Value(id),
+       reciterName = Value(reciterName),
+       moshafName = Value(moshafName),
+       server = Value(server),
+       surahList = Value(surahList),
+       surahTotal = Value(surahTotal);
   static Insertable<ReciterRow> custom({
     Expression<String>? id,
     Expression<String>? reciterName,
@@ -2968,14 +3488,15 @@ class RecitersCompanion extends UpdateCompanion<ReciterRow> {
     });
   }
 
-  RecitersCompanion copyWith(
-      {Value<String>? id,
-      Value<String>? reciterName,
-      Value<String>? moshafName,
-      Value<String>? server,
-      Value<String>? surahList,
-      Value<int>? surahTotal,
-      Value<int>? rowid}) {
+  RecitersCompanion copyWith({
+    Value<String>? id,
+    Value<String>? reciterName,
+    Value<String>? moshafName,
+    Value<String>? server,
+    Value<String>? surahList,
+    Value<int>? surahTotal,
+    Value<int>? rowid,
+  }) {
     return RecitersCompanion(
       id: id ?? this.id,
       reciterName: reciterName ?? this.reciterName,
@@ -3038,24 +3559,41 @@ class $HadithEntriesTable extends HadithEntries
   static const VerificationMeta _packIdMeta = const VerificationMeta('packId');
   @override
   late final GeneratedColumn<String> packId = GeneratedColumn<String>(
-      'pack_id', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _ordinalMeta =
-      const VerificationMeta('ordinal');
+    'pack_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ordinalMeta = const VerificationMeta(
+    'ordinal',
+  );
   @override
   late final GeneratedColumn<int> ordinal = GeneratedColumn<int>(
-      'ordinal', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'ordinal',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _numberMeta = const VerificationMeta('number');
   @override
   late final GeneratedColumn<int> number = GeneratedColumn<int>(
-      'number', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+    'number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _bodyMeta = const VerificationMeta('body');
   @override
   late final GeneratedColumn<String> body = GeneratedColumn<String>(
-      'body', aliasedName, false,
-      type: DriftSqlType.string, requiredDuringInsert: true);
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   @override
   List<GeneratedColumn> get $columns => [packId, ordinal, number, body];
   @override
@@ -3064,31 +3602,41 @@ class $HadithEntriesTable extends HadithEntries
   String get actualTableName => $name;
   static const String $name = 'hadith_entries';
   @override
-  VerificationContext validateIntegrity(Insertable<HadithEntry> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(
+    Insertable<HadithEntry> instance, {
+    bool isInserting = false,
+  }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('pack_id')) {
-      context.handle(_packIdMeta,
-          packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta));
+      context.handle(
+        _packIdMeta,
+        packId.isAcceptableOrUnknown(data['pack_id']!, _packIdMeta),
+      );
     } else if (isInserting) {
       context.missing(_packIdMeta);
     }
     if (data.containsKey('ordinal')) {
-      context.handle(_ordinalMeta,
-          ordinal.isAcceptableOrUnknown(data['ordinal']!, _ordinalMeta));
+      context.handle(
+        _ordinalMeta,
+        ordinal.isAcceptableOrUnknown(data['ordinal']!, _ordinalMeta),
+      );
     } else if (isInserting) {
       context.missing(_ordinalMeta);
     }
     if (data.containsKey('number')) {
-      context.handle(_numberMeta,
-          number.isAcceptableOrUnknown(data['number']!, _numberMeta));
+      context.handle(
+        _numberMeta,
+        number.isAcceptableOrUnknown(data['number']!, _numberMeta),
+      );
     } else if (isInserting) {
       context.missing(_numberMeta);
     }
     if (data.containsKey('body')) {
       context.handle(
-          _bodyMeta, body.isAcceptableOrUnknown(data['body']!, _bodyMeta));
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
     } else if (isInserting) {
       context.missing(_bodyMeta);
     }
@@ -3101,14 +3649,22 @@ class $HadithEntriesTable extends HadithEntries
   HadithEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return HadithEntry(
-      packId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}pack_id'])!,
-      ordinal: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}ordinal'])!,
-      number: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}number'])!,
-      body: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}body'])!,
+      packId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pack_id'],
+      )!,
+      ordinal: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ordinal'],
+      )!,
+      number: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}number'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
     );
   }
 
@@ -3132,11 +3688,12 @@ class HadithEntry extends DataClass implements Insertable<HadithEntry> {
   /// Hadith body. Empty text is a valid source value (the UI hides those
   /// rows); a malformed source entry is marked by [number] == -1.
   final String body;
-  const HadithEntry(
-      {required this.packId,
-      required this.ordinal,
-      required this.number,
-      required this.body});
+  const HadithEntry({
+    required this.packId,
+    required this.ordinal,
+    required this.number,
+    required this.body,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -3156,8 +3713,10 @@ class HadithEntry extends DataClass implements Insertable<HadithEntry> {
     );
   }
 
-  factory HadithEntry.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory HadithEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return HadithEntry(
       packId: serializer.fromJson<String>(json['packId']),
@@ -3177,14 +3736,17 @@ class HadithEntry extends DataClass implements Insertable<HadithEntry> {
     };
   }
 
-  HadithEntry copyWith(
-          {String? packId, int? ordinal, int? number, String? body}) =>
-      HadithEntry(
-        packId: packId ?? this.packId,
-        ordinal: ordinal ?? this.ordinal,
-        number: number ?? this.number,
-        body: body ?? this.body,
-      );
+  HadithEntry copyWith({
+    String? packId,
+    int? ordinal,
+    int? number,
+    String? body,
+  }) => HadithEntry(
+    packId: packId ?? this.packId,
+    ordinal: ordinal ?? this.ordinal,
+    number: number ?? this.number,
+    body: body ?? this.body,
+  );
   HadithEntry copyWithCompanion(HadithEntriesCompanion data) {
     return HadithEntry(
       packId: data.packId.present ? data.packId.value : this.packId,
@@ -3236,10 +3798,10 @@ class HadithEntriesCompanion extends UpdateCompanion<HadithEntry> {
     required int number,
     required String body,
     this.rowid = const Value.absent(),
-  })  : packId = Value(packId),
-        ordinal = Value(ordinal),
-        number = Value(number),
-        body = Value(body);
+  }) : packId = Value(packId),
+       ordinal = Value(ordinal),
+       number = Value(number),
+       body = Value(body);
   static Insertable<HadithEntry> custom({
     Expression<String>? packId,
     Expression<int>? ordinal,
@@ -3256,12 +3818,13 @@ class HadithEntriesCompanion extends UpdateCompanion<HadithEntry> {
     });
   }
 
-  HadithEntriesCompanion copyWith(
-      {Value<String>? packId,
-      Value<int>? ordinal,
-      Value<int>? number,
-      Value<String>? body,
-      Value<int>? rowid}) {
+  HadithEntriesCompanion copyWith({
+    Value<String>? packId,
+    Value<int>? ordinal,
+    Value<int>? number,
+    Value<String>? body,
+    Value<int>? rowid,
+  }) {
     return HadithEntriesCompanion(
       packId: packId ?? this.packId,
       ordinal: ordinal ?? this.ordinal,
@@ -3323,17 +3886,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
-        surahs,
-        ayahs,
-        bookmarks,
-        khatmaProgress,
-        prayerLog,
-        installedPacks,
-        downloads,
-        settingsTable,
-        reciters,
-        hadithEntries
-      ];
+    surahs,
+    ayahs,
+    bookmarks,
+    khatmaProgress,
+    prayerLog,
+    installedPacks,
+    downloads,
+    settingsTable,
+    reciters,
+    hadithEntries,
+  ];
 }
 
 typedef $$SurahsTableCreateCompanionBuilder = SurahsCompanion Function({
@@ -3365,26 +3928,39 @@ class $$SurahsTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get nameAr => $composableBuilder(
-      column: $table.nameAr, builder: (column) => ColumnFilters(column));
+    column: $table.nameAr,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get nameEn => $composableBuilder(
-      column: $table.nameEn, builder: (column) => ColumnFilters(column));
+    column: $table.nameEn,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get revelationType => $composableBuilder(
-      column: $table.revelationType,
-      builder: (column) => ColumnFilters(column));
+    column: $table.revelationType,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get ayahCount => $composableBuilder(
-      column: $table.ayahCount, builder: (column) => ColumnFilters(column));
+    column: $table.ayahCount,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get pagesStart => $composableBuilder(
-      column: $table.pagesStart, builder: (column) => ColumnFilters(column));
+    column: $table.pagesStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get pagesEnd => $composableBuilder(
-      column: $table.pagesEnd, builder: (column) => ColumnFilters(column));
+    column: $table.pagesEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$SurahsTableOrderingComposer
@@ -3397,26 +3973,39 @@ class $$SurahsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get nameAr => $composableBuilder(
-      column: $table.nameAr, builder: (column) => ColumnOrderings(column));
+    column: $table.nameAr,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get nameEn => $composableBuilder(
-      column: $table.nameEn, builder: (column) => ColumnOrderings(column));
+    column: $table.nameEn,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get revelationType => $composableBuilder(
-      column: $table.revelationType,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.revelationType,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get ayahCount => $composableBuilder(
-      column: $table.ayahCount, builder: (column) => ColumnOrderings(column));
+    column: $table.ayahCount,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get pagesStart => $composableBuilder(
-      column: $table.pagesStart, builder: (column) => ColumnOrderings(column));
+    column: $table.pagesStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get pagesEnd => $composableBuilder(
-      column: $table.pagesEnd, builder: (column) => ColumnOrderings(column));
+    column: $table.pagesEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SurahsTableAnnotationComposer
@@ -3438,32 +4027,40 @@ class $$SurahsTableAnnotationComposer
       $composableBuilder(column: $table.nameEn, builder: (column) => column);
 
   GeneratedColumn<String> get revelationType => $composableBuilder(
-      column: $table.revelationType, builder: (column) => column);
+    column: $table.revelationType,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get ayahCount =>
       $composableBuilder(column: $table.ayahCount, builder: (column) => column);
 
   GeneratedColumn<int> get pagesStart => $composableBuilder(
-      column: $table.pagesStart, builder: (column) => column);
+    column: $table.pagesStart,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get pagesEnd =>
       $composableBuilder(column: $table.pagesEnd, builder: (column) => column);
 }
 
-class $$SurahsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $SurahsTable,
-    Surah,
-    $$SurahsTableFilterComposer,
-    $$SurahsTableOrderingComposer,
-    $$SurahsTableAnnotationComposer,
-    $$SurahsTableCreateCompanionBuilder,
-    $$SurahsTableUpdateCompanionBuilder,
-    (Surah, BaseReferences<_$AppDatabase, $SurahsTable, Surah>),
-    Surah,
-    PrefetchHooks Function()> {
+class $$SurahsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SurahsTable,
+          Surah,
+          $$SurahsTableFilterComposer,
+          $$SurahsTableOrderingComposer,
+          $$SurahsTableAnnotationComposer,
+          $$SurahsTableCreateCompanionBuilder,
+          $$SurahsTableUpdateCompanionBuilder,
+          (Surah, BaseReferences<_$AppDatabase, $SurahsTable, Surah>),
+          Surah,
+          PrefetchHooks Function()
+        > {
   $$SurahsTableTableManager(_$AppDatabase db, $SurahsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3472,65 +4069,73 @@ class $$SurahsTableTableManager extends RootTableManager<
               $$SurahsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$SurahsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> nameAr = const Value.absent(),
-            Value<String> nameEn = const Value.absent(),
-            Value<String> revelationType = const Value.absent(),
-            Value<int> ayahCount = const Value.absent(),
-            Value<int> pagesStart = const Value.absent(),
-            Value<int> pagesEnd = const Value.absent(),
-          }) =>
-              SurahsCompanion(
-            id: id,
-            nameAr: nameAr,
-            nameEn: nameEn,
-            revelationType: revelationType,
-            ayahCount: ayahCount,
-            pagesStart: pagesStart,
-            pagesEnd: pagesEnd,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String nameAr,
-            required String nameEn,
-            required String revelationType,
-            required int ayahCount,
-            required int pagesStart,
-            required int pagesEnd,
-          }) =>
-              SurahsCompanion.insert(
-            id: id,
-            nameAr: nameAr,
-            nameEn: nameEn,
-            revelationType: revelationType,
-            ayahCount: ayahCount,
-            pagesStart: pagesStart,
-            pagesEnd: pagesEnd,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> nameAr = const Value.absent(),
+                Value<String> nameEn = const Value.absent(),
+                Value<String> revelationType = const Value.absent(),
+                Value<int> ayahCount = const Value.absent(),
+                Value<int> pagesStart = const Value.absent(),
+                Value<int> pagesEnd = const Value.absent(),
+              }) => SurahsCompanion(
+                id: id,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                revelationType: revelationType,
+                ayahCount: ayahCount,
+                pagesStart: pagesStart,
+                pagesEnd: pagesEnd,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nameAr,
+                required String nameEn,
+                required String revelationType,
+                required int ayahCount,
+                required int pagesStart,
+                required int pagesEnd,
+              }) => SurahsCompanion.insert(
+                id: id,
+                nameAr: nameAr,
+                nameEn: nameEn,
+                revelationType: revelationType,
+                ayahCount: ayahCount,
+                pagesStart: pagesStart,
+                pagesEnd: pagesEnd,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$SurahsTable, Surah>(table),
-                    BaseReferences<_$AppDatabase, $SurahsTable, Surah>(
-                        db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$SurahsTable, Surah>(table),
+                  BaseReferences<_$AppDatabase, $SurahsTable, Surah>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$SurahsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $SurahsTable,
-    Surah,
-    $$SurahsTableFilterComposer,
-    $$SurahsTableOrderingComposer,
-    $$SurahsTableAnnotationComposer,
-    $$SurahsTableCreateCompanionBuilder,
-    $$SurahsTableUpdateCompanionBuilder,
-    (Surah, BaseReferences<_$AppDatabase, $SurahsTable, Surah>),
-    Surah,
-    PrefetchHooks Function()>;
+typedef $$SurahsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SurahsTable,
+      Surah,
+      $$SurahsTableFilterComposer,
+      $$SurahsTableOrderingComposer,
+      $$SurahsTableAnnotationComposer,
+      $$SurahsTableCreateCompanionBuilder,
+      $$SurahsTableUpdateCompanionBuilder,
+      (Surah, BaseReferences<_$AppDatabase, $SurahsTable, Surah>),
+      Surah,
+      PrefetchHooks Function()
+    >;
 typedef $$AyahsTableCreateCompanionBuilder = AyahsCompanion Function({
   Value<int> id,
   required int surahId,
@@ -3565,34 +4170,54 @@ class $$AyahsTableFilterComposer extends Composer<_$AppDatabase, $AyahsTable> {
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get surahId => $composableBuilder(
-      column: $table.surahId, builder: (column) => ColumnFilters(column));
+    column: $table.surahId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get numberInSurah => $composableBuilder(
-      column: $table.numberInSurah, builder: (column) => ColumnFilters(column));
+    column: $table.numberInSurah,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get juz => $composableBuilder(
-      column: $table.juz, builder: (column) => ColumnFilters(column));
+    column: $table.juz,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get page => $composableBuilder(
-      column: $table.page, builder: (column) => ColumnFilters(column));
+    column: $table.page,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get lineStart => $composableBuilder(
-      column: $table.lineStart, builder: (column) => ColumnFilters(column));
+    column: $table.lineStart,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get lineEnd => $composableBuilder(
-      column: $table.lineEnd, builder: (column) => ColumnFilters(column));
+    column: $table.lineEnd,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get textUthmani => $composableBuilder(
-      column: $table.textUthmani, builder: (column) => ColumnFilters(column));
+    column: $table.textUthmani,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get textImlaei => $composableBuilder(
-      column: $table.textImlaei, builder: (column) => ColumnFilters(column));
+    column: $table.textImlaei,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get sajda => $composableBuilder(
-      column: $table.sajda, builder: (column) => ColumnFilters(column));
+    column: $table.sajda,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$AyahsTableOrderingComposer
@@ -3605,35 +4230,54 @@ class $$AyahsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get surahId => $composableBuilder(
-      column: $table.surahId, builder: (column) => ColumnOrderings(column));
+    column: $table.surahId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get numberInSurah => $composableBuilder(
-      column: $table.numberInSurah,
-      builder: (column) => ColumnOrderings(column));
+    column: $table.numberInSurah,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get juz => $composableBuilder(
-      column: $table.juz, builder: (column) => ColumnOrderings(column));
+    column: $table.juz,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get page => $composableBuilder(
-      column: $table.page, builder: (column) => ColumnOrderings(column));
+    column: $table.page,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get lineStart => $composableBuilder(
-      column: $table.lineStart, builder: (column) => ColumnOrderings(column));
+    column: $table.lineStart,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get lineEnd => $composableBuilder(
-      column: $table.lineEnd, builder: (column) => ColumnOrderings(column));
+    column: $table.lineEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get textUthmani => $composableBuilder(
-      column: $table.textUthmani, builder: (column) => ColumnOrderings(column));
+    column: $table.textUthmani,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get textImlaei => $composableBuilder(
-      column: $table.textImlaei, builder: (column) => ColumnOrderings(column));
+    column: $table.textImlaei,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get sajda => $composableBuilder(
-      column: $table.sajda, builder: (column) => ColumnOrderings(column));
+    column: $table.sajda,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AyahsTableAnnotationComposer
@@ -3652,7 +4296,9 @@ class $$AyahsTableAnnotationComposer
       $composableBuilder(column: $table.surahId, builder: (column) => column);
 
   GeneratedColumn<int> get numberInSurah => $composableBuilder(
-      column: $table.numberInSurah, builder: (column) => column);
+    column: $table.numberInSurah,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get juz =>
       $composableBuilder(column: $table.juz, builder: (column) => column);
@@ -3667,29 +4313,37 @@ class $$AyahsTableAnnotationComposer
       $composableBuilder(column: $table.lineEnd, builder: (column) => column);
 
   GeneratedColumn<String> get textUthmani => $composableBuilder(
-      column: $table.textUthmani, builder: (column) => column);
+    column: $table.textUthmani,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get textImlaei => $composableBuilder(
-      column: $table.textImlaei, builder: (column) => column);
+    column: $table.textImlaei,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<bool> get sajda =>
       $composableBuilder(column: $table.sajda, builder: (column) => column);
 }
 
-class $$AyahsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $AyahsTable,
-    Ayah,
-    $$AyahsTableFilterComposer,
-    $$AyahsTableOrderingComposer,
-    $$AyahsTableAnnotationComposer,
-    $$AyahsTableCreateCompanionBuilder,
-    $$AyahsTableUpdateCompanionBuilder,
-    (Ayah, BaseReferences<_$AppDatabase, $AyahsTable, Ayah>),
-    Ayah,
-    PrefetchHooks Function()> {
+class $$AyahsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AyahsTable,
+          Ayah,
+          $$AyahsTableFilterComposer,
+          $$AyahsTableOrderingComposer,
+          $$AyahsTableAnnotationComposer,
+          $$AyahsTableCreateCompanionBuilder,
+          $$AyahsTableUpdateCompanionBuilder,
+          (Ayah, BaseReferences<_$AppDatabase, $AyahsTable, Ayah>),
+          Ayah,
+          PrefetchHooks Function()
+        > {
   $$AyahsTableTableManager(_$AppDatabase db, $AyahsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3698,77 +4352,85 @@ class $$AyahsTableTableManager extends RootTableManager<
               $$AyahsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$AyahsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> surahId = const Value.absent(),
-            Value<int> numberInSurah = const Value.absent(),
-            Value<int> juz = const Value.absent(),
-            Value<int> page = const Value.absent(),
-            Value<int?> lineStart = const Value.absent(),
-            Value<int?> lineEnd = const Value.absent(),
-            Value<String> textUthmani = const Value.absent(),
-            Value<String> textImlaei = const Value.absent(),
-            Value<bool> sajda = const Value.absent(),
-          }) =>
-              AyahsCompanion(
-            id: id,
-            surahId: surahId,
-            numberInSurah: numberInSurah,
-            juz: juz,
-            page: page,
-            lineStart: lineStart,
-            lineEnd: lineEnd,
-            textUthmani: textUthmani,
-            textImlaei: textImlaei,
-            sajda: sajda,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int surahId,
-            required int numberInSurah,
-            required int juz,
-            required int page,
-            Value<int?> lineStart = const Value.absent(),
-            Value<int?> lineEnd = const Value.absent(),
-            required String textUthmani,
-            required String textImlaei,
-            Value<bool> sajda = const Value.absent(),
-          }) =>
-              AyahsCompanion.insert(
-            id: id,
-            surahId: surahId,
-            numberInSurah: numberInSurah,
-            juz: juz,
-            page: page,
-            lineStart: lineStart,
-            lineEnd: lineEnd,
-            textUthmani: textUthmani,
-            textImlaei: textImlaei,
-            sajda: sajda,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> surahId = const Value.absent(),
+                Value<int> numberInSurah = const Value.absent(),
+                Value<int> juz = const Value.absent(),
+                Value<int> page = const Value.absent(),
+                Value<int?> lineStart = const Value.absent(),
+                Value<int?> lineEnd = const Value.absent(),
+                Value<String> textUthmani = const Value.absent(),
+                Value<String> textImlaei = const Value.absent(),
+                Value<bool> sajda = const Value.absent(),
+              }) => AyahsCompanion(
+                id: id,
+                surahId: surahId,
+                numberInSurah: numberInSurah,
+                juz: juz,
+                page: page,
+                lineStart: lineStart,
+                lineEnd: lineEnd,
+                textUthmani: textUthmani,
+                textImlaei: textImlaei,
+                sajda: sajda,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int surahId,
+                required int numberInSurah,
+                required int juz,
+                required int page,
+                Value<int?> lineStart = const Value.absent(),
+                Value<int?> lineEnd = const Value.absent(),
+                required String textUthmani,
+                required String textImlaei,
+                Value<bool> sajda = const Value.absent(),
+              }) => AyahsCompanion.insert(
+                id: id,
+                surahId: surahId,
+                numberInSurah: numberInSurah,
+                juz: juz,
+                page: page,
+                lineStart: lineStart,
+                lineEnd: lineEnd,
+                textUthmani: textUthmani,
+                textImlaei: textImlaei,
+                sajda: sajda,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$AyahsTable, Ayah>(table),
-                    BaseReferences<_$AppDatabase, $AyahsTable, Ayah>(
-                        db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$AyahsTable, Ayah>(table),
+                  BaseReferences<_$AppDatabase, $AyahsTable, Ayah>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$AyahsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $AyahsTable,
-    Ayah,
-    $$AyahsTableFilterComposer,
-    $$AyahsTableOrderingComposer,
-    $$AyahsTableAnnotationComposer,
-    $$AyahsTableCreateCompanionBuilder,
-    $$AyahsTableUpdateCompanionBuilder,
-    (Ayah, BaseReferences<_$AppDatabase, $AyahsTable, Ayah>),
-    Ayah,
-    PrefetchHooks Function()>;
+typedef $$AyahsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AyahsTable,
+      Ayah,
+      $$AyahsTableFilterComposer,
+      $$AyahsTableOrderingComposer,
+      $$AyahsTableAnnotationComposer,
+      $$AyahsTableCreateCompanionBuilder,
+      $$AyahsTableUpdateCompanionBuilder,
+      (Ayah, BaseReferences<_$AppDatabase, $AyahsTable, Ayah>),
+      Ayah,
+      PrefetchHooks Function()
+    >;
 typedef $$BookmarksTableCreateCompanionBuilder = BookmarksCompanion Function({
   Value<int> id,
   required int ayahId,
@@ -3790,13 +4452,19 @@ class $$BookmarksTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get ayahId => $composableBuilder(
-      column: $table.ayahId, builder: (column) => ColumnFilters(column));
+    column: $table.ayahId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnFilters(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$BookmarksTableOrderingComposer
@@ -3809,13 +4477,19 @@ class $$BookmarksTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get ayahId => $composableBuilder(
-      column: $table.ayahId, builder: (column) => ColumnOrderings(column));
+    column: $table.ayahId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-      column: $table.createdAt, builder: (column) => ColumnOrderings(column));
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$BookmarksTableAnnotationComposer
@@ -3837,20 +4511,24 @@ class $$BookmarksTableAnnotationComposer
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 }
 
-class $$BookmarksTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $BookmarksTable,
-    Bookmark,
-    $$BookmarksTableFilterComposer,
-    $$BookmarksTableOrderingComposer,
-    $$BookmarksTableAnnotationComposer,
-    $$BookmarksTableCreateCompanionBuilder,
-    $$BookmarksTableUpdateCompanionBuilder,
-    (Bookmark, BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>),
-    Bookmark,
-    PrefetchHooks Function()> {
+class $$BookmarksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BookmarksTable,
+          Bookmark,
+          $$BookmarksTableFilterComposer,
+          $$BookmarksTableOrderingComposer,
+          $$BookmarksTableAnnotationComposer,
+          $$BookmarksTableCreateCompanionBuilder,
+          $$BookmarksTableUpdateCompanionBuilder,
+          (Bookmark, BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>),
+          Bookmark,
+          PrefetchHooks Function()
+        > {
   $$BookmarksTableTableManager(_$AppDatabase db, $BookmarksTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -3859,63 +4537,71 @@ class $$BookmarksTableTableManager extends RootTableManager<
               $$BookmarksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$BookmarksTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> ayahId = const Value.absent(),
-            Value<DateTime> createdAt = const Value.absent(),
-          }) =>
-              BookmarksCompanion(
-            id: id,
-            ayahId: ayahId,
-            createdAt: createdAt,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int ayahId,
-            Value<DateTime> createdAt = const Value.absent(),
-          }) =>
-              BookmarksCompanion.insert(
-            id: id,
-            ayahId: ayahId,
-            createdAt: createdAt,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ayahId = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BookmarksCompanion(
+                id: id,
+                ayahId: ayahId,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ayahId,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => BookmarksCompanion.insert(
+                id: id,
+                ayahId: ayahId,
+                createdAt: createdAt,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$BookmarksTable, Bookmark>(table),
-                    BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>(
-                        db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$BookmarksTable, Bookmark>(table),
+                  BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$BookmarksTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $BookmarksTable,
-    Bookmark,
-    $$BookmarksTableFilterComposer,
-    $$BookmarksTableOrderingComposer,
-    $$BookmarksTableAnnotationComposer,
-    $$BookmarksTableCreateCompanionBuilder,
-    $$BookmarksTableUpdateCompanionBuilder,
-    (Bookmark, BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>),
-    Bookmark,
-    PrefetchHooks Function()>;
-typedef $$KhatmaProgressTableCreateCompanionBuilder = KhatmaProgressCompanion
-    Function({
-  Value<int> id,
-  required int ayahId,
-  required int targetPages,
-  Value<DateTime> updatedAt,
-});
-typedef $$KhatmaProgressTableUpdateCompanionBuilder = KhatmaProgressCompanion
-    Function({
-  Value<int> id,
-  Value<int> ayahId,
-  Value<int> targetPages,
-  Value<DateTime> updatedAt,
-});
+typedef $$BookmarksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BookmarksTable,
+      Bookmark,
+      $$BookmarksTableFilterComposer,
+      $$BookmarksTableOrderingComposer,
+      $$BookmarksTableAnnotationComposer,
+      $$BookmarksTableCreateCompanionBuilder,
+      $$BookmarksTableUpdateCompanionBuilder,
+      (Bookmark, BaseReferences<_$AppDatabase, $BookmarksTable, Bookmark>),
+      Bookmark,
+      PrefetchHooks Function()
+    >;
+typedef $$KhatmaProgressTableCreateCompanionBuilder =
+    KhatmaProgressCompanion Function({
+      Value<int> id,
+      required int ayahId,
+      required int targetPages,
+      Value<DateTime> updatedAt,
+    });
+typedef $$KhatmaProgressTableUpdateCompanionBuilder =
+    KhatmaProgressCompanion Function({
+      Value<int> id,
+      Value<int> ayahId,
+      Value<int> targetPages,
+      Value<DateTime> updatedAt,
+    });
 
 class $$KhatmaProgressTableFilterComposer
     extends Composer<_$AppDatabase, $KhatmaProgressTable> {
@@ -3927,16 +4613,24 @@ class $$KhatmaProgressTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get ayahId => $composableBuilder(
-      column: $table.ayahId, builder: (column) => ColumnFilters(column));
+    column: $table.ayahId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get targetPages => $composableBuilder(
-      column: $table.targetPages, builder: (column) => ColumnFilters(column));
+    column: $table.targetPages,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$KhatmaProgressTableOrderingComposer
@@ -3949,16 +4643,24 @@ class $$KhatmaProgressTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get ayahId => $composableBuilder(
-      column: $table.ayahId, builder: (column) => ColumnOrderings(column));
+    column: $table.ayahId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get targetPages => $composableBuilder(
-      column: $table.targetPages, builder: (column) => ColumnOrderings(column));
+    column: $table.targetPages,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$KhatmaProgressTableAnnotationComposer
@@ -3977,30 +4679,41 @@ class $$KhatmaProgressTableAnnotationComposer
       $composableBuilder(column: $table.ayahId, builder: (column) => column);
 
   GeneratedColumn<int> get targetPages => $composableBuilder(
-      column: $table.targetPages, builder: (column) => column);
+    column: $table.targetPages,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
-class $$KhatmaProgressTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $KhatmaProgressTable,
-    KhatmaProgressData,
-    $$KhatmaProgressTableFilterComposer,
-    $$KhatmaProgressTableOrderingComposer,
-    $$KhatmaProgressTableAnnotationComposer,
-    $$KhatmaProgressTableCreateCompanionBuilder,
-    $$KhatmaProgressTableUpdateCompanionBuilder,
-    (
-      KhatmaProgressData,
-      BaseReferences<_$AppDatabase, $KhatmaProgressTable, KhatmaProgressData>
-    ),
-    KhatmaProgressData,
-    PrefetchHooks Function()> {
+class $$KhatmaProgressTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $KhatmaProgressTable,
+          KhatmaProgressData,
+          $$KhatmaProgressTableFilterComposer,
+          $$KhatmaProgressTableOrderingComposer,
+          $$KhatmaProgressTableAnnotationComposer,
+          $$KhatmaProgressTableCreateCompanionBuilder,
+          $$KhatmaProgressTableUpdateCompanionBuilder,
+          (
+            KhatmaProgressData,
+            BaseReferences<
+              _$AppDatabase,
+              $KhatmaProgressTable,
+              KhatmaProgressData
+            >,
+          ),
+          KhatmaProgressData,
+          PrefetchHooks Function()
+        > {
   $$KhatmaProgressTableTableManager(
-      _$AppDatabase db, $KhatmaProgressTable table)
-      : super(TableManagerState(
+    _$AppDatabase db,
+    $KhatmaProgressTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4009,57 +4722,64 @@ class $$KhatmaProgressTableTableManager extends RootTableManager<
               $$KhatmaProgressTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$KhatmaProgressTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<int> ayahId = const Value.absent(),
-            Value<int> targetPages = const Value.absent(),
-            Value<DateTime> updatedAt = const Value.absent(),
-          }) =>
-              KhatmaProgressCompanion(
-            id: id,
-            ayahId: ayahId,
-            targetPages: targetPages,
-            updatedAt: updatedAt,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required int ayahId,
-            required int targetPages,
-            Value<DateTime> updatedAt = const Value.absent(),
-          }) =>
-              KhatmaProgressCompanion.insert(
-            id: id,
-            ayahId: ayahId,
-            targetPages: targetPages,
-            updatedAt: updatedAt,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ayahId = const Value.absent(),
+                Value<int> targetPages = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => KhatmaProgressCompanion(
+                id: id,
+                ayahId: ayahId,
+                targetPages: targetPages,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ayahId,
+                required int targetPages,
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => KhatmaProgressCompanion.insert(
+                id: id,
+                ayahId: ayahId,
+                targetPages: targetPages,
+                updatedAt: updatedAt,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$KhatmaProgressTable, KhatmaProgressData>(
-                        table),
-                    BaseReferences<_$AppDatabase, $KhatmaProgressTable,
-                        KhatmaProgressData>(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$KhatmaProgressTable, KhatmaProgressData>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $KhatmaProgressTable,
+                    KhatmaProgressData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$KhatmaProgressTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $KhatmaProgressTable,
-    KhatmaProgressData,
-    $$KhatmaProgressTableFilterComposer,
-    $$KhatmaProgressTableOrderingComposer,
-    $$KhatmaProgressTableAnnotationComposer,
-    $$KhatmaProgressTableCreateCompanionBuilder,
-    $$KhatmaProgressTableUpdateCompanionBuilder,
-    (
+typedef $$KhatmaProgressTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $KhatmaProgressTable,
       KhatmaProgressData,
-      BaseReferences<_$AppDatabase, $KhatmaProgressTable, KhatmaProgressData>
-    ),
-    KhatmaProgressData,
-    PrefetchHooks Function()>;
+      $$KhatmaProgressTableFilterComposer,
+      $$KhatmaProgressTableOrderingComposer,
+      $$KhatmaProgressTableAnnotationComposer,
+      $$KhatmaProgressTableCreateCompanionBuilder,
+      $$KhatmaProgressTableUpdateCompanionBuilder,
+      (
+        KhatmaProgressData,
+        BaseReferences<_$AppDatabase, $KhatmaProgressTable, KhatmaProgressData>,
+      ),
+      KhatmaProgressData,
+      PrefetchHooks Function()
+    >;
 typedef $$PrayerLogTableCreateCompanionBuilder = PrayerLogCompanion Function({
   required DateTime day,
   Value<bool> fajr,
@@ -4089,22 +4809,34 @@ class $$PrayerLogTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<DateTime> get day => $composableBuilder(
-      column: $table.day, builder: (column) => ColumnFilters(column));
+    column: $table.day,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get fajr => $composableBuilder(
-      column: $table.fajr, builder: (column) => ColumnFilters(column));
+    column: $table.fajr,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get dhuhr => $composableBuilder(
-      column: $table.dhuhr, builder: (column) => ColumnFilters(column));
+    column: $table.dhuhr,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get asr => $composableBuilder(
-      column: $table.asr, builder: (column) => ColumnFilters(column));
+    column: $table.asr,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get maghrib => $composableBuilder(
-      column: $table.maghrib, builder: (column) => ColumnFilters(column));
+    column: $table.maghrib,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<bool> get isha => $composableBuilder(
-      column: $table.isha, builder: (column) => ColumnFilters(column));
+    column: $table.isha,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$PrayerLogTableOrderingComposer
@@ -4117,22 +4849,34 @@ class $$PrayerLogTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<DateTime> get day => $composableBuilder(
-      column: $table.day, builder: (column) => ColumnOrderings(column));
+    column: $table.day,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get fajr => $composableBuilder(
-      column: $table.fajr, builder: (column) => ColumnOrderings(column));
+    column: $table.fajr,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get dhuhr => $composableBuilder(
-      column: $table.dhuhr, builder: (column) => ColumnOrderings(column));
+    column: $table.dhuhr,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get asr => $composableBuilder(
-      column: $table.asr, builder: (column) => ColumnOrderings(column));
+    column: $table.asr,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get maghrib => $composableBuilder(
-      column: $table.maghrib, builder: (column) => ColumnOrderings(column));
+    column: $table.maghrib,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<bool> get isha => $composableBuilder(
-      column: $table.isha, builder: (column) => ColumnOrderings(column));
+    column: $table.isha,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PrayerLogTableAnnotationComposer
@@ -4163,23 +4907,27 @@ class $$PrayerLogTableAnnotationComposer
       $composableBuilder(column: $table.isha, builder: (column) => column);
 }
 
-class $$PrayerLogTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $PrayerLogTable,
-    PrayerLogData,
-    $$PrayerLogTableFilterComposer,
-    $$PrayerLogTableOrderingComposer,
-    $$PrayerLogTableAnnotationComposer,
-    $$PrayerLogTableCreateCompanionBuilder,
-    $$PrayerLogTableUpdateCompanionBuilder,
-    (
-      PrayerLogData,
-      BaseReferences<_$AppDatabase, $PrayerLogTable, PrayerLogData>
-    ),
-    PrayerLogData,
-    PrefetchHooks Function()> {
+class $$PrayerLogTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrayerLogTable,
+          PrayerLogData,
+          $$PrayerLogTableFilterComposer,
+          $$PrayerLogTableOrderingComposer,
+          $$PrayerLogTableAnnotationComposer,
+          $$PrayerLogTableCreateCompanionBuilder,
+          $$PrayerLogTableUpdateCompanionBuilder,
+          (
+            PrayerLogData,
+            BaseReferences<_$AppDatabase, $PrayerLogTable, PrayerLogData>,
+          ),
+          PrayerLogData,
+          PrefetchHooks Function()
+        > {
   $$PrayerLogTableTableManager(_$AppDatabase db, $PrayerLogTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4188,90 +4936,98 @@ class $$PrayerLogTableTableManager extends RootTableManager<
               $$PrayerLogTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$PrayerLogTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<DateTime> day = const Value.absent(),
-            Value<bool> fajr = const Value.absent(),
-            Value<bool> dhuhr = const Value.absent(),
-            Value<bool> asr = const Value.absent(),
-            Value<bool> maghrib = const Value.absent(),
-            Value<bool> isha = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              PrayerLogCompanion(
-            day: day,
-            fajr: fajr,
-            dhuhr: dhuhr,
-            asr: asr,
-            maghrib: maghrib,
-            isha: isha,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required DateTime day,
-            Value<bool> fajr = const Value.absent(),
-            Value<bool> dhuhr = const Value.absent(),
-            Value<bool> asr = const Value.absent(),
-            Value<bool> maghrib = const Value.absent(),
-            Value<bool> isha = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              PrayerLogCompanion.insert(
-            day: day,
-            fajr: fajr,
-            dhuhr: dhuhr,
-            asr: asr,
-            maghrib: maghrib,
-            isha: isha,
-            rowid: rowid,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<DateTime> day = const Value.absent(),
+                Value<bool> fajr = const Value.absent(),
+                Value<bool> dhuhr = const Value.absent(),
+                Value<bool> asr = const Value.absent(),
+                Value<bool> maghrib = const Value.absent(),
+                Value<bool> isha = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrayerLogCompanion(
+                day: day,
+                fajr: fajr,
+                dhuhr: dhuhr,
+                asr: asr,
+                maghrib: maghrib,
+                isha: isha,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required DateTime day,
+                Value<bool> fajr = const Value.absent(),
+                Value<bool> dhuhr = const Value.absent(),
+                Value<bool> asr = const Value.absent(),
+                Value<bool> maghrib = const Value.absent(),
+                Value<bool> isha = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrayerLogCompanion.insert(
+                day: day,
+                fajr: fajr,
+                dhuhr: dhuhr,
+                asr: asr,
+                maghrib: maghrib,
+                isha: isha,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$PrayerLogTable, PrayerLogData>(table),
-                    BaseReferences<_$AppDatabase, $PrayerLogTable,
-                        PrayerLogData>(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$PrayerLogTable, PrayerLogData>(table),
+                  BaseReferences<_$AppDatabase, $PrayerLogTable, PrayerLogData>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$PrayerLogTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $PrayerLogTable,
-    PrayerLogData,
-    $$PrayerLogTableFilterComposer,
-    $$PrayerLogTableOrderingComposer,
-    $$PrayerLogTableAnnotationComposer,
-    $$PrayerLogTableCreateCompanionBuilder,
-    $$PrayerLogTableUpdateCompanionBuilder,
-    (
+typedef $$PrayerLogTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrayerLogTable,
       PrayerLogData,
-      BaseReferences<_$AppDatabase, $PrayerLogTable, PrayerLogData>
-    ),
-    PrayerLogData,
-    PrefetchHooks Function()>;
-typedef $$InstalledPacksTableCreateCompanionBuilder = InstalledPacksCompanion
-    Function({
-  required String packId,
-  required String kind,
-  required String language,
-  required String title,
-  required double sizeMb,
-  required String version,
-  Value<DateTime> installedAt,
-  Value<int> rowid,
-});
-typedef $$InstalledPacksTableUpdateCompanionBuilder = InstalledPacksCompanion
-    Function({
-  Value<String> packId,
-  Value<String> kind,
-  Value<String> language,
-  Value<String> title,
-  Value<double> sizeMb,
-  Value<String> version,
-  Value<DateTime> installedAt,
-  Value<int> rowid,
-});
+      $$PrayerLogTableFilterComposer,
+      $$PrayerLogTableOrderingComposer,
+      $$PrayerLogTableAnnotationComposer,
+      $$PrayerLogTableCreateCompanionBuilder,
+      $$PrayerLogTableUpdateCompanionBuilder,
+      (
+        PrayerLogData,
+        BaseReferences<_$AppDatabase, $PrayerLogTable, PrayerLogData>,
+      ),
+      PrayerLogData,
+      PrefetchHooks Function()
+    >;
+typedef $$InstalledPacksTableCreateCompanionBuilder =
+    InstalledPacksCompanion Function({
+      required String packId,
+      required String kind,
+      required String language,
+      required String title,
+      required double sizeMb,
+      required String version,
+      Value<DateTime> installedAt,
+      Value<int> rowid,
+    });
+typedef $$InstalledPacksTableUpdateCompanionBuilder =
+    InstalledPacksCompanion Function({
+      Value<String> packId,
+      Value<String> kind,
+      Value<String> language,
+      Value<String> title,
+      Value<double> sizeMb,
+      Value<String> version,
+      Value<DateTime> installedAt,
+      Value<int> rowid,
+    });
 
 class $$InstalledPacksTableFilterComposer
     extends Composer<_$AppDatabase, $InstalledPacksTable> {
@@ -4283,25 +5039,39 @@ class $$InstalledPacksTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get packId => $composableBuilder(
-      column: $table.packId, builder: (column) => ColumnFilters(column));
+    column: $table.packId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get kind => $composableBuilder(
-      column: $table.kind, builder: (column) => ColumnFilters(column));
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get language => $composableBuilder(
-      column: $table.language, builder: (column) => ColumnFilters(column));
+    column: $table.language,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnFilters(column));
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<double> get sizeMb => $composableBuilder(
-      column: $table.sizeMb, builder: (column) => ColumnFilters(column));
+    column: $table.sizeMb,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get version => $composableBuilder(
-      column: $table.version, builder: (column) => ColumnFilters(column));
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<DateTime> get installedAt => $composableBuilder(
-      column: $table.installedAt, builder: (column) => ColumnFilters(column));
+    column: $table.installedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$InstalledPacksTableOrderingComposer
@@ -4314,25 +5084,39 @@ class $$InstalledPacksTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get packId => $composableBuilder(
-      column: $table.packId, builder: (column) => ColumnOrderings(column));
+    column: $table.packId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get kind => $composableBuilder(
-      column: $table.kind, builder: (column) => ColumnOrderings(column));
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get language => $composableBuilder(
-      column: $table.language, builder: (column) => ColumnOrderings(column));
+    column: $table.language,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get title => $composableBuilder(
-      column: $table.title, builder: (column) => ColumnOrderings(column));
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<double> get sizeMb => $composableBuilder(
-      column: $table.sizeMb, builder: (column) => ColumnOrderings(column));
+    column: $table.sizeMb,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get version => $composableBuilder(
-      column: $table.version, builder: (column) => ColumnOrderings(column));
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<DateTime> get installedAt => $composableBuilder(
-      column: $table.installedAt, builder: (column) => ColumnOrderings(column));
+    column: $table.installedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$InstalledPacksTableAnnotationComposer
@@ -4363,27 +5147,34 @@ class $$InstalledPacksTableAnnotationComposer
       $composableBuilder(column: $table.version, builder: (column) => column);
 
   GeneratedColumn<DateTime> get installedAt => $composableBuilder(
-      column: $table.installedAt, builder: (column) => column);
+    column: $table.installedAt,
+    builder: (column) => column,
+  );
 }
 
-class $$InstalledPacksTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $InstalledPacksTable,
-    InstalledPack,
-    $$InstalledPacksTableFilterComposer,
-    $$InstalledPacksTableOrderingComposer,
-    $$InstalledPacksTableAnnotationComposer,
-    $$InstalledPacksTableCreateCompanionBuilder,
-    $$InstalledPacksTableUpdateCompanionBuilder,
-    (
-      InstalledPack,
-      BaseReferences<_$AppDatabase, $InstalledPacksTable, InstalledPack>
-    ),
-    InstalledPack,
-    PrefetchHooks Function()> {
+class $$InstalledPacksTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $InstalledPacksTable,
+          InstalledPack,
+          $$InstalledPacksTableFilterComposer,
+          $$InstalledPacksTableOrderingComposer,
+          $$InstalledPacksTableAnnotationComposer,
+          $$InstalledPacksTableCreateCompanionBuilder,
+          $$InstalledPacksTableUpdateCompanionBuilder,
+          (
+            InstalledPack,
+            BaseReferences<_$AppDatabase, $InstalledPacksTable, InstalledPack>,
+          ),
+          InstalledPack,
+          PrefetchHooks Function()
+        > {
   $$InstalledPacksTableTableManager(
-      _$AppDatabase db, $InstalledPacksTable table)
-      : super(TableManagerState(
+    _$AppDatabase db,
+    $InstalledPacksTable table,
+  ) : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4392,72 +5183,80 @@ class $$InstalledPacksTableTableManager extends RootTableManager<
               $$InstalledPacksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$InstalledPacksTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> packId = const Value.absent(),
-            Value<String> kind = const Value.absent(),
-            Value<String> language = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<double> sizeMb = const Value.absent(),
-            Value<String> version = const Value.absent(),
-            Value<DateTime> installedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              InstalledPacksCompanion(
-            packId: packId,
-            kind: kind,
-            language: language,
-            title: title,
-            sizeMb: sizeMb,
-            version: version,
-            installedAt: installedAt,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String packId,
-            required String kind,
-            required String language,
-            required String title,
-            required double sizeMb,
-            required String version,
-            Value<DateTime> installedAt = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              InstalledPacksCompanion.insert(
-            packId: packId,
-            kind: kind,
-            language: language,
-            title: title,
-            sizeMb: sizeMb,
-            version: version,
-            installedAt: installedAt,
-            rowid: rowid,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<String> packId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> language = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<double> sizeMb = const Value.absent(),
+                Value<String> version = const Value.absent(),
+                Value<DateTime> installedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InstalledPacksCompanion(
+                packId: packId,
+                kind: kind,
+                language: language,
+                title: title,
+                sizeMb: sizeMb,
+                version: version,
+                installedAt: installedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packId,
+                required String kind,
+                required String language,
+                required String title,
+                required double sizeMb,
+                required String version,
+                Value<DateTime> installedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => InstalledPacksCompanion.insert(
+                packId: packId,
+                kind: kind,
+                language: language,
+                title: title,
+                sizeMb: sizeMb,
+                version: version,
+                installedAt: installedAt,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$InstalledPacksTable, InstalledPack>(table),
-                    BaseReferences<_$AppDatabase, $InstalledPacksTable,
-                        InstalledPack>(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$InstalledPacksTable, InstalledPack>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $InstalledPacksTable,
+                    InstalledPack
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$InstalledPacksTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $InstalledPacksTable,
-    InstalledPack,
-    $$InstalledPacksTableFilterComposer,
-    $$InstalledPacksTableOrderingComposer,
-    $$InstalledPacksTableAnnotationComposer,
-    $$InstalledPacksTableCreateCompanionBuilder,
-    $$InstalledPacksTableUpdateCompanionBuilder,
-    (
+typedef $$InstalledPacksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $InstalledPacksTable,
       InstalledPack,
-      BaseReferences<_$AppDatabase, $InstalledPacksTable, InstalledPack>
-    ),
-    InstalledPack,
-    PrefetchHooks Function()>;
+      $$InstalledPacksTableFilterComposer,
+      $$InstalledPacksTableOrderingComposer,
+      $$InstalledPacksTableAnnotationComposer,
+      $$InstalledPacksTableCreateCompanionBuilder,
+      $$InstalledPacksTableUpdateCompanionBuilder,
+      (
+        InstalledPack,
+        BaseReferences<_$AppDatabase, $InstalledPacksTable, InstalledPack>,
+      ),
+      InstalledPack,
+      PrefetchHooks Function()
+    >;
 typedef $$DownloadsTableCreateCompanionBuilder = DownloadsCompanion Function({
   Value<int> id,
   required String reciterId,
@@ -4485,22 +5284,34 @@ class $$DownloadsTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get reciterId => $composableBuilder(
-      column: $table.reciterId, builder: (column) => ColumnFilters(column));
+    column: $table.reciterId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get surahId => $composableBuilder(
-      column: $table.surahId, builder: (column) => ColumnFilters(column));
+    column: $table.surahId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnFilters(column));
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get bytes => $composableBuilder(
-      column: $table.bytes, builder: (column) => ColumnFilters(column));
+    column: $table.bytes,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get path => $composableBuilder(
-      column: $table.path, builder: (column) => ColumnFilters(column));
+    column: $table.path,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$DownloadsTableOrderingComposer
@@ -4513,22 +5324,34 @@ class $$DownloadsTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<int> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get reciterId => $composableBuilder(
-      column: $table.reciterId, builder: (column) => ColumnOrderings(column));
+    column: $table.reciterId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get surahId => $composableBuilder(
-      column: $table.surahId, builder: (column) => ColumnOrderings(column));
+    column: $table.surahId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get status => $composableBuilder(
-      column: $table.status, builder: (column) => ColumnOrderings(column));
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get bytes => $composableBuilder(
-      column: $table.bytes, builder: (column) => ColumnOrderings(column));
+    column: $table.bytes,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get path => $composableBuilder(
-      column: $table.path, builder: (column) => ColumnOrderings(column));
+    column: $table.path,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$DownloadsTableAnnotationComposer
@@ -4559,20 +5382,24 @@ class $$DownloadsTableAnnotationComposer
       $composableBuilder(column: $table.path, builder: (column) => column);
 }
 
-class $$DownloadsTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $DownloadsTable,
-    Download,
-    $$DownloadsTableFilterComposer,
-    $$DownloadsTableOrderingComposer,
-    $$DownloadsTableAnnotationComposer,
-    $$DownloadsTableCreateCompanionBuilder,
-    $$DownloadsTableUpdateCompanionBuilder,
-    (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
-    Download,
-    PrefetchHooks Function()> {
+class $$DownloadsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DownloadsTable,
+          Download,
+          $$DownloadsTableFilterComposer,
+          $$DownloadsTableOrderingComposer,
+          $$DownloadsTableAnnotationComposer,
+          $$DownloadsTableCreateCompanionBuilder,
+          $$DownloadsTableUpdateCompanionBuilder,
+          (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
+          Download,
+          PrefetchHooks Function()
+        > {
   $$DownloadsTableTableManager(_$AppDatabase db, $DownloadsTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4581,73 +5408,81 @@ class $$DownloadsTableTableManager extends RootTableManager<
               $$DownloadsTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$DownloadsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> reciterId = const Value.absent(),
-            Value<int> surahId = const Value.absent(),
-            Value<String> status = const Value.absent(),
-            Value<int> bytes = const Value.absent(),
-            Value<String> path = const Value.absent(),
-          }) =>
-              DownloadsCompanion(
-            id: id,
-            reciterId: reciterId,
-            surahId: surahId,
-            status: status,
-            bytes: bytes,
-            path: path,
-          ),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String reciterId,
-            required int surahId,
-            required String status,
-            Value<int> bytes = const Value.absent(),
-            required String path,
-          }) =>
-              DownloadsCompanion.insert(
-            id: id,
-            reciterId: reciterId,
-            surahId: surahId,
-            status: status,
-            bytes: bytes,
-            path: path,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> reciterId = const Value.absent(),
+                Value<int> surahId = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int> bytes = const Value.absent(),
+                Value<String> path = const Value.absent(),
+              }) => DownloadsCompanion(
+                id: id,
+                reciterId: reciterId,
+                surahId: surahId,
+                status: status,
+                bytes: bytes,
+                path: path,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String reciterId,
+                required int surahId,
+                required String status,
+                Value<int> bytes = const Value.absent(),
+                required String path,
+              }) => DownloadsCompanion.insert(
+                id: id,
+                reciterId: reciterId,
+                surahId: surahId,
+                status: status,
+                bytes: bytes,
+                path: path,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$DownloadsTable, Download>(table),
-                    BaseReferences<_$AppDatabase, $DownloadsTable, Download>(
-                        db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$DownloadsTable, Download>(table),
+                  BaseReferences<_$AppDatabase, $DownloadsTable, Download>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$DownloadsTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $DownloadsTable,
-    Download,
-    $$DownloadsTableFilterComposer,
-    $$DownloadsTableOrderingComposer,
-    $$DownloadsTableAnnotationComposer,
-    $$DownloadsTableCreateCompanionBuilder,
-    $$DownloadsTableUpdateCompanionBuilder,
-    (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
-    Download,
-    PrefetchHooks Function()>;
-typedef $$SettingsTableTableCreateCompanionBuilder = SettingsTableCompanion
-    Function({
-  required String key,
-  required String value,
-  Value<int> rowid,
-});
-typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion
-    Function({
-  Value<String> key,
-  Value<String> value,
-  Value<int> rowid,
-});
+typedef $$DownloadsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DownloadsTable,
+      Download,
+      $$DownloadsTableFilterComposer,
+      $$DownloadsTableOrderingComposer,
+      $$DownloadsTableAnnotationComposer,
+      $$DownloadsTableCreateCompanionBuilder,
+      $$DownloadsTableUpdateCompanionBuilder,
+      (Download, BaseReferences<_$AppDatabase, $DownloadsTable, Download>),
+      Download,
+      PrefetchHooks Function()
+    >;
+typedef $$SettingsTableTableCreateCompanionBuilder =
+    SettingsTableCompanion Function({
+      required String key,
+      required String value,
+      Value<int> rowid,
+    });
+typedef $$SettingsTableTableUpdateCompanionBuilder =
+    SettingsTableCompanion Function({
+      Value<String> key,
+      Value<String> value,
+      Value<int> rowid,
+    });
 
 class $$SettingsTableTableFilterComposer
     extends Composer<_$AppDatabase, $SettingsTableTable> {
@@ -4659,10 +5494,14 @@ class $$SettingsTableTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get key => $composableBuilder(
-      column: $table.key, builder: (column) => ColumnFilters(column));
+    column: $table.key,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get value => $composableBuilder(
-      column: $table.value, builder: (column) => ColumnFilters(column));
+    column: $table.value,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$SettingsTableTableOrderingComposer
@@ -4675,10 +5514,14 @@ class $$SettingsTableTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get key => $composableBuilder(
-      column: $table.key, builder: (column) => ColumnOrderings(column));
+    column: $table.key,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get value => $composableBuilder(
-      column: $table.value, builder: (column) => ColumnOrderings(column));
+    column: $table.value,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer
@@ -4697,23 +5540,31 @@ class $$SettingsTableTableAnnotationComposer
       $composableBuilder(column: $table.value, builder: (column) => column);
 }
 
-class $$SettingsTableTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $SettingsTableTable,
-    SettingsTableData,
-    $$SettingsTableTableFilterComposer,
-    $$SettingsTableTableOrderingComposer,
-    $$SettingsTableTableAnnotationComposer,
-    $$SettingsTableTableCreateCompanionBuilder,
-    $$SettingsTableTableUpdateCompanionBuilder,
-    (
-      SettingsTableData,
-      BaseReferences<_$AppDatabase, $SettingsTableTable, SettingsTableData>
-    ),
-    SettingsTableData,
-    PrefetchHooks Function()> {
+class $$SettingsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SettingsTableTable,
+          SettingsTableData,
+          $$SettingsTableTableFilterComposer,
+          $$SettingsTableTableOrderingComposer,
+          $$SettingsTableTableAnnotationComposer,
+          $$SettingsTableTableCreateCompanionBuilder,
+          $$SettingsTableTableUpdateCompanionBuilder,
+          (
+            SettingsTableData,
+            BaseReferences<
+              _$AppDatabase,
+              $SettingsTableTable,
+              SettingsTableData
+            >,
+          ),
+          SettingsTableData,
+          PrefetchHooks Function()
+        > {
   $$SettingsTableTableTableManager(_$AppDatabase db, $SettingsTableTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4726,48 +5577,51 @@ class $$SettingsTableTableTableManager extends RootTableManager<
             Value<String> key = const Value.absent(),
             Value<String> value = const Value.absent(),
             Value<int> rowid = const Value.absent(),
-          }) =>
-              SettingsTableCompanion(
-            key: key,
-            value: value,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String key,
-            required String value,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              SettingsTableCompanion.insert(
-            key: key,
-            value: value,
-            rowid: rowid,
-          ),
+          }) => SettingsTableCompanion(key: key, value: value, rowid: rowid),
+          createCompanionCallback:
+              ({
+                required String key,
+                required String value,
+                Value<int> rowid = const Value.absent(),
+              }) => SettingsTableCompanion.insert(
+                key: key,
+                value: value,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$SettingsTableTable, SettingsTableData>(table),
-                    BaseReferences<_$AppDatabase, $SettingsTableTable,
-                        SettingsTableData>(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$SettingsTableTable, SettingsTableData>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $SettingsTableTable,
+                    SettingsTableData
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$SettingsTableTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $SettingsTableTable,
-    SettingsTableData,
-    $$SettingsTableTableFilterComposer,
-    $$SettingsTableTableOrderingComposer,
-    $$SettingsTableTableAnnotationComposer,
-    $$SettingsTableTableCreateCompanionBuilder,
-    $$SettingsTableTableUpdateCompanionBuilder,
-    (
+typedef $$SettingsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SettingsTableTable,
       SettingsTableData,
-      BaseReferences<_$AppDatabase, $SettingsTableTable, SettingsTableData>
-    ),
-    SettingsTableData,
-    PrefetchHooks Function()>;
+      $$SettingsTableTableFilterComposer,
+      $$SettingsTableTableOrderingComposer,
+      $$SettingsTableTableAnnotationComposer,
+      $$SettingsTableTableCreateCompanionBuilder,
+      $$SettingsTableTableUpdateCompanionBuilder,
+      (
+        SettingsTableData,
+        BaseReferences<_$AppDatabase, $SettingsTableTable, SettingsTableData>,
+      ),
+      SettingsTableData,
+      PrefetchHooks Function()
+    >;
 typedef $$RecitersTableCreateCompanionBuilder = RecitersCompanion Function({
   required String id,
   required String reciterName,
@@ -4797,22 +5651,34 @@ class $$RecitersTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnFilters(column));
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get reciterName => $composableBuilder(
-      column: $table.reciterName, builder: (column) => ColumnFilters(column));
+    column: $table.reciterName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get moshafName => $composableBuilder(
-      column: $table.moshafName, builder: (column) => ColumnFilters(column));
+    column: $table.moshafName,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get server => $composableBuilder(
-      column: $table.server, builder: (column) => ColumnFilters(column));
+    column: $table.server,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get surahList => $composableBuilder(
-      column: $table.surahList, builder: (column) => ColumnFilters(column));
+    column: $table.surahList,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get surahTotal => $composableBuilder(
-      column: $table.surahTotal, builder: (column) => ColumnFilters(column));
+    column: $table.surahTotal,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$RecitersTableOrderingComposer
@@ -4825,22 +5691,34 @@ class $$RecitersTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get id => $composableBuilder(
-      column: $table.id, builder: (column) => ColumnOrderings(column));
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get reciterName => $composableBuilder(
-      column: $table.reciterName, builder: (column) => ColumnOrderings(column));
+    column: $table.reciterName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get moshafName => $composableBuilder(
-      column: $table.moshafName, builder: (column) => ColumnOrderings(column));
+    column: $table.moshafName,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get server => $composableBuilder(
-      column: $table.server, builder: (column) => ColumnOrderings(column));
+    column: $table.server,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get surahList => $composableBuilder(
-      column: $table.surahList, builder: (column) => ColumnOrderings(column));
+    column: $table.surahList,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get surahTotal => $composableBuilder(
-      column: $table.surahTotal, builder: (column) => ColumnOrderings(column));
+    column: $table.surahTotal,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RecitersTableAnnotationComposer
@@ -4856,10 +5734,14 @@ class $$RecitersTableAnnotationComposer
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get reciterName => $composableBuilder(
-      column: $table.reciterName, builder: (column) => column);
+    column: $table.reciterName,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get moshafName => $composableBuilder(
-      column: $table.moshafName, builder: (column) => column);
+    column: $table.moshafName,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get server =>
       $composableBuilder(column: $table.server, builder: (column) => column);
@@ -4868,23 +5750,32 @@ class $$RecitersTableAnnotationComposer
       $composableBuilder(column: $table.surahList, builder: (column) => column);
 
   GeneratedColumn<int> get surahTotal => $composableBuilder(
-      column: $table.surahTotal, builder: (column) => column);
+    column: $table.surahTotal,
+    builder: (column) => column,
+  );
 }
 
-class $$RecitersTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $RecitersTable,
-    ReciterRow,
-    $$RecitersTableFilterComposer,
-    $$RecitersTableOrderingComposer,
-    $$RecitersTableAnnotationComposer,
-    $$RecitersTableCreateCompanionBuilder,
-    $$RecitersTableUpdateCompanionBuilder,
-    (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
-    ReciterRow,
-    PrefetchHooks Function()> {
+class $$RecitersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RecitersTable,
+          ReciterRow,
+          $$RecitersTableFilterComposer,
+          $$RecitersTableOrderingComposer,
+          $$RecitersTableAnnotationComposer,
+          $$RecitersTableCreateCompanionBuilder,
+          $$RecitersTableUpdateCompanionBuilder,
+          (
+            ReciterRow,
+            BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>,
+          ),
+          ReciterRow,
+          PrefetchHooks Function()
+        > {
   $$RecitersTableTableManager(_$AppDatabase db, $RecitersTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -4893,81 +5784,89 @@ class $$RecitersTableTableManager extends RootTableManager<
               $$RecitersTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$RecitersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> id = const Value.absent(),
-            Value<String> reciterName = const Value.absent(),
-            Value<String> moshafName = const Value.absent(),
-            Value<String> server = const Value.absent(),
-            Value<String> surahList = const Value.absent(),
-            Value<int> surahTotal = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              RecitersCompanion(
-            id: id,
-            reciterName: reciterName,
-            moshafName: moshafName,
-            server: server,
-            surahList: surahList,
-            surahTotal: surahTotal,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String id,
-            required String reciterName,
-            required String moshafName,
-            required String server,
-            required String surahList,
-            required int surahTotal,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              RecitersCompanion.insert(
-            id: id,
-            reciterName: reciterName,
-            moshafName: moshafName,
-            server: server,
-            surahList: surahList,
-            surahTotal: surahTotal,
-            rowid: rowid,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> reciterName = const Value.absent(),
+                Value<String> moshafName = const Value.absent(),
+                Value<String> server = const Value.absent(),
+                Value<String> surahList = const Value.absent(),
+                Value<int> surahTotal = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => RecitersCompanion(
+                id: id,
+                reciterName: reciterName,
+                moshafName: moshafName,
+                server: server,
+                surahList: surahList,
+                surahTotal: surahTotal,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String reciterName,
+                required String moshafName,
+                required String server,
+                required String surahList,
+                required int surahTotal,
+                Value<int> rowid = const Value.absent(),
+              }) => RecitersCompanion.insert(
+                id: id,
+                reciterName: reciterName,
+                moshafName: moshafName,
+                server: server,
+                surahList: surahList,
+                surahTotal: surahTotal,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$RecitersTable, ReciterRow>(table),
-                    BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>(
-                        db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$RecitersTable, ReciterRow>(table),
+                  BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$RecitersTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $RecitersTable,
-    ReciterRow,
-    $$RecitersTableFilterComposer,
-    $$RecitersTableOrderingComposer,
-    $$RecitersTableAnnotationComposer,
-    $$RecitersTableCreateCompanionBuilder,
-    $$RecitersTableUpdateCompanionBuilder,
-    (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
-    ReciterRow,
-    PrefetchHooks Function()>;
-typedef $$HadithEntriesTableCreateCompanionBuilder = HadithEntriesCompanion
-    Function({
-  required String packId,
-  required int ordinal,
-  required int number,
-  required String body,
-  Value<int> rowid,
-});
-typedef $$HadithEntriesTableUpdateCompanionBuilder = HadithEntriesCompanion
-    Function({
-  Value<String> packId,
-  Value<int> ordinal,
-  Value<int> number,
-  Value<String> body,
-  Value<int> rowid,
-});
+typedef $$RecitersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RecitersTable,
+      ReciterRow,
+      $$RecitersTableFilterComposer,
+      $$RecitersTableOrderingComposer,
+      $$RecitersTableAnnotationComposer,
+      $$RecitersTableCreateCompanionBuilder,
+      $$RecitersTableUpdateCompanionBuilder,
+      (ReciterRow, BaseReferences<_$AppDatabase, $RecitersTable, ReciterRow>),
+      ReciterRow,
+      PrefetchHooks Function()
+    >;
+typedef $$HadithEntriesTableCreateCompanionBuilder =
+    HadithEntriesCompanion Function({
+      required String packId,
+      required int ordinal,
+      required int number,
+      required String body,
+      Value<int> rowid,
+    });
+typedef $$HadithEntriesTableUpdateCompanionBuilder =
+    HadithEntriesCompanion Function({
+      Value<String> packId,
+      Value<int> ordinal,
+      Value<int> number,
+      Value<String> body,
+      Value<int> rowid,
+    });
 
 class $$HadithEntriesTableFilterComposer
     extends Composer<_$AppDatabase, $HadithEntriesTable> {
@@ -4979,16 +5878,24 @@ class $$HadithEntriesTableFilterComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnFilters<String> get packId => $composableBuilder(
-      column: $table.packId, builder: (column) => ColumnFilters(column));
+    column: $table.packId,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get ordinal => $composableBuilder(
-      column: $table.ordinal, builder: (column) => ColumnFilters(column));
+    column: $table.ordinal,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<int> get number => $composableBuilder(
-      column: $table.number, builder: (column) => ColumnFilters(column));
+    column: $table.number,
+    builder: (column) => ColumnFilters(column),
+  );
 
   ColumnFilters<String> get body => $composableBuilder(
-      column: $table.body, builder: (column) => ColumnFilters(column));
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$HadithEntriesTableOrderingComposer
@@ -5001,16 +5908,24 @@ class $$HadithEntriesTableOrderingComposer
     super.$removeJoinBuilderFromRootComposer,
   });
   ColumnOrderings<String> get packId => $composableBuilder(
-      column: $table.packId, builder: (column) => ColumnOrderings(column));
+    column: $table.packId,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get ordinal => $composableBuilder(
-      column: $table.ordinal, builder: (column) => ColumnOrderings(column));
+    column: $table.ordinal,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<int> get number => $composableBuilder(
-      column: $table.number, builder: (column) => ColumnOrderings(column));
+    column: $table.number,
+    builder: (column) => ColumnOrderings(column),
+  );
 
   ColumnOrderings<String> get body => $composableBuilder(
-      column: $table.body, builder: (column) => ColumnOrderings(column));
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$HadithEntriesTableAnnotationComposer
@@ -5035,23 +5950,27 @@ class $$HadithEntriesTableAnnotationComposer
       $composableBuilder(column: $table.body, builder: (column) => column);
 }
 
-class $$HadithEntriesTableTableManager extends RootTableManager<
-    _$AppDatabase,
-    $HadithEntriesTable,
-    HadithEntry,
-    $$HadithEntriesTableFilterComposer,
-    $$HadithEntriesTableOrderingComposer,
-    $$HadithEntriesTableAnnotationComposer,
-    $$HadithEntriesTableCreateCompanionBuilder,
-    $$HadithEntriesTableUpdateCompanionBuilder,
-    (
-      HadithEntry,
-      BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>
-    ),
-    HadithEntry,
-    PrefetchHooks Function()> {
+class $$HadithEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HadithEntriesTable,
+          HadithEntry,
+          $$HadithEntriesTableFilterComposer,
+          $$HadithEntriesTableOrderingComposer,
+          $$HadithEntriesTableAnnotationComposer,
+          $$HadithEntriesTableCreateCompanionBuilder,
+          $$HadithEntriesTableUpdateCompanionBuilder,
+          (
+            HadithEntry,
+            BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>,
+          ),
+          HadithEntry,
+          PrefetchHooks Function()
+        > {
   $$HadithEntriesTableTableManager(_$AppDatabase db, $HadithEntriesTable table)
-      : super(TableManagerState(
+    : super(
+        TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
@@ -5060,60 +5979,68 @@ class $$HadithEntriesTableTableManager extends RootTableManager<
               $$HadithEntriesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$HadithEntriesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<String> packId = const Value.absent(),
-            Value<int> ordinal = const Value.absent(),
-            Value<int> number = const Value.absent(),
-            Value<String> body = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HadithEntriesCompanion(
-            packId: packId,
-            ordinal: ordinal,
-            number: number,
-            body: body,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String packId,
-            required int ordinal,
-            required int number,
-            required String body,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HadithEntriesCompanion.insert(
-            packId: packId,
-            ordinal: ordinal,
-            number: number,
-            body: body,
-            rowid: rowid,
-          ),
+          updateCompanionCallback:
+              ({
+                Value<String> packId = const Value.absent(),
+                Value<int> ordinal = const Value.absent(),
+                Value<int> number = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => HadithEntriesCompanion(
+                packId: packId,
+                ordinal: ordinal,
+                number: number,
+                body: body,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String packId,
+                required int ordinal,
+                required int number,
+                required String body,
+                Value<int> rowid = const Value.absent(),
+              }) => HadithEntriesCompanion.insert(
+                packId: packId,
+                ordinal: ordinal,
+                number: number,
+                body: body,
+                rowid: rowid,
+              ),
           withReferenceMapper: (p0) => p0
-              .map((e) => (
-                    e.readTable<$HadithEntriesTable, HadithEntry>(table),
-                    BaseReferences<_$AppDatabase, $HadithEntriesTable,
-                        HadithEntry>(db, table, e)
-                  ))
+              .map(
+                (e) => (
+                  e.readTable<$HadithEntriesTable, HadithEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $HadithEntriesTable,
+                    HadithEntry
+                  >(db, table, e),
+                ),
+              )
               .toList(),
           prefetchHooksCallback: null,
-        ));
+        ),
+      );
 }
 
-typedef $$HadithEntriesTableProcessedTableManager = ProcessedTableManager<
-    _$AppDatabase,
-    $HadithEntriesTable,
-    HadithEntry,
-    $$HadithEntriesTableFilterComposer,
-    $$HadithEntriesTableOrderingComposer,
-    $$HadithEntriesTableAnnotationComposer,
-    $$HadithEntriesTableCreateCompanionBuilder,
-    $$HadithEntriesTableUpdateCompanionBuilder,
-    (
+typedef $$HadithEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HadithEntriesTable,
       HadithEntry,
-      BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>
-    ),
-    HadithEntry,
-    PrefetchHooks Function()>;
+      $$HadithEntriesTableFilterComposer,
+      $$HadithEntriesTableOrderingComposer,
+      $$HadithEntriesTableAnnotationComposer,
+      $$HadithEntriesTableCreateCompanionBuilder,
+      $$HadithEntriesTableUpdateCompanionBuilder,
+      (
+        HadithEntry,
+        BaseReferences<_$AppDatabase, $HadithEntriesTable, HadithEntry>,
+      ),
+      HadithEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;

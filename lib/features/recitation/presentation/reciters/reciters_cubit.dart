@@ -16,8 +16,8 @@ class RecitersCubit extends Cubit<RecitersState> {
   /// The subscription is the source of truth; the first empty emission
   /// triggers a one-shot API refresh.
   RecitersCubit({required ReciterSource repo})
-      : _repo = repo,
-        super(const RecitersState.loading());
+    : _repo = repo,
+      super(const RecitersState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -27,19 +27,23 @@ class RecitersCubit extends Cubit<RecitersState> {
         .watchAll()
         .map((rows) => [for (final row in sortReciters(rows)) row.toInfo()])
         .listen(
-      (reciters) {
-        if (isClosed) return;
-        _latest = reciters;
-        _emitFiltered();
-        _kickOnce();
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        appLog('reciters stream failed',
-            name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
-        if (isClosed) return;
-        emit(const RecitersState.failed());
-      },
-    );
+          (reciters) {
+            if (isClosed) return;
+            _latest = reciters;
+            _emitFiltered();
+            _kickOnce();
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            appLog(
+              'reciters stream failed',
+              name: 'quran_yahdi/reciters',
+              error: error,
+              stackTrace: stackTrace,
+            );
+            if (isClosed) return;
+            emit(const RecitersState.failed());
+          },
+        );
   }
 
   final ReciterSource _repo;
@@ -60,8 +64,12 @@ class RecitersCubit extends Cubit<RecitersState> {
     try {
       await _repo.refreshFromApi();
     } on Object catch (error, stackTrace) {
-      appLog('reciters refresh failed',
-          name: 'quran_yahdi/reciters', error: error, stackTrace: stackTrace);
+      appLog(
+        'reciters refresh failed',
+        name: 'quran_yahdi/reciters',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _failSoft();
     }
   }
@@ -78,17 +86,19 @@ class RecitersCubit extends Cubit<RecitersState> {
     if (s is RecitersReady) {
       emit(s.copyWith(dataError: true));
     } else {
-      emit(RecitersState.ready(
-          reciters: const <ReciterInfo>[], query: _query, dataError: true));
+      emit(
+        RecitersState.ready(
+          reciters: const <ReciterInfo>[],
+          query: _query,
+          dataError: true,
+        ),
+      );
     }
   }
 
   void _emitFiltered() {
     if (isClosed) return;
-    emit(RecitersState.ready(
-      reciters: _filter(_latest),
-      query: _query,
-    ));
+    emit(RecitersState.ready(reciters: _filter(_latest), query: _query));
   }
 
   /// Dismisses the soft network failure banner until the next failure.
@@ -102,8 +112,10 @@ class RecitersCubit extends Cubit<RecitersState> {
   List<ReciterInfo> _filter(List<ReciterInfo> reciters) {
     if (_query.isEmpty) return reciters;
     return reciters
-        .where((r) =>
-            r.reciterName.contains(_query) || r.moshafName.contains(_query))
+        .where(
+          (r) =>
+              r.reciterName.contains(_query) || r.moshafName.contains(_query),
+        )
         .toList();
   }
 

@@ -16,10 +16,10 @@ class DuasCubit extends Cubit<DuasState> {
     required DuaRepository duas,
     required RuqyahRepository ruqyah,
     required AyahLookup ayahs,
-  })  : _duas = duas,
-        _ruqyah = ruqyah,
-        _ayahs = ayahs,
-        super(const DuasState.loading());
+  }) : _duas = duas,
+       _ruqyah = ruqyah,
+       _ayahs = ayahs,
+       super(const DuasState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -53,17 +53,24 @@ class DuasCubit extends Cubit<DuasState> {
       final categories = results[1] as List<String>;
       if (isClosed || seq != _viewSeq) return;
       _allDuas = entries;
-      emit(DuasState.duas(
-        categories: categories,
-        entries: entries,
-        categoryLabels: {
-          for (final entry in entries)
-            if (entry.categoryEn.isNotEmpty) entry.categoryAr: entry.categoryEn,
-        },
-      ));
+      emit(
+        DuasState.duas(
+          categories: categories,
+          entries: entries,
+          categoryLabels: {
+            for (final entry in entries)
+              if (entry.categoryEn.isNotEmpty)
+                entry.categoryAr: entry.categoryEn,
+          },
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('duas load failed',
-          name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
+      appLog(
+        'duas load failed',
+        name: 'quran_yahdi/duas',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed());
     }
@@ -94,8 +101,12 @@ class DuasCubit extends Cubit<DuasState> {
       _resolvedRuqyah = resolved;
       emit(DuasState.ruqyah(entries: resolved));
     } on Object catch (error, stackTrace) {
-      appLog('ruqyah load failed',
-          name: 'quran_yahdi/duas', error: error, stackTrace: stackTrace);
+      appLog(
+        'ruqyah load failed',
+        name: 'quran_yahdi/duas',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _viewSeq) return;
       emit(const DuasState.failed(tab: DuasTab.ruqyah));
     }
@@ -114,9 +125,10 @@ class DuasCubit extends Cubit<DuasState> {
       return RuqyahResolved(
         id: entry.id,
         isQuran: true,
-        displayText:
-            <String>[for (final ayah in ayahs) ayah.textUthmani].join(' '),
-        citation: '${surah?.nameAr ?? ''} '
+        displayText: <String>[for (final ayah in ayahs) ayah.textUthmani]
+            .join(' '),
+        citation:
+            '${surah?.nameAr ?? ''} '
             '${fromAyah.toArabicIndic}–${toAyah.toArabicIndic}',
         reference: entry.reference,
       );
@@ -150,16 +162,18 @@ class DuasCubit extends Cubit<DuasState> {
     final all = _allDuas;
     if (state is! DuasInView || all == null) return;
     if (isClosed) return;
-    emit(DuasState.duas(
-      categories: state.categories,
-      entries: category == null
-          ? all
-          : <DuaEntry>[
-              for (final entry in all)
-                if (entry.categoryAr == category) entry,
-            ],
-      selectedCategory: category,
-      categoryLabels: state.categoryLabels,
-    ));
+    emit(
+      DuasState.duas(
+        categories: state.categories,
+        entries: category == null
+            ? all
+            : <DuaEntry>[
+                for (final entry in all)
+                  if (entry.categoryAr == category) entry,
+              ],
+        selectedCategory: category,
+        categoryLabels: state.categoryLabels,
+      ),
+    );
   }
 }

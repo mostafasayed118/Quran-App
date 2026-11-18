@@ -31,13 +31,13 @@ class _StaticReciterRepository extends ReciterRepository {
 }
 
 ReciterRow _row({required String id, required String name}) => ReciterRow(
-      id: id,
-      reciterName: name,
-      moshafName: 'مرتل',
-      server: 'https://x/',
-      surahList: '1',
-      surahTotal: 114,
-    );
+  id: id,
+  reciterName: name,
+  moshafName: 'مرتل',
+  server: 'https://x/',
+  surahList: '1',
+  surahTotal: 114,
+);
 
 void main() {
   late AppDatabase db;
@@ -59,37 +59,43 @@ void main() {
     );
   }
 
-  test('soft refresh failure raises the flag and keeps the cached list',
-      () async {
-    final repo =
-        _StaticReciterRepository(db, [_row(id: '51-53', name: 'عبدالباسط')])
-          ..refreshError = StateError('mp3quran HTTP 502');
-    final cubit = RecitersCubit(repo: repo);
-    addTearDown(cubit.close);
+  test(
+    'soft refresh failure raises the flag and keeps the cached list',
+    () async {
+      final repo = _StaticReciterRepository(db, [
+        _row(id: '51-53', name: 'عبدالباسط'),
+      ])..refreshError = StateError('mp3quran HTTP 502');
+      final cubit = RecitersCubit(repo: repo);
+      addTearDown(cubit.close);
 
-    await cubit.start();
-    await Future<void>.delayed(Duration.zero);
-    expect(cubit.state, isA<RecitersReady>());
-    expect((cubit.state as RecitersReady).dataError, isFalse);
+      await cubit.start();
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state, isA<RecitersReady>());
+      expect((cubit.state as RecitersReady).dataError, isFalse);
 
-    await cubit.refresh();
+      await cubit.refresh();
 
-    final ready = cubit.state as RecitersReady;
-    expect(ready.dataError, isTrue);
-    expect(ready.reciters, hasLength(1));
-    expect(repo.refreshCalls, 1);
-  });
+      final ready = cubit.state as RecitersReady;
+      expect(ready.dataError, isTrue);
+      expect(ready.reciters, hasLength(1));
+      expect(repo.refreshCalls, 1);
+    },
+  );
 
-  testWidgets('refresh failure shows localized copy, never the raw exception',
-      (tester) async {
-    final repo =
-        _StaticReciterRepository(db, [_row(id: '51-53', name: 'عبدالباسط')])
-          ..refreshError = StateError('mp3quran HTTP 502');
+  testWidgets('refresh failure shows localized copy, never the raw exception', (
+    tester,
+  ) async {
+    final repo = _StaticReciterRepository(db, [
+      _row(id: '51-53', name: 'عبدالباسط'),
+    ])..refreshError = StateError('mp3quran HTTP 502');
     await pumpScreen(tester, repo);
 
     await tester.tap(find.byTooltip('تحديث'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تعذّر تحديث قائمة القرّاء'), findsOneWidget);
     expect(find.textContaining('StateError'), findsNothing);
@@ -100,21 +106,29 @@ void main() {
       matching: find.byType(IconButton),
     );
     await tester.tap(dismiss);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تعذّر تحديث قائمة القرّاء'), findsNothing);
   });
 
-  testWidgets('search with no matches shows the no-results copy',
-      (tester) async {
-    final repo =
-        _StaticReciterRepository(db, [_row(id: '51-53', name: 'عبدالباسط')]);
+  testWidgets('search with no matches shows the no-results copy', (
+    tester,
+  ) async {
+    final repo = _StaticReciterRepository(db, [
+      _row(id: '51-53', name: 'عبدالباسط'),
+    ]);
     await pumpScreen(tester, repo);
 
     await tester.enterText(find.byType(TextField), 'zzz');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('لا نتائج مطابقة'), findsOneWidget);
     expect(find.text('حمّل فهرس القرّاء من الإنترنت'), findsNothing);

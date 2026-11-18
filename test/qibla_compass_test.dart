@@ -58,19 +58,21 @@ void main() {
     );
   }
 
-  testWidgets('lined up with the qibla shows the confirmation and a gold dial',
-      (tester) async {
-    final controller = StreamController<double>();
-    addTearDown(controller.close);
-    await pumpWithHeading(tester, controller);
+  testWidgets(
+    'lined up with the qibla shows the confirmation and a gold dial',
+    (tester) async {
+      final controller = StreamController<double>();
+      addTearDown(controller.close);
+      await pumpWithHeading(tester, controller);
 
-    controller.add(137.2);
-    await tester.pump();
-    await tester.pump();
+      controller.add(137.2);
+      await tester.pump();
+      await tester.pump();
 
-    expect(find.text('أنت تواجه القبلة'), findsOneWidget);
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
-  });
+      expect(find.text('أنت تواجه القبلة'), findsOneWidget);
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
+    },
+  );
 
   testWidgets('a few degrees off shows which way to turn', (tester) async {
     final controller = StreamController<double>();

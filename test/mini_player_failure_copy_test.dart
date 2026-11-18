@@ -82,25 +82,26 @@ void main() {
     required bool backgroundActive,
     Object? error,
     ReciterRepository? reciters,
-  }) =>
-      PlaybackCubit(
-        service: _FailingPlaybackService(loadError: error),
-        reciters: reciters ?? ReciterRepository(db),
-        downloader:
-            AudioDownloader(db, audioRootResolver: () async => tempRoot),
-        backgroundActive: () => backgroundActive,
-      );
+  }) => PlaybackCubit(
+    service: _FailingPlaybackService(loadError: error),
+    reciters: reciters ?? ReciterRepository(db),
+    downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
+    backgroundActive: () => backgroundActive,
+  );
 
   Future<void> pumpBar(WidgetTester tester, PlaybackCubit cubit) async {
     addTearDown(cubit.close);
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: cubit),
-      ],
-      child: appShell(home: const Scaffold(bottomSheet: MiniPlayerBar())),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [BlocProvider<PlaybackCubit>.value(value: cubit)],
+        child: appShell(home: const Scaffold(bottomSheet: MiniPlayerBar())),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   testWidgets('a network failure keeps the playback wording', (tester) async {
@@ -113,33 +114,45 @@ void main() {
   });
 
   testWidgets(
-      'a background-inactive failure announces the missing background audio',
-      (tester) async {
-    final cubit = buildCubit(backgroundActive: false, error: StateError('x'));
-    await cubit.playSurah(_row, 1);
+    'a background-inactive failure announces the missing background audio',
+    (tester) async {
+      final cubit = buildCubit(backgroundActive: false, error: StateError('x'));
+      await cubit.playSurah(_row, 1);
 
-    await pumpBar(tester, cubit);
+      await pumpBar(tester, cubit);
 
-    expect(find.text('تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح'),
-        findsOneWidget);
-    expect(find.text('تعذّر تشغيل التلاوة'), findsNothing,
-        reason: 'the bare network copy must not stand in for the truthful one');
-  });
+      expect(
+        find.text('تعذّر تشغيل التلاوة — الصوت في الخلفية غير متاح'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('تعذّر تشغيل التلاوة'),
+        findsNothing,
+        reason: 'the bare network copy must not stand in for the truthful one',
+      );
+    },
+  );
 
   testWidgets(
-      'a no-reciters failure speaks playback wording, not the index hint',
-      (tester) async {
-    final cubit = buildCubit(
-      backgroundActive: true,
-      reciters: _EmptyCatalogRepository(db),
-    );
-    await cubit.playDefaultForSurah(1);
+    'a no-reciters failure speaks playback wording, not the index hint',
+    (tester) async {
+      final cubit = buildCubit(
+        backgroundActive: true,
+        reciters: _EmptyCatalogRepository(db),
+      );
+      await cubit.playDefaultForSurah(1);
 
-    await pumpBar(tester, cubit);
+      await pumpBar(tester, cubit);
 
-    expect(find.text('تعذّر التشغيل — حمّل فهرس القرّاء من الإنترنت'),
-        findsOneWidget);
-    expect(find.text('حمّل فهرس القرّاء من الإنترنت'), findsNothing,
-        reason: 'the bare index hint must not stand in for playback wording');
-  });
+      expect(
+        find.text('تعذّر التشغيل — حمّل فهرس القرّاء من الإنترنت'),
+        findsOneWidget,
+      );
+      expect(
+        find.text('حمّل فهرس القرّاء من الإنترنت'),
+        findsNothing,
+        reason: 'the bare index hint must not stand in for playback wording',
+      );
+    },
+  );
 }

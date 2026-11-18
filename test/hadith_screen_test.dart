@@ -24,14 +24,18 @@ Future<void> seedHadithPack(AppDatabase db, Directory tempRoot) async {
     ..createSync(recursive: true);
   File('test/fixtures/hadith_eng_muslim_excerpt.json')
       .copySync('${libraryDir.path}/en-muslim.json');
-  await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-        packId: 'en-muslim',
-        kind: 'hadith',
-        language: 'en',
-        title: 'Sahih Muslim',
-        sizeMb: 3.9,
-        version: '1',
-      ));
+  await db
+      .into(db.installedPacks)
+      .insert(
+        InstalledPacksCompanion.insert(
+          packId: 'en-muslim',
+          kind: 'hadith',
+          language: 'en',
+          title: 'Sahih Muslim',
+          sizeMb: 3.9,
+          version: '1',
+        ),
+      );
 }
 
 void main() {
@@ -51,11 +55,13 @@ void main() {
     });
 
     HadithCubit cubit() => HadithCubit(
-          downloader: PackDownloader(db,
-              libraryRootResolver: () async => tempRoot,
-              fileDecoder: _syncDecode),
-          packId: 'en-muslim',
-        );
+      downloader: PackDownloader(
+        db,
+        libraryRootResolver: () async => tempRoot,
+        fileDecoder: _syncDecode,
+      ),
+      packId: 'en-muslim',
+    );
 
     Future<HadithReady> readyOf(HadithCubit c) async {
       final ready = c.stream.firstWhere((s) => s is HadithReady);
@@ -121,9 +127,11 @@ void main() {
 
     test('missing pack resolves an empty page with packId as title', () async {
       final c = HadithCubit(
-        downloader: PackDownloader(db,
-            libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
+        downloader: PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
         packId: 'ghost-pack',
       );
       addTearDown(c.close);
@@ -166,26 +174,31 @@ void main() {
 
     Future<void> pumpScreen(WidgetTester tester) async {
       final cubit = HadithCubit(
-        downloader: PackDownloader(db,
-            libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
+        downloader: PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
         packId: 'en-muslim',
       );
       addTearDown(cubit.close);
       await cubit.start();
-      await tester.pumpWidget(appShell(
-        home: BlocProvider<HadithCubit>.value(
-          value: cubit,
-          child: const HadithScreen(),
+      await tester.pumpWidget(
+        appShell(
+          home: BlocProvider<HadithCubit>.value(
+            value: cubit,
+            child: const HadithScreen(),
+          ),
         ),
-      ));
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    testWidgets('renders the numbered list from the installed pack',
-        (tester) async {
+    testWidgets('renders the numbered list from the installed pack', (
+      tester,
+    ) async {
       await pumpScreen(tester);
 
       expect(find.text('Sahih Muslim'), findsOneWidget);
@@ -199,9 +212,7 @@ void main() {
       // At offset 0 the prev button is disabled.
       expect(
         tester
-            .widget<TextButton>(
-              find.widgetWithText(TextButton, 'السابق'),
-            )
+            .widget<TextButton>(find.widgetWithText(TextButton, 'السابق'))
             .onPressed,
         isNull,
       );
@@ -215,9 +226,7 @@ void main() {
       expect(find.text('٣'), findsNothing);
       expect(
         tester
-            .widget<TextButton>(
-              find.widgetWithText(TextButton, 'السابق'),
-            )
+            .widget<TextButton>(find.widgetWithText(TextButton, 'السابق'))
             .onPressed,
         isNotNull,
       );
@@ -228,19 +237,23 @@ void main() {
       expect(find.textContaining('Zuhayr bin Harb'), findsOneWidget);
     });
 
-    testWidgets('error surface shows localized copy, never the raw message',
-        (tester) async {
+    testWidgets('error surface shows localized copy, never the raw message', (
+      tester,
+    ) async {
       final cubit = HadithCubit(
         downloader: _ThrowingPageDownloader(db),
         packId: 'en-muslim',
       );
       addTearDown(cubit.close);
       await cubit.start();
-      await tester.pumpWidget(appShell(
+      await tester.pumpWidget(
+        appShell(
           home: BlocProvider<HadithCubit>.value(
-        value: cubit,
-        child: const HadithScreen(),
-      )));
+            value: cubit,
+            child: const HadithScreen(),
+          ),
+        ),
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 100));
@@ -256,6 +269,8 @@ class _ThrowingPageDownloader extends PackDownloader {
 
   @override
   Future<(List<(int, String)>, bool)> hadithPage(
-          String packId, int offset, int limit) =>
-      Future.error(PackFailure('page fetch failed'));
+    String packId,
+    int offset,
+    int limit,
+  ) => Future.error(PackFailure('page fetch failed'));
 }

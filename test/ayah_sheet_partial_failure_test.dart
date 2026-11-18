@@ -35,30 +35,39 @@ void main() {
   test('one unreadable pack does not hide the healthy tafsir entry', () async {
     final db = AppDatabase.test(NativeDatabase.memory());
     addTearDown(db.close);
-    final tempRoot =
-        await Directory.systemTemp.createTemp('qy_ayah_partial_test');
+    final tempRoot = await Directory.systemTemp.createTemp(
+      'qy_ayah_partial_test',
+    );
     addTearDown(() => tempRoot.delete(recursive: true));
 
     final libraryDir = Directory('${tempRoot.path}/library')
       ..createSync(recursive: true);
     File('test/fixtures/tafsir_wrapper_sample.json')
         .copySync('${libraryDir.path}/ar-tafsir-muyassar.json');
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: 'ar-tafsir-muyassar',
-          kind: 'tafsir',
-          language: 'ar',
-          title: 'التفسير الميسر',
-          sizeMb: 0.2,
-          version: 'v1.2.2',
-        ));
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: 'broken-tafsir',
-          kind: 'tafsir',
-          language: 'ar',
-          title: 'تفسير تالف',
-          sizeMb: 0.1,
-          version: '1',
-        ));
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: 'ar-tafsir-muyassar',
+            kind: 'tafsir',
+            language: 'ar',
+            title: 'التفسير الميسر',
+            sizeMb: 0.2,
+            version: 'v1.2.2',
+          ),
+        );
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: 'broken-tafsir',
+            kind: 'tafsir',
+            language: 'ar',
+            title: 'تفسير تالف',
+            sizeMb: 0.1,
+            version: '1',
+          ),
+        );
 
     final cubit = AyahSheetCubit(
       downloader: _OneCorruptPackDownloader(
@@ -72,8 +81,9 @@ void main() {
     );
     addTearDown(cubit.close);
 
-    final ready = await cubit.stream.firstWhere((s) => s is AyahSheetReady)
-        as AyahSheetReady;
+    final ready = await cubit.stream.firstWhere(
+      (s) => s is AyahSheetReady,
+    ) as AyahSheetReady;
 
     expect(ready.tafsirEntries, hasLength(1));
     expect(ready.tafsirEntries.single.title, 'التفسير الميسر');

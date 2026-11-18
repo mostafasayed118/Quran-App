@@ -52,8 +52,11 @@ void main() {
     await cubit.start();
     source.controllers[0].add(const [_juz2]);
     await pumpEventQueue();
-    expect((cubit.state as JuzIndexReady).juz.single.juz, 1,
-        reason: 'the orphaned stream must not emit into the cubit');
+    expect(
+      (cubit.state as JuzIndexReady).juz.single.juz,
+      1,
+      reason: 'the orphaned stream must not emit into the cubit',
+    );
 
     source.controllers[1].add(const [_juz2]);
     await pumpEventQueue();

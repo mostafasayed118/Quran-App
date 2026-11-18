@@ -281,8 +281,9 @@ class _AyahActions extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      tooltip:
-                          bookmarked ? loc.bookmarkRemove : loc.bookmarkSave,
+                      tooltip: bookmarked
+                          ? loc.bookmarkRemove
+                          : loc.bookmarkSave,
                       icon: Icon(
                         bookmarked ? Icons.bookmark : Icons.bookmark_border,
                         color: bookmarked ? colors.secondary : null,
@@ -370,11 +371,8 @@ class _ShareAyahButton extends StatelessWidget {
     return IconButton(
       tooltip: loc.shareAyah,
       icon: const Icon(Icons.share_outlined),
-      onPressed: () => showVerseShareSheet(
-        context,
-        ayah: ayah,
-        surahName: surahName,
-      ),
+      onPressed: () =>
+          showVerseShareSheet(context, ayah: ayah, surahName: surahName),
     );
   }
 }

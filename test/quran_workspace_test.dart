@@ -38,21 +38,21 @@ class _JuzSource implements JuzIndexSource {
   const _JuzSource();
   @override
   Stream<List<JuzSummary>> watchJuz() => Stream.value(const [
-        JuzSummary(
-          juz: 1,
-          firstPage: 1,
-          surahId: 1,
-          numberInSurah: 1,
-          surahName: 'الفاتحة',
-        ),
-        JuzSummary(
-          juz: 2,
-          firstPage: 22,
-          surahId: 2,
-          numberInSurah: 2,
-          surahName: 'البقرة',
-        ),
-      ]);
+    JuzSummary(
+      juz: 1,
+      firstPage: 1,
+      surahId: 1,
+      numberInSurah: 1,
+      surahName: 'الفاتحة',
+    ),
+    JuzSummary(
+      juz: 2,
+      firstPage: 22,
+      surahId: 2,
+      numberInSurah: 2,
+      surahName: 'البقرة',
+    ),
+  ]);
 }
 
 class _TestAyahRepository extends AyahRepository {
@@ -69,59 +69,67 @@ class _TestAyahRepository extends AyahRepository {
 }
 
 BookmarkEntry _bookmark() => const BookmarkEntry(
-      ayah: Ayah(
-        id: 9,
-        surahId: 2,
-        numberInSurah: 2,
-        juz: 1,
-        page: 2,
-        textUthmani: 'ذلك الكتاب',
-        textImlaei: 'ذلك الكتاب',
-        sajda: false,
-      ),
-    );
+  ayah: Ayah(
+    id: 9,
+    surahId: 2,
+    numberInSurah: 2,
+    juz: 1,
+    page: 2,
+    textUthmani: 'ذلك الكتاب',
+    textImlaei: 'ذلك الكتاب',
+    sajda: false,
+  ),
+);
 
 void main() {
   late AppDatabase db;
 
   setUp(() async {
     db = newTestDb();
-    await db.batch((b) => b.insertAll(db.surahs, [
-          SurahsCompanion.insert(
-              id: const Value(1),
-              nameAr: 'الفاتحة',
-              nameEn: 'Al-Fatihah',
-              revelationType: 'makkah',
-              ayahCount: 1,
-              pagesStart: 1,
-              pagesEnd: 1),
-          SurahsCompanion.insert(
-              id: const Value(2),
-              nameAr: 'البقرة',
-              nameEn: 'Al-Baqarah',
-              revelationType: 'madinah',
-              ayahCount: 1,
-              pagesStart: 2,
-              pagesEnd: 2),
-        ]));
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-              id: const Value(8),
-              surahId: 1,
-              numberInSurah: 1,
-              juz: 1,
-              page: 1,
-              textUthmani: 'بسم الله الرحمن الرحيم',
-              textImlaei: 'بسم الله الرحمن الرحيم'),
-          AyahsCompanion.insert(
-              id: const Value(9),
-              surahId: 2,
-              numberInSurah: 2,
-              juz: 1,
-              page: 2,
-              textUthmani: 'ذلك الكتاب',
-              textImlaei: 'ذلك الكتاب'),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.surahs, [
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 1,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+        SurahsCompanion.insert(
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'madinah',
+          ayahCount: 1,
+          pagesStart: 2,
+          pagesEnd: 2,
+        ),
+      ]),
+    );
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(8),
+          surahId: 1,
+          numberInSurah: 1,
+          juz: 1,
+          page: 1,
+          textUthmani: 'بسم الله الرحمن الرحيم',
+          textImlaei: 'بسم الله الرحمن الرحيم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+      ]),
+    );
   });
 
   tearDown(() async {
@@ -193,28 +201,33 @@ void main() {
     return calls;
   }
 
-  Finder tab(String label) => find.descendant(
-        of: find.byType(TabBar),
-        matching: find.text(label),
-      );
+  Finder tab(String label) =>
+      find.descendant(of: find.byType(TabBar), matching: find.text(label));
 
   Future<void> openTab(WidgetTester tester, String label) async {
     final target = tab(label);
     await tester.ensureVisible(target);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(target);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   Finder surahRow(String name) => find.descendant(
-        of: find.byKey(const Key('quran-master')),
-        matching: find.text(name),
-      );
+    of: find.byKey(const Key('quran-master')),
+    matching: find.text(name),
+  );
 
-  testWidgets('the expanded workspace shows three tabs and the prompt',
-      (tester) async {
+  testWidgets('the expanded workspace shows three tabs and the prompt', (
+    tester,
+  ) async {
     await pumpWorkspace(tester);
 
     expect(find.byType(QuranWorkspaceScreen), findsOneWidget);
@@ -224,59 +237,78 @@ void main() {
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
   });
 
-  testWidgets('tapping a surah opens the pane and back clears it',
-      (tester) async {
+  testWidgets('tapping a surah opens the pane and back clears it', (
+    tester,
+  ) async {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(calls, [(surah: 1, ayah: 0)]);
     expect(find.byType(ReaderPane), findsOneWidget);
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsNothing);
 
     await tester.tap(find.byType(BackButton));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(ReaderPane), findsNothing);
     expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
   });
 
-  testWidgets('tapping a juz opens the reader at its first ayah',
-      (tester) async {
+  testWidgets('tapping a juz opens the reader at its first ayah', (
+    tester,
+  ) async {
     final calls = await pumpWorkspace(tester);
 
     await openTab(tester, 'أجزاء');
     await tester.tap(find.text('الجزء ١'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(calls, [(surah: 1, ayah: 1)]);
     expect(find.byType(ReaderPane), findsOneWidget);
   });
 
-  testWidgets('tapping a bookmark opens the reader at the verse',
-      (tester) async {
+  testWidgets('tapping a bookmark opens the reader at the verse', (
+    tester,
+  ) async {
     final calls = await pumpWorkspace(tester);
 
     await openTab(tester, 'علامات');
     await tester.tap(find.text('ذلك الكتاب'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(calls, [(surah: 2, ayah: 2)]);
     expect(find.byType(ReaderPane), findsOneWidget);
   });
 
-  testWidgets('switching tabs keeps the search and the open reader',
-      (tester) async {
+  testWidgets('switching tabs keeps the search and the open reader', (
+    tester,
+  ) async {
     await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.enterText(find.byType(TextField), 'بقرة');
     await tester.pump();
 
@@ -290,23 +322,31 @@ void main() {
     expect(find.byType(ReaderPane), findsOneWidget);
   });
 
-  testWidgets('re-selecting the same surah keeps one pane and one cubit',
-      (tester) async {
+  testWidgets('re-selecting the same surah keeps one pane and one cubit', (
+    tester,
+  ) async {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(calls, [(surah: 1, ayah: 0)]);
     expect(find.byType(ReaderPane), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0 keeps the tabs scrollable and overflow-free',
-      (tester) async {
+  testWidgets('textScale 2.0 keeps the tabs scrollable and overflow-free', (
+    tester,
+  ) async {
     await pumpWorkspace(tester, textScale: 2.0);
 
     expect(tester.takeException(), isNull);
@@ -325,11 +365,17 @@ void main() {
     final calls = await pumpWorkspace(tester);
 
     await tester.tap(surahRow('الفاتحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.enterText(
       find.descendant(
@@ -339,8 +385,11 @@ void main() {
       '2',
     );
     await tester.tap(find.text('انتقال'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(calls.last, (surah: 2, ayah: 2));
     expect(find.byType(ReaderPane), findsOneWidget);

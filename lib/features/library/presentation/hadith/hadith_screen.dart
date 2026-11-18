@@ -34,9 +34,7 @@ class HadithScreen extends StatelessWidget {
               final only = state is HadithReady && state.bookmarksOnly;
               return IconButton(
                 tooltip: only ? loc.hadithShowAll : loc.hadithBookmarks,
-                icon: Icon(
-                  only ? Icons.bookmarks : Icons.bookmarks_outlined,
-                ),
+                icon: Icon(only ? Icons.bookmarks : Icons.bookmarks_outlined),
                 onPressed: only ? cubit.showBrowse : cubit.showBookmarks,
               );
             },
@@ -60,11 +58,11 @@ class HadithScreen extends StatelessWidget {
                           : Icons.menu_book_outlined,
                     ),
                   final HadithReady ready => Column(
-                      children: [
-                        Expanded(child: _HadithVerses(ready: ready)),
-                        if (!ready.bookmarksOnly) _HadithPager(ready: ready),
-                      ],
-                    ),
+                    children: [
+                      Expanded(child: _HadithVerses(ready: ready)),
+                      if (!ready.bookmarksOnly) _HadithPager(ready: ready),
+                    ],
+                  ),
                 },
               ),
             ),
@@ -148,16 +146,13 @@ class _HadithTitle extends StatelessWidget {
         return Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Flexible(
-              child: Text(title, overflow: TextOverflow.ellipsis),
-            ),
+            Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
             if (s is HadithReady && s.language.isNotEmpty) ...[
               const SizedBox(width: AppSpacing.sm),
               Text(
                 _languageLabel(AppLocalizations.of(context), s.language),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppTheme.goldText(context),
-                    ),
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(color: AppTheme.goldText(context)),
               ),
             ],
           ],
@@ -227,8 +222,10 @@ class _HadithVerseRow extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final direction = rtl ? TextDirection.rtl : TextDirection.ltr;
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: 6,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         textDirection: direction,
@@ -292,18 +289,22 @@ class _HadithPager extends StatelessWidget {
       top: false,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.sm,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TextButton(
-              onPressed:
-                  ready.offset > 0 ? context.read<HadithCubit>().prev : null,
+              onPressed: ready.offset > 0
+                  ? context.read<HadithCubit>().prev
+                  : null,
               child: Text(loc.hadithPrev),
             ),
             TextButton(
-              onPressed:
-                  ready.hasMore ? context.read<HadithCubit>().next : null,
+              onPressed: ready.hasMore
+                  ? context.read<HadithCubit>().next
+                  : null,
               child: Text(loc.hadithNext),
             ),
           ],

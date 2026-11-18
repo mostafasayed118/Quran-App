@@ -29,8 +29,10 @@ void main() {
         PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
         PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
       ]
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
   });
 
   Future<void> pumpHost(WidgetTester tester) async {
@@ -45,16 +47,18 @@ void main() {
     );
   }
 
-  testWidgets('no city selected shows the prompt and picker button',
-      (tester) async {
+  testWidgets('no city selected shows the prompt and picker button', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
   });
 
-  testWidgets('selected city renders six labeled times with next highlighted',
-      (tester) async {
+  testWidgets('selected city renders six labeled times with next highlighted', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     await pumpHost(tester);
 

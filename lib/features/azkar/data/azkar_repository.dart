@@ -9,15 +9,16 @@ export '../domain/azkar_models.dart';
 /// Reads the bundled azkar catalog and searches it locally.
 class AzkarRepository {
   AzkarRepository({required Future<Map<String, dynamic>> Function() loader})
-      : _loader = loader;
+    : _loader = loader;
 
   final Future<Map<String, dynamic>> Function() _loader;
 
   /// Default maximum number of matches returned by [search].
   static const int searchLimit = 50;
 
-  late final CachedLoader<List<AzkarCollection>> _collections =
-      CachedLoader(_load);
+  late final CachedLoader<List<AzkarCollection>> _collections = CachedLoader(
+    _load,
+  );
 
   /// The catalog normalized once, in catalog order. Rebuilt only when the
   /// loader hands over a new list (it is cached, so in practice once).
@@ -31,8 +32,10 @@ class AzkarRepository {
   /// Local, normalization-aware search over every collection name and item
   /// text. Bounded to [limit] hits with a [AzkarSearchResults.hasMore] flag;
   /// an empty query yields no hits.
-  Future<AzkarSearchResults> search(String query,
-      {int limit = searchLimit}) async {
+  Future<AzkarSearchResults> search(
+    String query, {
+    int limit = searchLimit,
+  }) async {
     // Normalize the query ONCE; the loop below reuses it for every entry.
     final prepared = prepareQuery(query);
     if (prepared.isEmpty) {
@@ -60,10 +63,12 @@ class AzkarRepository {
           hasMore = true;
           break;
         }
-        hits.add(AzkarSearchHit(
-          collection: entry.collection,
-          itemIndex: entry.itemIndex,
-        ));
+        hits.add(
+          AzkarSearchHit(
+            collection: entry.collection,
+            itemIndex: entry.itemIndex,
+          ),
+        );
       }
     }
     return AzkarSearchResults(hits: hits, hasMore: hasMore);

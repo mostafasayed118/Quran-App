@@ -34,7 +34,9 @@ void main() {
 
     test('leaves already-plain text untouched', () {
       expect(
-          normalizeArabic('بسم الله الرحمن الرحيم'), 'بسم الله الرحمن الرحيم');
+        normalizeArabic('بسم الله الرحمن الرحيم'),
+        'بسم الله الرحمن الرحيم',
+      );
     });
   });
 

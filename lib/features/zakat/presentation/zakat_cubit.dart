@@ -48,18 +48,20 @@ class ZakatCubit extends Cubit<ZakatState> {
   void _recompute() {
     if (isClosed) return;
     final state = this.state as ZakatReady;
-    emit(state.copyWith(
-      result: const ZakatCalculator().compute(
-        ZakatInput(
-          goldGrams: parseDecimal(state.goldGrams),
-          silverGrams: parseDecimal(state.silverGrams),
-          cash: parseDecimal(state.cash),
-          debts: parseDecimal(state.debts),
-          nisabBySilver: state.nisabBySilver,
+    emit(
+      state.copyWith(
+        result: const ZakatCalculator().compute(
+          ZakatInput(
+            goldGrams: parseDecimal(state.goldGrams),
+            silverGrams: parseDecimal(state.silverGrams),
+            cash: parseDecimal(state.cash),
+            debts: parseDecimal(state.debts),
+            nisabBySilver: state.nisabBySilver,
+          ),
+          goldPricePerGram: parseDecimal(state.goldPrice),
+          silverPricePerGram: parseDecimal(state.silverPrice),
         ),
-        goldPricePerGram: parseDecimal(state.goldPrice),
-        silverPricePerGram: parseDecimal(state.silverPrice),
       ),
-    ));
+    );
   }
 }

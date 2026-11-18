@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,10 +24,8 @@ class _TempSupportPathProvider extends PathProviderPlatform {
 
 /// The reader's AppBar carries the surah name; scoping to the AppBar keeps the
 /// assertion off the basmala/ayah cards of the (lazily built) verse list.
-Finder _appBarText(String text) => find.descendant(
-      of: find.byType(AppBar),
-      matching: find.text(text),
-    );
+Finder _appBarText(String text) =>
+    find.descendant(of: find.byType(AppBar), matching: find.text(text));
 
 bool _showsInAppBar(String text) => _appBarText(text).evaluate().isNotEmpty;
 
@@ -77,68 +75,86 @@ void main() {
   });
 
   testWidgets(
-      'a same-route query-only deep link re-enters the reader at its target',
-      (tester) async {
-    // Warm the file-backed database (asset copy + open) once, off the frame
-    // clock, so the navigations below are not gated by first-open I/O.
-    await tester.runAsync(
-        () => getIt<AppDatabase>().customSelect('SELECT 1').getSingle());
-
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-    ));
-    await _pumpRounds(tester);
-
-    try {
-      AppRouter.router.go('/quran/reader?surah=1');
-      await _pumpUntil(tester, () => _showsInAppBar('الفاتحة'));
-      expect(_appBarText('الفاتحة'), findsOneWidget,
-          reason: 'cold entry must show the target surah (الفاتحة)');
-
-      // Same route path, query-only change — the warm-link defect's scope.
-      AppRouter.router.go('/quran/reader?surah=2');
-      await _pumpUntil(tester, () => _showsInAppBar('البقرة'));
-      expect(_appBarText('البقرة'), findsOneWidget,
-          reason: 'a same-route deep link must re-enter the reader at البقرة');
-      expect(_appBarText('الفاتحة'), findsNothing,
-          reason: 'the previously open surah must not stay on screen');
-
-      // Same-URI idempotency: repeating the identical link keeps البقرة.
-      AppRouter.router.go('/quran/reader?surah=2');
-      await _pumpRounds(tester);
-      expect(_appBarText('البقرة'), findsOneWidget);
-
-      // Cross-path sanity: leaving the route and returning stays healthy.
-      AppRouter.router.go('/quran');
-      await _pumpUntil(
-        tester,
-        () => find.byType(SurahIndexScreen).evaluate().isNotEmpty,
-        maxRounds: 30,
+    'a same-route query-only deep link re-enters the reader at its target',
+    (tester) async {
+      // Warm the file-backed database (asset copy + open) once, off the frame
+      // clock, so the navigations below are not gated by first-open I/O.
+      await tester.runAsync(
+        () => getIt<AppDatabase>().customSelect('SELECT 1').getSingle(),
       );
-      expect(find.byType(SurahIndexScreen), findsOneWidget);
 
-      AppRouter.router.go('/quran/reader?surah=2');
-      await _pumpUntil(tester, () => _showsInAppBar('البقرة'));
-      expect(_appBarText('البقرة'), findsOneWidget,
-          reason: 'cross-path re-entry must keep working');
-    } finally {
-      // Let the last navigation's stream cancellations settle on the frame
-      // clock before releasing the file-backed database — closing against a
-      // pending frame-clock timer deadlocks in the real-async zone. The
-      // timeout turns any residual stall into a loud test failure.
-      await _pumpRounds(tester, rounds: 16);
-      await tester.runAsync(() =>
-          getIt<AppDatabase>().close().timeout(const Duration(seconds: 20)));
-    }
-  });
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: AppRouter.router,
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+        ),
+      );
+      await _pumpRounds(tester);
+
+      try {
+        AppRouter.router.go('/quran/reader?surah=1');
+        await _pumpUntil(tester, () => _showsInAppBar('الفاتحة'));
+        expect(
+          _appBarText('الفاتحة'),
+          findsOneWidget,
+          reason: 'cold entry must show the target surah (الفاتحة)',
+        );
+
+        // Same route path, query-only change — the warm-link defect's scope.
+        AppRouter.router.go('/quran/reader?surah=2');
+        await _pumpUntil(tester, () => _showsInAppBar('البقرة'));
+        expect(
+          _appBarText('البقرة'),
+          findsOneWidget,
+          reason: 'a same-route deep link must re-enter the reader at البقرة',
+        );
+        expect(
+          _appBarText('الفاتحة'),
+          findsNothing,
+          reason: 'the previously open surah must not stay on screen',
+        );
+
+        // Same-URI idempotency: repeating the identical link keeps البقرة.
+        AppRouter.router.go('/quran/reader?surah=2');
+        await _pumpRounds(tester);
+        expect(_appBarText('البقرة'), findsOneWidget);
+
+        // Cross-path sanity: leaving the route and returning stays healthy.
+        AppRouter.router.go('/quran');
+        await _pumpUntil(
+          tester,
+          () => find.byType(SurahIndexScreen).evaluate().isNotEmpty,
+          maxRounds: 30,
+        );
+        expect(find.byType(SurahIndexScreen), findsOneWidget);
+
+        AppRouter.router.go('/quran/reader?surah=2');
+        await _pumpUntil(tester, () => _showsInAppBar('البقرة'));
+        expect(
+          _appBarText('البقرة'),
+          findsOneWidget,
+          reason: 'cross-path re-entry must keep working',
+        );
+      } finally {
+        // Let the last navigation's stream cancellations settle on the frame
+        // clock before releasing the file-backed database — closing against a
+        // pending frame-clock timer deadlocks in the real-async zone. The
+        // timeout turns any residual stall into a loud test failure.
+        await _pumpRounds(tester, rounds: 16);
+        await tester.runAsync(
+          () =>
+              getIt<AppDatabase>().close().timeout(const Duration(seconds: 20)),
+        );
+      }
+    },
+  );
 }

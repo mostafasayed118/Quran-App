@@ -54,48 +54,59 @@ class ZakatScreen extends StatelessWidget {
             // Weight-only entries contribute 0 while the price is blank, so
             // zakatable can still be 0. Ask for the price whenever any asset
             // was entered, not only when cash already crossed zero.
-            final anyAsset = [ready.goldGrams, ready.silverGrams, ready.cash]
-                .any((text) => (parseDecimalOrNull(text) ?? 0) > 0);
+            final anyAsset = [
+              ready.goldGrams,
+              ready.silverGrams,
+              ready.cash,
+            ].any((text) => (parseDecimalOrNull(text) ?? 0) > 0);
             final needsNisabPrice = ready.result.nisabValue <= 0 && anyAsset;
             final verdictText = hasInvalid
                 ? loc.zakatFixInputs
                 : needsNisabPrice
-                    ? loc.zakatEnterPrice
-                    : ready.result.due
-                        ? loc.zakatDue
-                        : loc.zakatNotDue;
+                ? loc.zakatEnterPrice
+                : ready.result.due
+                ? loc.zakatDue
+                : loc.zakatNotDue;
             String? errorFor(String text) =>
                 _isInvalid(text) ? loc.zakatInvalidNumber : null;
             return ListView(
               padding: appScrollPadding(
-                  context, const EdgeInsets.all(AppSpacing.md)),
+                context,
+                const EdgeInsets.all(AppSpacing.md),
+              ),
               children: [
                 _NisabToggle(ready: ready),
                 const SizedBox(height: 10),
                 _Field(
-                    label: loc.goldGrams,
-                    errorText: errorFor(ready.goldGrams),
-                    onChanged: context.read<ZakatCubit>().setGoldGrams),
+                  label: loc.goldGrams,
+                  errorText: errorFor(ready.goldGrams),
+                  onChanged: context.read<ZakatCubit>().setGoldGrams,
+                ),
                 _Field(
-                    label: loc.silverGrams,
-                    errorText: errorFor(ready.silverGrams),
-                    onChanged: context.read<ZakatCubit>().setSilverGrams),
+                  label: loc.silverGrams,
+                  errorText: errorFor(ready.silverGrams),
+                  onChanged: context.read<ZakatCubit>().setSilverGrams,
+                ),
                 _Field(
-                    label: loc.goldPrice,
-                    errorText: errorFor(ready.goldPrice),
-                    onChanged: context.read<ZakatCubit>().setGoldPrice),
+                  label: loc.goldPrice,
+                  errorText: errorFor(ready.goldPrice),
+                  onChanged: context.read<ZakatCubit>().setGoldPrice,
+                ),
                 _Field(
-                    label: loc.silverPrice,
-                    errorText: errorFor(ready.silverPrice),
-                    onChanged: context.read<ZakatCubit>().setSilverPrice),
+                  label: loc.silverPrice,
+                  errorText: errorFor(ready.silverPrice),
+                  onChanged: context.read<ZakatCubit>().setSilverPrice,
+                ),
                 _Field(
-                    label: loc.cash,
-                    errorText: errorFor(ready.cash),
-                    onChanged: context.read<ZakatCubit>().setCash),
+                  label: loc.cash,
+                  errorText: errorFor(ready.cash),
+                  onChanged: context.read<ZakatCubit>().setCash,
+                ),
                 _Field(
-                    label: loc.debts,
-                    errorText: errorFor(ready.debts),
-                    onChanged: context.read<ZakatCubit>().setDebts),
+                  label: loc.debts,
+                  errorText: errorFor(ready.debts),
+                  onChanged: context.read<ZakatCubit>().setDebts,
+                ),
                 const SizedBox(height: 14),
                 _SummaryCard(
                   ready: ready,
@@ -134,9 +145,7 @@ class _NisabToggle extends StatelessWidget {
       ],
       selected: {ready.nisabBySilver},
       onSelectionChanged: (selection) =>
-          context.read<ZakatCubit>().setNisabBySilver(
-                selection.first,
-              ),
+          context.read<ZakatCubit>().setNisabBySilver(selection.first),
     );
   }
 }
@@ -163,7 +172,9 @@ class _SummaryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _ZakatLine(
-                label: loc.zakatableLabel, value: ready.result.zakatable),
+              label: loc.zakatableLabel,
+              value: ready.result.zakatable,
+            ),
             _ZakatLine(label: loc.nisabLabel, value: ready.result.nisabValue),
             const SizedBox(height: AppSpacing.sm),
             Semantics(
@@ -187,10 +198,7 @@ class _SummaryCard extends StatelessWidget {
                 style: _amountStyle.copyWith(color: colors.primary),
               ),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              loc.zakatRateNote,
-              style: AppTheme.mutedFootnote(context),
-            ),
+            Text(loc.zakatRateNote, style: AppTheme.mutedFootnote(context)),
           ],
         ),
       ),
@@ -211,12 +219,7 @@ class _ZakatLine extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Expanded(
-            child: Text(
-              label,
-              style: _lineLabelStyle,
-            ),
-          ),
+          Expanded(child: Text(label, style: _lineLabelStyle)),
           Text(
             loc.digits(value.toStringAsFixed(_amountDecimals)),
             style: _lineValueStyle,
@@ -231,11 +234,7 @@ bool _isInvalid(String text) =>
     text.trim().isNotEmpty && parseDecimalOrNull(text) == null;
 
 class _Field extends StatelessWidget {
-  const _Field({
-    required this.label,
-    required this.onChanged,
-    this.errorText,
-  });
+  const _Field({required this.label, required this.onChanged, this.errorText});
 
   final String label;
   final ValueChanged<String> onChanged;
@@ -254,9 +253,7 @@ class _Field extends StatelessWidget {
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         // Amounts are typed in decimal; scientific notation (1e3) would parse
         // but reads as a typo, so the field refuses the exponent letters.
-        inputFormatters: [
-          FilteringTextInputFormatter.deny(RegExp('[eE]')),
-        ],
+        inputFormatters: [FilteringTextInputFormatter.deny(RegExp('[eE]'))],
         // Filled + outlined like the app's cards: the raw Material underline
         // read as an empty row on the beige page.
         decoration: InputDecoration(

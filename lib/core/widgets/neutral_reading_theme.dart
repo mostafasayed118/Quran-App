@@ -19,9 +19,6 @@ class NeutralReadingTheme extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Theme(
-      data: isDark ? AppTheme.dark : AppTheme.light,
-      child: child,
-    );
+    return Theme(data: isDark ? AppTheme.dark : AppTheme.light, child: child);
   }
 }

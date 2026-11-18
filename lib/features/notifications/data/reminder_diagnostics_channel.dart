@@ -21,8 +21,9 @@ import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 class ReminderDiagnosticsChannel implements ReminderDiagnostics {
   const ReminderDiagnosticsChannel();
 
-  static const MethodChannel _channel =
-      MethodChannel('quran_yahdi/reminder_diagnostics');
+  static const MethodChannel _channel = MethodChannel(
+    'quran_yahdi/reminder_diagnostics',
+  );
 
   @override
   Future<bool> notificationsEnabled() async =>

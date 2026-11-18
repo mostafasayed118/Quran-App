@@ -22,8 +22,11 @@ class _FakeCdn implements HttpClientAdapter {
   Future<_Reply> Function(RequestOptions request)? handler;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     final scripted = handler;
     if (scripted == null) {
       throw StateError('unexpected request: ${options.uri}');
@@ -87,56 +90,60 @@ void main() {
   LibraryPackInfo tafsirPack({
     required int fileCount,
     List<String>? perSurah,
-  }) =>
-      LibraryPackInfo(
-        id: 'tip',
-        kind: LibraryPackKind.tafsir,
-        language: 'ar',
-        titleAr: 'تفسير',
-        titleEn: 'Tafsir',
-        urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/{n}.json',
-        fileCount: fileCount,
-        approxSizeMb: 0.001,
-        version: 'v1',
-        sha256PerSurah: perSurah,
-      );
+  }) => LibraryPackInfo(
+    id: 'tip',
+    kind: LibraryPackKind.tafsir,
+    language: 'ar',
+    titleAr: 'تفسير',
+    titleEn: 'Tafsir',
+    urlTemplate: 'https://cdn.jsdelivr.net/library/tafsir/{n}.json',
+    fileCount: fileCount,
+    approxSizeMb: 0.001,
+    version: 'v1',
+    sha256PerSurah: perSurah,
+  );
 
   List<String> surahBodies() => [
-        '[{"text":"tafsir 1:1","ayah":1,"surah":1},'
-            '{"text":"tafsir 1:2","ayah":2,"surah":1}]',
-        '[{"text":"tafsir 2:1","ayah":1,"surah":2},'
-            '{"text":"tafsir 2:2","ayah":2,"surah":2}]',
-      ];
+    '[{"text":"tafsir 1:1","ayah":1,"surah":1},'
+        '{"text":"tafsir 1:2","ayah":2,"surah":1}]',
+    '[{"text":"tafsir 2:1","ayah":1,"surah":2},'
+        '{"text":"tafsir 2:2","ayah":2,"surah":2}]',
+  ];
 
-  test('hash-pinned tafsir install decodes nothing and primes the index',
-      () async {
-    final bodies = surahBodies();
-    var decoderCalls = 0;
-    final downloader = await serveTafsir(bodies, (path) async {
-      decoderCalls++;
-      return jsonDecode(File(path).readAsStringSync());
-    });
+  test(
+    'hash-pinned tafsir install decodes nothing and primes the index',
+    () async {
+      final bodies = surahBodies();
+      var decoderCalls = 0;
+      final downloader = await serveTafsir(bodies, (path) async {
+        decoderCalls++;
+        return jsonDecode(File(path).readAsStringSync());
+      });
 
-    final file = await downloader.install(tafsirPack(
-      fileCount: bodies.length,
-      perSurah: bodies.map(shaOf).toList(),
-    ));
+      final file = await downloader.install(
+        tafsirPack(
+          fileCount: bodies.length,
+          perSurah: bodies.map(shaOf).toList(),
+        ),
+      );
 
-    // No end-of-install wrapper decode: the per-surah hashes plus the splice
-    // guards are the integrity proof.
-    expect(decoderCalls, 0);
+      // No end-of-install wrapper decode: the per-surah hashes plus the splice
+      // guards are the integrity proof.
+      expect(decoderCalls, 0);
 
-    // The merged per-surah index is primed, so reads are served from it.
-    expect(await downloader.tafsirFor('tip', 1, 1), 'tafsir 1:1');
-    expect(await downloader.tafsirFor('tip', 2, 2), 'tafsir 2:2');
-    expect(await downloader.tafsirFor('tip', 3, 1), isNull);
-    expect(decoderCalls, 0);
+      // The merged per-surah index is primed, so reads are served from it.
+      expect(await downloader.tafsirFor('tip', 1, 1), 'tafsir 1:1');
+      expect(await downloader.tafsirFor('tip', 2, 2), 'tafsir 2:2');
+      expect(await downloader.tafsirFor('tip', 3, 1), isNull);
+      expect(decoderCalls, 0);
 
-    // The documented wrapper on disk is unchanged and parses.
-    final wrapper = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-    expect(wrapper['pack'], 'tip');
-    expect(wrapper['tafsirs'] as List, hasLength(4));
-  });
+      // The documented wrapper on disk is unchanged and parses.
+      final wrapper =
+          jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+      expect(wrapper['pack'], 'tip');
+      expect(wrapper['tafsirs'] as List, hasLength(4));
+    },
+  );
 
   test('unpinned tafsir install keeps exactly ONE wrapper sniff', () async {
     final bodies = surahBodies();
@@ -146,9 +153,7 @@ void main() {
       return jsonDecode(File(path).readAsStringSync());
     });
 
-    final file = await downloader.install(tafsirPack(
-      fileCount: bodies.length,
-    ));
+    final file = await downloader.install(tafsirPack(fileCount: bodies.length));
 
     expect(decoderCalls, 1);
 

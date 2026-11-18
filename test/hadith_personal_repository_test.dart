@@ -25,7 +25,9 @@ void main() {
 
   test('a malformed bookmark row degrades to empty', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: HadithBookmarkRepository.key,
             value: 'not-json',
@@ -54,7 +56,9 @@ void main() {
 
   test('a malformed position row degrades to zero', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: HadithPositionRepository.key,
             value: '{"p1": -4, "p2": "x"}',

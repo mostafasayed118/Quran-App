@@ -11,17 +11,17 @@ import 'support/test_db.dart';
 /// and a backup from a build that ships a reciter this one does not must still
 /// restore, degrading to the default instead of failing the whole file.
 BackupDocument doc({Map<String, String> settings = const {}}) => BackupDocument(
-      exportedAt: DateTime(2026, 11, 4),
-      schemaVersion: 2,
-      data: BackupData(
-        bookmarks: const [],
-        lastReadAyahId: null,
-        khatma: const [],
-        prayerLog: const [],
-        tasbih: null,
-        settings: settings,
-      ),
-    );
+  exportedAt: DateTime(2026, 11, 4),
+  schemaVersion: 2,
+  data: BackupData(
+    bookmarks: const [],
+    lastReadAyahId: null,
+    khatma: const [],
+    prayerLog: const [],
+    tasbih: null,
+    settings: settings,
+  ),
+);
 
 void main() {
   late AppDatabase db;
@@ -33,16 +33,17 @@ void main() {
   });
 
   Future<String?> settingValue(String key) async {
-    final row = await (db.select(db.settingsTable)
-          ..where((s) => s.key.equals(key)))
-        .getSingleOrNull();
+    final row = await (db.select(
+      db.settingsTable,
+    )..where((s) => s.key.equals(key))).getSingleOrNull();
     return row?.value;
   }
 
-  Future<void> writeSetting(String key, String value) =>
-      db.into(db.settingsTable).insertOnConflictUpdate(
-            SettingsTableCompanion.insert(key: key, value: value),
-          );
+  Future<void> writeSetting(String key, String value) => db
+      .into(db.settingsTable)
+      .insertOnConflictUpdate(
+        SettingsTableCompanion.insert(key: key, value: value),
+      );
 
   test('export carries the adhan selection', () async {
     await writeSetting('adhan_id', 'omar_hisham');
@@ -55,10 +56,14 @@ void main() {
   });
 
   test('import restores a selected adhan and a fajr override', () async {
-    await service.apply(doc(settings: {
-      'adhan_id': kDefaultAdhanId,
-      'adhan_fajr_id': kDefaultAdhanId,
-    }));
+    await service.apply(
+      doc(
+        settings: {
+          'adhan_id': kDefaultAdhanId,
+          'adhan_fajr_id': kDefaultAdhanId,
+        },
+      ),
+    );
 
     expect(await settingValue('adhan_id'), kDefaultAdhanId);
     final prefs = AdhanPreferencesImpl(db);
@@ -67,18 +72,15 @@ void main() {
   });
 
   test('an unknown adhan id does not fail the restore', () async {
-    final outcome = await service.apply(doc(settings: {
-      'adhan_id': 'removed_in_a_future_build',
-    }));
+    final outcome = await service.apply(
+      doc(settings: {'adhan_id': 'removed_in_a_future_build'}),
+    );
 
     // The file is accepted, not rejected: one unknown preference must never
     // cost the user their bookmarks and prayer log.
     expect(outcome, isNotNull);
     // The raw value may survive in storage; every reader normalises it.
-    expect(
-      await AdhanPreferencesImpl(db).adhanId(),
-      kDefaultAdhanId,
-    );
+    expect(await AdhanPreferencesImpl(db).adhanId(), kDefaultAdhanId);
   });
 
   test('an empty fajr value restores "same as default"', () async {

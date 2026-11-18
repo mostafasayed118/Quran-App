@@ -35,7 +35,9 @@ void main() {
     required String name,
     String server = 'https://server.example/mp3',
   }) async {
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: id,
             reciterName: name,
@@ -49,10 +51,13 @@ void main() {
   }
 
   Future<String> seedDownload(String rowId, int surah) async {
-    final file =
-        File('${tempRoot.path}${Platform.pathSeparator}$rowId-$surah.mp3');
+    final file = File(
+      '${tempRoot.path}${Platform.pathSeparator}$rowId-$surah.mp3',
+    );
     await file.writeAsBytes([1, 2, 3]);
-    await db.into(db.downloads).insert(
+    await db
+        .into(db.downloads)
+        .insert(
           DownloadsCompanion.insert(
             reciterId: rowId,
             surahId: surah,
@@ -64,30 +69,34 @@ void main() {
   }
 
   PlaybackCubit buildCubit(ControllablePlaybackService fake) => PlaybackCubit(
-        service: fake,
-        reciters: ReciterRepository(db),
-        downloader:
-            AudioDownloader(db, audioRootResolver: () async => tempRoot),
-      );
+    service: fake,
+    reciters: ReciterRepository(db),
+    downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
+  );
 
-  test('playSurah uses the downloaded file when the downloads row is done',
-      () async {
-    final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    final seededPath = await seedDownload(row.id, 1);
-    service = ControllablePlaybackService();
-    cubit = buildCubit(service);
+  test(
+    'playSurah uses the downloaded file when the downloads row is done',
+    () async {
+      final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
+      final seededPath = await seedDownload(row.id, 1);
+      service = ControllablePlaybackService();
+      cubit = buildCubit(service);
 
-    await cubit.playSurah(row, 1);
+      await cubit.playSurah(row, 1);
 
-    expect(service.loaded, hasLength(1));
-    final source = service.loaded.single;
-    expect(source.kind, PlaybackSourceKind.file);
-    expect(source.path, seededPath);
-  });
+      expect(service.loaded, hasLength(1));
+      final source = service.loaded.single;
+      expect(source.kind, PlaybackSourceKind.file);
+      expect(source.path, seededPath);
+    },
+  );
 
   test('playSurah streams the server URL when nothing is downloaded', () async {
     final row = await seedRow(
-        id: '55-55', name: 'ماهر المعيقلي', server: 'https://s.example/a');
+      id: '55-55',
+      name: 'ماهر المعيقلي',
+      server: 'https://s.example/a',
+    );
     service = ControllablePlaybackService();
     cubit = buildCubit(service);
 
@@ -98,22 +107,22 @@ void main() {
     expect(source.uri.toString(), surahAudioUrl(row.server, 2));
   });
 
-  test('service failure lands in Failed(network) and keeps state resettable',
-      () async {
-    final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
-    service = ControllablePlaybackService()..loadError = StateError('boom');
-    cubit = buildCubit(service);
-
-    await cubit.playSurah(row, 1);
-    expect(cubit.state, isA<PlaybackFailed>());
-
-    await cubit.stopAndReset();
-    expect(cubit.state, isA<PlaybackInitial>());
-  });
-
   test(
-      'playDefaultForSurah falls back to the first featured row when no selection exists',
-      () async {
+    'service failure lands in Failed(network) and keeps state resettable',
+    () async {
+      final row = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
+      service = ControllablePlaybackService()..loadError = StateError('boom');
+      cubit = buildCubit(service);
+
+      await cubit.playSurah(row, 1);
+      expect(cubit.state, isA<PlaybackFailed>());
+
+      await cubit.stopAndReset();
+      expect(cubit.state, isA<PlaybackInitial>());
+    },
+  );
+
+  test('playDefaultForSurah falls back to the first featured row when no selection exists', () async {
     await seedRow(id: '55-55', name: 'ماهر المعيقلي');
     final featured = await seedRow(id: '51-53', name: 'عبدالباسط عبدالصمد');
     service = ControllablePlaybackService();

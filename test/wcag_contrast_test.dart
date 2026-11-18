@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/theme/app_colors.dart';
+
 import 'support/wcag_contrast.dart';
 
 void main() {
@@ -38,14 +39,8 @@ void main() {
   });
 
   test('raw gold as text on light surfaces fails AA (audited ~2:1 defect)', () {
-    expect(
-      ratioOf(AppColors.gold.toARGB32(), cardBackground),
-      lessThan(4.5),
-    );
-    expect(
-      ratioOf(AppColors.gold.toARGB32(), pageBackground),
-      lessThan(4.5),
-    );
+    expect(ratioOf(AppColors.gold.toARGB32(), cardBackground), lessThan(4.5));
+    expect(ratioOf(AppColors.gold.toARGB32(), pageBackground), lessThan(4.5));
   });
 
   test('both tones clear the 3:1 large-text bar on their mode surfaces', () {
@@ -65,6 +60,8 @@ void main() {
 
   test('helper sanity: identical colors give a ratio of exactly 1', () {
     expect(
-        wcagContrastRatio(of(0xE3A53E), of(0xE3A53E)), moreOrLessEquals(1.0));
+      wcagContrastRatio(of(0xE3A53E), of(0xE3A53E)),
+      moreOrLessEquals(1.0),
+    );
   });
 }

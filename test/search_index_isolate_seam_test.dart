@@ -11,37 +11,42 @@ import 'support/test_db.dart';
 const String _seededText = '  بِسْمِ   اللَّهِ  ';
 const String _normalizedText = 'بسم الله';
 
-Future<void> _insertAyah(AppDatabase db, int id, String text) =>
-    db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: Value(id),
-          surahId: 1,
-          numberInSurah: id,
-          juz: 1,
-          page: 1,
-          textUthmani: text,
-          textImlaei: text,
-        ));
+Future<void> _insertAyah(AppDatabase db, int id, String text) => db
+    .into(db.ayahs)
+    .insert(
+      AyahsCompanion.insert(
+        id: Value(id),
+        surahId: 1,
+        numberInSurah: id,
+        juz: 1,
+        page: 1,
+        textUthmani: text,
+        textImlaei: text,
+      ),
+    );
 
 void main() {
-  test('rebuild uses the injected runner once and writes normalized rows',
-      () async {
-    final db = newTestDb();
-    await _insertAyah(db, 1, _seededText);
-    var calls = 0;
+  test(
+    'rebuild uses the injected runner once and writes normalized rows',
+    () async {
+      final db = newTestDb();
+      await _insertAyah(db, 1, _seededText);
+      var calls = 0;
 
-    Future<R> run<R>(R Function() computation) async {
-      calls++;
-      return computation();
-    }
+      Future<R> run<R>(R Function() computation) async {
+        calls++;
+        return computation();
+      }
 
-    await rebuildQuranSearchIndex(db, run: run);
+      await rebuildQuranSearchIndex(db, run: run);
 
-    expect(calls, 1);
-    final row = await db
-        .customSelect('SELECT text_norm FROM ayah_search WHERE rowid = 1')
-        .getSingle();
-    expect(row.read<String>('text_norm'), _normalizedText);
-  });
+      expect(calls, 1);
+      final row = await db
+          .customSelect('SELECT text_norm FROM ayah_search WHERE rowid = 1')
+          .getSingle();
+      expect(row.read<String>('text_norm'), _normalizedText);
+    },
+  );
 
   test('the injected runner receives the normalized projection', () async {
     final db = newTestDb();

@@ -22,17 +22,19 @@ class _StaticReciterRepository extends ReciterRepository {
 
   @override
   Future<ReciterRow?> byId(String rowId) async => const ReciterRow(
-        id: '51-53',
-        reciterName: 'عبدالباسط عبدالصمد',
-        moshafName: 'حفص عن عاصم - مرتل',
-        server: 'PLACEHOLDER',
-        surahList: '1,2',
-        surahTotal: 114,
-      );
+    id: '51-53',
+    reciterName: 'عبدالباسط عبدالصمد',
+    moshafName: 'حفص عن عاصم - مرتل',
+    server: 'PLACEHOLDER',
+    surahList: '1,2',
+    surahTotal: 114,
+  );
 
   @override
-  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async =>
-      {1: 'الفاتحة', 2: 'البقرة'};
+  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async => {
+    1: 'الفاتحة',
+    2: 'البقرة',
+  };
 
   @override
   Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async => {};
@@ -42,10 +44,7 @@ class _StaticReciterRepository extends ReciterRepository {
 }
 
 class _SeededDownloadsCubit extends DownloadsCubit {
-  _SeededDownloadsCubit({
-    required super.downloader,
-    required super.reciters,
-  });
+  _SeededDownloadsCubit({required super.downloader, required super.reciters});
 
   final List<String> cancelled = <String>[];
 
@@ -67,7 +66,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_dl_ui_test');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -86,10 +87,7 @@ void main() {
   Future<_SeededDownloadsCubit> pumpSurahsHost(WidgetTester tester) async {
     final repo = _StaticReciterRepository(db);
     final downloads = _SeededDownloadsCubit(
-      downloader: AudioDownloader(
-        db,
-        audioRootResolver: () async => tempRoot,
-      ),
+      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: repo,
     );
     addTearDown(downloads.close);
@@ -106,27 +104,37 @@ void main() {
     );
     addTearDown(surahs.close);
     await surahs.start();
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-        BlocProvider<DownloadsCubit>.value(value: downloads),
-        BlocProvider<ReciterSurahsCubit>.value(value: surahs),
-      ],
-      child: appShell(home: const ReciterSurahsScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+          BlocProvider<DownloadsCubit>.value(value: downloads),
+          BlocProvider<ReciterSurahsCubit>.value(value: surahs),
+        ],
+        child: appShell(home: const ReciterSurahsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     return downloads;
   }
 
-  testWidgets('a queued row offers cancel and never the plain download icon',
-      (tester) async {
+  testWidgets('a queued row offers cancel and never the plain download icon', (
+    tester,
+  ) async {
     final downloads = await pumpSurahsHost(tester);
 
-    downloads
-        .seed({'51-53-1': const DownloadItem(status: DownloadStatus.queued)});
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    downloads.seed({
+      '51-53-1': const DownloadItem(status: DownloadStatus.queued),
+    });
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byTooltip('إلغاء'), findsOneWidget);
     // Surah 2 stays on the plain download affordance.
@@ -136,8 +144,9 @@ void main() {
     expect(downloads.cancelled, ['51-53-1']);
   });
 
-  testWidgets('a downloading row shows the MB label and a cancel affordance',
-      (tester) async {
+  testWidgets('a downloading row shows the MB label and a cancel affordance', (
+    tester,
+  ) async {
     final downloads = await pumpSurahsHost(tester);
 
     downloads.seed({
@@ -147,16 +156,20 @@ void main() {
         total: 3145728, // 3.0 MiB
       ),
     });
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('١.٥ من ٣.٠ م.ب'), findsOneWidget);
     await tester.tap(find.byTooltip('إلغاء'));
     expect(downloads.cancelled, ['51-53-1']);
   });
 
-  testWidgets('an unknown total renders the received-only label',
-      (tester) async {
+  testWidgets('an unknown total renders the received-only label', (
+    tester,
+  ) async {
     final downloads = await pumpSurahsHost(tester);
 
     downloads.seed({
@@ -174,40 +187,54 @@ void main() {
     expect(find.text('١.٠ م.ب'), findsOneWidget);
   });
 
-  testWidgets('a failed row retries with the localized tooltip',
-      (tester) async {
+  testWidgets('a failed row retries with the localized tooltip', (
+    tester,
+  ) async {
     final downloads = await pumpSurahsHost(tester);
 
-    downloads
-        .seed({'51-53-1': const DownloadItem(status: DownloadStatus.failed)});
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    downloads.seed({
+      '51-53-1': const DownloadItem(status: DownloadStatus.failed),
+    });
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byTooltip('أعِد المحاولة'), findsOneWidget);
   });
 
-  testWidgets('a full disk shows the localized strip and dismiss hides it',
-      (tester) async {
+  testWidgets('a full disk shows the localized strip and dismiss hides it', (
+    tester,
+  ) async {
     final downloads = await pumpSurahsHost(tester);
 
     downloads.seedSpaceWarning();
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(
       find.text(
-          'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.'),
+        'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.',
+      ),
       findsOneWidget,
     );
 
     await tester.tap(find.byTooltip('إغلاق'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(downloads.state.outOfSpace, isFalse);
     expect(
       find.text(
-          'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.'),
+        'لا توجد مساحة كافية على الجهاز. أفرغ بعض المساحة ثم أعد المحاولة.',
+      ),
       findsNothing,
     );
   });

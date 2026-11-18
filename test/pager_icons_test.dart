@@ -10,7 +10,9 @@ void main() {
 
   test('the previous chevron is the mirror', () {
     expect(
-        pagerChevronFor(TextDirection.rtl, next: false), Icons.chevron_right);
+      pagerChevronFor(TextDirection.rtl, next: false),
+      Icons.chevron_right,
+    );
     expect(pagerChevronFor(TextDirection.ltr, next: false), Icons.chevron_left);
   });
 }

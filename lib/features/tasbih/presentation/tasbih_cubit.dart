@@ -12,10 +12,9 @@ class TasbihCubit extends Cubit<TasbihState> {
   /// calls [start] once to hydrate from the stored snapshot.
   ///
   /// Await [loaded] to wait for the hydration.
-  TasbihCubit({
-    required TasbihRepository repo,
-  })  : _repo = repo,
-        super(const TasbihState.ready());
+  TasbihCubit({required TasbihRepository repo})
+    : _repo = repo,
+      super(const TasbihState.ready());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -45,14 +44,15 @@ class TasbihCubit extends Cubit<TasbihState> {
       final snapshot = await _repo.load();
       if (isClosed) return;
       if (snapshot != null && !_userMutated) {
-        emit(TasbihState.ready(
-          count: snapshot.count,
-          target: snapshot.target,
-        ));
+        emit(TasbihState.ready(count: snapshot.count, target: snapshot.target));
       }
     } on Object catch (error, stackTrace) {
-      appLog('tasbih load failed',
-          name: 'quran_yahdi/tasbih', error: error, stackTrace: stackTrace);
+      appLog(
+        'tasbih load failed',
+        name: 'quran_yahdi/tasbih',
+        error: error,
+        stackTrace: stackTrace,
+      );
     } finally {
       final pending = _pendingTaps;
       _pendingTaps = 0;
@@ -89,11 +89,13 @@ class TasbihCubit extends Cubit<TasbihState> {
     final next = state.count + 1;
     final reached = next == state.target;
     if (isClosed) return;
-    emit(TasbihState.ready(
-      count: next,
-      target: state.target,
-      reachedTarget: reached,
-    ));
+    emit(
+      TasbihState.ready(
+        count: next,
+        target: state.target,
+        reachedTarget: reached,
+      ),
+    );
     await _save(next, state.target);
   }
 
@@ -119,8 +121,12 @@ class TasbihCubit extends Cubit<TasbihState> {
     try {
       await _repo.save(count, target);
     } on Object catch (error, stackTrace) {
-      appLog('tasbih save failed',
-          name: 'quran_yahdi/tasbih', error: error, stackTrace: stackTrace);
+      appLog(
+        'tasbih save failed',
+        name: 'quran_yahdi/tasbih',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

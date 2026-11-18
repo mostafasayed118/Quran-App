@@ -16,7 +16,9 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
             id: const Value(2),
             nameAr: 'البقرة',
@@ -27,7 +29,9 @@ void main() {
             pagesEnd: 49,
           ),
         );
-    await db.into(db.ayahs).insert(
+    await db
+        .into(db.ayahs)
+        .insert(
           AyahsCompanion.insert(
             id: const Value(9),
             surahId: 2,
@@ -46,37 +50,55 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(BlocProvider<BookmarksCubit>.value(
-      value: cubit,
-      child: appShell(home: const BookmarksScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<BookmarksCubit>.value(
+        value: cubit,
+        child: appShell(home: const BookmarksScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('delete asks first and leaves the bookmark in place',
-      (tester) async {
+  testWidgets('delete asks first and leaves the bookmark in place', (
+    tester,
+  ) async {
     await pumpBookmarks(tester);
 
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(AlertDialog), findsOneWidget);
     expect(find.text('ستُحذف هذه العلامة من قائمتك.'), findsOneWidget);
-    expect(await db.select(db.bookmarks).get(), hasLength(1),
-        reason: 'opening the dialog must not delete anything');
+    expect(
+      await db.select(db.bookmarks).get(),
+      hasLength(1),
+      reason: 'opening the dialog must not delete anything',
+    );
   });
 
   testWidgets('cancelling the dialog keeps the bookmark', (tester) async {
     await pumpBookmarks(tester);
 
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.text('إلغاء'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(AlertDialog), findsNothing);
     expect(await db.select(db.bookmarks).get(), hasLength(1));
@@ -87,11 +109,17 @@ void main() {
     await pumpBookmarks(tester);
 
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.text('حذف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(await db.select(db.bookmarks).get(), isEmpty);
     expect(find.text('ذلك الكتاب'), findsNothing);

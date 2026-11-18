@@ -43,8 +43,9 @@ class ReaderScreen extends StatelessWidget {
     return BlocBuilder<ReaderCubit, ReaderState>(
       buildWhen: readerShellShouldRebuild,
       builder: (context, state) => switch (state) {
-        ReaderLoading() =>
-          const Scaffold(body: AppContentFrame.reading(child: LoadingView())),
+        ReaderLoading() => const Scaffold(
+          body: AppContentFrame.reading(child: LoadingView()),
+        ),
         ReaderFailed() => _ReaderErrorView(state: state),
         ReaderReady() => _ReadyView(state: state),
       },

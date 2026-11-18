@@ -17,29 +17,37 @@ void main() {
 
   setUp(() async {
     db = newLimitedVarDb(limit: 999);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makkah',
-          ayahCount: 2,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makkah',
+            ayahCount: 2,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
     final texts = <(int, int, int, String)>[
       (1, 1, 1, 'بسم الله الرحمن الرحيم'),
       (2, 1, 2, 'الذين يؤمنون بالغيب ويقيمون الصلاة'),
     ];
     for (final (id, surahId, number, text) in texts) {
-      await db.into(db.ayahs).insert(AyahsCompanion.insert(
-            id: Value(id),
-            surahId: surahId,
-            numberInSurah: number,
-            juz: 1,
-            page: 1,
-            textUthmani: text,
-            textImlaei: text,
-          ));
+      await db
+          .into(db.ayahs)
+          .insert(
+            AyahsCompanion.insert(
+              id: Value(id),
+              surahId: surahId,
+              numberInSurah: number,
+              juz: 1,
+              page: 1,
+              textUthmani: text,
+              textImlaei: text,
+            ),
+          );
     }
     await rebuildQuranSearchIndex(db);
   });

@@ -20,8 +20,9 @@ class GatedToggleRepository implements PrayerLogRepository {
 
   @override
   Future<List<DateTime>> markedDaysRange(
-          DateTime fromInclusive, int daysBack) async =>
-      const <DateTime>[];
+    DateTime fromInclusive,
+    int daysBack,
+  ) async => const <DateTime>[];
 
   @override
   Future<void> togglePrayer(DateTime day, PrayerSlot slot) async {
@@ -50,8 +51,9 @@ class GatedReloadRepository implements PrayerLogRepository {
 
   @override
   Future<List<DateTime>> markedDaysRange(
-          DateTime fromInclusive, int daysBack) async =>
-      const <DateTime>[];
+    DateTime fromInclusive,
+    int daysBack,
+  ) async => const <DateTime>[];
 
   @override
   Future<void> togglePrayer(DateTime day, PrayerSlot slot) async {}

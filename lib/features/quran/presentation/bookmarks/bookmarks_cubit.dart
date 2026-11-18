@@ -17,8 +17,8 @@ import 'bookmarks_state.dart';
 /// work; [start] subscribes to the live stream.
 class BookmarksCubit extends Cubit<BookmarksState> {
   BookmarksCubit(this._repo, {BookmarkPager? pager})
-      : _pager = pager,
-        super(const BookmarksState.loading());
+    : _pager = pager,
+      super(const BookmarksState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -26,15 +26,9 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     if (_sub != null || _pageSub != null) return;
     final pager = _pager;
     if (pager == null) {
-      _sub = _repo.watchBookmarkEntries().listen(
-            _onEntries,
-            onError: _onError,
-          );
+      _sub = _repo.watchBookmarkEntries().listen(_onEntries, onError: _onError);
     } else {
-      _pageSub = pager.watchFirstPage().listen(
-            _onPage,
-            onError: _onError,
-          );
+      _pageSub = pager.watchFirstPage().listen(_onPage, onError: _onError);
     }
   }
 
@@ -72,14 +66,18 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     try {
       await _repo.deleteBookmark(ayahId);
     } on Object catch (error, stackTrace) {
-      appLog('delete bookmark failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'delete bookmark failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return false;
     }
     if (isClosed) return false;
     _first = [
       for (final entry in _first)
-        if (entry.ayah.id != ayahId) entry
+        if (entry.ayah.id != ayahId) entry,
     ];
     _older.removeWhere((entry) => entry.ayah.id == ayahId);
     _emit();
@@ -112,8 +110,12 @@ class BookmarksCubit extends Cubit<BookmarksState> {
       _olderHasMore = page.hasMore;
       _emit();
     } on Object catch (error, stackTrace) {
-      appLog('bookmark page failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'bookmark page failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       final latest = state;
       if (latest is! BookmarksReady) return;
@@ -145,13 +147,15 @@ class BookmarksCubit extends Cubit<BookmarksState> {
         if (!firstIds.contains(entry.ayah.id)) entry.ayah.toVerse(),
     ];
     final current = state;
-    emit(BookmarksState.ready(
-      entries: entries,
-      lastBookmarkId: _cursor(),
-      hasMore: _hasMore(),
-      loadingMore: loadingMore,
-      moreFailed: current is BookmarksReady && current.moreFailed,
-    ));
+    emit(
+      BookmarksState.ready(
+        entries: entries,
+        lastBookmarkId: _cursor(),
+        hasMore: _hasMore(),
+        loadingMore: loadingMore,
+        moreFailed: current is BookmarksReady && current.moreFailed,
+      ),
+    );
   }
 
   int _cursor() {
@@ -164,9 +168,11 @@ class BookmarksCubit extends Cubit<BookmarksState> {
 
   void _onEntries(List<BookmarkEntry> entries) {
     if (isClosed) return;
-    emit(BookmarksState.ready(
-      entries: entries.map((e) => e.ayah.toVerse()).toList(),
-    ));
+    emit(
+      BookmarksState.ready(
+        entries: entries.map((e) => e.ayah.toVerse()).toList(),
+      ),
+    );
   }
 
   void _onPage(BookmarkPage page) {
@@ -177,9 +183,7 @@ class BookmarksCubit extends Cubit<BookmarksState> {
     _firstHasMore = page.hasMore;
     _alignOlderWithFirstPage(previousFirst, previousFirstHasMore);
     final current = state;
-    _emit(
-      loadingMore: current is BookmarksReady && current.loadingMore,
-    );
+    _emit(loadingMore: current is BookmarksReady && current.loadingMore);
   }
 
   /// Keeps [_older] ordered directly below the new page-1 window.
@@ -214,8 +218,12 @@ class BookmarksCubit extends Cubit<BookmarksState> {
   }
 
   void _onError(Object error, StackTrace stackTrace) {
-    appLog('bookmarks stream failed',
-        name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+    appLog(
+      'bookmarks stream failed',
+      name: 'quran_yahdi/bookmarks',
+      error: error,
+      stackTrace: stackTrace,
+    );
     if (isClosed) return;
     emit(const BookmarksState.failed());
   }

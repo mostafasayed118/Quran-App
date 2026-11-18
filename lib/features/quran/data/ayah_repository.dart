@@ -14,8 +14,8 @@ export 'bookmark_pager.dart'
 /// Reads ayahs and bookmarks from the local database.
 class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   AyahRepository(this._db, {BookmarkMetaSource? meta, int? maxSqlVariables})
-      : _meta = meta,
-        _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
+    : _meta = meta,
+      _maxSqlVariables = maxSqlVariables ?? kMaxSqlVariables;
 
   final AppDatabase _db;
   final BookmarkMetaSource? _meta;
@@ -33,15 +33,15 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   }
 
   @override
-  Future<Surah?> surahById(int surahId) =>
-      (_db.select(_db.surahs)..where((s) => s.id.equals(surahId)))
-          .getSingleOrNull();
+  Future<Surah?> surahById(int surahId) => (_db.select(
+    _db.surahs,
+  )..where((s) => s.id.equals(surahId))).getSingleOrNull();
 
   /// Single ayah lookup for the home continue-reading card (W3).
   @override
-  Future<Ayah?> ayahById(int ayahId) =>
-      (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
-          .getSingleOrNull();
+  Future<Ayah?> ayahById(int ayahId) => (_db.select(
+    _db.ayahs,
+  )..where((a) => a.id.equals(ayahId))).getSingleOrNull();
 
   /// One query for a whole set, used by the folder list.
   ///
@@ -56,7 +56,8 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
     final result = <Ayah>[];
     for (final batch in sqlBatches(ids, size: _maxSqlVariables)) {
       result.addAll(
-          await (_db.select(_db.ayahs)..where((a) => a.id.isIn(batch))).get());
+        await (_db.select(_db.ayahs)..where((a) => a.id.isIn(batch))).get(),
+      );
     }
     return result;
   }
@@ -65,10 +66,12 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   @override
   Future<List<Ayah>> ayahsForRange(int surahId, int fromAyah, int toAyah) {
     final query = _db.select(_db.ayahs)
-      ..where((a) =>
-          a.surahId.equals(surahId) &
-          a.numberInSurah.isBiggerOrEqualValue(fromAyah) &
-          a.numberInSurah.isSmallerOrEqualValue(toAyah))
+      ..where(
+        (a) =>
+            a.surahId.equals(surahId) &
+            a.numberInSurah.isBiggerOrEqualValue(fromAyah) &
+            a.numberInSurah.isSmallerOrEqualValue(toAyah),
+      )
       ..orderBy([(a) => OrderingTerm.asc(a.numberInSurah)]);
     return query.get();
   }
@@ -76,18 +79,21 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   @override
   Future<void> toggleBookmark(int ayahId) async {
     final removed = await _db.transaction(() async {
-      final existing = await (_db.select(_db.bookmarks)
-            ..where((b) => b.ayahId.equals(ayahId)))
-          .getSingleOrNull();
+      final existing = await (_db.select(
+        _db.bookmarks,
+      )..where((b) => b.ayahId.equals(ayahId))).getSingleOrNull();
       if (existing == null) {
-        await _db.into(_db.bookmarks).insert(
+        await _db
+            .into(_db.bookmarks)
+            .insert(
               BookmarksCompanion.insert(ayahId: ayahId),
               mode: InsertMode.insertOrIgnore,
             );
         return false;
       }
-      await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
-          .go();
+      await (_db.delete(
+        _db.bookmarks,
+      )..where((b) => b.ayahId.equals(ayahId))).go();
       return true;
     });
     if (removed) await _removeMeta(ayahId);
@@ -95,8 +101,9 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
 
   @override
   Future<void> deleteBookmark(int ayahId) async {
-    await (_db.delete(_db.bookmarks)..where((b) => b.ayahId.equals(ayahId)))
-        .go();
+    await (_db.delete(
+      _db.bookmarks,
+    )..where((b) => b.ayahId.equals(ayahId))).go();
     await _removeMeta(ayahId);
   }
 
@@ -110,24 +117,28 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
     try {
       await removeBookmarkMeta(meta, ayahId);
     } on Object catch (error, stackTrace) {
-      appLog('bookmark meta cleanup failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'bookmark meta cleanup failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
   @override
   Stream<Set<int>> watchBookmarkedIds() {
-    return _db.select(_db.bookmarks).watch().map(
-          (rows) => rows.map((b) => b.ayahId).toSet(),
-        );
+    return _db
+        .select(_db.bookmarks)
+        .watch()
+        .map((rows) => rows.map((b) => b.ayahId).toSet());
   }
 
   @override
   Stream<List<BookmarkEntry>> watchBookmarkEntries() {
     final query = _db.select(_db.bookmarks).join([
       innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
-    ])
-      ..orderBy([OrderingTerm.desc(_db.bookmarks.id)]);
+    ])..orderBy([OrderingTerm.desc(_db.bookmarks.id)]);
     return query.watch().map(_toEntries);
   }
 
@@ -146,8 +157,8 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
 
   JoinedSelectStatement<HasResultSet, dynamic> _firstPageQuery(int limit) =>
       _db.select(_db.bookmarks).join([
-        innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
-      ])
+          innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
+        ])
         ..orderBy([OrderingTerm.desc(_db.bookmarks.id)])
         ..limit(limit + 1);
 
@@ -156,8 +167,8 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
     int limit,
   ) =>
       _db.select(_db.bookmarks).join([
-        innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
-      ])
+          innerJoin(_db.ayahs, _db.ayahs.id.equalsExp(_db.bookmarks.ayahId)),
+        ])
         ..where(_db.bookmarks.id.isSmallerThanValue(beforeBookmarkId))
         ..orderBy([OrderingTerm.desc(_db.bookmarks.id)])
         ..limit(limit + 1);
@@ -172,10 +183,10 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   }
 
   List<BookmarkEntry> _toEntries(List<TypedResult> rows) => [
-        for (final row in rows)
-          BookmarkEntry(
-            ayah: row.readTable(_db.ayahs),
-            bookmarkId: row.readTable(_db.bookmarks).id,
-          ),
-      ];
+    for (final row in rows)
+      BookmarkEntry(
+        ayah: row.readTable(_db.ayahs),
+        bookmarkId: row.readTable(_db.bookmarks).id,
+      ),
+  ];
 }

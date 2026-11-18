@@ -15,8 +15,8 @@ import 'support/test_db.dart';
 class _Meta implements BookmarkMetaSource {
   @override
   Future<Map<int, BookmarkMetaEntry>> load() async => const {
-        9: BookmarkMetaEntry(folder: 'العلم', note: 'ملاحظة قصيرة'),
-      };
+    9: BookmarkMetaEntry(folder: 'العلم', note: 'ملاحظة قصيرة'),
+  };
 
   @override
   Future<void> save(Map<int, BookmarkMetaEntry> entries) async {}
@@ -27,32 +27,41 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'madinah',
-          ayahCount: 1,
-          pagesStart: 2,
-          pagesEnd: 2,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 3,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madinah',
+            ayahCount: 1,
+            pagesStart: 2,
+            pagesEnd: 2,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(9),
+            surahId: 2,
+            numberInSurah: 3,
+            juz: 1,
+            page: 2,
+            textUthmani: 'ذلك الكتاب',
+            textImlaei: 'ذلك الكتاب',
+          ),
+        );
   });
 
   tearDown(() async {
     await db.close();
   });
 
-  testWidgets('320 dp at textScale 2.0 survives the folder list',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 survives the folder list', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

@@ -49,43 +49,52 @@ void main() {
     lastRead = LastReadRepository(db);
   });
 
-  test('a surah with no readable ayahs emits ReaderError, not a blank ready',
-      () async {
-    final cubit = ReaderCubit(
-      ayahRepository: _TeardownSafeAyahRepository(db),
-      lastReadRepository: lastRead,
-      surahId: 999,
-      initialAyah: 0,
-    );
-    addTearDown(cubit.close);
+  test(
+    'a surah with no readable ayahs emits ReaderError, not a blank ready',
+    () async {
+      final cubit = ReaderCubit(
+        ayahRepository: _TeardownSafeAyahRepository(db),
+        lastReadRepository: lastRead,
+        surahId: 999,
+        initialAyah: 0,
+      );
+      addTearDown(cubit.close);
 
-    final failureFuture = cubit.stream.firstWhere((s) => s is ReaderError);
-    await cubit.start();
-    final failure = await failureFuture as ReaderError;
-    expect(failure.message, isNotEmpty);
-    expect(await lastRead.loadAyahId(), isNull,
-        reason: 'an unreadable surah must not overwrite last-read');
-  });
+      final failureFuture = cubit.stream.firstWhere((s) => s is ReaderError);
+      await cubit.start();
+      final failure = await failureFuture as ReaderError;
+      expect(failure.message, isNotEmpty);
+      expect(
+        await lastRead.loadAyahId(),
+        isNull,
+        reason: 'an unreadable surah must not overwrite last-read',
+      );
+    },
+  );
 
   test('reload recovers once the data reads again', () async {
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-              id: const Value(8),
-              surahId: 2,
-              numberInSurah: 1,
-              juz: 1,
-              page: 2,
-              textUthmani: 'الم',
-              textImlaei: 'الم'),
-          AyahsCompanion.insert(
-              id: const Value(9),
-              surahId: 2,
-              numberInSurah: 2,
-              juz: 1,
-              page: 2,
-              textUthmani: 'ذلك الكتاب',
-              textImlaei: 'ذلك الكتاب'),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+      ]),
+    );
     final cubit = ReaderCubit(
       ayahRepository: _FlakyAyahRepository(db),
       lastReadRepository: lastRead,
@@ -101,26 +110,31 @@ void main() {
     expect(cubit.state, isA<ReaderReady>());
   });
 
-  testWidgets('the error state is titled and retriable; retry recovers',
-      (tester) async {
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-              id: const Value(8),
-              surahId: 2,
-              numberInSurah: 1,
-              juz: 1,
-              page: 2,
-              textUthmani: 'الم',
-              textImlaei: 'الم'),
-          AyahsCompanion.insert(
-              id: const Value(9),
-              surahId: 2,
-              numberInSurah: 2,
-              juz: 1,
-              page: 2,
-              textUthmani: 'ذلك الكتاب',
-              textImlaei: 'ذلك الكتاب'),
-        ]));
+  testWidgets('the error state is titled and retriable; retry recovers', (
+    tester,
+  ) async {
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+      ]),
+    );
     final cubit = ReaderCubit(
       ayahRepository: _FlakyAyahRepository(db),
       lastReadRepository: lastRead,
@@ -132,28 +146,38 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('القرآن الكريم'), findsOneWidget);
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
     expect(find.text('أعِد المحاولة'), findsOneWidget);
 
     await tester.tap(find.text('أعِد المحاولة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('أعِد المحاولة'), findsNothing);
     expect(find.text('الم'), findsOneWidget);

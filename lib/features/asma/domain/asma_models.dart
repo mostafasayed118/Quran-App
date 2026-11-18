@@ -24,10 +24,10 @@ class AsmaName {
   final String meaningEn;
 
   factory AsmaName.fromJson(Map<String, dynamic> json) => AsmaName(
-        n: (json['n'] as num).toInt(),
-        nameAr: json['nameAr'] as String,
-        nameEn: json['nameEn'] as String,
-        meaningAr: json['meaningAr'] as String,
-        meaningEn: json['meaningEn'] as String,
-      );
+    n: (json['n'] as num).toInt(),
+    nameAr: json['nameAr'] as String,
+    nameEn: json['nameEn'] as String,
+    meaningAr: json['meaningAr'] as String,
+    meaningEn: json['meaningEn'] as String,
+  );
 }

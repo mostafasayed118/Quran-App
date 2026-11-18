@@ -52,19 +52,21 @@ class HadithBookmarkRepository implements HadithBookmarkSource {
       }
       return result;
     } on Object catch (error, stackTrace) {
-      appLog('hadith bookmarks decode failed, defaulting to empty',
-          name: 'quran_yahdi/library',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'hadith bookmarks decode failed, defaulting to empty',
+        name: 'quran_yahdi/library',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       return <String, Set<int>>{};
     }
   }
 
   Future<void> _writeAll(Map<String, Set<int>> all) => _settings.write(
-        key,
-        jsonEncode(<String, dynamic>{
-          for (final entry in all.entries)
-            entry.key: (entry.value.toList()..sort()),
-        }),
-      );
+    key,
+    jsonEncode(<String, dynamic>{
+      for (final entry in all.entries)
+        entry.key: (entry.value.toList()..sort()),
+    }),
+  );
 }

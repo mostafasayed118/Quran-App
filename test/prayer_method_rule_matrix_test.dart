@@ -26,10 +26,12 @@ void main() {
       PrayerCalculationMethod.ummAlQura,
       PrayerCalculationMethod.qatar,
     ]) {
-      final params = parametersFor(PrayerConfig(
-        method: method,
-        highLatitude: PrayerHighLatitudeRule.twilightAngle,
-      ));
+      final params = parametersFor(
+        PrayerConfig(
+          method: method,
+          highLatitude: PrayerHighLatitudeRule.twilightAngle,
+        ),
+      );
       expect(
         params.highLatitudeRule,
         HighLatitudeRule.seventh_of_the_night,
@@ -39,10 +41,12 @@ void main() {
   });
 
   test('twilight angle is kept for methods that define an Isha angle', () {
-    final params = parametersFor(const PrayerConfig(
-      method: PrayerCalculationMethod.egyptian,
-      highLatitude: PrayerHighLatitudeRule.twilightAngle,
-    ));
+    final params = parametersFor(
+      const PrayerConfig(
+        method: PrayerCalculationMethod.egyptian,
+        highLatitude: PrayerHighLatitudeRule.twilightAngle,
+      ),
+    );
     expect(params.highLatitudeRule, HighLatitudeRule.twilight_angle);
   });
 }

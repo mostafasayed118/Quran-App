@@ -18,13 +18,13 @@ class _CityCairo implements CitySource {
 
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-        timezone: 'Africa/Cairo',
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+    timezone: 'Africa/Cairo',
+  );
 
   @override
   Future<void> select(City city) async {}

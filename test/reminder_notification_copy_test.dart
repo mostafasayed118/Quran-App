@@ -46,58 +46,61 @@ void main() {
     expect(azkar.title, 'أذكار الصباح');
   });
 
-  test('planner still passes a provided azkar body through (contract held)',
-      () {
-    final plan = planReminders(
-      now: DateTime(2026, 3, 15, 5, 0),
-      todayPrayers: <PrayerChoice>[],
-      azkarEnabled: true,
-      azkarTimeHm: '06:30',
-      texts: ReminderTexts(
-        prayerTitle: (name) => 'x',
-        azkarTitle: 'أذكار الصباح',
-        azkarBody: 'جسم مخصص',
-      ),
-    );
+  test(
+    'planner still passes a provided azkar body through (contract held)',
+    () {
+      final plan = planReminders(
+        now: DateTime(2026, 3, 15, 5, 0),
+        todayPrayers: <PrayerChoice>[],
+        azkarEnabled: true,
+        azkarTimeHm: '06:30',
+        texts: ReminderTexts(
+          prayerTitle: (name) => 'x',
+          azkarTitle: 'أذكار الصباح',
+          azkarBody: 'جسم مخصص',
+        ),
+      );
 
-    expect(
-      plan.singleWhere((r) => r.id == azkarReminderId).body,
-      'جسم مخصص',
-    );
-  });
+      expect(plan.singleWhere((r) => r.id == azkarReminderId).body, 'جسم مخصص');
+    },
+  );
 
-  test('the schedule composition ships title-only reminders with payloads',
-      () async {
-    final db = AppDatabase.test(NativeDatabase.memory());
-    addTearDown(db.close);
-    final settings = ReminderSettings(db);
-    final city =
-        CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    final prayer = FakePrayerTimeService()..todayResult = fakeDay();
-    final scheduler = CapturingScheduler();
+  test(
+    'the schedule composition ships title-only reminders with payloads',
+    () async {
+      final db = AppDatabase.test(NativeDatabase.memory());
+      addTearDown(db.close);
+      final settings = ReminderSettings(db);
+      final city = CityRepository(
+        db: db,
+        loader: () async => [cairoCity.toJson()],
+      );
+      final prayer = FakePrayerTimeService()..todayResult = fakeDay();
+      final scheduler = CapturingScheduler();
 
-    await city.select(cairoCity);
-    await settings.setAzkarEnabled(true);
-    await settings.setAzkarTime('09:00');
+      await city.select(cairoCity);
+      await settings.setAzkarEnabled(true);
+      await settings.setAzkarTime('09:00');
 
-    await scheduleReminders(
-      city: city,
-      prayer: prayer,
-      settings: settings,
-      scheduler: scheduler,
-      now: DateTime(2026, 3, 15, 10, 0),
-    );
+      await scheduleReminders(
+        city: city,
+        prayer: prayer,
+        settings: settings,
+        scheduler: scheduler,
+        now: DateTime(2026, 3, 15, 10, 0),
+      );
 
-    final plan = scheduler.plans.single;
-    final prayerReminder = plan.singleWhere((r) => r.id == prayerReminderId);
-    expect(prayerReminder.body, isNull);
-    expect(prayerReminder.payload, prayerReminderPayload);
+      final plan = scheduler.plans.single;
+      final prayerReminder = plan.singleWhere((r) => r.id == prayerReminderId);
+      expect(prayerReminder.body, isNull);
+      expect(prayerReminder.payload, prayerReminderPayload);
 
-    final azkar = plan.singleWhere((r) => r.id == azkarReminderId);
-    expect(azkar.body, isNull);
-    expect(azkar.title, 'أذكار الصباح');
-    expect(azkar.payload, azkarReminderPayload);
-  });
+      final azkar = plan.singleWhere((r) => r.id == azkarReminderId);
+      expect(azkar.body, isNull);
+      expect(azkar.title, 'أذكار الصباح');
+      expect(azkar.payload, azkarReminderPayload);
+    },
+  );
 
   test('the shared channel description speaks for prayer and azkar', () {
     final ar = lookupAppLocalizations(const Locale('ar'));

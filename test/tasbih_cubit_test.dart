@@ -32,38 +32,42 @@ void main() {
     await cubit.close();
   });
 
-  test('reaching the target sets a one-shot flag cleared by the next increment',
-      () async {
-    final cubit = await build();
-    await cubit.selectTarget(33);
-    for (var i = 0; i < 32; i++) {
+  test(
+    'reaching the target sets a one-shot flag cleared by the next increment',
+    () async {
+      final cubit = await build();
+      await cubit.selectTarget(33);
+      for (var i = 0; i < 32; i++) {
+        await cubit.increment();
+      }
+      expect((cubit.state as TasbihReady).reachedTarget, isFalse);
       await cubit.increment();
-    }
-    expect((cubit.state as TasbihReady).reachedTarget, isFalse);
-    await cubit.increment();
-    expect((cubit.state as TasbihReady).reachedTarget, isTrue);
-    await cubit.increment();
-    expect((cubit.state as TasbihReady).reachedTarget, isFalse);
-    await cubit.close();
-  });
-
-  test('reset zeroes the count; selectTarget zeroes and changes target',
-      () async {
-    final cubit = await build();
-    await cubit.selectTarget(100);
-    for (var i = 0; i < 5; i++) {
+      expect((cubit.state as TasbihReady).reachedTarget, isTrue);
       await cubit.increment();
-    }
-    await cubit.reset();
-    final ready = cubit.state as TasbihReady;
-    expect(ready.count, 0);
-    expect(ready.target, 100);
+      expect((cubit.state as TasbihReady).reachedTarget, isFalse);
+      await cubit.close();
+    },
+  );
 
-    await cubit.selectTarget(500);
-    expect((cubit.state as TasbihReady).count, 0);
-    expect((cubit.state as TasbihReady).target, 500);
-    await cubit.close();
-  });
+  test(
+    'reset zeroes the count; selectTarget zeroes and changes target',
+    () async {
+      final cubit = await build();
+      await cubit.selectTarget(100);
+      for (var i = 0; i < 5; i++) {
+        await cubit.increment();
+      }
+      await cubit.reset();
+      final ready = cubit.state as TasbihReady;
+      expect(ready.count, 0);
+      expect(ready.target, 100);
+
+      await cubit.selectTarget(500);
+      expect((cubit.state as TasbihReady).count, 0);
+      expect((cubit.state as TasbihReady).target, 500);
+      await cubit.close();
+    },
+  );
 
   test('second life loads the persisted count', () async {
     final first = await build();

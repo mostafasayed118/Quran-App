@@ -12,21 +12,21 @@ class _Source implements JuzIndexSource {
 
   @override
   Stream<List<JuzSummary>> watchJuz() => Stream.value(const [
-        JuzSummary(
-          juz: 1,
-          firstPage: 1,
-          surahId: 1,
-          numberInSurah: 1,
-          surahName: 'الفاتحة',
-        ),
-        JuzSummary(
-          juz: 2,
-          firstPage: 22,
-          surahId: 2,
-          numberInSurah: 142,
-          surahName: 'البقرة',
-        ),
-      ]);
+    JuzSummary(
+      juz: 1,
+      firstPage: 1,
+      surahId: 1,
+      numberInSurah: 1,
+      surahName: 'الفاتحة',
+    ),
+    JuzSummary(
+      juz: 2,
+      firstPage: 22,
+      surahId: 2,
+      numberInSurah: 142,
+      surahName: 'البقرة',
+    ),
+  ]);
 }
 
 void main() {

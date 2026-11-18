@@ -48,9 +48,9 @@ class BackupService {
     required AppDatabase db,
     required Future<void> Function() reschedule,
     int? batchThreshold,
-  })  : _db = db,
-        _reschedule = reschedule,
-        _batchThresholdOverride = batchThreshold;
+  }) : _db = db,
+       _reschedule = reschedule,
+       _batchThresholdOverride = batchThreshold;
 
   final AppDatabase _db;
   final Future<void> Function() _reschedule;
@@ -70,8 +70,7 @@ class BackupService {
   Future<BackupDecodeResult> decodeImport(
     Uint8List bytes, {
     String? passphrase,
-  }) =>
-      decodeBackup(bytes, passphrase: passphrase);
+  }) => decodeBackup(bytes, passphrase: passphrase);
 
   /// Encrypts an export on a worker isolate.
   Future<String> encryptForExport(String json, String passphrase) =>
@@ -87,11 +86,13 @@ class BackupService {
   /// versioned document (settings filtered to the whitelist).
   Future<String> exportJson() async {
     final data = await _db.transaction(_gather);
-    final payload = encodeMap(BackupDocument(
-      exportedAt: DateTime.now(),
-      schemaVersion: _db.schemaVersion,
-      data: data,
-    ));
+    final payload = encodeMap(
+      BackupDocument(
+        exportedAt: DateTime.now(),
+        schemaVersion: _db.schemaVersion,
+        data: data,
+      ),
+    );
     if (Platform.environment['FLUTTER_TEST'] == 'true') {
       return jsonEncode(payload);
     }
@@ -122,10 +123,12 @@ class BackupService {
         await _reschedule();
       } on Object catch (error, stackTrace) {
         rescheduleFailed = true;
-        appLog('backup reminder reschedule failed',
-            name: 'quran_yahdi/backup',
-            error: error.runtimeType,
-            stackTrace: stackTrace);
+        appLog(
+          'backup reminder reschedule failed',
+          name: 'quran_yahdi/backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace,
+        );
       }
     }
     return BackupOutcome(
@@ -141,9 +144,9 @@ class BackupService {
     final prayerRows = await _db.select(_db.prayerLog).get();
     final lastReadRow = await _readSetting(backupKeyLastReadAyahId);
     final tasbihRow = await _readSetting(backupKeyTasbihState);
-    final whitelistRows = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.isIn(kBackupSettingsWhitelist)))
-        .get();
+    final whitelistRows = await (_db.select(
+      _db.settingsTable,
+    )..where((s) => s.key.isIn(kBackupSettingsWhitelist))).get();
 
     return BackupData(
       bookmarks: [
@@ -208,9 +211,9 @@ class BackupService {
     return redacted;
   }
 
-  Future<SettingsTableData?> _readSetting(String key) =>
-      (_db.select(_db.settingsTable)..where((s) => s.key.equals(key)))
-          .getSingleOrNull();
+  Future<SettingsTableData?> _readSetting(String key) => (_db.select(
+    _db.settingsTable,
+  )..where((s) => s.key.equals(key))).getSingleOrNull();
 
   /// Mirrors `TasbihRepository.load`'s tolerant JSON read (corrupt → null).
   static BackupTasbih? _decodeTasbihValue(String? value) {
@@ -232,9 +235,9 @@ class BackupService {
     final prayerRows = await _db.select(_db.prayerLog).get();
     final lastReadRow = await _readSetting(backupKeyLastReadAyahId);
     final tasbihRow = await _readSetting(backupKeyTasbihState);
-    final whitelistRows = await (_db.select(_db.settingsTable)
-          ..where((s) => s.key.isIn(kBackupSettingsWhitelist)))
-        .get();
+    final whitelistRows = await (_db.select(
+      _db.settingsTable,
+    )..where((s) => s.key.isIn(kBackupSettingsWhitelist))).get();
 
     return _ApplyPlan(
       bookmarks: mergeBookmarks(
@@ -307,23 +310,26 @@ class BackupService {
     final settings = <SettingsTableCompanion>[];
     final lastRead = plan.lastRead.toWrite;
     if (lastRead != null) {
-      settings.add(SettingsTableCompanion.insert(
-        key: backupKeyLastReadAyahId,
-        value: lastRead.toString(),
-      ));
+      settings.add(
+        SettingsTableCompanion.insert(
+          key: backupKeyLastReadAyahId,
+          value: lastRead.toString(),
+        ),
+      );
     }
     final tasbih = plan.tasbih.toWrite;
     if (tasbih != null) {
-      settings.add(SettingsTableCompanion.insert(
-        key: backupKeyTasbihState,
-        value: jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
-      ));
+      settings.add(
+        SettingsTableCompanion.insert(
+          key: backupKeyTasbihState,
+          value: jsonEncode({'count': tasbih.count, 'target': tasbih.target}),
+        ),
+      );
     }
     for (final entry in plan.settings.toWrite.entries) {
-      settings.add(SettingsTableCompanion.insert(
-        key: entry.key,
-        value: entry.value,
-      ));
+      settings.add(
+        SettingsTableCompanion.insert(key: entry.key, value: entry.value),
+      );
     }
 
     final khatma = plan.khatma.toWrite;
@@ -335,7 +341,8 @@ class BackupService {
             updatedAt: Value(khatma.updatedAt),
           );
     final khatmaRowId = plan.khatmaRowId;
-    final totalWrites = bookmarks.length +
+    final totalWrites =
+        bookmarks.length +
         prayerDays.length +
         settings.length +
         (khatmaWrite == null ? 0 : 1);
@@ -374,15 +381,13 @@ class BackupService {
   }
 
   /// Single khatma row: update in place when one exists, insert otherwise.
-  Future<void> _writeKhatma(
-    KhatmaProgressCompanion values,
-    int? rowId,
-  ) async {
+  Future<void> _writeKhatma(KhatmaProgressCompanion values, int? rowId) async {
     if (rowId == null) {
       await _db.into(_db.khatmaProgress).insert(values);
       return;
     }
-    await (_db.update(_db.khatmaProgress)..where((t) => t.id.equals(rowId)))
-        .write(values);
+    await (_db.update(
+      _db.khatmaProgress,
+    )..where((t) => t.id.equals(rowId))).write(values);
   }
 }

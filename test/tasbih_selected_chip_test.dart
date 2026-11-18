@@ -10,18 +10,24 @@ import 'support/host.dart';
 import 'support/test_db.dart';
 
 void main() {
-  testWidgets('tapping the already-selected target keeps the count',
-      (tester) async {
+  testWidgets('tapping the already-selected target keeps the count', (
+    tester,
+  ) async {
     final db = newTestDb();
     final cubit = TasbihCubit(repo: TasbihRepository(db));
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<TasbihCubit>.value(
-      value: cubit,
-      child: appShell(home: const TasbihScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<TasbihCubit>.value(
+        value: cubit,
+        child: appShell(home: const TasbihScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.byKey(const Key('tasbih_dial')));
     await tester.pump();
@@ -33,8 +39,11 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.text('١'), findsOneWidget,
-        reason: 'a stray tap on the highlighted chip must not wipe the count');
+    expect(
+      find.text('١'),
+      findsOneWidget,
+      reason: 'a stray tap on the highlighted chip must not wipe the count',
+    );
     expect(find.text('٠'), findsNothing);
   });
 }

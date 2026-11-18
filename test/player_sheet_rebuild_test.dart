@@ -6,26 +6,24 @@ PlaybackState _playing({
   Duration position = Duration.zero,
   Duration duration = const Duration(minutes: 3),
   String surahName = 'الفاتحة',
-}) =>
-    PlaybackState.playing(
-      reciterName: 'reciter',
-      surahNumber: 1,
-      surahName: surahName,
-      position: position,
-      duration: duration,
-    );
+}) => PlaybackState.playing(
+  reciterName: 'reciter',
+  surahNumber: 1,
+  surahName: surahName,
+  position: position,
+  duration: duration,
+);
 
 PlaybackState _paused({
   Duration position = Duration.zero,
   Duration duration = const Duration(minutes: 3),
-}) =>
-    PlaybackState.paused(
-      reciterName: 'reciter',
-      surahNumber: 1,
-      surahName: 'الفاتحة',
-      position: position,
-      duration: duration,
-    );
+}) => PlaybackState.paused(
+  reciterName: 'reciter',
+  surahNumber: 1,
+  surahName: 'الفاتحة',
+  position: position,
+  duration: duration,
+);
 
 void main() {
   test('a position tick is ignored while the user drags', () {

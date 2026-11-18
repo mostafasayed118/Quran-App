@@ -36,21 +36,23 @@ void main() {
     db = newTestDb();
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم'),
+        id: const Value(8),
+        surahId: 2,
+        numberInSurah: 1,
+        juz: 1,
+        page: 2,
+        textUthmani: 'الم',
+        textImlaei: 'الم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 2,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب'),
+        id: const Value(9),
+        surahId: 2,
+        numberInSurah: 2,
+        juz: 1,
+        page: 2,
+        textUthmani: 'ذلك الكتاب',
+        textImlaei: 'ذلك الكتاب',
+      ),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     lastRead = LastReadRepository(db);
@@ -67,8 +69,10 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
     return MultiBlocProvider(
@@ -88,16 +92,22 @@ void main() {
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(appShell(home: screen));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   testWidgets('mushaf page indicator clears the nav bar', (tester) async {
     await pumpScreen(tester, await host(2));
 
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final indicator = tester.getRect(find.textContaining('صفحة'));
     expect(indicator.bottom, lessThanOrEqualTo(kLimit));

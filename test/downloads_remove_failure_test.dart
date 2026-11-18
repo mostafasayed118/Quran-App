@@ -18,7 +18,9 @@ class _ThrowingRemoveDownloader extends AudioDownloader {
 void main() {
   test('a throwing removeDownload returns false and keeps the entry', () async {
     final db = newTestDb();
-    await db.into(db.downloads).insert(
+    await db
+        .into(db.downloads)
+        .insert(
           DownloadsCompanion.insert(
             reciterId: '51-53',
             surahId: 1,
@@ -34,11 +36,15 @@ void main() {
     await cubit.refreshDone();
     expect(cubit.state.items.containsKey('51-53-1'), isTrue);
 
-    final removed =
-        await cubit.removeDone('51-53', 1).timeout(const Duration(seconds: 10));
+    final removed = await cubit
+        .removeDone('51-53', 1)
+        .timeout(const Duration(seconds: 10));
 
     expect(removed, isFalse);
-    expect(cubit.state.items.containsKey('51-53-1'), isTrue,
-        reason: 'a failed delete must leave the row visible for a retry');
+    expect(
+      cubit.state.items.containsKey('51-53-1'),
+      isTrue,
+      reason: 'a failed delete must leave the row visible for a retry',
+    );
   });
 }

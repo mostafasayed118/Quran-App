@@ -15,8 +15,9 @@ class _EmptySource implements JuzIndexSource {
 }
 
 void main() {
-  testWidgets('a successful empty juz index shows the no-results copy',
-      (tester) async {
+  testWidgets('a successful empty juz index shows the no-results copy', (
+    tester,
+  ) async {
     final cubit = JuzIndexCubit(source: const _EmptySource());
     addTearDown(cubit.close);
     await cubit.start();

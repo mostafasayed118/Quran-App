@@ -9,10 +9,7 @@ import 'package:path/path.dart' as p;
 /// never let this set grow to match the tree. Reconciled 2026-10-28, pruning
 /// the 9 dead permissions that had accumulated since the 2026-10-19 first run;
 /// the pinned set below is what `lib/` actually contains.
-const Set<String> allowedFeatureEdges = {
-  'quran->library',
-  'quran->recitation',
-};
+const Set<String> allowedFeatureEdges = {'quran->library', 'quran->recitation'};
 
 /// Feature data files that legitimately need a Flutter platform API.
 ///
@@ -62,8 +59,9 @@ const Map<String, String> appLayerFiles = {
 };
 
 final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
-final _flutterImportRe =
-    RegExp(r"""import\s+['"](?:package:flutter/|dart:ui)""");
+final _flutterImportRe = RegExp(
+  r"""import\s+['"](?:package:flutter/|dart:ui)""",
+);
 
 /// Resolves an import target to a `lib/`-relative posix path; null for
 /// non-local (dart:/foreign package) imports.
@@ -103,19 +101,18 @@ typedef ResolvedImport = ({String from, String target, String import});
 
 /// Every local import in [sources] whose target resolves inside `lib/`.
 List<ResolvedImport> resolvedImports(Map<String, String> sources) => [
-      for (final entry in sources.entries)
-        for (final match in _importRe.allMatches(entry.value))
-          if (resolveTarget(entry.key, match.group(1)!) case final target?)
-            (from: entry.key, target: target, import: match.group(1)!),
-    ];
+  for (final entry in sources.entries)
+    for (final match in _importRe.allMatches(entry.value))
+      if (resolveTarget(entry.key, match.group(1)!) case final target?)
+        (from: entry.key, target: target, import: match.group(1)!),
+];
 
 /// `lib/core/**` must never import into `lib/features/`.
 List<String> coreToFeatureViolations(Map<String, String> sources) => [
-      for (final i in resolvedImports(sources))
-        if (i.from.startsWith('lib/core/') &&
-            i.target.startsWith('lib/features/'))
-          '${i.from} -> ${i.import}',
-    ];
+  for (final i in resolvedImports(sources))
+    if (i.from.startsWith('lib/core/') && i.target.startsWith('lib/features/'))
+      '${i.from} -> ${i.import}',
+];
 
 /// A feature's `presentation/` must never import another feature's `data/`.
 ///
@@ -124,12 +121,12 @@ List<String> coreToFeatureViolations(Map<String, String> sources) => [
 /// `quran/presentation/` reaching into `library/data/`. No allowlist here —
 /// there are no such hops today, and a legitimate one would need its own ruling.
 List<String> presentationDataHops(Map<String, String> sources) => [
-      for (final i in resolvedImports(sources))
-        if (layerOf(i.from) == 'presentation' &&
-            layerOf(i.target) == 'data' &&
-            featureOf(i.from) != featureOf(i.target))
-          '${i.from} -> ${i.import}',
-    ];
+  for (final i in resolvedImports(sources))
+    if (layerOf(i.from) == 'presentation' &&
+        layerOf(i.target) == 'data' &&
+        featureOf(i.from) != featureOf(i.target))
+      '${i.from} -> ${i.import}',
+];
 
 /// Live cross-feature `from->to` edges found in [sources].
 Set<String> liveFeatureEdges(Map<String, String> sources) {
@@ -143,11 +140,11 @@ Set<String> liveFeatureEdges(Map<String, String> sources) {
 
 /// Feature data files importing any `package:flutter/*` or `dart:ui` API.
 Set<String> liveFlutterImportsInFeatureData(Map<String, String> sources) => {
-      for (final entry in sources.entries)
-        if (RegExp(r'^lib/features/[a-z_]+/data/').hasMatch(entry.key) &&
-            _flutterImportRe.hasMatch(entry.value))
-          entry.key,
-    };
+  for (final entry in sources.entries)
+    if (RegExp(r'^lib/features/[a-z_]+/data/').hasMatch(entry.key) &&
+        _flutterImportRe.hasMatch(entry.value))
+      entry.key,
+};
 
 /// [liveFlutterImportsInFeatureData] minus the reasoned allowlist.
 List<String> flutterImportsInFeatureData(
@@ -159,16 +156,17 @@ List<String> flutterImportsInFeatureData(
 
 /// `lib/core/domain` is the pure, platform-free layer.
 List<String> flutterImportsInCoreDomain(Map<String, String> sources) => [
-      for (final entry in sources.entries)
-        if (entry.key.startsWith('lib/core/domain/') &&
-            _flutterImportRe.hasMatch(entry.value))
-          entry.key,
-    ]..sort();
+  for (final entry in sources.entries)
+    if (entry.key.startsWith('lib/core/domain/') &&
+        _flutterImportRe.hasMatch(entry.value))
+      entry.key,
+]..sort();
 
 void main() {
   final sources = <String, String>{};
-  for (final f
-      in Directory('lib').listSync(recursive: true).whereType<File>()) {
+  for (final f in Directory(
+    'lib',
+  ).listSync(recursive: true).whereType<File>()) {
     if (!f.path.endsWith('.dart')) continue;
     if (f.path.endsWith('.g.dart') || f.path.endsWith('.freezed.dart')) {
       continue;
@@ -183,23 +181,34 @@ void main() {
 
   test('resolver handles package, relative, and foreign imports', () {
     expect(
-        resolveTarget('lib/features/a/x.dart',
-            'package:quran_yahdi/core/db/app_database.dart'),
-        'lib/core/db/app_database.dart');
+      resolveTarget(
+        'lib/features/a/x.dart',
+        'package:quran_yahdi/core/db/app_database.dart',
+      ),
+      'lib/core/db/app_database.dart',
+    );
     expect(
-        resolveTarget(
-            'lib/features/a/presentation/x.dart', '../../../core/utils/a.dart'),
-        'lib/core/utils/a.dart');
+      resolveTarget(
+        'lib/features/a/presentation/x.dart',
+        '../../../core/utils/a.dart',
+      ),
+      'lib/core/utils/a.dart',
+    );
     expect(resolveTarget('lib/features/a/x.dart', 'dart:async'), isNull);
     expect(
-        resolveTarget('lib/features/a/x.dart', 'package:flutter/material.dart'),
-        isNull);
+      resolveTarget('lib/features/a/x.dart', 'package:flutter/material.dart'),
+      isNull,
+    );
   });
 
   test('core never imports a feature', () {
-    expect(coreToFeatureViolations(sources), isEmpty,
-        reason: 'lib/core/ must not depend on lib/features/ — a cross-feature '
-            'need goes through a port in lib/core/domain/');
+    expect(
+      coreToFeatureViolations(sources),
+      isEmpty,
+      reason:
+          'lib/core/ must not depend on lib/features/ — a cross-feature '
+          'need goes through a port in lib/core/domain/',
+    );
   });
 
   test('no feature imports the app layer', () {
@@ -213,9 +222,12 @@ void main() {
         }
       }
     });
-    expect(offenders, isEmpty,
-        reason:
-            'features must not depend on lib/app/ — move shared logic to core/');
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'features must not depend on lib/app/ — move shared logic to core/',
+    );
   });
 
   test('only lib/core/di/injector.dart may import the app layer', () {
@@ -232,24 +244,31 @@ void main() {
         }
       }
     });
-    expect(offenders, isEmpty,
-        reason:
-            'core must not depend on lib/app/ — lib/core/di/injector.dart is '
-            'the sole compat re-export shim (frozen-test path); any other '
-            'core->app import is a dependency-direction violation');
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'core must not depend on lib/app/ — lib/core/di/injector.dart is '
+          'the sole compat re-export shim (frozen-test path); any other '
+          'core->app import is a dependency-direction violation',
+    );
     // Pin the exception itself so it cannot silently disappear or multiply.
     final shimTargets = <String>[];
-    for (final m
-        in _importRe.allMatches(sources[allowedCoreAppImporter] ?? '')) {
+    for (final m in _importRe.allMatches(
+      sources[allowedCoreAppImporter] ?? '',
+    )) {
       final target = resolveTarget(allowedCoreAppImporter, m.group(1)!);
       if (target != null && target.startsWith('lib/app/')) {
         shimTargets.add(target);
       }
     }
-    expect(shimTargets, isNotEmpty,
-        reason:
-            'the documented compat shim must still re-export an app target; '
-            'if the shim was removed, delete this exception and migrate tests');
+    expect(
+      shimTargets,
+      isNotEmpty,
+      reason:
+          'the documented compat shim must still re-export an app target; '
+          'if the shim was removed, delete this exception and migrate tests',
+    );
   });
 
   test('cross-feature edges stay within the pinned allowlist', () {
@@ -266,20 +285,28 @@ void main() {
         }
       }
     });
-    expect(offenders, isEmpty,
-        reason: 'new cross-feature dependency — add it to allowedFeatureEdges '
-            'consciously in this test, or remove the import');
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'new cross-feature dependency — add it to allowedFeatureEdges '
+          'consciously in this test, or remove the import',
+    );
   });
 
   test('allowedFeatureEdges is exactly the live edge set', () {
     final live = liveFeatureEdges(sources);
     final missing = live.difference(allowedFeatureEdges).toList()..sort();
     final dead = allowedFeatureEdges.difference(live).toList()..sort();
-    expect(allowedFeatureEdges, live,
-        reason: 'allowedFeatureEdges is the EXACT set of permitted '
-            'feature->feature edges. Unpinned live edges: $missing. '
-            'Dead permissions to delete: $dead. A new edge is an architecture '
-            'decision — edit this test deliberately.');
+    expect(
+      allowedFeatureEdges,
+      live,
+      reason:
+          'allowedFeatureEdges is the EXACT set of permitted '
+          'feature->feature edges. Unpinned live edges: $missing. '
+          'Dead permissions to delete: $dead. A new edge is an architecture '
+          'decision — edit this test deliberately.',
+    );
   });
 
   test('lib/app holds only the pinned files', () {
@@ -287,18 +314,26 @@ void main() {
     final unpinned = live.difference(appLayerFiles.keys.toSet()).toList()
       ..sort();
     final stale = appLayerFiles.keys.toSet().difference(live).toList()..sort();
-    expect(appLayerFiles.keys.toSet(), live,
-        reason: '`lib/app/` is the composition root, not a home for feature '
-            'logic. Unpinned files: $unpinned. Stale entries to delete: $stale. '
-            'Adding a file here is an architecture decision — pin it with its '
-            'reason deliberately.');
+    expect(
+      appLayerFiles.keys.toSet(),
+      live,
+      reason:
+          '`lib/app/` is the composition root, not a home for feature '
+          'logic. Unpinned files: $unpinned. Stale entries to delete: $stale. '
+          'Adding a file here is an architecture decision — pin it with its '
+          'reason deliberately.',
+    );
   });
 
   test('presentation never imports another feature\'s data', () {
-    expect(presentationDataHops(sources), isEmpty,
-        reason: 'a feature\'s presentation/ must not reach into another '
-            'feature\'s data/ — go through that feature\'s domain or a '
-            'lib/core/domain/ port');
+    expect(
+      presentationDataHops(sources),
+      isEmpty,
+      reason:
+          'a feature\'s presentation/ must not reach into another '
+          'feature\'s data/ — go through that feature\'s domain or a '
+          'lib/core/domain/ port',
+    );
   });
 
   test('the new detectors catch planted violations', () {
@@ -322,7 +357,8 @@ void main() {
         allowlist: featureDataFlutterAllowlist.keys.toSet(),
       ),
       isEmpty,
-      reason: 'a new data-layer Flutter import needs a reasoned entry in '
+      reason:
+          'a new data-layer Flutter import needs a reasoned entry in '
           'featureDataFlutterAllowlist (prefer a core port or a platform '
           'adapter outside data/)',
     );
@@ -332,7 +368,8 @@ void main() {
     expect(
       liveFlutterImportsInFeatureData(sources),
       featureDataFlutterAllowlist.keys.toSet(),
-      reason: 'the allowlist is the exact set of data-layer Flutter imports; '
+      reason:
+          'the allowlist is the exact set of data-layer Flutter imports; '
           'delete stale permissions and account for every new one',
     );
   });
@@ -356,7 +393,8 @@ void main() {
     expect(
       flutterImportsInCoreDomain(sources),
       isEmpty,
-      reason: 'lib/core/domain/ is the pure port layer; a Flutter dependency '
+      reason:
+          'lib/core/domain/ is the pure port layer; a Flutter dependency '
           'belongs in an adapter outside it',
     );
   });

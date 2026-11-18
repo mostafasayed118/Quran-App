@@ -27,13 +27,13 @@ class HomeCubit extends Cubit<HomeState> {
     required CitySource city,
     Stream<PrayerConfig>? configChanges,
     HomeWidgetUpdater? widgetUpdater,
-  })  : _lastRead = lastRead,
-        _ayahs = ayahs,
-        _prayer = prayer,
-        _city = city,
-        _configChanges = configChanges,
-        _widgetUpdater = widgetUpdater,
-        super(const HomeState.loading());
+  }) : _lastRead = lastRead,
+       _ayahs = ayahs,
+       _prayer = prayer,
+       _city = city,
+       _configChanges = configChanges,
+       _widgetUpdater = widgetUpdater,
+       super(const HomeState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -83,17 +83,23 @@ class HomeCubit extends Cubit<HomeState> {
       final nextPrayerCard = results[1] as NextPrayerCard?;
       final selected = await _city.selectedCity();
       if (isClosed || seq != _reloadSeq) return;
-      emit(HomeState.ready(
-        lastRead: lastReadCard,
-        nextPrayer: nextPrayerCard,
-        cityTimezone: selected?.timezone,
-        cityNameEn: selected?.nameEn,
-      ));
+      emit(
+        HomeState.ready(
+          lastRead: lastReadCard,
+          nextPrayer: nextPrayerCard,
+          cityTimezone: selected?.timezone,
+          cityNameEn: selected?.nameEn,
+        ),
+      );
       await _syncWidget(nextPrayerCard, selected?.timezone);
       _scheduleNextPrayerRefresh(nextPrayerCard);
     } on Object catch (error, stackTrace) {
-      appLog('home load failed',
-          name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
+      appLog(
+        'home load failed',
+        name: 'quran_yahdi/home',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _reloadSeq) return;
       emit(const HomeState.failed());
     }
@@ -122,11 +128,7 @@ class HomeCubit extends Cubit<HomeState> {
     // giving the city's year/month/day (for the day the schedule is built for).
     final cityNow = cityWallClock(DateTime.now(), selected.timezone);
     final next = _prayer.nextPrayer(selected.coordinates, cityNow);
-    return (
-      name: next.name,
-      time: next.time,
-      cityName: selected.nameAr,
-    );
+    return (name: next.name, time: next.time, cityName: selected.nameAr);
   }
 
   /// Mirrors the next prayer into the Android home-screen widget.
@@ -149,8 +151,12 @@ class HomeCubit extends Cubit<HomeState> {
         city: card.cityName,
       );
     } on Object catch (error, stackTrace) {
-      appLog('home widget sync failed',
-          name: 'quran_yahdi/home', error: error, stackTrace: stackTrace);
+      appLog(
+        'home widget sync failed',
+        name: 'quran_yahdi/home',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -159,12 +165,9 @@ class HomeCubit extends Cubit<HomeState> {
     if (card == null) return;
     final delay = card.time.difference(DateTime.now());
     if (delay.isNegative) return;
-    _nextPrayerRefresh = Timer(
-      delay + const Duration(seconds: 1),
-      () {
-        if (!isClosed) unawaited(reload());
-      },
-    );
+    _nextPrayerRefresh = Timer(delay + const Duration(seconds: 1), () {
+      if (!isClosed) unawaited(reload());
+    });
   }
 
   @override

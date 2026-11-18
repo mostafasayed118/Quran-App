@@ -55,10 +55,10 @@ class _DialState extends State<_Dial> {
     final spoken = heading == null
         ? loc.degreesFromNorth(loc.number(widget.bearing.round()))
         : widget.aligned
-            ? loc.qiblaAligned
-            : delta > 0
-                ? loc.qiblaTurnRight(loc.number(delta.abs().round()))
-                : loc.qiblaTurnLeft(loc.number(delta.abs().round()));
+        ? loc.qiblaAligned
+        : delta > 0
+        ? loc.qiblaTurnRight(loc.number(delta.abs().round()))
+        : loc.qiblaTurnLeft(loc.number(delta.abs().round()));
     return Center(
       child: Semantics(
         label: spoken,

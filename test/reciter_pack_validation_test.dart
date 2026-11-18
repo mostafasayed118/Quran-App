@@ -26,23 +26,26 @@ void main() {
   });
 
   test('two entries are below the published minimum', () {
-    final defects =
-        validateReciterPack(_pack(rowIds: const <String>['51-51', '118-118']));
+    final defects = validateReciterPack(
+      _pack(rowIds: const <String>['51-51', '118-118']),
+    );
     expect(defects, contains(ReciterPackDefect.tooFewEntries));
   });
 
   test('eight entries are above the published maximum', () {
     final defects = validateReciterPack(
-      _pack(rowIds: const <String>[
-        '1-1',
-        '2-2',
-        '3-3',
-        '4-4',
-        '5-5',
-        '6-6',
-        '7-7',
-        '8-8',
-      ]),
+      _pack(
+        rowIds: const <String>[
+          '1-1',
+          '2-2',
+          '3-3',
+          '4-4',
+          '5-5',
+          '6-6',
+          '7-7',
+          '8-8',
+        ],
+      ),
     );
     expect(defects, contains(ReciterPackDefect.tooManyEntries));
   });
@@ -101,18 +104,22 @@ void main() {
         '112-114',
         '123-123',
         '102-102',
-        '51-52'
+        '51-52',
       ],
     );
-    expect(validateReciterPack(candidate),
-        contains(ReciterPackDefect.missingReviewer));
+    expect(
+      validateReciterPack(candidate),
+      contains(ReciterPackDefect.missingReviewer),
+    );
   });
 
-  test('nothing ships in kReciterPacks yet, and anything added must validate',
-      () {
-    expect(kReciterPacks, isEmpty, reason: 'no pack is signed yet');
-    for (final pack in kReciterPacks) {
-      expect(validateReciterPack(pack), isEmpty, reason: pack.id);
-    }
-  });
+  test(
+    'nothing ships in kReciterPacks yet, and anything added must validate',
+    () {
+      expect(kReciterPacks, isEmpty, reason: 'no pack is signed yet');
+      for (final pack in kReciterPacks) {
+        expect(validateReciterPack(pack), isEmpty, reason: pack.id);
+      }
+    },
+  );
 }

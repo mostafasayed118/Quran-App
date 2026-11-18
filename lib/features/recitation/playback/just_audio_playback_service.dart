@@ -25,14 +25,20 @@ void issuePlayRequest(
   void Function(String message, Object error, StackTrace stackTrace)? log,
 }) {
   final logger = log ?? _logPlayFailure;
-  unawaited(play().catchError((Object error, StackTrace stackTrace) {
-    logger(operation, error, stackTrace);
-  }));
+  unawaited(
+    play().catchError((Object error, StackTrace stackTrace) {
+      logger(operation, error, stackTrace);
+    }),
+  );
 }
 
 void _logPlayFailure(String operation, Object error, StackTrace stackTrace) {
-  appLog(operation,
-      name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+  appLog(
+    operation,
+    name: 'quran_yahdi/playback',
+    error: error,
+    stackTrace: stackTrace,
+  );
 }
 
 class JustAudioPlaybackService
@@ -44,7 +50,7 @@ class JustAudioPlaybackService
         TunablePlaybackService,
         MediaPlaybackControl {
   JustAudioPlaybackService([AudioPlayer? player])
-      : _player = player ?? AudioPlayer();
+    : _player = player ?? AudioPlayer();
 
   final AudioPlayer _player;
 
@@ -173,7 +179,10 @@ class JustAudioPlaybackService
     // The tag is mandatory: `JustAudioBackground.init` swapped in a
     // background-aware platform, and an untagged source throws.
     await _player.setAudioSource(
-      AudioSource.asset(assetPath, tag: MediaItem(id: id, title: title)),
+      AudioSource.asset(
+        assetPath,
+        tag: MediaItem(id: id, title: title),
+      ),
     );
     issuePlayRequest(
       () => _player.play(),

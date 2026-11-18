@@ -31,8 +31,9 @@ void main() {
     );
   }
 
-  testWidgets('featured row appears first (lower Y), then the rest',
-      (tester) async {
+  testWidgets('featured row appears first (lower Y), then the rest', (
+    tester,
+  ) async {
     await pumpHost(tester, [
       _row(id: '55-55', name: 'تجربة أحمد'),
       _row(id: '123-123', name: 'مشاري العفاسي'),
@@ -55,16 +56,20 @@ void main() {
     ]);
 
     await tester.enterText(find.byType(TextField), 'عفاسي');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('مشاري العفاسي'), findsOneWidget);
     expect(find.text('عبدالباسط عبدالصمد'), findsNothing);
     expect(find.text('تجربة أحمد'), findsNothing);
   });
 
-  testWidgets('empty index shows the offline hint, never a dead screen',
-      (tester) async {
+  testWidgets('empty index shows the offline hint, never a dead screen', (
+    tester,
+  ) async {
     await pumpHost(tester, const []);
 
     expect(find.text('حمّل فهرس القرّاء من الإنترنت'), findsOneWidget);
@@ -73,13 +78,13 @@ void main() {
 }
 
 ReciterRow _row({required String id, required String name}) => ReciterRow(
-      id: id,
-      reciterName: name,
-      moshafName: 'مرتل',
-      server: 'https://x/',
-      surahList: '1',
-      surahTotal: 114,
-    );
+  id: id,
+  reciterName: name,
+  moshafName: 'مرتل',
+  server: 'https://x/',
+  surahList: '1',
+  surahTotal: 114,
+);
 
 class _StaticReciterRepository extends ReciterRepository {
   _StaticReciterRepository(super.db, this._rows);

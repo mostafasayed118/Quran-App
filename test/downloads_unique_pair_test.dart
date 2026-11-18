@@ -15,85 +15,111 @@ const String _reciterId = '51-53';
 
 /// One downloads row for [surahId] of the only reciter these tests use.
 DownloadsCompanion _download({int surahId = 1}) => DownloadsCompanion.insert(
-      reciterId: _reciterId,
-      surahId: surahId,
-      status: 'done',
-      path: '',
-      bytes: const Value(0),
-    );
+  reciterId: _reciterId,
+  surahId: surahId,
+  status: 'done',
+  path: '',
+  bytes: const Value(0),
+);
 
 void main() {
-  test('a duplicate (reciter, surah) insert is rejected by the database',
-      () async {
-    final db = newTestDb();
-    await db.into(db.downloads).insert(_download());
+  test(
+    'a duplicate (reciter, surah) insert is rejected by the database',
+    () async {
+      final db = newTestDb();
+      await db.into(db.downloads).insert(_download());
 
-    await expectLater(
-      db.into(db.downloads).insert(_download()),
-      throwsA(isA<SqliteException>()),
-      reason: 'the (reciter_id, surah_id) pair is unique',
-    );
-    expect(await db.select(db.downloads).get(), hasLength(1));
-  });
+      await expectLater(
+        db.into(db.downloads).insert(_download()),
+        throwsA(isA<SqliteException>()),
+        reason: 'the (reciter_id, surah_id) pair is unique',
+      );
+      expect(await db.select(db.downloads).get(), hasLength(1));
+    },
+  );
 
-  test('a legacy file with duplicate download rows is repaired on every open',
-      () async {
-    final legacy = await _legacyDownloadsDbFile();
+  test(
+    'a legacy file with duplicate download rows is repaired on every open',
+    () async {
+      final legacy = await _legacyDownloadsDbFile();
 
-    for (var open = 1; open <= 2; open++) {
-      final db = AppDatabase(NativeDatabase(legacy.file));
-      try {
-        final rows = await db.select(db.downloads).get();
-        expect(rows, hasLength(1),
-            reason: 'open $open must collapse the duplicate pair');
-        expect(rows.single.id, legacy.oldestId,
-            reason: 'open $open must keep the lowest id of the pair');
-        expect(rows.single.reciterId, _reciterId);
-        expect(rows.single.surahId, 1);
-        await expectLater(
-          db.into(db.downloads).insert(_download()),
-          throwsA(isA<SqliteException>()),
-          reason: 'open $open must reject a duplicate download row',
-        );
-      } finally {
-        await db.close();
+      for (var open = 1; open <= 2; open++) {
+        final db = AppDatabase(NativeDatabase(legacy.file));
+        try {
+          final rows = await db.select(db.downloads).get();
+          expect(
+            rows,
+            hasLength(1),
+            reason: 'open $open must collapse the duplicate pair',
+          );
+          expect(
+            rows.single.id,
+            legacy.oldestId,
+            reason: 'open $open must keep the lowest id of the pair',
+          );
+          expect(rows.single.reciterId, _reciterId);
+          expect(rows.single.surahId, 1);
+          await expectLater(
+            db.into(db.downloads).insert(_download()),
+            throwsA(isA<SqliteException>()),
+            reason: 'open $open must reject a duplicate download row',
+          );
+        } finally {
+          await db.close();
+        }
       }
-    }
-  });
+    },
+  );
 
   test('two concurrent downloads for one pair leave exactly one row', () async {
     final harness = await _Harness.start();
 
     await Future.wait([
-      _settle(harness.downloader
-          .downloadSurah(reciter: harness.reciter, surahNumber: 1)),
-      _settle(harness.downloader
-          .downloadSurah(reciter: harness.reciter, surahNumber: 1)),
+      _settle(
+        harness.downloader.downloadSurah(
+          reciter: harness.reciter,
+          surahNumber: 1,
+        ),
+      ),
+      _settle(
+        harness.downloader.downloadSurah(
+          reciter: harness.reciter,
+          surahNumber: 1,
+        ),
+      ),
     ]);
 
     expect(await harness.db.select(harness.db.downloads).get(), hasLength(1));
-    final row = await (harness.db.select(harness.db.downloads)
-          ..where((d) => d.reciterId.equals(_reciterId) & d.surahId.equals(1)))
-        .getSingle();
+    final row =
+        await (harness.db.select(harness.db.downloads)..where(
+              (d) => d.reciterId.equals(_reciterId) & d.surahId.equals(1),
+            ))
+            .getSingle();
     expect(row.reciterId, _reciterId);
     expect(row.surahId, 1);
   });
 
-  test('a second download for another surah still creates its own row',
-      () async {
-    final harness = await _Harness.start();
+  test(
+    'a second download for another surah still creates its own row',
+    () async {
+      final harness = await _Harness.start();
 
-    await harness.downloader
-        .downloadSurah(reciter: harness.reciter, surahNumber: 1);
-    await harness.downloader
-        .downloadSurah(reciter: harness.reciter, surahNumber: 2);
+      await harness.downloader.downloadSurah(
+        reciter: harness.reciter,
+        surahNumber: 1,
+      );
+      await harness.downloader.downloadSurah(
+        reciter: harness.reciter,
+        surahNumber: 2,
+      );
 
-    final rows = await (harness.db.select(harness.db.downloads)
-          ..orderBy([(d) => OrderingTerm.asc(d.surahId)]))
-        .get();
-    expect(rows.map((r) => r.surahId), [1, 2]);
-    expect(rows.map((r) => r.status), ['done', 'done']);
-  });
+      final rows = await (harness.db.select(
+        harness.db.downloads,
+      )..orderBy([(d) => OrderingTerm.asc(d.surahId)])).get();
+      expect(rows.map((r) => r.surahId), [1, 2]);
+      expect(rows.map((r) => r.status), ['done', 'done']);
+    },
+  );
 }
 
 typedef _LegacyDb = ({File file, int oldestId});
@@ -112,8 +138,11 @@ Future<_LegacyDb> _legacyDownloadsDbFile() async {
     await db.customStatement('DROP INDEX IF EXISTS idx_downloads_lookup');
     final oldestId = await db.into(db.downloads).insert(_download());
     await db.into(db.downloads).insert(_download());
-    expect(await db.select(db.downloads).get(), hasLength(2),
-        reason: 'the legacy file must actually contain duplicate rows');
+    expect(
+      await db.select(db.downloads).get(),
+      hasLength(2),
+      reason: 'the legacy file must actually contain duplicate rows',
+    );
     return (file: file, oldestId: oldestId);
   } finally {
     await db.close();
@@ -154,20 +183,26 @@ class _Harness {
     });
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() => server.close(force: true));
-    unawaited(server.forEach((req) async {
-      final body = List<int>.generate(2048, (i) => i % 251);
-      req.response.contentLength = body.length;
-      req.response.add(body);
-      await req.response.close();
-    }));
-    await db.into(db.reciters).insert(RecitersCompanion.insert(
-          id: _reciterId,
-          reciterName: 'عبدالباسط عبدالصمد',
-          moshafName: 'حفص مرتل',
-          server: 'http://127.0.0.1:${server.port}',
-          surahList: '1,2',
-          surahTotal: 114,
-        ));
+    unawaited(
+      server.forEach((req) async {
+        final body = List<int>.generate(2048, (i) => i % 251);
+        req.response.contentLength = body.length;
+        req.response.add(body);
+        await req.response.close();
+      }),
+    );
+    await db
+        .into(db.reciters)
+        .insert(
+          RecitersCompanion.insert(
+            id: _reciterId,
+            reciterName: 'عبدالباسط عبدالصمد',
+            moshafName: 'حفص مرتل',
+            server: 'http://127.0.0.1:${server.port}',
+            surahList: '1,2',
+            surahTotal: 114,
+          ),
+        );
     final reciter = await (db.select(db.reciters)).getSingle();
     return _Harness._(db, root, server, reciter);
   }

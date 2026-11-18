@@ -49,8 +49,12 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
     try {
       completed = await source.isCompleted();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding gate read failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding gate read failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
       // A flag we cannot read must never trap the user behind the flow.
       completed = true;
     }
@@ -65,8 +69,12 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
     try {
       await _source?.markCompleted();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding gate write failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding gate write failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     if (_completed == true) return;
     _completed = true;
@@ -115,7 +123,8 @@ class OnboardingGate extends ChangeNotifier implements OnboardingStatusSource {
     // Any route inside the flow (`/onboarding`, `/onboarding/city`, ...) is
     // part of the flow: redirecting those would collapse the pushed page and
     // leave its `pop` with nothing to return to.
-    final atOnboarding = location == AppRoutes.onboarding ||
+    final atOnboarding =
+        location == AppRoutes.onboarding ||
         location.startsWith('${AppRoutes.onboarding}/');
     if (!completed) {
       if (atOnboarding) return null;

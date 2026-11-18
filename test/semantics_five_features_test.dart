@@ -20,14 +20,19 @@ void main() {
       final files = Directory(dir)
           .listSync(recursive: true)
           .whereType<File>()
-          .where((f) =>
-              f.path.endsWith('.dart') && !f.path.endsWith('.freezed.dart'))
+          .where(
+            (f) =>
+                f.path.endsWith('.dart') && !f.path.endsWith('.freezed.dart'),
+          )
           .toList();
       final withSemantics = files.where(
         (f) => f.readAsStringSync().contains('Semantics('),
       );
-      expect(withSemantics, isNotEmpty,
-          reason: '$dir has no Semantics widget for screen readers');
+      expect(
+        withSemantics,
+        isNotEmpty,
+        reason: '$dir has no Semantics widget for screen readers',
+      );
     }
   });
 }

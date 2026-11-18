@@ -33,9 +33,9 @@ void main() {
   });
 
   Finder wirdSwitch() => find.descendant(
-        of: find.widgetWithText(SwitchListTile, 'تذكير الورد'),
-        matching: find.byType(Switch),
-      );
+    of: find.widgetWithText(SwitchListTile, 'تذكير الورد'),
+    matching: find.byType(Switch),
+  );
 
   Future<void> pumpHost(WidgetTester tester) async {
     final cubit = SettingsCubit(
@@ -76,8 +76,9 @@ void main() {
     expect(scheduler.scheduleCalls, greaterThanOrEqualTo(1));
   });
 
-  testWidgets('the wird time tile opens the picker only once enabled',
-      (tester) async {
+  testWidgets('the wird time tile opens the picker only once enabled', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     await tester.tap(find.text('وقت تذكير الورد'));

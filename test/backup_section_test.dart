@@ -28,51 +28,51 @@ class _SpyService extends BackupService {
 
 /// Three new bookmarks + two worship days — a clean preview on an empty db.
 BackupDocument craftedDoc() => BackupDocument(
-      exportedAt: DateTime(2026, 10, 19),
-      schemaVersion: 2,
-      data: BackupData(
-        bookmarks: [
-          for (var i = 1; i <= 3; i++)
-            BackupBookmark(ayahId: i, createdAt: DateTime(2026, 1, 1)),
-        ],
-        lastReadAyahId: null,
-        khatma: const [],
-        prayerLog: [
-          BackupPrayerDay(
-            day: DateTime(2026, 5, 1),
-            fajr: true,
-            dhuhr: false,
-            asr: false,
-            maghrib: false,
-            isha: false,
-          ),
-          BackupPrayerDay(
-            day: DateTime(2026, 5, 2),
-            fajr: false,
-            dhuhr: false,
-            asr: false,
-            maghrib: false,
-            isha: true,
-          ),
-        ],
-        tasbih: null,
-        settings: const {},
+  exportedAt: DateTime(2026, 10, 19),
+  schemaVersion: 2,
+  data: BackupData(
+    bookmarks: [
+      for (var i = 1; i <= 3; i++)
+        BackupBookmark(ayahId: i, createdAt: DateTime(2026, 1, 1)),
+    ],
+    lastReadAyahId: null,
+    khatma: const [],
+    prayerLog: [
+      BackupPrayerDay(
+        day: DateTime(2026, 5, 1),
+        fajr: true,
+        dhuhr: false,
+        asr: false,
+        maghrib: false,
+        isha: false,
       ),
-    );
+      BackupPrayerDay(
+        day: DateTime(2026, 5, 2),
+        fajr: false,
+        dhuhr: false,
+        asr: false,
+        maghrib: false,
+        isha: true,
+      ),
+    ],
+    tasbih: null,
+    settings: const {},
+  ),
+);
 
 /// A backup that matches an empty database: the preview has no lines.
 BackupDocument emptyDoc() => BackupDocument(
-      exportedAt: DateTime(2026, 10, 19),
-      schemaVersion: 2,
-      data: const BackupData(
-        bookmarks: [],
-        lastReadAyahId: null,
-        khatma: [],
-        prayerLog: [],
-        tasbih: null,
-        settings: {},
-      ),
-    );
+  exportedAt: DateTime(2026, 10, 19),
+  schemaVersion: 2,
+  data: const BackupData(
+    bookmarks: [],
+    lastReadAyahId: null,
+    khatma: [],
+    prayerLog: [],
+    tasbih: null,
+    settings: {},
+  ),
+);
 
 /// Bounded pumps: drift futures + dialog/snackbar animations advance on
 /// explicit pumps only (no pumpAndSettle on a live DB, per the wave brief).
@@ -126,8 +126,9 @@ void main() {
     expect(find.text('استيراد البيانات'), findsOneWidget);
   });
 
-  testWidgets('a failed export shows the localized failure copy',
-      (tester) async {
+  testWidgets('a failed export shows the localized failure copy', (
+    tester,
+  ) async {
     await pumpSection(
       tester,
       shareJson: (json) async => throw StateError('no share sheet'),
@@ -139,8 +140,9 @@ void main() {
     expect(find.text('تعذّر تصدير البيانات'), findsOneWidget);
   });
 
-  testWidgets('a successful export shares the encoded document',
-      (tester) async {
+  testWidgets('a successful export shares the encoded document', (
+    tester,
+  ) async {
     String? shared;
     await pumpSection(
       tester,
@@ -157,8 +159,9 @@ void main() {
     expect(find.text('تم تصدير البيانات'), findsOneWidget);
   });
 
-  testWidgets('preview shows the per-entity counts; cancel writes nothing',
-      (tester) async {
+  testWidgets('preview shows the per-entity counts; cancel writes nothing', (
+    tester,
+  ) async {
     await pumpSection(
       tester,
       pickBytes: () async => utf8.encode(encode(craftedDoc())),
@@ -182,8 +185,9 @@ void main() {
     expect(rescheduleCalls, 0);
   });
 
-  testWidgets('a backup that changes nothing says so and disables merge',
-      (tester) async {
+  testWidgets('a backup that changes nothing says so and disables merge', (
+    tester,
+  ) async {
     await pumpSection(
       tester,
       pickBytes: () async => utf8.encode(encode(emptyDoc())),
@@ -209,8 +213,9 @@ void main() {
     expect(service.applies, 0);
   });
 
-  testWidgets('merge applies the document and shows the success copy',
-      (tester) async {
+  testWidgets('merge applies the document and shows the success copy', (
+    tester,
+  ) async {
     await pumpSection(
       tester,
       pickBytes: () async => utf8.encode(encode(craftedDoc())),

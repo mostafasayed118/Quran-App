@@ -21,14 +21,14 @@ class _Source implements QadaSource {
 }
 
 Widget _app(QadaCubit cubit) => BlocProvider.value(
-      value: cubit,
-      child: const MaterialApp(
-        locale: Locale('ar'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: QadaScreen(),
-      ),
-    );
+  value: cubit,
+  child: const MaterialApp(
+    locale: Locale('ar'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: QadaScreen(),
+  ),
+);
 
 void main() {
   testWidgets('renders the count and one row per recorded day', (tester) async {
@@ -67,11 +67,15 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.byTooltip('إضافة يوم'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
-    final dialog =
-        tester.widget<DatePickerDialog>(find.byType(DatePickerDialog));
+    final dialog = tester.widget<DatePickerDialog>(
+      find.byType(DatePickerDialog),
+    );
     expect(dialog.firstDate.year, DateTime.now().year - 10);
   });
 
@@ -85,13 +89,19 @@ void main() {
     await tester.pump();
 
     await tester.tap(find.byIcon(Icons.delete_outline).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('حذف اليوم؟'), findsOneWidget);
 
     await tester.tap(find.text('حذف').last);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(ListTile), findsOneWidget);
     expect(source.dates, hasLength(1));

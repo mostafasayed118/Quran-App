@@ -42,8 +42,12 @@ class PlatformHomeWidgetUpdater implements HomeWidgetUpdater {
       await HomeWidget.updateWidget(qualifiedAndroidName: providerClass);
     } on Object catch (error, stackTrace) {
       // A widget refresh must never break the app or the background plan.
-      appLog('home widget update failed',
-          name: 'quran_yahdi/widget', error: error, stackTrace: stackTrace);
+      appLog(
+        'home widget update failed',
+        name: 'quran_yahdi/widget',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

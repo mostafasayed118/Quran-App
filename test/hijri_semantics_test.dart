@@ -8,8 +8,9 @@ import 'package:quran_yahdi/features/hijri/presentation/hijri_screen.dart';
 import 'support/host.dart';
 
 void main() {
-  testWidgets('each Hijri day cell exposes a dual-calendar semantics label',
-      (tester) async {
+  testWidgets('each Hijri day cell exposes a dual-calendar semantics label', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       final cubit = HijriCubit(service: HijriService());

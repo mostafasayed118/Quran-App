@@ -22,8 +22,10 @@ class _NoopDownloader extends PackDownloader {
   Future<List<InstalledPack>> installedPacks() async => const [];
 
   @override
-  Future<File> install(LibraryPackInfo pack,
-      {void Function(int, int)? onProgress}) async {
+  Future<File> install(
+    LibraryPackInfo pack, {
+    void Function(int, int)? onProgress,
+  }) async {
     throw UnsupportedError('install is not exercised in this test');
   }
 }
@@ -54,16 +56,22 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(BlocProvider<LibraryCubit>.value(
-      value: cubit,
-      child: appShell(home: const LibraryScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<LibraryCubit>.value(
+        value: cubit,
+        child: appShell(home: const LibraryScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('an empty catalog shows one empty state instead of blank tabs',
-      (tester) async {
+  testWidgets('an empty catalog shows one empty state instead of blank tabs', (
+    tester,
+  ) async {
     await pumpLibrary(tester, const []);
 
     expect(find.text('لا توجد حزم معرفية بعد'), findsOneWidget);

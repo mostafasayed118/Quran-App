@@ -4,37 +4,37 @@ import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 
 List<PrayerChoice> _day(DateTime date) => [
-      PrayerChoice(
-        PrayerName.fajr,
-        DateTime(date.year, date.month, date.day, 4, 45),
-      ),
-      PrayerChoice(
-        PrayerName.sunrise,
-        DateTime(date.year, date.month, date.day, 6, 10),
-      ),
-      PrayerChoice(
-        PrayerName.dhuhr,
-        DateTime(date.year, date.month, date.day, 11, 40),
-      ),
-      PrayerChoice(
-        PrayerName.asr,
-        DateTime(date.year, date.month, date.day, 14, 42),
-      ),
-      PrayerChoice(
-        PrayerName.maghrib,
-        DateTime(date.year, date.month, date.day, 17, 4),
-      ),
-      PrayerChoice(
-        PrayerName.isha,
-        DateTime(date.year, date.month, date.day, 18, 24),
-      ),
-    ];
+  PrayerChoice(
+    PrayerName.fajr,
+    DateTime(date.year, date.month, date.day, 4, 45),
+  ),
+  PrayerChoice(
+    PrayerName.sunrise,
+    DateTime(date.year, date.month, date.day, 6, 10),
+  ),
+  PrayerChoice(
+    PrayerName.dhuhr,
+    DateTime(date.year, date.month, date.day, 11, 40),
+  ),
+  PrayerChoice(
+    PrayerName.asr,
+    DateTime(date.year, date.month, date.day, 14, 42),
+  ),
+  PrayerChoice(
+    PrayerName.maghrib,
+    DateTime(date.year, date.month, date.day, 17, 4),
+  ),
+  PrayerChoice(
+    PrayerName.isha,
+    DateTime(date.year, date.month, date.day, 18, 24),
+  ),
+];
 
 ReminderTexts _texts({String? followUpTitle}) => ReminderTexts(
-      prayerTitle: (prayer) => 'prayer ${prayer.name}',
-      azkarTitle: 'azkar',
-      fajrFollowUpTitle: followUpTitle,
-    );
+  prayerTitle: (prayer) => 'prayer ${prayer.name}',
+  azkarTitle: 'azkar',
+  fajrFollowUpTitle: followUpTitle,
+);
 
 void main() {
   final day = DateTime(2026, 11, 6);
@@ -47,14 +47,8 @@ void main() {
       texts: _texts(),
     );
 
-    expect(
-      plan.where((r) => r.id == fajrFollowUpAlarmId(day, 0)),
-      isEmpty,
-    );
-    expect(
-      plan.where((r) => r.id == fajrFollowUpAlarmId(day, 1)),
-      isEmpty,
-    );
+    expect(plan.where((r) => r.id == fajrFollowUpAlarmId(day, 0)), isEmpty);
+    expect(plan.where((r) => r.id == fajrFollowUpAlarmId(day, 1)), isEmpty);
   });
 
   test('pins the shipped follow-up offsets', () {
@@ -96,10 +90,7 @@ void main() {
       texts: _texts(followUpTitle: 'Fajr reminder'),
     );
 
-    expect(
-      plan.where((r) => r.id == fajrFollowUpAlarmId(day, 0)),
-      isEmpty,
-    );
+    expect(plan.where((r) => r.id == fajrFollowUpAlarmId(day, 0)), isEmpty);
     expect(
       plan.where((r) => r.id == fajrFollowUpAlarmId(day, 1)),
       hasLength(1),
@@ -118,9 +109,6 @@ void main() {
 
     expect(PrayerConfig.fromJson(config.toJson()).fajrFollowUp, isTrue);
     expect(PrayerConfig.fromJson(const {}).fajrFollowUp, isFalse);
-    expect(
-      config.copyWith(fajrFollowUp: false).fajrFollowUp,
-      isFalse,
-    );
+    expect(config.copyWith(fajrFollowUp: false).fajrFollowUp, isFalse);
   });
 }

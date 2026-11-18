@@ -22,13 +22,13 @@ const dubaiCity = City(
 );
 
 List<PrayerChoice> fakeDay() => [
-      PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-      PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-      PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-      PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-      PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-      PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+  PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
+  PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
+  PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
+  PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+];
 
 void main() {
   late AppDatabase db;
@@ -38,11 +38,15 @@ void main() {
   setUp(() async {
     db = newTestDb();
     repo = CityRepository(
-        db: db, loader: () async => [cairoCity.toJson(), dubaiCity.toJson()]);
+      db: db,
+      loader: () async => [cairoCity.toJson(), dubaiCity.toJson()],
+    );
     fake = FakePrayerTimeService()
       ..todayResult = fakeDay()
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
   });
 
   test('no selection emits ready with no city and empty entries', () async {
@@ -58,20 +62,22 @@ void main() {
     await cubit.close();
   });
 
-  test('with selection: entries ordered with times and the next anchor flagged',
-      () async {
-    await repo.select(cairoCity);
-    final cubit = PrayerTimesCubit(prayer: fake, city: repo);
-    await cubit.reload();
+  test(
+    'with selection: entries ordered with times and the next anchor flagged',
+    () async {
+      await repo.select(cairoCity);
+      final cubit = PrayerTimesCubit(prayer: fake, city: repo);
+      await cubit.reload();
 
-    final ready = cubit.state as PrayerTimesReady;
-    expect(ready.city!.id, 'cairo');
-    expect(ready.entries.map((e) => e.name), PrayerName.values);
-    final nextList = ready.entries.where((e) => e.isNext).toList();
-    expect(nextList, hasLength(1));
-    expect(nextList.single.name, PrayerName.asr);
-    expect(nextList.single.time, DateTime(2026, 3, 15, 15, 35));
+      final ready = cubit.state as PrayerTimesReady;
+      expect(ready.city!.id, 'cairo');
+      expect(ready.entries.map((e) => e.name), PrayerName.values);
+      final nextList = ready.entries.where((e) => e.isNext).toList();
+      expect(nextList, hasLength(1));
+      expect(nextList.single.name, PrayerName.asr);
+      expect(nextList.single.time, DateTime(2026, 3, 15, 15, 35));
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 }

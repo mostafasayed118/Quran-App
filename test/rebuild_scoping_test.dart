@@ -29,13 +29,12 @@ void main() {
       Duration duration = const Duration(minutes: 6),
       String reciterName = 'عبدالباسط عبدالصمد',
       int surahNumber = 1,
-    }) =>
-        PlaybackState.playing(
-          reciterName: reciterName,
-          surahNumber: surahNumber,
-          position: position,
-          duration: duration,
-        );
+    }) => PlaybackState.playing(
+      reciterName: reciterName,
+      surahNumber: surahNumber,
+      position: position,
+      duration: duration,
+    );
 
     test('a position-only tick does not rebuild the shell', () {
       expect(
@@ -121,37 +120,27 @@ void main() {
       double? bearing = 137.2,
       double? heading = 10.0,
       bool compassUnavailable = false,
-    }) =>
-        QiblaState.ready(
-          city: city,
-          bearing: bearing,
-          heading: heading,
-          compassUnavailable: compassUnavailable,
-        );
+    }) => QiblaState.ready(
+      city: city,
+      bearing: bearing,
+      heading: heading,
+      compassUnavailable: compassUnavailable,
+    );
 
     test('sub-degree heading jitter does not rebuild the body', () {
       expect(
-        qiblaBodyShouldRebuild(
-          ready(heading: 10.2),
-          ready(heading: 10.4),
-        ),
+        qiblaBodyShouldRebuild(ready(heading: 10.2), ready(heading: 10.4)),
         isFalse,
       );
     });
 
     test('a rounded heading crossing rebuilds the body', () {
       expect(
-        qiblaBodyShouldRebuild(
-          ready(heading: 10.4),
-          ready(heading: 10.6),
-        ),
+        qiblaBodyShouldRebuild(ready(heading: 10.4), ready(heading: 10.6)),
         isTrue,
       );
       expect(
-        qiblaBodyShouldRebuild(
-          ready(heading: 10.0),
-          ready(heading: 11.0),
-        ),
+        qiblaBodyShouldRebuild(ready(heading: 10.0), ready(heading: 11.0)),
         isTrue,
       );
     });
@@ -182,10 +171,7 @@ void main() {
       expect(qiblaBodyShouldRebuild(ready(), ready(city: giza)), isTrue);
       expect(qiblaBodyShouldRebuild(ready(), ready(bearing: 140.0)), isTrue);
       expect(
-        qiblaBodyShouldRebuild(
-          ready(),
-          ready(compassUnavailable: true),
-        ),
+        qiblaBodyShouldRebuild(ready(), ready(compassUnavailable: true)),
         isTrue,
       );
     });

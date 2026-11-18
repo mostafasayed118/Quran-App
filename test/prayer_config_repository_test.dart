@@ -37,25 +37,33 @@ void main() {
 
   test('malformed stored values degrade to the defaults', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: PrayerConfig.methodKey,
             value: 'not-a-method',
           ),
         );
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: PrayerConfig.madhabKey,
             value: 'not-a-madhab',
           ),
         );
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: PrayerConfig.enabledPrayersKey,
             value: 'sunrise,unknown',
           ),
         );
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: PrayerConfig.preAdhanMinutesKey,
             value: '999',
@@ -72,7 +80,9 @@ void main() {
 
   test('negative pre-adhan minutes clamp to zero', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: PrayerConfig.preAdhanMinutesKey,
             value: '-5',
@@ -83,21 +93,23 @@ void main() {
     expect((await repo.load()).preAdhanMinutes, 0);
   });
 
-  test('adjustments and the high-latitude rule round-trip through the table',
-      () async {
-    final db = newTestDb();
-    final repo = PrayerConfigRepository(db);
-    const config = PrayerConfig(
-      adjustments: {PrayerName.fajr: 6, PrayerName.isha: -2},
-      highLatitude: PrayerHighLatitudeRule.twilightAngle,
-      fajrFollowUp: true,
-    );
+  test(
+    'adjustments and the high-latitude rule round-trip through the table',
+    () async {
+      final db = newTestDb();
+      final repo = PrayerConfigRepository(db);
+      const config = PrayerConfig(
+        adjustments: {PrayerName.fajr: 6, PrayerName.isha: -2},
+        highLatitude: PrayerHighLatitudeRule.twilightAngle,
+        fajrFollowUp: true,
+      );
 
-    await repo.save(config);
+      await repo.save(config);
 
-    final reloaded = PrayerConfigRepository(db);
-    expect(await reloaded.load(), config);
-  });
+      final reloaded = PrayerConfigRepository(db);
+      expect(await reloaded.load(), config);
+    },
+  );
 
   test('changes emits after a successful save', () async {
     final db = newTestDb();

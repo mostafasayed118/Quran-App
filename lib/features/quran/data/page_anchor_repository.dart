@@ -14,11 +14,12 @@ class PageAnchorRepository implements PageAnchorSource {
   @override
   Future<({int surahId, int numberInSurah})?> anchorForPage(int page) async {
     if (page < 1 || page > kMushafPageCount) return null;
-    final row = await (_db.select(_db.ayahs)
-          ..where((ayah) => ayah.page.equals(page))
-          ..orderBy([(ayah) => OrderingTerm.asc(ayah.id)])
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.ayahs)
+              ..where((ayah) => ayah.page.equals(page))
+              ..orderBy([(ayah) => OrderingTerm.asc(ayah.id)])
+              ..limit(1))
+            .getSingleOrNull();
     if (row == null) return null;
     return (surahId: row.surahId, numberInSurah: row.numberInSurah);
   }

@@ -32,8 +32,9 @@ void main() {
     return cubit;
   }
 
-  testWidgets('the dial is circular ink that keeps the tap-up haptic',
-      (tester) async {
+  testWidgets('the dial is circular ink that keeps the tap-up haptic', (
+    tester,
+  ) async {
     final haptics = <MethodCall>[];
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -42,17 +43,23 @@ void main() {
         return null;
       },
     );
-    addTearDown(() => tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null));
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
 
     await pumpHost(tester);
 
     final ink = tester.widget<InkWell>(find.byKey(const Key('tasbih_dial')));
     expect(ink.customBorder, isA<CircleBorder>());
     expect(ink.onTap, isNotNull);
-    final circleMaterials = tester.widgetList<Material>(find.byWidgetPredicate(
-      (widget) => widget is Material && widget.shape is CircleBorder,
-    ));
+    final circleMaterials = tester.widgetList<Material>(
+      find.byWidgetPredicate(
+        (widget) => widget is Material && widget.shape is CircleBorder,
+      ),
+    );
     expect(circleMaterials, hasLength(1));
 
     await tester.tap(find.byKey(const Key('tasbih_dial')));

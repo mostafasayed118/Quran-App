@@ -14,10 +14,10 @@ class HijriCubit extends Cubit<HijriState> {
     required HijriService service,
     HijriOffsetSource? offset,
     String Function()? locale,
-  })  : _service = service,
-        _offset = offset,
-        _locale = locale,
-        super(const HijriState.loading());
+  }) : _service = service,
+       _offset = offset,
+       _locale = locale,
+       super(const HijriState.loading());
 
   /// Loads the saved local correction, then shows today.
   Future<void> start() async {
@@ -47,7 +47,8 @@ class HijriCubit extends Cubit<HijriState> {
           HijriCell(
             hDay: day,
             gDay: _service.toGregorian(hijriYear, hijriMonth, day).day,
-            isToday: todayHijri.hYear == hijriYear &&
+            isToday:
+                todayHijri.hYear == hijriYear &&
                 todayHijri.hMonth == hijriMonth &&
                 todayHijri.hDay == day,
           ),
@@ -56,19 +57,28 @@ class HijriCubit extends Cubit<HijriState> {
       final todayHeader =
           '${_arabic(todayHijri.hDay)} ${_service.localizedMonthName(todayHijri.hYear, todayHijri.hMonth, locale: language)} ${_arabic(todayHijri.hYear)}';
       if (isClosed) return;
-      emit(HijriState.ready(
-        month: hijriMonth,
-        year: hijriYear,
-        monthName: _service.localizedMonthName(hijriYear, hijriMonth,
-            locale: language),
-        offset: offset,
-        cells: cells,
-        todayHeader: todayHeader,
-        dayOffset: _service.offsetDays,
-      ));
+      emit(
+        HijriState.ready(
+          month: hijriMonth,
+          year: hijriYear,
+          monthName: _service.localizedMonthName(
+            hijriYear,
+            hijriMonth,
+            locale: language,
+          ),
+          offset: offset,
+          cells: cells,
+          todayHeader: todayHeader,
+          dayOffset: _service.offsetDays,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('hijri load failed',
-          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      appLog(
+        'hijri load failed',
+        name: 'quran_yahdi/hijri',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const HijriState.failed());
     }
@@ -80,8 +90,12 @@ class HijriCubit extends Cubit<HijriState> {
     try {
       return await _offset?.loadOffsetDays() ?? 0;
     } on Object catch (error, stackTrace) {
-      appLog('hijri offset read failed',
-          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      appLog(
+        'hijri offset read failed',
+        name: 'quran_yahdi/hijri',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return 0;
     }
   }
@@ -91,16 +105,20 @@ class HijriCubit extends Cubit<HijriState> {
     final safe = days < HijriService.minOffsetDays
         ? HijriService.minOffsetDays
         : (days > HijriService.maxOffsetDays
-            ? HijriService.maxOffsetDays
-            : days);
+              ? HijriService.maxOffsetDays
+              : days);
     if (safe == _service.offsetDays) return;
     // Persist before applying: a failed write must not show a correction that
     // silently disappears on the next launch.
     try {
       await _offset?.saveOffsetDays(safe);
     } on Object catch (error, stackTrace) {
-      appLog('hijri offset write failed',
-          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      appLog(
+        'hijri offset write failed',
+        name: 'quran_yahdi/hijri',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return;
     }
     _service.offsetDays = safe;
@@ -137,8 +155,12 @@ class HijriCubit extends Cubit<HijriState> {
       final hijri = _service.fromGregorian(now);
       await show(hijri.hYear, hijri.hMonth);
     } on Object catch (error, stackTrace) {
-      appLog('hijri today failed',
-          name: 'quran_yahdi/hijri', error: error, stackTrace: stackTrace);
+      appLog(
+        'hijri today failed',
+        name: 'quran_yahdi/hijri',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const HijriState.failed());
     }

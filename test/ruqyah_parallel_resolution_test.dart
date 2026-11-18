@@ -19,7 +19,10 @@ class _CountingAyahs extends AyahRepository {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-      int surahId, int fromAyah, int toAyah) async {
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async {
     rangeCalls.add(surahId);
     return const <Ayah>[];
   }
@@ -69,76 +72,89 @@ Future<void> _pumpUntil(bool Function() predicate) async {
 }
 
 DuaRepository _duas() => DuaRepository(
-      loader: () async => [
-        {
-          'id': 'a1',
-          'categoryAr': 'المنزل',
-          'categoryEn': 'Home',
-          'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
-        },
-      ],
-    );
+  loader: () async => [
+    {
+      'id': 'a1',
+      'categoryAr': 'المنزل',
+      'categoryEn': 'Home',
+      'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
+    },
+  ],
+);
 
 List<Map<String, dynamic>> _quranEntries() => [
-      {'id': 'r1', 'kind': 'quran', 'surahId': 1, 'fromAyah': 1, 'toAyah': 2},
-      {'id': 'r2', 'kind': 'quran', 'surahId': 2, 'fromAyah': 3, 'toAyah': 4},
-    ];
+  {'id': 'r1', 'kind': 'quran', 'surahId': 1, 'fromAyah': 1, 'toAyah': 2},
+  {'id': 'r2', 'kind': 'quran', 'surahId': 2, 'fromAyah': 3, 'toAyah': 4},
+];
 
 void main() {
-  test('a later entry resolves while an earlier one is still pending',
-      () async {
-    final db = newTestDb();
-    final ayahs = _GatedAyahs(db);
-    final cubit = DuasCubit(
-      duas: _duas(),
-      ruqyah: RuqyahRepository(loader: () async => _quranEntries()),
-      ayahs: ayahs,
-    );
-    addTearDown(cubit.close);
+  test(
+    'a later entry resolves while an earlier one is still pending',
+    () async {
+      final db = newTestDb();
+      final ayahs = _GatedAyahs(db);
+      final cubit = DuasCubit(
+        duas: _duas(),
+        ruqyah: RuqyahRepository(loader: () async => _quranEntries()),
+        ayahs: ayahs,
+      );
+      addTearDown(cubit.close);
 
-    final resolution = cubit.showRuqyah();
+      final resolution = cubit.showRuqyah();
 
-    await _pumpUntil(() => ayahs.rangeCalls.length == 2);
-    expect(ayahs.gate.isCompleted, isFalse,
-        reason: 'the gate must still be pending for the proof to hold');
-    expect(ayahs.rangeCalls, [1, 2],
-        reason: 'entry 2 must be invoked although entry 1 is still pending');
+      await _pumpUntil(() => ayahs.rangeCalls.length == 2);
+      expect(
+        ayahs.gate.isCompleted,
+        isFalse,
+        reason: 'the gate must still be pending for the proof to hold',
+      );
+      expect(ayahs.rangeCalls, [
+        1,
+        2,
+      ], reason: 'entry 2 must be invoked although entry 1 is still pending');
 
-    ayahs.gate.complete(const <Ayah>[]);
-    await resolution;
+      ayahs.gate.complete(const <Ayah>[]);
+      await resolution;
 
-    final resolved = (cubit.state as RuqyahInView).entries;
-    expect([for (final entry in resolved) entry.id], ['r1', 'r2'],
-        reason: 'Future.wait preserves the entry order');
-    expect(resolved.first.citation, ' ١–٢');
-    expect(resolved.last.citation, ' ٣–٤');
-  });
+      final resolved = (cubit.state as RuqyahInView).entries;
+      expect(
+        [for (final entry in resolved) entry.id],
+        ['r1', 'r2'],
+        reason: 'Future.wait preserves the entry order',
+      );
+      expect(resolved.first.citation, ' ١–٢');
+      expect(resolved.last.citation, ' ٣–٤');
+    },
+  );
 
-  test('resolution keeps the serial call counts (one range + one surah each)',
-      () async {
-    final db = newTestDb();
-    final ayahs = _CountingAyahs(db);
-    final ruqyah = _CountingRuqyah(
+  test(
+    'resolution keeps the serial call counts (one range + one surah each)',
+    () async {
+      final db = newTestDb();
+      final ayahs = _CountingAyahs(db);
+      final ruqyah = _CountingRuqyah(
         loader: () async => [
-              ..._quranEntries(),
-              {
-                'id': 'r3',
-                'kind': 'dhikr',
-                'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
-                'count': 3,
-              },
-            ]);
-    final cubit = DuasCubit(duas: _duas(), ruqyah: ruqyah, ayahs: ayahs);
-    addTearDown(cubit.close);
+          ..._quranEntries(),
+          {
+            'id': 'r3',
+            'kind': 'dhikr',
+            'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
+            'count': 3,
+          },
+        ],
+      );
+      final cubit = DuasCubit(duas: _duas(), ruqyah: ruqyah, ayahs: ayahs);
+      addTearDown(cubit.close);
 
-    await cubit.showRuqyah();
+      await cubit.showRuqyah();
 
-    expect(ayahs.rangeCalls, [1, 2]);
-    expect(ayahs.surahCalls, 2);
-    expect(ruqyah.entryCalls, 1);
-    final resolved = (cubit.state as RuqyahInView).entries;
-    expect([for (final entry in resolved) entry.id], ['r1', 'r2', 'r3']);
-    expect(resolved.last.isQuran, isFalse);
-    expect(resolved.last.count, 3);
-  });
+      expect(ayahs.rangeCalls, [1, 2]);
+      expect(ayahs.surahCalls, 2);
+      expect(ruqyah.entryCalls, 1);
+      final resolved = (cubit.state as RuqyahInView).entries;
+      expect([for (final entry in resolved) entry.id], ['r1', 'r2', 'r3']);
+      expect(resolved.last.isQuran, isFalse);
+      expect(resolved.last.count, 3);
+    },
+  );
 }

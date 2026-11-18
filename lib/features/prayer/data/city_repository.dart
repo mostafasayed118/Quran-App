@@ -18,8 +18,8 @@ class CityRepository implements CitySource {
   CityRepository({
     required AppDatabase db,
     required Future<List<Map<String, dynamic>>> Function() loader,
-  })  : _db = db,
-        _loader = loader;
+  }) : _db = db,
+       _loader = loader;
 
   final AppDatabase _db;
 
@@ -86,7 +86,8 @@ class CityRepository implements CitySource {
     const earthRadiusKm = 6371.0088;
     final dLat = _toRadians(lat2 - lat1);
     final dLng = _toRadians(lng2 - lng1);
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(lat1)) *
             math.cos(_toRadians(lat2)) *
             math.sin(dLng / 2) *

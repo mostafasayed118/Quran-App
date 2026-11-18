@@ -119,10 +119,7 @@ void main() {
       texts: _texts(wirdBody: 'واصل ختمتك'),
     );
 
-    expect(
-      plan.singleWhere((r) => r.id == wirdReminderId).body,
-      'واصل ختمتك',
-    );
+    expect(plan.singleWhere((r) => r.id == wirdReminderId).body, 'واصل ختمتك');
   });
 
   test('prayer, azkar and wird coexist with unique ids', () {
@@ -139,59 +136,80 @@ void main() {
     expect(plan.map((r) => r.id).toSet(), {1, 2, 3});
   });
 
-  test('scheduleReminders carries the persisted wird settings into the plan',
-      () async {
-    final db = AppDatabase.test(NativeDatabase.memory());
-    addTearDown(db.close);
-    final settings = ReminderSettings(db);
-    final city =
-        CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    final prayer = FakePrayerTimeService()..todayResult = fakeDay();
-    final scheduler = _CapturingScheduler();
+  test(
+    'scheduleReminders carries the persisted wird settings into the plan',
+    () async {
+      final db = AppDatabase.test(NativeDatabase.memory());
+      addTearDown(db.close);
+      final settings = ReminderSettings(db);
+      final city = CityRepository(
+        db: db,
+        loader: () async => [cairoCity.toJson()],
+      );
+      final prayer = FakePrayerTimeService()..todayResult = fakeDay();
+      final scheduler = _CapturingScheduler();
 
-    await city.select(cairoCity);
-    await db.into(db.settingsTable).insert(SettingsTableCompanion.insert(
-        key: wirdReminderEnabledKey, value: 'true'));
-    await db.into(db.settingsTable).insert(SettingsTableCompanion.insert(
-        key: wirdReminderTimeKey, value: '20:30'));
+      await city.select(cairoCity);
+      await db
+          .into(db.settingsTable)
+          .insert(
+            SettingsTableCompanion.insert(
+              key: wirdReminderEnabledKey,
+              value: 'true',
+            ),
+          );
+      await db
+          .into(db.settingsTable)
+          .insert(
+            SettingsTableCompanion.insert(
+              key: wirdReminderTimeKey,
+              value: '20:30',
+            ),
+          );
 
-    await scheduleReminders(
-      city: city,
-      prayer: prayer,
-      settings: settings,
-      scheduler: scheduler,
-      now: DateTime(2026, 3, 15, 10, 0),
-    );
+      await scheduleReminders(
+        city: city,
+        prayer: prayer,
+        settings: settings,
+        scheduler: scheduler,
+        now: DateTime(2026, 3, 15, 10, 0),
+      );
 
-    final wird =
-        scheduler.plans.single.singleWhere((r) => r.id == wirdReminderId);
-    expect(wird.fireAt, DateTime(2026, 3, 15, 20, 30));
-    expect(wird.payload, wirdReminderPayload);
-  });
+      final wird = scheduler.plans.single.singleWhere(
+        (r) => r.id == wirdReminderId,
+      );
+      expect(wird.fireAt, DateTime(2026, 3, 15, 20, 30));
+      expect(wird.payload, wirdReminderPayload);
+    },
+  );
 
-  test('without the wird keys scheduleReminders plans no wird reminder',
-      () async {
-    final db = AppDatabase.test(NativeDatabase.memory());
-    addTearDown(db.close);
-    final settings = ReminderSettings(db);
-    final city =
-        CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    final prayer = FakePrayerTimeService()..todayResult = fakeDay();
-    final scheduler = _CapturingScheduler();
+  test(
+    'without the wird keys scheduleReminders plans no wird reminder',
+    () async {
+      final db = AppDatabase.test(NativeDatabase.memory());
+      addTearDown(db.close);
+      final settings = ReminderSettings(db);
+      final city = CityRepository(
+        db: db,
+        loader: () async => [cairoCity.toJson()],
+      );
+      final prayer = FakePrayerTimeService()..todayResult = fakeDay();
+      final scheduler = _CapturingScheduler();
 
-    await city.select(cairoCity);
+      await city.select(cairoCity);
 
-    await scheduleReminders(
-      city: city,
-      prayer: prayer,
-      settings: settings,
-      scheduler: scheduler,
-      now: DateTime(2026, 3, 15, 10, 0),
-    );
+      await scheduleReminders(
+        city: city,
+        prayer: prayer,
+        settings: settings,
+        scheduler: scheduler,
+        now: DateTime(2026, 3, 15, 10, 0),
+      );
 
-    expect(
-      scheduler.plans.single.where((r) => r.id == wirdReminderId),
-      isEmpty,
-    );
-  });
+      expect(
+        scheduler.plans.single.where((r) => r.id == wirdReminderId),
+        isEmpty,
+      );
+    },
+  );
 }

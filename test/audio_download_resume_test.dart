@@ -13,8 +13,9 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart';
 import 'support/test_db.dart';
 
 /// 100 deterministic bytes: byte i has the value i.
-final Uint8List _payload =
-    Uint8List.fromList(List<int>.generate(100, (i) => i));
+final Uint8List _payload = Uint8List.fromList(
+  List<int>.generate(100, (i) => i),
+);
 
 const String _rowId = '51-53';
 
@@ -26,7 +27,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_audio_resume');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: _rowId,
             reciterName: 'عبدالباسط عبدالصمد',
@@ -55,9 +58,7 @@ void main() {
     });
     final row = await (db.select(db.reciters)).getSingle();
     await (db.update(db.reciters)..where((r) => r.id.equals(row.id))).write(
-      RecitersCompanion(
-        server: Value('http://127.0.0.1:${server.port}/'),
-      ),
+      RecitersCompanion(server: Value('http://127.0.0.1:${server.port}/')),
     );
     return AudioDownloader(
       db,
@@ -72,44 +73,51 @@ void main() {
   /// The exact path the downloader writes to, so a test can leave a prefix.
   Future<File> partFile(int surah) async {
     final folder = Directory(
-        '${tempRoot.path}${Platform.pathSeparator}${AudioDownloader.audioFolderName}${Platform.pathSeparator}$_rowId');
+      '${tempRoot.path}${Platform.pathSeparator}${AudioDownloader.audioFolderName}${Platform.pathSeparator}$_rowId',
+    );
     await folder.create(recursive: true);
     return File(
-        '${folder.path}${Platform.pathSeparator}${surahAudioFileName(surah)}.part');
+      '${folder.path}${Platform.pathSeparator}${surahAudioFileName(surah)}.part',
+    );
   }
 
-  test('a stored prefix with a validator resumes with Range + If-Range',
-      () async {
-    String? range;
-    String? ifRange;
-    final downloader = await serve((req, _) async {
-      range = req.headers.value(HttpHeaders.rangeHeader);
-      ifRange = req.headers.value(HttpHeaders.ifRangeHeader);
-      req.response.statusCode = HttpStatus.partialContent;
-      req.response.headers
-        ..contentType = ContentType('audio', 'mpeg')
-        ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/100')
-        ..contentLength = 60;
-      req.response.add(_payload.sublist(40));
-      await req.response.close();
-    });
+  test(
+    'a stored prefix with a validator resumes with Range + If-Range',
+    () async {
+      String? range;
+      String? ifRange;
+      final downloader = await serve((req, _) async {
+        range = req.headers.value(HttpHeaders.rangeHeader);
+        ifRange = req.headers.value(HttpHeaders.ifRangeHeader);
+        req.response.statusCode = HttpStatus.partialContent;
+        req.response.headers
+          ..contentType = ContentType('audio', 'mpeg')
+          ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/100')
+          ..contentLength = 60;
+        req.response.add(_payload.sublist(40));
+        await req.response.close();
+      });
 
-    final part = await partFile(1);
-    await part.writeAsBytes(_payload.sublist(0, 40));
-    await File('${part.path}.validator').writeAsString('"v1"');
+      final part = await partFile(1);
+      await part.writeAsBytes(_payload.sublist(0, 40));
+      await File('${part.path}.validator').writeAsString('"v1"');
 
-    final file = await downloader.downloadSurah(
-      reciter: await reciter(),
-      surahNumber: 1,
-    );
+      final file = await downloader.downloadSurah(
+        reciter: await reciter(),
+        surahNumber: 1,
+      );
 
-    expect(range, 'bytes=40-', reason: 'the prefix must be offered back');
-    expect(ifRange, '"v1"',
-        reason: 'the stored validator proves the remote did not change');
-    expect(await file.length(), 100);
-    expect(await file.readAsBytes(), _payload);
-    expect(await part.exists(), isFalse, reason: 'the part is promoted');
-  });
+      expect(range, 'bytes=40-', reason: 'the prefix must be offered back');
+      expect(
+        ifRange,
+        '"v1"',
+        reason: 'the stored validator proves the remote did not change',
+      );
+      expect(await file.length(), 100);
+      expect(await file.readAsBytes(), _payload);
+      expect(await part.exists(), isFalse, reason: 'the part is promoted');
+    },
+  );
 
   test('a host that ignores Range restarts cleanly (200)', () async {
     final downloader = await serve((req, _) async {
@@ -140,30 +148,29 @@ void main() {
 
   test('a transient failure is retried once and resumes', () async {
     final ranges = <String?>[];
-    final downloader = await serve(
-      (req, call) async {
-        ranges.add(req.headers.value(HttpHeaders.rangeHeader));
-        if (call == 1) {
-          req.response.statusCode = HttpStatus.internalServerError;
-          await req.response.close();
-          return;
-        }
-        final from =
-            req.headers.value(HttpHeaders.rangeHeader) == null ? 0 : 40;
-        req.response.statusCode =
-            from > 0 ? HttpStatus.partialContent : HttpStatus.ok;
-        req.response.headers
-          ..contentType = ContentType('audio', 'mpeg')
-          ..contentLength = 100 - from;
-        if (from > 0) {
-          req.response.headers
-              .set(HttpHeaders.contentRangeHeader, 'bytes $from-99/100');
-        }
-        req.response.add(_payload.sublist(from));
+    final downloader = await serve((req, call) async {
+      ranges.add(req.headers.value(HttpHeaders.rangeHeader));
+      if (call == 1) {
+        req.response.statusCode = HttpStatus.internalServerError;
         await req.response.close();
-      },
-      retryDelay: Duration.zero,
-    );
+        return;
+      }
+      final from = req.headers.value(HttpHeaders.rangeHeader) == null ? 0 : 40;
+      req.response.statusCode = from > 0
+          ? HttpStatus.partialContent
+          : HttpStatus.ok;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        ..contentLength = 100 - from;
+      if (from > 0) {
+        req.response.headers.set(
+          HttpHeaders.contentRangeHeader,
+          'bytes $from-99/100',
+        );
+      }
+      req.response.add(_payload.sublist(from));
+      await req.response.close();
+    }, retryDelay: Duration.zero);
 
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
@@ -183,25 +190,22 @@ void main() {
   test('a 416 discards the unusable prefix and downloads from zero', () async {
     var calls = 0;
     var secondHasRange = true;
-    final downloader = await serve(
-      (req, call) async {
-        calls = call;
-        if (call == 1) {
-          secondHasRange = req.headers.value(HttpHeaders.rangeHeader) != null;
-          req.response.statusCode = HttpStatus.requestedRangeNotSatisfiable;
-          await req.response.close();
-          return;
-        }
+    final downloader = await serve((req, call) async {
+      calls = call;
+      if (call == 1) {
         secondHasRange = req.headers.value(HttpHeaders.rangeHeader) != null;
-        req.response.statusCode = HttpStatus.ok;
-        req.response.headers
-          ..contentType = ContentType('audio', 'mpeg')
-          ..contentLength = 100;
-        req.response.add(_payload);
+        req.response.statusCode = HttpStatus.requestedRangeNotSatisfiable;
         await req.response.close();
-      },
-      retryDelay: Duration.zero,
-    );
+        return;
+      }
+      secondHasRange = req.headers.value(HttpHeaders.rangeHeader) != null;
+      req.response.statusCode = HttpStatus.ok;
+      req.response.headers
+        ..contentType = ContentType('audio', 'mpeg')
+        ..contentLength = 100;
+      req.response.add(_payload);
+      await req.response.close();
+    }, retryDelay: Duration.zero);
 
     final part = await partFile(1);
     // A prefix longer than the (now smaller) resource.
@@ -221,32 +225,28 @@ void main() {
     expect(await file.readAsBytes(), _payload);
   });
 
-  test(
-      'a 206 with an unknown total (bytes N-M/*) drops the prefix and '
+  test('a 206 with an unknown total (bytes N-M/*) drops the prefix and '
       'restarts from zero', () async {
     final ranges = <String?>[];
-    final downloader = await serve(
-      (req, call) async {
-        ranges.add(req.headers.value(HttpHeaders.rangeHeader));
-        if (call == 1) {
-          req.response.statusCode = HttpStatus.partialContent;
-          req.response.headers
-            ..contentType = ContentType('audio', 'mpeg')
-            // No total: the host does not know the full size.
-            ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/*')
-            ..contentLength = 60;
-          req.response.add(_payload.sublist(40));
-        } else {
-          req.response.statusCode = HttpStatus.ok;
-          req.response.headers
-            ..contentType = ContentType('audio', 'mpeg')
-            ..contentLength = _payload.length;
-          req.response.add(_payload);
-        }
-        await req.response.close();
-      },
-      retryDelay: Duration.zero,
-    );
+    final downloader = await serve((req, call) async {
+      ranges.add(req.headers.value(HttpHeaders.rangeHeader));
+      if (call == 1) {
+        req.response.statusCode = HttpStatus.partialContent;
+        req.response.headers
+          ..contentType = ContentType('audio', 'mpeg')
+          // No total: the host does not know the full size.
+          ..set(HttpHeaders.contentRangeHeader, 'bytes 40-99/*')
+          ..contentLength = 60;
+        req.response.add(_payload.sublist(40));
+      } else {
+        req.response.statusCode = HttpStatus.ok;
+        req.response.headers
+          ..contentType = ContentType('audio', 'mpeg')
+          ..contentLength = _payload.length;
+        req.response.add(_payload);
+      }
+      await req.response.close();
+    }, retryDelay: Duration.zero);
 
     final part = await partFile(1);
     await part.writeAsBytes(_payload.sublist(0, 40));
@@ -257,9 +257,13 @@ void main() {
       surahNumber: 1,
     );
 
-    expect(ranges, <String?>['bytes=40-', null],
-        reason: 'an unknown total cannot be verified, so the retry asks for '
-            'the whole file');
+    expect(
+      ranges,
+      <String?>['bytes=40-', null],
+      reason:
+          'an unknown total cannot be verified, so the retry asks for '
+          'the whole file',
+    );
     expect(await file.readAsBytes(), _payload);
   });
 

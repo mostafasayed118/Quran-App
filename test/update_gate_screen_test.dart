@@ -5,15 +5,17 @@ import 'package:quran_yahdi/features/update/presentation/update_gate_screen.dart
 import 'support/host.dart';
 
 Widget _pump({required bool mandatory}) => appShell(
-        home: UpdateGateScreen(
-      mandatory: mandatory,
-      onOpenStore: () async => true,
-      onLater: () async {},
-    ));
+  home: UpdateGateScreen(
+    mandatory: mandatory,
+    onOpenStore: () async => true,
+    onLater: () async {},
+  ),
+);
 
 void main() {
-  testWidgets('mandatory mode hides the back affordance and the Later button',
-      (tester) async {
+  testWidgets('mandatory mode hides the back affordance and the Later button', (
+    tester,
+  ) async {
     await tester.pumpWidget(_pump(mandatory: true));
 
     expect(find.text('تحديث مطلوب'), findsWidgets);

@@ -19,10 +19,10 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
     required PackDownloader downloader,
     required int surah,
     required int ayah,
-  })  : _downloader = downloader,
-        _surah = surah,
-        _ayah = ayah,
-        super(const AyahSheetState.loading()) {
+  }) : _downloader = downloader,
+       _surah = surah,
+       _ayah = ayah,
+       super(const AyahSheetState.loading()) {
     _load();
   }
 
@@ -50,19 +50,19 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
             _translationEntry(row.packId, row.title),
       ]);
       if (isClosed) return;
-      emit(AyahSheetState.ready(
-        tafsirEntries: [
-          for (final entry in tafsirs)
-            ?entry,
-        ],
-        translationEntries: [
-          for (final entry in translations)
-            ?entry,
-        ],
-      ));
+      emit(
+        AyahSheetState.ready(
+          tafsirEntries: [for (final entry in tafsirs) ?entry],
+          translationEntries: [for (final entry in translations) ?entry],
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('ayah sheet load failed',
-          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
+      appLog(
+        'ayah sheet load failed',
+        name: 'quran_yahdi/ayah_sheet',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const AyahSheetState.failed());
       return;
@@ -74,8 +74,12 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       final text = await _downloader.tafsirFor(packId, _surah, _ayah);
       return text == null ? null : (title: title, text: text);
     } on Object catch (error, stackTrace) {
-      appLog('ayah sheet tafsir read failed',
-          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
+      appLog(
+        'ayah sheet tafsir read failed',
+        name: 'quran_yahdi/ayah_sheet',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -85,8 +89,12 @@ class AyahSheetCubit extends Cubit<AyahSheetState> {
       final text = await _downloader.translationFor(packId, _surah, _ayah);
       return text == null ? null : (title: title, text: text);
     } on Object catch (error, stackTrace) {
-      appLog('ayah sheet translation read failed',
-          name: 'quran_yahdi/ayah_sheet', error: error, stackTrace: stackTrace);
+      appLog(
+        'ayah sheet translation read failed',
+        name: 'quran_yahdi/ayah_sheet',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

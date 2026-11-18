@@ -17,10 +17,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     required CitySource city,
     required OnboardingStatusSource status,
     required ReminderSchedulerPort reminders,
-  })  : _city = city,
-        _status = status,
-        _reminders = reminders,
-        super(const OnboardingState.loading());
+  }) : _city = city,
+       _status = status,
+       _reminders = reminders,
+       super(const OnboardingState.loading());
 
   final CitySource _city;
   final OnboardingStatusSource _status;
@@ -36,10 +36,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
     final city = await _readCity();
     if (isClosed) return;
-    emit(OnboardingState.ready(
-      citySelected: city != null,
-      cityName: city?.nameAr,
-    ));
+    emit(
+      OnboardingState.ready(citySelected: city != null, cityName: city?.nameAr),
+    );
   }
 
   /// Re-reads the city after the picker pops (the user may have changed it).
@@ -48,10 +47,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     if (state is! OnboardingReady || state.completed) return;
     final city = await _readCity();
     if (isClosed) return;
-    emit(state.copyWith(
-      citySelected: city != null,
-      cityName: city?.nameAr,
-    ));
+    emit(state.copyWith(citySelected: city != null, cityName: city?.nameAr));
   }
 
   /// Asks the OS for the notification permission through the reminder seam.
@@ -62,8 +58,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       granted = await _reminders.ensurePermissions();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding permission request failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding permission request failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     if (isClosed) return;
     final current = this.state;
@@ -78,22 +78,32 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       await _status.markCompleted();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding flag write failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding flag write failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     if (isClosed) return;
     final current = this.state;
-    emit(current is OnboardingReady
-        ? current.copyWith(completed: true)
-        : const OnboardingState.ready(completed: true));
+    emit(
+      current is OnboardingReady
+          ? current.copyWith(completed: true)
+          : const OnboardingState.ready(completed: true),
+    );
   }
 
   Future<bool> _readCompleted() async {
     try {
       return await _status.isCompleted();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding flag read failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding flag read failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
       // Never nag a user we cannot read: treat the flow as done.
       return true;
     }
@@ -103,8 +113,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       return await _city.selectedCity();
     } on Object catch (error, stackTrace) {
-      appLog('onboarding city read failed',
-          name: 'quran_yahdi/onboarding', error: error, stackTrace: stackTrace);
+      appLog(
+        'onboarding city read failed',
+        name: 'quran_yahdi/onboarding',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

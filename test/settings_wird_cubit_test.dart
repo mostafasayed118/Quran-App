@@ -29,11 +29,11 @@ void main() {
   });
 
   SettingsCubit build() => SettingsCubit(
-        settings: settings,
-        city: city,
-        prayer: prayer,
-        scheduler: scheduler,
-      );
+    settings: settings,
+    city: city,
+    prayer: prayer,
+    scheduler: scheduler,
+  );
 
   test('load emits wird defaults on a fresh database', () async {
     final cubit = build();
@@ -46,44 +46,49 @@ void main() {
     await cubit.close();
   });
 
-  test('enabling the wird persists, requests permission and re-plans',
-      () async {
-    await city.select(cairoCity);
-    final cubit = build();
-    await cubit.load();
+  test(
+    'enabling the wird persists, requests permission and re-plans',
+    () async {
+      await city.select(cairoCity);
+      final cubit = build();
+      await cubit.load();
 
-    await cubit.toggleWird(true);
+      await cubit.toggleWird(true);
 
-    expect(await settings.wirdEnabled(), isTrue);
-    final state = cubit.state as SettingsReady;
-    expect(state.wirdEnabled, isTrue);
-    expect(state.permissionDenied, isFalse);
-    expect(scheduler.permissionCalls, 1);
-    expect(scheduler.scheduleCalls, greaterThanOrEqualTo(1));
-    final wird =
-        scheduler.plans.last.singleWhere((r) => r.id == wirdReminderId);
-    expect(wird.fireAt.hour, 20);
-    expect(wird.fireAt.minute, 0);
+      expect(await settings.wirdEnabled(), isTrue);
+      final state = cubit.state as SettingsReady;
+      expect(state.wirdEnabled, isTrue);
+      expect(state.permissionDenied, isFalse);
+      expect(scheduler.permissionCalls, 1);
+      expect(scheduler.scheduleCalls, greaterThanOrEqualTo(1));
+      final wird = scheduler.plans.last.singleWhere(
+        (r) => r.id == wirdReminderId,
+      );
+      expect(wird.fireAt.hour, 20);
+      expect(wird.fireAt.minute, 0);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 
-  test('denied permission surfaces the hint flag; disabling clears it',
-      () async {
-    scheduler.permissionsResult = false;
-    final cubit = build();
-    await cubit.load();
+  test(
+    'denied permission surfaces the hint flag; disabling clears it',
+    () async {
+      scheduler.permissionsResult = false;
+      final cubit = build();
+      await cubit.load();
 
-    await cubit.toggleWird(true);
-    expect((cubit.state as SettingsReady).permissionDenied, isTrue);
+      await cubit.toggleWird(true);
+      expect((cubit.state as SettingsReady).permissionDenied, isTrue);
 
-    await cubit.toggleWird(false);
-    final state = cubit.state as SettingsReady;
-    expect(state.wirdEnabled, isFalse);
-    expect(state.permissionDenied, isFalse);
+      await cubit.toggleWird(false);
+      final state = cubit.state as SettingsReady;
+      expect(state.wirdEnabled, isFalse);
+      expect(state.permissionDenied, isFalse);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 
   test('wird time change persists and re-plans at the new time', () async {
     await city.select(cairoCity);
@@ -97,8 +102,9 @@ void main() {
     expect(await settings.wirdTimeHm(), '21:45');
     expect((cubit.state as SettingsReady).wirdTimeHm, '21:45');
     expect(scheduler.scheduleCalls, callsBefore + 1);
-    final wird =
-        scheduler.plans.last.singleWhere((r) => r.id == wirdReminderId);
+    final wird = scheduler.plans.last.singleWhere(
+      (r) => r.id == wirdReminderId,
+    );
     expect(wird.fireAt.hour, 21);
     expect(wird.fireAt.minute, 45);
 

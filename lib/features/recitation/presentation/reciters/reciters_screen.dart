@@ -53,8 +53,10 @@ class RecitersScreen extends StatelessWidget {
         child: BlocBuilder<RecitersCubit, RecitersState>(
           builder: (context, state) => switch (state) {
             RecitersLoading() => const LoadingView(),
-            RecitersFailed() =>
-              errorPane(loc, onRetry: context.read<RecitersCubit>().refresh),
+            RecitersFailed() => errorPane(
+              loc,
+              onRetry: context.read<RecitersCubit>().refresh,
+            ),
             RecitersReady(:final reciters, :final query, :final dataError) =>
               Column(
                 children: [
@@ -66,8 +68,12 @@ class RecitersScreen extends StatelessWidget {
                           context.read<RecitersCubit>().clearDataError(),
                     ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.md,
-                        AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.md,
+                      AppSpacing.md,
+                      AppSpacing.md,
+                      AppSpacing.xs,
+                    ),
                     child: SearchField(
                       hint: loc.searchReciters,
                       onChanged: context.read<RecitersCubit>().setQuery,
@@ -137,8 +143,10 @@ class _RecitersList extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) => switch (entries[index]) {
         final String title => SectionHeader(title: title),
-        final _ReciterEntry entry =>
-          _ReciterRow(reciter: entry.row, showTitle: entry.showTitle),
+        final _ReciterEntry entry => _ReciterRow(
+          reciter: entry.row,
+          showTitle: entry.showTitle,
+        ),
         _ => const SizedBox.shrink(),
       },
     );

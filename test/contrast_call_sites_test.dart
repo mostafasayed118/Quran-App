@@ -26,8 +26,11 @@ void main() {
     final fields = find.byType(TextField);
     await tester.enterText(fields.at(3), '1');
     await tester.enterText(fields.at(4), '1000');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final verdict = tester.widget<Text>(find.text('الزكاة الواجبة'));
     expect(verdict.style?.color, AppColors.goldText);

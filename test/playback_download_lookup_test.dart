@@ -66,27 +66,32 @@ const ReciterInfo _reciter = ReciterInfo(
 );
 
 void main() {
-  test('a failing download lookup falls back to the URL and reaches playing',
-      () async {
-    final db = newTestDb();
-    final service = _RecordingService();
-    final cubit = PlaybackCubit(
-      service: service,
-      reciters: _NoReciters(),
-      downloader: _ThrowingLookupDownloader(db),
-      backgroundActive: () => true,
-    );
-    addTearDown(cubit.close);
+  test(
+    'a failing download lookup falls back to the URL and reaches playing',
+    () async {
+      final db = newTestDb();
+      final service = _RecordingService();
+      final cubit = PlaybackCubit(
+        service: service,
+        reciters: _NoReciters(),
+        downloader: _ThrowingLookupDownloader(db),
+        backgroundActive: () => true,
+      );
+      addTearDown(cubit.close);
 
-    await cubit.playReciter(_reciter, 1).timeout(const Duration(seconds: 10));
+      await cubit.playReciter(_reciter, 1).timeout(const Duration(seconds: 10));
 
-    expect(cubit.state, isA<PlaybackPlaying>(),
-        reason: 'a registry failure must not leave the player loading');
-    expect(service.loaded, hasLength(1));
-    expect(service.loaded.single.kind, PlaybackSourceKind.url);
-    expect(
-      service.loaded.single.uri.toString(),
-      surahAudioUrl(_reciter.server, 1),
-    );
-  });
+      expect(
+        cubit.state,
+        isA<PlaybackPlaying>(),
+        reason: 'a registry failure must not leave the player loading',
+      );
+      expect(service.loaded, hasLength(1));
+      expect(service.loaded.single.kind, PlaybackSourceKind.url);
+      expect(
+        service.loaded.single.uri.toString(),
+        surahAudioUrl(_reciter.server, 1),
+      );
+    },
+  );
 }

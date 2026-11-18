@@ -22,23 +22,25 @@ void main() {
   Future<void> pumpHost(WidgetTester tester, {required Locale locale}) async {
     final cubit = DuasCubit(
       duas: DuaRepository(
-          loader: () async => [
-                {
-                  'id': 'a1',
-                  'categoryAr': 'المنزل',
-                  'categoryEn': 'Home',
-                  'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
-                },
-              ]),
+        loader: () async => [
+          {
+            'id': 'a1',
+            'categoryAr': 'المنزل',
+            'categoryEn': 'Home',
+            'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
+          },
+        ],
+      ),
       ruqyah: RuqyahRepository(
-          loader: () async => [
-                {
-                  'id': 'r1',
-                  'kind': 'dhikr',
-                  'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
-                  'count': 3,
-                },
-              ]),
+        loader: () async => [
+          {
+            'id': 'r1',
+            'kind': 'dhikr',
+            'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
+            'count': 3,
+          },
+        ],
+      ),
       ayahs: AyahRepository(db),
     );
     addTearDown(cubit.close);
@@ -51,29 +53,43 @@ void main() {
     );
   }
 
-  testWidgets('repetition marker renders from the l10n key (arabic locale)',
-      (tester) async {
+  testWidgets('repetition marker renders from the l10n key (arabic locale)', (
+    tester,
+  ) async {
     await pumpHost(tester, locale: const Locale('ar'));
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('×٣'), findsOneWidget);
-    expect(find.text('×3'), findsNothing,
-        reason: 'marker digits must be Arabic-Indic at the call site');
+    expect(
+      find.text('×3'),
+      findsNothing,
+      reason: 'marker digits must be Arabic-Indic at the call site',
+    );
   });
 
-  testWidgets('repetition marker renders from the l10n key (english locale)',
-      (tester) async {
+  testWidgets('repetition marker renders from the l10n key (english locale)', (
+    tester,
+  ) async {
     await pumpHost(tester, locale: const Locale('en'));
 
     await tester.tap(find.text('Ruqyah'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('×3'), findsOneWidget);
-    expect(find.text('×٣'), findsNothing,
-        reason: 'English copy must not keep Arabic-Indic digits');
+    expect(
+      find.text('×٣'),
+      findsNothing,
+      reason: 'English copy must not keep Arabic-Indic digits',
+    );
   });
 }

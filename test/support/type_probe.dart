@@ -43,7 +43,10 @@ void expectNotTruncated(WidgetTester tester, Finder finder) {
 void expectTapTargets(WidgetTester tester, Finder finder) {
   for (final element in finder.evaluate()) {
     final box = element.renderObject! as RenderBox;
-    expect(box.size.shortestSide, greaterThanOrEqualTo(48),
-        reason: element.widget.runtimeType.toString());
+    expect(
+      box.size.shortestSide,
+      greaterThanOrEqualTo(48),
+      reason: element.widget.runtimeType.toString(),
+    );
   }
 }

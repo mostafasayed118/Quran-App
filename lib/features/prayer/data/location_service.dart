@@ -14,7 +14,7 @@ const Duration _locationTimeout = Duration(seconds: 20);
 /// manual selection.
 class LocationService {
   LocationService({PositionResolver? resolver})
-      : _resolver = resolver ?? resolveFromDevice;
+    : _resolver = resolver ?? resolveFromDevice;
 
   final PositionResolver _resolver;
 

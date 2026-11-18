@@ -72,8 +72,10 @@ void main() {
     await cubit.start();
     final ready = cubit.state as HijriReady;
     expect(RegExp('[\u0600-\u06FF]').hasMatch(ready.monthName), isFalse);
-    expect(ready.monthName,
-        service.localizedMonthName(ready.year, ready.month, locale: 'en'));
+    expect(
+      ready.monthName,
+      service.localizedMonthName(ready.year, ready.month, locale: 'en'),
+    );
   });
 
   test('a failed offset write leaves the applied offset unchanged', () async {

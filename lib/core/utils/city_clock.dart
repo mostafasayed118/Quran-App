@@ -24,8 +24,11 @@ DateTime cityWallClock(DateTime instant, String? timezone) {
   try {
     return tz.TZDateTime.from(instant, tz.getLocation(timezone));
   } on Object catch (error) {
-    appLog('city zone resolution failed, using device-local components',
-        name: 'quran_yahdi/city_clock', error: error.runtimeType);
+    appLog(
+      'city zone resolution failed, using device-local components',
+      name: 'quran_yahdi/city_clock',
+      error: error.runtimeType,
+    );
     return instant;
   }
 }

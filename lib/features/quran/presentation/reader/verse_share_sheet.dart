@@ -73,9 +73,9 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
   AyahSharer get _sharer => widget.sharer ?? const SharePlusAyahSharer();
 
   String _composeText(AppLocalizations loc) => loc.shareAyahText(
-        widget.ayah.copyText,
-        webSurahUrl(widget.ayah.surahId, widget.ayah.numberInSurah),
-      );
+    widget.ayah.copyText,
+    webSurahUrl(widget.ayah.surahId, widget.ayah.numberInSurah),
+  );
 
   Future<void> _shareText() async {
     if (_busy) return;
@@ -83,8 +83,12 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
     try {
       await _sharer.shareText(_composeText(AppLocalizations.of(context)));
     } on Object catch (error, stackTrace) {
-      appLog('ayah text share failed',
-          name: 'quran_yahdi/share', error: error, stackTrace: stackTrace);
+      appLog(
+        'ayah text share failed',
+        name: 'quran_yahdi/share',
+        error: error,
+        stackTrace: stackTrace,
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -109,15 +113,21 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
       );
     } on Object catch (error, stackTrace) {
       // A failed raster or share must never leave the user with nothing.
-      appLog('ayah image share failed',
-          name: 'quran_yahdi/share', error: error, stackTrace: stackTrace);
+      appLog(
+        'ayah image share failed',
+        name: 'quran_yahdi/share',
+        error: error,
+        stackTrace: stackTrace,
+      );
       try {
         await _sharer.shareText(text);
       } on Object catch (fallbackError, fallbackStack) {
-        appLog('ayah text fallback failed',
-            name: 'quran_yahdi/share',
-            error: fallbackError,
-            stackTrace: fallbackStack);
+        appLog(
+          'ayah text fallback failed',
+          name: 'quran_yahdi/share',
+          error: fallbackError,
+          stackTrace: fallbackStack,
+        );
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -151,10 +161,7 @@ class _VerseShareSheetState extends State<VerseShareSheet> {
         children: [
           RepaintBoundary(
             key: _boundaryKey,
-            child: VerseCard(
-              ayah: widget.ayah,
-              surahName: widget.surahName,
-            ),
+            child: VerseCard(ayah: widget.ayah, surahName: widget.surahName),
           ),
           const SizedBox(height: AppSpacing.md),
           Row(

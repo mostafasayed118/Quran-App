@@ -20,8 +20,7 @@ class _FailingAdapter implements HttpClientAdapter {
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
-  ) =>
-      onFetch(options);
+  ) => onFetch(options);
 
   @override
   void close({bool force = false}) {}
@@ -34,8 +33,7 @@ class _HangingAdapter implements HttpClientAdapter {
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
-  ) =>
-      Completer<ResponseBody>().future;
+  ) => Completer<ResponseBody>().future;
 
   @override
   void close({bool force = false}) {}
@@ -78,9 +76,7 @@ void main() {
   test('a 5xx response is surfaced and leaves the catalog untouched', () async {
     final repo = _repo(
       db,
-      _FailingAdapter(
-        (_) async => ResponseBody.fromString('', 503),
-      ),
+      _FailingAdapter((_) async => ResponseBody.fromString('', 503)),
     );
 
     await expectLater(repo.refreshFromApi(), throwsA(isA<StateError>()));

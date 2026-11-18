@@ -19,8 +19,11 @@ class _TeardownSafeAyahRepository extends AyahRepository {
   Stream<List<BookmarkEntry>> watchBookmarkEntries() => Stream.value(entries);
 }
 
-BookmarkEntry _entry(AppDatabase db,
-    {required int ayahId, required String text}) {
+BookmarkEntry _entry(
+  AppDatabase db, {
+  required int ayahId,
+  required String text,
+}) {
   return BookmarkEntry(
     ayah: Ayah(
       id: ayahId,
@@ -43,8 +46,9 @@ void main() {
   });
 
   Future<Widget> host(List<BookmarkEntry> entries) async {
-    final cubit =
-        BookmarksCubit(_TeardownSafeAyahRepository(db, entries: entries));
+    final cubit = BookmarksCubit(
+      _TeardownSafeAyahRepository(db, entries: entries),
+    );
     addTearDown(cubit.close);
     await cubit.start();
     return BlocProvider<BookmarksCubit>.value(
@@ -58,27 +62,32 @@ void main() {
     Widget child, {
     double? textScale,
   }) async {
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: textScale == null
-          ? null
-          : (context, child) => MediaQuery(
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: textScale == null
+            ? null
+            : (context, child) => MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: TextScaler.linear(textScale)),
                 child: child!,
               ),
-      home: child,
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+        home: child,
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   testWidgets('empty state message when no bookmarks', (tester) async {
@@ -86,8 +95,9 @@ void main() {
     expect(find.byType(ListTile), findsNothing);
   });
 
-  testWidgets('lists entries with verse info and removes on delete',
-      (tester) async {
+  testWidgets('lists entries with verse info and removes on delete', (
+    tester,
+  ) async {
     final text = 'ذلك الكتاب لا ريب فيه';
     final repo = _TeardownSafeAyahRepository(
       db,
@@ -100,29 +110,39 @@ void main() {
     await pump(
       tester,
       BlocProvider<BookmarksCubit>.value(
-          value: cubit, child: const BookmarksScreen()),
+        value: cubit,
+        child: const BookmarksScreen(),
+      ),
     );
 
     expect(find.textContaining(text), findsOneWidget);
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     // Owner-requested behaviour change: deleting a bookmark now asks first.
     await tester.tap(find.widgetWithText(TextButton, 'حذف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(await db.select(db.bookmarks).get(), isEmpty);
   });
 
-  testWidgets('delete button exposes a tooltip (a11y label census)',
-      (tester) async {
+  testWidgets('delete button exposes a tooltip (a11y label census)', (
+    tester,
+  ) async {
     final text = 'ذلك الكتاب لا ريب فيه';
     await pump(tester, await host([_entry(db, ayahId: 9, text: text)]));
     expect(find.byTooltip('أزل الحفظ'), findsOneWidget);
   });
 
-  testWidgets('320 dp at textScale 2.0 survives the bookmark list',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 survives the bookmark list', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

@@ -4,12 +4,12 @@ enum PlaybackSourceKind { file, url }
 
 class PlaybackSource {
   const PlaybackSource.file(this.path, {this.mediaTitle = '', this.artist = ''})
-      : kind = PlaybackSourceKind.file,
-        uri = null;
+    : kind = PlaybackSourceKind.file,
+      uri = null;
 
   const PlaybackSource.url(this.uri, {this.mediaTitle = '', this.artist = ''})
-      : kind = PlaybackSourceKind.url,
-        path = null;
+    : kind = PlaybackSourceKind.url,
+      path = null;
 
   final PlaybackSourceKind kind;
   final String? path;

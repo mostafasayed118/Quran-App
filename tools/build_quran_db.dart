@@ -49,8 +49,8 @@ Future<void> main() async {
     File(cachePath).writeAsStringSync(pretty);
     chapters = jsonDecode(pretty) as Map<String, dynamic>;
   }
-  final chapterRows =
-      (chapters['chapters'] as List).cast<Map<String, dynamic>>();
+  final chapterRows = (chapters['chapters'] as List)
+      .cast<Map<String, dynamic>>();
   if (chapterRows.length != 114) {
     stderr.writeln('unexpected chapter count: ${chapterRows.length}');
     exitCode = 1;
@@ -63,7 +63,9 @@ Future<void> main() async {
   await db.createSchemaForSeeding();
 
   final bySurah = groupBy(
-      ayahList, (Map<String, dynamic> a) => (a['sura_no'] as num).toInt());
+    ayahList,
+    (Map<String, dynamic> a) => (a['sura_no'] as num).toInt(),
+  );
 
   await db.batch((b) {
     for (final ch in chapterRows) {
@@ -71,39 +73,43 @@ Future<void> main() async {
       final ayahs = bySurah[surahNo]!;
       final pages = ayahs.map((a) => (a['page'] as num).toInt()).toList();
       b.insert(
-          db.surahs,
-          SurahsCompanion.insert(
-            id: Value(surahNo),
-            nameAr: ch['name_arabic'] as String,
-            nameEn: ch['name_simple'] as String,
-            revelationType: ch['revelation_place'] as String,
-            ayahCount: (ch['verses_count'] as num).toInt(),
-            pagesStart: pages.reduce(min),
-            pagesEnd: pages.reduce(max),
-          ));
+        db.surahs,
+        SurahsCompanion.insert(
+          id: Value(surahNo),
+          nameAr: ch['name_arabic'] as String,
+          nameEn: ch['name_simple'] as String,
+          revelationType: ch['revelation_place'] as String,
+          ayahCount: (ch['verses_count'] as num).toInt(),
+          pagesStart: pages.reduce(min),
+          pagesEnd: pages.reduce(max),
+        ),
+      );
     }
     for (final a in ayahList) {
       b.insert(
-          db.ayahs,
-          AyahsCompanion.insert(
-            id: Value((a['id'] as num).toInt()),
-            surahId: (a['sura_no'] as num).toInt(),
-            numberInSurah: (a['aya_no'] as num).toInt(),
-            juz: (a['jozz'] as num).toInt(),
-            page: (a['page'] as num).toInt(),
-            lineStart: a['line_start'] == null
-                ? const Value.absent()
-                : Value((a['line_start'] as num).toInt()),
-            lineEnd: a['line_end'] == null
-                ? const Value.absent()
-                : Value((a['line_end'] as num).toInt()),
-            textUthmani: a['aya_text'] as String,
-            textImlaei: a['aya_text_emlaey'] as String,
-          ));
+        db.ayahs,
+        AyahsCompanion.insert(
+          id: Value((a['id'] as num).toInt()),
+          surahId: (a['sura_no'] as num).toInt(),
+          numberInSurah: (a['aya_no'] as num).toInt(),
+          juz: (a['jozz'] as num).toInt(),
+          page: (a['page'] as num).toInt(),
+          lineStart: a['line_start'] == null
+              ? const Value.absent()
+              : Value((a['line_start'] as num).toInt()),
+          lineEnd: a['line_end'] == null
+              ? const Value.absent()
+              : Value((a['line_end'] as num).toInt()),
+          textUthmani: a['aya_text'] as String,
+          textImlaei: a['aya_text_emlaey'] as String,
+        ),
+      );
     }
   });
 
-  await db.into(db.settingsTable).insertOnConflictUpdate(
+  await db
+      .into(db.settingsTable)
+      .insertOnConflictUpdate(
         SettingsTableCompanion.insert(
           key: kContentVersionKey,
           value: '$kContentVersion',
@@ -123,16 +129,19 @@ Future<void> main() async {
 
   final surahCount = (await db.select(db.surahs).get()).length;
   final ayahCount = (await db.select(db.ayahs).get()).length;
-  final indexCount = (await db
-          .customSelect('SELECT COUNT(*) AS c FROM ayah_search')
-          .getSingle())
-      .read<int>('c');
-  final indexStamp = await (db.select(db.settingsTable)
-        ..where((s) => s.key.equals(kSearchIndexVersionKey)))
-      .getSingleOrNull();
+  final indexCount =
+      (await db
+              .customSelect('SELECT COUNT(*) AS c FROM ayah_search')
+              .getSingle())
+          .read<int>('c');
+  final indexStamp = await (db.select(
+    db.settingsTable,
+  )..where((s) => s.key.equals(kSearchIndexVersionKey))).getSingleOrNull();
   await db.close();
-  stdout.writeln('surahs=$surahCount ayahs=$ayahCount '
-      'index_rows=$indexCount bytes=${dbFile.lengthSync()}');
+  stdout.writeln(
+    'surahs=$surahCount ayahs=$ayahCount '
+    'index_rows=$indexCount bytes=${dbFile.lengthSync()}',
+  );
   if (surahCount != 114 ||
       ayahCount != 6236 ||
       indexCount != 6236 ||

@@ -38,14 +38,12 @@ void main() {
     unawaited(controller.close());
   });
 
-  for (final state in [
-    AppLifecycleState.inactive,
-    AppLifecycleState.hidden,
-  ]) {
+  for (final state in [AppLifecycleState.inactive, AppLifecycleState.hidden]) {
     testWidgets('$state pauses the magnetometer stream', (tester) async {
       addTearDown(
-        () => tester.binding
-            .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+        () => tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        ),
       );
       await pumpAppHost(
         tester,

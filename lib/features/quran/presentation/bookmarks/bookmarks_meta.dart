@@ -63,9 +63,9 @@ class _BookmarkMetaDialogState extends State<_BookmarkMetaDialog> {
           child: Text(loc.cancel),
         ),
         TextButton(
-          onPressed: () => Navigator.of(context).pop(
-            (folder: _folder.text, note: _note.text),
-          ),
+          onPressed: () =>
+              Navigator.of(context)
+                  .pop((folder: _folder.text, note: _note.text)),
           child: Text(loc.bookmarkMetaSave),
         ),
       ],
@@ -87,19 +87,16 @@ class _MetaLine extends StatelessWidget {
         if (entry.folder.isNotEmpty)
           Text(
             entry.folder,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: colors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: colors.primary, fontWeight: FontWeight.w700),
           ),
         if (entry.note.isNotEmpty)
           Text(
             entry.note,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: colors.onSurfaceVariant),
           ),
       ],
     );

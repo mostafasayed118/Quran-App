@@ -8,24 +8,32 @@ import 'package:quran_yahdi/features/quran/data/quran_search_repository.dart';
 import 'support/test_db.dart';
 
 Future<void> _seed(AppDatabase db) async {
-  await db.into(db.surahs).insert(SurahsCompanion.insert(
-        id: const Value(1),
-        nameAr: 'الفاتحة',
-        nameEn: 'Al-Fatihah',
-        revelationType: 'makkah',
-        ayahCount: 2,
-        pagesStart: 1,
-        pagesEnd: 1,
-      ));
-  await db.into(db.surahs).insert(SurahsCompanion.insert(
-        id: const Value(2),
-        nameAr: 'البقرة',
-        nameEn: 'Al-Baqarah',
-        revelationType: 'madani',
-        ayahCount: 2,
-        pagesStart: 2,
-        pagesEnd: 2,
-      ));
+  await db
+      .into(db.surahs)
+      .insert(
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 2,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+      );
+  await db
+      .into(db.surahs)
+      .insert(
+        SurahsCompanion.insert(
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'madani',
+          ayahCount: 2,
+          pagesStart: 2,
+          pagesEnd: 2,
+        ),
+      );
   final texts = <(int, int, int, String)>[
     (1, 1, 1, 'بسم الله الرحمن الرحيم'),
     (2, 2, 1, 'الذين يؤمنون بالغيب ويقيمون الصلاة'),
@@ -33,15 +41,19 @@ Future<void> _seed(AppDatabase db) async {
     (4, 2, 3, 'إن الإسلام دين الرحمة'),
   ];
   for (final (id, surahId, number, text) in texts) {
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: Value(id),
-          surahId: surahId,
-          numberInSurah: number,
-          juz: 1,
-          page: 1,
-          textUthmani: text,
-          textImlaei: text,
-        ));
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: Value(id),
+            surahId: surahId,
+            numberInSurah: number,
+            juz: 1,
+            page: 1,
+            textUthmani: text,
+            textImlaei: text,
+          ),
+        );
   }
   await rebuildQuranSearchIndex(db);
 }
@@ -92,13 +104,19 @@ void main() {
     expect(first.hasMore, true);
     expect(first.total, 2);
 
-    final second = await repo.search('الصلاة',
-        afterAyahId: first.hits.last.ayahId, limit: 1);
+    final second = await repo.search(
+      'الصلاة',
+      afterAyahId: first.hits.last.ayahId,
+      limit: 1,
+    );
     expect(second.hits.single.ayahId, 3);
     expect(second.hasMore, false);
 
-    final third = await repo.search('الصلاة',
-        afterAyahId: second.hits.last.ayahId, limit: 1);
+    final third = await repo.search(
+      'الصلاة',
+      afterAyahId: second.hits.last.ayahId,
+      limit: 1,
+    );
     expect(third.hits, isEmpty);
   });
 }

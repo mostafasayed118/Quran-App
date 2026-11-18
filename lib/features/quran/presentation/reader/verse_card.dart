@@ -39,9 +39,7 @@ class VerseCard extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final text = ayah.displayText;
     final fontSize = text.length > 400 ? AppType.title : AppType.titleLarge;
-    final host = Uri.parse(
-      webSurahUrl(ayah.surahId, ayah.numberInSurah),
-    ).host;
+    final host = Uri.parse(webSurahUrl(ayah.surahId, ayah.numberInSurah)).host;
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Container(
@@ -55,9 +53,10 @@ class VerseCard extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
-              color: AppColors.mushafCardAccent.withValues(
-            alpha: AppAlphas.accentRule,
-          )),
+            color: AppColors.mushafCardAccent.withValues(
+              alpha: AppAlphas.accentRule,
+            ),
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -117,10 +116,11 @@ class VerseCard extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Container(
-                height: 1,
-                color: AppColors.mushafCardAccent.withValues(
-                  alpha: AppAlphas.accentRuleSoft,
-                )),
+              height: 1,
+              color: AppColors.mushafCardAccent.withValues(
+                alpha: AppAlphas.accentRuleSoft,
+              ),
+            ),
             const SizedBox(height: 10),
             Row(
               children: [

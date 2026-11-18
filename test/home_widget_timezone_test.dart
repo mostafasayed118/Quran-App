@@ -8,13 +8,13 @@ import 'package:quran_yahdi/core/platform/home_widget_updater.dart';
 class _City implements CitySource {
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-        timezone: 'Africa/Cairo',
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+    timezone: 'Africa/Cairo',
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -58,12 +58,18 @@ void main() {
 
   tearDown(() => getIt.reset());
 
-  test('the background widget refresh shows the city clock, not the device one',
-      () async {
-    await updateHomeWidgetFromState();
+  test(
+    'the background widget refresh shows the city clock, not the device one',
+    () async {
+      await updateHomeWidgetFromState();
 
-    expect(updater.time, '١٥:٣٠',
-        reason: 'the prayer instant is 13:30 UTC; the widget must render the '
-            'selected city wall clock (UTC+2), as the app card does');
-  });
+      expect(
+        updater.time,
+        '١٥:٣٠',
+        reason:
+            'the prayer instant is 13:30 UTC; the widget must render the '
+            'selected city wall clock (UTC+2), as the app card does',
+      );
+    },
+  );
 }

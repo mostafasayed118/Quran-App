@@ -20,10 +20,10 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
     required ReciterSource reciters,
     required DownloadsCubit downloads,
     required String rowId,
-  })  : _reciters = reciters,
-        _downloads = downloads,
-        _rowId = rowId,
-        super(const ReciterSurahsState.loading());
+  }) : _reciters = reciters,
+       _downloads = downloads,
+       _rowId = rowId,
+       super(const ReciterSurahsState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -43,8 +43,11 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       final row = await _reciters.byId(_rowId);
       if (isClosed) return;
       if (row == null) {
-        appLog('reciter row not found',
-            name: 'quran_yahdi/reciter_surahs', error: _rowId);
+        appLog(
+          'reciter row not found',
+          name: 'quran_yahdi/reciter_surahs',
+          error: _rowId,
+        );
         emit(const ReciterSurahsState.failed());
         return;
       }
@@ -56,17 +59,21 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       if (isClosed) return;
       await _downloads.refreshDone();
       if (isClosed) return;
-      emit(ReciterSurahsState.ready(
-        row: row.toInfo(),
-        surahNumbers: surahs,
-        names: names,
-        previews: previews,
-      ));
+      emit(
+        ReciterSurahsState.ready(
+          row: row.toInfo(),
+          surahNumbers: surahs,
+          names: names,
+          previews: previews,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('reciter surahs load failed',
-          name: 'quran_yahdi/reciter_surahs',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'reciter surahs load failed',
+        name: 'quran_yahdi/reciter_surahs',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const ReciterSurahsState.failed());
     }
   }
@@ -81,10 +88,12 @@ class ReciterSurahsCubit extends Cubit<ReciterSurahsState> {
       await _reciters.selectMoshaf(_rowId);
       return true;
     } on Object catch (error, stackTrace) {
-      appLog('select moshaf failed',
-          name: 'quran_yahdi/reciter_surahs',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'select moshaf failed',
+        name: 'quran_yahdi/reciter_surahs',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }

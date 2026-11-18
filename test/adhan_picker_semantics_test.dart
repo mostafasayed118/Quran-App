@@ -45,8 +45,9 @@ class _SilentPlayer implements AdhanPlayer {
 }
 
 void main() {
-  testWidgets('the selected adhan row announces that it is selected',
-      (tester) async {
+  testWidgets('the selected adhan row announces that it is selected', (
+    tester,
+  ) async {
     final track = kAdhanCatalog.first;
     final cubit = AdhanPickerCubit(
       prefs: _FakePreferences(track.id),
@@ -59,20 +60,22 @@ void main() {
     await pumpAppHost(
       tester,
       home: const AdhanPickerScreen(),
-      wrap: (app) => BlocProvider<AdhanPickerCubit>.value(
-        value: cubit,
-        child: app,
-      ),
+      wrap: (app) =>
+          BlocProvider<AdhanPickerCubit>.value(value: cubit, child: app),
     );
 
     final semantics = tester.ensureSemantics();
     // The trailing tick is the only visual selection indicator; assistive tech
     // needs the state on the row itself.
-    final row =
-        tester.getSemantics(find.text(track.nameAr).first).getSemanticsData();
+    final row = tester
+        .getSemantics(find.text(track.nameAr).first)
+        .getSemanticsData();
     semantics.dispose();
 
-    expect(row.flagsCollection.isSelected, Tristate.isTrue,
-        reason: 'a tick icon is not announced; the row must expose selection');
+    expect(
+      row.flagsCollection.isSelected,
+      Tristate.isTrue,
+      reason: 'a tick icon is not announced; the row must expose selection',
+    );
   });
 }

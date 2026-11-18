@@ -6,25 +6,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 
 List<Map<String, dynamic>> fixtureRows() => [
-      {
-        'id': 'a1',
-        'categoryAr': 'المنزل',
-        'categoryEn': 'Home',
-        'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
-      },
-      {
-        'id': 'a2',
-        'categoryAr': 'المنزل',
-        'categoryEn': 'Home',
-        'text': 'بِسْمِ اللَّهِ خَرَجْنَا',
-      },
-      {
-        'id': 'a3',
-        'categoryAr': 'السفر',
-        'categoryEn': 'Travel',
-        'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
-      },
-    ];
+  {
+    'id': 'a1',
+    'categoryAr': 'المنزل',
+    'categoryEn': 'Home',
+    'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
+  },
+  {
+    'id': 'a2',
+    'categoryAr': 'المنزل',
+    'categoryEn': 'Home',
+    'text': 'بِسْمِ اللَّهِ خَرَجْنَا',
+  },
+  {
+    'id': 'a3',
+    'categoryAr': 'السفر',
+    'categoryEn': 'Travel',
+    'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
+  },
+];
 
 void main() {
   late DuaRepository repo;
@@ -47,22 +47,28 @@ void main() {
     expect(categories, ['المنزل', 'السفر']);
   });
 
-  test('bundled duas asset is well-formed (>=40 entries across >=6 categories)',
-      () {
-    final file = File('assets/data/duas.json');
-    if (!file.existsSync()) {
-      markTestSkipped(
-          'working dir does not resolve the bundled asset from this runner');
-    }
-    final rows = (jsonDecode(file.readAsStringSync()) as List)
-        .cast<Map<String, dynamic>>();
-    expect(rows.length, greaterThanOrEqualTo(40));
-    final categories = rows.map((r) => r['categoryAr'] as String).toSet();
-    expect(categories.length, greaterThanOrEqualTo(6));
-    for (final row in rows) {
-      expect((row['text'] as String).trim().isNotEmpty, isTrue,
-          reason: 'empty dua text in ${row['id']}');
-      expect((row['categoryAr'] as String).isNotEmpty, isTrue);
-    }
-  });
+  test(
+    'bundled duas asset is well-formed (>=40 entries across >=6 categories)',
+    () {
+      final file = File('assets/data/duas.json');
+      if (!file.existsSync()) {
+        markTestSkipped(
+          'working dir does not resolve the bundled asset from this runner',
+        );
+      }
+      final rows = (jsonDecode(file.readAsStringSync()) as List)
+          .cast<Map<String, dynamic>>();
+      expect(rows.length, greaterThanOrEqualTo(40));
+      final categories = rows.map((r) => r['categoryAr'] as String).toSet();
+      expect(categories.length, greaterThanOrEqualTo(6));
+      for (final row in rows) {
+        expect(
+          (row['text'] as String).trim().isNotEmpty,
+          isTrue,
+          reason: 'empty dua text in ${row['id']}',
+        );
+        expect((row['categoryAr'] as String).isNotEmpty, isTrue);
+      }
+    },
+  );
 }

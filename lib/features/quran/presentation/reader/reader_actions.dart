@@ -82,9 +82,9 @@ class ReaderActions extends StatelessWidget {
       tooltip: loc.listenTooltip,
       icon: const Icon(Icons.headphones),
       onPressed: () => context.read<PlaybackCubit>().playDefaultForSurah(
-            state.surahId,
-            surahName: state.surahName,
-          ),
+        state.surahId,
+        surahName: state.surahName,
+      ),
     );
     final bookmarks = IconButton(
       tooltip: loc.bookmarks,
@@ -94,9 +94,8 @@ class ReaderActions extends StatelessWidget {
     final pageJump = IconButton(
       tooltip: loc.pageJump,
       icon: const Icon(Icons.pin_outlined),
-      onPressed: () => unawaited(
-        _openPageJump(context, cubit, loc, onResolved: onOpenAyah),
-      ),
+      onPressed: () =>
+          unawaited(_openPageJump(context, cubit, loc, onResolved: onOpenAyah)),
     );
 
     // Five icons plus a long surah title do not fit a 360 dp bar at
@@ -127,8 +126,9 @@ class ReaderActions extends StatelessWidget {
               PopupMenuItem(
                 value: _ReaderMoreAction.mode,
                 child: ListTile(
-                  leading:
-                      Icon(isVerses ? Icons.menu_book : Icons.auto_stories),
+                  leading: Icon(
+                    isVerses ? Icons.menu_book : Icons.auto_stories,
+                  ),
                   title: Text(isVerses ? loc.mushafMode : loc.versesMode),
                 ),
               ),
@@ -159,12 +159,8 @@ class ReaderActions extends StatelessWidget {
         IconButton(
           tooltip: loc.readerFontSize,
           icon: const Icon(Icons.format_size),
-          onPressed: () => _showFontSheet(
-            context,
-            cubit,
-            state.fontScale,
-            state.lineHeight,
-          ),
+          onPressed: () =>
+              _showFontSheet(context, cubit, state.fontScale, state.lineHeight),
         ),
       ],
     );

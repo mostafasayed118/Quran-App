@@ -17,14 +17,21 @@ void setInset(WidgetTester tester, {double inset = kInset}) {
 }
 
 void main() {
-  testWidgets('body padding: the bottom inset is the nav bar height',
-      (tester) async {
+  testWidgets('body padding: the bottom inset is the nav bar height', (
+    tester,
+  ) async {
     setInset(tester);
     late double measured;
-    await tester.pumpWidget(appShell(home: Builder(builder: (context) {
-      measured = appBottomInset(context);
-      return const SizedBox.shrink();
-    })));
+    await tester.pumpWidget(
+      appShell(
+        home: Builder(
+          builder: (context) {
+            measured = appBottomInset(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
     expect(measured, kInset);
   });
 
@@ -32,53 +39,78 @@ void main() {
     setInset(tester);
     tester.view.viewInsets = const FakeViewPadding(bottom: 300);
     late double measured;
-    await tester.pumpWidget(appShell(home: Builder(builder: (context) {
-      measured = appBottomInset(context);
-      return const SizedBox.shrink();
-    })));
+    await tester.pumpWidget(
+      appShell(
+        home: Builder(
+          builder: (context) {
+            measured = appBottomInset(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
     expect(measured, 0);
   });
 
-  testWidgets('bar stripped of padding: falls back to viewPadding',
-      (tester) async {
+  testWidgets('bar stripped of padding: falls back to viewPadding', (
+    tester,
+  ) async {
     setInset(tester);
     late double measured;
-    await tester.pumpWidget(appShell(home: Scaffold(
-      bottomSheet: Builder(builder: (context) {
-        measured = appBottomInset(context);
-        return const SizedBox(height: 10);
-      }),
-    )));
+    await tester.pumpWidget(
+      appShell(
+        home: Scaffold(
+          bottomSheet: Builder(
+            builder: (context) {
+              measured = appBottomInset(context);
+              return const SizedBox(height: 10);
+            },
+          ),
+        ),
+      ),
+    );
     expect(measured, kInset);
   });
 
   testWidgets('adds the inset to a scroll padding', (tester) async {
     setInset(tester);
     late EdgeInsets measured;
-    await tester.pumpWidget(appShell(home: Builder(builder: (context) {
-      measured = appScrollPadding(context, const EdgeInsets.all(12));
-      return const SizedBox.shrink();
-    })));
+    await tester.pumpWidget(
+      appShell(
+        home: Builder(
+          builder: (context) {
+            measured = appScrollPadding(context, const EdgeInsets.all(12));
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
     expect(measured, const EdgeInsets.fromLTRB(12, 12, 12, 60));
   });
 
   testWidgets('last list row stays above the nav bar', (tester) async {
     setInset(tester);
-    await tester.pumpWidget(appShell(
+    await tester.pumpWidget(
+      appShell(
         home: Scaffold(
-      body: Builder(
-        builder: (context) => ListView(
-          padding: appScrollPadding(context, const EdgeInsets.all(12)),
-          children: [
-            for (var i = 0; i < 20; i++) const SizedBox(height: 80),
-            Container(key: const Key('last'), height: 80),
-          ],
+          body: Builder(
+            builder: (context) => ListView(
+              padding: appScrollPadding(context, const EdgeInsets.all(12)),
+              children: [
+                for (var i = 0; i < 20; i++) const SizedBox(height: 80),
+                Container(key: const Key('last'), height: 80),
+              ],
+            ),
+          ),
         ),
       ),
-    )));
+    );
     await tester.drag(find.byType(ListView), const Offset(0, -5000));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     final rect = tester.getRect(find.byKey(const Key('last')));
     expect(rect.bottom, lessThanOrEqualTo(kHeight - kInset));
   });

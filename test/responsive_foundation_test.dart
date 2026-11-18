@@ -31,8 +31,9 @@ void main() {
     expect(tester.getSize(find.byKey(const Key('body'))).width, 360);
   });
 
-  testWidgets('above the measure the body is capped and centred',
-      (tester) async {
+  testWidgets('above the measure the body is capped and centred', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -56,22 +57,24 @@ void main() {
     expect(rect.center.dx, 600);
   });
 
-  testWidgets('a full-height scroll body keeps filling the height',
-      (tester) async {
+  testWidgets('a full-height scroll body keeps filling the height', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
       appShell(
-          home: Scaffold(
-        body: AppContentFrame(
-          child: ListView(
-            key: const Key('list'),
-            children: const [SizedBox(height: 40)],
+        home: Scaffold(
+          body: AppContentFrame(
+            child: ListView(
+              key: const Key('list'),
+              children: const [SizedBox(height: 40)],
+            ),
           ),
         ),
-      )),
+      ),
     );
 
     final rect = tester.getRect(find.byKey(const Key('list')));
@@ -79,35 +82,40 @@ void main() {
     expect(rect.height, 800);
   });
 
-  testWidgets('a sheet is capped at the sheet measure on a tablet',
-      (tester) async {
+  testWidgets('a sheet is capped at the sheet measure on a tablet', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1200, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     await tester.pumpWidget(
       appShell(
-          home: Scaffold(
-        body: Builder(
-          builder: (context) => Center(
-            child: ElevatedButton(
-              onPressed: () => showAppSheet<void>(
-                context: context,
-                builder: (_) => const SizedBox(
-                  key: Key('sheet-content'),
-                  height: 120,
-                  width: double.infinity,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () => showAppSheet<void>(
+                  context: context,
+                  builder: (_) => const SizedBox(
+                    key: Key('sheet-content'),
+                    height: 120,
+                    width: double.infinity,
+                  ),
                 ),
+                child: const Text('open'),
               ),
-              child: const Text('open'),
             ),
           ),
         ),
-      )),
+      ),
     );
     await tester.tap(find.text('open'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(
       tester.getSize(find.byKey(const Key('sheet-content'))).width,
@@ -115,16 +123,20 @@ void main() {
     );
   });
 
-  testWidgets('the shared search field follows the ambient direction',
-      (tester) async {
+  testWidgets('the shared search field follows the ambient direction', (
+    tester,
+  ) async {
     Future<void> pump(TextDirection direction) {
-      return tester.pumpWidget(appShell(
+      return tester.pumpWidget(
+        appShell(
           home: Directionality(
-        textDirection: direction,
-        child: Scaffold(
-          body: SearchField(hint: 'search', onChanged: (_) {}),
+            textDirection: direction,
+            child: Scaffold(
+              body: SearchField(hint: 'search', onChanged: (_) {}),
+            ),
+          ),
         ),
-      )));
+      );
     }
 
     await pump(TextDirection.rtl);
@@ -140,46 +152,53 @@ void main() {
     );
   });
 
-  testWidgets('showAppSheet roots itself above a nested Navigator',
-      (tester) async {
+  testWidgets('showAppSheet roots itself above a nested Navigator', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1024, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     const nestedKey = Key('nested-navigator');
-    await tester.pumpWidget(appShell(
+    await tester.pumpWidget(
+      appShell(
         home: Row(
-      children: [
-        SizedBox(
-          width: 300,
-          child: Navigator(
-            key: nestedKey,
-            onGenerateRoute: (_) => MaterialPageRoute(
-              builder: (_) => Scaffold(
-                body: Builder(
-                  builder: (context) => ElevatedButton(
-                    onPressed: () => showAppSheet<void>(
-                      context: context,
-                      builder: (_) => const SizedBox(
-                        key: Key('sheet-content'),
-                        height: 100,
-                        width: double.infinity,
+          children: [
+            SizedBox(
+              width: 300,
+              child: Navigator(
+                key: nestedKey,
+                onGenerateRoute: (_) => MaterialPageRoute(
+                  builder: (_) => Scaffold(
+                    body: Builder(
+                      builder: (context) => ElevatedButton(
+                        onPressed: () => showAppSheet<void>(
+                          context: context,
+                          builder: (_) => const SizedBox(
+                            key: Key('sheet-content'),
+                            height: 100,
+                            width: double.infinity,
+                          ),
+                        ),
+                        child: const Text('open'),
                       ),
                     ),
-                    child: const Text('open'),
                   ),
                 ),
               ),
             ),
-          ),
+            const Expanded(child: SizedBox()),
+          ],
         ),
-        const Expanded(child: SizedBox()),
-      ],
-    )));
+      ),
+    );
 
     await tester.tap(find.text('open'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(BottomSheet), findsOneWidget);
     expect(

@@ -6,7 +6,9 @@ import 'package:quran_yahdi/features/quran/data/page_anchor_repository.dart';
 import 'support/test_db.dart';
 
 Future<void> _seed(AppDatabase db) async {
-  await db.into(db.surahs).insert(
+  await db
+      .into(db.surahs)
+      .insert(
         SurahsCompanion.insert(
           id: const Value(1),
           nameAr: 'الفاتحة',
@@ -17,7 +19,9 @@ Future<void> _seed(AppDatabase db) async {
           pagesEnd: 1,
         ),
       );
-  await db.into(db.surahs).insert(
+  await db
+      .into(db.surahs)
+      .insert(
         SurahsCompanion.insert(
           id: const Value(2),
           nameAr: 'البقرة',
@@ -28,7 +32,9 @@ Future<void> _seed(AppDatabase db) async {
           pagesEnd: 49,
         ),
       );
-  await db.into(db.ayahs).insert(
+  await db
+      .into(db.ayahs)
+      .insert(
         AyahsCompanion.insert(
           id: const Value(1),
           surahId: 1,
@@ -39,7 +45,9 @@ Future<void> _seed(AppDatabase db) async {
           textImlaei: 'x',
         ),
       );
-  await db.into(db.ayahs).insert(
+  await db
+      .into(db.ayahs)
+      .insert(
         AyahsCompanion.insert(
           id: const Value(2),
           surahId: 2,
@@ -53,15 +61,17 @@ Future<void> _seed(AppDatabase db) async {
 }
 
 void main() {
-  test('page anchors resolve the first ayah of a page from the database',
-      () async {
-    final db = newTestDb();
-    await _seed(db);
-    final repo = PageAnchorRepository(db);
+  test(
+    'page anchors resolve the first ayah of a page from the database',
+    () async {
+      final db = newTestDb();
+      await _seed(db);
+      final repo = PageAnchorRepository(db);
 
-    expect(await repo.anchorForPage(1), (surahId: 1, numberInSurah: 1));
-    expect(await repo.anchorForPage(604), (surahId: 2, numberInSurah: 1));
-  });
+      expect(await repo.anchorForPage(1), (surahId: 1, numberInSurah: 1));
+      expect(await repo.anchorForPage(604), (surahId: 2, numberInSurah: 1));
+    },
+  );
 
   test('page anchors reject out-of-range values', () async {
     final db = newTestDb();

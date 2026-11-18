@@ -31,11 +31,15 @@ const _manualPairs = <String, Map<String, String>>{
 
 void main(List<String> args) {
   final base = args.isEmpty ? _defaultBase : args.first;
-  final diff = Process.runSync(
-    'git',
-    <String>['diff', '-U0', base, '--', 'lib'],
-    workingDirectory: Directory.current.path,
-  ).stdout as String;
+  final diff =
+      Process.runSync('git', <String>[
+            'diff',
+            '-U0',
+            base,
+            '--',
+            'lib',
+          ], workingDirectory: Directory.current.path).stdout
+          as String;
 
   final tokens = _loadTokens();
   final result = _audit(diff, tokens);
@@ -69,8 +73,9 @@ _AuditResult _audit(String diff, Map<String, _TokenValue> tokens) {
       ];
 
       if (refs.isEmpty) {
-        final manualValues =
-            manual.values.map((value) => value.toUpperCase()).toSet();
+        final manualValues = manual.values
+            .map((value) => value.toUpperCase())
+            .toSet();
         final unpaired = <String>[
           for (final hex in literals.hexes)
             if (!manualValues.contains(hex.toUpperCase())) 'hex $hex',
@@ -87,10 +92,7 @@ _AuditResult _audit(String diff, Map<String, _TokenValue> tokens) {
         continue;
       }
 
-      final used = <String, int>{
-        for (final kind in _kinds) kind: 0,
-        'bare': 0,
-      };
+      final used = <String, int>{for (final kind in _kinds) kind: 0, 'bare': 0};
       for (final ref in refs) {
         // A token that already existed on the removed line is unchanged, not a
         // substitution (e.g. fontSize: AppType.bodyLarge in the same style).
@@ -180,9 +182,11 @@ _AuditResult _audit(String diff, Map<String, _TokenValue> tokens) {
               .contains(literals.hexes[index].toUpperCase()))
             'hex ${literals.hexes[index]}',
         for (final kind in _kinds.where((kind) => kind != 'hex'))
-          for (var index = used[kind]!;
-              index < literals.numbers[kind]!.length;
-              index++)
+          for (
+            var index = used[kind]!;
+            index < literals.numbers[kind]!.length;
+            index++
+          )
             '$kind ${_fmt(literals.numbers[kind]![index])}',
       ];
       if (left.isNotEmpty) {
@@ -214,11 +218,7 @@ const _kinds = <String>[
   'stroke',
 ];
 
-String _kindOf(
-  String name,
-  _Literals literals,
-  _TokenValue? token,
-) {
+String _kindOf(String name, _Literals literals, _TokenValue? token) {
   if (name.startsWith('AppAlphas.')) {
     return literals.numbers['opacity']!.isEmpty ? 'alpha' : 'opacity';
   }
@@ -244,11 +244,7 @@ String? _nextHex(_Literals literals, Map<String, int> used) {
   return literals.hexes[index];
 }
 
-double? _nextNumber(
-  _Literals literals,
-  Map<String, int> used,
-  String kind,
-) {
+double? _nextNumber(_Literals literals, Map<String, int> used, String kind) {
   final queue = kind == 'bare' ? literals.bare : literals.numbers[kind]!;
   var index = used[kind]!;
   // `opacity: done ? 0.8 : 1` carries the identity 1 after the fade value.
@@ -341,15 +337,12 @@ _Literals _literals(String text) {
   return _Literals(numbers: numbers, hexes: hexes, bare: bare);
 }
 
-List<_TokenRef> _tokenRefs(String text, int line) => RegExp(
-      r'App(Colors|Alphas|Type|IconSize|Radius|Strokes)\.([a-zA-Z0-9_]+)',
-    )
+List<_TokenRef> _tokenRefs(String text, int line) =>
+    RegExp(r'App(Colors|Alphas|Type|IconSize|Radius|Strokes)\.([a-zA-Z0-9_]+)')
         .allMatches(text)
         .map(
-          (match) => _TokenRef(
-            'App${match.group(1)!}.${match.group(2)!}',
-            line,
-          ),
+          (match) =>
+              _TokenRef('App${match.group(1)!}.${match.group(2)!}', line),
         )
         .toList();
 
@@ -398,9 +391,7 @@ Map<String, _TokenValue> _loadTokens() {
   return out;
 }
 
-final _bareNumber = RegExp(
-  r'(?<![\w.])(-?(?:\d+(?:\.\d+)?|\.\d+))(?![\w.])',
-);
+final _bareNumber = RegExp(r'(?<![\w.])(-?(?:\d+(?:\.\d+)?|\.\d+))(?![\w.])');
 
 String _fmt(double value) {
   final text = value.toString();

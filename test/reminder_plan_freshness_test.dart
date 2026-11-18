@@ -42,8 +42,9 @@ void main() {
   });
 
   test('a plan built just before midnight is stale a minute later', () {
-    final freshness =
-        ReminderPlanFreshness(now: DateTime(2026, 12, 31, 23, 59));
+    final freshness = ReminderPlanFreshness(
+      now: DateTime(2026, 12, 31, 23, 59),
+    );
 
     expect(freshness.needsReplan(DateTime(2027, 1, 1, 0, 0, 30)), isTrue);
   });

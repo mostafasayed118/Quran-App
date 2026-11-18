@@ -77,18 +77,16 @@ class ForbiddenWindowsSection extends StatelessWidget {
               const SizedBox(width: AppSpacing.xs),
               Text(
                 loc.forbiddenWindowsTitle,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             loc.forbiddenWindowsNote,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: colors.onSurfaceVariant),
           ),
           for (final window in windows) ...[
             const Divider(height: AppSpacing.lg),
@@ -106,9 +104,8 @@ class ForbiddenWindowsSection extends StatelessWidget {
                   '${formatHm(window.start, arabicIndic: loc.usesArabicIndicDigits)}'
                   ' – '
                   '${formatHm(window.end, arabicIndic: loc.usesArabicIndicDigits)}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ],
             ),

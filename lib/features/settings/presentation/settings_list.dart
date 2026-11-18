@@ -131,12 +131,14 @@ class _SettingsList extends StatelessWidget {
         if (permissionDenied)
           Padding(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg, AppSpacing.xs, AppSpacing.lg, AppSpacing.xs),
+              AppSpacing.lg,
+              AppSpacing.xs,
+              AppSpacing.lg,
+              AppSpacing.xs,
+            ),
             child: Text(
               loc.notificationsEnabledHint,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         _reminderReliabilitySection(),
@@ -170,12 +172,12 @@ class _SettingsList extends StatelessWidget {
   }
 
   Widget _minimalNote(BuildContext context, AppLocalizations loc) => Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: Text(
-          loc.settingsMinimalNote,
-          style: AppTheme.mutedFootnote(context),
-        ),
-      );
+    padding: const EdgeInsets.all(AppSpacing.lg),
+    child: Text(
+      loc.settingsMinimalNote,
+      style: AppTheme.mutedFootnote(context),
+    ),
+  );
 
   /// The reminder-health readout, or an empty box when this host has none:
   /// the service locator registration, or the diagnostics a host passes in.

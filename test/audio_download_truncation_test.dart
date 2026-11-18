@@ -13,31 +13,43 @@ import 'package:quran_yahdi/features/recitation/data/reciter_repository.dart'
 import 'support/test_db.dart';
 
 Future<ReciterRow> _seedReciter(AppDatabase db) async {
-  await db.into(db.reciters).insert(RecitersCompanion.insert(
-        id: '51-53',
-        reciterName: 'عبدالباسط عبدالصمد',
-        moshafName: 'حفص مرتل',
-        server: 'https://server.example/mp3',
-        surahList: '1',
-        surahTotal: 114,
-      ));
+  await db
+      .into(db.reciters)
+      .insert(
+        RecitersCompanion.insert(
+          id: '51-53',
+          reciterName: 'عبدالباسط عبدالصمد',
+          moshafName: 'حفص مرتل',
+          server: 'https://server.example/mp3',
+          surahList: '1',
+          surahTotal: 114,
+        ),
+      );
   return (db.select(db.reciters)).getSingle();
 }
 
 File _surahFile(Directory root, ReciterRow reciter, int surahNumber) => File(
-    '${root.path}${Platform.pathSeparator}${AudioDownloader.audioFolderName}'
-    '${Platform.pathSeparator}${reciter.id}'
-    '${Platform.pathSeparator}${surahAudioFileName(surahNumber)}');
+  '${root.path}${Platform.pathSeparator}${AudioDownloader.audioFolderName}'
+  '${Platform.pathSeparator}${reciter.id}'
+  '${Platform.pathSeparator}${surahAudioFileName(surahNumber)}',
+);
 
 Future<void> _seedDoneRow(
-    AppDatabase db, ReciterRow reciter, File target) async {
-  await db.into(db.downloads).insert(DownloadsCompanion.insert(
-        reciterId: reciter.id,
-        surahId: 1,
-        status: 'done',
-        path: target.path,
-        bytes: Value(await target.length()),
-      ));
+  AppDatabase db,
+  ReciterRow reciter,
+  File target,
+) async {
+  await db
+      .into(db.downloads)
+      .insert(
+        DownloadsCompanion.insert(
+          reciterId: reciter.id,
+          surahId: 1,
+          status: 'done',
+          path: target.path,
+          bytes: Value(await target.length()),
+        ),
+      );
 }
 
 class _FixedBodyAdapter implements HttpClientAdapter {
@@ -46,8 +58,11 @@ class _FixedBodyAdapter implements HttpClientAdapter {
   final List<int> body;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     return ResponseBody(
       Stream.fromIterable([Uint8List.fromList(body)]),
       200,
@@ -64,8 +79,11 @@ class _FixedBodyAdapter implements HttpClientAdapter {
 
 class _ShortAdapter implements HttpClientAdapter {
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     return ResponseBody(
       Stream.fromIterable([Uint8List.fromList(List<int>.filled(10, 7))]),
       200,
@@ -81,42 +99,48 @@ class _ShortAdapter implements HttpClientAdapter {
 }
 
 void main() {
-  test('a body shorter than content-length leaves no final file, only a prefix',
-      () async {
-    final db = newTestDb();
-    final root = await Directory.systemTemp.createTemp('qy_audio_short');
-    addTearDown(() => root.delete(recursive: true));
-    await db.into(db.reciters).insert(RecitersCompanion.insert(
-          id: '51-53',
-          reciterName: 'عبدالباسط عبدالصمد',
-          moshafName: 'حفص مرتل',
-          server: 'https://server.example/mp3',
-          surahList: '1',
-          surahTotal: 114,
-        ));
-    final reciter = await (db.select(db.reciters)).getSingle();
-    final downloader = AudioDownloader(
-      db,
-      dio: Dio()..httpClientAdapter = _ShortAdapter(),
-      audioRootResolver: () async => root,
-      // One attempt: the resume/retry contract has its own file.
-      retryDelay: null,
-    );
+  test(
+    'a body shorter than content-length leaves no final file, only a prefix',
+    () async {
+      final db = newTestDb();
+      final root = await Directory.systemTemp.createTemp('qy_audio_short');
+      addTearDown(() => root.delete(recursive: true));
+      await db
+          .into(db.reciters)
+          .insert(
+            RecitersCompanion.insert(
+              id: '51-53',
+              reciterName: 'عبدالباسط عبدالصمد',
+              moshafName: 'حفص مرتل',
+              server: 'https://server.example/mp3',
+              surahList: '1',
+              surahTotal: 114,
+            ),
+          );
+      final reciter = await (db.select(db.reciters)).getSingle();
+      final downloader = AudioDownloader(
+        db,
+        dio: Dio()..httpClientAdapter = _ShortAdapter(),
+        audioRootResolver: () async => root,
+        // One attempt: the resume/retry contract has its own file.
+        retryDelay: null,
+      );
 
-    await expectLater(
-      downloader.downloadSurah(reciter: reciter, surahNumber: 1),
-      throwsA(isA<DownloadFailure>()),
-    );
+      await expectLater(
+        downloader.downloadSurah(reciter: reciter, surahNumber: 1),
+        throwsA(isA<DownloadFailure>()),
+      );
 
-    final row = await (db.select(db.downloads)).getSingle();
-    expect(row.status, 'failed');
-    expect(File(row.path).existsSync(), isFalse);
-    expect(
-      File('${row.path}.part').existsSync(),
-      isTrue,
-      reason: 'the prefix is kept so the next attempt resumes',
-    );
-  });
+      final row = await (db.select(db.downloads)).getSingle();
+      expect(row.status, 'failed');
+      expect(File(row.path).existsSync(), isFalse);
+      expect(
+        File('${row.path}.part').existsSync(),
+        isTrue,
+        reason: 'the prefix is kept so the next attempt resumes',
+      );
+    },
+  );
 
   test('a failed retry keeps the previously downloaded file intact', () async {
     final db = newTestDb();
@@ -141,8 +165,11 @@ void main() {
       throwsA(isA<DownloadFailure>()),
     );
 
-    expect(target.existsSync(), isTrue,
-        reason: 'a failed retry must not delete the previous file');
+    expect(
+      target.existsSync(),
+      isTrue,
+      reason: 'a failed retry must not delete the previous file',
+    );
     expect(await target.readAsBytes(), oldBytes);
     expect(
       File('${target.path}.part').existsSync(),
@@ -155,34 +182,37 @@ void main() {
   });
 
   test(
-      'a successful retry replaces the previous file and removes staging files',
-      () async {
-    final db = newTestDb();
-    final root = await Directory.systemTemp.createTemp('qy_audio_retry_full');
-    addTearDown(() => root.delete(recursive: true));
-    final reciter = await _seedReciter(db);
-    final target = _surahFile(root, reciter, 1);
-    await target.parent.create(recursive: true);
-    await target.writeAsBytes(List<int>.filled(64, 1));
-    await _seedDoneRow(db, reciter, target);
-    final backup = File('${target.path}.bak');
-    await backup.writeAsBytes([9, 9, 9]);
-    final newBytes = List<int>.generate(128, (i) => i % 251);
-    final downloader = AudioDownloader(
-      db,
-      dio: Dio()..httpClientAdapter = _FixedBodyAdapter(newBytes),
-      audioRootResolver: () async => root,
-    );
+    'a successful retry replaces the previous file and removes staging files',
+    () async {
+      final db = newTestDb();
+      final root = await Directory.systemTemp.createTemp('qy_audio_retry_full');
+      addTearDown(() => root.delete(recursive: true));
+      final reciter = await _seedReciter(db);
+      final target = _surahFile(root, reciter, 1);
+      await target.parent.create(recursive: true);
+      await target.writeAsBytes(List<int>.filled(64, 1));
+      await _seedDoneRow(db, reciter, target);
+      final backup = File('${target.path}.bak');
+      await backup.writeAsBytes([9, 9, 9]);
+      final newBytes = List<int>.generate(128, (i) => i % 251);
+      final downloader = AudioDownloader(
+        db,
+        dio: Dio()..httpClientAdapter = _FixedBodyAdapter(newBytes),
+        audioRootResolver: () async => root,
+      );
 
-    final file =
-        await downloader.downloadSurah(reciter: reciter, surahNumber: 1);
+      final file = await downloader.downloadSurah(
+        reciter: reciter,
+        surahNumber: 1,
+      );
 
-    expect(file.path, target.path);
-    expect(await target.readAsBytes(), newBytes);
-    expect(File('${target.path}.part').existsSync(), isFalse);
-    expect(backup.existsSync(), isFalse);
-    final row = await (db.select(db.downloads)).getSingle();
-    expect(row.status, 'done');
-    expect(row.bytes, newBytes.length);
-  });
+      expect(file.path, target.path);
+      expect(await target.readAsBytes(), newBytes);
+      expect(File('${target.path}.part').existsSync(), isFalse);
+      expect(backup.existsSync(), isFalse);
+      final row = await (db.select(db.downloads)).getSingle();
+      expect(row.status, 'done');
+      expect(row.bytes, newBytes.length);
+    },
+  );
 }

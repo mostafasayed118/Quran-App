@@ -60,7 +60,9 @@ void main() {
       reciters: ReciterRepository(db),
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
     );
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -77,8 +79,9 @@ void main() {
     if (await tempRoot.exists()) await tempRoot.delete(recursive: true);
   });
 
-  testWidgets('the playing strip clears the nav bar and paints behind it',
-      (tester) async {
+  testWidgets('the playing strip clears the nav bar and paints behind it', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(400, kHeight);
     tester.view.devicePixelRatio = 1;
     tester.view.padding = const FakeViewPadding(bottom: kInset);
@@ -92,15 +95,21 @@ void main() {
       home: const Scaffold(bottomSheet: MiniPlayerBar()),
       settle: false,
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final row = (await ReciterRepository(db).byId('51-53'))!;
     await cubit.playSurah(row, 1);
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final stopButton = tester.getRect(find.byTooltip('إيقاف'));
     expect(stopButton.bottom, lessThanOrEqualTo(kHeight - kInset));

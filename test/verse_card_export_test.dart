@@ -22,8 +22,9 @@ final _longVerse = Verse(
 );
 
 void main() {
-  testWidgets('the exported card is 720 px wide and loses no text',
-      (tester) async {
+  testWidgets('the exported card is 720 px wide and loses no text', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(420, 2400));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -33,10 +34,7 @@ void main() {
         home: Center(
           child: RepaintBoundary(
             key: boundaryKey,
-            child: VerseCard(
-              ayah: _longVerse,
-              surahName: 'سورة البقرة',
-            ),
+            child: VerseCard(ayah: _longVerse, surahName: 'سورة البقرة'),
           ),
         ),
       ),

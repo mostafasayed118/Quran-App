@@ -28,8 +28,9 @@ class ReciterPacksScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     // The gate, not the caller, decides what is published: an unsigned pack is
     // dropped here even when it is handed to the constructor.
-    final published =
-        packs.where((pack) => validateReciterPack(pack).isEmpty).toList();
+    final published = packs
+        .where((pack) => validateReciterPack(pack).isEmpty)
+        .toList();
     // The five published criteria, in the order the decision states them.
     final criteria = <String>[
       loc.reciterPacksCriterion1,
@@ -138,9 +139,7 @@ class _PackCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.xs),
             Text(
               pack.descriptionAr,
-              style: AppTheme.bodyText.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
+              style: AppTheme.bodyText.copyWith(color: colors.onSurfaceVariant),
             ),
             const SizedBox(height: AppSpacing.md),
             for (final entry in pack.entries) _Bullet(text: entry.reasonAr),

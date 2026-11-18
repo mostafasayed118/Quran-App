@@ -14,10 +14,14 @@ void main() {
     });
 
     test('#ayah-{m} (m >= 1) → reader at surah + ayah', () {
-      expect(deepLinkRouteFor(link('/surah/36#ayah-1')),
-          '/quran/reader?surah=36&ayah=1');
-      expect(deepLinkRouteFor(link('/surah/2#ayah-255')),
-          '/quran/reader?surah=2&ayah=255');
+      expect(
+        deepLinkRouteFor(link('/surah/36#ayah-1')),
+        '/quran/reader?surah=36&ayah=1',
+      );
+      expect(
+        deepLinkRouteFor(link('/surah/2#ayah-255')),
+        '/quran/reader?surah=2&ayah=255',
+      );
     });
 
     test('invalid surah number (0, 115, non-numeric) → null', () {
@@ -28,14 +32,18 @@ void main() {
 
     test('trailing slash tolerated', () {
       expect(deepLinkRouteFor(link('/surah/36/')), '/quran/reader?surah=36');
-      expect(deepLinkRouteFor(link('/surah/36/#ayah-5')),
-          '/quran/reader?surah=36&ayah=5');
+      expect(
+        deepLinkRouteFor(link('/surah/36/#ayah-5')),
+        '/quran/reader?surah=36&ayah=5',
+      );
     });
 
     test('absent/invalid fragment → surah-only route', () {
       expect(deepLinkRouteFor(link('/surah/36')), '/quran/reader?surah=36');
       expect(
-          deepLinkRouteFor(link('/surah/36#ayah-0')), '/quran/reader?surah=36');
+        deepLinkRouteFor(link('/surah/36#ayah-0')),
+        '/quran/reader?surah=36',
+      );
       expect(deepLinkRouteFor(link('/surah/36#x')), '/quran/reader?surah=36');
     });
 
@@ -57,10 +65,13 @@ void main() {
 
     test('wrong host or scheme → null', () {
       expect(
-          deepLinkRouteFor(Uri.parse('https://example.com/surah/36')), isNull);
+        deepLinkRouteFor(Uri.parse('https://example.com/surah/36')),
+        isNull,
+      );
       expect(
-          deepLinkRouteFor(Uri.parse('http://quranyahdi.pages.dev/surah/36')),
-          isNull);
+        deepLinkRouteFor(Uri.parse('http://quranyahdi.pages.dev/surah/36')),
+        isNull,
+      );
     });
   });
 
@@ -71,7 +82,9 @@ void main() {
 
     test('with ayah fragment', () {
       expect(
-          webSurahUrl(36, 5), 'https://quranyahdi.pages.dev/surah/36#ayah-5');
+        webSurahUrl(36, 5),
+        'https://quranyahdi.pages.dev/surah/36#ayah-5',
+      );
     });
   });
 }

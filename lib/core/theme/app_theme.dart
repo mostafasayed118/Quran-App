@@ -14,21 +14,28 @@ abstract final class QuranFonts {
 }
 
 abstract final class AppTheme {
-  static const TextStyle meQuranHead =
-      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.titleLarge);
+  static const TextStyle meQuranHead = TextStyle(
+    fontFamily: QuranFonts.meQuran,
+    fontSize: AppType.titleLarge,
+  );
 
   /// City and degree headings rendered in the meQuran face.
-  static const TextStyle meQuranTitle =
-      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.title);
+  static const TextStyle meQuranTitle = TextStyle(
+    fontFamily: QuranFonts.meQuran,
+    fontSize: AppType.title,
+  );
 
   static const TextStyle hafsAyah = TextStyle(
-      fontFamily: QuranFonts.quran,
-      fontSize: AppType.quranVerse,
-      height: AppType.quranHeight);
+    fontFamily: QuranFonts.quran,
+    fontSize: AppType.quranVerse,
+    height: AppType.quranHeight,
+  );
 
   /// The verse card's ayah number; the reader multiplies it by its own scale.
-  static const TextStyle ayahNumber =
-      TextStyle(fontFamily: QuranFonts.meQuran, fontSize: AppType.ayahNumber);
+  static const TextStyle ayahNumber = TextStyle(
+    fontFamily: QuranFonts.meQuran,
+    fontSize: AppType.ayahNumber,
+  );
 
   /// Bold Latin-font row title used by the reciter lists.
   static const TextStyle rowTitle = TextStyle(
@@ -85,18 +92,20 @@ abstract final class AppTheme {
   );
 
   /// Shared content padding for tappable list rows.
-  static const EdgeInsets tileContentPadding =
-      EdgeInsets.symmetric(horizontal: 14, vertical: 2);
+  static const EdgeInsets tileContentPadding = EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 2,
+  );
 
   static Color goldText(BuildContext context) =>
       Theme.of(context).brightness == Brightness.light
-          ? AppColors.goldText
-          : AppColors.gold;
+      ? AppColors.goldText
+      : AppColors.gold;
 
   static TextStyle mutedFootnote(BuildContext context) => TextStyle(
-        fontSize: AppType.micro,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      );
+    fontSize: AppType.micro,
+    color: Theme.of(context).colorScheme.onSurfaceVariant,
+  );
 
   /// Muted secondary text at [fontSize]
   /// ([mutedFootnote]'s treatment with a call-site size).
@@ -121,8 +130,9 @@ abstract final class AppTheme {
   /// Cached per `(PrayerName, brightness)`: the root build reads it on every
   /// rebuild, and a `ThemeData` plus a seeded `ColorScheme` is not cheap.
   static ThemeData forPrayer(PrayerName name, Brightness brightness) {
-    final cache =
-        brightness == Brightness.light ? _lightByPeriod : _darkByPeriod;
+    final cache = brightness == Brightness.light
+        ? _lightByPeriod
+        : _darkByPeriod;
     return cache.putIfAbsent(
       name,
       () => _theme(brightness, PrayerPalettes.of(name, brightness)),
@@ -219,41 +229,51 @@ abstract final class AppTheme {
       // overridden below.
       seedColor: palette?.primary ?? AppColors.emerald,
       brightness: brightness,
-      primary: palette?.primary ??
+      primary:
+          palette?.primary ??
           (isLight ? AppColors.emerald : AppColors.emeraldLight),
-      onPrimary: palette?.onPrimary ??
+      onPrimary:
+          palette?.onPrimary ??
           (isLight ? AppColors.cardBackground : AppColors.ink),
       secondary:
           palette?.gold ?? (isLight ? AppColors.goldStrong : AppColors.gold),
       // Gold is a light accent: ink on it measures 3.47:1 in the light theme,
       // so white is used for text on a gold fill (5.0:1). Dark keeps the ink.
-      onSecondary: palette?.onGold ??
+      onSecondary:
+          palette?.onGold ??
           (isLight ? AppColors.cardBackground : AppColors.ink),
       // `fromSeed` derives `surfaceTint` from the *generated* primary, not the
       // override above; an elevated dialog would otherwise take the seeded
       // tone instead of the period's.
       surfaceTint: palette?.primary,
-      surface: palette?.surface ??
+      surface:
+          palette?.surface ??
           (isLight ? AppColors.cardBackground : AppColors.darkSurface),
       onSurface:
           palette?.ink ?? (isLight ? AppColors.ink : AppColors.darkOnSurface),
       // The generated container roles are cool mint; the brand highlight is a
       // warm emerald wash. Both pairings stay above 9:1.
-      primaryContainer: palette?.tint ??
+      primaryContainer:
+          palette?.tint ??
           (isLight ? AppColors.emeraldTintLight : AppColors.emeraldTintDark),
-      onPrimaryContainer: palette?.onTint ??
+      onPrimaryContainer:
+          palette?.onTint ??
           (isLight
               ? AppColors.onEmeraldTintLight
               : AppColors.onEmeraldTintDark),
       // The light container is a pale gold; on a dark surface that same pale
       // fill left the 28 dp hadith badge with `onSurface` text at 1.09:1.
       // Dark uses a dark gold wash and a gold label instead.
-      secondaryContainer: palette?.secondaryContainer ??
+      secondaryContainer:
+          palette?.secondaryContainer ??
           (isLight
               ? AppColors.goldLight
-              : Color.alphaBlend(AppColors.gold.withValues(alpha: 0.18),
-                  AppColors.darkSurface)),
-      onSecondaryContainer: palette?.onSecondaryContainer ??
+              : Color.alphaBlend(
+                  AppColors.gold.withValues(alpha: 0.18),
+                  AppColors.darkSurface,
+                )),
+      onSecondaryContainer:
+          palette?.onSecondaryContainer ??
           (isLight ? AppColors.goldText : AppColors.gold),
       // Grouping surfaces (grid tiles, inset panels) read as warm paper, not
       // as the neutral grey the seed generates.
@@ -283,13 +303,17 @@ abstract final class AppTheme {
       inverseSurface: palette?.ink,
       onInverseSurface: palette?.surface,
     );
-    final page = palette?.page ??
+    final page =
+        palette?.page ??
         (isLight ? AppColors.pageBackground : AppColors.darkBackground);
-    final hairline = palette?.hairline ??
+    final hairline =
+        palette?.hairline ??
         (isLight ? AppColors.hairline : AppColors.darkHairline);
-    final appBar = palette?.appBar ??
+    final appBar =
+        palette?.appBar ??
         (isLight ? AppColors.primaryBeige : AppColors.darkSurface);
-    final appBarInk = palette?.ink ??
+    final appBarInk =
+        palette?.ink ??
         (isLight ? AppColors.emeraldDark : AppColors.darkOnSurface);
 
     return ThemeData(
@@ -305,9 +329,7 @@ abstract final class AppTheme {
         systemOverlayStyle: AppSystemUi.overlayStyle(brightness),
         // A one-pixel hairline is what separates the bar from the page without
         // adding a shadow or a second surface tone. Structure, not elevation.
-        shape: Border(
-          bottom: BorderSide(color: hairline, width: 1),
-        ),
+        shape: Border(bottom: BorderSide(color: hairline, width: 1)),
       ),
       cardTheme: CardThemeData(
         color: colorScheme.surface,
@@ -341,7 +363,8 @@ abstract final class AppTheme {
           height: AppType.relaxedHeight,
           color: colorScheme.onSurface,
         ),
-        actionTextColor: palette?.goldText ??
+        actionTextColor:
+            palette?.goldText ??
             (isLight ? AppColors.goldText : AppColors.gold),
         elevation: 3,
         shape: RoundedRectangleBorder(

@@ -12,7 +12,7 @@ import 'support/test_db.dart';
 
 class _FullDiskDownloader extends AudioDownloader {
   _FullDiskDownloader(super.db)
-      : super(audioRootResolver: () async => Directory.systemTemp);
+    : super(audioRootResolver: () async => Directory.systemTemp);
 
   bool fail = true;
 
@@ -41,7 +41,9 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: 'row-1',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -59,20 +61,25 @@ void main() {
     addTearDown(cubit.close);
   });
 
-  test('a full disk raises the flag and a successful retry clears it',
-      () async {
-    await cubit.enqueue('row-1', 1);
+  test(
+    'a full disk raises the flag and a successful retry clears it',
+    () async {
+      await cubit.enqueue('row-1', 1);
 
-    expect(cubit.state.outOfSpace, isTrue);
-    expect(cubit.state.items['row-1-1']?.status, DownloadStatus.failed);
+      expect(cubit.state.outOfSpace, isTrue);
+      expect(cubit.state.items['row-1-1']?.status, DownloadStatus.failed);
 
-    downloader.fail = false;
-    await cubit.enqueue('row-1', 1);
+      downloader.fail = false;
+      await cubit.enqueue('row-1', 1);
 
-    expect(cubit.state.items['row-1-1']?.status, DownloadStatus.done);
-    expect(cubit.state.outOfSpace, isFalse,
-        reason: 'the retry proved the device has space again');
-  });
+      expect(cubit.state.items['row-1-1']?.status, DownloadStatus.done);
+      expect(
+        cubit.state.outOfSpace,
+        isFalse,
+        reason: 'the retry proved the device has space again',
+      );
+    },
+  );
 
   test('dismissing the warning leaves the failed row retriable', () async {
     await cubit.enqueue('row-1', 1);

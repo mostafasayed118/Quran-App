@@ -10,25 +10,33 @@ import 'support/test_db.dart';
 
 Future<AppDatabase> _seed(int bookmarks) async {
   final db = newTestDb();
-  await db.into(db.surahs).insert(SurahsCompanion.insert(
-        id: const Value(1),
-        nameAr: 'الفاتحة',
-        nameEn: 'Al-Fatihah',
-        revelationType: 'makkah',
-        ayahCount: bookmarks,
-        pagesStart: 1,
-        pagesEnd: 1,
-      ));
+  await db
+      .into(db.surahs)
+      .insert(
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: bookmarks,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+      );
   for (var id = 1; id <= bookmarks; id++) {
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: Value(id),
-          surahId: 1,
-          numberInSurah: id,
-          juz: 1,
-          page: 1,
-          textUthmani: 'نص $id',
-          textImlaei: 'نص $id',
-        ));
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: Value(id),
+            surahId: 1,
+            numberInSurah: id,
+            juz: 1,
+            page: 1,
+            textUthmani: 'نص $id',
+            textImlaei: 'نص $id',
+          ),
+        );
     await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: id));
   }
   return db;
@@ -52,8 +60,10 @@ void main() {
     final repo = AyahRepository(db);
 
     final first = await repo.watchFirstPage(limit: 20).first;
-    final older =
-        await repo.entriesBefore(first.entries.last.bookmarkId, limit: 20);
+    final older = await repo.entriesBefore(
+      first.entries.last.bookmarkId,
+      limit: 20,
+    );
 
     expect(older.entries, hasLength(5));
     expect(older.hasMore, false);

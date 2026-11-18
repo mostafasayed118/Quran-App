@@ -82,26 +82,32 @@ void main() {
     // Keep the route test fast and deterministic: every source the Quran tab
     // and the reader touch points at a seeded in-memory database.
     _testDb = newTestDb();
-    await _testDb.batch((b) => b.insertAll(_testDb.surahs, [
-          SurahsCompanion.insert(
-              id: const Value(1),
-              nameAr: 'الفاتحة',
-              nameEn: 'Al-Fatihah',
-              revelationType: 'makkah',
-              ayahCount: 1,
-              pagesStart: 1,
-              pagesEnd: 1),
-        ]));
-    await _testDb.batch((b) => b.insertAll(_testDb.ayahs, [
-          AyahsCompanion.insert(
-              id: const Value(8),
-              surahId: 1,
-              numberInSurah: 1,
-              juz: 1,
-              page: 1,
-              textUthmani: 'بسم الله الرحمن الرحيم',
-              textImlaei: 'بسم الله الرحمن الرحيم'),
-        ]));
+    await _testDb.batch(
+      (b) => b.insertAll(_testDb.surahs, [
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 1,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+      ]),
+    );
+    await _testDb.batch(
+      (b) => b.insertAll(_testDb.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(8),
+          surahId: 1,
+          numberInSurah: 1,
+          juz: 1,
+          page: 1,
+          textUthmani: 'بسم الله الرحمن الرحيم',
+          textImlaei: 'بسم الله الرحمن الرحيم',
+        ),
+      ]),
+    );
 
     getIt.unregister<SurahSource>();
     getIt.registerSingleton<SurahSource>(SurahRepository(_testDb));
@@ -130,19 +136,21 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-    ));
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: AppRouter.router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+      ),
+    );
   }
 
   Future<void> openWorkspace(WidgetTester tester) async {
@@ -187,34 +195,39 @@ void main() {
   });
 
   testWidgets(
-      'expanded opens the pane without changing the URL and back clears',
-      (tester) async {
-    tester.view.physicalSize = const Size(1024, 768);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
+    'expanded opens the pane without changing the URL and back clears',
+    (tester) async {
+      tester.view.physicalSize = const Size(1024, 768);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
 
-    await openWorkspace(tester);
-    expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
+      await openWorkspace(tester);
+      expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
 
-    await openFirstSurah(tester);
+      await openFirstSurah(tester);
 
-    expect(find.byType(ReaderPane), findsOneWidget);
-    expect(AppRouter.router.state.uri.path, AppRoutes.quran);
+      expect(find.byType(ReaderPane), findsOneWidget);
+      expect(AppRouter.router.state.uri.path, AppRoutes.quran);
 
-    // System back clears the pane and keeps the tab.
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      // System back clears the pane and keeps the tab.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.byType(ReaderPane), findsNothing);
-    expect(find.byType(QuranWorkspaceScreen), findsOneWidget);
-    expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
+      expect(find.byType(ReaderPane), findsNothing);
+      expect(find.byType(QuranWorkspaceScreen), findsOneWidget);
+      expect(find.text('اختر سورة أو جزءًا أو علامة للقراءة'), findsOneWidget);
 
-    await disposeApp(tester);
-  });
+      await disposeApp(tester);
+    },
+  );
 
-  testWidgets('resizing to compact with a live reader unmounts cleanly',
-      (tester) async {
+  testWidgets('resizing to compact with a live reader unmounts cleanly', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

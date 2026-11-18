@@ -19,36 +19,37 @@ const ReminderTexts _texts = ReminderTexts(
 
 /// The six times of [day], at fixed clock values.
 List<PrayerChoice> _day(DateTime day) => <PrayerChoice>[
-      PrayerChoice(
-          PrayerName.fajr, DateTime(day.year, day.month, day.day, 4, 45)),
-      PrayerChoice(
-          PrayerName.sunrise, DateTime(day.year, day.month, day.day, 6, 10)),
-      PrayerChoice(
-          PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12, 5)),
-      PrayerChoice(
-          PrayerName.asr, DateTime(day.year, day.month, day.day, 15, 35)),
-      PrayerChoice(
-          PrayerName.maghrib, DateTime(day.year, day.month, day.day, 18, 5)),
-      PrayerChoice(
-          PrayerName.isha, DateTime(day.year, day.month, day.day, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(day.year, day.month, day.day, 4, 45)),
+  PrayerChoice(
+    PrayerName.sunrise,
+    DateTime(day.year, day.month, day.day, 6, 10),
+  ),
+  PrayerChoice(PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(day.year, day.month, day.day, 15, 35)),
+  PrayerChoice(
+    PrayerName.maghrib,
+    DateTime(day.year, day.month, day.day, 18, 5),
+  ),
+  PrayerChoice(PrayerName.isha, DateTime(day.year, day.month, day.day, 19, 30)),
+];
 
-List<List<PrayerChoice>> _window(DateTime first,
-        {int days = reminderHorizonDays}) =>
-    <List<PrayerChoice>>[
-      for (var offset = 0; offset < days; offset++)
-        _day(DateTime(first.year, first.month, first.day + offset)),
-    ];
+List<List<PrayerChoice>> _window(
+  DateTime first, {
+  int days = reminderHorizonDays,
+}) => <List<PrayerChoice>>[
+  for (var offset = 0; offset < days; offset++)
+    _day(DateTime(first.year, first.month, first.day + offset)),
+];
 
 class _City implements CitySource {
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
   @override
   Future<void> select(City city) async {}
 }
@@ -59,8 +60,13 @@ class _DayPrayer implements PrayerTimesPort {
       _day(dayLocal);
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) {
-    final next =
-        DateTime(whenLocal.year, whenLocal.month, whenLocal.day + 1, 4, 45);
+    final next = DateTime(
+      whenLocal.year,
+      whenLocal.month,
+      whenLocal.day + 1,
+      4,
+      45,
+    );
     return PrayerChoice(PrayerName.fajr, next);
   }
 }
@@ -146,10 +152,16 @@ void main() {
   });
 
   test('ids are stable for the same day and reused only a window apart', () {
-    final first =
-        planPrayerHorizon(now: now, days: _window(now), texts: _texts);
-    final second =
-        planPrayerHorizon(now: now, days: _window(now), texts: _texts);
+    final first = planPrayerHorizon(
+      now: now,
+      days: _window(now),
+      texts: _texts,
+    );
+    final second = planPrayerHorizon(
+      now: now,
+      days: _window(now),
+      texts: _texts,
+    );
 
     expect(
       first.map((r) => r.id).toSet(),
@@ -177,10 +189,7 @@ void main() {
       texts: _texts,
     );
 
-    expect(
-      plan.map((r) => r.id).toSet(),
-      isNot(contains(anyOf(1, 2, 3, 4))),
-    );
+    expect(plan.map((r) => r.id).toSet(), isNot(contains(anyOf(1, 2, 3, 4))));
     expect(
       reminderAlarmIds().containsAll(plan.map((r) => r.id)),
       isTrue,
@@ -263,8 +272,7 @@ void main() {
     );
   });
 
-  test('the shared schedule path ships a full window for a real day source',
-      () async {
+  test('the shared schedule path ships a full window for a real day source', () async {
     final scheduler = _Scheduler();
 
     final plan = await scheduleReminders(

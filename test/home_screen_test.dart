@@ -24,30 +24,39 @@ void main() {
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'Medinan',
-          ayahCount: 286,
-          pagesStart: 2,
-          pagesEnd: 49,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 3,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'Medinan',
+            ayahCount: 286,
+            pagesStart: 2,
+            pagesEnd: 49,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(8),
+            surahId: 2,
+            numberInSurah: 3,
+            juz: 1,
+            page: 2,
+            textUthmani: 'ذلك الكتاب',
+            textImlaei: 'ذلك الكتاب',
+          ),
+        );
     await city.select(cairoCity);
     await lastRead.saveAyahId(8);
   });
 
-  testWidgets('home shows continue-reading and next-prayer cards plus grid',
-      (tester) async {
+  testWidgets('home shows continue-reading and next-prayer cards plus grid', (
+    tester,
+  ) async {
     final cubit = HomeCubit(
       lastRead: lastRead,
       ayahs: ayahs,
@@ -56,12 +65,17 @@ void main() {
     );
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<HomeCubit>.value(
-      value: cubit,
-      child: appShell(home: const HomeScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<HomeCubit>.value(
+        value: cubit,
+        child: appShell(home: const HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('قرآن يَهدي'), findsOneWidget);
     expect(find.textContaining('متابعة القراءة'), findsOneWidget);

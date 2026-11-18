@@ -10,10 +10,7 @@ class _RecitingList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: appScrollPadding(
-        context,
-        const EdgeInsets.all(AppSpacing.md),
-      ),
+      padding: appScrollPadding(context, const EdgeInsets.all(AppSpacing.md)),
       itemCount: collection.items.length,
       itemBuilder: (context, i) {
         final item = collection.items[i];
@@ -22,8 +19,8 @@ class _RecitingList extends StatelessWidget {
         return BlocSelector<AzkarCubit, AzkarState, int>(
           selector: (state) =>
               state is AzkarReciting && i < state.remaining.length
-                  ? state.remaining[i]
-                  : item.count,
+              ? state.remaining[i]
+              : item.count,
           builder: (context, remaining) =>
               _RecitingCard(item: item, remaining: remaining, index: i),
         );
@@ -71,10 +68,7 @@ class _RecitingCard extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
-                      [
-                        ?item.virtue,
-                        ?item.reference,
-                      ].join(' · '),
+                      [?item.virtue, ?item.reference].join(' · '),
                       textAlign: TextAlign.right,
                       style: AppTheme.mutedFootnote(context),
                     ),

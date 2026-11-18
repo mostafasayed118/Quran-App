@@ -124,15 +124,17 @@ void main() {
     expect(find.text(_fixAction), findsNothing);
   });
 
-  testWidgets('a failed plan write shows the schedule row without a fix button',
-      (tester) async {
-    applyHealth.setFailed(true);
-    await pumpSettings(tester);
+  testWidgets(
+    'a failed plan write shows the schedule row without a fix button',
+    (tester) async {
+      applyHealth.setFailed(true);
+      await pumpSettings(tester);
 
-    expect(find.text(_title), findsOneWidget);
-    expect(find.text(_scheduleIssue), findsOneWidget);
-    expect(find.text(_fixAction), findsNothing);
-  });
+      expect(find.text(_title), findsOneWidget);
+      expect(find.text(_scheduleIssue), findsOneWidget);
+      expect(find.text(_fixAction), findsNothing);
+    },
+  );
 
   testWidgets('a failure after mount appears without a resume', (tester) async {
     await pumpSettings(tester);
@@ -144,8 +146,9 @@ void main() {
     expect(find.text(_scheduleIssue), findsOneWidget);
   });
 
-  testWidgets('a single issue shows its row and its fix action',
-      (tester) async {
+  testWidgets('a single issue shows its row and its fix action', (
+    tester,
+  ) async {
     diagnostics.exactAlarms = false;
     await pumpSettings(tester);
 
@@ -175,8 +178,9 @@ void main() {
     expect(diagnostics.exactAlarmOpens, 0);
   });
 
-  testWidgets('an unreadable battery state gives instructions, not a button',
-      (tester) async {
+  testWidgets('an unreadable battery state gives instructions, not a button', (
+    tester,
+  ) async {
     diagnostics.battery = null;
     await pumpSettings(tester);
 
@@ -186,8 +190,9 @@ void main() {
     expect(find.text(_batteryIssue), findsNothing);
   });
 
-  testWidgets('a platform without battery optimisation shows no section',
-      (tester) async {
+  testWidgets('a platform without battery optimisation shows no section', (
+    tester,
+  ) async {
     // Reset in the body too: the widget binding asserts that debug foundation
     // variables are unset before tearDown callbacks run.
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
@@ -207,8 +212,9 @@ void main() {
     }
   });
 
-  testWidgets('a denied notification permission shows the permission row',
-      (tester) async {
+  testWidgets('a denied notification permission shows the permission row', (
+    tester,
+  ) async {
     diagnostics.notifications = false;
     await pumpSettings(tester);
 
@@ -220,8 +226,9 @@ void main() {
 
   testWidgets('resuming re-reads the device state', (tester) async {
     addTearDown(
-      () => tester.binding
-          .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+      () => tester.binding.handleAppLifecycleStateChanged(
+        AppLifecycleState.resumed,
+      ),
     );
     diagnostics.exactAlarms = false;
     await pumpSettings(tester);
@@ -236,8 +243,9 @@ void main() {
     expect(find.text(_title), findsNothing);
   });
 
-  testWidgets('all three issues render at textScaler 2.0 without overflow',
-      (tester) async {
+  testWidgets('all three issues render at textScaler 2.0 without overflow', (
+    tester,
+  ) async {
     diagnostics
       ..notifications = false
       ..exactAlarms = false
@@ -251,8 +259,9 @@ void main() {
     expect(find.text(_fixAction), findsNWidgets(2));
   });
 
-  testWidgets('without a diagnostics dependency the section stays out',
-      (tester) async {
+  testWidgets('without a diagnostics dependency the section stays out', (
+    tester,
+  ) async {
     final cubit = SettingsCubit(
       settings: ReminderSettings(db),
       city: CityRepository(db: db, loader: () async => [cairoCity.toJson()]),

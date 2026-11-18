@@ -11,8 +11,8 @@ import 'juz_index_state.dart';
 class JuzIndexCubit extends Cubit<JuzIndexState> {
   /// Creates the cubit; the route scope calls [start] once.
   JuzIndexCubit({required JuzIndexSource source})
-      : _source = source,
-        super(const JuzIndexState.loading());
+    : _source = source,
+      super(const JuzIndexState.loading());
 
   final JuzIndexSource _source;
   StreamSubscription<List<JuzSummary>>? _sub;
@@ -29,14 +29,22 @@ class JuzIndexCubit extends Cubit<JuzIndexState> {
           if (!isClosed) emit(JuzIndexState.ready(juz));
         },
         onError: (Object error, StackTrace stackTrace) {
-          appLog('juz index stream failed',
-              name: 'quran_yahdi/quran', error: error, stackTrace: stackTrace);
+          appLog(
+            'juz index stream failed',
+            name: 'quran_yahdi/quran',
+            error: error,
+            stackTrace: stackTrace,
+          );
           if (!isClosed) emit(const JuzIndexState.failed());
         },
       );
     } on Object catch (error, stackTrace) {
-      appLog('juz index load failed',
-          name: 'quran_yahdi/quran', error: error, stackTrace: stackTrace);
+      appLog(
+        'juz index load failed',
+        name: 'quran_yahdi/quran',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const JuzIndexState.failed());
     }
   }

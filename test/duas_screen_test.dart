@@ -21,63 +21,77 @@ void main() {
   setUp(() async {
     db = newTestDb();
     duaRepo = DuaRepository(
-        loader: () async => [
-              {
-                'id': 'a1',
-                'categoryAr': 'المنزل',
-                'categoryEn': 'Home',
-                'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
-              },
-              {
-                'id': 'a2',
-                'categoryAr': 'السفر',
-                'categoryEn': 'Travel',
-                'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
-              },
-            ]);
+      loader: () async => [
+        {
+          'id': 'a1',
+          'categoryAr': 'المنزل',
+          'categoryEn': 'Home',
+          'text': 'بِسْمِ اللَّهِ وَلَجْنَا',
+        },
+        {
+          'id': 'a2',
+          'categoryAr': 'السفر',
+          'categoryEn': 'Travel',
+          'text': 'سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا',
+        },
+      ],
+    );
     ruqyahRepo = RuqyahRepository(
-        loader: () async => [
-              {
-                'id': 'r1',
-                'kind': 'dhikr',
-                'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
-                'count': 3
-              },
-              {
-                'id': 'r2',
-                'kind': 'quran',
-                'surahId': 112,
-                'fromAyah': 1,
-                'toAyah': 2
-              },
-            ]);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(112),
-          nameAr: 'الإخلاص',
-          nameEn: 'Al-Ikhlas',
-          revelationType: 'Meccan',
-          ayahCount: 4,
-          pagesStart: 604,
-          pagesEnd: 604,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(6220),
-          surahId: 112,
-          numberInSurah: 1,
-          juz: 30,
-          page: 604,
-          textUthmani: 'قُلْ هُوَ اللَّهُ أَحَدٌ',
-          textImlaei: 'قل هو الله أحد',
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(6221),
-          surahId: 112,
-          numberInSurah: 2,
-          juz: 30,
-          page: 604,
-          textUthmani: 'اللَّهُ الصَّمَدُ',
-          textImlaei: 'الله الصمد',
-        ));
+      loader: () async => [
+        {
+          'id': 'r1',
+          'kind': 'dhikr',
+          'text': 'أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ',
+          'count': 3,
+        },
+        {
+          'id': 'r2',
+          'kind': 'quran',
+          'surahId': 112,
+          'fromAyah': 1,
+          'toAyah': 2,
+        },
+      ],
+    );
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(112),
+            nameAr: 'الإخلاص',
+            nameEn: 'Al-Ikhlas',
+            revelationType: 'Meccan',
+            ayahCount: 4,
+            pagesStart: 604,
+            pagesEnd: 604,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(6220),
+            surahId: 112,
+            numberInSurah: 1,
+            juz: 30,
+            page: 604,
+            textUthmani: 'قُلْ هُوَ اللَّهُ أَحَدٌ',
+            textImlaei: 'قل هو الله أحد',
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(6221),
+            surahId: 112,
+            numberInSurah: 2,
+            juz: 30,
+            page: 604,
+            textUthmani: 'اللَّهُ الصَّمَدُ',
+            textImlaei: 'الله الصمد',
+          ),
+        );
   });
 
   Future<void> pumpHost(WidgetTester tester) async {
@@ -95,37 +109,48 @@ void main() {
     );
   }
 
-  testWidgets('duas tab lists entries and filters by category chip',
-      (tester) async {
+  testWidgets('duas tab lists entries and filters by category chip', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(find.text('بِسْمِ اللَّهِ وَلَجْنَا'), findsOneWidget);
     expect(find.text('سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا'), findsOneWidget);
 
     await tester.tap(find.text('المنزل'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('بِسْمِ اللَّهِ وَلَجْنَا'), findsOneWidget);
     expect(find.text('سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا'), findsNothing);
   });
 
-  testWidgets('ruqyah tab resolves quran ranges from the DB shows citation',
-      (tester) async {
+  testWidgets('ruqyah tab resolves quran ranges from the DB shows citation', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.textContaining('أَعُوذُ بِكَلِمَاتِ اللَّهِ'), findsOneWidget);
-    expect(find.text('قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ'),
-        findsOneWidget);
+    expect(
+      find.text('قُلْ هُوَ اللَّهُ أَحَدٌ اللَّهُ الصَّمَدُ'),
+      findsOneWidget,
+    );
     expect(find.textContaining('الإخلاص'), findsOneWidget);
     expect(find.text('×٣'), findsOneWidget);
   });
 
-  testWidgets('duas load failure lands in the error pane, never hangs',
-      (tester) async {
+  testWidgets('duas load failure lands in the error pane, never hangs', (
+    tester,
+  ) async {
     final cubit = DuasCubit(
       duas: DuaRepository(loader: () async => throw StateError('duas down')),
       ruqyah: ruqyahRepo,
@@ -133,10 +158,12 @@ void main() {
     );
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<DuasCubit>.value(
-      value: cubit,
-      child: appShell(home: const DuasScreen()),
-    ));
+    await tester.pumpWidget(
+      BlocProvider<DuasCubit>.value(
+        value: cubit,
+        child: appShell(home: const DuasScreen()),
+      ),
+    );
     await tester.pump();
     await tester.pump();
 

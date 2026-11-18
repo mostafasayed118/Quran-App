@@ -12,8 +12,9 @@ import 'support/test_db.dart';
 /// The compact index title is part of the frozen compact behaviour: the
 /// workspace wave must not rename it while extracting the body.
 void main() {
-  testWidgets('the compact surah index keeps its English title',
-      (tester) async {
+  testWidgets('the compact surah index keeps its English title', (
+    tester,
+  ) async {
     final db = newTestDb();
     addTearDown(db.close);
     final cubit = SurahIndexCubit(SurahRepository(db));

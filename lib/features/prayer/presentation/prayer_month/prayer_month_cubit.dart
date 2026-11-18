@@ -13,10 +13,10 @@ class PrayerMonthCubit extends Cubit<PrayerMonthState> {
     required CitySource city,
     required PrayerTimesPort prayer,
     DateTime Function()? clock,
-  })  : _city = city,
-        _prayer = prayer,
-        _month = _firstOfMonth((clock ?? DateTime.now)()),
-        super(const PrayerMonthState.loading());
+  }) : _city = city,
+       _prayer = prayer,
+       _month = _firstOfMonth((clock ?? DateTime.now)()),
+       super(const PrayerMonthState.loading());
 
   final CitySource _city;
   final PrayerTimesPort _prayer;
@@ -51,15 +51,21 @@ class PrayerMonthCubit extends Cubit<PrayerMonthState> {
         }
       }
       if (isClosed) return;
-      emit(PrayerMonthState.ready(
-        city: city,
-        year: _month.year,
-        month: _month.month,
-        days: List<PrayerMonthDay>.unmodifiable(days),
-      ));
+      emit(
+        PrayerMonthState.ready(
+          city: city,
+          year: _month.year,
+          month: _month.month,
+          days: List<PrayerMonthDay>.unmodifiable(days),
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('prayer month load failed',
-          name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
+      appLog(
+        'prayer month load failed',
+        name: 'quran_yahdi/prayer',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const PrayerMonthState.failed());
     }
   }

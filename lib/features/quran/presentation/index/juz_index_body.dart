@@ -33,29 +33,27 @@ class JuzIndexBody extends StatelessWidget {
         JuzIndexFailed() => errorPane(loc, onRetry: cubit.start),
         JuzIndexReady(:final juz) when juz.isEmpty => EmptyState(loc.noResults),
         JuzIndexReady(:final juz) => ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-            itemCount: juz.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final entry = juz[index];
-              return ListTile(
-                selected: entry.juz == selectedJuz,
-                leading: CircleAvatar(
-                  child: Text(loc.number(entry.juz)),
-                ),
-                title: Text(loc.juzLabel(loc.number(entry.juz))),
-                subtitle: Text(
-                  '${entry.surahName} · ${loc.number(entry.firstPage)}',
-                ),
-                trailing: Icon(
-                  Directionality.of(context) == TextDirection.rtl
-                      ? Icons.chevron_left
-                      : Icons.chevron_right,
-                ),
-                onTap: () => onSelect(entry),
-              );
-            },
-          ),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          itemCount: juz.length,
+          separatorBuilder: (_, _) => const Divider(height: 1),
+          itemBuilder: (context, index) {
+            final entry = juz[index];
+            return ListTile(
+              selected: entry.juz == selectedJuz,
+              leading: CircleAvatar(child: Text(loc.number(entry.juz))),
+              title: Text(loc.juzLabel(loc.number(entry.juz))),
+              subtitle: Text(
+                '${entry.surahName} · ${loc.number(entry.firstPage)}',
+              ),
+              trailing: Icon(
+                Directionality.of(context) == TextDirection.rtl
+                    ? Icons.chevron_left
+                    : Icons.chevron_right,
+              ),
+              onTap: () => onSelect(entry),
+            );
+          },
+        ),
       },
     );
   }

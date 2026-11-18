@@ -15,33 +15,34 @@ class _NoAyahs implements AyahLookup {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      const <Ayah>[];
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => const <Ayah>[];
 
   @override
   Future<Surah?> surahById(int surahId) async => null;
 }
 
 DuaRepository _duas() => DuaRepository(
-    loader: () async => [
-          {
-            'id': 'd1',
-            'categoryAr': 'المنزل',
-            'text': 'دعاء المنزل',
-          },
-        ]);
+  loader: () async => [
+    {'id': 'd1', 'categoryAr': 'المنزل', 'text': 'دعاء المنزل'},
+  ],
+);
 
 void main() {
   test('a stale ruqyah load cannot flip a newer duas intent', () async {
     final gate = Completer<void>();
     final cubit = DuasCubit(
       duas: _duas(),
-      ruqyah: RuqyahRepository(loader: () async {
-        await gate.future;
-        return [
-          {'id': 'r1', 'kind': 'dhikr', 'text': 'رقية'},
-        ];
-      }),
+      ruqyah: RuqyahRepository(
+        loader: () async {
+          await gate.future;
+          return [
+            {'id': 'r1', 'kind': 'dhikr', 'text': 'رقية'},
+          ];
+        },
+      ),
       ayahs: _NoAyahs(),
     );
     addTearDown(cubit.close);
@@ -70,10 +71,12 @@ void main() {
     final gate = Completer<void>();
     final cubit = DuasCubit(
       duas: _duas(),
-      ruqyah: RuqyahRepository(loader: () async {
-        await gate.future;
-        throw StateError('ruqyah down');
-      }),
+      ruqyah: RuqyahRepository(
+        loader: () async {
+          await gate.future;
+          throw StateError('ruqyah down');
+        },
+      ),
       ayahs: _NoAyahs(),
     );
     addTearDown(cubit.close);
@@ -96,14 +99,15 @@ void main() {
   test('the state carries the English category labels', () async {
     final cubit = DuasCubit(
       duas: DuaRepository(
-          loader: () async => [
-                {
-                  'id': 'd1',
-                  'categoryAr': 'المنزل',
-                  'categoryEn': 'Home',
-                  'text': 'دعاء',
-                },
-              ]),
+        loader: () async => [
+          {
+            'id': 'd1',
+            'categoryAr': 'المنزل',
+            'categoryEn': 'Home',
+            'text': 'دعاء',
+          },
+        ],
+      ),
       ruqyah: RuqyahRepository(loader: () async => const []),
       ayahs: _NoAyahs(),
     );
@@ -117,13 +121,15 @@ void main() {
     var loads = 0;
     final cubit = DuasCubit(
       duas: _duas(),
-      ruqyah: RuqyahRepository(loader: () async {
-        loads += 1;
-        await gate.future;
-        return [
-          {'id': 'r1', 'kind': 'dhikr', 'text': 'رقية'},
-        ];
-      }),
+      ruqyah: RuqyahRepository(
+        loader: () async {
+          loads += 1;
+          await gate.future;
+          return [
+            {'id': 'r1', 'kind': 'dhikr', 'text': 'رقية'},
+          ];
+        },
+      ),
       ayahs: _NoAyahs(),
     );
     addTearDown(cubit.close);

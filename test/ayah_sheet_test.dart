@@ -48,22 +48,30 @@ Future<void> seedPacks(AppDatabase db, Directory tempRoot) async {
       .copySync('${libraryDir.path}/ar-tafsir-muyassar.json');
   File('test/fixtures/translation_ara_sirajtafseer_excerpt.json')
       .copySync('${libraryDir.path}/ar-sirajtafseer.json');
-  await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-        packId: 'ar-tafsir-muyassar',
-        kind: 'tafsir',
-        language: 'ar',
-        title: 'التفسير الميسر',
-        sizeMb: 0.2,
-        version: 'v1.2.2',
-      ));
-  await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-        packId: 'ar-sirajtafseer',
-        kind: 'translation',
-        language: 'ar',
-        title: 'السراج المنير',
-        sizeMb: 2.0,
-        version: '1',
-      ));
+  await db
+      .into(db.installedPacks)
+      .insert(
+        InstalledPacksCompanion.insert(
+          packId: 'ar-tafsir-muyassar',
+          kind: 'tafsir',
+          language: 'ar',
+          title: 'التفسير الميسر',
+          sizeMb: 0.2,
+          version: 'v1.2.2',
+        ),
+      );
+  await db
+      .into(db.installedPacks)
+      .insert(
+        InstalledPacksCompanion.insert(
+          packId: 'ar-sirajtafseer',
+          kind: 'translation',
+          language: 'ar',
+          title: 'السراج المنير',
+          sizeMb: 2.0,
+          version: '1',
+        ),
+      );
 }
 
 void main() {
@@ -84,16 +92,19 @@ void main() {
     test('resolves installed tafsir and translation for the ayah', () async {
       await seedPacks(db, tempRoot);
       final cubit = AyahSheetCubit(
-        downloader: PackDownloader(db,
-            libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
+        downloader: PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
         surah: 1,
         ayah: 1,
       );
       addTearDown(cubit.close);
 
-      final ready = await cubit.stream.firstWhere((s) => s is AyahSheetReady)
-          as AyahSheetReady;
+      final ready = await cubit.stream.firstWhere(
+        (s) => s is AyahSheetReady,
+      ) as AyahSheetReady;
 
       expect(ready.tafsirEntries, hasLength(1));
       expect(ready.tafsirEntries.single.title, 'التفسير الميسر');
@@ -105,58 +116,74 @@ void main() {
 
     test('no installed packs resolves empty entry lists', () async {
       final cubit = AyahSheetCubit(
-        downloader: PackDownloader(db,
-            libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
+        downloader: PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
         surah: 1,
         ayah: 1,
       );
       addTearDown(cubit.close);
 
-      final ready = await cubit.stream.firstWhere((s) => s is AyahSheetReady)
-          as AyahSheetReady;
+      final ready = await cubit.stream.firstWhere(
+        (s) => s is AyahSheetReady,
+      ) as AyahSheetReady;
 
       expect(ready.tafsirEntries, isEmpty);
       expect(ready.translationEntries, isEmpty);
     });
 
-    test('hadith-kind rows and missing pack files are treated as absent',
-        () async {
-      final libraryDir = Directory('${tempRoot.path}/library')
-        ..createSync(recursive: true);
-      File('test/fixtures/hadith_eng_muslim_excerpt.json')
-          .copySync('${libraryDir.path}/en-muslim.json');
-      await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-            packId: 'en-muslim',
-            kind: 'hadith',
-            language: 'en',
-            title: 'Sahih Muslim',
-            sizeMb: 3.9,
-            version: '1',
-          ));
-      await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-            packId: 'ghost-tafsir',
-            kind: 'tafsir',
-            language: 'ar',
-            title: 'حزمة بلا ملف',
-            sizeMb: 1.0,
-            version: '1',
-          ));
-      final cubit = AyahSheetCubit(
-        downloader: PackDownloader(db,
+    test(
+      'hadith-kind rows and missing pack files are treated as absent',
+      () async {
+        final libraryDir = Directory('${tempRoot.path}/library')
+          ..createSync(recursive: true);
+        File('test/fixtures/hadith_eng_muslim_excerpt.json')
+            .copySync('${libraryDir.path}/en-muslim.json');
+        await db
+            .into(db.installedPacks)
+            .insert(
+              InstalledPacksCompanion.insert(
+                packId: 'en-muslim',
+                kind: 'hadith',
+                language: 'en',
+                title: 'Sahih Muslim',
+                sizeMb: 3.9,
+                version: '1',
+              ),
+            );
+        await db
+            .into(db.installedPacks)
+            .insert(
+              InstalledPacksCompanion.insert(
+                packId: 'ghost-tafsir',
+                kind: 'tafsir',
+                language: 'ar',
+                title: 'حزمة بلا ملف',
+                sizeMb: 1.0,
+                version: '1',
+              ),
+            );
+        final cubit = AyahSheetCubit(
+          downloader: PackDownloader(
+            db,
             libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
-        surah: 1,
-        ayah: 1,
-      );
-      addTearDown(cubit.close);
+            fileDecoder: _syncDecode,
+          ),
+          surah: 1,
+          ayah: 1,
+        );
+        addTearDown(cubit.close);
 
-      final ready = await cubit.stream.firstWhere((s) => s is AyahSheetReady)
-          as AyahSheetReady;
+        final ready = await cubit.stream.firstWhere(
+          (s) => s is AyahSheetReady,
+        ) as AyahSheetReady;
 
-      expect(ready.tafsirEntries, isEmpty);
-      expect(ready.translationEntries, isEmpty);
-    });
+        expect(ready.tafsirEntries, isEmpty);
+        expect(ready.translationEntries, isEmpty);
+      },
+    );
 
     test('downloader failure lands in the error state, never hangs', () async {
       final cubit = AyahSheetCubit(
@@ -166,8 +193,9 @@ void main() {
       );
       addTearDown(cubit.close);
 
-      final failure = await cubit.stream.firstWhere((s) => s is AyahSheetError)
-          as AyahSheetError;
+      final failure = await cubit.stream.firstWhere(
+        (s) => s is AyahSheetError,
+      ) as AyahSheetError;
 
       expect(failure.message, isNotEmpty);
     });
@@ -181,8 +209,11 @@ void main() {
     setUp(() async {
       db = AppDatabase.test(NativeDatabase.memory());
       tempRoot = await Directory.systemTemp.createTemp('qy_ayah_sheet_wtest');
-      downloader = PackDownloader(db,
-          libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode);
+      downloader = PackDownloader(
+        db,
+        libraryRootResolver: () async => tempRoot,
+        fileDecoder: _syncDecode,
+      );
     });
 
     tearDown(() async {
@@ -196,8 +227,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    testWidgets('shows ayah tafsir and translation for installed packs',
-        (tester) async {
+    testWidgets('shows ayah tafsir and translation for installed packs', (
+      tester,
+    ) async {
       await tester.runAsync(() => seedPacks(db, tempRoot));
       await pumpLocales(
         tester,
@@ -212,8 +244,11 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 200));
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
       expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('الفاتحة ﴿١﴾'), findsOneWidget);
       expect(find.text('تفسير'), findsOneWidget);
@@ -258,18 +293,20 @@ void main() {
           ),
         ],
       );
-      await tester.pumpWidget(MaterialApp.router(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        routerConfig: router,
-      ));
+      await tester.pumpWidget(
+        MaterialApp.router(
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.light,
+          routerConfig: router,
+        ),
+      );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
 
@@ -278,7 +315,9 @@ void main() {
       await tester.pump(const Duration(milliseconds: 500));
 
       expect(
-          find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'), findsOneWidget);
+        find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'),
+        findsOneWidget,
+      );
 
       await tester.tap(find.text('المكتبة'));
       await tester.pump();
@@ -294,36 +333,44 @@ void main() {
       // sequentially here (awaited, test-scoped).
       await getIt.reset();
       getIt.registerLazySingleton<PackDownloader>(
-        () => PackDownloader(db,
-            libraryRootResolver: () async => tempRoot,
-            fileDecoder: _syncDecode),
+        () => PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
       );
       addTearDown(getIt.reset);
       final dbHarness = db;
       final fatiha = [
         AyahsCompanion.insert(
-            id: const Value(1),
-            surahId: 1,
-            numberInSurah: 1,
-            juz: 1,
-            page: 1,
-            textUthmani: 'بسم الله الرحمن الرحيم',
-            textImlaei: 'بسم الله الرحمن الرحيم'),
-      ];
-      await tester.runAsync(() async =>
-          dbHarness.batch((b) => b.insertAll(dbHarness.ayahs, fatiha)));
-      final cubit = ReaderCubit(
-          ayahRepository: _TeardownSafeAyahRepository(dbHarness),
-          lastReadRepository: LastReadRepository(dbHarness),
+          id: const Value(1),
           surahId: 1,
-          initialAyah: 0);
+          numberInSurah: 1,
+          juz: 1,
+          page: 1,
+          textUthmani: 'بسم الله الرحمن الرحيم',
+          textImlaei: 'بسم الله الرحمن الرحيم',
+        ),
+      ];
+      await tester.runAsync(
+        () async =>
+            dbHarness.batch((b) => b.insertAll(dbHarness.ayahs, fatiha)),
+      );
+      final cubit = ReaderCubit(
+        ayahRepository: _TeardownSafeAyahRepository(dbHarness),
+        lastReadRepository: LastReadRepository(dbHarness),
+        surahId: 1,
+        initialAyah: 0,
+      );
       addTearDown(cubit.close);
       await cubit.start();
       final playbackCubit = PlaybackCubit(
         service: FakePlaybackService(),
         reciters: ReciterRepository(dbHarness),
-        downloader: AudioDownloader(dbHarness,
-            audioRootResolver: () async => Directory.systemTemp),
+        downloader: AudioDownloader(
+          dbHarness,
+          audioRootResolver: () async => Directory.systemTemp,
+        ),
       );
       addTearDown(playbackCubit.close);
 
@@ -339,14 +386,20 @@ void main() {
       );
 
       await tester.tap(find.text('بسم الله الرحمن الرحيم').first);
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
       await tester.tap(find.byIcon(Icons.menu_book_outlined));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 500));
 
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
       expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
       expect(find.textContaining('سميت الفاتحة'), findsOneWidget);
     });

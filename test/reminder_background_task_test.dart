@@ -31,8 +31,9 @@ void main() {
   });
 
   test('the stamp keeps a bounded history', () async {
-    final file =
-        File('${Directory.systemTemp.path}/reminder_refresh_stamp.txt');
+    final file = File(
+      '${Directory.systemTemp.path}/reminder_refresh_stamp.txt',
+    );
     if (file.existsSync()) file.deleteSync();
     addTearDown(() {
       if (file.existsSync()) file.deleteSync();

@@ -6,26 +6,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
 
 Map<String, dynamic> fixtureRoot() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ أَوَّلٌ'},
-            {'text': 'ذِكْرٌ ثَانٍ', 'count': 3, 'virtue': 'فضل الذكر'},
-          ],
-        },
-        {
-          'id': 'c2',
-          'nameAr': 'أذكار المساء',
-          'nameEn': 'Evening',
-          'items': [
-            {'text': 'ذِكْرٌ ثَالِثٌ', 'count': 7},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ أَوَّلٌ'},
+        {'text': 'ذِكْرٌ ثَانٍ', 'count': 3, 'virtue': 'فضل الذكر'},
       ],
-    };
+    },
+    {
+      'id': 'c2',
+      'nameAr': 'أذكار المساء',
+      'nameEn': 'Evening',
+      'items': [
+        {'text': 'ذِكْرٌ ثَالِثٌ', 'count': 7},
+      ],
+    },
+  ],
+};
 
 void main() {
   late AzkarRepository repo;
@@ -44,8 +44,10 @@ void main() {
 
   test('collection lookup by id', () async {
     final collections = await repo.collections();
-    final evening = collections.firstWhere((c) => c.id == 'c2',
-        orElse: () => throw StateError('missing c2'));
+    final evening = collections.firstWhere(
+      (c) => c.id == 'c2',
+      orElse: () => throw StateError('missing c2'),
+    );
     expect(evening.nameEn, 'Evening');
     expect(evening.items.single.count, 7);
   });
@@ -54,7 +56,8 @@ void main() {
     final file = File('assets/data/azkar.json');
     if (!file.existsSync()) {
       markTestSkipped(
-          'working dir does not resolve the bundled asset from this runner');
+        'working dir does not resolve the bundled asset from this runner',
+      );
     }
     final root = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     final list = (root['collections'] as List).cast<Map<String, dynamic>>();
@@ -68,8 +71,11 @@ void main() {
       final items = (c['items'] as List).cast<Map<String, dynamic>>();
       totalItems += items.length;
       for (final item in items) {
-        expect((item['text'] as String).trim().isNotEmpty, isTrue,
-            reason: 'empty text in ${c['id']}');
+        expect(
+          (item['text'] as String).trim().isNotEmpty,
+          isTrue,
+          reason: 'empty text in ${c['id']}',
+        );
         final count = item['count'] as int?;
         if (count != null) {
           expect(count, greaterThanOrEqualTo(1));

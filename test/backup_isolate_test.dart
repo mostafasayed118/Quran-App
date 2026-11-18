@@ -8,18 +8,20 @@ import 'package:quran_yahdi/features/backup/data/backup_io.dart';
 
 void main() {
   test('the worker-isolate decode path completes and decodes', () async {
-    final raw = encode(BackupDocument(
-      exportedAt: DateTime.utc(2026, 10, 22),
-      schemaVersion: 2,
-      data: const BackupData(
-        bookmarks: [],
-        lastReadAyahId: null,
-        khatma: [],
-        prayerLog: [],
-        tasbih: null,
-        settings: {'selected_city': '{"id":"cairo"}'},
+    final raw = encode(
+      BackupDocument(
+        exportedAt: DateTime.utc(2026, 10, 22),
+        schemaVersion: 2,
+        data: const BackupData(
+          bookmarks: [],
+          lastReadAyahId: null,
+          khatma: [],
+          prayerLog: [],
+          tasbih: null,
+          settings: {'selected_city': '{"id":"cairo"}'},
+        ),
       ),
-    ));
+    );
     final result = await decodeBackupInIsolate(
       Uint8List.fromList(utf8.encode(raw)),
     );

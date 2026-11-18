@@ -42,10 +42,7 @@ class PlaceholderScreen extends StatelessWidget {
             ],
             if (actionLabelText != null && onAction != null) ...[
               const SizedBox(height: 20),
-              FilledButton(
-                onPressed: onAction,
-                child: Text(actionLabelText),
-              ),
+              FilledButton(onPressed: onAction, child: Text(actionLabelText)),
             ],
           ],
         ),

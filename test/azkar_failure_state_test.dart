@@ -12,17 +12,23 @@ Future<void> pumpAzkar(WidgetTester tester, AzkarRepository repository) async {
   final cubit = AzkarCubit(repository: repository);
   addTearDown(cubit.close);
   await cubit.start();
-  await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-    value: cubit,
-    child: appShell(home: const AzkarScreen()),
-  ));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  await tester.pumpWidget(
+    BlocProvider<AzkarCubit>.value(
+      value: cubit,
+      child: appShell(home: const AzkarScreen()),
+    ),
+  );
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
-  testWidgets('a loader crash shows the localized error pane, not a spinner',
-      (tester) async {
+  testWidgets('a loader crash shows the localized error pane, not a spinner', (
+    tester,
+  ) async {
     await pumpAzkar(
       tester,
       AzkarRepository(loader: () async => throw StateError('boom')),
@@ -32,8 +38,9 @@ void main() {
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
   });
 
-  testWidgets('an empty dataset shows the empty state, not a blank body',
-      (tester) async {
+  testWidgets('an empty dataset shows the empty state, not a blank body', (
+    tester,
+  ) async {
     await pumpAzkar(
       tester,
       AzkarRepository(loader: () async => {'collections': <Object>[]}),

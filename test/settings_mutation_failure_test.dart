@@ -47,27 +47,29 @@ void main() {
   });
 
   SettingsCubit build() => SettingsCubit(
-        settings: settings,
-        city: city,
-        prayer: prayer,
-        scheduler: scheduler,
-      );
+    settings: settings,
+    city: city,
+    prayer: prayer,
+    scheduler: scheduler,
+  );
 
-  test('a failed enable write completes and keeps the last ready state',
-      () async {
-    final cubit = build();
-    await cubit.load();
+  test(
+    'a failed enable write completes and keeps the last ready state',
+    () async {
+      final cubit = build();
+      await cubit.load();
 
-    settings.failWrites = true;
-    await expectLater(cubit.setAzkarEnabled(true), completes);
+      settings.failWrites = true;
+      await expectLater(cubit.setAzkarEnabled(true), completes);
 
-    final state = cubit.state;
-    expect(state, isA<SettingsReady>());
-    expect((state as SettingsReady).azkarEnabled, isFalse);
-    expect(scheduler.permissionCalls, 0);
+      final state = cubit.state;
+      expect(state, isA<SettingsReady>());
+      expect((state as SettingsReady).azkarEnabled, isFalse);
+      expect(scheduler.permissionCalls, 0);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 
   test('a failed time write keeps the last confirmed time', () async {
     final cubit = build();

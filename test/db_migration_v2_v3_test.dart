@@ -7,73 +7,84 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
 
 void main() {
-  test('a v2 file with duplicate rows upgrades to v3 and repairs them',
-      () async {
+  test(
+    'a v2 file with duplicate rows upgrades to v3 and repairs them',
+    () async {
+      final file = await _tempDbFile();
+
+      final v2 = AppDatabase(NativeDatabase(file));
+      try {
+        // One good row of each user-visible identity.
+        await v2
+            .into(v2.bookmarks)
+            .insert(BookmarksCompanion.insert(ayahId: 7));
+        await v2
+            .into(v2.downloads)
+            .insert(
+              DownloadsCompanion.insert(
+                reciterId: 'r1',
+                surahId: 1,
+                status: 'done',
+                path: '/audio/r1/001.mp3',
+              ),
+            );
+
+        // Simulate a file written before the unique indexes existed: drop them
+        // and insert the duplicates the old read-then-write paths could leave.
+        await v2.customStatement('DROP INDEX idx_bookmarks_ayah');
+        await v2.customStatement('DROP INDEX idx_downloads_lookup');
+        await v2
+            .into(v2.bookmarks)
+            .insert(BookmarksCompanion.insert(ayahId: 7));
+        await v2
+            .into(v2.downloads)
+            .insert(
+              DownloadsCompanion.insert(
+                reciterId: 'r1',
+                surahId: 1,
+                status: 'queued',
+                path: '',
+              ),
+            );
+        await v2.customStatement('PRAGMA user_version = 2');
+      } finally {
+        await v2.close();
+      }
+
+      // Reopening runs onUpgrade(2 → 3): repair, then the unique indexes.
+      final v3 = AppDatabase(NativeDatabase(file));
+      try {
+        expect(await _userVersion(v3), v3.schemaVersion);
+
+        final bookmarks = await v3.select(v3.bookmarks).get();
+        expect(bookmarks, hasLength(1), reason: 'one bookmark per ayah');
+        expect(bookmarks.single.ayahId, 7);
+
+        final downloads = await v3.select(v3.downloads).get();
+        expect(downloads, hasLength(1), reason: 'one row per (reciter, surah)');
+        expect(
+          downloads.single.path,
+          '/audio/r1/001.mp3',
+          reason: 'the oldest row wins: it is the one that owns the file',
+        );
+
+        expect(await _uniqueIndexExists(v3, 'idx_bookmarks_ayah'), isTrue);
+        expect(await _uniqueIndexExists(v3, 'idx_downloads_lookup'), isTrue);
+      } finally {
+        await v3.close();
+      }
+    },
+  );
+
+  test('a legacy non-unique index is replaced instead of blocking the open', () async {
     final file = await _tempDbFile();
 
     final v2 = AppDatabase(NativeDatabase(file));
     try {
-      // One good row of each user-visible identity.
       await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
-      await v2.into(v2.downloads).insert(
-            DownloadsCompanion.insert(
-              reciterId: 'r1',
-              surahId: 1,
-              status: 'done',
-              path: '/audio/r1/001.mp3',
-            ),
-          );
-
-      // Simulate a file written before the unique indexes existed: drop them
-      // and insert the duplicates the old read-then-write paths could leave.
-      await v2.customStatement('DROP INDEX idx_bookmarks_ayah');
-      await v2.customStatement('DROP INDEX idx_downloads_lookup');
-      await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
-      await v2.into(v2.downloads).insert(
-            DownloadsCompanion.insert(
-              reciterId: 'r1',
-              surahId: 1,
-              status: 'queued',
-              path: '',
-            ),
-          );
-      await v2.customStatement('PRAGMA user_version = 2');
-    } finally {
-      await v2.close();
-    }
-
-    // Reopening runs onUpgrade(2 → 3): repair, then the unique indexes.
-    final v3 = AppDatabase(NativeDatabase(file));
-    try {
-      expect(await _userVersion(v3), v3.schemaVersion);
-
-      final bookmarks = await v3.select(v3.bookmarks).get();
-      expect(bookmarks, hasLength(1), reason: 'one bookmark per ayah');
-      expect(bookmarks.single.ayahId, 7);
-
-      final downloads = await v3.select(v3.downloads).get();
-      expect(downloads, hasLength(1), reason: 'one row per (reciter, surah)');
-      expect(
-        downloads.single.path,
-        '/audio/r1/001.mp3',
-        reason: 'the oldest row wins: it is the one that owns the file',
-      );
-
-      expect(await _uniqueIndexExists(v3, 'idx_bookmarks_ayah'), isTrue);
-      expect(await _uniqueIndexExists(v3, 'idx_downloads_lookup'), isTrue);
-    } finally {
-      await v3.close();
-    }
-  });
-
-  test('a legacy non-unique index is replaced instead of blocking the open',
-      () async {
-    final file = await _tempDbFile();
-
-    final v2 = AppDatabase(NativeDatabase(file));
-    try {
-      await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
-      await v2.into(v2.downloads).insert(
+      await v2
+          .into(v2.downloads)
+          .insert(
             DownloadsCompanion.insert(
               reciterId: 'r1',
               surahId: 1,
@@ -88,12 +99,16 @@ void main() {
       await v2.customStatement('DROP INDEX idx_bookmarks_ayah');
       await v2.customStatement('DROP INDEX idx_downloads_lookup');
       await v2.customStatement(
-          'CREATE INDEX idx_bookmarks_ayah ON bookmarks(ayah_id)');
+        'CREATE INDEX idx_bookmarks_ayah ON bookmarks(ayah_id)',
+      );
       await v2.customStatement(
-          'CREATE INDEX idx_downloads_lookup ON downloads(reciter_id, surah_id)');
+        'CREATE INDEX idx_downloads_lookup ON downloads(reciter_id, surah_id)',
+      );
 
       await v2.into(v2.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
-      await v2.into(v2.downloads).insert(
+      await v2
+          .into(v2.downloads)
+          .insert(
             DownloadsCompanion.insert(
               reciterId: 'r1',
               surahId: 1,
@@ -141,10 +156,12 @@ void main() {
 
     final first = AppDatabase(NativeDatabase(file));
     try {
-      await first.into(first.bookmarks).insert(
-            BookmarksCompanion.insert(ayahId: 42),
-          );
-      await first.into(first.settingsTable).insert(
+      await first
+          .into(first.bookmarks)
+          .insert(BookmarksCompanion.insert(ayahId: 42));
+      await first
+          .into(first.settingsTable)
+          .insert(
             SettingsTableCompanion.insert(key: 'selected_city', value: 'cairo'),
           );
     } finally {
@@ -176,18 +193,22 @@ Future<int> _userVersion(AppDatabase db) async {
 }
 
 Future<bool> _tableExists(AppDatabase db, String name) async {
-  final rows = await db.customSelect(
-    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
-    variables: [Variable.withString(name)],
-  ).get();
+  final rows = await db
+      .customSelect(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable.withString(name)],
+      )
+      .get();
   return rows.isNotEmpty;
 }
 
 Future<String?> _indexSql(AppDatabase db, String name) async {
-  final row = await db.customSelect(
-    "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
-    variables: [Variable.withString(name)],
-  ).getSingleOrNull();
+  final row = await db
+      .customSelect(
+        "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+        variables: [Variable.withString(name)],
+      )
+      .getSingleOrNull();
   return row?.readNullable<String>('sql');
 }
 

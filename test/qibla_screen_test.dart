@@ -43,17 +43,20 @@ void main() {
     );
   }
 
-  test('cubit with no selection emits ready with null city and bearing',
-      () async {
-    final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
-    await cubit.reload();
-    expect(cubit.state.city, isNull);
-    expect(cubit.state.bearing, isNull);
-    await cubit.close();
-  });
+  test(
+    'cubit with no selection emits ready with null city and bearing',
+    () async {
+      final cubit = QiblaCubit(city: repo, qibla: FakeQiblaService());
+      await cubit.reload();
+      expect(cubit.state.city, isNull);
+      expect(cubit.state.bearing, isNull);
+      await cubit.close();
+    },
+  );
 
-  testWidgets('seeded city renders the bearing dial with the rotated arrow',
-      (tester) async {
+  testWidgets('seeded city renders the bearing dial with the rotated arrow', (
+    tester,
+  ) async {
     await pumpHost(tester, seeded: true);
 
     final rotated = find.byWidgetPredicate(
@@ -75,8 +78,9 @@ void main() {
     expect(find.text('اختر مدينتك'), findsOneWidget);
   });
 
-  testWidgets('live heading rotates the dial by bearing minus heading',
-      (tester) async {
+  testWidgets('live heading rotates the dial by bearing minus heading', (
+    tester,
+  ) async {
     final controller = StreamController<double>();
     addTearDown(controller.close);
     await pumpHost(
@@ -88,14 +92,16 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    final rotation =
-        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
+    final rotation = tester.widget<AnimatedRotation>(
+      find.byType(AnimatedRotation),
+    );
     expect(rotation.turns, closeTo((137.2 - 90) / 360.0, 1e-9));
     expect(find.text('المقياس حي'), findsOneWidget);
   });
 
-  testWidgets('the arrow crosses north with a small step, not a full spin',
-      (tester) async {
+  testWidgets('the arrow crosses north with a small step, not a full spin', (
+    tester,
+  ) async {
     final controller = StreamController<double>();
     addTearDown(controller.close);
     await pumpHost(
@@ -107,27 +113,35 @@ void main() {
     controller.add(120.0);
     await tester.pump();
     await tester.pump();
-    final before =
-        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns;
+    final before = tester
+        .widget<AnimatedRotation>(find.byType(AnimatedRotation))
+        .turns;
 
     controller.add(140.0);
     await tester.pump();
     await tester.pump();
-    final after =
-        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation)).turns;
+    final after = tester
+        .widget<AnimatedRotation>(find.byType(AnimatedRotation))
+        .turns;
 
-    expect(after, lessThan(before),
-        reason: 'the dial angle wraps past north; the turns must not');
+    expect(
+      after,
+      lessThan(before),
+      reason: 'the dial angle wraps past north; the turns must not',
+    );
     expect(after, closeTo(before - 20 / 360.0, 1e-9));
   });
 
-  testWidgets('without a live heading the dial stays static and no hint shows',
-      (tester) async {
-    await pumpHost(tester, seeded: true);
+  testWidgets(
+    'without a live heading the dial stays static and no hint shows',
+    (tester) async {
+      await pumpHost(tester, seeded: true);
 
-    final rotation =
-        tester.widget<AnimatedRotation>(find.byType(AnimatedRotation));
-    expect(rotation.turns, closeTo(137.2 / 360.0, 1e-9));
-    expect(find.text('المقياس حي'), findsNothing);
-  });
+      final rotation = tester.widget<AnimatedRotation>(
+        find.byType(AnimatedRotation),
+      );
+      expect(rotation.turns, closeTo(137.2 / 360.0, 1e-9));
+      expect(find.text('المقياس حي'), findsNothing);
+    },
+  );
 }

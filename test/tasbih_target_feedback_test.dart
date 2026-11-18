@@ -31,8 +31,9 @@ void main() {
     return cubit;
   }
 
-  testWidgets('picking a target announces the restart; counting does not',
-      (tester) async {
+  testWidgets('picking a target announces the restart; counting does not', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(find.text('تم ضبط الهدف — بدأ العد من جديد'), findsNothing);

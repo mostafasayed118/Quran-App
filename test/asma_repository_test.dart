@@ -6,21 +6,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 
 List<Map<String, dynamic>> fixtureRows() => [
-      {
-        'n': 1,
-        'nameAr': 'الرحمن',
-        'nameEn': 'Ar-Rahman',
-        'meaningAr': 'ذو الرحمة الواسعة',
-        'meaningEn': 'The Most Compassionate',
-      },
-      {
-        'n': 2,
-        'nameAr': 'الرحيم',
-        'nameEn': 'Ar-Raheem',
-        'meaningAr': 'النازل بالرحمة',
-        'meaningEn': 'The Most Merciful',
-      },
-    ];
+  {
+    'n': 1,
+    'nameAr': 'الرحمن',
+    'nameEn': 'Ar-Rahman',
+    'meaningAr': 'ذو الرحمة الواسعة',
+    'meaningEn': 'The Most Compassionate',
+  },
+  {
+    'n': 2,
+    'nameAr': 'الرحيم',
+    'nameEn': 'Ar-Raheem',
+    'meaningAr': 'النازل بالرحمة',
+    'meaningEn': 'The Most Merciful',
+  },
+];
 
 void main() {
   late AsmaRepository repo;
@@ -41,7 +41,8 @@ void main() {
     final file = File('assets/data/asma.json');
     if (!file.existsSync()) {
       markTestSkipped(
-          'working dir does not resolve the bundled asset from this runner');
+        'working dir does not resolve the bundled asset from this runner',
+      );
     }
     final rows = (jsonDecode(file.readAsStringSync()) as List)
         .cast<Map<String, dynamic>>();
@@ -49,8 +50,11 @@ void main() {
     final numbers = rows.map((r) => r['n'] as int).toList()..sort();
     expect(numbers, [for (var i = 1; i <= 99; i++) i]);
     for (final row in rows) {
-      expect((row['nameAr'] as String).trim().isNotEmpty, isTrue,
-          reason: 'nameAr empty at n=${row['n']}');
+      expect(
+        (row['nameAr'] as String).trim().isNotEmpty,
+        isTrue,
+        reason: 'nameAr empty at n=${row['n']}',
+      );
       expect((row['nameEn'] as String).trim().isNotEmpty, isTrue);
       expect((row['meaningAr'] as String).trim().isNotEmpty, isTrue);
       expect((row['meaningEn'] as String).trim().isNotEmpty, isTrue);

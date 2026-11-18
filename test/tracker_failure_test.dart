@@ -27,16 +27,18 @@ class _CrashingToggleRepo extends PrayerLogRepository {
 }
 
 void main() {
-  test('a data-layer crash maps to TrackerFailed; loaded still completes',
-      () async {
-    final db = AppDatabase.test(NativeDatabase.memory());
-    final cubit = TrackerCubit(repo: _CrashingLoadRepo(db));
-    await cubit.start();
-    await cubit.loaded;
-    expect(cubit.state, isA<TrackerFailed>());
-    await cubit.close();
-    await db.close();
-  });
+  test(
+    'a data-layer crash maps to TrackerFailed; loaded still completes',
+    () async {
+      final db = AppDatabase.test(NativeDatabase.memory());
+      final cubit = TrackerCubit(repo: _CrashingLoadRepo(db));
+      await cubit.start();
+      await cubit.loaded;
+      expect(cubit.state, isA<TrackerFailed>());
+      await cubit.close();
+      await db.close();
+    },
+  );
 
   test('a toggle crash is swallowed; the ready state survives', () async {
     final db = AppDatabase.test(NativeDatabase.memory());
@@ -50,19 +52,25 @@ void main() {
     await db.close();
   });
 
-  testWidgets('a load crash shows the error pane, not an eternal spinner',
-      (tester) async {
+  testWidgets('a load crash shows the error pane, not an eternal spinner', (
+    tester,
+  ) async {
     final db = AppDatabase.test(NativeDatabase.memory());
     addTearDown(db.close);
     final cubit = TrackerCubit(repo: _CrashingLoadRepo(db));
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
-      value: cubit,
-      child: appShell(home: const TrackerScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<TrackerCubit>.value(
+        value: cubit,
+        child: appShell(home: const TrackerScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);

@@ -31,9 +31,9 @@ class CityPickerScreen extends StatelessWidget {
                 builder: (context, state) => switch (state) {
                   CityPickerLoading() => const LoadingView(),
                   CityPickerFailed() => errorPane(
-                      loc,
-                      onRetry: context.read<CityPickerCubit>().start,
-                    ),
+                    loc,
+                    onRetry: context.read<CityPickerCubit>().start,
+                  ),
                   CityPickerReady(
                     :final results,
                     :final locating,
@@ -69,7 +69,11 @@ class _CitySearchField extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          AppSpacing.md, AppSpacing.md, AppSpacing.md, 6),
+        AppSpacing.md,
+        AppSpacing.md,
+        AppSpacing.md,
+        6,
+      ),
       child: SearchField(
         hint: loc.searchCity,
         onChanged: (query) => context.read<CityPickerCubit>().search(query),

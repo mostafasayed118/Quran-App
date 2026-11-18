@@ -44,12 +44,14 @@ void main() {
       expect(await prefs.fajrAdhanId(), isNull);
     });
 
-    test('an unknown stored override resolves to null, not a dead id',
-        () async {
-      final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
-      await prefs.setFajrAdhanId('removed_in_a_future_build');
-      expect(await prefs.fajrAdhanId(), isNull);
-    });
+    test(
+      'an unknown stored override resolves to null, not a dead id',
+      () async {
+        final AdhanPreferences prefs = AdhanPreferencesImpl(newTestDb());
+        await prefs.setFajrAdhanId('removed_in_a_future_build');
+        expect(await prefs.fajrAdhanId(), isNull);
+      },
+    );
   });
 
   group('isolation', () {

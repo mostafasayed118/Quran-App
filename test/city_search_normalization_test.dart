@@ -6,35 +6,35 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'support/test_db.dart';
 
 List<Map<String, dynamic>> _rows() => [
-      {
-        'id': 'alex',
-        'nameAr': 'الإسكندرية',
-        'nameEn': 'Alexandria',
-        'lat': 31.2001,
-        'lng': 29.9187,
-      },
-      {
-        'id': 'cairo',
-        'nameAr': 'القاهرة',
-        'nameEn': 'Cairo',
-        'lat': 30.0444,
-        'lng': 31.2357,
-      },
-      {
-        'id': 'amman',
-        'nameAr': 'عمّان',
-        'nameEn': 'Amman',
-        'lat': 31.9539,
-        'lng': 35.9106,
-      },
-      {
-        'id': 'benisuef',
-        'nameAr': 'بنى سويف',
-        'nameEn': 'Beni Suef',
-        'lat': 29.0661,
-        'lng': 31.0994,
-      },
-    ];
+  {
+    'id': 'alex',
+    'nameAr': 'الإسكندرية',
+    'nameEn': 'Alexandria',
+    'lat': 31.2001,
+    'lng': 29.9187,
+  },
+  {
+    'id': 'cairo',
+    'nameAr': 'القاهرة',
+    'nameEn': 'Cairo',
+    'lat': 30.0444,
+    'lng': 31.2357,
+  },
+  {
+    'id': 'amman',
+    'nameAr': 'عمّان',
+    'nameEn': 'Amman',
+    'lat': 31.9539,
+    'lng': 35.9106,
+  },
+  {
+    'id': 'benisuef',
+    'nameAr': 'بنى سويف',
+    'nameEn': 'Beni Suef',
+    'lat': 29.0661,
+    'lng': 31.0994,
+  },
+];
 
 void main() {
   late AppDatabase db;

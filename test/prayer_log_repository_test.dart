@@ -25,32 +25,36 @@ void main() {
     expect(day.anyMarked, isTrue);
   });
 
-  test('toggle-all-off keeps the row; anyMarked=false; row count stays 1',
-      () async {
-    final now = DateTime.now();
-    for (final slot in PrayerSlot.values) {
-      await repo.togglePrayer(now, slot);
-    }
-    for (final slot in PrayerSlot.values) {
-      await repo.togglePrayer(now, slot);
-    }
-    final day = await repo.dayView(now);
-    expect(day.anyMarked, isFalse);
-    final rows = await db.select(db.prayerLog).get();
-    expect(rows, hasLength(1));
-  });
+  test(
+    'toggle-all-off keeps the row; anyMarked=false; row count stays 1',
+    () async {
+      final now = DateTime.now();
+      for (final slot in PrayerSlot.values) {
+        await repo.togglePrayer(now, slot);
+      }
+      for (final slot in PrayerSlot.values) {
+        await repo.togglePrayer(now, slot);
+      }
+      final day = await repo.dayView(now);
+      expect(day.anyMarked, isFalse);
+      final rows = await db.select(db.prayerLog).get();
+      expect(rows, hasLength(1));
+    },
+  );
 
-  test('day normalization: raw-now call matches dateOnly row (both ways)',
-      () async {
-    final now = DateTime.now();
+  test(
+    'day normalization: raw-now call matches dateOnly row (both ways)',
+    () async {
+      final now = DateTime.now();
 
-    await repo.togglePrayer(now, PrayerSlot.dhuhr);
-    expect(await repo.getForDay(now), isTrue);
-    expect(await repo.getForDay(dateOnly(now)), isTrue);
+      await repo.togglePrayer(now, PrayerSlot.dhuhr);
+      expect(await repo.getForDay(now), isTrue);
+      expect(await repo.getForDay(dateOnly(now)), isTrue);
 
-    final laterToday = DateTime(now.year, now.month, now.day, 23, 59);
-    expect(await repo.getForDay(laterToday), isTrue);
-  });
+      final laterToday = DateTime(now.year, now.month, now.day, 23, 59);
+      expect(await repo.getForDay(laterToday), isTrue);
+    },
+  );
 
   test('markedDaysRange returns only marked days, normalized', () async {
     final now = DateTime.now();
@@ -64,8 +68,10 @@ void main() {
     final marked = await repo.markedDaysRange(now, 7);
     final keys = marked.map((d) => '${d.year}-${d.month}-${d.day}').toSet();
     expect(keys, contains('${now.year}-${now.month}-${now.day}'));
-    expect(keys,
-        contains('${yesterday.year}-${yesterday.month}-${yesterday.day}'));
+    expect(
+      keys,
+      contains('${yesterday.year}-${yesterday.month}-${yesterday.day}'),
+    );
     expect(keys, hasLength(2));
   });
 }

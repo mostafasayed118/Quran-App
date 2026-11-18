@@ -7,20 +7,22 @@ void main() {
 
   DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  test('roundtrip: gregorian → hijri → gregorian is EXACT (no ±1 tolerance)',
-      () {
-    final samples = [
-      DateTime(2026, 10, 15),
-      DateTime(2025, 3, 1),
-      DateTime(2027, 7, 20),
-      DateTime(2024, 12, 31),
-    ];
-    for (final sample in samples) {
-      final hijri = service.fromGregorian(sample);
-      final back = service.toGregorian(hijri.hYear, hijri.hMonth, hijri.hDay);
-      expect(dateOnly(back), dateOnly(sample), reason: 'roundtrip $sample');
-    }
-  });
+  test(
+    'roundtrip: gregorian → hijri → gregorian is EXACT (no ±1 tolerance)',
+    () {
+      final samples = [
+        DateTime(2026, 10, 15),
+        DateTime(2025, 3, 1),
+        DateTime(2027, 7, 20),
+        DateTime(2024, 12, 31),
+      ];
+      for (final sample in samples) {
+        final hijri = service.fromGregorian(sample);
+        final back = service.toGregorian(hijri.hYear, hijri.hMonth, hijri.hDay);
+        expect(dateOnly(back), dateOnly(sample), reason: 'roundtrip $sample');
+      }
+    },
+  );
 
   test('hijri year for 2026-10-15 is in {1447, 1448}', () {
     final hijri = service.fromGregorian(DateTime(2026, 10, 15));

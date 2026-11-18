@@ -19,10 +19,7 @@ class JuzIndexScreen extends StatelessWidget {
       body: AppContentFrame(
         child: JuzIndexBody(
           onSelect: (entry) => context.push(
-            quranReaderPath(
-              surah: entry.surahId,
-              ayah: entry.numberInSurah,
-            ),
+            quranReaderPath(surah: entry.surahId, ayah: entry.numberInSurah),
           ),
         ),
       ),

@@ -50,14 +50,16 @@ extension WesternDigitsString on String {
 /// [arabicIndic] false returns the plain 'HH:mm' form — the format the
 /// reminder planner parses, so a caller that PERSISTS a time must use it.
 String formatHm(DateTime time, {bool arabicIndic = true}) {
-  final clock = '${time.hour.toString().padLeft(2, '0')}:'
+  final clock =
+      '${time.hour.toString().padLeft(2, '0')}:'
       '${time.minute.toString().padLeft(2, '0')}';
   return arabicIndic ? clock.toArabicIndicDigits : clock;
 }
 
 /// H:mm label for a Duration (call-site transform, W3).
 String formatDurationHm(Duration duration, {bool arabicIndic = true}) {
-  final clock = '${duration.inHours.toString().padLeft(2, '0')}:'
+  final clock =
+      '${duration.inHours.toString().padLeft(2, '0')}:'
       '${duration.inMinutes.remainder(60).toString().padLeft(2, '0')}';
   return arabicIndic ? clock.toArabicIndicDigits : clock;
 }
@@ -69,7 +71,8 @@ String formatDurationHm(Duration duration, {bool arabicIndic = true}) {
 /// hero never shows "-00:00:01".
 String formatDurationHms(Duration duration, {bool arabicIndic = true}) {
   final safe = duration.isNegative ? Duration.zero : duration;
-  final clock = '${safe.inHours.toString().padLeft(2, '0')}:'
+  final clock =
+      '${safe.inHours.toString().padLeft(2, '0')}:'
       '${safe.inMinutes.remainder(60).toString().padLeft(2, '0')}:'
       '${safe.inSeconds.remainder(60).toString().padLeft(2, '0')}';
   return arabicIndic ? clock.toArabicIndicDigits : clock;

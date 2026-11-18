@@ -134,12 +134,13 @@ abstract final class AppToast {
   /// Gold is a light accent (~1.9:1 on paper), so [ToastTone.info] uses the
   /// darkened `goldText` in light mode and the bright gold in dark mode.
   static Color _accentOf(ThemeData theme, ToastTone tone) => switch (tone) {
-        ToastTone.success => theme.colorScheme.primary,
-        ToastTone.error => theme.colorScheme.error,
-        ToastTone.info => theme.brightness == Brightness.light
-            ? AppColors.goldText
-            : AppColors.gold,
-      };
+    ToastTone.success => theme.colorScheme.primary,
+    ToastTone.error => theme.colorScheme.error,
+    ToastTone.info =>
+      theme.brightness == Brightness.light
+          ? AppColors.goldText
+          : AppColors.gold,
+  };
 }
 
 class _ToastBody extends StatelessWidget {
@@ -199,8 +200,8 @@ class _ToastBody extends StatelessWidget {
   }
 
   IconData get _defaultIcon => switch (tone) {
-        ToastTone.success => Icons.check_circle_outline,
-        ToastTone.error => Icons.error_outline,
-        ToastTone.info => Icons.info_outline,
-      };
+    ToastTone.success => Icons.check_circle_outline,
+    ToastTone.error => Icons.error_outline,
+    ToastTone.info => Icons.info_outline,
+  };
 }

@@ -80,8 +80,10 @@ class SettingsScreen extends StatelessWidget {
         child: BlocBuilder<SettingsCubit, SettingsState>(
           builder: (context, state) => switch (state) {
             SettingsLoading() => const LoadingView(),
-            SettingsFailed() =>
-              errorPane(loc, onRetry: context.read<SettingsCubit>().load),
+            SettingsFailed() => errorPane(
+              loc,
+              onRetry: context.read<SettingsCubit>().load,
+            ),
             SettingsReady(
               :final prayerEnabled,
               :final azkarEnabled,

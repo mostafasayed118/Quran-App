@@ -18,16 +18,13 @@ class BookmarkMetaEntry {
 
   /// A copy with the given fields replaced.
   BookmarkMetaEntry copyWith({String? folder, String? note}) =>
-      BookmarkMetaEntry(
-        folder: folder ?? this.folder,
-        note: note ?? this.note,
-      );
+      BookmarkMetaEntry(folder: folder ?? this.folder, note: note ?? this.note);
 
   /// The persisted shape.
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'folder': folder,
-        'note': note,
-      };
+    'folder': folder,
+    'note': note,
+  };
 
   /// Decodes a persisted entry; missing fields degrade to empty.
   factory BookmarkMetaEntry.fromJson(Map<String, dynamic> json) =>

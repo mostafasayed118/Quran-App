@@ -19,7 +19,9 @@ void main() {
     final db = newTestDb();
     final repo = ReaderSettingsRepository(db);
 
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: ReaderSettingsRepository.fontScaleKey,
             value: 'not-a-number',

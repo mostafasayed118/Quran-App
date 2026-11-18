@@ -34,16 +34,22 @@ void main() {
 
   Future<void> pumpPicker(WidgetTester tester, CityPickerCubit cubit) async {
     addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
-      value: cubit,
-      child: appShell(home: const CityPickerScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<CityPickerCubit>.value(
+        value: cubit,
+        child: appShell(home: const CityPickerScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('the persisted city is marked, and raw ids no longer render',
-      (tester) async {
+  testWidgets('the persisted city is marked, and raw ids no longer render', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     final handle = tester.ensureSemantics();
     final cubit = CityPickerCubit(cityRepo: repo);
@@ -70,8 +76,9 @@ void main() {
     expect(find.byIcon(Icons.check_circle), findsNothing);
   });
 
-  testWidgets('the mark follows the persisted city after picking one',
-      (tester) async {
+  testWidgets('the mark follows the persisted city after picking one', (
+    tester,
+  ) async {
     final cubit = CityPickerCubit(cityRepo: repo);
     await cubit.start();
     await pumpPicker(tester, cubit);
@@ -80,8 +87,11 @@ void main() {
 
     await cubit.persist(cairoCity);
     await cubit.search('');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
   });

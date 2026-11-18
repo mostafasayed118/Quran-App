@@ -22,19 +22,13 @@ class _Probe extends StatelessWidget {
       body: Column(
         children: [
           TextButton(
-            onPressed: () => AppToast.show(
-              context,
-              'تم النسخ',
-              tone: ToastTone.success,
-            ),
+            onPressed: () =>
+                AppToast.show(context, 'تم النسخ', tone: ToastTone.success),
             child: const Text('first'),
           ),
           TextButton(
-            onPressed: () => AppToast.show(
-              context,
-              'تعذّر الحفظ',
-              tone: ToastTone.error,
-            ),
+            onPressed: () =>
+                AppToast.show(context, 'تعذّر الحفظ', tone: ToastTone.error),
             child: const Text('second'),
           ),
           TextButton(
@@ -57,13 +51,17 @@ class _Probe extends StatelessWidget {
 /// test never tears down with a pending snackbar timer.
 Future<void> _drain(WidgetTester tester) async {
   await tester.pump(const Duration(seconds: 5));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
-  testWidgets('a success toast shows the message and its tone icon',
-      (tester) async {
+  testWidgets('a success toast shows the message and its tone icon', (
+    tester,
+  ) async {
     await pumpAppHost(tester, home: const _Probe());
 
     await tester.tap(find.text('first'));
@@ -88,8 +86,9 @@ void main() {
     await _drain(tester);
   });
 
-  testWidgets('a new toast replaces the visible one instead of stacking',
-      (tester) async {
+  testWidgets('a new toast replaces the visible one instead of stacking', (
+    tester,
+  ) async {
     await pumpAppHost(tester, home: const _Probe());
 
     await tester.tap(find.text('first'));

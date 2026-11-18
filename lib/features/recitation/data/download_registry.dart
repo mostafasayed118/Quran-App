@@ -18,8 +18,8 @@ class DownloadRegistry {
     this._db, {
     required Future<Directory> Function() root,
     required String folderName,
-  })  : _root = root,
-        _folderName = folderName;
+  }) : _root = root,
+       _folderName = folderName;
 
   final AppDatabase _db;
   final Future<Directory> Function() _root;
@@ -28,17 +28,25 @@ class DownloadRegistry {
   final String _folderName;
 
   /// Upserts the row for one surah and its current transfer state.
-  Future<void> mark(String rowId, int surahNumber, DownloadStatus status,
-      int bytes, String path) async {
-    final existing = await (_db.select(_db.downloads)
-          ..where(
-              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber)))
-        .getSingleOrNull();
+  Future<void> mark(
+    String rowId,
+    int surahNumber,
+    DownloadStatus status,
+    int bytes,
+    String path,
+  ) async {
+    final existing =
+        await (_db.select(_db.downloads)..where(
+              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber),
+            ))
+            .getSingleOrNull();
     if (existing == null) {
       // Read-then-write made conflict-safe: the (reciter, surah) pair is
       // unique, so a racing first-write must reuse the surviving row instead
       // of inserting a duplicate or throwing a constraint error.
-      await _db.into(_db.downloads).insert(
+      await _db
+          .into(_db.downloads)
+          .insert(
             DownloadsCompanion.insert(
               reciterId: rowId,
               surahId: surahNumber,
@@ -52,14 +60,16 @@ class DownloadRegistry {
     // Runs for both branches: drift's insertOrIgnore reports the surviving
     // rowid (not an affected-row count), so this pair-scoped write is what
     // converges the racing caller onto the row that exists.
-    await (_db.update(_db.downloads)
-          ..where(
-              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber)))
-        .write(DownloadsCompanion(
-      status: Value(status.name),
-      bytes: Value(bytes),
-      path: Value(path),
-    ));
+    await (_db.update(_db.downloads)..where(
+          (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber),
+        ))
+        .write(
+          DownloadsCompanion(
+            status: Value(status.name),
+            bytes: Value(bytes),
+            path: Value(path),
+          ),
+        );
   }
 
   /// Reconciles rows and dot-part files left by a killed process.
@@ -111,38 +121,45 @@ class DownloadRegistry {
           // The part stays: the next attempt resumes from it.
         }
       } on Object catch (error, stackTrace) {
-        appLog('download reconcile row failed',
-            name: 'quran_yahdi/downloads',
-            error: error,
-            stackTrace: stackTrace);
+        appLog(
+          'download reconcile row failed',
+          name: 'quran_yahdi/downloads',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
     final audioDir = Directory(
       '${root.path}${Platform.pathSeparator}$_folderName',
     );
     if (!audioDir.existsSync()) return;
-    for (final entity
-        in audioDir.listSync(recursive: true, followLinks: false)) {
+    for (final entity in audioDir.listSync(
+      recursive: true,
+      followLinks: false,
+    )) {
       if (entity is! File || !entity.path.endsWith('.part')) continue;
       if (keepParts.contains(p.normalize(entity.path))) continue;
       try {
         entity.deleteSync();
       } on Object catch (error, stackTrace) {
-        appLog('download part cleanup failed',
-            name: 'quran_yahdi/downloads',
-            error: error,
-            stackTrace: stackTrace);
+        appLog(
+          'download part cleanup failed',
+          name: 'quran_yahdi/downloads',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
 
   /// The completed download row for [rowId]/[surahNumber], or null.
   Future<Download?> _doneRow(String rowId, int surahNumber) =>
-      (_db.select(_db.downloads)
-            ..where((d) =>
+      (_db.select(_db.downloads)..where(
+            (d) =>
                 d.reciterId.equals(rowId) &
                 d.surahId.equals(surahNumber) &
-                d.status.equals(DownloadStatus.done.name)))
+                d.status.equals(DownloadStatus.done.name),
+          ))
           .getSingleOrNull();
 
   /// True when the surah finished downloading for that reciter.
@@ -165,10 +182,11 @@ class DownloadRegistry {
 
   /// Deletes the downloaded file and forgets the download row.
   Future<void> forget(String rowId, int surahNumber) async {
-    final row = await (_db.select(_db.downloads)
-          ..where(
-              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber)))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.downloads)..where(
+              (d) => d.reciterId.equals(rowId) & d.surahId.equals(surahNumber),
+            ))
+            .getSingleOrNull();
     if (row != null) {
       await _deleteIfInsideAudioRoot(row.path);
       await (_db.delete(_db.downloads)..where((d) => d.id.equals(row.id))).go();
@@ -189,7 +207,7 @@ class DownloadRegistry {
   }
 
   /// All completed-download rows (used by the queue cubit on startup).
-  Future<List<Download>> listDone() => (_db.select(_db.downloads)
-        ..where((d) => d.status.equals(DownloadStatus.done.name)))
-      .get();
+  Future<List<Download>> listDone() => (_db.select(
+    _db.downloads,
+  )..where((d) => d.status.equals(DownloadStatus.done.name))).get();
 }

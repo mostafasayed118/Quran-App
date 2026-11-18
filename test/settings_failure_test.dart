@@ -26,25 +26,27 @@ void main() {
     db = newTestDb();
   });
 
-  test('a throwing settings read emits loading then failed, never hangs',
-      () async {
-    final cubit = SettingsCubit(
-      settings: ThrowingReminderSettings(db),
-      city: CityRepository(
-        db: db,
-        loader: () async => const <Map<String, dynamic>>[],
-      ),
-      prayer: FakePrayerTimeService(),
-      scheduler: FakeReminderScheduler(),
-    );
+  test(
+    'a throwing settings read emits loading then failed, never hangs',
+    () async {
+      final cubit = SettingsCubit(
+        settings: ThrowingReminderSettings(db),
+        city: CityRepository(
+          db: db,
+          loader: () async => const <Map<String, dynamic>>[],
+        ),
+        prayer: FakePrayerTimeService(),
+        scheduler: FakeReminderScheduler(),
+      );
 
-    expect(cubit.state, isA<SettingsLoading>());
+      expect(cubit.state, isA<SettingsLoading>());
 
-    await cubit.load();
+      await cubit.load();
 
-    expect(cubit.state, isA<SettingsFailed>());
-    expect(cubit.state, isNot(isA<SettingsLoading>()));
+      expect(cubit.state, isA<SettingsFailed>());
+      expect(cubit.state, isNot(isA<SettingsLoading>()));
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 }

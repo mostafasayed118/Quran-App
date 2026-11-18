@@ -40,8 +40,12 @@ class AppLocaleController extends ChangeNotifier {
     try {
       _language = await _source.load();
     } on Object catch (error, stackTrace) {
-      appLog('app locale read failed',
-          name: 'quran_yahdi/locale', error: error, stackTrace: stackTrace);
+      appLog(
+        'app locale read failed',
+        name: 'quran_yahdi/locale',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _language = AppLanguage.arabic;
     }
     _loaded = true;
@@ -58,8 +62,12 @@ class AppLocaleController extends ChangeNotifier {
     try {
       await _source.save(language);
     } on Object catch (error, stackTrace) {
-      appLog('app locale write failed',
-          name: 'quran_yahdi/locale', error: error, stackTrace: stackTrace);
+      appLog(
+        'app locale write failed',
+        name: 'quran_yahdi/locale',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

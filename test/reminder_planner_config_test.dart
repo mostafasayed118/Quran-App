@@ -5,20 +5,20 @@ import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 DateTime _at(int hour, [int minute = 0]) => DateTime(2026, 11, 1, hour, minute);
 
 List<PrayerChoice> _day() => [
-      PrayerChoice(PrayerName.fajr, _at(5)),
-      PrayerChoice(PrayerName.sunrise, _at(6)),
-      PrayerChoice(PrayerName.dhuhr, _at(12)),
-      PrayerChoice(PrayerName.asr, _at(15)),
-      PrayerChoice(PrayerName.maghrib, _at(17, 30)),
-      PrayerChoice(PrayerName.isha, _at(19)),
-    ];
+  PrayerChoice(PrayerName.fajr, _at(5)),
+  PrayerChoice(PrayerName.sunrise, _at(6)),
+  PrayerChoice(PrayerName.dhuhr, _at(12)),
+  PrayerChoice(PrayerName.asr, _at(15)),
+  PrayerChoice(PrayerName.maghrib, _at(17, 30)),
+  PrayerChoice(PrayerName.isha, _at(19)),
+];
 
 ReminderTexts _texts() => ReminderTexts(
-      prayerTitle: (prayer) => 'prayer ${prayer.name}',
-      prayerSoonTitle: (prayer, minutes) => 'soon ${prayer.name} $minutes',
-      azkarTitle: 'azkar',
-      wirdTitle: 'wird',
-    );
+  prayerTitle: (prayer) => 'prayer ${prayer.name}',
+  prayerSoonTitle: (prayer, minutes) => 'soon ${prayer.name} $minutes',
+  azkarTitle: 'azkar',
+  wirdTitle: 'wird',
+);
 
 void main() {
   test('defaults keep the frozen one-prayer plan', () {

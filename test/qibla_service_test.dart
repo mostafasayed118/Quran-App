@@ -14,8 +14,10 @@ void main() {
   test('makkah itself returns a finite value within [0, 360)', () {
     final d = service.bearingDeg(const CityCoordinates(21.4225, 39.8262));
     expect(d.isFinite, isTrue);
-    expect(d, inInclusiveRange(0, 360),
-        reason:
-            'degenerate self-point artifact (adhan internal Kaaba constant), measured 324.892');
+    expect(
+      d,
+      inInclusiveRange(0, 360),
+      reason: 'degenerate self-point artifact (adhan internal Kaaba constant), measured 324.892',
+    );
   });
 }

@@ -139,14 +139,16 @@ void _validatePackShape(
   }
   switch (kind) {
     case LibraryPackKind.tafsir:
-      final hasTemplate = urlTemplate != null &&
+      final hasTemplate =
+          urlTemplate != null &&
           urlTemplate.isNotEmpty &&
           fileCount != null &&
           fileCount > 0;
       final hasSingleFile = sourceUrl != null && sourceUrl.isNotEmpty;
       if (!hasTemplate && !hasSingleFile) {
         throw const FormatException(
-            'tafsir pack requires urlTemplate/fileCount or sourceUrl');
+          'tafsir pack requires urlTemplate/fileCount or sourceUrl',
+        );
       }
     case LibraryPackKind.translation:
     case LibraryPackKind.hadith:

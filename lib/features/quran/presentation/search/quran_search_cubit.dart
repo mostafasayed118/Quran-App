@@ -8,16 +8,16 @@ import 'quran_search_state.dart';
 
 /// Drives the Quran text search: one query, keyset-paged result pages.
 class QuranSearchCubit extends Cubit<QuranSearchState> {
-  QuranSearchCubit(
-    this._source, {
-    Duration debounce = Duration.zero,
-  })  : _debounceDuration = debounce,
-        super(const QuranSearchState.ready(
+  QuranSearchCubit(this._source, {Duration debounce = Duration.zero})
+    : _debounceDuration = debounce,
+      super(
+        const QuranSearchState.ready(
           query: '',
           hits: [],
           total: 0,
           hasMore: false,
-        ));
+        ),
+      );
 
   final QuranSearchSource _source;
   final Duration _debounceDuration;
@@ -41,12 +41,14 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
     final query = rawQuery.trim();
     final generation = ++_generation;
     if (!quranSearchQueryUsable(query)) {
-      emit(QuranSearchState.ready(
-        query: query,
-        hits: const [],
-        total: 0,
-        hasMore: false,
-      ));
+      emit(
+        QuranSearchState.ready(
+          query: query,
+          hits: const [],
+          total: 0,
+          hasMore: false,
+        ),
+      );
       return;
     }
     // Keep the previous page on screen while typing: a Loading flash on every
@@ -55,15 +57,21 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
     try {
       final page = await _source.search(query);
       if (isClosed || generation != _generation) return;
-      emit(QuranSearchState.ready(
-        query: query,
-        hits: page.hits,
-        total: page.total,
-        hasMore: page.hasMore,
-      ));
+      emit(
+        QuranSearchState.ready(
+          query: query,
+          hits: page.hits,
+          total: page.total,
+          hasMore: page.hasMore,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('quran search failed',
-          name: 'quran_yahdi/search', error: error, stackTrace: stackTrace);
+      appLog(
+        'quran search failed',
+        name: 'quran_yahdi/search',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || generation != _generation) return;
       emit(const QuranSearchState.failed());
     }
@@ -90,15 +98,21 @@ class QuranSearchCubit extends Cubit<QuranSearchState> {
       if (isClosed || generation != _generation) return;
       final latest = state;
       if (latest is! QuranSearchReady || latest.query != query) return;
-      emit(latest.copyWith(
-        hits: [...latest.hits, ...page.hits],
-        total: page.total,
-        hasMore: page.hasMore,
-        loadingMore: false,
-      ));
+      emit(
+        latest.copyWith(
+          hits: [...latest.hits, ...page.hits],
+          total: page.total,
+          hasMore: page.hasMore,
+          loadingMore: false,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('quran search page failed',
-          name: 'quran_yahdi/search', error: error, stackTrace: stackTrace);
+      appLog(
+        'quran search page failed',
+        name: 'quran_yahdi/search',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || generation != _generation) return;
       final latest = state;
       if (latest is! QuranSearchReady) return;

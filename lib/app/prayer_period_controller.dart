@@ -35,12 +35,12 @@ class PrayerPeriodController extends ChangeNotifier {
     Stream<City>? cityChanges,
     DateTime Function()? now,
     PeriodTimerFactory? schedule,
-  })  : _city = city,
-        _times = times,
-        _config = config,
-        _cityChanges = cityChanges,
-        _now = now ?? DateTime.now,
-        _schedule = schedule ?? ((delay, fire) => Timer(delay, fire));
+  }) : _city = city,
+       _times = times,
+       _config = config,
+       _cityChanges = cityChanges,
+       _now = now ?? DateTime.now,
+       _schedule = schedule ?? ((delay, fire) => Timer(delay, fire));
 
   final CitySource _city;
   final PrayerTimesPort _times;
@@ -65,12 +65,8 @@ class PrayerPeriodController extends ChangeNotifier {
   /// subscriptions are only created the first time.
   void start() {
     if (_disposed) return;
-    _configSubscription ??= _config.changes.listen(
-      (_) => unawaited(refresh()),
-    );
-    _citySubscription ??= _cityChanges?.listen(
-      (_) => unawaited(refresh()),
-    );
+    _configSubscription ??= _config.changes.listen((_) => unawaited(refresh()));
+    _citySubscription ??= _cityChanges?.listen((_) => unawaited(refresh()));
     unawaited(refresh());
   }
 

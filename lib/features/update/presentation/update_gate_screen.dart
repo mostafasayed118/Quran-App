@@ -52,8 +52,9 @@ class UpdateGateScreen extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final body = mandatory ? loc.updateRequiredBody : loc.updateRecommendedBody;
-    final title =
-        mandatory ? loc.updateRequiredTitle : loc.updateRecommendedTitle;
+    final title = mandatory
+        ? loc.updateRequiredTitle
+        : loc.updateRecommendedTitle;
     return PopScope(
       canPop: !mandatory,
       child: Scaffold(
@@ -113,9 +114,7 @@ class UpdateGateScreen extends StatelessWidget {
                 ),
                 if (!mandatory)
                   TextButton(
-                    style: TextButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                    ),
+                    style: TextButton.styleFrom(minimumSize: const Size(0, 48)),
                     onPressed: () => _dismissRecommended(context),
                     child: Text(loc.updateLater),
                   ),

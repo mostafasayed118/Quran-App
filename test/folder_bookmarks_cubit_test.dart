@@ -30,15 +30,15 @@ class _Lookup implements AyahLookup {
 }
 
 Ayah _ayah(int id, int surah, int number, String text) => Ayah(
-      id: id,
-      surahId: surah,
-      numberInSurah: number,
-      juz: 1,
-      page: 1,
-      textUthmani: text,
-      textImlaei: text,
-      sajda: false,
-    );
+  id: id,
+  surahId: surah,
+  numberInSurah: number,
+  juz: 1,
+  page: 1,
+  textUthmani: text,
+  textImlaei: text,
+  sajda: false,
+);
 
 void main() {
   test('loads the folder items in surah/ayah order with their notes', () async {
@@ -69,9 +69,7 @@ void main() {
   test('an ayah missing from the database is skipped', () async {
     final cubit = FolderBookmarksCubit(
       folder: 'تفسير',
-      meta: _Meta({
-        9: const BookmarkMetaEntry(folder: 'تفسير'),
-      }),
+      meta: _Meta({9: const BookmarkMetaEntry(folder: 'تفسير')}),
       ayahs: _Lookup(const {}),
     );
     addTearDown(cubit.close);
@@ -84,9 +82,7 @@ void main() {
   test('a folder with no entries is ready and empty', () async {
     final cubit = FolderBookmarksCubit(
       folder: 'غير موجود',
-      meta: _Meta({
-        9: const BookmarkMetaEntry(folder: 'تفسير'),
-      }),
+      meta: _Meta({9: const BookmarkMetaEntry(folder: 'تفسير')}),
       ayahs: _Lookup(const {}),
     );
     addTearDown(cubit.close);

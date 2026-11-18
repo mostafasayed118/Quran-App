@@ -45,10 +45,14 @@ void main() {
     );
   }
 
-  testWidgets('textScale 2.0: the static dial survives the layout',
-      (tester) async {
-    await pumpHost(tester,
-        seeded: true, textScaler: const TextScaler.linear(2.0));
+  testWidgets('textScale 2.0: the static dial survives the layout', (
+    tester,
+  ) async {
+    await pumpHost(
+      tester,
+      seeded: true,
+      textScaler: const TextScaler.linear(2.0),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('القاهرة'), findsOneWidget);
@@ -56,8 +60,9 @@ void main() {
     expect(find.textContaining('المقياس ثابت'), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0: the live dial survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the live dial survives the layout', (
+    tester,
+  ) async {
     final controller = StreamController<double>();
     addTearDown(controller.close);
     await pumpHost(
@@ -75,16 +80,19 @@ void main() {
     expect(find.textContaining('عن الشمال'), findsOneWidget);
   });
 
-  testWidgets('a11y: the bearing line and the static hint are announced',
-      (tester) async {
+  testWidgets('a11y: the bearing line and the static hint are announced', (
+    tester,
+  ) async {
     await pumpHost(tester, seeded: true);
     final semantics = tester.ensureSemantics();
 
-    final bearingLabel =
-        tester.getSemantics(find.textContaining('عن الشمال')).label;
+    final bearingLabel = tester
+        .getSemantics(find.textContaining('عن الشمال'))
+        .label;
     expect(bearingLabel, contains('عن الشمال'));
-    final hintLabel =
-        tester.getSemantics(find.textContaining('المقياس ثابت')).label;
+    final hintLabel = tester
+        .getSemantics(find.textContaining('المقياس ثابت'))
+        .label;
     expect(hintLabel, contains('المقياس ثابت'));
 
     semantics.dispose();

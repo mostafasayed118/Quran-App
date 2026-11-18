@@ -16,7 +16,7 @@ class PackFailure implements Exception {
 typedef _SurahProjection = ({
   String? error,
   Map<int, String> index,
-  String interior
+  String interior,
 });
 
 /// The [error] sentinel a worker projection carries when the body failed its

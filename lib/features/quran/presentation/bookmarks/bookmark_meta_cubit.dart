@@ -12,8 +12,8 @@ import 'bookmark_meta_state.dart';
 class BookmarkMetaCubit extends Cubit<BookmarkMetaState> {
   /// Creates the cubit over [source].
   BookmarkMetaCubit({required BookmarkMetaSource source})
-      : _source = source,
-        super(const BookmarkMetaState.loading());
+    : _source = source,
+      super(const BookmarkMetaState.loading());
 
   final BookmarkMetaSource _source;
 
@@ -23,8 +23,12 @@ class BookmarkMetaCubit extends Cubit<BookmarkMetaState> {
       final entries = await _source.load();
       if (!isClosed) emit(BookmarkMetaState.ready(entries: entries));
     } on Object catch (error, stackTrace) {
-      appLog('bookmark metadata load failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'bookmark metadata load failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const BookmarkMetaState.failed());
     }
   }
@@ -39,11 +43,7 @@ class BookmarkMetaCubit extends Cubit<BookmarkMetaState> {
   ///
   /// A pair where both are empty removes the entry. Returns whether the write
   /// landed (a no-op change counts as success).
-  Future<bool> set(
-    int ayahId, {
-    required String folder,
-    required String note,
-  }) {
+  Future<bool> set(int ayahId, {required String folder, required String note}) {
     final current = state;
     if (current is! BookmarkMetaReady) return Future<bool>.value(false);
     final next = Map<int, BookmarkMetaEntry>.of(current.entries);
@@ -106,8 +106,12 @@ class BookmarkMetaCubit extends Cubit<BookmarkMetaState> {
       await _source.save(normalized);
       return true;
     } on Object catch (error, stackTrace) {
-      appLog('bookmark metadata save failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'bookmark metadata save failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(previous);
       return false;
     }

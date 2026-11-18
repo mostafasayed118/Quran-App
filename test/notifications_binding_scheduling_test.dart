@@ -30,35 +30,35 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      if (throwOn != null && call.method == throwOn) {
-        throw PlatformException(code: 'boom');
-      }
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return exact;
-        case 'areNotificationsEnabled':
-          return notificationsEnabled;
-        case 'requestNotificationsPermission':
-        case 'requestExactAlarmsPermission':
-          return true;
-        case 'getNotificationAppLaunchDetails':
-          return <String, Object?>{
-            'notificationLaunchedApp': true,
-            'notificationResponse': <String, Object?>{
-              'notificationId': 1,
-              'actionId': null,
-              'input': null,
-              'notificationResponseType': 0,
-              'payload': 'prayer',
-            },
-          };
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          if (throwOn != null && call.method == throwOn) {
+            throw PlatformException(code: 'boom');
+          }
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return exact;
+            case 'areNotificationsEnabled':
+              return notificationsEnabled;
+            case 'requestNotificationsPermission':
+            case 'requestExactAlarmsPermission':
+              return true;
+            case 'getNotificationAppLaunchDetails':
+              return <String, Object?>{
+                'notificationLaunchedApp': true,
+                'notificationResponse': <String, Object?>{
+                  'notificationId': 1,
+                  'actionId': null,
+                  'input': null,
+                  'notificationResponseType': 0,
+                  'payload': 'prayer',
+                },
+              };
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -79,15 +79,19 @@ void main() {
     await binding.init();
 
     final methods = _methods(calls);
-    expect(methods.take(2).toList(),
-        ['initialize', 'canScheduleExactNotifications']);
+    expect(methods.take(2).toList(), [
+      'initialize',
+      'canScheduleExactNotifications',
+    ]);
     expect(
       methods.sublist(2, methods.length - 2),
       everyElement('cancel'),
       reason: 'every planner id is cleared before the plan lands',
     );
-    expect(methods.sublist(methods.length - 2),
-        ['zonedSchedule', 'zonedSchedule']);
+    expect(methods.sublist(methods.length - 2), [
+      'zonedSchedule',
+      'zonedSchedule',
+    ]);
     expect(_zonedIds(calls), [1, 3]);
   });
 
@@ -102,7 +106,8 @@ void main() {
     expect(
       _methods(calls.sublist(before)),
       ['canScheduleExactNotifications'],
-      reason: 'the mode probe runs on every apply (the exact-alarm grant can '
+      reason:
+          'the mode probe runs on every apply (the exact-alarm grant can '
           'change), but no alarm is cancelled or scheduled again',
     );
   });
@@ -117,11 +122,9 @@ void main() {
     final before = calls.length;
     await binding.scheduleAll([second, first]);
 
-    expect(
-      _methods(calls.sublist(before)),
-      ['canScheduleExactNotifications'],
-      reason: 'same plan in another order = same alarms, so no re-schedule',
-    );
+    expect(_methods(calls.sublist(before)), [
+      'canScheduleExactNotifications',
+    ], reason: 'same plan in another order = same alarms, so no re-schedule');
   });
 
   test('a title change re-registers the plan', () async {
@@ -133,8 +136,10 @@ void main() {
     await binding.scheduleAll([_reminder(id: 1, title: 'new title')]);
 
     final added = _methods(calls.sublist(before));
-    expect(added,
-        containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']));
+    expect(
+      added,
+      containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']),
+    );
     expect(_zoned(calls.sublist(before)), hasLength(1));
   });
 
@@ -151,33 +156,39 @@ void main() {
     ]);
 
     final added = _methods(calls.sublist(before));
-    expect(added,
-        containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']));
+    expect(
+      added,
+      containsAllInOrder(['cancel', 'cancel', 'cancel', 'zonedSchedule']),
+    );
     expect(_zoned(calls.sublist(before)), hasLength(1));
   });
 
-  test('exact alarms use exactAllowWhileIdle when the OS allows them',
-      () async {
-    exact = true;
-    final binding = NotificationsBinding();
-    await binding.init();
-    await binding.scheduleAll([_reminder(id: 1), _reminder(id: 2)]);
+  test(
+    'exact alarms use exactAllowWhileIdle when the OS allows them',
+    () async {
+      exact = true;
+      final binding = NotificationsBinding();
+      await binding.init();
+      await binding.scheduleAll([_reminder(id: 1), _reminder(id: 2)]);
 
-    expect(_scheduleModes(calls), [
-      'exactAllowWhileIdle',
-      'exactAllowWhileIdle',
-    ]);
-  });
+      expect(_scheduleModes(calls), [
+        'exactAllowWhileIdle',
+        'exactAllowWhileIdle',
+      ]);
+    },
+  );
 
-  test('inexact alarms use inexactAllowWhileIdle when exact is denied',
-      () async {
-    exact = false;
-    final binding = NotificationsBinding();
-    await binding.init();
-    await binding.scheduleAll([_reminder(id: 1)]);
+  test(
+    'inexact alarms use inexactAllowWhileIdle when exact is denied',
+    () async {
+      exact = false;
+      final binding = NotificationsBinding();
+      await binding.init();
+      await binding.scheduleAll([_reminder(id: 1)]);
 
-    expect(_scheduleModes(calls), ['inexactAllowWhileIdle']);
-  });
+      expect(_scheduleModes(calls), ['inexactAllowWhileIdle']);
+    },
+  );
 
   test('granting exact alarms upgrades an already-applied plan', () async {
     exact = false;
@@ -195,7 +206,8 @@ void main() {
     expect(
       _scheduleModes(calls),
       ['exactAllowWhileIdle'],
-      reason: 'the grant changes the schedule MODE, not the plan, so the '
+      reason:
+          'the grant changes the schedule MODE, not the plan, so the '
           'fingerprint alone must not dedupe the re-apply away',
     );
   });
@@ -211,15 +223,18 @@ void main() {
     final methods = _methods(calls);
     expect(methods.first, 'initialize');
     expect(
-        methods,
-        containsAllInOrder([
-          'requestNotificationsPermission',
-          'requestExactAlarmsPermission',
-          'cancel',
-        ]));
+      methods,
+      containsAllInOrder([
+        'requestNotificationsPermission',
+        'requestExactAlarmsPermission',
+        'cancel',
+      ]),
+    );
     // Every planner id is cleared before the plan lands, and the plan lands.
-    expect(methods.lastIndexOf('cancel'),
-        lessThan(methods.indexOf('zonedSchedule')));
+    expect(
+      methods.lastIndexOf('cancel'),
+      lessThan(methods.indexOf('zonedSchedule')),
+    );
   });
 
   test('a failed init drops the queued plan and permission', () async {
@@ -264,20 +279,22 @@ void main() {
     expect(await binding.launchPayload(), 'prayer');
   });
 
-  test('boot grace asks for notifications when they are off and azkar is on',
-      () async {
-    final binding = NotificationsBinding();
-    await binding.init();
-    notificationsEnabled = false;
+  test(
+    'boot grace asks for notifications when they are off and azkar is on',
+    () async {
+      final binding = NotificationsBinding();
+      await binding.init();
+      notificationsEnabled = false;
 
-    await binding.requestBootPermission(azkarEnabled: true);
+      await binding.requestBootPermission(azkarEnabled: true);
 
-    expect(
-      _methods(calls)
-          .where((method) => method == 'requestNotificationsPermission'),
-      hasLength(1),
-    );
-  });
+      expect(
+        _methods(calls)
+            .where((method) => method == 'requestNotificationsPermission'),
+        hasLength(1),
+      );
+    },
+  );
 
   test('boot grace never re-prompts an opted-out user', () async {
     final binding = NotificationsBinding();
@@ -295,14 +312,13 @@ ScheduledReminder _reminder({
   String? body,
   String? payload,
   DateTime? fireAt,
-}) =>
-    ScheduledReminder(
-      id: id,
-      fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
-      title: title,
-      body: body,
-      payload: payload,
-    );
+}) => ScheduledReminder(
+  id: id,
+  fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
+  title: title,
+  body: body,
+  payload: payload,
+);
 
 List<String> _methods(List<MethodCall> calls) =>
     calls.map((call) => call.method).toList();
@@ -314,8 +330,12 @@ List<int> _zonedIds(List<MethodCall> calls) =>
     _zoned(calls).map((call) => _arguments(call)['id'] as int).toList();
 
 List<String?> _scheduleModes(List<MethodCall> calls) => _zoned(calls)
-    .map((call) => (_arguments(call)['platformSpecifics']
-        as Map<Object?, Object?>)['scheduleMode'] as String?)
+    .map(
+      (call) =>
+          (_arguments(call)['platformSpecifics']
+                  as Map<Object?, Object?>)['scheduleMode']
+              as String?,
+    )
     .toList();
 
 Map<Object?, Object?> _arguments(MethodCall call) =>

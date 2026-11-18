@@ -21,23 +21,25 @@ void main() {
 
   final bytes = Uint8List.fromList(List<int>.generate(64, (i) => i));
 
-  test('a worker asset read that never completes falls back to the UI isolate',
-      () async {
-    final target = File(p.join(tempDir.path, 'quran_yahdi.sqlite'));
-    final never = Completer<Uint8List?>();
+  test(
+    'a worker asset read that never completes falls back to the UI isolate',
+    () async {
+      final target = File(p.join(tempDir.path, 'quran_yahdi.sqlite'));
+      final never = Completer<Uint8List?>();
 
-    await writeAssetOffUiIsolate(
-      target,
-      'assets/db/quran.sqlite',
-      workerLoad: () => never.future,
-      loadAsset: (_) async => ByteData.sublistView(bytes),
-      timeout: const Duration(milliseconds: 50),
-    );
+      await writeAssetOffUiIsolate(
+        target,
+        'assets/db/quran.sqlite',
+        workerLoad: () => never.future,
+        loadAsset: (_) async => ByteData.sublistView(bytes),
+        timeout: const Duration(milliseconds: 50),
+      );
 
-    expect(target.existsSync(), isTrue);
-    expect(await target.readAsBytes(), bytes);
-    expect(File('${target.path}.part').existsSync(), isFalse);
-  });
+      expect(target.existsSync(), isTrue);
+      expect(await target.readAsBytes(), bytes);
+      expect(File('${target.path}.part').existsSync(), isFalse);
+    },
+  );
 
   test('a throwing worker asset read falls back to the UI isolate', () async {
     final target = File(p.join(tempDir.path, 'quran_yahdi.sqlite'));

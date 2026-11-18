@@ -4,15 +4,15 @@ import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 import 'package:quran_yahdi/features/library/presentation/library_screen.dart';
 
 LibraryPackInfo _pack(String id, LibraryPackKind kind) => LibraryPackInfo(
-      id: id,
-      kind: kind,
-      language: 'ar',
-      titleAr: 'حزمة',
-      titleEn: 'Pack',
-      approxSizeMb: 1,
-      version: 'v1',
-      sourceUrl: 'https://example.test/$id.json',
-    );
+  id: id,
+  kind: kind,
+  language: 'ar',
+  titleAr: 'حزمة',
+  titleEn: 'Pack',
+  approxSizeMb: 1,
+  version: 'v1',
+  sourceUrl: 'https://example.test/$id.json',
+);
 
 void main() {
   test('a kind with no packs is hidden (tafsir after the withdrawal)', () {

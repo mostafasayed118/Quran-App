@@ -21,8 +21,10 @@ void main() {
 
     // Reproduce exactly what the previous build wrote: PBKDF2-HMAC-SHA256 at
     // 100,000 iterations, no AAD, one concatenated payload.
-    final key = await Pbkdf2.hmacSha256(iterations: 100000, bits: 256)
-        .deriveKeyFromPassword(password: passphrase, nonce: salt);
+    final key = await Pbkdf2.hmacSha256(
+      iterations: 100000,
+      bits: 256,
+    ).deriveKeyFromPassword(password: passphrase, nonce: salt);
     final box = await AesGcm.with256bits().encrypt(
       utf8.encode(plain),
       secretKey: key,
@@ -72,11 +74,13 @@ void main() {
     expect(await decryptBackupJson(jsonEncode(map), 'p'), isNull);
   });
 
-  test('a payload larger than the cap is rejected before any derivation',
-      () async {
-    final envelope = await encryptBackupJson('{"a":1}', 'p');
-    final map = jsonDecode(envelope) as Map<String, Object?>;
-    map['payload'] = base64Encode(Uint8List(5 * 1024 * 1024));
-    expect(await decryptBackupJson(jsonEncode(map), 'p'), isNull);
-  });
+  test(
+    'a payload larger than the cap is rejected before any derivation',
+    () async {
+      final envelope = await encryptBackupJson('{"a":1}', 'p');
+      final map = jsonDecode(envelope) as Map<String, Object?>;
+      map['payload'] = base64Encode(Uint8List(5 * 1024 * 1024));
+      expect(await decryptBackupJson(jsonEncode(map), 'p'), isNull);
+    },
+  );
 }

@@ -100,9 +100,8 @@ class _MonthList extends StatelessWidget {
             ),
             child: Text(
               months.formatMonthYear(DateTime(year, month)),
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
           );
         }
@@ -117,9 +116,8 @@ class _MonthList extends StatelessWidget {
             children: [
               Text(
                 months.formatMediumDate(day.date),
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: AppSpacing.xs),
               Wrap(

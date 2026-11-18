@@ -11,7 +11,9 @@ import 'support/test_db.dart';
 void main() {
   test('removing a bookmark twice never re-adds it', () async {
     final db = newTestDb();
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
             id: const Value(2),
             nameAr: 'البقرة',
@@ -22,7 +24,9 @@ void main() {
             pagesEnd: 49,
           ),
         );
-    await db.into(db.ayahs).insert(
+    await db
+        .into(db.ayahs)
+        .insert(
           AyahsCompanion.insert(
             id: const Value(9),
             surahId: 2,
@@ -52,8 +56,11 @@ void main() {
     await cubit.remove(9);
 
     await emptied;
-    expect(await db.select(db.bookmarks).get(), isEmpty,
-        reason: 'the second delete must not toggle the bookmark back in');
+    expect(
+      await db.select(db.bookmarks).get(),
+      isEmpty,
+      reason: 'the second delete must not toggle the bookmark back in',
+    );
     expect((cubit.state as BookmarksReady).entries, isEmpty);
   });
 }

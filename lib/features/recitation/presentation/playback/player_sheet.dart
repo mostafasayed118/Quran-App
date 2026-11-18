@@ -132,11 +132,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
           duration: duration,
           playing: false,
         ),
-      PlaybackLoading(
-        :final reciterName,
-        :final surahNumber,
-        :final surahName,
-      )
+      PlaybackLoading(:final reciterName, :final surahNumber, :final surahName)
           when reciterName != null =>
         _Track(
           reciterName: reciterName,
@@ -175,23 +171,15 @@ class _PlayerSheetState extends State<_PlayerSheet> {
         final maxMs = track.duration.inMilliseconds.toDouble();
         final cubit = context.read<PlaybackCubit>();
         final controls = switch (state) {
-          PlaybackPlaying(
-            :final speed,
-            :final repeatMode,
-            :final sleepTimer,
-          ) =>
+          PlaybackPlaying(:final speed, :final repeatMode, :final sleepTimer) =>
             (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
-          PlaybackPaused(
-            :final speed,
-            :final repeatMode,
-            :final sleepTimer,
-          ) =>
+          PlaybackPaused(:final speed, :final repeatMode, :final sleepTimer) =>
             (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
           _ => (
-              speed: 1.0,
-              repeatMode: PlaybackRepeatMode.off,
-              sleepTimer: null,
-            ),
+            speed: 1.0,
+            repeatMode: PlaybackRepeatMode.off,
+            sleepTimer: null,
+          ),
         };
         final value = (_dragging ?? track.position.inMilliseconds.toDouble())
             .clamp(0.0, maxMs > 0 ? maxMs : 0.0);
@@ -218,10 +206,7 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  track.surahLabel,
-                  style: AppTheme.mutedAt(colors, 13),
-                ),
+                Text(track.surahLabel, style: AppTheme.mutedAt(colors, 13)),
                 const SizedBox(height: AppSpacing.md),
                 _SeekRow(
                   value: value,
@@ -234,9 +219,9 @@ class _PlayerSheetState extends State<_PlayerSheet> {
                       : null,
                   onChangeEnd: maxMs > 0
                       ? (next) {
-                          context
-                              .read<PlaybackCubit>()
-                              .seek(Duration(milliseconds: next.round()));
+                          context.read<PlaybackCubit>().seek(
+                            Duration(milliseconds: next.round()),
+                          );
                           setState(() => _dragging = null);
                         }
                       : null,

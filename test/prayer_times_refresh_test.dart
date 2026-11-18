@@ -23,14 +23,13 @@ class _CountingPrayerService extends FakePrayerTimeService {
 }
 
 List<PrayerChoice> _day({int fajrHour = 4, int fajrMinute = 45}) => [
-      PrayerChoice(
-          PrayerName.fajr, DateTime(2026, 3, 15, fajrHour, fajrMinute)),
-      PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-      PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-      PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-      PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-      PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, fajrHour, fajrMinute)),
+  PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
+  PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
+  PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
+  PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+];
 
 void main() {
   late AppDatabase db;
@@ -55,8 +54,10 @@ void main() {
   testWidgets('app-bar refresh reloads the times in place', (tester) async {
     final fake = _CountingPrayerService()
       ..todayResult = _day()
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
     final cubit = PrayerTimesCubit(
       prayer: fake,
       city: repo,
@@ -70,8 +71,11 @@ void main() {
 
     fake.todayResult = _day(fajrHour: 5, fajrMinute: 0);
     await tester.tap(find.byTooltip('تحديث'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(fake.todayCalls, 2);
     expect(find.text('٠٥:٠٠'), findsOneWidget);
@@ -81,8 +85,10 @@ void main() {
   testWidgets('pull-to-refresh reloads the times in place', (tester) async {
     final fake = _CountingPrayerService()
       ..todayResult = _day()
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
     final cubit = PrayerTimesCubit(
       prayer: fake,
       city: repo,
@@ -94,8 +100,11 @@ void main() {
     expect(fake.todayCalls, 1);
 
     await tester.fling(find.byType(ListView), const Offset(0, 300), 1000);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(fake.todayCalls, 2);
   });

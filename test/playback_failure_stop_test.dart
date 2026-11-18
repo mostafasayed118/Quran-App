@@ -50,13 +50,13 @@ class _ThrowingReciters implements ReciterInfoSource {
 class _OneReciter implements ReciterInfoSource {
   @override
   Future<ReciterInfo?> defaultReciter() async => const ReciterInfo(
-        id: '1-1',
-        reciterName: 'القارئ',
-        moshafName: 'حفص',
-        server: 'https://server.example/mp3',
-        surahList: '1',
-        surahTotal: 114,
-      );
+    id: '1-1',
+    reciterName: 'القارئ',
+    moshafName: 'حفص',
+    server: 'https://server.example/mp3',
+    surahList: '1',
+    surahTotal: 114,
+  );
 }
 
 void main() {

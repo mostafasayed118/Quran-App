@@ -7,8 +7,9 @@ import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/notifications_binding.dart';
 
 /// The channel the plugin's Android implementation talks to.
-const MethodChannel _channel =
-    MethodChannel('dexterous.com/flutter/local_notifications');
+const MethodChannel _channel = MethodChannel(
+  'dexterous.com/flutter/local_notifications',
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -27,22 +28,22 @@ void main() {
     scheduleCalls = 0;
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      switch (call.method) {
-        case 'initialize':
-          if (failInitialize) {
-            throw PlatformException(code: 'init-failed');
+          switch (call.method) {
+            case 'initialize':
+              if (failInitialize) {
+                throw PlatformException(code: 'init-failed');
+              }
+              return true;
+            case 'zonedSchedule':
+              scheduleCalls += 1;
+              if (failSchedule) {
+                throw PlatformException(code: 'schedule-failed');
+              }
+              return null;
+            default:
+              return null;
           }
-          return true;
-        case 'zonedSchedule':
-          scheduleCalls += 1;
-          if (failSchedule) {
-            throw PlatformException(code: 'schedule-failed');
-          }
-          return null;
-        default:
-          return null;
-      }
-    });
+        });
   });
 
   tearDown(() {
@@ -52,10 +53,10 @@ void main() {
   });
 
   ScheduledReminder reminder() => ScheduledReminder(
-        id: 9001,
-        fireAt: DateTime.now().add(const Duration(hours: 1)),
-        title: 'test reminder',
-      );
+    id: 9001,
+    fireAt: DateTime.now().add(const Duration(hours: 1)),
+    title: 'test reminder',
+  );
 
   test('a failed init reports the health flag', () async {
     failInitialize = true;

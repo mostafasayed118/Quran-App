@@ -53,27 +53,28 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester, {double? textScale}) async {
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      builder: textScale == null
-          ? null
-          : (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(textScale),
-                ),
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: AppRouter.router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        builder: textScale == null
+            ? null
+            : (context, child) => MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
                 child: child!,
               ),
-    ));
+      ),
+    );
     await _pumpUntil(
       tester,
       () =>
@@ -82,8 +83,9 @@ void main() {
     );
   }
 
-  testWidgets('an expanded window uses the navigation rail, not the bar',
-      (tester) async {
+  testWidgets('an expanded window uses the navigation rail, not the bar', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -112,8 +114,9 @@ void main() {
     expect(find.byType(NavigationRail), findsNothing);
   });
 
-  testWidgets('tapping a rail destination switches tab and selection',
-      (tester) async {
+  testWidgets('tapping a rail destination switches tab and selection', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

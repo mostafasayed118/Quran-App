@@ -15,29 +15,29 @@ extension AyahRowMapping on Ayah {
   /// The ayah-end medallion is stripped here, once per row, so the reader
   /// never does it inside a rebuild.
   Verse toVerse() => Verse(
-        id: id,
-        surahId: surahId,
-        numberInSurah: numberInSurah,
-        juz: juz,
-        page: page,
-        textUthmani: textUthmani,
-        textImlaei: textImlaei,
-        sajda: sajda,
-        displayUthmani: stripAyahEndMarker(textUthmani),
-      );
+    id: id,
+    surahId: surahId,
+    numberInSurah: numberInSurah,
+    juz: juz,
+    page: page,
+    textUthmani: textUthmani,
+    textImlaei: textImlaei,
+    sajda: sajda,
+    displayUthmani: stripAyahEndMarker(textUthmani),
+  );
 }
 
 extension SurahRowMapping on Surah {
   /// Maps this row to the list-facing [SurahSummary] model.
   SurahSummary toSummary() => SurahSummary(
-        id: id,
-        nameAr: nameAr,
-        nameEn: nameEn,
-        revelationType: _normalizeRevelationType(revelationType),
-        ayahCount: ayahCount,
-        pagesStart: pagesStart,
-        pagesEnd: pagesEnd,
-      );
+    id: id,
+    nameAr: nameAr,
+    nameEn: nameEn,
+    revelationType: _normalizeRevelationType(revelationType),
+    ayahCount: ayahCount,
+    pagesStart: pagesStart,
+    pagesEnd: pagesEnd,
+  );
 }
 
 /// Normalizes the free-text DB column to the two values the UI understands.
@@ -47,10 +47,6 @@ extension SurahRowMapping on Surah {
 String _normalizeRevelationType(String raw) {
   final value = raw.toLowerCase().trim();
   if (value == 'makkah' || value == 'madinah') return value;
-  appLog(
-    'unknown revelation type',
-    name: 'quran_yahdi/quran',
-    error: raw,
-  );
+  appLog('unknown revelation type', name: 'quran_yahdi/quran', error: raw);
   return 'madinah';
 }

@@ -45,7 +45,7 @@ class MiniPlayerBar extends StatelessWidget {
         PlaybackLoading(
           :final reciterName,
           :final surahNumber,
-          :final surahName
+          :final surahName,
         ) =>
           reciterName == null
               ? const SizedBox.shrink()
@@ -60,7 +60,7 @@ class MiniPlayerBar extends StatelessWidget {
         PlaybackPlaying(
           :final reciterName,
           :final surahNumber,
-          :final surahName
+          :final surahName,
         ) =>
           _PlaybackStrip(
             reciterName: reciterName,
@@ -72,7 +72,7 @@ class MiniPlayerBar extends StatelessWidget {
         PlaybackPaused(
           :final reciterName,
           :final surahNumber,
-          :final surahName
+          :final surahName,
         ) =>
           _PlaybackStrip(
             reciterName: reciterName,
@@ -167,7 +167,9 @@ class _TrackInfo extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
-              fontWeight: FontWeight.bold, fontSize: AppType.caption),
+            fontWeight: FontWeight.bold,
+            fontSize: AppType.caption,
+          ),
         ),
         Text(
           surahName.isEmpty
@@ -191,16 +193,14 @@ class _ProgressRow extends StatelessWidget {
     return BlocBuilder<PlaybackCubit, PlaybackState>(
       builder: (context, state) {
         final (:position, :duration) = switch (state) {
-          PlaybackPlaying(
-            :final position,
-            :final duration,
-          ) =>
-            (position: position, duration: duration),
-          PlaybackPaused(
-            :final position,
-            :final duration,
-          ) =>
-            (position: position, duration: duration),
+          PlaybackPlaying(:final position, :final duration) => (
+            position: position,
+            duration: duration,
+          ),
+          PlaybackPaused(:final position, :final duration) => (
+            position: position,
+            duration: duration,
+          ),
           _ => (position: Duration.zero, duration: Duration.zero),
         };
         final progress = duration.inMilliseconds > 0

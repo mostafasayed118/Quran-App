@@ -48,8 +48,10 @@ class _FakeAyahSource implements AyahSource {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      const [];
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => const [];
 
   @override
   Future<void> deleteBookmark(int ayahId) async {}
@@ -110,13 +112,16 @@ void main() {
 
     await cubit.loadMore();
     await cubit.loadMore();
-    expect(pager.cursors, [2],
-        reason: 'scroll notifications must not reissue a failed page');
+    expect(pager.cursors, [
+      2,
+    ], reason: 'scroll notifications must not reissue a failed page');
 
     await cubit.retryMore();
     state = cubit.state as BookmarksReady;
-    expect(pager.cursors, [2, 2],
-        reason: 'the retry reissues exactly one page at the same cursor');
+    expect(pager.cursors, [
+      2,
+      2,
+    ], reason: 'the retry reissues exactly one page at the same cursor');
     expect(state.moreFailed, isFalse);
     expect(state.entries.map((verse) => verse.id), [3, 2, 1]);
   });

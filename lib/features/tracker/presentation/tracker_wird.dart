@@ -2,9 +2,9 @@ part of 'tracker_screen.dart';
 
 /// Reader route opening the wird at the plan's read-up-to pointer.
 String wirdReaderRoute(KhatmaProgress progress) => quranReaderPath(
-      surah: progress.readerSurahId,
-      ayah: progress.readerAyahNumber,
-    );
+  surah: progress.readerSurahId,
+  ayah: progress.readerAyahNumber,
+);
 
 class _WirdCard extends StatelessWidget {
   const _WirdCard({required this.progress});
@@ -35,8 +35,11 @@ class _WirdCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.menu_book,
-                    size: AppIconSize.md, color: colors.primary),
+                Icon(
+                  Icons.menu_book,
+                  size: AppIconSize.md,
+                  color: colors.primary,
+                ),
                 const SizedBox(width: AppSpacing.sm),
                 Text(loc.wirdTitle, style: AppTheme.rowTitle),
               ],
@@ -129,7 +132,11 @@ class _WirdSetupSheet extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.lg, AppSpacing.md, 6),
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.md,
+                6,
+              ),
               child: Text(loc.wirdPaceSheetTitle, style: AppTheme.rowTitle),
             ),
             for (final target in KhatmaProgress.targetChoices)

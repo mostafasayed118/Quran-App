@@ -11,34 +11,46 @@ import 'asma_repository_test.dart' show fixtureRows;
 import 'support/host.dart';
 
 void main() {
-  testWidgets('grid renders names; tapping shows the meanings sheet',
-      (tester) async {
+  testWidgets('grid renders names; tapping shows the meanings sheet', (
+    tester,
+  ) async {
     final cubit = AsmaCubit(
       repository: AsmaRepository(loader: () async => fixtureRows()),
     );
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
-      value: cubit,
-      child: appShell(home: const AsmaScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<AsmaCubit>.value(
+        value: cubit,
+        child: appShell(home: const AsmaScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('الرحمن'), findsOneWidget);
     expect(find.text('الرحيم'), findsOneWidget);
 
     await tester.tap(find.text('الرحيم'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.textContaining('الاسم ٢'), findsOneWidget);
     expect(find.text('النازل بالرحمة'), findsOneWidget);
     expect(find.text('The Most Merciful'), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.close));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.textContaining('الاسم ٢'), findsNothing);
   });
 }

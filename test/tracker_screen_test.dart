@@ -30,8 +30,9 @@ void main() {
     );
   }
 
-  testWidgets('five prayer toggle rows; tapping fajr fills the checkbox',
-      (tester) async {
+  testWidgets('five prayer toggle rows; tapping fajr fills the checkbox', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(find.text('صلوات اليوم'), findsOneWidget);
@@ -40,8 +41,11 @@ void main() {
     expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(5));
 
     await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(4));
     expect(find.text('سلسلة ١ يوم'), findsOneWidget);

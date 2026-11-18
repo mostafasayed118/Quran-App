@@ -30,10 +30,10 @@ class QadaScreen extends StatelessWidget {
           BlocBuilder<QadaCubit, QadaState>(
             builder: (context, state) => switch (state) {
               QadaReady() => IconButton(
-                  tooltip: loc.qadaAdd,
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _pickDate(context, cubit),
-                ),
+                tooltip: loc.qadaAdd,
+                icon: const Icon(Icons.add),
+                onPressed: () => _pickDate(context, cubit),
+              ),
               _ => const SizedBox.shrink(),
             },
           ),
@@ -44,8 +44,10 @@ class QadaScreen extends StatelessWidget {
           builder: (context, state) => switch (state) {
             QadaLoading() => const LoadingView(),
             QadaFailed() => errorPane(loc, onRetry: cubit.start),
-            QadaReady(:final dates) when dates.isEmpty =>
-              EmptyState(loc.qadaEmpty, icon: Icons.event_available_outlined),
+            QadaReady(:final dates) when dates.isEmpty => EmptyState(
+              loc.qadaEmpty,
+              icon: Icons.event_available_outlined,
+            ),
             QadaReady(:final dates) => _QadaList(dates: dates),
           },
         ),
@@ -58,8 +60,11 @@ Future<void> _pickDate(BuildContext context, QadaCubit cubit) async {
   final loc = AppLocalizations.of(context);
   final messenger = ScaffoldMessenger.of(context);
   final now = DateTime.now();
-  final yesterday =
-      DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
+  final yesterday = DateTime(
+    now.year,
+    now.month,
+    now.day,
+  ).subtract(const Duration(days: 1));
   final picked = await showDatePicker(
     context: context,
     initialDate: yesterday,
@@ -94,9 +99,8 @@ class _QadaList extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Text(
               loc.qadaCount(loc.number(dates.length)),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
           ),
         ),

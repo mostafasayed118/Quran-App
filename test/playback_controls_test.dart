@@ -77,7 +77,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_player_controls');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: 'row-1',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -104,23 +106,25 @@ void main() {
     }
   });
 
-  test('speed is clamped, reaches the service and survives position ticks',
-      () async {
-    await cubit.playSurah(row, 1);
-    await pumpEventQueue();
+  test(
+    'speed is clamped, reaches the service and survives position ticks',
+    () async {
+      await cubit.playSurah(row, 1);
+      await pumpEventQueue();
 
-    await cubit.setSpeed(1.5);
-    expect(service.speed, 1.5);
-    expect((cubit.state as PlaybackPlaying).speed, 1.5);
+      await cubit.setSpeed(1.5);
+      expect(service.speed, 1.5);
+      expect((cubit.state as PlaybackPlaying).speed, 1.5);
 
-    service.position.add(const Duration(seconds: 3));
-    await pumpEventQueue();
-    expect((cubit.state as PlaybackPlaying).speed, 1.5);
+      service.position.add(const Duration(seconds: 3));
+      await pumpEventQueue();
+      expect((cubit.state as PlaybackPlaying).speed, 1.5);
 
-    await cubit.setSpeed(9);
-    expect(service.speed, 2);
-    expect((cubit.state as PlaybackPlaying).speed, 2);
-  });
+      await cubit.setSpeed(9);
+      expect(service.speed, 2);
+      expect((cubit.state as PlaybackPlaying).speed, 2);
+    },
+  );
 
   test('cycleSpeed moves through the declared ladder', () async {
     await cubit.playSurah(row, 1);
@@ -139,17 +143,11 @@ void main() {
 
     await cubit.toggleRepeat();
     expect(service.loop, isTrue);
-    expect(
-      (cubit.state as PlaybackPlaying).repeatMode,
-      PlaybackRepeatMode.one,
-    );
+    expect((cubit.state as PlaybackPlaying).repeatMode, PlaybackRepeatMode.one);
 
     await cubit.toggleRepeat();
     expect(service.loop, isFalse);
-    expect(
-      (cubit.state as PlaybackPlaying).repeatMode,
-      PlaybackRepeatMode.off,
-    );
+    expect((cubit.state as PlaybackPlaying).repeatMode, PlaybackRepeatMode.off);
   });
 
   test('next and previous move inside the surah range', () async {
@@ -200,8 +198,10 @@ void main() {
     await pumpEventQueue();
 
     await cubit.startSleepTimer(const Duration(milliseconds: 20));
-    expect((cubit.state as PlaybackPlaying).sleepTimer,
-        const Duration(milliseconds: 20));
+    expect(
+      (cubit.state as PlaybackPlaying).sleepTimer,
+      const Duration(milliseconds: 20),
+    );
 
     await Future<void>.delayed(const Duration(milliseconds: 150));
 

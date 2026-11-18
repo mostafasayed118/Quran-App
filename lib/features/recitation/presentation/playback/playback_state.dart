@@ -35,12 +35,11 @@ sealed class PlaybackState with _$PlaybackState {
     required String reciterName,
     required int surahNumber,
     String surahName = '',
-  }) =>
-      PlaybackLoading(
-        reciterName: reciterName,
-        surahNumber: surahNumber,
-        surahName: surahName,
-      );
+  }) => PlaybackLoading(
+    reciterName: reciterName,
+    surahNumber: surahNumber,
+    surahName: surahName,
+  );
 
   const factory PlaybackState.playing({
     required String reciterName,
@@ -64,9 +63,8 @@ sealed class PlaybackState with _$PlaybackState {
     @Default(null) Duration? sleepTimer,
   }) = PlaybackPaused;
 
-  const factory PlaybackState.failed({
-    required PlaybackFailureKind kind,
-  }) = PlaybackFailed;
+  const factory PlaybackState.failed({required PlaybackFailureKind kind}) =
+      PlaybackFailed;
 }
 
 /// Compatibility alias for the frozen suite: the pre-merge name of the
@@ -90,73 +88,69 @@ extension PlaybackStateTransitions on PlaybackState {
     double? speedOverride,
     PlaybackRepeatMode? repeatModeOverride,
     Duration? sleepTimerOverride,
-  }) =>
-      switch (this) {
-        PlaybackLoading(
-          :final reciterName,
-          :final surahNumber,
-          :final surahName
-        )
-            when reciterName != null =>
-          PlaybackState.playing(
-            reciterName: reciterName,
-            surahNumber: surahNumber,
-            surahName: surahName,
-            duration: duration ?? Duration.zero,
-            speed: speedOverride ?? 1.0,
-            repeatMode: repeatModeOverride ?? PlaybackRepeatMode.off,
-            sleepTimer: sleepTimerOverride,
-          ),
-        PlaybackPaused(
-          :final reciterName,
-          :final surahNumber,
-          :final surahName,
-          :final position,
-          :final duration,
-          :final speed,
-          :final repeatMode,
-          :final sleepTimer,
-        ) =>
-          PlaybackState.playing(
-            reciterName: reciterName,
-            surahNumber: surahNumber,
-            surahName: surahName,
-            position: position,
-            duration: duration,
-            speed: speedOverride ?? speed,
-            repeatMode: repeatModeOverride ?? repeatMode,
-            sleepTimer: sleepTimerOverride ?? sleepTimer,
-          ),
-        _ => this,
-      };
+  }) => switch (this) {
+    PlaybackLoading(:final reciterName, :final surahNumber, :final surahName)
+        when reciterName != null =>
+      PlaybackState.playing(
+        reciterName: reciterName,
+        surahNumber: surahNumber,
+        surahName: surahName,
+        duration: duration ?? Duration.zero,
+        speed: speedOverride ?? 1.0,
+        repeatMode: repeatModeOverride ?? PlaybackRepeatMode.off,
+        sleepTimer: sleepTimerOverride,
+      ),
+    PlaybackPaused(
+      :final reciterName,
+      :final surahNumber,
+      :final surahName,
+      :final position,
+      :final duration,
+      :final speed,
+      :final repeatMode,
+      :final sleepTimer,
+    ) =>
+      PlaybackState.playing(
+        reciterName: reciterName,
+        surahNumber: surahNumber,
+        surahName: surahName,
+        position: position,
+        duration: duration,
+        speed: speedOverride ?? speed,
+        repeatMode: repeatModeOverride ?? repeatMode,
+        sleepTimer: sleepTimerOverride ?? sleepTimer,
+      ),
+    _ => this,
+  };
 
   /// Converts a playing state to paused, or clears a paused state's timer.
   ///
   /// [clearSleepTimer] is the sleep-timer-fired case; every other transition
   /// preserves the timer.
   PlaybackState toPaused({bool clearSleepTimer = false}) => switch (this) {
-        PlaybackPlaying(
-          :final reciterName,
-          :final surahNumber,
-          :final surahName,
-          :final position,
-          :final duration,
-          :final speed,
-          :final repeatMode,
-          :final sleepTimer,
-        ) =>
-          PlaybackState.paused(
-            reciterName: reciterName,
-            surahNumber: surahNumber,
-            surahName: surahName,
-            position: position,
-            duration: duration,
-            speed: speed,
-            repeatMode: repeatMode,
-            sleepTimer: clearSleepTimer ? null : sleepTimer,
-          ),
-        PlaybackPaused() when clearSleepTimer =>
-          (this as PlaybackPaused).copyWith(sleepTimer: null),
-        _ => this,
-      };
+    PlaybackPlaying(
+      :final reciterName,
+      :final surahNumber,
+      :final surahName,
+      :final position,
+      :final duration,
+      :final speed,
+      :final repeatMode,
+      :final sleepTimer,
+    ) =>
+      PlaybackState.paused(
+        reciterName: reciterName,
+        surahNumber: surahNumber,
+        surahName: surahName,
+        position: position,
+        duration: duration,
+        speed: speed,
+        repeatMode: repeatMode,
+        sleepTimer: clearSleepTimer ? null : sleepTimer,
+      ),
+    PlaybackPaused() when clearSleepTimer => (this as PlaybackPaused).copyWith(
+      sleepTimer: null,
+    ),
+    _ => this,
+  };
 }

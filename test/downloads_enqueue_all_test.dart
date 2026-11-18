@@ -13,7 +13,7 @@ import 'support/test_db.dart';
 class _HoldDownloader extends AudioDownloader {
   // ignore: use_super_parameters
   _HoldDownloader(AppDatabase db)
-      : super(db, audioRootResolver: () async => Directory.systemTemp);
+    : super(db, audioRootResolver: () async => Directory.systemTemp);
 
   final gate = Completer<void>();
   final calls = <int>[];
@@ -40,7 +40,9 @@ class _HoldDownloader extends AudioDownloader {
 void main() {
   test('enqueueAll queues only the missing surahs and is idempotent', () async {
     final db = newTestDb();
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: 'row-1',
             reciterName: 'عبدالباسط عبدالصمد',

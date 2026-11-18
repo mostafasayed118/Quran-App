@@ -9,18 +9,18 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 import 'support/host.dart';
 
 Map<String, dynamic> fixtureRoot() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
-            {'text': 'ذِكْرٌ وَاحِدٌ'},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
+        {'text': 'ذِكْرٌ وَاحِدٌ'},
       ],
-    };
+    },
+  ],
+};
 
 void main() {
   testWidgets('browsing lists collections with item counts', (tester) async {
@@ -29,54 +29,80 @@ void main() {
     );
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-      value: cubit,
-      child: appShell(home: const AzkarScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<AzkarCubit>.value(
+        value: cubit,
+        child: appShell(home: const AzkarScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('أذكار الصباح'), findsOneWidget);
     expect(find.text('٢ ذكر'), findsOneWidget);
   });
 
   testWidgets(
-      'tapping a collection opens items; taps decrement the chip; done dims',
-      (tester) async {
-    final cubit = AzkarCubit(
-      repository: AzkarRepository(loader: () async => fixtureRoot()),
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
-    await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-      value: cubit,
-      child: appShell(home: const AzkarScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    'tapping a collection opens items; taps decrement the chip; done dims',
+    (tester) async {
+      final cubit = AzkarCubit(
+        repository: AzkarRepository(loader: () async => fixtureRoot()),
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
+      await tester.pumpWidget(
+        BlocProvider<AzkarCubit>.value(
+          value: cubit,
+          child: appShell(home: const AzkarScreen()),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsOneWidget);
-    expect(find.text('٣'), findsOneWidget);
+      await tester.tap(find.text('أذكار الصباح'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsOneWidget);
+      expect(find.text('٣'), findsOneWidget);
 
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.text('٢'), findsOneWidget);
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.text('٢'), findsOneWidget);
 
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.byIcon(Icons.check), findsOneWidget);
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.byIcon(Icons.check), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.text('أذكار الصباح'), findsOneWidget);
-  });
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.text('أذكار الصباح'), findsOneWidget);
+    },
+  );
 }

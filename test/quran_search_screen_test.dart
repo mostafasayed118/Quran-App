@@ -16,46 +16,47 @@ class _FakeSource implements QuranSearchSource {
     String query, {
     int? afterAyahId,
     int limit = kQuranSearchPageSize,
-  }) async =>
-      const QuranSearchPage(
-        hits: [
-          QuranSearchHit(
-            ayahId: 10,
-            surahId: 2,
-            numberInSurah: 3,
-            surahNameAr: 'البقرة',
-            textImlaei: 'الذين يؤمنون بالغيب ويقيمون الصلاة',
-          ),
-        ],
-        total: 1,
-        hasMore: false,
-      );
+  }) async => const QuranSearchPage(
+    hits: [
+      QuranSearchHit(
+        ayahId: 10,
+        surahId: 2,
+        numberInSurah: 3,
+        surahNameAr: 'البقرة',
+        textImlaei: 'الذين يؤمنون بالغيب ويقيمون الصلاة',
+      ),
+    ],
+    total: 1,
+    hasMore: false,
+  );
 }
 
 Widget _host() => BlocProvider<QuranSearchCubit>(
-      create: (_) => QuranSearchCubit(const _FakeSource()),
-      child: const QuranSearchScreen(),
-    );
+  create: (_) => QuranSearchCubit(const _FakeSource()),
+  child: const QuranSearchScreen(),
+);
 
 Future<void> _pump(WidgetTester tester, {double? textScale}) async {
-  await tester.pumpWidget(MaterialApp(
-    locale: const Locale('ar'),
-    supportedLocales: const [Locale('ar'), Locale('en')],
-    localizationsDelegates: const [
-      AppLocalizations.delegate,
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ],
-    builder: textScale == null
-        ? null
-        : (context, child) => MediaQuery(
+  await tester.pumpWidget(
+    MaterialApp(
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: textScale == null
+          ? null
+          : (context, child) => MediaQuery(
               data: MediaQuery.of(context)
                   .copyWith(textScaler: TextScaler.linear(textScale)),
               child: child!,
             ),
-    home: _host(),
-  ));
+      home: _host(),
+    ),
+  );
   await tester.pump();
 }
 
@@ -85,8 +86,9 @@ void main() {
     expect(find.text('عدد النتائج: ١'), findsOneWidget);
   });
 
-  testWidgets('320 dp at textScale 2.0 keeps the result row readable',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 keeps the result row readable', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

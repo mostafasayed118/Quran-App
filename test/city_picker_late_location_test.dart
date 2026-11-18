@@ -27,10 +27,7 @@ class _RecordingNavigatorObserver extends NavigatorObserver {
 }
 
 class _GatedSelectCityRepository extends CityRepository {
-  _GatedSelectCityRepository({
-    required super.db,
-    required super.loader,
-  });
+  _GatedSelectCityRepository({required super.db, required super.loader});
 
   final selectGate = Completer<void>();
 
@@ -111,8 +108,11 @@ void main() {
       ),
     );
     await tester.tap(find.text('OPEN'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('اختر مدينتك'), findsOneWidget);
     return cubit;
   }
@@ -127,8 +127,9 @@ void main() {
     expect(find.text('UNDER'), findsOneWidget);
   }
 
-  testWidgets('a late successful locate does not pop the underlying route',
-      (tester) async {
+  testWidgets('a late successful locate does not pop the underlying route', (
+    tester,
+  ) async {
     final gate = Completer<CityCoordinates?>();
     await pumpHost(
       tester,
@@ -147,8 +148,7 @@ void main() {
     expect((await repo.selectedCity())?.id, 'cairo');
   });
 
-  testWidgets(
-      'a late failed locate does not show a snackbar on the '
+  testWidgets('a late failed locate does not show a snackbar on the '
       'underlying route', (tester) async {
     final gate = Completer<CityCoordinates?>();
     await pumpHost(
@@ -166,8 +166,7 @@ void main() {
     expect(find.byType(SnackBar), findsNothing);
   });
 
-  testWidgets(
-      'a locate resolving while the picker is popping does not pop the '
+  testWidgets('a locate resolving while the picker is popping does not pop the '
       'underlying route', (tester) async {
     final observer = _RecordingNavigatorObserver();
     final gate = Completer<CityCoordinates?>();
@@ -203,37 +202,39 @@ void main() {
   });
 
   testWidgets(
-      'a slow manual pick does not pop the route under the popping picker',
-      (tester) async {
-    final observer = _RecordingNavigatorObserver();
-    final gated = _GatedSelectCityRepository(
-      db: db,
-      loader: () async => [cairoCity.toJson()],
-    );
-    repo = gated;
-    await pumpHost(tester, observer: observer);
+    'a slow manual pick does not pop the route under the popping picker',
+    (tester) async {
+      final observer = _RecordingNavigatorObserver();
+      final gated = _GatedSelectCityRepository(
+        db: db,
+        loader: () async => [cairoCity.toJson()],
+      );
+      repo = gated;
+      await pumpHost(tester, observer: observer);
 
-    expect(find.text('القاهرة'), findsOneWidget);
-    await tester.tap(find.text('القاهرة'));
-    await tester.pump();
+      expect(find.text('القاهرة'), findsOneWidget);
+      await tester.tap(find.text('القاهرة'));
+      await tester.pump();
 
-    await tester.tap(find.byType(BackButton));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.byType(BackButton));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
-    expect(observer.popped, ['picker']);
-    expect(find.text('اختر مدينتك'), findsOneWidget);
-    expect(find.text('UNDER'), findsOneWidget);
+      expect(observer.popped, ['picker']);
+      expect(find.text('اختر مدينتك'), findsOneWidget);
+      expect(find.text('UNDER'), findsOneWidget);
 
-    gated.selectGate.complete();
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+      gated.selectGate.complete();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
 
-    expect(observer.popped, ['picker'],
-        reason: 'a late persist must not pop the route under the picker');
-    expect(find.text('UNDER'), findsOneWidget);
-    expect(find.text('HOME'), findsNothing);
-    expect(find.byType(SnackBar), findsNothing);
-    expect((await gated.selectedCity())?.id, 'cairo');
-  });
+      expect(observer.popped, [
+        'picker',
+      ], reason: 'a late persist must not pop the route under the picker');
+      expect(find.text('UNDER'), findsOneWidget);
+      expect(find.text('HOME'), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
+      expect((await gated.selectedCity())?.id, 'cairo');
+    },
+  );
 }

@@ -18,8 +18,9 @@ class AdhanPlaybackState {
   const AdhanPlaybackState({required this.status, this.trackId});
 
   /// The idle snapshot, used as the initial value and after [AdhanPlayer.stop].
-  static const AdhanPlaybackState idle =
-      AdhanPlaybackState(status: AdhanPlaybackStatus.idle);
+  static const AdhanPlaybackState idle = AdhanPlaybackState(
+    status: AdhanPlaybackStatus.idle,
+  );
 
   /// What the player is doing.
   final AdhanPlaybackStatus status;

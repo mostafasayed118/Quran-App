@@ -55,7 +55,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_completion_test');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',

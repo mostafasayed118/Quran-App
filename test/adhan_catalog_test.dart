@@ -48,10 +48,7 @@ void main() {
     });
 
     test('the default track is present in the catalog', () {
-      expect(
-        kAdhanCatalog.any((track) => track.id == kDefaultAdhanId),
-        isTrue,
-      );
+      expect(kAdhanCatalog.any((track) => track.id == kDefaultAdhanId), isTrue);
     });
   });
 
@@ -70,27 +67,15 @@ void main() {
     test('fajr and other prayers resolve to the single shipped voice', () {
       final id = kDefaultAdhanId;
       expect(
-        adhanIdForPrayer(
-          prayer: PrayerName.fajr,
-          globalId: id,
-          fajrId: id,
-        ),
+        adhanIdForPrayer(prayer: PrayerName.fajr, globalId: id, fajrId: id),
         id,
       );
       expect(
-        adhanIdForPrayer(
-          prayer: PrayerName.fajr,
-          globalId: id,
-          fajrId: null,
-        ),
+        adhanIdForPrayer(prayer: PrayerName.fajr, globalId: id, fajrId: null),
         id,
       );
       expect(
-        adhanIdForPrayer(
-          prayer: PrayerName.isha,
-          globalId: id,
-          fajrId: id,
-        ),
+        adhanIdForPrayer(prayer: PrayerName.isha, globalId: id, fajrId: id),
         id,
       );
     });

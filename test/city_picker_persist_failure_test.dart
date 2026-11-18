@@ -10,10 +10,10 @@ import 'support/test_db.dart';
 
 class _FlakySelectRepo extends CityRepository {
   _FlakySelectRepo(AppDatabase db)
-      : super(
-          db: db,
-          loader: () async => [cairoCity.toJson(), dubaiCity.toJson()],
-        );
+    : super(
+        db: db,
+        loader: () async => [cairoCity.toJson(), dubaiCity.toJson()],
+      );
 
   bool failSelect = false;
 

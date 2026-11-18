@@ -37,9 +37,7 @@ class SharePlusAyahSharer implements AyahSharer {
     required String text,
   }) async {
     final directory = await getTemporaryDirectory();
-    final file = File(
-      '${directory.path}${Platform.pathSeparator}$fileName',
-    );
+    final file = File('${directory.path}${Platform.pathSeparator}$fileName');
     await file.writeAsBytes(bytes, flush: true);
     await SharePlus.instance.share(
       ShareParams(files: [XFile(file.path)], text: text),

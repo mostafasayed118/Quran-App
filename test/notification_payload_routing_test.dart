@@ -25,24 +25,29 @@ void main() {
   });
 
   group('NotificationsBinding tap routing', () {
-    test('a payloaded tap fires the payload callback, not the plain one',
-        () async {
-      final binding = NotificationsBinding();
-      final plain = <String>[];
-      final payloads = <String>[];
-      await binding.init(
-        onTap: () => plain.add('default'),
-        onTapPayload: payloads.add,
-      );
+    test(
+      'a payloaded tap fires the payload callback, not the plain one',
+      () async {
+        final binding = NotificationsBinding();
+        final plain = <String>[];
+        final payloads = <String>[];
+        await binding.init(
+          onTap: () => plain.add('default'),
+          onTapPayload: payloads.add,
+        );
 
-      binding.onNotificationTap(const NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotification,
-        payload: prayerReminderPayload,
-      ));
+        binding.onNotificationTap(
+          const NotificationResponse(
+            notificationResponseType:
+                NotificationResponseType.selectedNotification,
+            payload: prayerReminderPayload,
+          ),
+        );
 
-      expect(payloads, ['prayer']);
-      expect(plain, isEmpty);
-    });
+        expect(payloads, ['prayer']);
+        expect(plain, isEmpty);
+      },
+    );
 
     test('a payloadless tap keeps the default-launch callback', () async {
       final binding = NotificationsBinding();
@@ -53,33 +58,43 @@ void main() {
         onTapPayload: payloads.add,
       );
 
-      binding.onNotificationTap(const NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotification,
-      ));
+      binding.onNotificationTap(
+        const NotificationResponse(
+          notificationResponseType:
+              NotificationResponseType.selectedNotification,
+        ),
+      );
 
       expect(plain, ['default']);
       expect(payloads, isEmpty);
     });
 
-    test('a payloaded tap without a payload callback falls back to plain',
-        () async {
-      final binding = NotificationsBinding();
-      final plain = <String>[];
-      await binding.init(onTap: () => plain.add('default'));
-
-      binding.onNotificationTap(const NotificationResponse(
-        notificationResponseType: NotificationResponseType.selectedNotification,
-        payload: azkarReminderPayload,
-      ));
-
-      expect(plain, ['default']);
-    });
-  });
-
-  test('launchPayload is null when the plugin is unavailable (never throws)',
+    test(
+      'a payloaded tap without a payload callback falls back to plain',
       () async {
-    final binding = NotificationsBinding();
+        final binding = NotificationsBinding();
+        final plain = <String>[];
+        await binding.init(onTap: () => plain.add('default'));
 
-    expect(await binding.launchPayload(), isNull);
+        binding.onNotificationTap(
+          const NotificationResponse(
+            notificationResponseType:
+                NotificationResponseType.selectedNotification,
+            payload: azkarReminderPayload,
+          ),
+        );
+
+        expect(plain, ['default']);
+      },
+    );
   });
+
+  test(
+    'launchPayload is null when the plugin is unavailable (never throws)',
+    () async {
+      final binding = NotificationsBinding();
+
+      expect(await binding.launchPayload(), isNull);
+    },
+  );
 }

@@ -23,7 +23,10 @@ void main() {
     await Future.wait([repo.toggleBookmark(8), repo.toggleBookmark(8)]);
 
     final rows = await db.select(db.bookmarks).get();
-    expect(rows, isEmpty,
-        reason: 'two toggles from empty must net zero under the transaction');
+    expect(
+      rows,
+      isEmpty,
+      reason: 'two toggles from empty must net zero under the transaction',
+    );
   });
 }

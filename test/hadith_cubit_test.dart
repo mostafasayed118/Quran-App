@@ -9,14 +9,12 @@ import 'package:quran_yahdi/features/library/presentation/hadith/hadith_state.da
 
 import 'support/test_db.dart';
 
-final _rows = <(int, String)>[
-  for (var i = 1; i <= 25; i++) (i, 'hadith $i'),
-];
+final _rows = <(int, String)>[for (var i = 1; i <= 25; i++) (i, 'hadith $i')];
 
 class _FakeDownloader extends PackDownloader {
   // ignore: use_super_parameters
   _FakeDownloader(AppDatabase db)
-      : super(db, libraryRootResolver: () async => Directory.systemTemp);
+    : super(db, libraryRootResolver: () async => Directory.systemTemp);
 
   @override
   Future<List<InstalledPack>> installedPacks() async => const <InstalledPack>[];
@@ -50,11 +48,10 @@ class _FakeDownloader extends PackDownloader {
   Future<List<(int, String)>> hadithByNumbers(
     String packId,
     Set<int> numbers,
-  ) async =>
-      [
-        for (final row in _rows)
-          if (numbers.contains(row.$1)) row,
-      ];
+  ) async => [
+    for (final row in _rows)
+      if (numbers.contains(row.$1)) row,
+  ];
 }
 
 class _Marks implements HadithBookmarkSource {
@@ -207,8 +204,10 @@ void main() {
 
     await cubit.toggleBookmark(9);
 
-    expect(marks.stored, {7, 9},
-        reason: 'the stored mark 7 must survive an unreadable first load');
+    expect(marks.stored, {
+      7,
+      9,
+    }, reason: 'the stored mark 7 must survive an unreadable first load');
   });
 }
 

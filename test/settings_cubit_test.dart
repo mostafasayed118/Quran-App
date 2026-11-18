@@ -48,11 +48,11 @@ void main() {
   });
 
   SettingsCubit build() => SettingsCubit(
-        settings: settings,
-        city: city,
-        prayer: prayer,
-        scheduler: scheduler,
-      );
+    settings: settings,
+    city: city,
+    prayer: prayer,
+    scheduler: scheduler,
+  );
 
   test('load emits defaults on a fresh database', () async {
     final cubit = build();
@@ -79,30 +79,29 @@ void main() {
     expect(state.permissionDenied, isFalse);
     expect(scheduler.permissionCalls, 1);
     expect(scheduler.scheduleCalls, greaterThanOrEqualTo(1));
-    expect(
-      scheduler.plans.last.any((r) => r.id == azkarReminderId),
-      isTrue,
-    );
+    expect(scheduler.plans.last.any((r) => r.id == azkarReminderId), isTrue);
 
     await cubit.close();
   });
 
-  test('denied permission surfaces the hint flag; disabling clears it',
-      () async {
-    scheduler.permissionsResult = false;
-    final cubit = build();
-    await cubit.load();
+  test(
+    'denied permission surfaces the hint flag; disabling clears it',
+    () async {
+      scheduler.permissionsResult = false;
+      final cubit = build();
+      await cubit.load();
 
-    await cubit.setAzkarEnabled(true);
-    expect((cubit.state as SettingsReady).permissionDenied, isTrue);
+      await cubit.setAzkarEnabled(true);
+      expect((cubit.state as SettingsReady).permissionDenied, isTrue);
 
-    await cubit.setAzkarEnabled(false);
-    final state = cubit.state as SettingsReady;
-    expect(state.azkarEnabled, isFalse);
-    expect(state.permissionDenied, isFalse);
+      await cubit.setAzkarEnabled(false);
+      final state = cubit.state as SettingsReady;
+      expect(state.azkarEnabled, isFalse);
+      expect(state.permissionDenied, isFalse);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 
   test('time change persists and re-plans at the new time', () async {
     await city.select(cairoCity);
@@ -116,8 +115,9 @@ void main() {
     expect(await settings.azkarTimeHm(), '05:15');
     expect((cubit.state as SettingsReady).azkarTimeHm, '05:15');
     expect(scheduler.scheduleCalls, callsBefore + 1);
-    final azkar =
-        scheduler.plans.last.singleWhere((r) => r.id == azkarReminderId);
+    final azkar = scheduler.plans.last.singleWhere(
+      (r) => r.id == azkarReminderId,
+    );
     expect(azkar.fireAt.hour, 5);
     expect(azkar.fireAt.minute, 15);
 

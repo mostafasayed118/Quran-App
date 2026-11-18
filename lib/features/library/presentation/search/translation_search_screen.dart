@@ -58,11 +58,7 @@ class _TranslationSearchScreenState extends State<TranslationSearchScreen> {
                 actionLabel: loc.library,
                 onAction: () => context.pop(),
               ),
-            TranslationSearchReady(
-              :final query,
-              :final hits,
-              :final total,
-            ) =>
+            TranslationSearchReady(:final query, :final hits, :final total) =>
               _Results(
                 controller: _controller,
                 query: query,
@@ -136,70 +132,72 @@ class _Results extends StatelessWidget {
           )
         else
           Expanded(
-            child: Builder(builder: (context) {
-              final truncated = hits.length < total;
-              return ListView.builder(
-                padding: EdgeInsets.only(bottom: appBottomInset(context)),
-                itemCount: hits.length + 1 + (truncated ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        AppSpacing.sm,
-                        AppSpacing.lg,
-                        AppSpacing.xs,
-                      ),
-                      child: Text(
-                        loc.translationSearchResults(loc.number(total)),
-                        style:
-                            Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                      ),
-                    );
-                  }
-                  if (truncated && index == hits.length + 1) {
-                    return Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Text(
-                        loc.translationSearchTruncated(
-                          loc.number(hits.length),
-                          loc.number(total),
+            child: Builder(
+              builder: (context) {
+                final truncated = hits.length < total;
+                return ListView.builder(
+                  padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                  itemCount: hits.length + 1 + (truncated ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          AppSpacing.sm,
+                          AppSpacing.lg,
+                          AppSpacing.xs,
                         ),
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).textTheme.labelMedium?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
+                        child: Text(
+                          loc.translationSearchResults(loc.number(total)),
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                      );
+                    }
+                    if (truncated && index == hits.length + 1) {
+                      return Padding(
+                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        child: Text(
+                          loc.translationSearchTruncated(
+                            loc.number(hits.length),
+                            loc.number(total),
+                          ),
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              ),
+                        ),
+                      );
+                    }
+                    final hit = hits[index - 1];
+                    final label = hit.surahName.isEmpty
+                        ? loc.surahBadge(loc.number(hit.surahId))
+                        : hit.surahName;
+                    return ListTile(
+                      title: Text('$label · ${loc.number(hit.ayah)}'),
+                      subtitle: Text(
+                        hit.text,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        textDirection: isArabicText(hit.text)
+                            ? TextDirection.rtl
+                            : TextDirection.ltr,
+                      ),
+                      onTap: () => context.push(
+                        quranReaderPath(surah: hit.surahId, ayah: hit.ayah),
                       ),
                     );
-                  }
-                  final hit = hits[index - 1];
-                  final label = hit.surahName.isEmpty
-                      ? loc.surahBadge(loc.number(hit.surahId))
-                      : hit.surahName;
-                  return ListTile(
-                    title: Text('$label · ${loc.number(hit.ayah)}'),
-                    subtitle: Text(
-                      hit.text,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      textDirection: isArabicText(hit.text)
-                          ? TextDirection.rtl
-                          : TextDirection.ltr,
-                    ),
-                    onTap: () => context.push(
-                      quranReaderPath(surah: hit.surahId, ayah: hit.ayah),
-                    ),
-                  );
-                },
-              );
-            }),
+                  },
+                );
+              },
+            ),
           ),
       ],
     );

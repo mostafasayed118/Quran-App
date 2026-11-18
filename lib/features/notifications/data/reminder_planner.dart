@@ -92,19 +92,19 @@ int fajrFollowUpAlarmId(DateTime day, int index) {
 /// memory across a process death, so a reminder the user turned off in an
 /// earlier session would otherwise keep firing for the rest of the window.
 Set<int> reminderAlarmIds() => <int>{
-      prayerReminderId,
-      azkarReminderId,
-      wirdReminderId,
-      preAdhanReminderId,
-      for (var slot = 0; slot < reminderHorizonDays; slot++)
-        for (var i = 0; i < _remindedPrayers.length; i++) ...<int>[
-          _horizonPrayerBase + slot * 10 + i,
-          _horizonPreAdhanBase + slot * 10 + i,
-        ],
-      for (var slot = 0; slot < reminderHorizonDays; slot++)
-        for (var i = 0; i < kFajrFollowUpMinutes.length; i++)
-          _horizonFajrFollowUpBase + slot * 10 + i,
-    };
+  prayerReminderId,
+  azkarReminderId,
+  wirdReminderId,
+  preAdhanReminderId,
+  for (var slot = 0; slot < reminderHorizonDays; slot++)
+    for (var i = 0; i < _remindedPrayers.length; i++) ...<int>[
+      _horizonPrayerBase + slot * 10 + i,
+      _horizonPreAdhanBase + slot * 10 + i,
+    ],
+  for (var slot = 0; slot < reminderHorizonDays; slot++)
+    for (var i = 0; i < kFajrFollowUpMinutes.length; i++)
+      _horizonFajrFollowUpBase + slot * 10 + i,
+};
 
 /// Tap payloads: cold/warm notification taps carry these tags so the app
 /// layer can route to the reminder's own screen (W7b non-goal closed).
@@ -339,8 +339,7 @@ List<ScheduledReminder> planPrayerHorizon({
 bool shouldRequestBootPermission({
   required bool? notificationsEnabled,
   required bool azkarEnabled,
-}) =>
-    azkarEnabled && notificationsEnabled == false;
+}) => azkarEnabled && notificationsEnabled == false;
 
 /// Today at the 'H:mm' settings time when still ahead, else tomorrow at it;
 /// [fallback] covers unset or malformed values (azkar and wird share it).

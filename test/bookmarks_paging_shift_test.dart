@@ -24,11 +24,9 @@ BookmarkEntry _entry({required int bookmarkId, required int ayahId}) =>
     );
 
 BookmarkPage _page(List<int> ids, {required bool hasMore}) => BookmarkPage(
-      entries: [
-        for (final id in ids) _entry(bookmarkId: id, ayahId: id),
-      ],
-      hasMore: hasMore,
-    );
+  entries: [for (final id in ids) _entry(bookmarkId: id, ayahId: id)],
+  hasMore: hasMore,
+);
 
 /// The rendered ayah ids, in order.
 List<int> _ids(BookmarksState state) =>
@@ -61,8 +59,10 @@ class _FakeAyahSource implements AyahSource {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      const [];
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => const [];
 
   @override
   Future<void> deleteBookmark(int ayahId) async {}
@@ -118,11 +118,8 @@ class _Harness {
 }
 
 void main() {
-  test('a new bookmark that shifts page 1 keeps the row it pushed out',
-      () async {
-    final harness = _Harness(
-      (_) async => _page(const [8, 7], hasMore: false),
-    );
+  test('a new bookmark that shifts page 1 keeps the row it pushed out', () async {
+    final harness = _Harness((_) async => _page(const [8, 7], hasMore: false));
     addTearDown(harness.dispose);
 
     await harness.start(_page(const [10, 9], hasMore: true));
@@ -132,11 +129,13 @@ void main() {
     // A newer bookmark lands: page 1 becomes [11, 10] and 9 falls off its end.
     await harness.emitPage1(_page(const [11, 10], hasMore: true));
 
-    expect(
-      _ids(harness.cubit.state),
-      [11, 10, 9, 8, 7],
-      reason: 'the row pushed off page 1 must stay visible',
-    );
+    expect(_ids(harness.cubit.state), [
+      11,
+      10,
+      9,
+      8,
+      7,
+    ], reason: 'the row pushed off page 1 must stay visible');
     expect(
       (harness.cubit.state as BookmarksReady).lastBookmarkId,
       7,
@@ -145,9 +144,7 @@ void main() {
   });
 
   test('a shifted page 1 renders every ayah exactly once', () async {
-    final harness = _Harness(
-      (_) async => _page(const [8, 7], hasMore: false),
-    );
+    final harness = _Harness((_) async => _page(const [8, 7], hasMore: false));
     addTearDown(harness.dispose);
 
     await harness.start(_page(const [10, 9], hasMore: true));
@@ -161,50 +158,56 @@ void main() {
     expect(ids.toSet(), hasLength(ids.length), reason: 'no duplicate rows');
   });
 
-  test('a delete that pulls an older row up never revives the deleted row',
-      () async {
-    final harness = _Harness(
-      (_) async => _page(const [8, 7], hasMore: false),
-    );
-    addTearDown(harness.dispose);
+  test(
+    'a delete that pulls an older row up never revives the deleted row',
+    () async {
+      final harness = _Harness(
+        (_) async => _page(const [8, 7], hasMore: false),
+      );
+      addTearDown(harness.dispose);
 
-    await harness.start(_page(const [10, 9], hasMore: true));
-    await harness.cubit.loadMore();
+      await harness.start(_page(const [10, 9], hasMore: true));
+      await harness.cubit.loadMore();
 
-    // Ayah 9 is unbookmarked and row 8 moves up into the first page.
-    await harness.emitPage1(_page(const [10, 8], hasMore: true));
+      // Ayah 9 is unbookmarked and row 8 moves up into the first page.
+      await harness.emitPage1(_page(const [10, 8], hasMore: true));
 
-    expect(_ids(harness.cubit.state), [10, 8, 7]);
-    expect(
-      _ids(harness.cubit.state),
-      isNot(contains(9)),
-      reason: 'a row pulled up into page 1 must not be carried back',
-    );
-  });
+      expect(_ids(harness.cubit.state), [10, 8, 7]);
+      expect(
+        _ids(harness.cubit.state),
+        isNot(contains(9)),
+        reason: 'a row pulled up into page 1 must not be carried back',
+      );
+    },
+  );
 
-  test('a landed page clears loadingMore and lets the next page load',
-      () async {
-    final harness = _Harness(
-      (cursor) async => cursor == 9
-          ? _page(const [8, 7], hasMore: true)
-          : _page(const [6], hasMore: false),
-    );
-    addTearDown(harness.dispose);
+  test(
+    'a landed page clears loadingMore and lets the next page load',
+    () async {
+      final harness = _Harness(
+        (cursor) async => cursor == 9
+            ? _page(const [8, 7], hasMore: true)
+            : _page(const [6], hasMore: false),
+      );
+      addTearDown(harness.dispose);
 
-    await harness.start(_page(const [10, 9], hasMore: true));
-    await harness.cubit.loadMore();
+      await harness.start(_page(const [10, 9], hasMore: true));
+      await harness.cubit.loadMore();
 
-    expect(
-      (harness.cubit.state as BookmarksReady).loadingMore,
-      isFalse,
-      reason: 'the footer spinner must stop once the page lands',
-    );
+      expect(
+        (harness.cubit.state as BookmarksReady).loadingMore,
+        isFalse,
+        reason: 'the footer spinner must stop once the page lands',
+      );
 
-    await harness.cubit.loadMore();
-    expect(harness.pager.cursors, [9, 7],
-        reason: 'a later scroll must reach the pager again');
-    expect(_ids(harness.cubit.state), [10, 9, 8, 7, 6]);
-  });
+      await harness.cubit.loadMore();
+      expect(harness.pager.cursors, [
+        9,
+        7,
+      ], reason: 'a later scroll must reach the pager again');
+      expect(_ids(harness.cubit.state), [10, 9, 8, 7, 6]);
+    },
+  );
 
   test('a live page arriving mid-fetch keeps the in-flight spinner', () async {
     final release = Completer<BookmarkPage>();
@@ -230,9 +233,7 @@ void main() {
   });
 
   test('a plain loadMore still appends older rows in order', () async {
-    final harness = _Harness(
-      (_) async => _page(const [8, 7], hasMore: true),
-    );
+    final harness = _Harness((_) async => _page(const [8, 7], hasMore: true));
     addTearDown(harness.dispose);
 
     await harness.start(_page(const [10, 9], hasMore: true));
@@ -243,24 +244,30 @@ void main() {
     expect((harness.cubit.state as BookmarksReady).hasMore, isTrue);
   });
 
-  test('after a shift the cursor asks for rows strictly below the last id',
-      () async {
-    final harness = _Harness(
-      (_) async => _page(const [8, 7], hasMore: false),
-    );
-    addTearDown(harness.dispose);
+  test(
+    'after a shift the cursor asks for rows strictly below the last id',
+    () async {
+      final harness = _Harness(
+        (_) async => _page(const [8, 7], hasMore: false),
+      );
+      addTearDown(harness.dispose);
 
-    await harness.start(_page(const [10, 9], hasMore: true));
-    await harness.emitPage1(_page(const [11, 10], hasMore: true));
+      await harness.start(_page(const [10, 9], hasMore: true));
+      await harness.emitPage1(_page(const [11, 10], hasMore: true));
 
-    final shifted = harness.cubit.state as BookmarksReady;
-    expect(shifted.hasMore, isTrue,
-        reason: 'rows below the carried row are still unread');
-    expect(shifted.lastBookmarkId, 9);
+      final shifted = harness.cubit.state as BookmarksReady;
+      expect(
+        shifted.hasMore,
+        isTrue,
+        reason: 'rows below the carried row are still unread',
+      );
+      expect(shifted.lastBookmarkId, 9);
 
-    await harness.cubit.loadMore();
-    expect(harness.pager.cursors, [9],
-        reason: 'the next page starts below the last rendered id');
-    expect(_ids(harness.cubit.state), [11, 10, 9, 8, 7]);
-  });
+      await harness.cubit.loadMore();
+      expect(harness.pager.cursors, [
+        9,
+      ], reason: 'the next page starts below the last rendered id');
+      expect(_ids(harness.cubit.state), [11, 10, 9, 8, 7]);
+    },
+  );
 }

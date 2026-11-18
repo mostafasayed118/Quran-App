@@ -42,9 +42,7 @@ void main() {
     await pumpAppHost(
       tester,
       wrap: (app) => MultiBlocProvider(
-        providers: [
-          BlocProvider<PlaybackCubit>.value(value: cubit),
-        ],
+        providers: [BlocProvider<PlaybackCubit>.value(value: cubit)],
         child: app,
       ),
       home: const Scaffold(bottomSheet: MiniPlayerBar()),
@@ -53,7 +51,9 @@ void main() {
   }
 
   Future<void> seedRow() async {
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -67,37 +67,50 @@ void main() {
 
   testWidgets('idle state renders nothing', (tester) async {
     await pumpHost(tester);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(LinearProgressIndicator), findsNothing);
     expect(find.byType(IconButton), findsNothing);
   });
 
   testWidgets(
-      'playing state shows names, progress, and pause→resume flips the icon',
-      (tester) async {
-    await seedRow();
-    final row = (await ReciterRepository(db).byId('51-53'))!;
-    await pumpHost(tester);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    'playing state shows names, progress, and pause→resume flips the icon',
+    (tester) async {
+      await seedRow();
+      final row = (await ReciterRepository(db).byId('51-53'))!;
+      await pumpHost(tester);
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await cubit.playSurah(row, 1);
-    fake.durationCtrl.add(const Duration(minutes: 6));
-    fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await cubit.playSurah(row, 1);
+      fake.durationCtrl.add(const Duration(minutes: 6));
+      fake.positionCtrl.add(Duration.zero);
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.textContaining('عبدالباسط عبدالصمد'), findsOneWidget);
-    expect(find.text('سورة ١'), findsOneWidget);
-    expect(find.byType(LinearProgressIndicator), findsOneWidget);
-    expect(find.byTooltip('إيقاف مؤقت'), findsOneWidget);
+      expect(find.textContaining('عبدالباسط عبدالصمد'), findsOneWidget);
+      expect(find.text('سورة ١'), findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
+      expect(find.byTooltip('إيقاف مؤقت'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('إيقاف مؤقت'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.byTooltip('تشغيل'), findsOneWidget);
-    expect(find.byTooltip('إيقاف مؤقت'), findsNothing);
-  });
+      await tester.tap(find.byTooltip('إيقاف مؤقت'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.byTooltip('تشغيل'), findsOneWidget);
+      expect(find.byTooltip('إيقاف مؤقت'), findsNothing);
+    },
+  );
 }

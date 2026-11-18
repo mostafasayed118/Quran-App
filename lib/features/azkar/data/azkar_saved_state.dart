@@ -31,7 +31,10 @@ abstract interface class AzkarSavedStateSource {
 
   /// Stores the remaining counters of [collectionId] for [day].
   Future<void> saveRemaining(
-      String collectionId, List<int> remaining, String day);
+    String collectionId,
+    List<int> remaining,
+    String day,
+  );
 
   /// Stores the pinned collection ids.
   Future<void> saveFavorites(Set<String> favorites);

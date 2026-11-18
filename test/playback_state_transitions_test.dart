@@ -14,34 +14,36 @@ void main() {
     sleepTimer: Duration(minutes: 10),
   );
 
-  test('a pending loading state becomes playing with the supplied controls',
-      () {
-    const loading = PlaybackState.initial(
-      reciterName: 'Reciter',
-      surahNumber: 2,
-      surahName: 'Al-Baqarah',
-    );
-
-    final next = loading.toPlaying(
-      duration: const Duration(minutes: 5),
-      speedOverride: 1.25,
-      repeatModeOverride: PlaybackRepeatMode.one,
-      sleepTimerOverride: const Duration(minutes: 10),
-    );
-
-    expect(
-      next,
-      const PlaybackState.playing(
+  test(
+    'a pending loading state becomes playing with the supplied controls',
+    () {
+      const loading = PlaybackState.initial(
         reciterName: 'Reciter',
         surahNumber: 2,
         surahName: 'Al-Baqarah',
-        duration: Duration(minutes: 5),
-        speed: 1.25,
-        repeatMode: PlaybackRepeatMode.one,
-        sleepTimer: Duration(minutes: 10),
-      ),
-    );
-  });
+      );
+
+      final next = loading.toPlaying(
+        duration: const Duration(minutes: 5),
+        speedOverride: 1.25,
+        repeatModeOverride: PlaybackRepeatMode.one,
+        sleepTimerOverride: const Duration(minutes: 10),
+      );
+
+      expect(
+        next,
+        const PlaybackState.playing(
+          reciterName: 'Reciter',
+          surahNumber: 2,
+          surahName: 'Al-Baqarah',
+          duration: Duration(minutes: 5),
+          speed: 1.25,
+          repeatMode: PlaybackRepeatMode.one,
+          sleepTimer: Duration(minutes: 10),
+        ),
+      );
+    },
+  );
 
   test('paused becomes playing while preserving position and duration', () {
     const paused = PlaybackState.paused(

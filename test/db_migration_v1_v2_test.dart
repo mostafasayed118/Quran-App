@@ -37,10 +37,14 @@ void main() {
         reason: 'onUpgrade(from: 1) must create the reciters table',
       );
       expect(await reopened.select(reopened.reciters).get(), isEmpty);
-      expect(await reopened.select(reopened.bookmarks).getSingle(),
-          bookmarkBefore);
-      expect(await reopened.select(reopened.settingsTable).getSingle(),
-          settingBefore);
+      expect(
+        await reopened.select(reopened.bookmarks).getSingle(),
+        bookmarkBefore,
+      );
+      expect(
+        await reopened.select(reopened.settingsTable).getSingle(),
+        settingBefore,
+      );
       expect(await _userVersion(reopened), reopened.schemaVersion);
     } finally {
       await reopened.close();
@@ -75,10 +79,14 @@ void main() {
     try {
       expect(await _userVersion(reopened), reopened.schemaVersion);
       expect(await reopened.select(reopened.reciters).get(), isEmpty);
-      expect(await reopened.select(reopened.bookmarks).getSingle(),
-          bookmarkBefore);
-      expect(await reopened.select(reopened.settingsTable).getSingle(),
-          settingBefore);
+      expect(
+        await reopened.select(reopened.bookmarks).getSingle(),
+        bookmarkBefore,
+      );
+      expect(
+        await reopened.select(reopened.settingsTable).getSingle(),
+        settingBefore,
+      );
     } finally {
       await reopened.close();
     }
@@ -94,10 +102,10 @@ Future<File> _tempDbFile() async {
 }
 
 Future<void> _seedUserRows(AppDatabase db) async {
-  await db.into(db.bookmarks).insert(
-        BookmarksCompanion.insert(ayahId: 42),
-      );
-  await db.into(db.settingsTable).insert(
+  await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 42));
+  await db
+      .into(db.settingsTable)
+      .insert(
         SettingsTableCompanion.insert(key: 'last_read_page', value: '42'),
       );
 }
@@ -109,10 +117,12 @@ Future<void> _downgradeToV1(AppDatabase db) async {
 }
 
 Future<bool> _tableExists(AppDatabase db, String name) async {
-  final rows = await db.customSelect(
-    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
-    variables: [Variable.withString(name)],
-  ).get();
+  final rows = await db
+      .customSelect(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?",
+        variables: [Variable.withString(name)],
+      )
+      .get();
   return rows.isNotEmpty;
 }
 

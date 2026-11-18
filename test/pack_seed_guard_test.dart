@@ -23,8 +23,11 @@ class _RecordingAdapter implements HttpClientAdapter {
   final List<String> requested = <String>[];
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     requested.add(options.uri.toString());
     return ResponseBody(
       Stream<Uint8List>.value(Uint8List.fromList(body)),
@@ -64,57 +67,63 @@ Future<Directory> _newRoot() async {
 /// The install must leave no dot-part behind when the seed is refused.
 List<File> _partials(Directory root) => root.existsSync()
     ? root
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.part'))
-        .toList()
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.part'))
+          .toList()
     : const <File>[];
 
 void main() {
   group('pack seed guard', () {
-    test('an untrusted https seed is rejected before any request is sent',
-        () async {
-      final db = newTestDb();
-      final root = await _newRoot();
-      final adapter = _RecordingAdapter(utf8.encode(_body));
-      final downloader = PackDownloader(
-        db,
-        dio: Dio()..httpClientAdapter = adapter,
-        libraryRootResolver: () async => root,
-      );
+    test(
+      'an untrusted https seed is rejected before any request is sent',
+      () async {
+        final db = newTestDb();
+        final root = await _newRoot();
+        final adapter = _RecordingAdapter(utf8.encode(_body));
+        final downloader = PackDownloader(
+          db,
+          dio: Dio()..httpClientAdapter = adapter,
+          libraryRootResolver: () async => root,
+        );
 
-      await expectLater(
-        downloader.install(_pack(sourceUrl: 'https://evil.example/pack.json')),
-        throwsA(isA<PackFailure>()),
-      );
+        await expectLater(
+          downloader.install(
+            _pack(sourceUrl: 'https://evil.example/pack.json'),
+          ),
+          throwsA(isA<PackFailure>()),
+        );
 
-      expect(adapter.requested, isEmpty);
-      expect(await downloader.installedPacks(), isEmpty);
-      expect(_partials(root), isEmpty);
-    });
+        expect(adapter.requested, isEmpty);
+        expect(await downloader.installedPacks(), isEmpty);
+        expect(_partials(root), isEmpty);
+      },
+    );
 
-    test('a plain-http seed on the trusted host is rejected before any request',
-        () async {
-      final db = newTestDb();
-      final root = await _newRoot();
-      final adapter = _RecordingAdapter(utf8.encode(_body));
-      final downloader = PackDownloader(
-        db,
-        dio: Dio()..httpClientAdapter = adapter,
-        libraryRootResolver: () async => root,
-      );
+    test(
+      'a plain-http seed on the trusted host is rejected before any request',
+      () async {
+        final db = newTestDb();
+        final root = await _newRoot();
+        final adapter = _RecordingAdapter(utf8.encode(_body));
+        final downloader = PackDownloader(
+          db,
+          dio: Dio()..httpClientAdapter = adapter,
+          libraryRootResolver: () async => root,
+        );
 
-      await expectLater(
-        downloader.install(
-          _pack(sourceUrl: 'http://cdn.jsdelivr.net/pack.json'),
-        ),
-        throwsA(isA<PackFailure>()),
-      );
+        await expectLater(
+          downloader.install(
+            _pack(sourceUrl: 'http://cdn.jsdelivr.net/pack.json'),
+          ),
+          throwsA(isA<PackFailure>()),
+        );
 
-      expect(adapter.requested, isEmpty);
-      expect(await downloader.installedPacks(), isEmpty);
-      expect(_partials(root), isEmpty);
-    });
+        expect(adapter.requested, isEmpty);
+        expect(await downloader.installedPacks(), isEmpty);
+        expect(_partials(root), isEmpty);
+      },
+    );
 
     test('a trusted https jsDelivr seed still installs', () async {
       final db = newTestDb();

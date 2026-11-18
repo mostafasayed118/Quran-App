@@ -12,9 +12,9 @@ import 'support/fakes.dart';
 class _StaticPolicy implements VersionPolicySource {
   @override
   Future<VersionPolicy?> fetch() async => const VersionPolicy(
-        minSupported: AppVersion(1, 0, 0),
-        latest: AppVersion(1, 0, 0),
-      );
+    minSupported: AppVersion(1, 0, 0),
+    latest: AppVersion(1, 0, 0),
+  );
 }
 
 class _NoAck implements VersionAckStore {
@@ -39,9 +39,7 @@ void main() {
     // Without the hook this second configure would return immediately and
     // `first` would still be the registered instance.
     resetDependenciesForTest();
-    await configureDependencies(
-      citiesLoader: () async => [cairoCity.toJson()],
-    );
+    await configureDependencies(citiesLoader: () async => [cairoCity.toJson()]);
 
     final second = getIt<CityRepository>();
     expect(identical(first, second), isFalse);

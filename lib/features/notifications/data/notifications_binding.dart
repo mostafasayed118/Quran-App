@@ -21,8 +21,9 @@ import 'package:timezone/timezone.dart' as tz;
 /// is never trusted across processes, so the cost is one re-apply per process.
 String? _readBootId() {
   try {
-    final value =
-        File('/proc/sys/kernel/random/boot_id').readAsStringSync().trim();
+    final value = File('/proc/sys/kernel/random/boot_id')
+        .readAsStringSync()
+        .trim();
     return value.isEmpty ? null : value;
   } on Object {
     return null;
@@ -68,10 +69,10 @@ class NotificationsBinding extends ChangeNotifier
     ReminderPlanStore? store,
     String? Function()? bootId,
     ReminderAlarmProbe? alarmProbe,
-  })  : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
-        _store = store,
-        _bootId = bootId ?? _readBootId,
-        _alarmProbe = alarmProbe;
+  }) : _plugin = plugin ?? FlutterLocalNotificationsPlugin(),
+       _store = store,
+       _bootId = bootId ?? _readBootId,
+       _alarmProbe = alarmProbe;
 
   static const String channelId = 'quran_yahdi_reminders';
 
@@ -279,10 +280,12 @@ class NotificationsBinding extends ChangeNotifier
       }
     } on Object catch (error, stackTrace) {
       // A store hiccup must not disable reminders; it only costs one re-apply.
-      appLog('reminder plan restore failed',
-          name: 'quran_yahdi/reminders',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'reminder plan restore failed',
+        name: 'quran_yahdi/reminders',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
     }
     await _drainPending();
   }
@@ -372,8 +375,10 @@ class NotificationsBinding extends ChangeNotifier
   Future<void> requestBootPermission({required bool azkarEnabled}) async {
     if (!_ready) return;
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       if (android == null) return;
       final enabled = await android.areNotificationsEnabled();
       if (!shouldRequestBootPermission(
@@ -408,15 +413,19 @@ class NotificationsBinding extends ChangeNotifier
       return true;
     }
     try {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       if (android != null) {
         final notifications = await android.requestNotificationsPermission();
         final exact = await android.requestExactAlarmsPermission();
         return notifications != false && exact != false;
       }
-      final ios = _plugin.resolvePlatformSpecificImplementation<
-          IOSFlutterLocalNotificationsPlugin>();
+      final ios = _plugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >();
       if (ios != null) {
         return await ios.requestPermissions(
               alert: true,
@@ -587,14 +596,18 @@ class NotificationsBinding extends ChangeNotifier
         // answer the channel: absence of the channel is not evidence that the
         // alarms are gone, so it must not force a re-arm. Logged so a
         // foreground registration failure is not silent.
-        appLog('reminder alarm probe unavailable in this isolate',
-            name: 'quran_yahdi/reminders');
+        appLog(
+          'reminder alarm probe unavailable in this isolate',
+          name: 'quran_yahdi/reminders',
+        );
         return true;
       } on Object catch (error, stackTrace) {
-        appLog('reminder alarm probe failed',
-            name: 'quran_yahdi/reminders',
-            error: error.runtimeType,
-            stackTrace: stackTrace);
+        appLog(
+          'reminder alarm probe failed',
+          name: 'quran_yahdi/reminders',
+          error: error.runtimeType,
+          stackTrace: stackTrace,
+        );
         return false;
       }
     }
@@ -619,20 +632,28 @@ class NotificationsBinding extends ChangeNotifier
       // schedule MODE, not the plan, so a fingerprint match alone must not skip
       // the re-apply — that is how a newly granted permission upgrades the
       // alarms from inexact to exact.
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       final exact = await android?.canScheduleExactNotifications() ?? false;
       final fingerprint = planFingerprint(reminders);
       if (_forceNextApply) {
-        appLog('reminder rearm',
-            name: 'quran_yahdi/reminders', error: 'exit-reason');
+        appLog(
+          'reminder rearm',
+          name: 'quran_yahdi/reminders',
+          error: 'exit-reason',
+        );
       } else if (fingerprint == _appliedPlan && exact == _appliedExact) {
         // The fingerprint is only trustworthy while the OS still holds the
         // alarms; force stop clears them without changing anything the
         // fingerprint can see.
         if (await _alarmsStillScheduled(reminders)) return;
-        appLog('reminder rearm',
-            name: 'quran_yahdi/reminders', error: 'alive-check');
+        appLog(
+          'reminder rearm',
+          name: 'quran_yahdi/reminders',
+          error: 'alive-check',
+        );
       }
       final mode = exact
           ? AndroidScheduleMode.exactAllowWhileIdle
@@ -665,17 +686,20 @@ class NotificationsBinding extends ChangeNotifier
             // Azkar and wird fire at a fixed clock time, so the OS can repeat
             // them forever and restore them after a reboot with no app start.
             // Prayer reminders stay one-shot: their time moves every day.
-            matchDateTimeComponents:
-                reminder.repeatsDaily ? DateTimeComponents.time : null,
+            matchDateTimeComponents: reminder.repeatsDaily
+                ? DateTimeComponents.time
+                : null,
           );
         } on Object catch (error, stackTrace) {
           // One rejected alarm must not abort the rest of the window: the
           // user would silently lose every reminder after it.
           scheduleFailures.add(error);
-          appLog('reminder schedule failed',
-              name: 'quran_yahdi/reminders',
-              error: error.runtimeType,
-              stackTrace: stackTrace);
+          appLog(
+            'reminder schedule failed',
+            name: 'quran_yahdi/reminders',
+            error: error.runtimeType,
+            stackTrace: stackTrace,
+          );
         }
       });
       if (scheduleFailures.isNotEmpty) {
@@ -757,9 +781,7 @@ class NotificationsBinding extends ChangeNotifier
       final end = start + concurrency < queue.length
           ? start + concurrency
           : queue.length;
-      await Future.wait([
-        for (var i = start; i < end; i++) action(queue[i]),
-      ]);
+      await Future.wait([for (var i = start; i < end; i++) action(queue[i])]);
     }
   }
 }

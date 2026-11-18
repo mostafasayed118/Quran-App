@@ -23,7 +23,9 @@ class _Meta implements BookmarkMetaSource {
 
 Future<AppDatabase> _seededDb() async {
   final db = newTestDb();
-  await db.into(db.surahs).insert(
+  await db
+      .into(db.surahs)
+      .insert(
         SurahsCompanion.insert(
           id: const Value(2),
           nameAr: 'البقرة',
@@ -34,7 +36,9 @@ Future<AppDatabase> _seededDb() async {
           pagesEnd: 49,
         ),
       );
-  await db.into(db.ayahs).insert(
+  await db
+      .into(db.ayahs)
+      .insert(
         AyahsCompanion.insert(
           id: const Value(9),
           surahId: 2,
@@ -60,22 +64,27 @@ void main() {
     await repo.deleteBookmark(9);
 
     expect(await db.select(db.bookmarks).get(), isEmpty);
-    expect(meta.entries, isEmpty,
-        reason: 'a folder must not outlive the bookmark it describes');
+    expect(
+      meta.entries,
+      isEmpty,
+      reason: 'a folder must not outlive the bookmark it describes',
+    );
   });
 
-  test('the reader star toggle also removes the entry when unbookmarking',
-      () async {
-    final db = await _seededDb();
-    final meta = _Meta({9: _entry});
-    final repo = AyahRepository(db, meta: meta);
+  test(
+    'the reader star toggle also removes the entry when unbookmarking',
+    () async {
+      final db = await _seededDb();
+      final meta = _Meta({9: _entry});
+      final repo = AyahRepository(db, meta: meta);
 
-    await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 9));
-    await repo.toggleBookmark(9);
+      await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 9));
+      await repo.toggleBookmark(9);
 
-    expect(await db.select(db.bookmarks).get(), isEmpty);
-    expect(meta.entries, isEmpty);
-  });
+      expect(await db.select(db.bookmarks).get(), isEmpty);
+      expect(meta.entries, isEmpty);
+    },
+  );
 
   test('bookmarking a new ayah keeps any pre-existing note for it', () async {
     final db = await _seededDb();

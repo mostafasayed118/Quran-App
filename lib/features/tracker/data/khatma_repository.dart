@@ -44,7 +44,9 @@ class KhatmaRepository implements WirdProgressSink {
     final first = await _firstAyahId() ?? 1;
     await _db.transaction(() async {
       await _db.delete(_db.khatmaProgress).go();
-      await _db.into(_db.khatmaProgress).insert(
+      await _db
+          .into(_db.khatmaProgress)
+          .insert(
             KhatmaProgressCompanion.insert(
               ayahId: first,
               targetPages: targetPages,
@@ -62,13 +64,15 @@ class KhatmaRepository implements WirdProgressSink {
     // One conditional statement, not read-then-write: two overlapping page
     // changes can both read the same old pointer, and the slower one must not
     // move it backwards.
-    await (_db.update(_db.khatmaProgress)
-          ..where(
-              (t) => t.id.equals(row.id) & t.ayahId.isSmallerThanValue(ayahId)))
-        .write(KhatmaProgressCompanion(
-      ayahId: Value(ayahId),
-      updatedAt: Value(DateTime.now()),
-    ));
+    await (_db.update(_db.khatmaProgress)..where(
+          (t) => t.id.equals(row.id) & t.ayahId.isSmallerThanValue(ayahId),
+        ))
+        .write(
+          KhatmaProgressCompanion(
+            ayahId: Value(ayahId),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
   }
 
   /// Jumps the pointer to the last ayah of the mushaf (khatma completion).
@@ -89,9 +93,11 @@ class KhatmaRepository implements WirdProgressSink {
 
   /// Mushaf coordinates of [ayahId]; null when the id is unknown.
   Future<({int page, int surahId, int numberInSurah})?> anchorFor(
-      int ayahId) async {
-    final row = await (_db.select(_db.ayahs)..where((a) => a.id.equals(ayahId)))
-        .getSingleOrNull();
+    int ayahId,
+  ) async {
+    final row = await (_db.select(
+      _db.ayahs,
+    )..where((a) => a.id.equals(ayahId))).getSingleOrNull();
     if (row == null) return null;
     return (
       page: row.page,
@@ -102,11 +108,12 @@ class KhatmaRepository implements WirdProgressSink {
 
   /// First ayah id on mushaf [page]; null when the page is unknown.
   Future<int?> firstAyahIdOfPage(int page) async {
-    final row = await (_db.select(_db.ayahs)
-          ..where((a) => a.page.equals(page))
-          ..orderBy([(a) => OrderingTerm.asc(a.id)])
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.ayahs)
+              ..where((a) => a.page.equals(page))
+              ..orderBy([(a) => OrderingTerm.asc(a.id)])
+              ..limit(1))
+            .getSingleOrNull();
     return row?.id;
   }
 
@@ -114,18 +121,20 @@ class KhatmaRepository implements WirdProgressSink {
       _db.select(_db.khatmaProgress).getSingleOrNull();
 
   Future<int?> _firstAyahId() async {
-    final row = await (_db.select(_db.ayahs)
-          ..orderBy([(a) => OrderingTerm.asc(a.id)])
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.ayahs)
+              ..orderBy([(a) => OrderingTerm.asc(a.id)])
+              ..limit(1))
+            .getSingleOrNull();
     return row?.id;
   }
 
   Future<int?> _lastAyahId() async {
-    final row = await (_db.select(_db.ayahs)
-          ..orderBy([(a) => OrderingTerm.desc(a.id)])
-          ..limit(1))
-        .getSingleOrNull();
+    final row =
+        await (_db.select(_db.ayahs)
+              ..orderBy([(a) => OrderingTerm.desc(a.id)])
+              ..limit(1))
+            .getSingleOrNull();
     return row?.id;
   }
 }

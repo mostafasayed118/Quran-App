@@ -20,22 +20,19 @@ final j = Opacity(opacity: done ? .8 : 1);
 ''';
 
     final hits = scanSource('lib/x.dart', source);
-    expect(
-      hits.map((hit) => '${hit.kind}:${hit.value}'),
-      <String>[
-        'hex:0xFF112233',
-        'alpha:0.4',
-        'lineHeight:1.7',
-        'lineHeight:1.2',
-        'lineHeight:2.0',
-        'iconSize:18.0',
-        'radius:14.0',
-        'stroke:1.5',
-        'alpha:0.42',
-        'alpha:0.55',
-        'opacity:0.8',
-      ],
-    );
+    expect(hits.map((hit) => '${hit.kind}:${hit.value}'), <String>[
+      'hex:0xFF112233',
+      'alpha:0.4',
+      'lineHeight:1.7',
+      'lineHeight:1.2',
+      'lineHeight:2.0',
+      'iconSize:18.0',
+      'radius:14.0',
+      'stroke:1.5',
+      'alpha:0.42',
+      'alpha:0.55',
+      'opacity:0.8',
+    ]);
   });
 
   test('allows token references and a transparent gradient stop', () {

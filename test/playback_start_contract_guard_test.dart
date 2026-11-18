@@ -23,32 +23,32 @@ void main() {
       final gate = Completer<void>();
       var issued = 0;
 
-      issuePlayRequest(
-        () {
-          issued++;
-          return gate.future;
-        },
-        operation: 'playback play request failed',
-      );
+      issuePlayRequest(() {
+        issued++;
+        return gate.future;
+      }, operation: 'playback play request failed');
 
       // Draining the microtask queue must not wait for playback to start.
       await Future<void>.delayed(Duration.zero);
       expect(issued, 1, reason: 'the play request must still be issued');
-      expect(gate.isCompleted, isFalse,
-          reason: 'the caller must not wait for the play future');
+      expect(
+        gate.isCompleted,
+        isFalse,
+        reason: 'the caller must not wait for the play future',
+      );
 
       gate.complete();
       await gate.future;
     });
 
-    test('swallows a failing play future and reports it exactly once',
-        () async {
-      final logged = <String>[];
-      Object? reportedError;
-      final escaped = <Object>[];
+    test(
+      'swallows a failing play future and reports it exactly once',
+      () async {
+        final logged = <String>[];
+        Object? reportedError;
+        final escaped = <Object>[];
 
-      final body = runZonedGuarded<Future<void>>(
-        () async {
+        final body = runZonedGuarded<Future<void>>(() async {
           issuePlayRequest(
             () => Future<void>.error(
               StateError('play failed'),
@@ -61,17 +61,20 @@ void main() {
             },
           );
           await Future<void>.delayed(Duration.zero);
-        },
-        (error, stackTrace) => escaped.add(error),
-      );
-      await body;
+        }, (error, stackTrace) => escaped.add(error));
+        await body;
 
-      expect(logged, ['playback resume request failed'],
-          reason: 'the injected log must receive the operation verbatim');
-      expect(reportedError, isA<StateError>());
-      expect(escaped, isEmpty,
-          reason: 'a failing play future must never escape the helper');
-    });
+        expect(logged, [
+          'playback resume request failed',
+        ], reason: 'the injected log must receive the operation verbatim');
+        expect(reportedError, isA<StateError>());
+        expect(
+          escaped,
+          isEmpty,
+          reason: 'a failing play future must never escape the helper',
+        );
+      },
+    );
   });
 
   group('just_audio_playback_service source guard', () {
@@ -80,10 +83,16 @@ void main() {
           .readAsStringSync();
 
       expect(source, contains('issuePlayRequest('));
-      expect(source, isNot(contains('await _player.play()')),
-          reason: 'play() resolves on pause/stop/completion, not on start');
-      expect(source, isNot(contains('await _player.play(')),
-          reason: 'play() resolves on pause/stop/completion, not on start');
+      expect(
+        source,
+        isNot(contains('await _player.play()')),
+        reason: 'play() resolves on pause/stop/completion, not on start',
+      );
+      expect(
+        source,
+        isNot(contains('await _player.play(')),
+        reason: 'play() resolves on pause/stop/completion, not on start',
+      );
       expect(source, contains("'playback play request failed'"));
       expect(source, contains("'playback resume request failed'"));
     });

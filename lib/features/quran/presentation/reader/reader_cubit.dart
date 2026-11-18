@@ -34,30 +34,30 @@ class ReaderCubit extends Cubit<ReaderState> {
     PageAnchorSource? pageAnchors,
     ReaderSettingsSource? settings,
     ReaderLayoutSource? layout,
-  })  : _ayahRepository = ayahRepository,
-        _lastReadRepository = lastReadRepository,
-        _wirdProgress = wirdProgress,
-        _uthmani = uthmani,
-        _pageAnchors = pageAnchors,
-        _settings = settings,
-        _layout = layout,
-        _surahId = surahId,
-        _initialAyah = initialAyah,
-        super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
+  }) : _ayahRepository = ayahRepository,
+       _lastReadRepository = lastReadRepository,
+       _wirdProgress = wirdProgress,
+       _uthmani = uthmani,
+       _pageAnchors = pageAnchors,
+       _settings = settings,
+       _layout = layout,
+       _surahId = surahId,
+       _initialAyah = initialAyah,
+       super(ReaderState.loading(surahId: surahId, initialAyah: initialAyah));
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
   Future<void> start() async {
     if (_bookmarksSub != null) return;
     _bookmarksSub = _ayahRepository.watchBookmarkedIds().listen(
-          _onBookmarks,
-          onError: (Object error, StackTrace stackTrace) => appLog(
-            'bookmarks stream error',
-            name: 'quran_yahdi/reader',
-            error: error,
-            stackTrace: stackTrace,
-          ),
-        );
+      _onBookmarks,
+      onError: (Object error, StackTrace stackTrace) => appLog(
+        'bookmarks stream error',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      ),
+    );
     await _load();
   }
 
@@ -87,8 +87,10 @@ class ReaderCubit extends Cubit<ReaderState> {
       ).wait;
       if (ayahs.isEmpty) {
         if (isClosed) return;
-        appLog('surah $_surahId has no readable ayahs',
-            name: 'quran_yahdi/reader');
+        appLog(
+          'surah $_surahId has no readable ayahs',
+          name: 'quran_yahdi/reader',
+        );
         emit(ReaderState.failed(emptySurahId: _surahId));
         return;
       }
@@ -109,26 +111,34 @@ class ReaderCubit extends Cubit<ReaderState> {
       // verses keep glyph text and the reader turns selection off.
       final unicode =
           await _uthmani?.forSurah(_surahId) ?? const <int, String>{};
-      final (fontScale, lineHeight) =
-          await (_loadFontScale(), _loadLineHeight()).wait;
+      final (fontScale, lineHeight) = await (
+        _loadFontScale(),
+        _loadLineHeight(),
+      ).wait;
       if (isClosed) return;
       final verses = ayahs
           .map((a) => a.toVerse().withUnicode(unicode[a.numberInSurah]))
           .toList();
-      emit(ReaderState.ready(
-        surahId: _surahId,
-        surahName: surah?.nameAr ?? '',
-        initialAyah: requested > 0 ? startAyah.numberInSurah : 0,
-        currentAyahId: startAyahId,
-        ayahs: verses,
-        bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
-        showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
-        fontScale: fontScale,
-        lineHeight: lineHeight,
-      ));
+      emit(
+        ReaderState.ready(
+          surahId: _surahId,
+          surahName: surah?.nameAr ?? '',
+          initialAyah: requested > 0 ? startAyah.numberInSurah : 0,
+          currentAyahId: startAyahId,
+          ayahs: verses,
+          bookmarkedAyahIds: Set<int>.of(_bookmarkedIds),
+          showBasmala: !_basmalaExemptSurahIds.contains(_surahId),
+          fontScale: fontScale,
+          lineHeight: lineHeight,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('reader load failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'reader load failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const ReaderState.failed());
     }
@@ -144,8 +154,12 @@ class ReaderCubit extends Cubit<ReaderState> {
         await _saveLastRead(startAyahId);
       }
     } on Object catch (error, stackTrace) {
-      appLog('last-read read failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'last-read read failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -155,8 +169,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await _lastReadRepository.saveAyahId(ayahId);
     } on Object catch (error, stackTrace) {
-      appLog('last-read save failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'last-read save failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -177,8 +195,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await sink.advanceTo(ayahId);
     } on Object catch (error, stackTrace) {
-      appLog('wird progress advance failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'wird progress advance failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -203,21 +225,28 @@ class ReaderCubit extends Cubit<ReaderState> {
   void toggleMode() {
     final current = state;
     if (current is! ReaderReady || isClosed) return;
-    emit(current.copyWith(
-      currentAyahId:
-          _currentAyahId > 0 ? _currentAyahId : current.currentAyahId,
-      mode: current.mode == ReaderMode.verses
-          ? ReaderMode.mushaf
-          : ReaderMode.verses,
-    ));
+    emit(
+      current.copyWith(
+        currentAyahId: _currentAyahId > 0
+            ? _currentAyahId
+            : current.currentAyahId,
+        mode: current.mode == ReaderMode.verses
+            ? ReaderMode.mushaf
+            : ReaderMode.verses,
+      ),
+    );
   }
 
   Future<double> _loadFontScale() async {
     try {
       return await _settings?.loadFontScale() ?? 1.0;
     } on Object catch (error, stackTrace) {
-      appLog('reader font scale read failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'reader font scale read failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return 1.0;
     }
   }
@@ -233,8 +262,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await _settings?.saveFontScale(safe);
     } on Object catch (error, stackTrace) {
-      appLog('reader font scale write failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'reader font scale write failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -243,8 +276,12 @@ class ReaderCubit extends Cubit<ReaderState> {
       return await _layout?.loadLineHeight() ??
           ReaderLayoutSource.defaultLineHeight;
     } on Object catch (error, stackTrace) {
-      appLog('reader line height read failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'reader line height read failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return ReaderLayoutSource.defaultLineHeight;
     }
   }
@@ -257,15 +294,19 @@ class ReaderCubit extends Cubit<ReaderState> {
     final safe = lineHeight < ReaderLayoutSource.minLineHeight
         ? ReaderLayoutSource.minLineHeight
         : (lineHeight > ReaderLayoutSource.maxLineHeight
-            ? ReaderLayoutSource.maxLineHeight
-            : lineHeight);
+              ? ReaderLayoutSource.maxLineHeight
+              : lineHeight);
     if (safe == current.lineHeight) return;
     emit(current.copyWith(lineHeight: safe));
     try {
       await _layout?.saveLineHeight(safe);
     } on Object catch (error, stackTrace) {
-      appLog('reader line height write failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'reader line height write failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -277,8 +318,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       return await source.anchorForPage(page);
     } on Object catch (error, stackTrace) {
-      appLog('page anchor read failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'page anchor read failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -292,8 +337,12 @@ class ReaderCubit extends Cubit<ReaderState> {
       await _ayahRepository.toggleBookmark(ayahId);
       return true;
     } on Object catch (error, stackTrace) {
-      appLog('toggle bookmark failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'toggle bookmark failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }
@@ -315,8 +364,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     try {
       await sink.advanceTo(pageAyahs.first.id);
     } on Object catch (error, stackTrace) {
-      appLog('wird progress advance failed',
-          name: 'quran_yahdi/reader', error: error, stackTrace: stackTrace);
+      appLog(
+        'wird progress advance failed',
+        name: 'quran_yahdi/reader',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

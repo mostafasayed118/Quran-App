@@ -61,8 +61,9 @@ void main() {
     resetDependenciesForTest();
   });
 
-  testWidgets('the root repaints when the period lands and restores when fixed',
-      (tester) async {
+  testWidgets('the root repaints when the period lands and restores when fixed', (
+    tester,
+  ) async {
     final skin = getIt<PrayerSkinController>();
     final period = getIt<PrayerPeriodController>();
     addTearDown(() => skin.setMode(PrayerSkinMode.fixed));
@@ -104,19 +105,21 @@ void main() {
     expect(computed, isNotNull);
     expect(periodNotifies, greaterThan(0), reason: 'the period never notified');
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    expect(identical(appBefore, app), isFalse,
-        reason: 'the root builder never re-ran');
+    expect(
+      identical(appBefore, app),
+      isFalse,
+      reason: 'the root builder never re-ran',
+    );
     final paletteTheme = AppTheme.forPrayer(computed!, Brightness.light);
-    expect(_hex(app.theme!.colorScheme.surfaceTint),
-        _hex(paletteTheme.colorScheme.surfaceTint),
-        reason: 'MaterialApp did not receive the palette theme');
+    expect(
+      _hex(app.theme!.colorScheme.surfaceTint),
+      _hex(paletteTheme.colorScheme.surfaceTint),
+      reason: 'MaterialApp did not receive the palette theme',
+    );
     final followed = Theme.of(tester.element(find.byType(SplashScreen)));
     final palette = PrayerPalettes.of(computed, followed.brightness);
     expect(_hex(followed.colorScheme.surfaceTint), _hex(palette.primary));
-    expect(
-      _hex(followed.colorScheme.onSurfaceVariant),
-      _hex(palette.muted),
-    );
+    expect(_hex(followed.colorScheme.onSurfaceVariant), _hex(palette.muted));
 
     // The rollback path: fixed is the shipped theme, role for role.
     await tester.runAsync(() async {

@@ -178,11 +178,7 @@ class _TargetChips extends StatelessWidget {
               // tapped; selecting the current target would reset the count.
               if (!selected) return;
               context.read<TasbihCubit>().selectTarget(target);
-              AppToast.show(
-                context,
-                loc.tasbihTargetSet,
-                tone: ToastTone.info,
-              );
+              AppToast.show(context, loc.tasbihTargetSet, tone: ToastTone.info);
             },
           ),
       ],

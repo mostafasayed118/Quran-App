@@ -10,25 +10,25 @@ const String _today = '2026-11-02';
 final DateTime _now = DateTime(2026, 11, 2, 9);
 
 Map<String, dynamic> _catalog() => {
-      'collections': [
-        {
-          'id': 'morning',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ أَوَّل', 'count': 3},
-          ],
-        },
-        {
-          'id': 'evening',
-          'nameAr': 'أذكار المساء',
-          'nameEn': 'Evening',
-          'items': [
-            {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'morning',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ أَوَّل', 'count': 3},
       ],
-    };
+    },
+    {
+      'id': 'evening',
+      'nameAr': 'أذكار المساء',
+      'nameEn': 'Evening',
+      'items': [
+        {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
+      ],
+    },
+  ],
+};
 
 /// A source whose first read can be held open, so a tap can land while the
 /// stored state is still in flight.
@@ -87,24 +87,29 @@ Future<AzkarCubit> _startWithGate(_GatedSource source) async {
 }
 
 void main() {
-  test('a favourite added while the read is pending survives hydration',
-      () async {
-    final gate = Completer<void>();
-    final source = _GatedSource(const AzkarSavedState(day: _today))
-      ..gate = gate;
-    final cubit = await _startWithGate(source);
-    addTearDown(cubit.close);
+  test(
+    'a favourite added while the read is pending survives hydration',
+    () async {
+      final gate = Completer<void>();
+      final source = _GatedSource(const AzkarSavedState(day: _today))
+        ..gate = gate;
+      final cubit = await _startWithGate(source);
+      addTearDown(cubit.close);
 
-    expect((cubit.state as AzkarBrowsing).favorites, isEmpty);
-    cubit.toggleFavorite('morning');
+      expect((cubit.state as AzkarBrowsing).favorites, isEmpty);
+      cubit.toggleFavorite('morning');
 
-    gate.complete();
-    await Future<void>.delayed(Duration.zero);
-    await Future<void>.delayed(Duration.zero);
+      gate.complete();
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
-    expect((cubit.state as AzkarBrowsing).favorites, contains('morning'),
-        reason: 'the read must not overwrite a tap that landed while it ran');
-  });
+      expect(
+        (cubit.state as AzkarBrowsing).favorites,
+        contains('morning'),
+        reason: 'the read must not overwrite a tap that landed while it ran',
+      );
+    },
+  );
 
   test('a favourite removed while the read is pending stays removed', () async {
     final gate = Completer<void>();
@@ -123,9 +128,13 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     await Future<void>.delayed(Duration.zero);
 
-    expect((cubit.state as AzkarBrowsing).favorites, isNot(contains('morning')),
-        reason: 'the stored set must not resurrect a favourite the user '
-            'removed while the read was in flight');
+    expect(
+      (cubit.state as AzkarBrowsing).favorites,
+      isNot(contains('morning')),
+      reason:
+          'the stored set must not resurrect a favourite the user '
+          'removed while the read was in flight',
+    );
   });
 
   test('an untouched favourite comes from the stored state', () async {
@@ -143,26 +152,30 @@ void main() {
     expect((cubit.state as AzkarBrowsing).favorites, {'evening'});
   });
 
-  test('untouched counters come from the stored state after hydration',
-      () async {
-    final gate = Completer<void>();
-    final source = _GatedSource(const AzkarSavedState(
-      day: _today,
-      remaining: {
-        'morning': [0],
-      },
-    ))
-      ..gate = gate;
-    final cubit = await _startWithGate(source);
-    addTearDown(cubit.close);
+  test(
+    'untouched counters come from the stored state after hydration',
+    () async {
+      final gate = Completer<void>();
+      final source = _GatedSource(
+        const AzkarSavedState(
+          day: _today,
+          remaining: {
+            'morning': [0],
+          },
+        ),
+      )..gate = gate;
+      final cubit = await _startWithGate(source);
+      addTearDown(cubit.close);
 
-    final collection = (cubit.state as AzkarBrowsing).collections.first;
-    cubit.open(collection);
-    gate.complete();
-    await Future<void>.delayed(Duration.zero);
-    await Future<void>.delayed(Duration.zero);
+      final collection = (cubit.state as AzkarBrowsing).collections.first;
+      cubit.open(collection);
+      gate.complete();
+      await Future<void>.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
-    expect((cubit.state as AzkarReciting).remaining, [0],
-        reason: 'the open waits for the read and shows the stored counters');
-  });
+      expect((cubit.state as AzkarReciting).remaining, [
+        0,
+      ], reason: 'the open waits for the read and shows the stored counters');
+    },
+  );
 }

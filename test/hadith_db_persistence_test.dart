@@ -17,14 +17,18 @@ void main() {
       ..createSync(recursive: true);
     File('test/fixtures/hadith_eng_muslim_excerpt.json')
         .copySync('${libraryDir.path}/en-muslim.json');
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: 'en-muslim',
-          kind: 'hadith',
-          language: 'en',
-          title: 'Sahih Muslim',
-          sizeMb: 1,
-          version: '1',
-        ));
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: 'en-muslim',
+            kind: 'hadith',
+            language: 'en',
+            title: 'Sahih Muslim',
+            sizeMb: 1,
+            version: '1',
+          ),
+        );
 
     final downloader = PackDownloader(
       db,
@@ -38,8 +42,11 @@ void main() {
     final imported = await db
         .customSelect('SELECT COUNT(*) AS c FROM hadith_entries')
         .getSingle();
-    expect(imported.read<int>('c'), 12,
-        reason: 'the first page must import every pack row into the DB');
+    expect(
+      imported.read<int>('c'),
+      12,
+      reason: 'the first page must import every pack row into the DB',
+    );
 
     // The DB is now the read index: deleting the canonical file must not
     // empty the browse screen.

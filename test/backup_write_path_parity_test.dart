@@ -32,43 +32,43 @@ class _PathProbe extends QueryInterceptor {
 }
 
 BackupDocument _document() => BackupDocument(
-      exportedAt: DateTime(2026, 10, 30),
-      schemaVersion: 2,
-      data: BackupData(
-        bookmarks: [
-          for (var i = 1; i <= 3; i++)
-            BackupBookmark(ayahId: i, createdAt: DateTime(2026, 1, i)),
-        ],
-        lastReadAyahId: 4321,
-        khatma: [
-          BackupKhatmaRow(
-            ayahId: 100,
-            targetPages: 20,
-            updatedAt: DateTime(2026, 3, 1),
-          ),
-        ],
-        prayerLog: [
-          BackupPrayerDay(
-            day: DateTime(2026, 5, 1),
-            fajr: true,
-            dhuhr: false,
-            asr: false,
-            maghrib: false,
-            isha: true,
-          ),
-          BackupPrayerDay(
-            day: DateTime(2026, 5, 2),
-            fajr: false,
-            dhuhr: false,
-            asr: false,
-            maghrib: true,
-            isha: false,
-          ),
-        ],
-        tasbih: const BackupTasbih(count: 33, target: 99),
-        settings: const {'azkar_reminder_time': '06:30'},
+  exportedAt: DateTime(2026, 10, 30),
+  schemaVersion: 2,
+  data: BackupData(
+    bookmarks: [
+      for (var i = 1; i <= 3; i++)
+        BackupBookmark(ayahId: i, createdAt: DateTime(2026, 1, i)),
+    ],
+    lastReadAyahId: 4321,
+    khatma: [
+      BackupKhatmaRow(
+        ayahId: 100,
+        targetPages: 20,
+        updatedAt: DateTime(2026, 3, 1),
       ),
-    );
+    ],
+    prayerLog: [
+      BackupPrayerDay(
+        day: DateTime(2026, 5, 1),
+        fajr: true,
+        dhuhr: false,
+        asr: false,
+        maghrib: false,
+        isha: true,
+      ),
+      BackupPrayerDay(
+        day: DateTime(2026, 5, 2),
+        fajr: false,
+        dhuhr: false,
+        asr: false,
+        maghrib: true,
+        isha: false,
+      ),
+    ],
+    tasbih: const BackupTasbih(count: 33, target: 99),
+    settings: const {'azkar_reminder_time': '06:30'},
+  ),
+);
 
 AppDatabase _dbWith(_PathProbe probe) {
   final db = AppDatabase.test(NativeDatabase.memory().interceptWith(probe));
@@ -76,14 +76,15 @@ AppDatabase _dbWith(_PathProbe probe) {
   return db;
 }
 
-Future<void> _seedKhatma(AppDatabase db, DateTime updatedAt) =>
-    db.into(db.khatmaProgress).insert(
-          KhatmaProgressCompanion.insert(
-            ayahId: 1,
-            targetPages: 10,
-            updatedAt: Value(updatedAt),
-          ),
-        );
+Future<void> _seedKhatma(AppDatabase db, DateTime updatedAt) => db
+    .into(db.khatmaProgress)
+    .insert(
+      KhatmaProgressCompanion.insert(
+        ayahId: 1,
+        targetPages: 10,
+        updatedAt: Value(updatedAt),
+      ),
+    );
 
 Future<Map<String, Object?>> _dump(AppDatabase db) async {
   final bookmarks = await db.select(db.bookmarks).get();
@@ -114,69 +115,73 @@ Future<Map<String, Object?>> _dump(AppDatabase db) async {
 }
 
 void main() {
-  test('per-row and batch paths persist identical rows (khatma insert)',
-      () async {
-    final perRowProbe = _PathProbe();
-    final batchProbe = _PathProbe();
-    final perRowDb = _dbWith(perRowProbe);
-    final batchDb = _dbWith(batchProbe);
-    final document = _document();
+  test(
+    'per-row and batch paths persist identical rows (khatma insert)',
+    () async {
+      final perRowProbe = _PathProbe();
+      final batchProbe = _PathProbe();
+      final perRowDb = _dbWith(perRowProbe);
+      final batchDb = _dbWith(batchProbe);
+      final document = _document();
 
-    await BackupService(
-      db: perRowDb,
-      reschedule: () async {},
-      batchThreshold: 1000,
-    ).apply(document);
-    await BackupService(
-      db: batchDb,
-      reschedule: () async {},
-      batchThreshold: 0,
-    ).apply(document);
+      await BackupService(
+        db: perRowDb,
+        reschedule: () async {},
+        batchThreshold: 1000,
+      ).apply(document);
+      await BackupService(
+        db: batchDb,
+        reschedule: () async {},
+        batchThreshold: 0,
+      ).apply(document);
 
-    expect(perRowProbe.insertCalls, greaterThan(0));
-    expect(perRowProbe.batchCalls, 0);
-    expect(batchProbe.insertCalls, 0);
-    expect(batchProbe.batchCalls, 1);
-    expect(await _dump(perRowDb), await _dump(batchDb));
+      expect(perRowProbe.insertCalls, greaterThan(0));
+      expect(perRowProbe.batchCalls, 0);
+      expect(batchProbe.insertCalls, 0);
+      expect(batchProbe.batchCalls, 1);
+      expect(await _dump(perRowDb), await _dump(batchDb));
 
-    final khatma = await batchDb.select(batchDb.khatmaProgress).get();
-    expect(khatma, hasLength(1));
-    expect(khatma.single.ayahId, 100);
-    expect(khatma.single.targetPages, 20);
-  });
+      final khatma = await batchDb.select(batchDb.khatmaProgress).get();
+      expect(khatma, hasLength(1));
+      expect(khatma.single.ayahId, 100);
+      expect(khatma.single.targetPages, 20);
+    },
+  );
 
-  test('per-row and batch paths persist identical rows (khatma update)',
-      () async {
-    final perRowProbe = _PathProbe();
-    final batchProbe = _PathProbe();
-    final perRowDb = _dbWith(perRowProbe);
-    final batchDb = _dbWith(batchProbe);
-    final older = DateTime(2026, 1, 1);
-    await _seedKhatma(perRowDb, older);
-    await _seedKhatma(batchDb, older);
-    // The seed itself is an insert; only the apply is measured.
-    perRowProbe.insertCalls = 0;
-    batchProbe.insertCalls = 0;
-    final document = _document();
+  test(
+    'per-row and batch paths persist identical rows (khatma update)',
+    () async {
+      final perRowProbe = _PathProbe();
+      final batchProbe = _PathProbe();
+      final perRowDb = _dbWith(perRowProbe);
+      final batchDb = _dbWith(batchProbe);
+      final older = DateTime(2026, 1, 1);
+      await _seedKhatma(perRowDb, older);
+      await _seedKhatma(batchDb, older);
+      // The seed itself is an insert; only the apply is measured.
+      perRowProbe.insertCalls = 0;
+      batchProbe.insertCalls = 0;
+      final document = _document();
 
-    await BackupService(
-      db: perRowDb,
-      reschedule: () async {},
-      batchThreshold: 1000,
-    ).apply(document);
-    await BackupService(
-      db: batchDb,
-      reschedule: () async {},
-      batchThreshold: 0,
-    ).apply(document);
+      await BackupService(
+        db: perRowDb,
+        reschedule: () async {},
+        batchThreshold: 1000,
+      ).apply(document);
+      await BackupService(
+        db: batchDb,
+        reschedule: () async {},
+        batchThreshold: 0,
+      ).apply(document);
 
-    expect(perRowProbe.batchCalls, 0);
-    expect(batchProbe.batchCalls, 1);
-    expect(await _dump(perRowDb), await _dump(batchDb));
+      expect(perRowProbe.batchCalls, 0);
+      expect(batchProbe.batchCalls, 1);
+      expect(await _dump(perRowDb), await _dump(batchDb));
 
-    final khatma = await batchDb.select(batchDb.khatmaProgress).get();
-    expect(khatma, hasLength(1));
-    expect(khatma.single.ayahId, 100);
-    expect(khatma.single.targetPages, 20);
-  });
+      final khatma = await batchDb.select(batchDb.khatmaProgress).get();
+      expect(khatma, hasLength(1));
+      expect(khatma.single.ayahId, 100);
+      expect(khatma.single.targetPages, 20);
+    },
+  );
 }

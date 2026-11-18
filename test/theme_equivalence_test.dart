@@ -42,16 +42,18 @@ void main() {
     }
   });
 
-  test('the per-period cache returns one instance and rebuilds after clear',
-      () {
-    AppTheme.clearPrayerCache();
-    final first = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
-    final again = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
-    expect(identical(first, again), isTrue);
+  test(
+    'the per-period cache returns one instance and rebuilds after clear',
+    () {
+      AppTheme.clearPrayerCache();
+      final first = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
+      final again = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
+      expect(identical(first, again), isTrue);
 
-    AppTheme.clearPrayerCache();
-    final rebuilt = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
-    expect(identical(first, rebuilt), isFalse);
-    expect(themeRoles(rebuilt), themeRoles(first));
-  });
+      AppTheme.clearPrayerCache();
+      final rebuilt = AppTheme.forPrayer(PrayerName.fajr, Brightness.light);
+      expect(identical(first, rebuilt), isFalse);
+      expect(themeRoles(rebuilt), themeRoles(first));
+    },
+  );
 }

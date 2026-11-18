@@ -56,7 +56,7 @@ bool fieldLooksDisturbed(MagneticSample sample) {
 class CompassCalibration {
   /// Creates the calibration watcher over an optional [field] source.
   CompassCalibration({MagneticStreamFactory? field})
-      : _field = field ?? _deviceField;
+    : _field = field ?? _deviceField;
 
   final MagneticStreamFactory _field;
 
@@ -75,10 +75,8 @@ class CompassCalibration {
     }
   }
 
-  static Stream<MagneticSample>? _deviceField() =>
-      magnetometerEventStream().map(
-        (event) => MagneticSample(event.x, event.y, event.z),
-      );
+  static Stream<MagneticSample>? _deviceField() => magnetometerEventStream()
+      .map((event) => MagneticSample(event.x, event.y, event.z));
 
   static Stream<bool> _debounced(
     Stream<MagneticSample> raw,

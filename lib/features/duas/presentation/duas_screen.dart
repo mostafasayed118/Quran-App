@@ -28,7 +28,11 @@ class DuasScreen extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.md, 10, AppSpacing.md, AppSpacing.xs),
+                  AppSpacing.md,
+                  10,
+                  AppSpacing.md,
+                  AppSpacing.xs,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -48,11 +52,10 @@ class DuasScreen extends StatelessWidget {
                         selected: {
                           switch (state) {
                             DuasLoading(:final tab) ||
-                            DuasFailed(:final tab) =>
-                              tab,
+                            DuasFailed(:final tab) => tab,
                             RuqyahInView() => DuasTab.ruqyah,
                             DuasInView() => DuasTab.duas,
-                          }
+                          },
                         },
                         onSelectionChanged: (selection) => context
                             .read<DuasCubit>()
@@ -65,8 +68,10 @@ class DuasScreen extends StatelessWidget {
               Expanded(
                 child: switch (state) {
                   DuasLoading() => const LoadingView(),
-                  DuasFailed() =>
-                    errorPane(loc, onRetry: context.read<DuasCubit>().start),
+                  DuasFailed() => errorPane(
+                    loc,
+                    onRetry: context.read<DuasCubit>().start,
+                  ),
                   DuasInView() => const _DuasView(),
                   RuqyahInView() => const _RuqyahView(),
                 },
@@ -112,10 +117,10 @@ class _DuasView extends StatelessWidget {
                         selected: view.selectedCategory == category,
                         onSelected: (_) =>
                             context.read<DuasCubit>().selectCategory(
-                                  view.selectedCategory == category
-                                      ? null
-                                      : category,
-                                ),
+                              view.selectedCategory == category
+                                  ? null
+                                  : category,
+                            ),
                       ),
                     ),
                 ],

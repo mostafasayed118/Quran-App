@@ -26,29 +26,35 @@ void main() {
   });
 
   Future<void> pumpScaled(WidgetTester tester, Widget home) async {
-    await tester.pumpWidget(MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(2.0)),
-        child: child!,
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(2.0)),
+          child: child!,
+        ),
+        home: home,
       ),
-      home: home,
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('prayer times list + countdown survive textScale 2.0',
-      (tester) async {
+  testWidgets('prayer times list + countdown survive textScale 2.0', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     final fake = FakePrayerTimeService()
       ..todayResult = [
@@ -59,8 +65,10 @@ void main() {
         PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
         PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
       ]
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
     final cubit = PrayerTimesCubit(
       prayer: fake,
       city: repo,
@@ -83,8 +91,9 @@ void main() {
     expect(find.text('متبقٍ ٠١:٣٥'), findsOneWidget);
   });
 
-  testWidgets('city picker rows + selected mark survive textScale 2.0',
-      (tester) async {
+  testWidgets('city picker rows + selected mark survive textScale 2.0', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     final cubit = CityPickerCubit(cityRepo: repo);
     addTearDown(cubit.close);

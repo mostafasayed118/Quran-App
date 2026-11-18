@@ -28,16 +28,16 @@ class _InstalledThenThrowDownloader extends PackDownloader {
 
   @override
   Future<List<InstalledPack>> installedPacks() async => [
-        InstalledPack(
-          packId: 'p1',
-          kind: 'translation',
-          language: 'ar',
-          title: 'ع',
-          sizeMb: 1,
-          version: '1',
-          installedAt: DateTime(2026),
-        ),
-      ];
+    InstalledPack(
+      packId: 'p1',
+      kind: 'translation',
+      language: 'ar',
+      title: 'ع',
+      sizeMb: 1,
+      version: '1',
+      installedAt: DateTime(2026),
+    ),
+  ];
 
   @override
   Future<void> uninstall(String packId) async {
@@ -56,15 +56,15 @@ class _InstalledThenThrowDownloader extends PackDownloader {
 }
 
 Map<String, dynamic> _catalogRow() => {
-      'id': 'p1',
-      'kind': 'translation',
-      'language': 'ar',
-      'titleAr': 'ع',
-      'titleEn': 'x',
-      'sourceUrl': 'https://cdn.jsdelivr.net/gh/a/b@1/x.json',
-      'approxSizeMb': 1.0,
-      'version': '1',
-    };
+  'id': 'p1',
+  'kind': 'translation',
+  'language': 'ar',
+  'titleAr': 'ع',
+  'titleEn': 'x',
+  'sourceUrl': 'https://cdn.jsdelivr.net/gh/a/b@1/x.json',
+  'approxSizeMb': 1.0,
+  'version': '1',
+};
 
 void main() {
   late AppDatabase db;
@@ -73,57 +73,61 @@ void main() {
     db = newTestDb();
   });
 
-  test('a throwing uninstall keeps the ready state and marks the pack failed',
-      () async {
-    final cubit = LibraryCubit(
-      catalog: CatalogRepository(
-        source: BundledCatalogSource(
-          loader: () async => [
-            {
-              'id': 'p1',
-              'kind': 'translation',
-              'language': 'ar',
-              'titleAr': 'ع',
-              'titleEn': 'x',
-              'sourceUrl': 'https://cdn.jsdelivr.net/gh/a/b@1/x.json',
-              'approxSizeMb': 1.0,
-              'version': '1',
-            },
-          ],
+  test(
+    'a throwing uninstall keeps the ready state and marks the pack failed',
+    () async {
+      final cubit = LibraryCubit(
+        catalog: CatalogRepository(
+          source: BundledCatalogSource(
+            loader: () async => [
+              {
+                'id': 'p1',
+                'kind': 'translation',
+                'language': 'ar',
+                'titleAr': 'ع',
+                'titleEn': 'x',
+                'sourceUrl': 'https://cdn.jsdelivr.net/gh/a/b@1/x.json',
+                'approxSizeMb': 1.0,
+                'version': '1',
+              },
+            ],
+          ),
         ),
-      ),
-      downloader: _ThrowingUninstallDownloader(db),
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
-    expect(cubit.state, isA<LibraryReady>());
+        downloader: _ThrowingUninstallDownloader(db),
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
+      expect(cubit.state, isA<LibraryReady>());
 
-    await cubit.uninstall('p1');
+      await cubit.uninstall('p1');
 
-    final ready = cubit.state as LibraryReady;
-    expect(ready.failed, contains('p1'));
-    expect(ready.installed, isNot(contains('p1')));
-  });
+      final ready = cubit.state as LibraryReady;
+      expect(ready.failed, contains('p1'));
+      expect(ready.installed, isNot(contains('p1')));
+    },
+  );
 
-  test('retrying a failed uninstall retries the delete, not the download',
-      () async {
-    final downloader = _InstalledThenThrowDownloader(db);
-    final cubit = LibraryCubit(
-      catalog: CatalogRepository(
-        source: BundledCatalogSource(loader: () async => [_catalogRow()]),
-      ),
-      downloader: downloader,
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'retrying a failed uninstall retries the delete, not the download',
+    () async {
+      final downloader = _InstalledThenThrowDownloader(db);
+      final cubit = LibraryCubit(
+        catalog: CatalogRepository(
+          source: BundledCatalogSource(loader: () async => [_catalogRow()]),
+        ),
+        downloader: downloader,
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    expect((cubit.state as LibraryReady).installed, contains('p1'));
-    await cubit.uninstall('p1');
-    expect((cubit.state as LibraryReady).failed, contains('p1'));
+      expect((cubit.state as LibraryReady).installed, contains('p1'));
+      await cubit.uninstall('p1');
+      expect((cubit.state as LibraryReady).failed, contains('p1'));
 
-    await cubit.retry('p1');
+      await cubit.retry('p1');
 
-    expect(downloader.uninstalls, 2);
-    expect(downloader.installs, 0);
-  });
+      expect(downloader.uninstalls, 2);
+      expect(downloader.installs, 0);
+    },
+  );
 }

@@ -23,7 +23,8 @@ class PackStore {
     final resolver = _rootResolver;
     if (resolver != null) return resolver();
     throw PackFailure(
-        'libraryRootResolver not configured — register library bindings first');
+      'libraryRootResolver not configured — register library bindings first',
+    );
   }
 
   /// Pack ids compose filesystem paths (see `library_catalog.dart`); the
@@ -50,7 +51,8 @@ class PackStore {
 
   /// Promotes a fully-written part file to its final name.
   Future<File> promote(File partFile) => partFile.rename(
-      partFile.path.substring(0, partFile.path.length - '.part'.length));
+    partFile.path.substring(0, partFile.path.length - '.part'.length),
+  );
 
   /// Deletes [file] when it exists; missing files are not an error.
   Future<void> deleteIfExists(File file) async {

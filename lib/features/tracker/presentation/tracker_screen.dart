@@ -48,8 +48,10 @@ class TrackerScreen extends StatelessWidget {
           child: BlocBuilder<TrackerCubit, TrackerState>(
             builder: (context, state) => switch (state) {
               TrackerLoading() => const LoadingView(),
-              TrackerFailed() =>
-                errorPane(loc, onRetry: context.read<TrackerCubit>().reload),
+              TrackerFailed() => errorPane(
+                loc,
+                onRetry: context.read<TrackerCubit>().reload,
+              ),
               TrackerReady(
                 :final today,
                 :final streakDays,
@@ -70,8 +72,10 @@ class TrackerScreen extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     Text(
                       loc.last7Days,
-                      style:
-                          AppTheme.mutedAt(Theme.of(context).colorScheme, 12),
+                      style: AppTheme.mutedAt(
+                        Theme.of(context).colorScheme,
+                        12,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     _Last7Row(last7: last7, today: today.day),

@@ -47,14 +47,8 @@ void main() {
     expect(backupKeyHadithBookmarks, HadithBookmarkRepository.key);
     expect(backupKeyHadithPositions, HadithPositionRepository.key);
     expect(backupKeyQadaMissedFasts, QadaRepository.key);
-    expect(
-      backupKeyAzkarProgress,
-      AzkarSavedStateRepository.progressKey,
-    );
-    expect(
-      backupKeyAzkarFavorites,
-      AzkarSavedStateRepository.favoritesKey,
-    );
+    expect(backupKeyAzkarProgress, AzkarSavedStateRepository.progressKey);
+    expect(backupKeyAzkarFavorites, AzkarSavedStateRepository.favoritesKey);
   });
 
   test('last-read literal matches quran/last_read_repository.dart', () {
@@ -130,10 +124,14 @@ void main() {
       adhanFajrIdKey,
     });
     // Not planner inputs: the reader's font scale and the azkar counters.
-    expect(kBackupReminderRelevantKeys,
-        isNot(contains(ReaderSettingsRepository.fontScaleKey)));
-    expect(kBackupReminderRelevantKeys,
-        isNot(contains(AzkarSavedStateRepository.progressKey)));
+    expect(
+      kBackupReminderRelevantKeys,
+      isNot(contains(ReaderSettingsRepository.fontScaleKey)),
+    );
+    expect(
+      kBackupReminderRelevantKeys,
+      isNot(contains(AzkarSavedStateRepository.progressKey)),
+    );
     expect(kBackupReminderRelevantKeys, isNot(contains(selectedMoshafKey)));
   });
 }

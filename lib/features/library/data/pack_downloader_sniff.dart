@@ -10,11 +10,12 @@ Future<List<_SurahProjection>> _decodeSurahs(
   List<Uint8List> bodies,
   List<int> numbers,
   List<String?> expectedHashes,
-) =>
-    Isolate.run(() => [
-          for (var i = 0; i < numbers.length; i++)
-            _projectSurah(bodies[i], expectedHashes[i]),
-        ]);
+) => Isolate.run(
+  () => [
+    for (var i = 0; i < numbers.length; i++)
+      _projectSurah(bodies[i], expectedHashes[i]),
+  ],
+);
 
 /// The worker-side projection of one surah body.
 ///
@@ -50,11 +51,7 @@ _SurahProjection _projectSurah(List<int> bytes, String? expectedSha) {
   }
   final interior = trimmed.substring(1, trimmed.length - 1).trim();
   if (interior.isEmpty) {
-    return const (
-      error: 'empty',
-      index: <int, String>{},
-      interior: '',
-    );
+    return const (error: 'empty', index: <int, String>{}, interior: '');
   }
   return (
     error: null,

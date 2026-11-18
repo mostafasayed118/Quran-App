@@ -62,8 +62,9 @@ void main() {
     }
   });
 
-  testWidgets('textScale 2.0 on a 360-wide phone: the counter survives',
-      (tester) async {
+  testWidgets('textScale 2.0 on a 360-wide phone: the counter survives', (
+    tester,
+  ) async {
     usePhoneViewport(tester);
     await pumpHost(tester, textScale: 2.0);
 
@@ -73,8 +74,9 @@ void main() {
     expect(find.text('الهدف: ٣٣'), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0: the done state survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the done state survives the layout', (
+    tester,
+  ) async {
     usePhoneViewport(tester);
     final cubit = await pumpHost(tester, textScale: 2.0);
 
@@ -82,8 +84,11 @@ void main() {
     for (var i = 0; i < 33; i++) {
       await cubit.increment();
     }
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.byIcon(Icons.check_circle), findsOneWidget);

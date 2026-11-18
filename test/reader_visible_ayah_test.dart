@@ -29,27 +29,33 @@ void main() {
     db = newTestDb();
     ayahs = AyahRepository(db);
     lastRead = _RecordingLastRead(db);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makkah',
-          ayahCount: 3,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          for (var i = 1; i <= 3; i++)
-            AyahsCompanion.insert(
-              id: Value(i),
-              surahId: 1,
-              numberInSurah: i,
-              juz: 1,
-              page: 1,
-              textUthmani: 'آية $i',
-              textImlaei: 'آية $i',
-            ),
-        ]));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makkah',
+            ayahCount: 3,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        for (var i = 1; i <= 3; i++)
+          AyahsCompanion.insert(
+            id: Value(i),
+            surahId: 1,
+            numberInSurah: i,
+            juz: 1,
+            page: 1,
+            textUthmani: 'آية $i',
+            textImlaei: 'آية $i',
+          ),
+      ]),
+    );
   });
 
   tearDown(() async => db.close());

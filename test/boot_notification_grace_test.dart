@@ -28,35 +28,44 @@ void main() {
     test('asks only when notifications are off AND azkar opted in', () {
       expect(
         shouldRequestBootPermission(
-            notificationsEnabled: false, azkarEnabled: true),
+          notificationsEnabled: false,
+          azkarEnabled: true,
+        ),
         isTrue,
       );
     });
     test('never asks the opted-out user', () {
       expect(
         shouldRequestBootPermission(
-            notificationsEnabled: false, azkarEnabled: false),
+          notificationsEnabled: false,
+          azkarEnabled: false,
+        ),
         isFalse,
       );
     });
     test('never asks when notifications are already granted', () {
       expect(
         shouldRequestBootPermission(
-            notificationsEnabled: true, azkarEnabled: true),
+          notificationsEnabled: true,
+          azkarEnabled: true,
+        ),
         isFalse,
       );
     });
     test('never asks when the OS state is unknown', () {
       expect(
         shouldRequestBootPermission(
-            notificationsEnabled: null, azkarEnabled: true),
+          notificationsEnabled: null,
+          azkarEnabled: true,
+        ),
         isFalse,
       );
     });
   });
 
-  testWidgets('notification tap response default-launches to /home',
-      (tester) async {
+  testWidgets('notification tap response default-launches to /home', (
+    tester,
+  ) async {
     final tmp = Directory.systemTemp.createTempSync('quran_yahdi_boot_grace');
     PathProviderPlatform.instance = _TempSupportPathProvider(tmp.path);
     addTearDown(() {
@@ -79,9 +88,11 @@ void main() {
 
     final binding = NotificationsBinding();
     await binding.init(onTap: () => AppRouter.router.go('/home'));
-    binding.onNotificationTap(const NotificationResponse(
-      notificationResponseType: NotificationResponseType.selectedNotification,
-    ));
+    binding.onNotificationTap(
+      const NotificationResponse(
+        notificationResponseType: NotificationResponseType.selectedNotification,
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 

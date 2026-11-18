@@ -11,7 +11,9 @@ import 'support/test_db.dart';
 
 Future<AppDatabase> _seededDb() async {
   final db = newTestDb();
-  await db.into(db.surahs).insert(
+  await db
+      .into(db.surahs)
+      .insert(
         SurahsCompanion.insert(
           id: const Value(2),
           nameAr: 'البقرة',
@@ -23,7 +25,9 @@ Future<AppDatabase> _seededDb() async {
         ),
       );
   for (final (id, number, page) in [(8, 1, 2), (9, 2, 2), (10, 3, 3)]) {
-    await db.into(db.ayahs).insert(
+    await db
+        .into(db.ayahs)
+        .insert(
           AyahsCompanion.insert(
             id: Value(id),
             surahId: 2,
@@ -39,27 +43,32 @@ Future<AppDatabase> _seededDb() async {
 }
 
 void main() {
-  test('opening a surah does not overwrite the stored last-read marker',
-      () async {
-    final db = await _seededDb();
-    final lastRead = LastReadRepository(db);
-    await lastRead.saveAyahId(9);
+  test(
+    'opening a surah does not overwrite the stored last-read marker',
+    () async {
+      final db = await _seededDb();
+      final lastRead = LastReadRepository(db);
+      await lastRead.saveAyahId(9);
 
-    final cubit = ReaderCubit(
-      ayahRepository: AyahRepository(db),
-      lastReadRepository: lastRead,
-      surahId: 2,
-      initialAyah: 0,
-    );
-    addTearDown(cubit.close);
-    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
-    await cubit.start();
-    final ready = await readyFuture as ReaderReady;
+      final cubit = ReaderCubit(
+        ayahRepository: AyahRepository(db),
+        lastReadRepository: lastRead,
+        surahId: 2,
+        initialAyah: 0,
+      );
+      addTearDown(cubit.close);
+      final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+      await cubit.start();
+      final ready = await readyFuture as ReaderReady;
 
-    expect(ready.currentAyahId, 8);
-    expect(await lastRead.loadAyahId(), 9,
-        reason: 'a glance at the surah must not rewind continue-reading');
-  });
+      expect(ready.currentAyahId, 8);
+      expect(
+        await lastRead.loadAyahId(),
+        9,
+        reason: 'a glance at the surah must not rewind continue-reading',
+      );
+    },
+  );
 
   test('the reading anchor survives both mode switches', () async {
     final db = await _seededDb();
@@ -78,12 +87,18 @@ void main() {
     await cubit.onVisibleAyah(10);
     expect(await lastRead.loadAyahId(), 10);
     cubit.toggleMode();
-    expect((cubit.state as ReaderReady).currentAyahId, 10,
-        reason: 'verses -> mushaf must stay on the visible ayah');
+    expect(
+      (cubit.state as ReaderReady).currentAyahId,
+      10,
+      reason: 'verses -> mushaf must stay on the visible ayah',
+    );
 
     await cubit.onMushafPageChanged(0);
     cubit.toggleMode();
-    expect((cubit.state as ReaderReady).currentAyahId, 8,
-        reason: 'mushaf -> verses must use the page reached, not the route');
+    expect(
+      (cubit.state as ReaderReady).currentAyahId,
+      8,
+      reason: 'mushaf -> verses must use the page reached, not the route',
+    );
   });
 }

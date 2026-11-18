@@ -58,7 +58,8 @@ class _Harness extends StatelessWidget {
 
 Widget _app(Object identity, List<_FakeCubit> cubits, List<int> started) =>
     appShell(
-        home: _Harness(identity: identity, cubits: cubits, started: started));
+      home: _Harness(identity: identity, cubits: cubits, started: started),
+    );
 
 void main() {
   testWidgets('creates and starts the cubit exactly once', (tester) async {
@@ -77,8 +78,9 @@ void main() {
     expect(started, [0], reason: 'start must stay one-shot per cubit');
   });
 
-  testWidgets('a changed identity closes the old cubit and mounts a new one',
-      (tester) async {
+  testWidgets('a changed identity closes the old cubit and mounts a new one', (
+    tester,
+  ) async {
     final cubits = <_FakeCubit>[];
     final started = <int>[];
 

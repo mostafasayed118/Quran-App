@@ -12,10 +12,12 @@ void main() {
     final files = Directory('lib')
         .listSync(recursive: true)
         .whereType<File>()
-        .where((file) =>
-            file.path.endsWith('.dart') &&
-            !file.path.endsWith('.g.dart') &&
-            !file.path.endsWith('.freezed.dart'));
+        .where(
+          (file) =>
+              file.path.endsWith('.dart') &&
+              !file.path.endsWith('.g.dart') &&
+              !file.path.endsWith('.freezed.dart'),
+        );
 
     for (final file in files) {
       final lines = file.readAsLinesSync();

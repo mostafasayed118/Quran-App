@@ -59,25 +59,30 @@ const _other = ReciterRow(
 );
 
 void main() {
-  test('reciters ready carries mapped ReciterInfos from a pure seam fake',
-      () async {
-    final cubit =
-        RecitersCubit(repo: _InMemoryReciterSource(const [_other, _featured]));
-    addTearDown(cubit.close);
-    await cubit.start();
-    await Future<void>.delayed(Duration.zero);
+  test(
+    'reciters ready carries mapped ReciterInfos from a pure seam fake',
+    () async {
+      final cubit = RecitersCubit(
+        repo: _InMemoryReciterSource(const [_other, _featured]),
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
+      await Future<void>.delayed(Duration.zero);
 
-    final ready = cubit.state as RecitersReady;
+      final ready = cubit.state as RecitersReady;
 
-    expect(ready.reciters, everyElement(isA<ReciterInfo>()));
-    expect(ready.reciters.map((r) => r.reciterName).toList(),
-        ['عبدالباسط عبدالصمد', 'تجربة أحمد'],
-        reason: 'featured rows sort first');
-  });
+      expect(ready.reciters, everyElement(isA<ReciterInfo>()));
+      expect(ready.reciters.map((r) => r.reciterName).toList(), [
+        'عبدالباسط عبدالصمد',
+        'تجربة أحمد',
+      ], reason: 'featured rows sort first');
+    },
+  );
 
   test('setQuery filters the entity list in place', () async {
-    final cubit =
-        RecitersCubit(repo: _InMemoryReciterSource(const [_other, _featured]));
+    final cubit = RecitersCubit(
+      repo: _InMemoryReciterSource(const [_other, _featured]),
+    );
     addTearDown(cubit.close);
     await cubit.start();
     await Future<void>.delayed(Duration.zero);

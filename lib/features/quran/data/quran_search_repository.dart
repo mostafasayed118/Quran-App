@@ -70,7 +70,8 @@ class QuranSearchRepository implements QuranSearchSource {
     if (tokens.every((t) => t.length >= _ftsTrigramMinTokenLength)) {
       return _SearchPlan(
         from: 'ayah_search',
-        join: 'JOIN ayahs a ON a.id = ayah_search.rowid '
+        join:
+            'JOIN ayahs a ON a.id = ayah_search.rowid '
             'JOIN surahs u ON u.id = a.surah_id',
         where: 'ayah_search MATCH ?',
         ayahIdExpr: 'ayah_search.rowid',
@@ -82,7 +83,8 @@ class QuranSearchRepository implements QuranSearchSource {
     // bounded by the same 6,236-row corpus.
     return _SearchPlan(
       from: 'ayah_search s',
-      join: 'JOIN ayahs a ON a.id = s.rowid '
+      join:
+          'JOIN ayahs a ON a.id = s.rowid '
           'JOIN surahs u ON u.id = a.surah_id',
       where: List.filled(tokens.length, 's.text_norm LIKE ?').join(' AND '),
       ayahIdExpr: 's.rowid',
@@ -114,10 +116,12 @@ class QuranSearchRepository implements QuranSearchSource {
     int? afterAyahId,
     int fetch,
   ) async {
-    final sql = StringBuffer('SELECT ${plan.ayahIdExpr} AS ayah_id, '
-        'a.surah_id, a.number_in_surah, u.name_ar, a.text_imlaei '
-        'FROM ${plan.from} ${plan.join} '
-        'WHERE ${plan.where}');
+    final sql = StringBuffer(
+      'SELECT ${plan.ayahIdExpr} AS ayah_id, '
+      'a.surah_id, a.number_in_surah, u.name_ar, a.text_imlaei '
+      'FROM ${plan.from} ${plan.join} '
+      'WHERE ${plan.where}',
+    );
     final variables = <Variable<Object>>[...plan.variables];
     if (afterAyahId != null) {
       sql.write(' AND ${plan.ayahIdExpr} > ?');

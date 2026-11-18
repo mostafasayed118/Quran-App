@@ -20,24 +20,32 @@ import 'support/test_db.dart';
 ///   3  وأقيموا الصلاة وآتوا الزكاة
 ///   4  إن الإسلام دين الرحمة
 Future<void> _seed(AppDatabase db) async {
-  await db.into(db.surahs).insert(SurahsCompanion.insert(
-        id: const Value(1),
-        nameAr: 'الفاتحة',
-        nameEn: 'Al-Fatihah',
-        revelationType: 'makkah',
-        ayahCount: 2,
-        pagesStart: 1,
-        pagesEnd: 1,
-      ));
-  await db.into(db.surahs).insert(SurahsCompanion.insert(
-        id: const Value(2),
-        nameAr: 'البقرة',
-        nameEn: 'Al-Baqarah',
-        revelationType: 'madani',
-        ayahCount: 2,
-        pagesStart: 2,
-        pagesEnd: 2,
-      ));
+  await db
+      .into(db.surahs)
+      .insert(
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 2,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+      );
+  await db
+      .into(db.surahs)
+      .insert(
+        SurahsCompanion.insert(
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'madani',
+          ayahCount: 2,
+          pagesStart: 2,
+          pagesEnd: 2,
+        ),
+      );
   final texts = <(int, int, int, String)>[
     (1, 1, 1, 'بسم الله الرحمن الرحيم'),
     (2, 2, 1, 'الذين يؤمنون بالغيب ويقيمون الصلاة'),
@@ -45,15 +53,19 @@ Future<void> _seed(AppDatabase db) async {
     (4, 2, 3, 'إن الإسلام دين الرحمة'),
   ];
   for (final (id, surahId, number, text) in texts) {
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: Value(id),
-          surahId: surahId,
-          numberInSurah: number,
-          juz: 1,
-          page: 1,
-          textUthmani: text,
-          textImlaei: text,
-        ));
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: Value(id),
+            surahId: surahId,
+            numberInSurah: number,
+            juz: 1,
+            page: 1,
+            textUthmani: text,
+            textImlaei: text,
+          ),
+        );
   }
   await rebuildQuranSearchIndex(db);
 }
@@ -75,8 +87,7 @@ void main() {
     expect(page.total, 2);
   });
 
-  test('a short token is ANDed with the long ones, not dropped from it',
-      () async {
+  test('a short token is ANDed with the long ones, not dropped from it', () async {
     // 'من' is in ayahs 1 and 2; 'الصلاة' is in ayahs 2 and 3. The AND is
     // ayah 2 alone — dropping the short token would widen it to ayahs 2 AND 3.
     final page = await repo.search('من الصلاة');

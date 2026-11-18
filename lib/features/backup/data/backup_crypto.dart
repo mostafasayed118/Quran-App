@@ -255,20 +255,16 @@ Future<SecretKey> _deriveKey({
         iterations: iterations.clamp(1, _maxArgon2idIterations),
         hashLength: kArgon2idHashLength,
       );
-      return algorithm.deriveKeyFromPassword(
-        password: passphrase,
-        nonce: salt,
-      );
+      return algorithm.deriveKeyFromPassword(password: passphrase, nonce: salt);
     case _kdfPbkdf2HmacSha256:
       final algorithm = Pbkdf2.hmacSha256(
-        iterations:
-            iterations.clamp(_minPbkdf2Iterations, _maxPbkdf2Iterations),
+        iterations: iterations.clamp(
+          _minPbkdf2Iterations,
+          _maxPbkdf2Iterations,
+        ),
         bits: 256,
       );
-      return algorithm.deriveKeyFromPassword(
-        password: passphrase,
-        nonce: salt,
-      );
+      return algorithm.deriveKeyFromPassword(password: passphrase, nonce: salt);
     default:
       throw ArgumentError.value(kdfName, 'kdfName', 'unknown KDF');
   }
@@ -287,9 +283,8 @@ List<int> _headerAad(Map<String, Object?> envelope) {
   return utf8.encode(canonicalJson(header));
 }
 
-Uint8List _randomBytes(int count, Random random) => Uint8List.fromList(
-      List<int>.generate(count, (_) => random.nextInt(256)),
-    );
+Uint8List _randomBytes(int count, Random random) =>
+    Uint8List.fromList(List<int>.generate(count, (_) => random.nextInt(256)));
 
 int _intOr(Object? raw, int fallback) => raw is int ? raw : fallback;
 

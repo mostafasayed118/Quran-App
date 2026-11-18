@@ -5,8 +5,9 @@ import 'package:quran_yahdi/app/splash_screen.dart';
 import 'support/host.dart';
 
 void main() {
-  testWidgets('the splash stops scheduling frames once it has faded out',
-      (tester) async {
+  testWidgets('the splash stops scheduling frames once it has faded out', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       appShell(home: const SplashScreen(child: SizedBox.expand())),
     );
@@ -18,10 +19,17 @@ void main() {
       await tester.pump(const Duration(milliseconds: 16));
     }
 
-    expect(find.byType(IgnorePointer), findsWidgets,
-        reason: 'sanity: the shell itself still uses IgnorePointer');
-    expect(tester.binding.hasScheduledFrame, isFalse,
-        reason: 'the splash overlay is gone, so its looping bar must not keep '
-            'the ticker alive for the rest of the app lifetime');
+    expect(
+      find.byType(IgnorePointer),
+      findsWidgets,
+      reason: 'sanity: the shell itself still uses IgnorePointer',
+    );
+    expect(
+      tester.binding.hasScheduledFrame,
+      isFalse,
+      reason:
+          'the splash overlay is gone, so its looping bar must not keep '
+          'the ticker alive for the rest of the app lifetime',
+    );
   });
 }

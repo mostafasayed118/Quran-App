@@ -52,8 +52,11 @@ class ServiceTile extends StatelessWidget {
                     color: colors.primary.withValues(alpha: AppAlphas.chipTint),
                     shape: BoxShape.circle,
                   ),
-                  child:
-                      Icon(icon, size: AppIconSize.xl, color: colors.primary),
+                  child: Icon(
+                    icon,
+                    size: AppIconSize.xl,
+                    color: colors.primary,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(

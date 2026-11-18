@@ -47,24 +47,32 @@ void main() {
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'Medinan',
-          ayahCount: 286,
-          pagesStart: 2,
-          pagesEnd: 49,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 83,
-          juz: 1,
-          page: 2,
-          textUthmani: 'وإذ أخذنا ميثاق بني إسرائيل',
-          textImlaei: 'واذ اخذنا ميثاق بني اسرائيل',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'Medinan',
+            ayahCount: 286,
+            pagesStart: 2,
+            pagesEnd: 49,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(8),
+            surahId: 2,
+            numberInSurah: 83,
+            juz: 1,
+            page: 2,
+            textUthmani: 'وإذ أخذنا ميثاق بني إسرائيل',
+            textImlaei: 'واذ اخذنا ميثاق بني اسرائيل',
+          ),
+        );
     await city.select(cairoCity);
     await lastRead.saveAyahId(8);
   });
@@ -90,8 +98,9 @@ void main() {
     return cubit;
   }
 
-  testWidgets('the dashboard groups every destination under a named section',
-      (tester) async {
+  testWidgets('the dashboard groups every destination under a named section', (
+    tester,
+  ) async {
     await pumpDashboard(tester);
 
     expect(find.text('القرآن والاستماع'), findsOneWidget);
@@ -103,8 +112,9 @@ void main() {
     }
   });
 
-  testWidgets('the next-prayer hero shows the city, the time and a countdown',
-      (tester) async {
+  testWidgets('the next-prayer hero shows the city, the time and a countdown', (
+    tester,
+  ) async {
     await pumpDashboard(tester);
 
     expect(find.text('الصلاة القادمة'), findsOneWidget);
@@ -119,12 +129,16 @@ void main() {
         .widgetList<Text>(find.byType(Text))
         .where((t) => t.data != null && _clock.hasMatch(t.data!))
         .toList();
-    expect(clocks, hasLength(1),
-        reason: 'the hero renders exactly one countdown line');
+    expect(
+      clocks,
+      hasLength(1),
+      reason: 'the hero renders exactly one countdown line',
+    );
   });
 
-  testWidgets('service tiles stay at least 48 dp at a 1.0 text scale',
-      (tester) async {
+  testWidgets('service tiles stay at least 48 dp at a 1.0 text scale', (
+    tester,
+  ) async {
     await pumpDashboard(tester);
 
     for (final element in find.byType(ServiceTile).evaluate()) {
@@ -134,8 +148,9 @@ void main() {
     }
   });
 
-  testWidgets('textScale 2.0: the groups grow instead of clipping labels',
-      (tester) async {
+  testWidgets('textScale 2.0: the groups grow instead of clipping labels', (
+    tester,
+  ) async {
     await pumpDashboard(tester, textScale: 2.0);
 
     expect(tester.takeException(), isNull);

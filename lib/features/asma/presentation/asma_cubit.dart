@@ -9,8 +9,8 @@ class AsmaCubit extends Cubit<AsmaState> {
   /// Creates the cubit; the constructor is side-effect free and does no
   /// work — [start] performs the first load.
   AsmaCubit({required AsmaRepository repository})
-      : _repository = repository,
-        super(const AsmaState.loading());
+    : _repository = repository,
+      super(const AsmaState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -25,8 +25,12 @@ class AsmaCubit extends Cubit<AsmaState> {
       if (isClosed) return;
       emit(AsmaState.ready(names: names));
     } on Object catch (error, stackTrace) {
-      appLog('asma load failed',
-          name: 'quran_yahdi/asma', error: error, stackTrace: stackTrace);
+      appLog(
+        'asma load failed',
+        name: 'quran_yahdi/asma',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const AsmaState.failed());
     }

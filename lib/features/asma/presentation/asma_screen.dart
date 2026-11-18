@@ -34,10 +34,10 @@ const TextStyle _sheetMeaningArStyle = TextStyle(
 );
 
 TextStyle _sheetNameEnStyle(ColorScheme colors) => TextStyle(
-      fontSize: AppType.title,
-      fontWeight: FontWeight.bold,
-      color: colors.primary,
-    );
+  fontSize: AppType.title,
+  fontWeight: FontWeight.bold,
+  color: colors.primary,
+);
 
 class AsmaScreen extends StatelessWidget {
   const AsmaScreen({super.key});
@@ -60,19 +60,22 @@ class AsmaScreen extends StatelessWidget {
             body: AppContentFrame.grid(
               child: switch (state) {
                 AsmaLoading() => const LoadingView(),
-                AsmaFailed() =>
-                  errorPane(loc, onRetry: context.read<AsmaCubit>().start),
-                AsmaReady(:final names) when names.isEmpty =>
-                  EmptyState(loc.noResults),
+                AsmaFailed() => errorPane(
+                  loc,
+                  onRetry: context.read<AsmaCubit>().start,
+                ),
+                AsmaReady(:final names) when names.isEmpty => EmptyState(
+                  loc.noResults,
+                ),
                 AsmaReady(:final names, :final selected) => Stack(
-                    children: [
-                      _NamesGrid(names: names),
-                      if (selected != null) ...[
-                        const Positioned.fill(child: _Scrim()),
-                        _NameSheet(name: selected),
-                      ],
+                  children: [
+                    _NamesGrid(names: names),
+                    if (selected != null) ...[
+                      const Positioned.fill(child: _Scrim()),
+                      _NameSheet(name: selected),
                     ],
-                  ),
+                  ],
+                ),
               },
             ),
           ),
@@ -195,17 +198,15 @@ class _NameCell extends StatelessWidget {
       onTap: () => context.read<AsmaCubit>().select(name),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: colors.surfaceContainerHighest
-              .withValues(alpha: AppColors.mutedSurfaceAlpha),
+          color: colors.surfaceContainerHighest.withValues(
+            alpha: AppColors.mutedSurfaceAlpha,
+          ),
           borderRadius: BorderRadius.circular(AppRadius.panel),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              loc.number(name.n),
-              style: AppTheme.mutedAt(colors, 10),
-            ),
+            Text(loc.number(name.n), style: AppTheme.mutedAt(colors, 10)),
             const SizedBox(height: AppSpacing.xs),
             FittedBox(
               fit: BoxFit.scaleDown,
@@ -244,9 +245,7 @@ class _Scrim extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: () => context.read<AsmaCubit>().select(null),
         child: ColoredBox(
-          color: Theme.of(context)
-              .colorScheme
-              .scrim
+          color: Theme.of(context).colorScheme.scrim
               .withValues(alpha: AppColors.scrimAlpha),
         ),
       ),

@@ -88,11 +88,10 @@ Widget _host({required Widget home, double? textScale}) {
     builder: textScale == null
         ? null
         : (context, child) => MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: TextScaler.linear(textScale),
-              ),
-              child: child!,
-            ),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
   );
 }
 
@@ -106,14 +105,19 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('البداية'), findsOneWidget);
     expect(find.text('اختر مدينتك'), findsOneWidget);
@@ -121,8 +125,9 @@ void main() {
     expect(find.text('ابدأ الاستخدام'), findsOneWidget);
   });
 
-  testWidgets('the city step opens the flow-scoped picker route',
-      (tester) async {
+  testWidgets('the city step opens the flow-scoped picker route', (
+    tester,
+  ) async {
     final cubit = OnboardingCubit(
       city: _City(null),
       status: _Status(),
@@ -131,18 +136,26 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('اختر مدينتك'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // A sub-route of the flow, not the standalone picker: while the flag is
     // unset the gate redirects every other route, which used to collapse the
@@ -160,18 +173,26 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('ابدأ الاستخدام'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(status.writes, 1);
     expect(status.completed, isTrue);
@@ -187,24 +208,33 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('تخطّي'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(status.writes, 1);
   });
 
-  testWidgets('a selected city shows its name and a change action',
-      (tester) async {
+  testWidgets('a selected city shows its name and a change action', (
+    tester,
+  ) async {
     final cubit = OnboardingCubit(
       city: _City(_cairo),
       status: _Status(),
@@ -213,21 +243,27 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('المدينة: القاهرة'), findsOneWidget);
     expect(find.text('تغيير المدينة'), findsOneWidget);
   });
 
-  testWidgets('the reminder action asks through the scheduler seam',
-      (tester) async {
+  testWidgets('the reminder action asks through the scheduler seam', (
+    tester,
+  ) async {
     final scheduler = _Scheduler();
     final cubit = OnboardingCubit(
       city: _City(null),
@@ -237,25 +273,34 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('تفعيل'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(scheduler.requests, 1);
     expect(find.text('التنبيهات مفعّلة'), findsOneWidget);
   });
 
-  testWidgets('320 dp at textScale 2.0 keeps the step action intact',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 keeps the step action intact', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -268,15 +313,20 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(_host(
-      textScale: 2.0,
-      home: BlocProvider<OnboardingCubit>.value(
-        value: cubit,
-        child: const OnboardingScreen(),
+    await tester.pumpWidget(
+      _host(
+        textScale: 2.0,
+        home: BlocProvider<OnboardingCubit>.value(
+          value: cubit,
+          child: const OnboardingScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('تغيير المدينة'), findsOneWidget);

@@ -10,13 +10,13 @@ export '../domain/tracker_day.dart';
 /// The prayers marked on one calendar day as stored in the database; the
 /// pure record lives in [tracker_day.dart].
 TrackerDay trackerDayFromRow(PrayerLogData row) => TrackerDay(
-      day: dateOnly(row.day),
-      fajr: row.fajr,
-      dhuhr: row.dhuhr,
-      asr: row.asr,
-      maghrib: row.maghrib,
-      isha: row.isha,
-    );
+  day: dateOnly(row.day),
+  fajr: row.fajr,
+  dhuhr: row.dhuhr,
+  asr: row.asr,
+  maghrib: row.maghrib,
+  isha: row.isha,
+);
 
 /// Reads and toggles the daily prayer log.
 class PrayerLogRepository {
@@ -27,9 +27,9 @@ class PrayerLogRepository {
   /// The marked prayers of [day]; an unmarked day returns all-false.
   Future<TrackerDay> dayView(DateTime day) async {
     final key = dateOnly(day);
-    final row = await (_db.select(_db.prayerLog)
-          ..where((p) => p.day.equals(key)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.prayerLog,
+    )..where((p) => p.day.equals(key))).getSingleOrNull();
     return row == null ? TrackerDay.empty(key) : trackerDayFromRow(row);
   }
 
@@ -42,16 +42,26 @@ class PrayerLogRepository {
     final current = await dayView(key);
     final flipped = !current.forSlot(slot);
     final companion = switch (slot) {
-      PrayerSlot.fajr =>
-        PrayerLogCompanion.insert(day: key, fajr: Value(flipped)),
-      PrayerSlot.dhuhr =>
-        PrayerLogCompanion.insert(day: key, dhuhr: Value(flipped)),
-      PrayerSlot.asr =>
-        PrayerLogCompanion.insert(day: key, asr: Value(flipped)),
-      PrayerSlot.maghrib =>
-        PrayerLogCompanion.insert(day: key, maghrib: Value(flipped)),
-      PrayerSlot.isha =>
-        PrayerLogCompanion.insert(day: key, isha: Value(flipped)),
+      PrayerSlot.fajr => PrayerLogCompanion.insert(
+        day: key,
+        fajr: Value(flipped),
+      ),
+      PrayerSlot.dhuhr => PrayerLogCompanion.insert(
+        day: key,
+        dhuhr: Value(flipped),
+      ),
+      PrayerSlot.asr => PrayerLogCompanion.insert(
+        day: key,
+        asr: Value(flipped),
+      ),
+      PrayerSlot.maghrib => PrayerLogCompanion.insert(
+        day: key,
+        maghrib: Value(flipped),
+      ),
+      PrayerSlot.isha => PrayerLogCompanion.insert(
+        day: key,
+        isha: Value(flipped),
+      ),
     };
     await _db.into(_db.prayerLog).insertOnConflictUpdate(companion);
   }
@@ -62,18 +72,20 @@ class PrayerLogRepository {
   /// lookback would otherwise build thousands of SQL parameters and hit the
   /// engine's variable limit.
   Future<List<DateTime>> markedDaysRange(
-      DateTime fromInclusive, int daysBack) async {
+    DateTime fromInclusive,
+    int daysBack,
+  ) async {
     final from = dateOnly(fromInclusive);
     final start = DateTime(from.year, from.month, from.day - (daysBack - 1));
-    final rows = await (_db.select(_db.prayerLog)
-          ..where((p) => p.day.isBiggerOrEqualValue(start))
-          ..where((p) => p.day.isSmallerOrEqualValue(from)))
-        .get();
+    final rows =
+        await (_db.select(_db.prayerLog)
+              ..where((p) => p.day.isBiggerOrEqualValue(start))
+              ..where((p) => p.day.isSmallerOrEqualValue(from)))
+            .get();
     final marked = <DateTime>{
       for (final row in rows)
         if (trackerDayFromRow(row).anyMarked) dateOnly(row.day),
-    }.toList()
-      ..sort((a, b) => b.compareTo(a));
+    }.toList()..sort((a, b) => b.compareTo(a));
     return marked;
   }
 }

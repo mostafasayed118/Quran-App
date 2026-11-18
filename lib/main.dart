@@ -163,37 +163,43 @@ Future<void> _warmReciterCatalog() async {
   try {
     await getIt<ReciterRepository>().ensureCatalog();
   } on Object catch (error, stackTrace) {
-    appLog('reciter catalog warm-up failed',
-        name: 'quran_yahdi/boot',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'reciter catalog warm-up failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 
 /// Tap-target route for a reminder payload; null for unknown/absent payloads
 /// (the caller falls back to `/home`). Warm taps and cold launches share it.
 String? reminderRouteFor(String? payload) => switch (payload) {
-      prayerReminderPayload => AppRoutes.prayerTimes,
-      azkarReminderPayload => AppRoutes.azkar,
-      wirdReminderPayload => AppRoutes.worship,
-      _ => null,
-    };
+  prayerReminderPayload => AppRoutes.prayerTimes,
+  azkarReminderPayload => AppRoutes.azkar,
+  wirdReminderPayload => AppRoutes.worship,
+  _ => null,
+};
 
 /// Cold-start routing: when the app was launched by tapping a reminder, land
 /// on its own screen instead of home. Best-effort — a launch-details read
 /// failure never breaks boot (W7b discipline).
 Future<void> _openReminderLaunchTarget() async {
   try {
-    final route =
-        reminderRouteFor(await getIt<NotificationsBinding>().launchPayload());
+    final route = reminderRouteFor(
+      await getIt<NotificationsBinding>().launchPayload(),
+    );
     if (route == null) return;
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => AppRouter.router.go(route));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => AppRouter.router.go(route),
+    );
   } on Object catch (error, stackTrace) {
-    appLog('reminder launch routing failed',
-        name: 'quran_yahdi/boot',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'reminder launch routing failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -206,10 +212,12 @@ Future<void> _playAdhanLaunchTarget() async {
     if (trackId == null) return;
     await getIt<AdhanPlayer>().play(trackId);
   } on Object catch (error, stackTrace) {
-    appLog('adhan launch target failed',
-        name: 'quran_yahdi/boot',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'adhan launch target failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -219,13 +227,16 @@ Future<void> _playAdhanLaunchTarget() async {
 Future<void> _requestBootNotificationGrace() async {
   try {
     final azkarEnabled = await getIt<ReminderSettings>().azkarEnabled();
-    await getIt<NotificationsBinding>()
-        .requestBootPermission(azkarEnabled: azkarEnabled);
+    await getIt<NotificationsBinding>().requestBootPermission(
+      azkarEnabled: azkarEnabled,
+    );
   } on Object catch (error, stackTrace) {
-    appLog('boot notification grace failed',
-        name: 'quran_yahdi/boot',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'boot notification grace failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -238,13 +249,16 @@ Future<void> _openDeepLinkLaunchTarget() async {
     if (uri == null) return;
     final route = deepLinkRouteFor(uri);
     if (route == null) return;
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => AppRouter.router.go(route));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => AppRouter.router.go(route),
+    );
   } on Object catch (error, stackTrace) {
-    appLog('deep link launch routing failed',
-        name: 'quran_yahdi/boot',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'deep link launch routing failed',
+      name: 'quran_yahdi/boot',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 
@@ -258,7 +272,8 @@ Future<void> _openDeepLinkLaunchTarget() async {
 Future<void> _attachVersionGate() async {
   try {
     final info = await PackageInfo.fromPlatform();
-    final installed = AppVersion.parse('${info.version}+${info.buildNumber}') ??
+    final installed =
+        AppVersion.parse('${info.version}+${info.buildNumber}') ??
         AppVersion.parse(info.version);
     final gate = getIt<VersionGate>();
     gate.attach(

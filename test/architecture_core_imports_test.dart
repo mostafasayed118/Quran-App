@@ -20,8 +20,9 @@ String? resolveLibTarget(String fileRel, String directive) {
 
 void main() {
   final sources = <String, String>{};
-  for (final f
-      in Directory('lib/core').listSync(recursive: true).whereType<File>()) {
+  for (final f in Directory(
+    'lib/core',
+  ).listSync(recursive: true).whereType<File>()) {
     if (!f.path.endsWith('.dart')) continue;
     if (f.path.endsWith('.g.dart') || f.path.endsWith('.freezed.dart')) {
       continue;
@@ -37,12 +38,16 @@ void main() {
   test('resolver handles package, relative, and foreign directives', () {
     expect(
       resolveLibTarget(
-          'lib/core/db/x.dart', 'package:quran_yahdi/core/domain/city.dart'),
+        'lib/core/db/x.dart',
+        'package:quran_yahdi/core/domain/city.dart',
+      ),
       'lib/core/domain/city.dart',
     );
     expect(
       resolveLibTarget(
-          'lib/core/widgets/x.dart', '../utils/arabic_numbers.dart'),
+        'lib/core/widgets/x.dart',
+        '../utils/arabic_numbers.dart',
+      ),
       'lib/core/utils/arabic_numbers.dart',
     );
     expect(resolveLibTarget('lib/core/db/x.dart', 'dart:io'), isNull);
@@ -66,7 +71,8 @@ void main() {
     expect(
       offenders,
       isEmpty,
-      reason: 'lib/core/ must not depend on lib/features/. Move the shared '
+      reason:
+          'lib/core/ must not depend on lib/features/. Move the shared '
           'contract into lib/core/domain/ and inject the implementation from '
           'lib/app/di/. Offending directives:\n${offenders.join('\n')}',
     );

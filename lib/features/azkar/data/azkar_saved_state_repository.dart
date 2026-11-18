@@ -61,10 +61,7 @@ class AzkarSavedStateRepository implements AzkarSavedStateSource {
           ? <String, List<int>>{...stored.counts}
           : <String, List<int>>{};
       counts[collectionId] = List<int>.unmodifiable(remaining);
-      await _write(
-        progressKey,
-        jsonEncode({'day': day, 'counts': counts}),
-      );
+      await _write(progressKey, jsonEncode({'day': day, 'counts': counts}));
     }();
     _writeQueue = run;
     return run;

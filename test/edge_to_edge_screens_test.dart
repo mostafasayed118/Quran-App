@@ -25,22 +25,27 @@ void main() {
     lastRead = LastReadRepository(db);
     ayahs = AyahRepository(db);
     city = CityRepository(db: db, loader: () async => [cairoCity.toJson()]);
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'Medinan',
-          ayahCount: 286,
-          pagesStart: 2,
-          pagesEnd: 49,
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'Medinan',
+            ayahCount: 286,
+            pagesStart: 2,
+            pagesEnd: 49,
+          ),
+        );
     await city.select(cairoCity);
     await lastRead.saveAyahId(8);
   });
 
   for (final inset in <double>[48, 24]) {
-    testWidgets('home list padding includes the ${inset.toInt()} dp inset',
-        (tester) async {
+    testWidgets('home list padding includes the ${inset.toInt()} dp inset', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(400, 800);
       tester.view.devicePixelRatio = 1;
       tester.view.padding = FakeViewPadding(bottom: inset);

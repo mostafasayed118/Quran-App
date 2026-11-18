@@ -12,10 +12,7 @@ void main() {
   test('readAll stays under the variable ceiling for 1500 keys', () async {
     final db = newLimitedVarDb(limit: 999);
     final store = SettingsStore(db);
-    await store.writeAll(<String, String>{
-      'k0': 'v0',
-      'k1499': 'v1499',
-    });
+    await store.writeAll(<String, String>{'k0': 'v0', 'k1499': 'v1499'});
     final keys = [for (var i = 0; i < 1500; i++) 'k$i'];
 
     final got = await store.readAll(keys);

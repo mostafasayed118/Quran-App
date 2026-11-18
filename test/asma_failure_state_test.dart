@@ -12,17 +12,23 @@ Future<void> pumpAsma(WidgetTester tester, AsmaRepository repository) async {
   final cubit = AsmaCubit(repository: repository);
   addTearDown(cubit.close);
   await cubit.start();
-  await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
-    value: cubit,
-    child: appShell(home: const AsmaScreen()),
-  ));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  await tester.pumpWidget(
+    BlocProvider<AsmaCubit>.value(
+      value: cubit,
+      child: appShell(home: const AsmaScreen()),
+    ),
+  );
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
-  testWidgets('a loader crash shows the localized error pane, not a spinner',
-      (tester) async {
+  testWidgets('a loader crash shows the localized error pane, not a spinner', (
+    tester,
+  ) async {
     await pumpAsma(
       tester,
       AsmaRepository(loader: () async => throw StateError('boom')),
@@ -32,8 +38,9 @@ void main() {
     expect(find.text('عذرًا، حدث خطأ — حاول مرة أخرى'), findsOneWidget);
   });
 
-  testWidgets('an empty dataset shows the empty state, not a blank body',
-      (tester) async {
+  testWidgets('an empty dataset shows the empty state, not a blank body', (
+    tester,
+  ) async {
     await pumpAsma(
       tester,
       AsmaRepository(loader: () async => <Map<String, dynamic>>[]),

@@ -179,19 +179,17 @@ class PrayerConfig {
 
   /// The persisted map, using only string values.
   Map<String, String> toJson() => {
-        methodKey: method.name,
-        madhabKey: madhab.name,
-        enabledPrayersKey:
-            enabledPrayers.map((prayer) => prayer.name).join(','),
-        preAdhanMinutesKey: '$preAdhanMinutes',
-        fajrFollowUpKey: fajrFollowUp ? 'true' : 'false',
-        adjustmentsKey: adjustments.entries
-            .where(
-                (entry) => entry.key != PrayerName.sunrise && entry.value != 0)
-            .map((entry) => '${entry.key.name}:${entry.value}')
-            .join(','),
-        highLatitudeKey: highLatitude.name,
-      };
+    methodKey: method.name,
+    madhabKey: madhab.name,
+    enabledPrayersKey: enabledPrayers.map((prayer) => prayer.name).join(','),
+    preAdhanMinutesKey: '$preAdhanMinutes',
+    fajrFollowUpKey: fajrFollowUp ? 'true' : 'false',
+    adjustmentsKey: adjustments.entries
+        .where((entry) => entry.key != PrayerName.sunrise && entry.value != 0)
+        .map((entry) => '${entry.key.name}:${entry.value}')
+        .join(','),
+    highLatitudeKey: highLatitude.name,
+  };
 
   /// Decodes a persisted map; unknown or missing values fall back to the
   /// historical defaults instead of throwing.
@@ -293,25 +291,21 @@ class PrayerConfig {
 
   @override
   int get hashCode => Object.hash(
-        method,
-        madhab,
-        preAdhanMinutes,
-        fajrFollowUp,
-        highLatitude,
-        Object.hashAllUnordered(enabledPrayers),
-        Object.hashAllUnordered(
-          adjustments.entries
-              .map((entry) => Object.hash(entry.key, entry.value)),
-        ),
-      );
+    method,
+    madhab,
+    preAdhanMinutes,
+    fajrFollowUp,
+    highLatitude,
+    Object.hashAllUnordered(enabledPrayers),
+    Object.hashAllUnordered(
+      adjustments.entries.map((entry) => Object.hash(entry.key, entry.value)),
+    ),
+  );
 
   static bool _samePrayers(Set<PrayerName> a, Set<PrayerName> b) =>
       a.length == b.length && a.containsAll(b);
 
-  static bool _sameAdjustments(
-    Map<PrayerName, int> a,
-    Map<PrayerName, int> b,
-  ) {
+  static bool _sameAdjustments(Map<PrayerName, int> a, Map<PrayerName, int> b) {
     if (a.length != b.length) return false;
     for (final entry in a.entries) {
       if (b[entry.key] != entry.value) return false;

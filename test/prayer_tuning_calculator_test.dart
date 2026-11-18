@@ -10,13 +10,15 @@ void main() {
   final day = DateTime(2026, 11, 1);
 
   test('per-prayer adjustments map into the adhan parameters', () {
-    final params = parametersFor(const PrayerConfig(
-      adjustments: {
-        PrayerName.fajr: 5,
-        PrayerName.dhuhr: -2,
-        PrayerName.isha: 7,
-      },
-    ));
+    final params = parametersFor(
+      const PrayerConfig(
+        adjustments: {
+          PrayerName.fajr: 5,
+          PrayerName.dhuhr: -2,
+          PrayerName.isha: 7,
+        },
+      ),
+    );
 
     expect(params.adjustments.fajr, 5);
     expect(params.adjustments.dhuhr, -2);
@@ -41,30 +43,34 @@ void main() {
 
   test('every high-latitude rule maps to its adhan enum', () {
     expect(
-      parametersFor(const PrayerConfig(
-        highLatitude: PrayerHighLatitudeRule.middleOfTheNight,
-      )).highLatitudeRule,
+      parametersFor(
+        const PrayerConfig(
+          highLatitude: PrayerHighLatitudeRule.middleOfTheNight,
+        ),
+      ).highLatitudeRule,
       HighLatitudeRule.middle_of_the_night,
     );
     expect(
-      parametersFor(const PrayerConfig(
-        highLatitude: PrayerHighLatitudeRule.seventhOfTheNight,
-      )).highLatitudeRule,
+      parametersFor(
+        const PrayerConfig(
+          highLatitude: PrayerHighLatitudeRule.seventhOfTheNight,
+        ),
+      ).highLatitudeRule,
       HighLatitudeRule.seventh_of_the_night,
     );
     expect(
-      parametersFor(const PrayerConfig(
-        highLatitude: PrayerHighLatitudeRule.twilightAngle,
-      )).highLatitudeRule,
+      parametersFor(
+        const PrayerConfig(highLatitude: PrayerHighLatitudeRule.twilightAngle),
+      ).highLatitudeRule,
       HighLatitudeRule.twilight_angle,
     );
   });
 
   test('the none rule keeps the method default', () {
     final defaultRule = parametersFor(PrayerConfig.egyptian).highLatitudeRule;
-    final none = parametersFor(const PrayerConfig(
-      highLatitude: PrayerHighLatitudeRule.none,
-    )).highLatitudeRule;
+    final none = parametersFor(
+      const PrayerConfig(highLatitude: PrayerHighLatitudeRule.none),
+    ).highLatitudeRule;
 
     expect(none, defaultRule);
   });
@@ -81,9 +87,9 @@ void main() {
       ),
     );
 
-    expect(
-      (seventh[0].time, seventh[5].time),
-      isNot((base[0].time, base[5].time)),
-    );
+    expect((
+      seventh[0].time,
+      seventh[5].time,
+    ), isNot((base[0].time, base[5].time)));
   });
 }

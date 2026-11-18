@@ -20,7 +20,10 @@ class GatedHadithDownloader extends PackDownloader {
 
   @override
   Future<(List<(int, String)>, bool)> hadithPage(
-      String packId, int offset, int limit) async {
+    String packId,
+    int offset,
+    int limit,
+  ) async {
     if (offset == 0) {
       return (<(int, String)>[(1, 'first')], true);
     }

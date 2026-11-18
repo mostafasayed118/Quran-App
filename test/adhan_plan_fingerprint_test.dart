@@ -5,12 +5,12 @@ import 'package:quran_yahdi/features/notifications/data/notifications_binding.da
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 
 ScheduledReminder prayerReminder({String? adhanId}) => ScheduledReminder(
-      id: prayerReminderId,
-      fireAt: DateTime.utc(2026, 3, 15, 4, 45),
-      title: 'prayer:fajr',
-      payload: prayerReminderPayload,
-      adhanId: adhanId,
-    );
+  id: prayerReminderId,
+  fireAt: DateTime.utc(2026, 3, 15, 4, 45),
+  title: 'prayer:fajr',
+  payload: prayerReminderPayload,
+  adhanId: adhanId,
+);
 
 void main() {
   test('an unchanged plan keeps the same fingerprint', () {
@@ -26,9 +26,11 @@ void main() {
     // restart happens to change something else.
     expect(
       NotificationsBinding.planFingerprint([prayerReminder(adhanId: 'khushu')]),
-      isNot(NotificationsBinding.planFingerprint(
-        [prayerReminder(adhanId: 'omar_hisham')],
-      )),
+      isNot(
+        NotificationsBinding.planFingerprint([
+          prayerReminder(adhanId: 'omar_hisham'),
+        ]),
+      ),
     );
   });
 
@@ -45,12 +47,14 @@ void main() {
       fireAt: DateTime.utc(2026, 3, 15, 4, 30),
       title: 'azkar',
     );
-    final a = NotificationsBinding.planFingerprint(
-      [prayerReminder(adhanId: 'khushu'), azkar],
-    );
-    final b = NotificationsBinding.planFingerprint(
-      [azkar, prayerReminder(adhanId: 'khushu')],
-    );
+    final a = NotificationsBinding.planFingerprint([
+      prayerReminder(adhanId: 'khushu'),
+      azkar,
+    ]);
+    final b = NotificationsBinding.planFingerprint([
+      azkar,
+      prayerReminder(adhanId: 'khushu'),
+    ]);
     expect(a, b);
   });
 }

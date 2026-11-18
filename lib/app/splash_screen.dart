@@ -38,8 +38,11 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
-  late final AnimationController _fade =
-      AnimationController(vsync: this, value: 1, duration: SplashScreen.fade);
+  late final AnimationController _fade = AnimationController(
+    vsync: this,
+    value: 1,
+    duration: SplashScreen.fade,
+  );
   late final AnimationController _bar = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 1400),
@@ -114,12 +117,15 @@ class _SplashContent extends StatelessWidget {
       alpha: dark ? AppColors.splashFooterDark : AppColors.splashFooterLight,
     );
     final track = dark ? AppColors.darkHairline : AppColors.hairline;
-    final glowAlpha =
-        dark ? AppColors.splashGlowDark : AppColors.splashGlowLight;
-    final ringAlpha1 =
-        dark ? AppColors.splashRing1Dark : AppColors.splashRing1Light;
-    final ringAlpha2 =
-        dark ? AppColors.splashRing2Dark : AppColors.splashRing2Light;
+    final glowAlpha = dark
+        ? AppColors.splashGlowDark
+        : AppColors.splashGlowLight;
+    final ringAlpha1 = dark
+        ? AppColors.splashRing1Dark
+        : AppColors.splashRing1Light;
+    final ringAlpha2 = dark
+        ? AppColors.splashRing2Dark
+        : AppColors.splashRing2Light;
 
     return ExcludeSemantics(
       child: ColoredBox(
@@ -182,8 +188,9 @@ class _SplashContent extends StatelessWidget {
                             shape: BoxShape.circle,
                             gradient: RadialGradient(
                               colors: [
-                                AppColors.splashGlowGold
-                                    .withValues(alpha: glowAlpha),
+                                AppColors.splashGlowGold.withValues(
+                                  alpha: glowAlpha,
+                                ),
                                 AppColors.splashGlowGold.withValues(alpha: 0),
                               ],
                               stops: const <double>[0, .72],
@@ -197,8 +204,9 @@ class _SplashContent extends StatelessWidget {
                             height: cardSize * ringScale,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: AppColors.gold
-                                    .withValues(alpha: ringAlpha1),
+                                color: AppColors.gold.withValues(
+                                  alpha: ringAlpha1,
+                                ),
                                 width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -212,8 +220,9 @@ class _SplashContent extends StatelessWidget {
                             height: cardSize * ringScale,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: AppColors.gold
-                                    .withValues(alpha: ringAlpha2),
+                                color: AppColors.gold.withValues(
+                                  alpha: ringAlpha2,
+                                ),
                                 width: AppStrokes.ring,
                               ),
                               borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -317,16 +326,16 @@ class _CornerGlow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: 190,
-        height: 190,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [color, color.withValues(alpha: 0)],
-            stops: const <double>[0, .75],
-          ),
-        ),
-      );
+    width: 190,
+    height: 190,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      gradient: RadialGradient(
+        colors: [color, color.withValues(alpha: 0)],
+        stops: const <double>[0, .75],
+      ),
+    ),
+  );
 }
 
 class _LoadingTrack extends StatelessWidget {
@@ -340,29 +349,29 @@ class _LoadingTrack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        child: SizedBox(
-          width: width,
-          height: 3,
-          child: Stack(
-            children: [
-              ColoredBox(color: track),
-              AnimatedBuilder(
-                animation: animation,
-                builder: (context, _) {
-                  final t = Curves.easeInOut.transform(animation.value);
-                  final left = -segment + t * (width + segment * 2);
-                  return Positioned(
-                    left: left,
-                    top: 0,
-                    bottom: 0,
-                    width: segment,
-                    child: const ColoredBox(color: AppColors.gold),
-                  );
-                },
-              ),
-            ],
+    borderRadius: BorderRadius.circular(AppRadius.pill),
+    child: SizedBox(
+      width: width,
+      height: 3,
+      child: Stack(
+        children: [
+          ColoredBox(color: track),
+          AnimatedBuilder(
+            animation: animation,
+            builder: (context, _) {
+              final t = Curves.easeInOut.transform(animation.value);
+              final left = -segment + t * (width + segment * 2);
+              return Positioned(
+                left: left,
+                top: 0,
+                bottom: 0,
+                width: segment,
+                child: const ColoredBox(color: AppColors.gold),
+              );
+            },
           ),
-        ),
-      );
+        ],
+      ),
+    ),
+  );
 }

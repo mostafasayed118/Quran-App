@@ -22,11 +22,18 @@ void main() {
       }
       break;
     }
-    expect(version, isNotEmpty,
-        reason: 'pubspec.lock has no flutter_local_notifications version');
-    expect(version, '22.3.2',
-        reason: 'the alarm probe identity was verified against 22.3.2 only. '
-            'Re-read getBroadcastPendingIntent() in the new plugin source, '
-            're-run the device probe, then update this pin.');
+    expect(
+      version,
+      isNotEmpty,
+      reason: 'pubspec.lock has no flutter_local_notifications version',
+    );
+    expect(
+      version,
+      '22.3.2',
+      reason:
+          'the alarm probe identity was verified against 22.3.2 only. '
+          'Re-read getBroadcastPendingIntent() in the new plugin source, '
+          're-run the device probe, then update this pin.',
+    );
   });
 }

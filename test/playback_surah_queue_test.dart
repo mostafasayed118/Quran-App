@@ -14,23 +14,25 @@ import 'support/fake_playback_service.dart';
 import 'support/test_db.dart';
 
 int? _number(PlaybackState state) => switch (state) {
-      PlaybackPlaying(:final surahNumber) => surahNumber,
-      PlaybackPaused(:final surahNumber) => surahNumber,
-      PlaybackLoading(:final surahNumber) => surahNumber,
-      _ => null,
-    };
+  PlaybackPlaying(:final surahNumber) => surahNumber,
+  PlaybackPaused(:final surahNumber) => surahNumber,
+  PlaybackLoading(:final surahNumber) => surahNumber,
+  _ => null,
+};
 
 String? _name(PlaybackState state) => switch (state) {
-      PlaybackPlaying(:final surahName) => surahName,
-      PlaybackPaused(:final surahName) => surahName,
-      PlaybackLoading(:final surahName) => surahName,
-      _ => null,
-    };
+  PlaybackPlaying(:final surahName) => surahName,
+  PlaybackPaused(:final surahName) => surahName,
+  PlaybackLoading(:final surahName) => surahName,
+  _ => null,
+};
 
 void main() {
   test('next/previous walk the reciter surah list, not 1..114', () async {
     final db = newTestDb();
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'قارئ',
@@ -43,17 +45,21 @@ void main() {
     for (final (id, name) in [
       (1, 'الفاتحة'),
       (3, 'آل عمران'),
-      (7, 'الأعراف')
+      (7, 'الأعراف'),
     ]) {
-      await db.into(db.surahs).insert(SurahsCompanion.insert(
-            id: Value(id),
-            nameAr: name,
-            nameEn: name,
-            revelationType: 'makkah',
-            ayahCount: 7,
-            pagesStart: 1,
-            pagesEnd: 1,
-          ));
+      await db
+          .into(db.surahs)
+          .insert(
+            SurahsCompanion.insert(
+              id: Value(id),
+              nameAr: name,
+              nameEn: name,
+              revelationType: 'makkah',
+              ayahCount: 7,
+              pagesStart: 1,
+              pagesEnd: 1,
+            ),
+          );
     }
     final row = (await ReciterRepository(db).byId('51-53'))!;
     final cubit = PlaybackCubit(
@@ -74,8 +80,11 @@ void main() {
     expect(cubit.hasPreviousSurah, isFalse);
 
     await cubit.nextSurah();
-    expect(_number(cubit.state), 3,
-        reason: 'surah 2 is not in this reciter\'s list');
+    expect(
+      _number(cubit.state),
+      3,
+      reason: 'surah 2 is not in this reciter\'s list',
+    );
     expect(_name(cubit.state), 'آل عمران');
 
     await cubit.nextSurah();
@@ -89,7 +98,9 @@ void main() {
 
   test('an empty surah list keeps the 1..114 fallback', () async {
     final db = newTestDb();
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'قارئ',

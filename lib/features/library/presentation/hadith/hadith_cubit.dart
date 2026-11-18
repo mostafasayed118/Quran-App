@@ -14,11 +14,11 @@ class HadithCubit extends Cubit<HadithState> {
     required String packId,
     HadithBookmarkSource? bookmarks,
     HadithPositionSource? positions,
-  })  : _downloader = downloader,
-        _packId = packId,
-        _bookmarks = bookmarks,
-        _positions = positions,
-        super(const HadithState.loading());
+  }) : _downloader = downloader,
+       _packId = packId,
+       _bookmarks = bookmarks,
+       _positions = positions,
+       super(const HadithState.loading());
 
   /// Starts the route-scoped load at the saved position.
   Future<void> start() async {
@@ -26,15 +26,23 @@ class HadithCubit extends Cubit<HadithState> {
       _bookmarked = await _bookmarks?.load(_packId) ?? <int>{};
     } on Object catch (error, stackTrace) {
       _bookmarksLoaded = false;
-      appLog('hadith bookmarks load failed',
-          name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith bookmarks load failed',
+        name: 'quran_yahdi/hadith',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     var offset = 0;
     try {
       offset = await _positions?.load(_packId) ?? 0;
     } on Object catch (error, stackTrace) {
-      appLog('hadith position load failed',
-          name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith position load failed',
+        name: 'quran_yahdi/hadith',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     _browseOffset = offset;
     await _load(offset);
@@ -119,8 +127,12 @@ class HadithCubit extends Cubit<HadithState> {
           emit(current.copyWith(bookmarked: _bookmarked));
         }
       } on Object catch (error, stackTrace) {
-        appLog('hadith bookmarks reload failed',
-            name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+        appLog(
+          'hadith bookmarks reload failed',
+          name: 'quran_yahdi/hadith',
+          error: error,
+          stackTrace: stackTrace,
+        );
         return; // never save a set we could not read
       }
     }
@@ -135,8 +147,12 @@ class HadithCubit extends Cubit<HadithState> {
     try {
       await _bookmarks?.save(_packId, next);
     } on Object catch (error, stackTrace) {
-      appLog('hadith bookmark save failed',
-          name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith bookmark save failed',
+        name: 'quran_yahdi/hadith',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _bookmarked = previous;
       final latest = state;
       if (!isClosed && latest is HadithReady) {
@@ -206,8 +222,12 @@ class HadithCubit extends Cubit<HadithState> {
           );
         }
       } on Object catch (error, stackTrace) {
-        appLog('hadith load failed',
-            name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+        appLog(
+          'hadith load failed',
+          name: 'quran_yahdi/hadith',
+          error: error,
+          stackTrace: stackTrace,
+        );
         if (isClosed) return;
         emit(const HadithState.failed());
         return;
@@ -221,23 +241,29 @@ class HadithCubit extends Cubit<HadithState> {
       _query = q;
       _bookmarksOnly = only;
       if (isClosed) return;
-      emit(HadithState.ready(
-        packTitle: packTitle,
-        language: language,
-        items: items,
-        offset: effectiveOffset,
-        hasMore: hasMore,
-        query: q,
-        bookmarksOnly: only,
-        bookmarked: _bookmarked,
-      ));
+      emit(
+        HadithState.ready(
+          packTitle: packTitle,
+          language: language,
+          items: items,
+          offset: effectiveOffset,
+          hasMore: hasMore,
+          query: q,
+          bookmarksOnly: only,
+          bookmarked: _bookmarked,
+        ),
+      );
       if (!only && q.isEmpty) {
         _browseOffset = effectiveOffset;
         try {
           await _positions?.save(_packId, effectiveOffset);
         } on Object catch (error, stackTrace) {
-          appLog('hadith position save failed',
-              name: 'quran_yahdi/hadith', error: error, stackTrace: stackTrace);
+          appLog(
+            'hadith position save failed',
+            name: 'quran_yahdi/hadith',
+            error: error,
+            stackTrace: stackTrace,
+          );
         }
       }
     } finally {

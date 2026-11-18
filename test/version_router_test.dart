@@ -23,9 +23,9 @@ class _MandatorySource implements VersionPolicySource {
 
   @override
   Future<VersionPolicy?> fetch() async => const VersionPolicy(
-        minSupported: AppVersion(2, 0, 0),
-        latest: AppVersion(2, 0, 0),
-      );
+    minSupported: AppVersion(2, 0, 0),
+    latest: AppVersion(2, 0, 0),
+  );
 }
 
 class _MemoryAckStore implements VersionAckStore {
@@ -39,22 +39,24 @@ class _MemoryAckStore implements VersionAckStore {
 }
 
 void main() {
-  test('a mandatory policy in the app router blocks every route to /update',
-      () async {
-    addTearDown(AppRouter.onboardingGate.reset);
-    addTearDown(AppRouter.versionGate.reset);
-    AppRouter.onboardingGate.attach(_Status(completed: true));
-    await Future<void>.delayed(Duration.zero);
-    AppRouter.versionGate.attach(
-      source: const _MandatorySource(),
-      ackStore: _MemoryAckStore(),
-      installed: const AppVersion(1, 0, 0),
-    );
-    await AppRouter.versionGate.settled;
+  test(
+    'a mandatory policy in the app router blocks every route to /update',
+    () async {
+      addTearDown(AppRouter.onboardingGate.reset);
+      addTearDown(AppRouter.versionGate.reset);
+      AppRouter.onboardingGate.attach(_Status(completed: true));
+      await Future<void>.delayed(Duration.zero);
+      AppRouter.versionGate.attach(
+        source: const _MandatorySource(),
+        ackStore: _MemoryAckStore(),
+        installed: const AppVersion(1, 0, 0),
+      );
+      await AppRouter.versionGate.settled;
 
-    expect(AppRouter.redirectFor(AppRoutes.home), AppRoutes.update);
-    expect(AppRouter.redirectFor(AppRoutes.update), isNull);
-  });
+      expect(AppRouter.redirectFor(AppRoutes.home), AppRoutes.update);
+      expect(AppRouter.redirectFor(AppRoutes.update), isNull);
+    },
+  );
 
   test('the router stays navigable when the version gate never attaches', () {
     AppRouter.versionGate.reset();

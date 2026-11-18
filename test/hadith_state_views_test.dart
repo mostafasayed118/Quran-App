@@ -25,8 +25,10 @@ class _CannedPageDownloader extends PackDownloader {
 
   @override
   Future<(List<(int, String)>, bool)> hadithPage(
-          String packId, int offset, int limit) async =>
-      (items, hasMore);
+    String packId,
+    int offset,
+    int limit,
+  ) async => (items, hasMore);
 }
 
 void main() {
@@ -45,14 +47,18 @@ void main() {
     String language = 'ar',
     String title = 'صحيح البخاري',
   }) async {
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: packId,
-          kind: 'hadith',
-          language: language,
-          title: title,
-          sizeMb: 4.2,
-          version: '1',
-        ));
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: packId,
+            kind: 'hadith',
+            language: language,
+            title: title,
+            sizeMb: 4.2,
+            version: '1',
+          ),
+        );
   }
 
   Future<HadithCubit> pumpScreen(
@@ -65,19 +71,22 @@ void main() {
     final cubit = HadithCubit(downloader: downloader, packId: packId);
     addTearDown(cubit.close);
     if (start) await cubit.start();
-    await tester.pumpWidget(appShell(
-      textScale: textScale,
-      home: BlocProvider<HadithCubit>.value(
-        value: cubit,
-        child: const HadithScreen(),
+    await tester.pumpWidget(
+      appShell(
+        textScale: textScale,
+        home: BlocProvider<HadithCubit>.value(
+          value: cubit,
+          child: const HadithScreen(),
+        ),
       ),
-    ));
+    );
     await tester.pump();
     return cubit;
   }
 
-  testWidgets('empty pack renders the empty state and no pager',
-      (tester) async {
+  testWidgets('empty pack renders the empty state and no pager', (
+    tester,
+  ) async {
     await seedPack();
     await pumpScreen(tester, downloader: _CannedPageDownloader(db));
 
@@ -100,38 +109,35 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 
-  testWidgets('language chip shows the localized name, not the raw code',
-      (tester) async {
+  testWidgets('language chip shows the localized name, not the raw code', (
+    tester,
+  ) async {
     await seedPack();
     await pumpScreen(
       tester,
-      downloader: _CannedPageDownloader(
-        db,
-        items: const [(1, 'حديثٌ أوّل')],
-      ),
+      downloader: _CannedPageDownloader(db, items: const [(1, 'حديثٌ أوّل')]),
     );
 
     expect(find.text('العربية'), findsOneWidget);
     expect(find.text('AR'), findsNothing);
   });
 
-  testWidgets('unknown language codes fall back to the raw code',
-      (tester) async {
+  testWidgets('unknown language codes fall back to the raw code', (
+    tester,
+  ) async {
     await seedPack(packId: 'ur-pack', language: 'ur', title: 'Urdu pack');
     await pumpScreen(
       tester,
       packId: 'ur-pack',
-      downloader: _CannedPageDownloader(
-        db,
-        items: const [(1, 'حديث')],
-      ),
+      downloader: _CannedPageDownloader(db, items: const [(1, 'حديث')]),
     );
 
     expect(find.text('UR'), findsOneWidget);
   });
 
-  testWidgets('rows survive textScaler 2.0 without overflowing',
-      (tester) async {
+  testWidgets('rows survive textScaler 2.0 without overflowing', (
+    tester,
+  ) async {
     await seedPack();
     await pumpScreen(
       tester,

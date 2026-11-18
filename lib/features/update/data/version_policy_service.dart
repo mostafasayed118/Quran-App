@@ -58,15 +58,16 @@ class VersionPolicyService implements VersionPolicySource, VersionPolicyCache {
     String? publicKeyB64,
     bool? isRelease,
     Duration maxCacheAge = const Duration(days: 30),
-  })  : _db = db,
-        _clock = clock ?? DateTime.now,
-        _publicKeyB64 = publicKeyB64 ?? policyPublicKeyB64,
-        _isRelease = isRelease ?? kReleaseMode,
-        _maxCacheAge = maxCacheAge,
-        _client = client ??
-            (Dio()
-              ..options.connectTimeout = const Duration(seconds: 8)
-              ..options.receiveTimeout = const Duration(seconds: 8));
+  }) : _db = db,
+       _clock = clock ?? DateTime.now,
+       _publicKeyB64 = publicKeyB64 ?? policyPublicKeyB64,
+       _isRelease = isRelease ?? kReleaseMode,
+       _maxCacheAge = maxCacheAge,
+       _client =
+           client ??
+           (Dio()
+             ..options.connectTimeout = const Duration(seconds: 8)
+             ..options.receiveTimeout = const Duration(seconds: 8));
 
   /// The compile-time Ed25519 public key (base64) a policy must be signed with.
   ///
@@ -76,8 +77,9 @@ class VersionPolicyService implements VersionPolicySource, VersionPolicyCache {
   /// account cannot wall installed apps. A release build with an empty key
   /// rejects every policy instead of trusting an unsigned one; debug builds
   /// keep the legacy unsigned path for local development.
-  static const String policyPublicKeyB64 =
-      String.fromEnvironment('QURAN_VERSION_POLICY_PUBLIC_KEY');
+  static const String policyPublicKeyB64 = String.fromEnvironment(
+    'QURAN_VERSION_POLICY_PUBLIC_KEY',
+  );
 
   /// The largest document this app will read. The real one is ~200 bytes.
   static const int maxPolicyBytes = 64 * 1024;
@@ -241,7 +243,7 @@ class VersionPolicyService implements VersionPolicySource, VersionPolicyCache {
 
   @override
   Future<void> write(String rawJson) => _settings.writeAll({
-        versionPolicyCacheKey: rawJson,
-        versionPolicyCacheAtKey: _clock().toUtc().toIso8601String(),
-      });
+    versionPolicyCacheKey: rawJson,
+    versionPolicyCacheAtKey: _clock().toUtc().toIso8601String(),
+  });
 }

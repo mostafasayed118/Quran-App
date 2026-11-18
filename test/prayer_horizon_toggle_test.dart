@@ -7,29 +7,29 @@ import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_scheduling.dart';
 
 List<PrayerChoice> _day(DateTime day) => <PrayerChoice>[
-      PrayerChoice(
-          PrayerName.fajr, DateTime(day.year, day.month, day.day, 4, 45)),
-      PrayerChoice(
-          PrayerName.sunrise, DateTime(day.year, day.month, day.day, 6, 10)),
-      PrayerChoice(
-          PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12, 5)),
-      PrayerChoice(
-          PrayerName.asr, DateTime(day.year, day.month, day.day, 15, 35)),
-      PrayerChoice(
-          PrayerName.maghrib, DateTime(day.year, day.month, day.day, 18, 5)),
-      PrayerChoice(
-          PrayerName.isha, DateTime(day.year, day.month, day.day, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(day.year, day.month, day.day, 4, 45)),
+  PrayerChoice(
+    PrayerName.sunrise,
+    DateTime(day.year, day.month, day.day, 6, 10),
+  ),
+  PrayerChoice(PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(day.year, day.month, day.day, 15, 35)),
+  PrayerChoice(
+    PrayerName.maghrib,
+    DateTime(day.year, day.month, day.day, 18, 5),
+  ),
+  PrayerChoice(PrayerName.isha, DateTime(day.year, day.month, day.day, 19, 30)),
+];
 
 class _City implements CitySource {
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
   @override
   Future<void> select(City city) async {}
 }
@@ -105,9 +105,6 @@ void main() {
 
   test('prayer reminders on still schedules the horizon', () async {
     final plan = await run(prayerEnabled: true);
-    expect(
-      plan.where((r) => r.payload == prayerReminderPayload),
-      isNotEmpty,
-    );
+    expect(plan.where((r) => r.payload == prayerReminderPayload), isNotEmpty);
   });
 }

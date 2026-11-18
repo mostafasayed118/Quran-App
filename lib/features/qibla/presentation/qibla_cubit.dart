@@ -20,11 +20,11 @@ class QiblaCubit extends Cubit<QiblaState> {
     required QiblaService qibla,
     HeadingService? heading,
     CompassCalibration? calibration,
-  })  : _city = city,
-        _qibla = qibla,
-        _headingService = heading,
-        _calibration = calibration,
-        super(const QiblaState.loading());
+  }) : _city = city,
+       _qibla = qibla,
+       _headingService = heading,
+       _calibration = calibration,
+       super(const QiblaState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -54,18 +54,25 @@ class QiblaCubit extends Cubit<QiblaState> {
     try {
       final selected = await _city.selectedCity();
       if (isClosed) return;
-      final bearing =
-          selected == null ? null : _qibla.bearingDeg(selected.coordinates);
-      emit(QiblaState.ready(
-        city: selected,
-        bearing: bearing,
-        heading: _heading,
-        compassUnavailable: _compassUnavailable,
-        calibrationNeeded: _calibrationNeeded,
-      ));
+      final bearing = selected == null
+          ? null
+          : _qibla.bearingDeg(selected.coordinates);
+      emit(
+        QiblaState.ready(
+          city: selected,
+          bearing: bearing,
+          heading: _heading,
+          compassUnavailable: _compassUnavailable,
+          calibrationNeeded: _calibrationNeeded,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('qibla reload failed',
-          name: 'quran_yahdi/qibla', error: error, stackTrace: stackTrace);
+      appLog(
+        'qibla reload failed',
+        name: 'quran_yahdi/qibla',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const QiblaState.failed());
     }
@@ -144,32 +151,37 @@ class QiblaCubit extends Cubit<QiblaState> {
     if (isClosed) return;
     final state = this.state;
     if (state is! QiblaReady) return;
-    emit(QiblaState.ready(
-      city: state.city,
-      bearing: state.bearing,
-      heading: null,
-      compassUnavailable: true,
-      calibrationNeeded: false,
-    ));
+    emit(
+      QiblaState.ready(
+        city: state.city,
+        bearing: state.bearing,
+        heading: null,
+        compassUnavailable: true,
+        calibrationNeeded: false,
+      ),
+    );
   }
 
   void _onHeading(double degrees) {
     final previous = _smoothedHeading;
-    final smoothed =
-        previous == null ? degrees : smoothHeadingDeg(previous, degrees);
+    final smoothed = previous == null
+        ? degrees
+        : smoothHeadingDeg(previous, degrees);
     _smoothedHeading = smoothed;
     _heading = smoothed;
     _compassUnavailable = false;
     if (isClosed) return;
     final state = this.state;
     if (state is! QiblaReady) return;
-    emit(QiblaState.ready(
-      city: state.city,
-      bearing: state.bearing,
-      heading: smoothed,
-      compassUnavailable: false,
-      calibrationNeeded: _calibrationNeeded,
-    ));
+    emit(
+      QiblaState.ready(
+        city: state.city,
+        bearing: state.bearing,
+        heading: smoothed,
+        compassUnavailable: false,
+        calibrationNeeded: _calibrationNeeded,
+      ),
+    );
   }
 
   void _onCalibration(bool needed) {
@@ -177,13 +189,15 @@ class QiblaCubit extends Cubit<QiblaState> {
     _calibrationNeeded = needed;
     final state = this.state;
     if (state is! QiblaReady) return;
-    emit(QiblaState.ready(
-      city: state.city,
-      bearing: state.bearing,
-      heading: state.heading,
-      compassUnavailable: state.compassUnavailable,
-      calibrationNeeded: needed,
-    ));
+    emit(
+      QiblaState.ready(
+        city: state.city,
+        bearing: state.bearing,
+        heading: state.heading,
+        compassUnavailable: state.compassUnavailable,
+        calibrationNeeded: needed,
+      ),
+    );
   }
 
   /// Cancels the heading and calibration subscriptions before closing.

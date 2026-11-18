@@ -19,15 +19,15 @@ void main() {
   }
 
   test('the HafsSmart EULA asset ships with the app', () async {
-    final text =
-        await rootBundle.loadString('assets/licenses/HafsSmart-EULA.txt');
+    final text = await rootBundle.loadString(
+      'assets/licenses/HafsSmart-EULA.txt',
+    );
 
     expect(text, contains('KFGQPC'));
     expect(text, contains('Free of Cost'));
   });
 
-  test('the Tanzil attribution ships and states the basmala omission',
-      () async {
+  test('the Tanzil attribution ships and states the basmala omission', () async {
     final text = await rootBundle.loadString(
       'assets/licenses/tanzil-quran-uthmani.txt',
     );
@@ -40,8 +40,9 @@ void main() {
     expect(text, contains('not a verbatim copy'));
   });
 
-  testWidgets('the screen lists the shipped content and font sources',
-      (tester) async {
+  testWidgets('the screen lists the shipped content and font sources', (
+    tester,
+  ) async {
     await pumpTallLicenses(tester);
     expect(find.text('التراخيص والمصادر'), findsOneWidget);
     expect(find.textContaining('QuranEnc.com'), findsOneWidget);
@@ -51,8 +52,9 @@ void main() {
     expect(find.textContaining('تَنزيل'), findsOneWidget);
   });
 
-  testWidgets('opening the HafsSmart terms shows the embedded EULA',
-      (tester) async {
+  testWidgets('opening the HafsSmart terms shows the embedded EULA', (
+    tester,
+  ) async {
     await pumpTallLicenses(tester);
 
     // The attribution tiles lengthen the list; the tall surface keeps the
@@ -77,8 +79,9 @@ void main() {
     expect(find.textContaining('Free of Cost'), findsOneWidget);
   });
 
-  testWidgets('320 dp at textScale 2.0 survives the licenses list',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 survives the licenses list', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

@@ -20,7 +20,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_cancel_test');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -72,18 +74,19 @@ void main() {
     await cubit.cancelDownload('51-53', 2);
 
     expect(cubit.state.items.containsKey('51-53-2'), isFalse);
-    expect(requests, ['/001.mp3'],
-        reason: 'the cancelled queued task must never hit the server');
+    expect(requests, [
+      '/001.mp3',
+    ], reason: 'the cancelled queued task must never hit the server');
 
-    final cleared =
-        cubit.stream.firstWhere((s) => !s.items.containsKey('51-53-1'));
+    final cleared = cubit.stream.firstWhere(
+      (s) => !s.items.containsKey('51-53-1'),
+    );
     await cubit.cancelDownload('51-53', 1);
     await cleared;
     expect(cubit.state.items.containsKey('51-53-1'), isFalse);
   });
 
-  test(
-      'cancelling the in-flight task aborts it, drops the entry and leaves '
+  test('cancelling the in-flight task aborts it, drops the entry and leaves '
       'no registry row or partial file', () async {
     final firstRequest = Completer<HttpRequest>();
     final server = await HttpServer.bind('127.0.0.1', 0);
@@ -96,8 +99,9 @@ void main() {
     unawaited(cubit.enqueue('51-53', 1));
     await firstRequest.future;
 
-    final cleared =
-        cubit.stream.firstWhere((s) => !s.items.containsKey('51-53-1'));
+    final cleared = cubit.stream.firstWhere(
+      (s) => !s.items.containsKey('51-53-1'),
+    );
     await cubit.cancelDownload('51-53', 1);
     await cleared;
 

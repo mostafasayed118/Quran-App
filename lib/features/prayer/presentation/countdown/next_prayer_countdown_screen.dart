@@ -208,8 +208,11 @@ class _MissingFocus extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Column(
       children: [
-        Icon(Icons.schedule,
-            size: AppIconSize.hero, color: colors.onSurfaceVariant),
+        Icon(
+          Icons.schedule,
+          size: AppIconSize.hero,
+          color: colors.onSurfaceVariant,
+        ),
         const SizedBox(height: AppSpacing.md),
         Text(
           message,

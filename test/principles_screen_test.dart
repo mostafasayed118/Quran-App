@@ -38,26 +38,30 @@ const List<String> _blocks = <String>[
 /// The in-app shell for a router: locale, delegates and the app theme, so a
 /// route renders exactly what the app renders.
 Widget _routerApp(GoRouter router) => MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    );
+  routerConfig: router,
+  locale: const Locale('ar'),
+  supportedLocales: const [Locale('ar'), Locale('en')],
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  theme: AppTheme.light,
+);
 
 void main() {
-  testWidgets('the /settings/principles route renders the four principles',
-      (tester) async {
+  testWidgets('the /settings/principles route renders the four principles', (
+    tester,
+  ) async {
     // The real router: proves the address is wired, not just the widget.
     AppRouter.router.go(AppRoutes.principles);
     await tester.pumpWidget(_routerApp(AppRouter.router));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(PrinciplesScreen), findsOneWidget);
     for (final copy in _blocks) {
@@ -66,11 +70,7 @@ void main() {
   });
 
   testWidgets('renders at textScaler 2.0 without overflowing', (tester) async {
-    await pumpAppHost(
-      tester,
-      home: const PrinciplesScreen(),
-      textScale: 2.0,
-    );
+    await pumpAppHost(tester, home: const PrinciplesScreen(), textScale: 2.0);
 
     // Scroll the whole page: every block must lay out at the largest device
     // text size, not just the ones on the first screen.
@@ -95,8 +95,9 @@ void main() {
     );
   });
 
-  testWidgets('the settings row under the licenses opens the page',
-      (tester) async {
+  testWidgets('the settings row under the licenses opens the page', (
+    tester,
+  ) async {
     final db = newTestDb();
     final cubit = SettingsCubit(
       settings: ReminderSettings(db),
@@ -129,13 +130,19 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_routerApp(router));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.scrollUntilVisible(find.text('مبادئ التطبيق'), 100);
     await tester.tap(find.text('مبادئ التطبيق'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(PrinciplesScreen), findsOneWidget);
     expect(find.text(_free), findsOneWidget);

@@ -30,35 +30,41 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'madani',
-          ayahCount: 2,
-          pagesStart: 2,
-          pagesEnd: 2,
-        ));
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-            id: const Value(101),
-            surahId: 2,
-            numberInSurah: 1,
-            juz: 1,
-            page: 2,
-            textUthmani: 'الم',
-            textImlaei: 'الم',
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madani',
+            ayahCount: 2,
+            pagesStart: 2,
+            pagesEnd: 2,
           ),
-          AyahsCompanion.insert(
-            id: const Value(102),
-            surahId: 2,
-            numberInSurah: 2,
-            juz: 1,
-            page: 2,
-            textUthmani: 'ذلك الكتاب',
-            textImlaei: 'ذلك الكتاب',
-          ),
-        ]));
+        );
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(101),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(102),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+      ]),
+    );
   });
 
   Future<void> pumpReader(WidgetTester tester) async {
@@ -73,70 +79,103 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   testWidgets('a page outside 1..604 reports the error toast', (tester) async {
     await pumpReader(tester);
 
     await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.enterText(find.byType(TextField), '999');
     await tester.tap(find.widgetWithText(FilledButton, 'انتقال'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('صفحة غير موجودة'), findsOneWidget);
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 
-  testWidgets('a non-numeric page keeps the dialog and reports the error',
-      (tester) async {
+  testWidgets('a non-numeric page keeps the dialog and reports the error', (
+    tester,
+  ) async {
     await pumpReader(tester);
 
     await tester.tap(find.byTooltip('الانتقال إلى صفحة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.enterText(find.byType(TextField), 'abc');
     await tester.tap(find.widgetWithText(FilledButton, 'انتقال'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
-    expect(find.byType(AlertDialog), findsOneWidget,
-        reason: 'an invalid entry must not close the dialog silently');
+    expect(
+      find.byType(AlertDialog),
+      findsOneWidget,
+      reason: 'an invalid entry must not close the dialog silently',
+    );
     expect(find.text('صفحة غير موجودة'), findsOneWidget);
 
     await tester.tap(find.text('إلغاء'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 
-  testWidgets('a narrow reader folds mode and font into one menu',
-      (tester) async {
+  testWidgets('a narrow reader folds mode and font into one menu', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

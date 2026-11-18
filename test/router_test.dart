@@ -22,22 +22,23 @@ void main() {
         .map((r) => r.path)
         .toSet();
     expect(
-        paths,
-        containsAll(<String>[
-          '/home',
-          '/quran',
-          '/recitation',
-          '/library',
-          '/prayer-times',
-          '/qibla',
-          '/azkar',
-          '/tasbih',
-          '/duas',
-          '/worship',
-          '/zakat',
-          '/hijri',
-          '/asma',
-          '/settings',
-        ]));
+      paths,
+      containsAll(<String>[
+        '/home',
+        '/quran',
+        '/recitation',
+        '/library',
+        '/prayer-times',
+        '/qibla',
+        '/azkar',
+        '/tasbih',
+        '/duas',
+        '/worship',
+        '/zakat',
+        '/hijri',
+        '/asma',
+        '/settings',
+      ]),
+    );
   });
 }

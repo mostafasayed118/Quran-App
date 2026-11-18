@@ -28,28 +28,33 @@ void main() {
     final cubit = TrackerCubit(repo: repo);
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
-      value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        supportedLocales: const [Locale('ar'), Locale('en')],
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light,
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context)
-              .copyWith(textScaler: TextScaler.linear(textScale)),
-          child: child!,
+    await tester.pumpWidget(
+      BlocProvider<TrackerCubit>.value(
+        value: cubit,
+        child: MaterialApp(
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.light,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
+          home: const TrackerScreen(),
         ),
-        home: const TrackerScreen(),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   void usePhoneViewport(WidgetTester tester) {
@@ -74,29 +79,39 @@ void main() {
   });
 
   testWidgets(
-      'textScale 2.0 on a 360-wide phone: slots, dots and streak survive',
-      (tester) async {
-    usePhoneViewport(tester);
-    await pumpTracker(tester, textScale: 2.0);
+    'textScale 2.0 on a 360-wide phone: slots, dots and streak survive',
+    (tester) async {
+      usePhoneViewport(tester);
+      await pumpTracker(tester, textScale: 2.0);
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('صلوات اليوم'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      expect(find.text('صلوات اليوم'), findsOneWidget);
 
-    await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(tester.takeException(), isNull);
-    expect(find.byIcon(Icons.check_circle), findsOneWidget);
+      await tester.tap(find.text('فجر'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.check_circle), findsOneWidget);
 
-    final scrollable = find.byType(Scrollable).first;
-    await tester.scrollUntilVisible(find.text('آخر ٧ أيام'), 100,
-        scrollable: scrollable);
-    expect(find.byIcon(Icons.circle_outlined), findsNWidgets(6));
-    expect(find.byIcon(Icons.circle), findsOneWidget);
+      final scrollable = find.byType(Scrollable).first;
+      await tester.scrollUntilVisible(
+        find.text('آخر ٧ أيام'),
+        100,
+        scrollable: scrollable,
+      );
+      expect(find.byIcon(Icons.circle_outlined), findsNWidgets(6));
+      expect(find.byIcon(Icons.circle), findsOneWidget);
 
-    await tester.scrollUntilVisible(find.text('سلسلة ١ يوم'), 100,
-        scrollable: scrollable);
-    expect(find.text('سلسلة ١ يوم'), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+      await tester.scrollUntilVisible(
+        find.text('سلسلة ١ يوم'),
+        100,
+        scrollable: scrollable,
+      );
+      expect(find.text('سلسلة ١ يوم'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

@@ -13,8 +13,8 @@ import 'support/host.dart';
 
 class _FakeAdhanPreferences implements AdhanPreferences {
   _FakeAdhanPreferences({String? adhanId, String? fajrId})
-      : _id = adhanId ?? kDefaultAdhanId,
-        _fajr = fajrId;
+    : _id = adhanId ?? kDefaultAdhanId,
+      _fajr = fajrId;
 
   String _id;
   String? _fajr;
@@ -69,10 +69,7 @@ void main() {
   late int reschedules;
   late AdhanPickerCubit cubit;
 
-  Future<void> setUpCubit({
-    String? adhanId,
-    String? fajrId,
-  }) async {
+  Future<void> setUpCubit({String? adhanId, String? fajrId}) async {
     prefs = _FakeAdhanPreferences(adhanId: adhanId, fajrId: fajrId);
     player = _FakeAdhanPlayer();
     reschedules = 0;
@@ -102,20 +99,14 @@ void main() {
       tester,
       textScale: textScale == 1 ? null : textScale,
       home: const AdhanPickerScreen(),
-      wrap: (app) => BlocProvider<AdhanPickerCubit>.value(
-        value: cubit,
-        child: app,
-      ),
+      wrap: (app) =>
+          BlocProvider<AdhanPickerCubit>.value(value: cubit, child: app),
     );
   }
 
   testWidgets('320 dp at textScale 2.0 survives the picker', (tester) async {
     await setUpCubit();
-    await pumpPicker(
-      tester,
-      size: const Size(320, 640),
-      textScale: 2.0,
-    );
+    await pumpPicker(tester, size: const Size(320, 640), textScale: 2.0);
 
     expect(tester.takeException(), isNull);
     expect(find.byType(AdhanPickerScreen), findsOneWidget);
@@ -133,8 +124,9 @@ void main() {
     expect(find.text(loc.adhanSameAsDefault), findsOneWidget);
   });
 
-  testWidgets('marks the stored global choice and "same as default" for Fajr',
-      (tester) async {
+  testWidgets('marks the stored global choice and "same as default" for Fajr', (
+    tester,
+  ) async {
     await setUpCubit(adhanId: kDefaultAdhanId);
     await pumpPicker(tester);
 
@@ -147,59 +139,83 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.text(kAdhanCatalog.first.nameAr).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(await prefs.adhanId(), kDefaultAdhanId);
     expect(reschedules, 1);
   });
 
-  testWidgets('choosing "same as default" clears the Fajr override',
-      (tester) async {
+  testWidgets('choosing "same as default" clears the Fajr override', (
+    tester,
+  ) async {
     await setUpCubit(fajrId: 'khushu');
     await pumpPicker(tester);
 
     final loc = AppLocalizations.of(tester.element(find.byType(Scaffold)));
     await tester.tap(find.text(loc.adhanSameAsDefault));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(await prefs.fajrAdhanId(), isNull);
     expect(reschedules, 1);
   });
 
-  testWidgets('preview plays the clip and a second tap stops it',
-      (tester) async {
+  testWidgets('preview plays the clip and a second tap stops it', (
+    tester,
+  ) async {
     await setUpCubit();
     await pumpPicker(tester);
 
     final previewButton = find.byIcon(Icons.play_circle_outline).first;
     await tester.tap(previewButton);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(player.previews, 1);
 
     // The same row now offers "stop".
     await tester.tap(find.byIcon(Icons.stop_circle_outlined).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(player.stopCalls, greaterThanOrEqualTo(1));
   });
 
-  testWidgets('a stopped preview can be replayed without stacking',
-      (tester) async {
+  testWidgets('a stopped preview can be replayed without stacking', (
+    tester,
+  ) async {
     await setUpCubit();
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.stop_circle_outlined).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // With one shipped voice there is no second row to switch to; the same
     // invariant is proven by stopping the first audition before replaying.
@@ -212,13 +228,19 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     final before = player.stopCalls;
 
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(player.stopCalls, greaterThan(before));
   });
@@ -230,13 +252,19 @@ void main() {
     await pumpPicker(tester);
 
     await tester.tap(find.byIcon(Icons.play_circle_outline).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     final before = player.stopCalls;
 
     await tester.tap(find.text(kAdhanCatalog.first.nameAr).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(player.stopCalls, greaterThan(before));
     expect(await prefs.adhanId(), kDefaultAdhanId);

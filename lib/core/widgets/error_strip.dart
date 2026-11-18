@@ -47,7 +47,8 @@ class ErrorStrip extends StatelessWidget {
               if (label != null && onRetry != null)
                 TextButton(onPressed: onRetry, child: Text(label)),
               IconButton(
-                tooltip: dismissTooltip ??
+                tooltip:
+                    dismissTooltip ??
                     MaterialLocalizations.of(context).closeButtonTooltip,
                 icon: const Icon(Icons.close),
                 onPressed: onDismiss,

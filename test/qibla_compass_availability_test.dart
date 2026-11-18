@@ -31,20 +31,21 @@ void main() {
       await cubit.close();
     });
 
-    test('a null stream (no magnetometer) marks the compass unavailable',
-        () async {
-      final cubit = QiblaCubit(
-        city: repo,
-        qibla: FakeQiblaService(),
-        heading: HeadingService(streamFactory: () => null),
-      );
-      await cubit.start();
-      expect(cubit.state.compassUnavailable, isTrue);
-      await cubit.close();
-    });
-
     test(
-        'a stream error marks the compass unavailable instead of being '
+      'a null stream (no magnetometer) marks the compass unavailable',
+      () async {
+        final cubit = QiblaCubit(
+          city: repo,
+          qibla: FakeQiblaService(),
+          heading: HeadingService(streamFactory: () => null),
+        );
+        await cubit.start();
+        expect(cubit.state.compassUnavailable, isTrue);
+        await cubit.close();
+      },
+    );
+
+    test('a stream error marks the compass unavailable instead of being '
         'swallowed twice', () async {
       final controller = StreamController<double>();
       addTearDown(controller.close);
@@ -97,32 +98,36 @@ void main() {
       await cubit.close();
     });
 
-    test('a closed heading stream returns to the unavailable compass',
-        () async {
-      final controller = StreamController<double>();
-      addTearDown(controller.close);
-      final cubit = QiblaCubit(
-        city: repo,
-        qibla: FakeQiblaService(),
-        heading: HeadingService(streamFactory: () => controller.stream),
-      );
-      await cubit.start();
-      controller.add(90.0);
-      await Future<void>.delayed(Duration.zero);
-      expect(cubit.state.heading, 90.0);
-      expect(cubit.state.compassUnavailable, isFalse);
+    test(
+      'a closed heading stream returns to the unavailable compass',
+      () async {
+        final controller = StreamController<double>();
+        addTearDown(controller.close);
+        final cubit = QiblaCubit(
+          city: repo,
+          qibla: FakeQiblaService(),
+          heading: HeadingService(streamFactory: () => controller.stream),
+        );
+        await cubit.start();
+        controller.add(90.0);
+        await Future<void>.delayed(Duration.zero);
+        expect(cubit.state.heading, 90.0);
+        expect(cubit.state.compassUnavailable, isFalse);
 
-      unawaited(controller.close());
-      await Future<void>.delayed(Duration.zero);
-      expect(cubit.state.heading, isNull);
-      expect(cubit.state.compassUnavailable, isTrue);
-      await cubit.close();
-    });
+        unawaited(controller.close());
+        await Future<void>.delayed(Duration.zero);
+        expect(cubit.state.heading, isNull);
+        expect(cubit.state.compassUnavailable, isTrue);
+        await cubit.close();
+      },
+    );
   });
 
   group('QiblaScreen static-mode hint', () {
-    Future<void> pumpHost(WidgetTester tester,
-        {HeadingService? heading}) async {
+    Future<void> pumpHost(
+      WidgetTester tester, {
+      HeadingService? heading,
+    }) async {
       await repo.select(cairoCity);
       final cubit = QiblaCubit(
         city: repo,
@@ -138,8 +143,9 @@ void main() {
       );
     }
 
-    testWidgets('without any sensor the screen explains the static dial',
-        (tester) async {
+    testWidgets('without any sensor the screen explains the static dial', (
+      tester,
+    ) async {
       await pumpHost(tester);
       expect(find.text('المقياس حي'), findsNothing);
       expect(
@@ -162,8 +168,9 @@ void main() {
       expect(find.textContaining('المقياس ثابت'), findsNothing);
     });
 
-    testWidgets('a dead sensor stream (error) surfaces the static-mode hint',
-        (tester) async {
+    testWidgets('a dead sensor stream (error) surfaces the static-mode hint', (
+      tester,
+    ) async {
       await pumpHost(
         tester,
         heading: HeadingService(

@@ -18,15 +18,15 @@ class AppContentFrame extends StatelessWidget {
 
   /// Long-form reading (reader, hadith): the narrowest measure.
   const AppContentFrame.reading({super.key, required this.child})
-      : maxWidth = AppBreakpoints.readingMaxWidth;
+    : maxWidth = AppBreakpoints.readingMaxWidth;
 
   /// Narrow forms: onboarding, zakat, prayer settings.
   const AppContentFrame.form({super.key, required this.child})
-      : maxWidth = AppBreakpoints.formMaxWidth;
+    : maxWidth = AppBreakpoints.formMaxWidth;
 
   /// Grids: the widest measure before they read as a stretched phone.
   const AppContentFrame.grid({super.key, required this.child})
-      : maxWidth = AppBreakpoints.gridMaxWidth;
+    : maxWidth = AppBreakpoints.gridMaxWidth;
 
   /// The body to constrain.
   final Widget child;

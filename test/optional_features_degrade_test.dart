@@ -74,88 +74,92 @@ void main() {
   });
 
   testWidgets(
-      'a boot without the optional loaders degrades to empty states and '
-      'sends the library home', (tester) async {
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-    ));
-    await _pumpUntil(
-      tester,
-      () => find.byType(HomeScreen).evaluate().isNotEmpty,
-    );
-    expect(find.byType(HomeScreen), findsOneWidget);
-    expect(tester.takeException(), isNull);
+    'a boot without the optional loaders degrades to empty states and '
+    'sends the library home',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: AppRouter.router,
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+        ),
+      );
+      await _pumpUntil(
+        tester,
+        () => find.byType(HomeScreen).evaluate().isNotEmpty,
+      );
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // /azkar — AzkarRepository is registered with an empty catalog and the
-    // screen shows its localized empty state.
-    AppRouter.router.go(AppRoutes.azkar);
-    await _pumpUntil(
-      tester,
-      () => find.byType(AzkarScreen).evaluate().isNotEmpty,
-    );
-    await _pumpRounds(tester);
-    expect(find.byType(AzkarScreen), findsOneWidget);
-    expect(find.byType(EmptyState), findsOneWidget);
-    expect(find.text(_noResults), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      // /azkar — AzkarRepository is registered with an empty catalog and the
+      // screen shows its localized empty state.
+      AppRouter.router.go(AppRoutes.azkar);
+      await _pumpUntil(
+        tester,
+        () => find.byType(AzkarScreen).evaluate().isNotEmpty,
+      );
+      await _pumpRounds(tester);
+      expect(find.byType(AzkarScreen), findsOneWidget);
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.text(_noResults), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // /duas — both DuaRepository and RuqyahRepository resolve; the dua tab is
-    // the empty state (no tab switch needed).
-    AppRouter.router.go(AppRoutes.duas);
-    await _pumpUntil(
-      tester,
-      () => find.byType(DuasScreen).evaluate().isNotEmpty,
-    );
-    await _pumpRounds(tester);
-    expect(find.byType(DuasScreen), findsOneWidget);
-    expect(find.byType(EmptyState), findsOneWidget);
-    expect(find.text(_noResults), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      // /duas — both DuaRepository and RuqyahRepository resolve; the dua tab is
+      // the empty state (no tab switch needed).
+      AppRouter.router.go(AppRoutes.duas);
+      await _pumpUntil(
+        tester,
+        () => find.byType(DuasScreen).evaluate().isNotEmpty,
+      );
+      await _pumpRounds(tester);
+      expect(find.byType(DuasScreen), findsOneWidget);
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.text(_noResults), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // /asma — AsmaRepository resolves with an empty list.
-    AppRouter.router.go(AppRoutes.asma);
-    await _pumpUntil(
-      tester,
-      () => find.byType(AsmaScreen).evaluate().isNotEmpty,
-    );
-    await _pumpRounds(tester);
-    expect(find.byType(AsmaScreen), findsOneWidget);
-    expect(find.byType(EmptyState), findsOneWidget);
-    expect(find.text(_noResults), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      // /asma — AsmaRepository resolves with an empty list.
+      AppRouter.router.go(AppRoutes.asma);
+      await _pumpUntil(
+        tester,
+        () => find.byType(AsmaScreen).evaluate().isNotEmpty,
+      );
+      await _pumpRounds(tester);
+      expect(find.byType(AsmaScreen), findsOneWidget);
+      expect(find.byType(EmptyState), findsOneWidget);
+      expect(find.text(_noResults), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // /library — no PackDownloader was registered (no writable root), so the
-    // route redirects home instead of resolving it.
-    expect(getIt.isRegistered<PackDownloader>(), isFalse);
-    AppRouter.router.go(AppRoutes.library);
-    await _pumpUntil(
-      tester,
-      () => find.byType(HomeScreen).evaluate().isNotEmpty,
-    );
-    await _pumpRounds(tester);
-    expect(find.byType(LibraryScreen), findsNothing);
-    expect(find.byType(HomeScreen), findsOneWidget);
-    expect(tester.takeException(), isNull);
+      // /library — no PackDownloader was registered (no writable root), so the
+      // route redirects home instead of resolving it.
+      expect(getIt.isRegistered<PackDownloader>(), isFalse);
+      AppRouter.router.go(AppRoutes.library);
+      await _pumpUntil(
+        tester,
+        () => find.byType(HomeScreen).evaluate().isNotEmpty,
+      );
+      await _pumpRounds(tester);
+      expect(find.byType(LibraryScreen), findsNothing);
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
 
-    // /library/hadith — the same guard.
-    AppRouter.router.go(AppRoutes.hadith);
-    await _pumpUntil(
-      tester,
-      () => find.byType(HomeScreen).evaluate().isNotEmpty,
-    );
-    await _pumpRounds(tester);
-    expect(find.byType(HadithScreen), findsNothing);
-    expect(find.byType(HomeScreen), findsOneWidget);
-    expect(tester.takeException(), isNull);
-  });
+      // /library/hadith — the same guard.
+      AppRouter.router.go(AppRoutes.hadith);
+      await _pumpUntil(
+        tester,
+        () => find.byType(HomeScreen).evaluate().isNotEmpty,
+      );
+      await _pumpRounds(tester);
+      expect(find.byType(HadithScreen), findsNothing);
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

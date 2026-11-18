@@ -29,8 +29,9 @@ class QuranSearchScreen extends StatefulWidget {
 }
 
 class _QuranSearchScreenState extends State<QuranSearchScreen> {
-  late final TextEditingController _controller =
-      TextEditingController(text: widget.initialQuery);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialQuery,
+  );
 
   @override
   void initState() {
@@ -57,7 +58,11 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.xs,
+              ),
               child: SearchField(
                 hint: loc.searchQuranHint,
                 controller: _controller,
@@ -72,17 +77,17 @@ class _QuranSearchScreenState extends State<QuranSearchScreen> {
                 builder: (context, state) => switch (state) {
                   QuranSearchLoading() => const LoadingView(),
                   QuranSearchFailed() => errorPane(
-                      loc,
-                      onRetry: () => context
-                          .read<QuranSearchCubit>()
-                          .search(_controller.text.trim()),
+                    loc,
+                    onRetry: () => context.read<QuranSearchCubit>().search(
+                      _controller.text.trim(),
                     ),
+                  ),
                   QuranSearchReady(:final query, :final hits) =>
                     !quranSearchQueryUsable(query)
                         ? EmptyState(loc.searchQuranPrompt)
                         : hits.isEmpty
-                            ? EmptyState(loc.noResults)
-                            : _Results(ready: state),
+                        ? EmptyState(loc.noResults)
+                        : _Results(ready: state),
                 },
               ),
             ),
@@ -124,7 +129,9 @@ class _Results extends StatelessWidget {
             },
             child: ListView.builder(
               padding: appScrollPadding(
-                  context, const EdgeInsets.all(AppSpacing.md)),
+                context,
+                const EdgeInsets.all(AppSpacing.md),
+              ),
               itemCount: ready.hits.length + (showTail ? 1 : 0),
               itemBuilder: (context, index) {
                 if (index == ready.hits.length) return _tail(context, loc);
@@ -182,10 +189,9 @@ class _HitTile extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         subtitle: Text(hit.surahNameAr),
-        onTap: () => context.push(quranReaderPath(
-          surah: hit.surahId,
-          ayah: hit.numberInSurah,
-        )),
+        onTap: () => context.push(
+          quranReaderPath(surah: hit.surahId, ayah: hit.numberInSurah),
+        ),
       ),
     );
   }

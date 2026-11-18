@@ -20,8 +20,8 @@ class _MushafPagerState extends State<_MushafPager> {
     final target = anchor > 0
         ? widget.state.ayahs.where((a) => a.id == anchor).toList()
         : widget.state.ayahs
-            .where((a) => a.numberInSurah == widget.state.initialAyah)
-            .toList();
+              .where((a) => a.numberInSurah == widget.state.initialAyah)
+              .toList();
     var index = 0;
     if (target.isNotEmpty) {
       final idx = pages.indexWhere((b) => b.page == target.first.page);
@@ -64,9 +64,7 @@ class _MushafPagerState extends State<_MushafPager> {
             // Non-breaking space: the medallion must wrap WITH the ayah's last
             // word, never land at the start of the next line (where it would
             // read as if it belonged to the following verse).
-            TextSpan(
-              text: '${a.displayText}\u00A0',
-            ),
+            TextSpan(text: '${a.displayText}\u00A0'),
             TextSpan(
               text: '${loc.ornateBrackets(loc.number(a.numberInSurah))} ',
               style: numberStyle,
@@ -104,9 +102,7 @@ class _MushafPagerState extends State<_MushafPager> {
                 ),
               ),
               Text(
-                loc.ornateBrackets(
-                  loc.pageIndicator(loc.number(block.page)),
-                ),
+                loc.ornateBrackets(loc.pageIndicator(loc.number(block.page))),
                 style: TextStyle(
                   fontFamily: QuranFonts.meQuran,
                   color: AppTheme.goldText(context),
@@ -147,9 +143,11 @@ Future<void> _openPageJump(
     onResolved(anchor.surahId, anchor.numberInSurah);
     return;
   }
-  unawaited(context.push(
-    quranReaderPath(surah: anchor.surahId, ayah: anchor.numberInSurah),
-  ));
+  unawaited(
+    context.push(
+      quranReaderPath(surah: anchor.surahId, ayah: anchor.numberInSurah),
+    ),
+  );
 }
 
 void _showInvalidPage(BuildContext context, AppLocalizations loc) {
@@ -219,53 +217,55 @@ void _showFontSheet(
 ) {
   var value = initial;
   var lineHeight = initialLineHeight;
-  unawaited(showAppSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    builder: (sheetContext) => StatefulBuilder(
-      builder: (context, setSheetState) => SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  AppLocalizations.of(context).readerFontSize,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider(
-                  value: value,
-                  min: 0.8,
-                  max: 2,
-                  divisions: 12,
-                  label: value.toStringAsFixed(1),
-                  onChanged: (next) {
-                    setSheetState(() => value = next);
-                    unawaited(cubit.setFontScale(next));
-                  },
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  AppLocalizations.of(context).readerLineSpacing,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Slider(
-                  value: lineHeight,
-                  min: ReaderLayoutSource.minLineHeight,
-                  max: ReaderLayoutSource.maxLineHeight,
-                  divisions: 14,
-                  label: lineHeight.toStringAsFixed(1),
-                  onChanged: (next) {
-                    setSheetState(() => lineHeight = next);
-                    unawaited(cubit.setLineHeight(next));
-                  },
-                ),
-              ],
+  unawaited(
+    showAppSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppLocalizations.of(context).readerFontSize,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Slider(
+                    value: value,
+                    min: 0.8,
+                    max: 2,
+                    divisions: 12,
+                    label: value.toStringAsFixed(1),
+                    onChanged: (next) {
+                      setSheetState(() => value = next);
+                      unawaited(cubit.setFontScale(next));
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    AppLocalizations.of(context).readerLineSpacing,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Slider(
+                    value: lineHeight,
+                    min: ReaderLayoutSource.minLineHeight,
+                    max: ReaderLayoutSource.maxLineHeight,
+                    divisions: 14,
+                    label: lineHeight.toStringAsFixed(1),
+                    onChanged: (next) {
+                      setSheetState(() => lineHeight = next);
+                      unawaited(cubit.setLineHeight(next));
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     ),
-  ));
+  );
 }

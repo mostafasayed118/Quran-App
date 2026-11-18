@@ -16,11 +16,11 @@ class RamadanCubit extends Cubit<RamadanState> {
     required PrayerTimesPort prayer,
     required RamadanCalendar calendar,
     DateTime Function()? clock,
-  })  : _city = city,
-        _prayer = prayer,
-        _calendar = calendar,
-        _clock = clock ?? DateTime.now,
-        super(const RamadanState.loading());
+  }) : _city = city,
+       _prayer = prayer,
+       _calendar = calendar,
+       _clock = clock ?? DateTime.now,
+       super(const RamadanState.loading());
 
   final CitySource _city;
   final PrayerTimesPort _prayer;
@@ -39,11 +39,13 @@ class RamadanCubit extends Cubit<RamadanState> {
       final monthName = _calendar.monthName(year, 9);
       if (city == null) {
         if (!isClosed) {
-          emit(RamadanState.ready(
-            hijriYear: year,
-            monthName: monthName,
-            days: const <RamadanDay>[],
-          ));
+          emit(
+            RamadanState.ready(
+              hijriYear: year,
+              monthName: monthName,
+              days: const <RamadanDay>[],
+            ),
+          );
         }
         return;
       }
@@ -56,13 +58,15 @@ class RamadanCubit extends Cubit<RamadanState> {
           fajr: _timeOf(prayers, PrayerName.fajr),
           maghrib: _timeOf(prayers, PrayerName.maghrib),
         );
-        days.add(RamadanDay(
-          hijriDay: day,
-          date: date,
-          imsak: times.imsak,
-          iftar: times.iftar,
-          isToday: _sameDay(date, now),
-        ));
+        days.add(
+          RamadanDay(
+            hijriDay: day,
+            date: date,
+            imsak: times.imsak,
+            iftar: times.iftar,
+            isToday: _sameDay(date, now),
+          ),
+        );
       }
       RamadanDay? todayRow;
       for (final day in days) {
@@ -72,15 +76,21 @@ class RamadanCubit extends Cubit<RamadanState> {
         }
       }
       if (isClosed) return;
-      emit(RamadanState.ready(
-        hijriYear: year,
-        monthName: monthName,
-        days: List<RamadanDay>.unmodifiable(days),
-        today: todayRow,
-      ));
+      emit(
+        RamadanState.ready(
+          hijriYear: year,
+          monthName: monthName,
+          days: List<RamadanDay>.unmodifiable(days),
+          today: todayRow,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('ramadan load failed',
-          name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
+      appLog(
+        'ramadan load failed',
+        name: 'quran_yahdi/ramadan',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const RamadanState.failed());
     }
   }

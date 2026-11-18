@@ -12,24 +12,22 @@ void main() {
   Future<void> pump(WidgetTester tester, Widget child) =>
       tester.pumpWidget(appShell(home: Scaffold(body: child)));
 
-  testWidgets('ArabicBadge renders the coin with primary ring styling',
-      (tester) async {
+  testWidgets('ArabicBadge renders the coin with primary ring styling', (
+    tester,
+  ) async {
     await pump(tester, const ArabicBadge('٣'));
     expect(find.text('٣'), findsOneWidget);
     final box = tester.widget<Container>(
-        find.ancestor(of: find.text('٣'), matching: find.byType(Container)));
+      find.ancestor(of: find.text('٣'), matching: find.byType(Container)),
+    );
     expect(box.constraints?.maxWidth, 38);
   });
 
-  testWidgets('SearchField emits onChanged and shows the arrow hint',
-      (tester) async {
+  testWidgets('SearchField emits onChanged and shows the arrow hint', (
+    tester,
+  ) async {
     var query = '';
-    await pump(
-        tester,
-        SearchField(
-          hint: 'ابحث…',
-          onChanged: (q) => query = q,
-        ));
+    await pump(tester, SearchField(hint: 'ابحث…', onChanged: (q) => query = q));
     await tester.enterText(find.byType(TextField), 'عفاسي');
     expect(query, 'عفاسي');
     expect(find.text('ابحث…'), findsOneWidget);
@@ -40,12 +38,9 @@ void main() {
     final controller = TextEditingController(text: 'الفاتحة');
     addTearDown(controller.dispose);
     await pump(
-        tester,
-        SearchField(
-          hint: 'ابحث…',
-          onChanged: (_) {},
-          controller: controller,
-        ));
+      tester,
+      SearchField(hint: 'ابحث…', onChanged: (_) {}, controller: controller),
+    );
     expect(find.text('الفاتحة'), findsOneWidget);
   });
 
@@ -55,28 +50,33 @@ void main() {
     expect(find.byType(FilledButton), findsNothing);
   });
 
-  testWidgets('DownloadProgressLabel defaults format and indicator value',
-      (tester) async {
+  testWidgets('DownloadProgressLabel defaults format and indicator value', (
+    tester,
+  ) async {
     await pump(tester, const DownloadProgressLabel(received: 50, total: 100));
     expect(find.text('50/100'), findsOneWidget);
-    final progress = tester
-        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    final progress = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
     expect(progress.value, 0.5);
   });
 
-  testWidgets('DownloadProgressLabel formats via callback and clamps',
-      (tester) async {
+  testWidgets('DownloadProgressLabel formats via callback and clamps', (
+    tester,
+  ) async {
     await pump(
-        tester,
-        DownloadProgressLabel(
-          received: 9999,
-          total: 100,
-          width: 96,
-          format: (r, t) => '$r bytes',
-        ));
+      tester,
+      DownloadProgressLabel(
+        received: 9999,
+        total: 100,
+        width: 96,
+        format: (r, t) => '$r bytes',
+      ),
+    );
     expect(find.text('9999 bytes'), findsOneWidget);
-    final progress = tester
-        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    final progress = tester.widget<LinearProgressIndicator>(
+      find.byType(LinearProgressIndicator),
+    );
     expect(progress.value, 1.0);
   });
 }

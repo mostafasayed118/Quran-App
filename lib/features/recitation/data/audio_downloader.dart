@@ -21,12 +21,15 @@ class AudioDownloader {
     Dio? dio,
     Future<Directory> Function()? audioRootResolver,
     this.retryDelay = const Duration(seconds: 3),
-  })  : _dio = dio ??
-            Dio(BaseOptions(
-              connectTimeout: _connectTimeout,
-              receiveTimeout: _receiveTimeout,
-            )),
-        _audioRoot = audioRootResolver;
+  }) : _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: _connectTimeout,
+               receiveTimeout: _receiveTimeout,
+             ),
+           ),
+       _audioRoot = audioRootResolver;
 
   final AppDatabase _db;
   final Dio _dio;
@@ -67,7 +70,6 @@ class AudioDownloader {
   static const int maxAcceptedBytesCeiling = 64 << 20;
 
   @visibleForTesting
-
   /// Byte cap accepted for a download, derived from the declared size.
   static int maxAcceptedBytes(int declaredTotal) =>
       guardedByteCap(declaredTotal, ceiling: maxAcceptedBytesCeiling);
@@ -76,16 +78,19 @@ class AudioDownloader {
     final resolver = _audioRoot;
     if (resolver != null) return resolver();
     throw DownloadFailure.permanent(
-        'audioRootResolver not configured — call ensureAudioBindings() first');
+      'audioRootResolver not configured — call ensureAudioBindings() first',
+    );
   }
 
   Future<File> _targetFile(String rowId, int surahNumber) async {
     final rootDir = await _root();
     final folder = Directory(
-        '${rootDir.path}${Platform.pathSeparator}$audioFolderName${Platform.pathSeparator}$rowId');
+      '${rootDir.path}${Platform.pathSeparator}$audioFolderName${Platform.pathSeparator}$rowId',
+    );
     await folder.create(recursive: true);
     return File(
-        '${folder.path}${Platform.pathSeparator}${surahAudioFileName(surahNumber)}');
+      '${folder.path}${Platform.pathSeparator}${surahAudioFileName(surahNumber)}',
+    );
   }
 
   /// Fetches [start] while following at most [maxRedirectHops] redirects
@@ -117,13 +122,15 @@ class AudioDownloader {
         final next = current.resolve(location);
         if (next.scheme != 'http' && next.scheme != 'https') {
           throw DownloadFailure.permanent(
-              'audio redirect to unsupported scheme "${next.scheme}"');
+            'audio redirect to unsupported scheme "${next.scheme}"',
+          );
         }
         // Reuses the catalog allowlist (https + mp3quran.net) — one rule, one
         // place: a host that cannot be a reciter server cannot serve bytes.
         if (!isTrustedAudioServer(next.toString())) {
           throw DownloadFailure.permanent(
-              'audio redirect to untrusted host ${next.host}');
+            'audio redirect to untrusted host ${next.host}',
+          );
         }
         return next;
       },
@@ -219,8 +226,13 @@ class AudioDownloader {
         }
       }
     }
-    await _registry.mark(reciter.id, surahNumber, DownloadStatus.downloading,
-        resumeFrom, target.path);
+    await _registry.mark(
+      reciter.id,
+      surahNumber,
+      DownloadStatus.downloading,
+      resumeFrom,
+      target.path,
+    );
     try {
       final res = await _fetchTrustedRedirects(
         Uri.parse(url),
@@ -228,23 +240,27 @@ class AudioDownloader {
         rangeFrom: resumeFrom,
         ifRange: ifRange,
       );
-      final contentType =
-          res.headers.value(Headers.contentTypeHeader)?.toLowerCase().trim();
+      final contentType = res.headers
+          .value(Headers.contentTypeHeader)
+          ?.toLowerCase()
+          .trim();
       if (contentType != null && contentType.contains('html')) {
         throw DownloadFailure.permanent(
-            'audio response is an HTML page, not an audio stream');
+          'audio response is an HTML page, not an audio stream',
+        );
       }
       final status = res.statusCode ?? 0;
       final declared =
           int.tryParse(res.headers.value(Headers.contentLengthHeader) ?? '') ??
-              0;
+          0;
       var total = declared;
       var received = 0;
       var append = false;
       if (resumeFrom > 0) {
         if (status == 206) {
-          final contentRange =
-              res.headers.value(HttpHeaders.contentRangeHeader);
+          final contentRange = res.headers.value(
+            HttpHeaders.contentRangeHeader,
+          );
           final start = _rangeStart(contentRange);
           if (start != resumeFrom) {
             // The host resumed somewhere else: the prefix is unusable, so
@@ -272,7 +288,8 @@ class AudioDownloader {
       // Persist the validator before the body: if the process dies mid-body,
       // the next attempt can prove the remote did not change. A 200 means the
       // validator did not match (or a fresh start), so the old one is replaced.
-      final responseValidator = res.headers.value(HttpHeaders.etagHeader) ??
+      final responseValidator =
+          res.headers.value(HttpHeaders.etagHeader) ??
           res.headers.value(HttpHeaders.lastModifiedHeader);
       if (responseValidator != null) {
         await validatorFile.writeAsString(responseValidator, flush: true);
@@ -282,14 +299,16 @@ class AudioDownloader {
       final throttle = ProgressThrottle();
       final body = res.data;
       if (body == null) throw DownloadFailure('empty audio response');
-      final sink =
-          part.openWrite(mode: append ? FileMode.append : FileMode.write);
+      final sink = part.openWrite(
+        mode: append ? FileMode.append : FileMode.write,
+      );
       try {
         await for (final chunk in body.stream) {
           received += chunk.length;
           if (received > maxAcceptedBytes(total)) {
             throw DownloadFailure.permanent(
-                'audio stream exceeded its declared size');
+              'audio stream exceeded its declared size',
+            );
           }
           sink.add(chunk);
           if (throttle.shouldReport(received, total)) {
@@ -307,7 +326,12 @@ class AudioDownloader {
       if (await validatorFile.exists()) await validatorFile.delete();
       final size = await promoted.length();
       await _registry.mark(
-          reciter.id, surahNumber, DownloadStatus.done, size, promoted.path);
+        reciter.id,
+        surahNumber,
+        DownloadStatus.done,
+        size,
+        promoted.path,
+      );
       return promoted;
     } on Object catch (error) {
       final cancelled = cancelToken?.isCancelled ?? false;
@@ -319,7 +343,12 @@ class AudioDownloader {
         await _discardPart(part, validatorFile);
       }
       await _registry.mark(
-          reciter.id, surahNumber, DownloadStatus.failed, 0, target.path);
+        reciter.id,
+        surahNumber,
+        DownloadStatus.failed,
+        0,
+        target.path,
+      );
       if (!cancelled && isOutOfSpaceError(error)) {
         throw DownloadFailure.outOfSpace();
       }

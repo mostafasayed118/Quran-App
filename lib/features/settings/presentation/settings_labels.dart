@@ -17,10 +17,10 @@ String _languageLabel(AppLocalizations loc, AppLanguage language) =>
 
 /// The label for the current appearance, in the current language.
 String _themeLabel(AppLocalizations loc, AppThemeMode mode) => switch (mode) {
-      AppThemeMode.system => loc.themeSystem,
-      AppThemeMode.light => loc.themeLight,
-      AppThemeMode.dark => loc.themeDark,
-    };
+  AppThemeMode.system => loc.themeSystem,
+  AppThemeMode.light => loc.themeLight,
+  AppThemeMode.dark => loc.themeDark,
+};
 
 /// The label for the current prayer-skin choice.
 ///

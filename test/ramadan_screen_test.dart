@@ -27,27 +27,22 @@ class _City implements CitySource {
 class _Prayer implements PrayerTimesPort {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime day) => [
-        PrayerChoice(
-            PrayerName.fajr, DateTime(day.year, day.month, day.day, 5)),
-        PrayerChoice(
-          PrayerName.sunrise,
-          DateTime(day.year, day.month, day.day, 6, 20),
-        ),
-        PrayerChoice(
-          PrayerName.dhuhr,
-          DateTime(day.year, day.month, day.day, 12),
-        ),
-        PrayerChoice(
-            PrayerName.asr, DateTime(day.year, day.month, day.day, 15)),
-        PrayerChoice(
-          PrayerName.maghrib,
-          DateTime(day.year, day.month, day.day, 18),
-        ),
-        PrayerChoice(
-          PrayerName.isha,
-          DateTime(day.year, day.month, day.day, 19, 30),
-        ),
-      ];
+    PrayerChoice(PrayerName.fajr, DateTime(day.year, day.month, day.day, 5)),
+    PrayerChoice(
+      PrayerName.sunrise,
+      DateTime(day.year, day.month, day.day, 6, 20),
+    ),
+    PrayerChoice(PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12)),
+    PrayerChoice(PrayerName.asr, DateTime(day.year, day.month, day.day, 15)),
+    PrayerChoice(
+      PrayerName.maghrib,
+      DateTime(day.year, day.month, day.day, 18),
+    ),
+    PrayerChoice(
+      PrayerName.isha,
+      DateTime(day.year, day.month, day.day, 19, 30),
+    ),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -82,20 +77,19 @@ Future<RamadanCubit> _readyCubit() async {
 }
 
 Widget _app(RamadanCubit cubit, {double textScale = 1}) => BlocProvider.value(
-      value: cubit,
-      child: MaterialApp(
-        locale: const Locale('ar'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        builder: (context, child) => MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(textScale),
-          ),
-          child: child!,
-        ),
-        home: const RamadanScreen(),
-      ),
-    );
+  value: cubit,
+  child: MaterialApp(
+    locale: const Locale('ar'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    builder: (context, child) => MediaQuery(
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: TextScaler.linear(textScale)),
+      child: child!,
+    ),
+    home: const RamadanScreen(),
+  ),
+);
 
 void main() {
   testWidgets('renders the month header, today and the table', (tester) async {

@@ -30,79 +30,95 @@ void main() {
   });
 
   testWidgets(
-      'first run without a city shows the pick-city hint, opens the picker, '
-      'and reloads into the next-prayer card on return', (tester) async {
-    final cubit = HomeCubit(
-      lastRead: lastRead,
-      ayahs: ayahs,
-      prayer: FakePrayerTimeService(),
-      city: city,
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
+    'first run without a city shows the pick-city hint, opens the picker, '
+    'and reloads into the next-prayer card on return',
+    (tester) async {
+      final cubit = HomeCubit(
+        lastRead: lastRead,
+        ayahs: ayahs,
+        prayer: FakePrayerTimeService(),
+        city: city,
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    final router = GoRouter(
-      initialLocation: '/home',
-      routes: [
-        GoRoute(
-          path: '/home',
-          builder: (_, _) => BlocProvider<HomeCubit>.value(
-            value: cubit,
-            child: const HomeScreen(),
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (_, _) => BlocProvider<HomeCubit>.value(
+              value: cubit,
+              child: const HomeScreen(),
+            ),
           ),
-        ),
-        GoRoute(
-          path: '/prayer-times/city',
-          builder: (context, _) => Scaffold(
-            body: Center(
-              child: TextButton(
-                onPressed: () async {
-                  await city.select(cairoCity);
-                  if (context.mounted) context.pop(true);
-                },
-                child: const Text('PICK-CITY-STUB'),
+          GoRoute(
+            path: '/prayer-times/city',
+            builder: (context, _) => Scaffold(
+              body: Center(
+                child: TextButton(
+                  onPressed: () async {
+                    await city.select(cairoCity);
+                    if (context.mounted) context.pop(true);
+                  },
+                  child: const Text('PICK-CITY-STUB'),
+                ),
               ),
             ),
           ),
+        ],
+      );
+      addTearDown(router.dispose);
+
+      await tester.pumpWidget(
+        MaterialApp.router(
+          routerConfig: router,
+          locale: const Locale('ar'),
+          supportedLocales: const [Locale('ar'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          theme: AppTheme.light,
         ),
-      ],
-    );
-    addTearDown(router.dispose);
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      expect(find.text('الصلاة القادمة'), findsNothing);
+      expect(find.text('اختر مدينتك'), findsOneWidget);
+      expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
 
-    expect(find.text('الصلاة القادمة'), findsNothing);
-    expect(find.text('اختر مدينتك'), findsOneWidget);
-    expect(find.text('لم تُحدَّد مدينة بعد'), findsOneWidget);
+      await tester.tap(find.text('اختر مدينتك'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(find.text('PICK-CITY-STUB'), findsOneWidget);
 
-    await tester.tap(find.text('اختر مدينتك'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.text('PICK-CITY-STUB'), findsOneWidget);
+      await tester.tap(find.text('PICK-CITY-STUB'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await tester.tap(find.text('PICK-CITY-STUB'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-
-    expect(find.text('PICK-CITY-STUB'), findsNothing);
-    expect(find.text('اختر مدينتك'), findsNothing);
-    expect(find.text('الصلاة القادمة'), findsOneWidget);
-    expect(find.text('فجر'), findsOneWidget);
-    expect(find.text('٠٤:٤٥'), findsOneWidget);
-  });
+      expect(find.text('PICK-CITY-STUB'), findsNothing);
+      expect(find.text('اختر مدينتك'), findsNothing);
+      expect(find.text('الصلاة القادمة'), findsOneWidget);
+      expect(find.text('فجر'), findsOneWidget);
+      expect(find.text('٠٤:٤٥'), findsOneWidget);
+    },
+  );
 }

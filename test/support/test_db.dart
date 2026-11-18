@@ -20,9 +20,7 @@ AppDatabase newTestDb() {
 /// not pass the suite by accident).
 AppDatabase newLimitedVarDb({int limit = 3}) {
   final db = AppDatabase.test(
-    NativeDatabase.memory().interceptWith(
-      _VariableLimit(limit),
-    ),
+    NativeDatabase.memory().interceptWith(_VariableLimit(limit)),
   );
   addTearDown(db.close);
   return db;

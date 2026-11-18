@@ -20,13 +20,13 @@ import 'support/test_db.dart';
 class _OneReciter implements ReciterInfoSource {
   @override
   Future<ReciterInfo?> defaultReciter() async => const ReciterInfo(
-        id: '1-1',
-        reciterName: 'القارئ',
-        moshafName: 'حفص',
-        server: 'https://server.example/mp3',
-        surahList: '1',
-        surahTotal: 114,
-      );
+    id: '1-1',
+    reciterName: 'القارئ',
+    moshafName: 'حفص',
+    server: 'https://server.example/mp3',
+    surahList: '1',
+    surahTotal: 114,
+  );
 }
 
 class _SpyPlaybackCubit extends PlaybackCubit {
@@ -149,8 +149,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 350));
   }
 
-  testWidgets('the sheet shows the track and seeks through the cubit',
-      (tester) async {
+  testWidgets('the sheet shows the track and seeks through the cubit', (
+    tester,
+  ) async {
     await openSheet(tester, cubit);
 
     expect(find.text('الفاتحة'), findsOneWidget);
@@ -163,8 +164,9 @@ void main() {
     expect(service.seekCalls, [const Duration(minutes: 1)]);
   });
 
-  testWidgets('stop closes the sheet once and leaves the underlying route',
-      (tester) async {
+  testWidgets('stop closes the sheet once and leaves the underlying route', (
+    tester,
+  ) async {
     final spy = _SpyPlaybackCubit(
       service: service,
       reciters: _OneReciter(),
@@ -195,8 +197,9 @@ void main() {
     expect(find.text('٢:٠٣:٠٤'), findsOneWidget);
   });
 
-  testWidgets('landscape 640x360 at textScale 2.0 keeps the player usable',
-      (tester) async {
+  testWidgets('landscape 640x360 at textScale 2.0 keeps the player usable', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(640, 360);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -209,8 +212,9 @@ void main() {
     expect(find.byType(SingleChildScrollView), findsWidgets);
   });
 
-  testWidgets('portrait 360x640 at textScale 2.0 wraps the options row',
-      (tester) async {
+  testWidgets('portrait 360x640 at textScale 2.0 wraps the options row', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(360, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);

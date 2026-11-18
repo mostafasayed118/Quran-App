@@ -29,10 +29,10 @@ class TrackerCubit extends Cubit<TrackerState> {
     required PrayerLogRepository repo,
     KhatmaRepository? khatma,
     DateTime Function()? clock,
-  })  : _repo = repo,
-        _khatma = khatma,
-        _clock = clock ?? DateTime.now,
-        super(const TrackerState.loading());
+  }) : _repo = repo,
+       _khatma = khatma,
+       _clock = clock ?? DateTime.now,
+       super(const TrackerState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -77,16 +77,22 @@ class TrackerCubit extends Cubit<TrackerState> {
       final streak = _computeStreak(marked, now);
       final khatma = await _loadKhatma();
       if (isClosed || seq != _reloadSeq) return;
-      emit(TrackerState.ready(
-        today: today,
-        streakDays: streak,
-        last7: last7,
-        khatmaAvailable: khatma.available,
-        khatma: khatma.progress,
-      ));
+      emit(
+        TrackerState.ready(
+          today: today,
+          streakDays: streak,
+          last7: last7,
+          khatmaAvailable: khatma.available,
+          khatma: khatma.progress,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('tracker load failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'tracker load failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _reloadSeq) return;
       emit(const TrackerState.failed());
     }
@@ -113,8 +119,12 @@ class TrackerCubit extends Cubit<TrackerState> {
         ),
       );
     } on Object catch (error, stackTrace) {
-      appLog('khatma load failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'khatma load failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return (available: false, progress: null);
     }
   }
@@ -126,8 +136,12 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await repo.startPlan(targetPages);
     } on Object catch (error, stackTrace) {
-      appLog('khatma start failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'khatma start failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _markActionFailed();
       return;
     }
@@ -154,8 +168,12 @@ class TrackerCubit extends Cubit<TrackerState> {
         await repo.advanceTo(first);
       }
     } on Object catch (error, stackTrace) {
-      appLog('khatma advance failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'khatma advance failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _markActionFailed();
       return;
     }
@@ -169,8 +187,12 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await repo.reset();
     } on Object catch (error, stackTrace) {
-      appLog('khatma reset failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'khatma reset failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _markActionFailed();
       return;
     }
@@ -204,9 +226,7 @@ class TrackerCubit extends Cubit<TrackerState> {
   /// Consecutive marked days ending today — or yesterday, when today is
   /// still unmarked (so the streak survives the morning). PM ruling, W5.
   int _computeStreak(List<DateTime> marked, DateTime now) {
-    final keys = <String>{
-      for (final day in marked) _key(day),
-    };
+    final keys = <String>{for (final day in marked) _key(day)};
     var cursor = DateTime(now.year, now.month, now.day);
     if (!keys.contains(_key(cursor))) {
       cursor = _daysBefore(cursor, _streakGraceDays);
@@ -230,8 +250,12 @@ class TrackerCubit extends Cubit<TrackerState> {
     try {
       await _repo.togglePrayer(_clock(), slot);
     } on Object catch (error, stackTrace) {
-      appLog('tracker toggle failed',
-          name: 'quran_yahdi/tracker', error: error, stackTrace: stackTrace);
+      appLog(
+        'tracker toggle failed',
+        name: 'quran_yahdi/tracker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _markActionFailed();
       return;
     } finally {

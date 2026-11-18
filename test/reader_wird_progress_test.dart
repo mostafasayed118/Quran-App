@@ -56,85 +56,96 @@ void main() {
     db = newTestDb();
     final fatiha = [
       AyahsCompanion.insert(
-          id: const Value(1),
-          surahId: 1,
-          numberInSurah: 1,
-          juz: 1,
-          page: 1,
-          textUthmani: 'بسم الله',
-          textImlaei: 'بسم الله'),
+        id: const Value(1),
+        surahId: 1,
+        numberInSurah: 1,
+        juz: 1,
+        page: 1,
+        textUthmani: 'بسم الله',
+        textImlaei: 'بسم الله',
+      ),
     ];
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم'),
+        id: const Value(8),
+        surahId: 2,
+        numberInSurah: 1,
+        juz: 1,
+        page: 2,
+        textUthmani: 'الم',
+        textImlaei: 'الم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 2,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب'),
+        id: const Value(9),
+        surahId: 2,
+        numberInSurah: 2,
+        juz: 1,
+        page: 2,
+        textUthmani: 'ذلك الكتاب',
+        textImlaei: 'ذلك الكتاب',
+      ),
       AyahsCompanion.insert(
-          id: const Value(10),
-          surahId: 2,
-          numberInSurah: 3,
-          juz: 1,
-          page: 3,
-          textUthmani: 'الذين يؤمنون',
-          textImlaei: 'الذين يؤمنون'),
+        id: const Value(10),
+        surahId: 2,
+        numberInSurah: 3,
+        juz: 1,
+        page: 3,
+        textUthmani: 'الذين يؤمنون',
+        textImlaei: 'الذين يؤمنون',
+      ),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
-              id: const Value(2),
-              nameAr: 'البقرة',
-              nameEn: 'Al-Baqarah',
-              revelationType: 'madinah',
-              ayahCount: 3,
-              pagesStart: 2,
-              pagesEnd: 3),
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madinah',
+            ayahCount: 3,
+            pagesStart: 2,
+            pagesEnd: 3,
+          ),
         );
     ayahs = AyahRepository(db);
     lastRead = LastReadRepository(db);
   });
 
-  test('mushaf page changes advance the sink with the page-first ayah',
-      () async {
-    final sink = _RecordingSink();
-    final cubit = ReaderCubit(
+  test(
+    'mushaf page changes advance the sink with the page-first ayah',
+    () async {
+      final sink = _RecordingSink();
+      final cubit = ReaderCubit(
         ayahRepository: ayahs,
         lastReadRepository: lastRead,
         surahId: 2,
         initialAyah: 0,
-        wirdProgress: sink);
-    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
-    await cubit.start();
-    await readyFuture;
+        wirdProgress: sink,
+      );
+      final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+      await cubit.start();
+      await readyFuture;
 
-    await cubit.onMushafPageChanged(0);
-    await cubit.onMushafPageChanged(1);
-    await cubit.onMushafPageChanged(7); // out of range: ignored
+      await cubit.onMushafPageChanged(0);
+      await cubit.onMushafPageChanged(1);
+      await cubit.onMushafPageChanged(7); // out of range: ignored
 
-    expect(sink.ids, [8, 10]);
-    await cubit.close();
-  });
+      expect(sink.ids, [8, 10]);
+      await cubit.close();
+    },
+  );
 
   test('visible verses advance the sink once per distinct ayah', () async {
     final sink = _RecordingSink();
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0,
-        wirdProgress: sink);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+      wirdProgress: sink,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     await readyFuture;
@@ -150,10 +161,11 @@ void main() {
 
   test('without a sink the page change still persists last-read', () async {
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     await readyFuture;
@@ -166,11 +178,12 @@ void main() {
 
   test('a throwing sink is swallowed and last-read survives', () async {
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0,
-        wirdProgress: _ThrowingSink());
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+      wirdProgress: _ThrowingSink(),
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     await readyFuture;
@@ -181,33 +194,39 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('mushaf paging forwards the page-first ayah to the sink',
-      (tester) async {
+  testWidgets('mushaf paging forwards the page-first ayah to the sink', (
+    tester,
+  ) async {
     final sink = _RecordingSink();
     final repo = _TeardownSafeAyahRepository(db);
     final cubit = ReaderCubit(
-        ayahRepository: repo,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0,
-        wirdProgress: sink);
+      ayahRepository: repo,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+      wirdProgress: sink,
+    );
     addTearDown(cubit.close);
     await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
     await settle(tester);
 
     await tester.tap(find.byTooltip('وضع المصحف'));

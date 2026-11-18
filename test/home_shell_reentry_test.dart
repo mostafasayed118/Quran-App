@@ -147,17 +147,17 @@ _Harness _buildShellHarness() {
 }
 
 Widget _app(GoRouter router) => MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    );
+  routerConfig: router,
+  locale: const Locale('ar'),
+  supportedLocales: const [Locale('ar'), Locale('en')],
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  theme: AppTheme.light,
+);
 
 Future<int> _pumpHome(WidgetTester tester, _Harness harness) async {
   await harness.cubit.start();
@@ -169,24 +169,34 @@ Future<int> _pumpHome(WidgetTester tester, _Harness harness) async {
 }
 
 void main() {
-  testWidgets('returning from the reader reloads Home exactly once',
-      (tester) async {
+  testWidgets('returning from the reader reloads Home exactly once', (
+    tester,
+  ) async {
     final harness = _buildHarness();
     final afterStart = await _pumpHome(tester, harness);
-    expect(harness.reloads, afterStart,
-        reason: 'showing Home must not add a load on top of start()');
+    expect(
+      harness.reloads,
+      afterStart,
+      reason: 'showing Home must not add a load on top of start()',
+    );
 
     unawaited(harness.router.push(AppRoutes.reader));
     await _pumpRounds(tester);
     expect(find.text('READER-STUB'), findsOneWidget);
-    expect(harness.reloads, afterStart,
-        reason: 'the reader sitting above Home must not reload it');
+    expect(
+      harness.reloads,
+      afterStart,
+      reason: 'the reader sitting above Home must not reload it',
+    );
 
     harness.router.pop();
     await _pumpRounds(tester);
     expect(find.text('READER-STUB'), findsNothing);
-    expect(harness.reloads, afterStart + 1,
-        reason: 'the reader writes last-read, so Home must reload on return');
+    expect(
+      harness.reloads,
+      afterStart + 1,
+      reason: 'the reader writes last-read, so Home must reload on return',
+    );
   });
 
   testWidgets('showing Home alone never adds a second load', (tester) async {
@@ -221,8 +231,9 @@ void main() {
     expect(harness.reloads, afterStart + 2);
   });
 
-  testWidgets('inside the shell, the reader round trip still reloads once',
-      (tester) async {
+  testWidgets('inside the shell, the reader round trip still reloads once', (
+    tester,
+  ) async {
     final harness = _buildShellHarness();
     final afterStart = await _pumpHome(tester, harness);
     expect(harness.reloads, afterStart);
@@ -233,9 +244,13 @@ void main() {
 
     harness.router.pop();
     await _pumpRounds(tester);
-    expect(harness.reloads, afterStart + 1,
-        reason: 'a reader return crosses navigators, so only the location '
-            'listener fires');
+    expect(
+      harness.reloads,
+      afterStart + 1,
+      reason:
+          'a reader return crosses navigators, so only the location '
+          'listener fires',
+    );
   });
 
   testWidgets('a shell-owned tile round trip reloads twice', (tester) async {
@@ -245,8 +260,11 @@ void main() {
     unawaited(harness.router.push(AppRoutes.quran));
     await _pumpRounds(tester);
     expect(find.text('QURAN-STUB'), findsOneWidget);
-    expect(harness.reloads, afterStart,
-        reason: 'the inner page sitting on Home must not reload it');
+    expect(
+      harness.reloads,
+      afterStart,
+      reason: 'the inner page sitting on Home must not reload it',
+    );
 
     harness.router.pop();
     await _pumpRounds(tester);
@@ -257,7 +275,10 @@ void main() {
     // location changes back to /home — two `reload()` calls for one return.
     // User-invisible: `reload()` emits no loading state and the cubit's
     // sequence token lets only the newest load emit.
-    expect(harness.reloads, afterStart + 2,
-        reason: 'inner push: didPopNext + location event = 2 reloads');
+    expect(
+      harness.reloads,
+      afterStart + 2,
+      reason: 'inner push: didPopNext + location event = 2 reloads',
+    );
   });
 }

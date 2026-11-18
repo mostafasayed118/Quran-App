@@ -7,9 +7,8 @@ export '../domain/duas_models.dart';
 
 /// Reads the bundled duas catalog.
 class DuaRepository {
-  DuaRepository({
-    required Future<List<Map<String, dynamic>>> Function() loader,
-  }) : _loader = loader;
+  DuaRepository({required Future<List<Map<String, dynamic>>> Function() loader})
+    : _loader = loader;
 
   final Future<List<Map<String, dynamic>>> Function() _loader;
 

@@ -18,9 +18,9 @@ Future<void> main() async {
     final ayahDir = Directory('${outDir.path}/ayahs')
       ..createSync(recursive: true);
 
-    final surahs = await (db.select(db.surahs)
-          ..orderBy([(t) => OrderingTerm(expression: t.id)]))
-        .get();
+    final surahs = await (db.select(
+      db.surahs,
+    )..orderBy([(t) => OrderingTerm(expression: t.id)])).get();
     if (surahs.length != 114) {
       stderr.writeln('expected 114 surahs, got ${surahs.length}');
       exitCode = 1;
@@ -31,13 +31,15 @@ Future<void> main() async {
     final surahRows = <Map<String, Object?>>[];
     final searchRows = <Map<String, Object?>>[];
     for (final s in surahs) {
-      final ayahs = await (db.select(db.ayahs)
-            ..where((t) => t.surahId.equals(s.id))
-            ..orderBy([(t) => OrderingTerm(expression: t.numberInSurah)]))
-          .get();
+      final ayahs =
+          await (db.select(db.ayahs)
+                ..where((t) => t.surahId.equals(s.id))
+                ..orderBy([(t) => OrderingTerm(expression: t.numberInSurah)]))
+              .get();
       if (ayahs.length != s.ayahCount) {
-        stderr
-            .writeln('surah ${s.id}: ${ayahs.length} ayahs != ${s.ayahCount}');
+        stderr.writeln(
+          'surah ${s.id}: ${ayahs.length} ayahs != ${s.ayahCount}',
+        );
         exitCode = 1;
         return;
       }
@@ -56,20 +58,22 @@ Future<void> main() async {
           searchRows.add({'s': s.id, 'a': a.numberInSurah, 't': a.textImlaei});
         }
       }
-      File('${ayahDir.path}/${s.id}.json').writeAsStringSync(jsonEncode({
-        'surah': s.id,
-        'ayahs': [
-          for (final a in ayahs)
-            {
-              'n': a.numberInSurah,
-              'juz': a.juz,
-              'page': a.page,
-              'u': a.textUthmani,
-              'i': a.textImlaei,
-              'sajda': a.sajda
-            },
-        ],
-      }));
+      File('${ayahDir.path}/${s.id}.json').writeAsStringSync(
+        jsonEncode({
+          'surah': s.id,
+          'ayahs': [
+            for (final a in ayahs)
+              {
+                'n': a.numberInSurah,
+                'juz': a.juz,
+                'page': a.page,
+                'u': a.textUthmani,
+                'i': a.textImlaei,
+                'sajda': a.sajda,
+              },
+          ],
+        }),
+      );
     }
     if (total != 6236) {
       stderr.writeln('expected 6236 ayahs, got $total');

@@ -16,23 +16,25 @@ void main() {
     repo = PrayerLogRepository(db);
   });
 
-  test('today and yesterday mark last7 and both count toward the streak',
-      () async {
-    final now = DateTime(2026, 6, 15, 10, 30);
-    await repo.togglePrayer(DateTime(2026, 6, 15), PrayerSlot.fajr);
-    await repo.togglePrayer(DateTime(2026, 6, 14), PrayerSlot.dhuhr);
+  test(
+    'today and yesterday mark last7 and both count toward the streak',
+    () async {
+      final now = DateTime(2026, 6, 15, 10, 30);
+      await repo.togglePrayer(DateTime(2026, 6, 15), PrayerSlot.fajr);
+      await repo.togglePrayer(DateTime(2026, 6, 14), PrayerSlot.dhuhr);
 
-    final cubit = TrackerCubit(repo: repo, clock: () => now);
-    await cubit.start();
-    await cubit.loaded;
+      final cubit = TrackerCubit(repo: repo, clock: () => now);
+      await cubit.start();
+      await cubit.loaded;
 
-    final ready = cubit.state as TrackerReady;
-    expect(ready.last7, hasLength(7));
-    expect(ready.last7[0], isTrue);
-    expect(ready.last7[1], isTrue);
-    expect(ready.last7.skip(2), everyElement(isFalse));
-    expect(ready.streakDays, 2);
+      final ready = cubit.state as TrackerReady;
+      expect(ready.last7, hasLength(7));
+      expect(ready.last7[0], isTrue);
+      expect(ready.last7[1], isTrue);
+      expect(ready.last7.skip(2), everyElement(isFalse));
+      expect(ready.streakDays, 2);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 }

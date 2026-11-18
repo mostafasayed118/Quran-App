@@ -17,17 +17,7 @@ import 'surah_name_source.dart';
 
 /// Featured reciters pinned by PM from the verified 2026-10-15 mp3quran dump
 /// (all حفص مرتل, 114 surahs each). Never extend without a PM grant.
-const List<int> featuredReciterIds = <int>[
-  51,
-  123,
-  118,
-  92,
-  102,
-  54,
-  30,
-  4,
-  5,
-];
+const List<int> featuredReciterIds = <int>[51, 123, 118, 92, 102, 54, 30, 4, 5];
 
 /// File name the surah audio is stored under.
 String surahAudioFileName(int surahNumber) =>
@@ -64,9 +54,11 @@ List<ReciterRow> sortReciters(List<ReciterRow> input) {
   // and splitting ids inside it is pure waste.
   final ranksById = {for (final row in input) row.id: rankOf(row)};
   final fallbackRank = featuredReciterIds.length;
-  final sorted = [...input]..sort((a, b) {
-      final byFeature = (ranksById[a.id] ?? fallbackRank)
-          .compareTo(ranksById[b.id] ?? fallbackRank);
+  final sorted = [...input]
+    ..sort((a, b) {
+      final byFeature = (ranksById[a.id] ?? fallbackRank).compareTo(
+        ranksById[b.id] ?? fallbackRank,
+      );
       if (byFeature != 0) return byFeature;
       final byName = a.reciterName.compareTo(b.reciterName);
       if (byName != 0) return byName;
@@ -103,9 +95,9 @@ class ReciterRepository
     Dio? client,
     String? apiEndpointOverride,
     Duration? catalogTimeout,
-  })  : _client = client ?? Dio(),
-        _endpoint = apiEndpointOverride ?? recitersApiEndpoint,
-        _catalogTimeout = catalogTimeout ?? const Duration(seconds: 20);
+  }) : _client = client ?? Dio(),
+       _endpoint = apiEndpointOverride ?? recitersApiEndpoint,
+       _catalogTimeout = catalogTimeout ?? const Duration(seconds: 20);
 
   final AppDatabase _db;
 
@@ -209,14 +201,16 @@ class ReciterRepository
         final surahTotal = moshaf['surah_total'];
         final reciterIdInt = reciterId.toInt();
         if (featuredReciterIds.contains(reciterIdInt)) featuredPresent = true;
-        rows.add(RecitersCompanion.insert(
-          id: '$reciterIdInt$reciterRowSeparator${moshafId.toInt()}',
-          reciterName: reciterName is String ? reciterName : '',
-          moshafName: moshafName is String ? moshafName : '',
-          server: server,
-          surahList: surahList is String ? surahList : '',
-          surahTotal: surahTotal is num ? surahTotal.toInt() : 0,
-        ));
+        rows.add(
+          RecitersCompanion.insert(
+            id: '$reciterIdInt$reciterRowSeparator${moshafId.toInt()}',
+            reciterName: reciterName is String ? reciterName : '',
+            moshafName: moshafName is String ? moshafName : '',
+            server: server,
+            surahList: surahList is String ? surahList : '',
+            surahTotal: surahTotal is num ? surahTotal.toInt() : 0,
+          ),
+        );
       }
     }
     // Sanity floor: the payload must yield at least one trusted row and
@@ -224,7 +218,8 @@ class ReciterRepository
     // response would leave the app with an empty reciter list.
     if (rows.isEmpty || !featuredPresent) {
       throw StateError(
-          'mp3quran payload failed the sanity floor: ${rows.length} trusted rows, featured=$featuredPresent');
+        'mp3quran payload failed the sanity floor: ${rows.length} trusted rows, featured=$featuredPresent',
+      );
     }
     await _db.transaction(() async {
       await _db.delete(_db.reciters).go();
@@ -263,9 +258,9 @@ class ReciterRepository
   }
 
   @override
-  Future<ReciterRow?> byId(String rowId) =>
-      (_db.select(_db.reciters)..where((r) => r.id.equals(rowId)))
-          .getSingleOrNull();
+  Future<ReciterRow?> byId(String rowId) => (_db.select(
+    _db.reciters,
+  )..where((r) => r.id.equals(rowId))).getSingleOrNull();
 
   /// Reciters for [rowIds] in one query, keyed by row id.
   ///
@@ -278,9 +273,9 @@ class ReciterRepository
     // is keyed by id, so batch boundaries cannot change the result.
     final result = <String, ReciterRow>{};
     for (final batch in sqlBatches(rowIds.toList())) {
-      final rows = await (_db.select(_db.reciters)
-            ..where((r) => r.id.isIn(batch)))
-          .get();
+      final rows = await (_db.select(
+        _db.reciters,
+      )..where((r) => r.id.isIn(batch))).get();
       for (final r in rows) {
         result[r.id] = r;
       }
@@ -300,8 +295,9 @@ class ReciterRepository
     if (surahIds.isEmpty) return {};
     final result = <int, String>{};
     for (final batch in sqlBatches(surahIds)) {
-      final rows =
-          await (_db.select(_db.surahs)..where((s) => s.id.isIn(batch))).get();
+      final rows = await (_db.select(
+        _db.surahs,
+      )..where((s) => s.id.isIn(batch))).get();
       for (final s in rows) {
         result[s.id] = s.nameAr;
       }
@@ -320,9 +316,9 @@ class ReciterRepository
     if (surahIds.isEmpty) return {};
     final result = <int, String>{};
     for (final batch in sqlBatches(surahIds)) {
-      final rows = await (_db.select(_db.ayahs)
-            ..where((a) => a.surahId.isIn(batch) & a.numberInSurah.equals(1)))
-          .get();
+      final rows = await (_db.select(
+        _db.ayahs,
+      )..where((a) => a.surahId.isIn(batch) & a.numberInSurah.equals(1))).get();
       for (final a in rows) {
         result[a.surahId] = a.textImlaei;
       }

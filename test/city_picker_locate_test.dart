@@ -33,24 +33,33 @@ void main() {
 
   Future<void> pumpPicker(WidgetTester tester, CityPickerCubit cubit) async {
     addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
-      value: cubit,
-      child: appShell(home: const CityPickerScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<CityPickerCubit>.value(
+        value: cubit,
+        child: appShell(home: const CityPickerScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('a failed locate offers a working location-settings action',
-      (tester) async {
+  testWidgets('a failed locate offers a working location-settings action', (
+    tester,
+  ) async {
     final location = _RecordingLocation();
     final cubit = CityPickerCubit(cityRepo: repo, location: location);
     await cubit.start();
     await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تعذّر تحديد الموقع — اختر يدويًا'), findsOneWidget);
     expect(find.text('إعدادات الموقع'), findsOneWidget);
@@ -61,20 +70,25 @@ void main() {
     expect(location.opened, isTrue);
 
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 
-  testWidgets(
-      'without a location service the hint still shows and the action '
+  testWidgets('without a location service the hint still shows and the action '
       'is a safe no-op', (tester) async {
     final cubit = CityPickerCubit(cityRepo: repo);
     await cubit.start();
     await pumpPicker(tester, cubit);
 
     await tester.tap(find.text('استخدم موقعي'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تعذّر تحديد الموقع — اختر يدويًا'), findsOneWidget);
 
@@ -84,7 +98,10 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 }

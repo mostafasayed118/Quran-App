@@ -72,7 +72,10 @@ class _BookmarkList extends StatelessWidget {
   }
 
   Future<void> _confirmRemove(
-      BuildContext context, int ayahId, AppLocalizations loc) async {
+    BuildContext context,
+    int ayahId,
+    AppLocalizations loc,
+  ) async {
     // The cubit is resolved before the await so the confirmation cannot
     // outlive the provider lookup.
     final cubit = context.read<BookmarksCubit>();

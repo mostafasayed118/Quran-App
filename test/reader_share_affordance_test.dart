@@ -32,59 +32,76 @@ void main() {
     db = newTestDb();
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم'),
+        id: const Value(8),
+        surahId: 2,
+        numberInSurah: 1,
+        juz: 1,
+        page: 2,
+        textUthmani: 'الم',
+        textImlaei: 'الم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 2,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب'),
+        id: const Value(9),
+        surahId: 2,
+        numberInSurah: 2,
+        juz: 1,
+        page: 2,
+        textUthmani: 'ذلك الكتاب',
+        textImlaei: 'ذلك الكتاب',
+      ),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     lastRead = LastReadRepository(db);
   });
 
-  testWidgets('verse cards expose the share affordance with its tooltip',
-      (tester) async {
+  testWidgets('verse cards expose the share affordance with its tooltip', (
+    tester,
+  ) async {
     final cubit = ReaderCubit(
-        ayahRepository: _TeardownSafeAyahRepository(db),
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0);
+      ayahRepository: _TeardownSafeAyahRepository(db),
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+    );
     await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // The action row stays closed until the verse is tapped (UI-1).
     expect(find.byTooltip('مشاركة الآية'), findsNothing);
     await tester.tap(find.text('الم').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
-    expect(find.byTooltip('مشاركة الآية'), findsOneWidget,
-        reason: 'the open verse carries the share_plus affordance');
+    expect(
+      find.byTooltip('مشاركة الآية'),
+      findsOneWidget,
+      reason: 'the open verse carries the share_plus affordance',
+    );
     expect(find.byIcon(Icons.share_outlined), findsOneWidget);
   });
 }

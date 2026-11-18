@@ -33,39 +33,43 @@ void main() {
     db = newTestDb();
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم'),
+        id: const Value(8),
+        surahId: 2,
+        numberInSurah: 1,
+        juz: 1,
+        page: 2,
+        textUthmani: 'الم',
+        textImlaei: 'الم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 2,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب'),
+        id: const Value(9),
+        surahId: 2,
+        numberInSurah: 2,
+        juz: 1,
+        page: 2,
+        textUthmani: 'ذلك الكتاب',
+        textImlaei: 'ذلك الكتاب',
+      ),
       AyahsCompanion.insert(
-          id: const Value(10),
-          surahId: 2,
-          numberInSurah: 3,
-          juz: 1,
-          page: 3,
-          textUthmani: 'الذين يؤمنون',
-          textImlaei: 'الذين يؤمنون'),
+        id: const Value(10),
+        surahId: 2,
+        numberInSurah: 3,
+        juz: 1,
+        page: 3,
+        textUthmani: 'الذين يؤمنون',
+        textImlaei: 'الذين يؤمنون',
+      ),
     ];
     final fatiha = [
       AyahsCompanion.insert(
-          id: const Value(1),
-          surahId: 1,
-          numberInSurah: 1,
-          juz: 1,
-          page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم',
-          textImlaei: 'بسم الله الرحمن الرحيم'),
+        id: const Value(1),
+        surahId: 1,
+        numberInSurah: 1,
+        juz: 1,
+        page: 1,
+        textUthmani: 'بسم الله الرحمن الرحيم',
+        textImlaei: 'بسم الله الرحمن الرحيم',
+      ),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
@@ -75,16 +79,19 @@ void main() {
   Future<Widget> host(int surahId) async {
     repo = _TeardownSafeAyahRepository(db);
     final cubit = ReaderCubit(
-        ayahRepository: repo,
-        lastReadRepository: lastRead,
-        surahId: surahId,
-        initialAyah: 0);
+      ayahRepository: repo,
+      lastReadRepository: lastRead,
+      surahId: surahId,
+      initialAyah: 0,
+    );
     await cubit.start();
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
     return MultiBlocProvider(
@@ -96,47 +103,70 @@ void main() {
     );
   }
 
-  testWidgets('surah 2 shows basmala banner and ayah cards in verse mode',
-      (tester) async {
+  testWidgets('surah 2 shows basmala banner and ayah cards in verse mode', (
+    tester,
+  ) async {
     final screen = await host(2);
     await tester.pumpWidget(appShell(home: screen));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'), findsOneWidget);
     expect(find.text('الم'), findsOneWidget);
-    expect(find.text('بسم الله الرحمن الرحيم'), findsNothing,
-        reason: 'Fatiha text is not part of surah 2');
+    expect(
+      find.text('بسم الله الرحمن الرحيم'),
+      findsNothing,
+      reason: 'Fatiha text is not part of surah 2',
+    );
   });
 
   testWidgets('bookmark heart toggles the DB row', (tester) async {
     final screen = await host(2);
     await tester.pumpWidget(appShell(home: screen));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('الم').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.bookmark_border).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final rows = await db.select(db.bookmarks).get();
     expect(rows, hasLength(1));
     expect(rows.single.ayahId, 8);
   });
 
-  testWidgets('mushaf mode renders page blocks with the page indicator',
-      (tester) async {
+  testWidgets('mushaf mode renders page blocks with the page indicator', (
+    tester,
+  ) async {
     final screen = await host(2);
     await tester.pumpWidget(appShell(home: screen));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.textContaining('صفحة'), findsOneWidget);
   });

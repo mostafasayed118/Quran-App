@@ -29,8 +29,8 @@ class _ProgressDownloader extends PackDownloader {
 }
 
 CatalogRepository _emptyCatalog() => CatalogRepository(
-      source: BundledCatalogSource(loader: () async => const []),
-    );
+  source: BundledCatalogSource(loader: () async => const []),
+);
 
 void main() {
   late AppDatabase db;
@@ -46,21 +46,27 @@ void main() {
     await db.close();
   });
 
-  test('a re-entering cubit seeds progress from the app-scoped downloader',
-      () async {
-    downloader.current = {'p': (3, 10)};
-    final cubit =
-        LibraryCubit(catalog: _emptyCatalog(), downloader: downloader);
-    addTearDown(cubit.close);
+  test(
+    'a re-entering cubit seeds progress from the app-scoped downloader',
+    () async {
+      downloader.current = {'p': (3, 10)};
+      final cubit = LibraryCubit(
+        catalog: _emptyCatalog(),
+        downloader: downloader,
+      );
+      addTearDown(cubit.close);
 
-    await cubit.start();
+      await cubit.start();
 
-    expect((cubit.state as LibraryReady).progress['p'], (3, 10));
-  });
+      expect((cubit.state as LibraryReady).progress['p'], (3, 10));
+    },
+  );
 
   test('live downloader progress is mirrored into the route cubit', () async {
-    final cubit =
-        LibraryCubit(catalog: _emptyCatalog(), downloader: downloader);
+    final cubit = LibraryCubit(
+      catalog: _emptyCatalog(),
+      downloader: downloader,
+    );
     addTearDown(cubit.close);
     await cubit.start();
 

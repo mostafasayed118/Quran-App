@@ -80,7 +80,8 @@ void main() {
   /// controllers must live in the widget tester's fake-clock zone, or their
   /// subscription-cancel futures never complete during `stopAndReset`.
   ({_FakePlaybackService fake, PlaybackCubit cubit}) build(
-      WidgetTester tester) {
+    WidgetTester tester,
+  ) {
     final fake = _FakePlaybackService();
     final cubit = PlaybackCubit(
       service: fake,
@@ -93,18 +94,22 @@ void main() {
   }
 
   Future<void> pumpBar(WidgetTester tester, PlaybackCubit cubit) async {
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: cubit),
-      ],
-      child: appShell(home: const Scaffold(bottomSheet: MiniPlayerBar())),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [BlocProvider<PlaybackCubit>.value(value: cubit)],
+        child: appShell(home: const Scaffold(bottomSheet: MiniPlayerBar())),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('the stop control uses the stop glyph and resets playback',
-      (tester) async {
+  testWidgets('the stop control uses the stop glyph and resets playback', (
+    tester,
+  ) async {
     final (:fake, :cubit) = build(tester);
     await pumpBar(tester, cubit);
     await cubit.playSurah(_row, 1);
@@ -112,37 +117,53 @@ void main() {
     // that animates forever and would never let pumpAndSettle settle.
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byIcon(Icons.stop), findsOneWidget);
-    expect(find.byIcon(Icons.close), findsNothing,
-        reason: 'close is the dismiss glyph, not stop');
+    expect(
+      find.byIcon(Icons.close),
+      findsNothing,
+      reason: 'close is the dismiss glyph, not stop',
+    );
 
     await tester.tap(find.byIcon(Icons.stop));
     // Subscription-cancel futures (inside stopAndReset) only complete on a
     // real event-loop turn; plain fake-clock pumps never resolve them.
     await tester.runAsync(() => Future<void>.delayed(Duration.zero));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(fake.stopCount, 1);
     expect(cubit.state, isA<PlaybackInitial>());
     expect(find.byType(IconButton), findsNothing);
   });
 
-  testWidgets('the failed strip dismiss carries the unified stop wording',
-      (tester) async {
+  testWidgets('the failed strip dismiss carries the unified stop wording', (
+    tester,
+  ) async {
     final (:fake, :cubit) = build(tester);
     fake.loadError = StateError('boom');
     await pumpBar(tester, cubit);
     await cubit.playSurah(_row, 1);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(cubit.state, isA<PlaybackFailed>());
     expect(find.byTooltip('إيقاف'), findsOneWidget);
-    expect(find.byTooltip('وقف'), findsNothing,
-        reason: 'the dual stop wording must be gone');
+    expect(
+      find.byTooltip('وقف'),
+      findsNothing,
+      reason: 'the dual stop wording must be gone',
+    );
   });
 }

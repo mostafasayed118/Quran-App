@@ -18,12 +18,12 @@ class _City implements CitySource {
 
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -89,8 +89,9 @@ void main() {
     expect(events, [false]);
   });
 
-  testWidgets('the screen shows the hint when the field is disturbed',
-      (tester) async {
+  testWidgets('the screen shows the hint when the field is disturbed', (
+    tester,
+  ) async {
     final heading = StreamController<double>();
     final field = StreamController<MagneticSample>();
     final cubit = QiblaCubit(

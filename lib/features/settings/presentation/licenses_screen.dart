@@ -49,9 +49,13 @@ class LicensesScreen extends StatelessWidget {
             ),
             _InfoTile(icon: Icons.translate_outlined, text: loc.licensesSiraj),
             _InfoTile(
-                icon: Icons.translate_outlined, text: loc.licensesPickthall),
+              icon: Icons.translate_outlined,
+              text: loc.licensesPickthall,
+            ),
             _InfoTile(
-                icon: Icons.library_books_outlined, text: loc.licensesBukhari),
+              icon: Icons.library_books_outlined,
+              text: loc.licensesBukhari,
+            ),
             _InfoTile(icon: Icons.spa_outlined, text: loc.licensesAzkar),
             _InfoTile(icon: Icons.headphones_outlined, text: loc.licensesAudio),
             _AssetTile(
@@ -165,8 +169,10 @@ class _AssetTile extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
               return SingleChildScrollView(
-                child: Text(text,
-                    style: const TextStyle(fontSize: AppType.caption)),
+                child: Text(
+                  text,
+                  style: const TextStyle(fontSize: AppType.caption),
+                ),
               );
             },
           ),

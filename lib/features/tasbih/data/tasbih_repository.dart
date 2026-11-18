@@ -36,17 +36,19 @@ class TasbihRepository {
         target: (json['target'] as num).toInt(),
       );
     } on Object catch (error, stackTrace) {
-      appLog('tasbih state decode failed, defaulting',
-          name: 'quran_yahdi/tasbih',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'tasbih state decode failed, defaulting',
+        name: 'quran_yahdi/tasbih',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
 
   /// Stores [count] and [target] as the tasbih counter.
   Future<void> save(int count, int target) => _settings.write(
-        tasbihStateKey,
-        jsonEncode({'count': count, 'target': target}),
-      );
+    tasbihStateKey,
+    jsonEncode({'count': count, 'target': target}),
+  );
 }

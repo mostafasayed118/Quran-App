@@ -9,8 +9,8 @@ import 'loading_and_error_views.dart';
 /// Pass [onRetry] when the screen owns a reload path, so the pane is not a
 /// dead end.
 Widget errorPane(AppLocalizations loc, {VoidCallback? onRetry}) => ErrorView(
-      loc.genericError,
-      onRetry: onRetry,
-      retryLabel: onRetry == null ? null : loc.retry,
-      icon: Icons.error_outline,
-    );
+  loc.genericError,
+  onRetry: onRetry,
+  retryLabel: onRetry == null ? null : loc.retry,
+  icon: Icons.error_outline,
+);

@@ -113,18 +113,10 @@ KhatmaMerge mergeKhatma({
     return KhatmaMerge(toWrite: null, replaced: false, rejected: rejected);
   }
   if (existing == null) {
-    return KhatmaMerge(
-      toWrite: newest,
-      replaced: true,
-      rejected: rejected,
-    );
+    return KhatmaMerge(toWrite: newest, replaced: true, rejected: rejected);
   }
   if (newest.updatedAt.isAfter(existing.updatedAt)) {
-    return KhatmaMerge(
-      toWrite: newest,
-      replaced: true,
-      rejected: rejected,
-    );
+    return KhatmaMerge(toWrite: newest, replaced: true, rejected: rejected);
   }
   return KhatmaMerge(toWrite: null, replaced: false, rejected: rejected);
 }
@@ -206,7 +198,8 @@ TasbihMerge mergeTasbih({
       ? imported.target
       : (existing?.target ?? imported.target);
   final merged = BackupTasbih(count: count, target: target);
-  final changed = existing == null ||
+  final changed =
+      existing == null ||
       existing.count != merged.count ||
       existing.target != merged.target;
   return TasbihMerge(
@@ -229,10 +222,7 @@ const Set<String> _documentSettings = <String>{
 };
 
 class SettingsMerge {
-  const SettingsMerge(
-    this.toWrite, {
-    this.skippedDocuments = const <String>{},
-  });
+  const SettingsMerge(this.toWrite, {this.skippedDocuments = const <String>{}});
 
   /// Settings that differ from the stored ones and must be written.
   final Map<String, String> toWrite;
@@ -371,8 +361,7 @@ String? _mergeStringCollections(String current, String imported) {
       if (value is String && value.isNotEmpty) value,
     for (final value in incoming)
       if (value is String && value.isNotEmpty) value,
-  }.toList()
-    ..sort();
+  }.toList()..sort();
   if (values.isEmpty) return null;
   return jsonEncode(values);
 }

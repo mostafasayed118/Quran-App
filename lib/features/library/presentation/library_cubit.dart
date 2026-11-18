@@ -18,9 +18,9 @@ class LibraryCubit extends Cubit<LibraryState> {
   LibraryCubit({
     required CatalogRepository catalog,
     required PackDownloader downloader,
-  })  : _catalog = catalog,
-        _downloader = downloader,
-        super(const LibraryState.loading());
+  }) : _catalog = catalog,
+       _downloader = downloader,
+       super(const LibraryState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -60,7 +60,8 @@ class LibraryCubit extends Cubit<LibraryState> {
           if (!catalogIds.contains(row.packId))
             LibraryPackInfo(
               id: row.packId,
-              kind: LibraryPackKind.values
+              kind:
+                  LibraryPackKind.values
                       .where((kind) => kind.name == row.kind)
                       .firstOrNull ??
                   LibraryPackKind.tafsir,
@@ -74,20 +75,26 @@ class LibraryCubit extends Cubit<LibraryState> {
       ];
       installed = {for (final row in rows) row.packId};
     } on Object catch (error, stackTrace) {
-      appLog('library load failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'library load failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const LibraryState.failed());
       return;
     }
     if (isClosed) return;
-    emit(LibraryState.ready(
-      packs: [...catalogPacks, ...orphans],
-      installed: installed,
-      // A route that re-enters while an app-scoped install is still running
-      // must show the current bytes, not a reset 0 %.
-      progress: {..._downloader.progress},
-    ));
+    emit(
+      LibraryState.ready(
+        packs: [...catalogPacks, ...orphans],
+        installed: installed,
+        // A route that re-enters while an app-scoped install is still running
+        // must show the current bytes, not a reset 0 %.
+        progress: {..._downloader.progress},
+      ),
+    );
   }
 
   /// Downloads and installs [pack], reporting progress on the state.
@@ -99,38 +106,52 @@ class LibraryCubit extends Cubit<LibraryState> {
     final current = state;
     if (current is! LibraryReady) return;
     final expected = (pack.approxSizeMb * 1024 * 1024).round();
-    emit(current.copyWith(
-      failed: {...current.failed}..remove(pack.id),
-      progress: {...current.progress, pack.id: (0, expected)},
-    ));
+    emit(
+      current.copyWith(
+        failed: {...current.failed}..remove(pack.id),
+        progress: {...current.progress, pack.id: (0, expected)},
+      ),
+    );
     try {
-      await _downloader.install(pack, onProgress: (received, total) {
-        if (isClosed) return;
-        final current = state;
-        if (current is! LibraryReady) return;
-        emit(current.copyWith(progress: {
-          ...current.progress,
-          pack.id: (received, total),
-        }));
-      });
+      await _downloader.install(
+        pack,
+        onProgress: (received, total) {
+          if (isClosed) return;
+          final current = state;
+          if (current is! LibraryReady) return;
+          emit(
+            current.copyWith(
+              progress: {...current.progress, pack.id: (received, total)},
+            ),
+          );
+        },
+      );
       if (isClosed) return;
       final ready = state;
       if (ready is! LibraryReady) return;
-      emit(ready.copyWith(
-        installed: {...ready.installed, pack.id},
-        progress: {...ready.progress}..remove(pack.id),
-      ));
+      emit(
+        ready.copyWith(
+          installed: {...ready.installed, pack.id},
+          progress: {...ready.progress}..remove(pack.id),
+        ),
+      );
       onInstalled(pack.id);
     } on Object catch (error, stackTrace) {
-      appLog('library install failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'library install failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       final ready = state;
       if (ready is! LibraryReady) return;
-      emit(ready.copyWith(
-        failed: {...ready.failed, pack.id},
-        progress: {...ready.progress}..remove(pack.id),
-      ));
+      emit(
+        ready.copyWith(
+          failed: {...ready.failed, pack.id},
+          progress: {...ready.progress}..remove(pack.id),
+        ),
+      );
     }
   }
 
@@ -151,8 +172,12 @@ class LibraryCubit extends Cubit<LibraryState> {
     try {
       await _downloader.uninstall(packId);
     } on Object catch (error, stackTrace) {
-      appLog('library uninstall failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'library uninstall failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       final ready = state;
       if (ready is! LibraryReady) return;
@@ -162,19 +187,22 @@ class LibraryCubit extends Cubit<LibraryState> {
     if (isClosed) return;
     final ready = state;
     if (ready is! LibraryReady) return;
-    final wasOrphan =
-        ready.packs.any((pack) => pack.id == packId && pack.orphan);
-    emit(ready.copyWith(
-      installed: {...ready.installed}..remove(packId),
-      // An orphan has no catalog entry to reinstall from: drop its row too,
-      // otherwise the row would offer an install that cannot work.
-      packs: wasOrphan
-          ? [
-              for (final pack in ready.packs)
-                if (pack.id != packId) pack,
-            ]
-          : ready.packs,
-    ));
+    final wasOrphan = ready.packs.any(
+      (pack) => pack.id == packId && pack.orphan,
+    );
+    emit(
+      ready.copyWith(
+        installed: {...ready.installed}..remove(packId),
+        // An orphan has no catalog entry to reinstall from: drop its row too,
+        // otherwise the row would offer an install that cannot work.
+        packs: wasOrphan
+            ? [
+                for (final pack in ready.packs)
+                  if (pack.id != packId) pack,
+              ]
+            : ready.packs,
+      ),
+    );
   }
 
   /// Clears the failure recorded for [packId] (the user dismissed it).
@@ -200,8 +228,12 @@ class LibraryCubit extends Cubit<LibraryState> {
       if (pack == null) return;
       await install(pack);
     } on Object catch (error, stackTrace) {
-      appLog('library retry failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'library retry failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 

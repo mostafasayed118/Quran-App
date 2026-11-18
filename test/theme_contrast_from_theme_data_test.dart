@@ -42,32 +42,68 @@ void main() {
 
       test('$label: the built ThemeData clears the text floors', () {
         _atLeast(colors.onSurface, page, _text, '$label onSurface/page');
-        _atLeast(colors.onSurface, colors.surface, _text,
-            '$label onSurface/surface');
-        _atLeast(colors.onSurfaceVariant, colors.surface, _text,
-            '$label onSurfaceVariant');
-        _atLeast(colors.onPrimary, colors.primary, _text, '$label onPrimary');
-        _atLeast(colors.onPrimaryContainer, colors.primaryContainer, _text,
-            '$label onPrimaryContainer');
         _atLeast(
-            colors.primary, colors.surface, _text, '$label primary/surface');
-        _atLeast(colors.onSecondaryContainer, colors.surface, _text,
-            '$label goldText/surface');
+          colors.onSurface,
+          colors.surface,
+          _text,
+          '$label onSurface/surface',
+        );
+        _atLeast(
+          colors.onSurfaceVariant,
+          colors.surface,
+          _text,
+          '$label onSurfaceVariant',
+        );
+        _atLeast(colors.onPrimary, colors.primary, _text, '$label onPrimary');
+        _atLeast(
+          colors.onPrimaryContainer,
+          colors.primaryContainer,
+          _text,
+          '$label onPrimaryContainer',
+        );
+        _atLeast(
+          colors.primary,
+          colors.surface,
+          _text,
+          '$label primary/surface',
+        );
+        _atLeast(
+          colors.onSecondaryContainer,
+          colors.surface,
+          _text,
+          '$label goldText/surface',
+        );
         _atLeast(colors.onSurface, appBar, _text, '$label onSurface/appBar');
       });
 
       test('$label: the built ThemeData clears the container floors', () {
-        _atLeast(colors.onSecondaryContainer, colors.secondaryContainer, _text,
-            '$label onSecondaryContainer/secondaryContainer');
-        _atLeast(colors.onErrorContainer, colors.errorContainer, _text,
-            '$label onErrorContainer/errorContainer');
+        _atLeast(
+          colors.onSecondaryContainer,
+          colors.secondaryContainer,
+          _text,
+          '$label onSecondaryContainer/secondaryContainer',
+        );
+        _atLeast(
+          colors.onErrorContainer,
+          colors.errorContainer,
+          _text,
+          '$label onErrorContainer/errorContainer',
+        );
       });
 
       test('$label: the built ThemeData clears the graphics floors', () {
         _atLeast(
-            colors.secondary, colors.surface, _graphics, '$label gold/surface');
-        _atLeast(colors.onSecondary, colors.secondary, _graphics,
-            '$label onGold/gold');
+          colors.secondary,
+          colors.surface,
+          _graphics,
+          '$label gold/surface',
+        );
+        _atLeast(
+          colors.onSecondary,
+          colors.secondary,
+          _graphics,
+          '$label onGold/gold',
+        );
         final palette = PrayerPalettes.of(name, brightness);
         for (final entry in {
           'success': palette.success,
@@ -75,8 +111,12 @@ void main() {
           'error': colors.error,
           'info': palette.info,
         }.entries) {
-          _atLeast(entry.value, colors.surface, _text,
-              '$label ${entry.key}/surface');
+          _atLeast(
+            entry.value,
+            colors.surface,
+            _text,
+            '$label ${entry.key}/surface',
+          );
         }
       });
 

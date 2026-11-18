@@ -20,8 +20,10 @@ void main() {
     db = newTestDb();
   });
 
-  Future<void> pumpSection(WidgetTester tester,
-      {Locale locale = const Locale('ar')}) async {
+  Future<void> pumpSection(
+    WidgetTester tester, {
+    Locale locale = const Locale('ar'),
+  }) async {
     final cubit = BackupCubit(
       service: BackupService(db: db, reschedule: () async {}),
       pickBytes: () async => null,
@@ -40,16 +42,18 @@ void main() {
     }
   }
 
-  testWidgets('the Arabic export row warns that the file is unencrypted',
-      (tester) async {
+  testWidgets('the Arabic export row warns that the file is unencrypted', (
+    tester,
+  ) async {
     await pumpSection(tester);
 
     expect(find.textContaining('غير مشفَّر'), findsOneWidget);
     expect(find.textContaining('احفظه في مكان آمن'), findsOneWidget);
   });
 
-  testWidgets('the English export row shows the English warning',
-      (tester) async {
+  testWidgets('the English export row shows the English warning', (
+    tester,
+  ) async {
     await pumpSection(tester, locale: const Locale('en'));
 
     expect(find.textContaining("isn't encrypted"), findsOneWidget);

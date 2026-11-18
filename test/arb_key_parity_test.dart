@@ -24,9 +24,15 @@ void main() {
     final arKeys = ar.keys.where((k) => !k.startsWith('@')).toSet();
     final enKeys = en.keys.where((k) => !k.startsWith('@')).toSet();
 
-    expect(arKeys.difference(enKeys), isEmpty,
-        reason: 'AR keys missing from EN: ${arKeys.difference(enKeys)}');
-    expect(enKeys.difference(arKeys), isEmpty,
-        reason: 'EN keys missing from AR: ${enKeys.difference(arKeys)}');
+    expect(
+      arKeys.difference(enKeys),
+      isEmpty,
+      reason: 'AR keys missing from EN: ${arKeys.difference(enKeys)}',
+    );
+    expect(
+      enKeys.difference(arKeys),
+      isEmpty,
+      reason: 'EN keys missing from AR: ${enKeys.difference(arKeys)}',
+    );
   });
 }

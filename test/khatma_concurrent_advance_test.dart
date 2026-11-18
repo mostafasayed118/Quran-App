@@ -14,10 +14,7 @@ void main() {
     // Interleave a forward and a backward write many times. The conditional
     // UPDATE must keep the maximum regardless of completion order.
     for (var i = 0; i < 20; i++) {
-      await Future.wait([
-        repo.advanceTo(100 + i),
-        repo.advanceTo(50 + i),
-      ]);
+      await Future.wait([repo.advanceTo(100 + i), repo.advanceTo(50 + i)]);
     }
 
     final plan = await repo.currentPlan();

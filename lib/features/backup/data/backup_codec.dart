@@ -37,8 +37,9 @@ Map<String, Object?> encodeMap(BackupDocument document) {
             'createdAt': bookmark.createdAt.toIso8601String(),
           },
       ],
-      'lastRead':
-          lastRead == null ? null : <String, Object?>{'ayahId': lastRead},
+      'lastRead': lastRead == null
+          ? null
+          : <String, Object?>{'ayahId': lastRead},
       'khatma': [
         for (final row in data.khatma)
           <String, Object?>{

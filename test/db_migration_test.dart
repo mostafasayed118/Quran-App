@@ -19,7 +19,9 @@ void main() {
     // w2a: + reciters (PM grant) · 2026-10-25 owner-approved: + hadith_entries
     expect(db.allTables.length, 10);
 
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
             id: const Value(1),
             nameAr: 'الفاتحة',
@@ -37,7 +39,9 @@ void main() {
   });
 
   test('ayahs table roundtrips uthmani + imlaei text', () async {
-    await db.into(db.ayahs).insert(
+    await db
+        .into(db.ayahs)
+        .insert(
           AyahsCompanion.insert(
             id: const Value(1),
             surahId: 1,
@@ -63,17 +67,20 @@ void main() {
         .map((row) => row.read<String>('name'))
         .get();
     expect(
-        names,
-        containsAll(<String>[
-          'idx_ayahs_surah',
-          'idx_bookmarks_ayah',
-          'idx_downloads_lookup',
-        ]));
+      names,
+      containsAll(<String>[
+        'idx_ayahs_surah',
+        'idx_bookmarks_ayah',
+        'idx_downloads_lookup',
+      ]),
+    );
   });
 
   test('v2 adds reciters table; companion roundtrips a row', () async {
     final db2 = AppDatabase.test(NativeDatabase.memory());
-    await db2.into(db2.reciters).insert(
+    await db2
+        .into(db2.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',

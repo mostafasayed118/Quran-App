@@ -18,8 +18,8 @@ typedef PrepareRunner = Future<R> Function<R>(R Function() computation);
 /// Normalizes every `(key, text)` pair; a top-level function so the closure
 /// sent to the isolate captures only sendable values.
 List<(int, String, String)> _prepareEntries(List<(int, String)> pairs) => [
-      for (final (key, text) in pairs) (key, text, prepareQuery(text)),
-    ];
+  for (final (key, text) in pairs) (key, text, prepareQuery(text)),
+];
 
 /// Searches every installed translation pack locally.
 ///
@@ -32,11 +32,11 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
     required SurahNameResolver surahName,
     Duration debounce = const Duration(milliseconds: 300),
     PrepareRunner? prepare,
-  })  : _source = source,
-        _surahName = surahName,
-        _debounceDuration = debounce,
-        _prepare = prepare ?? Isolate.run,
-        super(const TranslationSearchState.loading());
+  }) : _source = source,
+       _surahName = surahName,
+       _debounceDuration = debounce,
+       _prepare = prepare ?? Isolate.run,
+       super(const TranslationSearchState.loading());
 
   final TranslationSearchSource _source;
   final SurahNameResolver _surahName;
@@ -81,19 +81,25 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
       // several dropped frames, so it runs off the UI isolate.
       final prepared = await _prepare(() => _prepareEntries(pairs));
       for (final (key, text, preparedText) in prepared) {
-        _entries.add(_Entry(
-          surah: AyahKey.surahOf(key),
-          ayah: AyahKey.ayahOf(key),
-          text: text,
-          prepared: preparedText,
-        ));
+        _entries.add(
+          _Entry(
+            surah: AyahKey.surahOf(key),
+            ayah: AyahKey.ayahOf(key),
+            text: text,
+            prepared: preparedText,
+          ),
+        );
       }
       if (!isClosed) {
         emit(const TranslationSearchState.ready(hasPacks: true));
       }
     } on Object catch (error, stackTrace) {
-      appLog('translation search load failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'translation search load failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
       // Let the retry button re-enter the load; the latch only covers a
       // successful/in-flight attempt.
       _started = false;
@@ -114,10 +120,7 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
       emit(const TranslationSearchState.ready(hasPacks: true));
       return;
     }
-    _timer = Timer(
-      _debounceDuration,
-      () => unawaited(_run(query, generation)),
-    );
+    _timer = Timer(_debounceDuration, () => unawaited(_run(query, generation)));
   }
 
   Future<void> _run(String query, int generation) async {
@@ -155,20 +158,22 @@ class TranslationSearchCubit extends Cubit<TranslationSearchState> {
       }
     }
     if (isClosed || generation != _generation) return;
-    emit(TranslationSearchState.ready(
-      hasPacks: true,
-      query: query,
-      total: total,
-      hits: [
-        for (final match in matches)
-          TranslationHit(
-            surahId: match.surah,
-            ayah: match.ayah,
-            text: match.text,
-            surahName: names[match.surah] ?? '',
-          ),
-      ],
-    ));
+    emit(
+      TranslationSearchState.ready(
+        hasPacks: true,
+        query: query,
+        total: total,
+        hits: [
+          for (final match in matches)
+            TranslationHit(
+              surahId: match.surah,
+              ayah: match.ayah,
+              text: match.text,
+              surahName: names[match.surah] ?? '',
+            ),
+        ],
+      ),
+    );
   }
 
   @override

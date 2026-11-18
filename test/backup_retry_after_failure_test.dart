@@ -25,21 +25,23 @@ class FlakyBackupService extends BackupService {
 }
 
 void main() {
-  test('export retries from the failed state without an explicit acknowledge',
-      () async {
-    final db = newTestDb();
-    final service = FlakyBackupService(db);
-    final cubit = BackupCubit(service: service, shareJson: (_) async {});
+  test(
+    'export retries from the failed state without an explicit acknowledge',
+    () async {
+      final db = newTestDb();
+      final service = FlakyBackupService(db);
+      final cubit = BackupCubit(service: service, shareJson: (_) async {});
 
-    await cubit.export();
-    expect(cubit.state, isA<BackupFailed>());
-    expect((cubit.state as BackupFailed).duringExport, isTrue);
-    expect(service.exportCalls, 1);
+      await cubit.export();
+      expect(cubit.state, isA<BackupFailed>());
+      expect((cubit.state as BackupFailed).duringExport, isTrue);
+      expect(service.exportCalls, 1);
 
-    await cubit.export();
-    expect(cubit.state, isA<BackupExported>());
-    expect(service.exportCalls, 2);
+      await cubit.export();
+      expect(cubit.state, isA<BackupExported>());
+      expect(service.exportCalls, 2);
 
-    await cubit.close();
-  });
+      await cubit.close();
+    },
+  );
 }

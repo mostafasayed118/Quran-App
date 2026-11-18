@@ -159,10 +159,12 @@ Future<void> updateHomeWidgetFromState() async {
       city: city.nameAr,
     );
   } on Object catch (error, stackTrace) {
-    appLog('background widget update failed',
-        name: 'quran_yahdi/background',
-        error: error.runtimeType,
-        stackTrace: stackTrace);
+    appLog(
+      'background widget update failed',
+      name: 'quran_yahdi/background',
+      error: error.runtimeType,
+      stackTrace: stackTrace,
+    );
   }
 }
 

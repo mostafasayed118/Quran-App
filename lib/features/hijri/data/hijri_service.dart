@@ -32,9 +32,9 @@ class HijriService implements RamadanCalendar {
 
   /// Converts a Hijri year/month/day back to a Gregorian date.
   DateTime toGregorian(int hijriYear, int hijriMonth, int hijriDay) => _shift(
-        HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, hijriDay),
-        -_offsetDays,
-      );
+    HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, hijriDay),
+    -_offsetDays,
+  );
 
   @override
   ({int year, int month, int day}) hijriDate(DateTime date) {
@@ -67,8 +67,11 @@ class HijriService implements RamadanCalendar {
     try {
       HijriCalendar.setLocal(locale);
       // Mid-month gregorian anchor is stable within the month.
-      final anchor =
-          HijriCalendar().hijriToGregorian(hijriYear, hijriMonth, 15);
+      final anchor = HijriCalendar().hijriToGregorian(
+        hijriYear,
+        hijriMonth,
+        15,
+      );
       return HijriCalendar.fromDate(anchor).longMonthName;
     } finally {
       HijriCalendar.setLocal(previous);

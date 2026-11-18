@@ -40,8 +40,11 @@ void main() {
       const PrayerConfig(madhab: PrayerMadhab.hanafi),
     );
 
-    expect(hanafi[3].time.isAfter(shafi[3].time), isTrue,
-        reason: 'Asr must be later under Hanafi');
+    expect(
+      hanafi[3].time.isAfter(shafi[3].time),
+      isTrue,
+      reason: 'Asr must be later under Hanafi',
+    );
     for (final index in [0, 1, 2, 4, 5]) {
       expect(hanafi[index].time, shafi[index].time, reason: 'entry $index');
     }

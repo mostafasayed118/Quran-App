@@ -33,26 +33,34 @@ Future<void> _installPacks(
   if (tafsir) {
     File('test/fixtures/tafsir_wrapper_sample.json')
         .copySync('${libraryDir.path}/$_tafsirPackId.json');
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: _tafsirPackId,
-          kind: 'tafsir',
-          language: 'ar',
-          title: 'التفسير الميسر',
-          sizeMb: 0.2,
-          version: 'v1.2.2',
-        ));
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: _tafsirPackId,
+            kind: 'tafsir',
+            language: 'ar',
+            title: 'التفسير الميسر',
+            sizeMb: 0.2,
+            version: 'v1.2.2',
+          ),
+        );
   }
   if (translation) {
     File('test/fixtures/translation_ara_sirajtafseer_excerpt.json')
         .copySync('${libraryDir.path}/$_translationPackId.json');
-    await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-          packId: _translationPackId,
-          kind: 'translation',
-          language: 'ar',
-          title: 'السراج المنير',
-          sizeMb: 2.0,
-          version: '1',
-        ));
+    await db
+        .into(db.installedPacks)
+        .insert(
+          InstalledPacksCompanion.insert(
+            packId: _translationPackId,
+            kind: 'translation',
+            language: 'ar',
+            title: 'السراج المنير',
+            sizeMb: 2.0,
+            version: '1',
+          ),
+        );
   }
 }
 
@@ -66,8 +74,11 @@ void main() {
   setUp(() async {
     db = AppDatabase.test(NativeDatabase.memory());
     tempRoot = await Directory.systemTemp.createTemp('qy_ayah_sheet_tabs');
-    downloader = PackDownloader(db,
-        libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode);
+    downloader = PackDownloader(
+      db,
+      libraryRootResolver: () async => tempRoot,
+      fileDecoder: _syncDecode,
+    );
   });
 
   tearDown(() async {
@@ -76,15 +87,18 @@ void main() {
   });
 
   Future<void> pumpSheet(WidgetTester tester) async {
-    await tester.pumpWidget(appShell(
+    await tester.pumpWidget(
+      appShell(
         home: Scaffold(
-      body: AyahSheet(
-        surahId: 1,
-        surahName: 'الفاتحة',
-        ayah: 1,
-        downloader: downloader,
+          body: AyahSheet(
+            surahId: 1,
+            surahName: 'الفاتحة',
+            ayah: 1,
+            downloader: downloader,
+          ),
+        ),
       ),
-    )));
+    );
     // Bounded pumps only: pumpAndSettle can hang while drift loads.
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
@@ -107,8 +121,9 @@ void main() {
     expect(find.text(loc.ayahSheetTranslation), findsOneWidget);
   });
 
-  testWidgets('no translation entries hides the translation tab',
-      (tester) async {
+  testWidgets('no translation entries hides the translation tab', (
+    tester,
+  ) async {
     await tester.runAsync(
       () => _installPacks(db, tempRoot, tafsir: true, translation: false),
     );
@@ -129,12 +144,15 @@ void main() {
 
     final tabs = tabsOf(tester);
     expect(tabs, hasLength(2));
-    expect(tabs.map((tab) => tab.text),
-        containsAll(<String>[loc.ayahSheetTafsir, loc.ayahSheetTranslation]));
+    expect(
+      tabs.map((tab) => tab.text),
+      containsAll(<String>[loc.ayahSheetTafsir, loc.ayahSheetTranslation]),
+    );
   });
 
-  testWidgets('nothing installed keeps exactly the translation tab',
-      (tester) async {
+  testWidgets('nothing installed keeps exactly the translation tab', (
+    tester,
+  ) async {
     await pumpSheet(tester);
 
     final tabs = tabsOf(tester);

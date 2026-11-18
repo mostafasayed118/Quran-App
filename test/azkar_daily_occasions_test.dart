@@ -36,13 +36,22 @@ void main() {
       final items = (collection['items'] as List).cast<Map<String, dynamic>>();
       expect(items, isNotEmpty, reason: 'no items in ${collection['id']}');
       for (final item in items) {
-        expect((item['text'] as String).trim().isNotEmpty, isTrue,
-            reason: 'empty text in ${collection['id']}');
+        expect(
+          (item['text'] as String).trim().isNotEmpty,
+          isTrue,
+          reason: 'empty text in ${collection['id']}',
+        );
         final count = item['count'];
-        expect(count, isA<int>(),
-            reason: 'missing count in ${collection['id']}');
-        expect(count as int, greaterThanOrEqualTo(1),
-            reason: 'invalid count in ${collection['id']}');
+        expect(
+          count,
+          isA<int>(),
+          reason: 'missing count in ${collection['id']}',
+        );
+        expect(
+          count as int,
+          greaterThanOrEqualTo(1),
+          reason: 'invalid count in ${collection['id']}',
+        );
       }
     }
     expect(ids.toSet(), hasLength(ids.length), reason: 'duplicate ids');
@@ -64,10 +73,16 @@ void main() {
       final items = (entry.value['items'] as List).cast<Map<String, dynamic>>();
       for (final item in items) {
         final reference = item['reference'] as String?;
-        expect(reference, isNotNull,
-            reason: 'missing reference in ${entry.key}');
-        expect(reference, contains('حصن المسلم'),
-            reason: 'unattributed text in ${entry.key}');
+        expect(
+          reference,
+          isNotNull,
+          reason: 'missing reference in ${entry.key}',
+        );
+        expect(
+          reference,
+          contains('حصن المسلم'),
+          reason: 'unattributed text in ${entry.key}',
+        );
       }
     }
   });

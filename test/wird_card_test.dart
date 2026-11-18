@@ -42,15 +42,17 @@ void main() {
     db = newTestDb();
     logRepo = PrayerLogRepository(db);
     khatmaRepo = KhatmaRepository(db);
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          _ayah(1, page: 1, number: 1),
-          _ayah(2, page: 1, number: 2),
-          _ayah(9, page: 6, number: 3),
-          _ayah(19, page: 11, number: 4),
-          _ayah(90, page: 603, number: 5),
-          _ayah(91, page: 604, number: 6),
-          _ayah(6236, page: 604, number: 7),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        _ayah(1, page: 1, number: 1),
+        _ayah(2, page: 1, number: 2),
+        _ayah(9, page: 6, number: 3),
+        _ayah(19, page: 11, number: 4),
+        _ayah(90, page: 603, number: 5),
+        _ayah(91, page: 604, number: 6),
+        _ayah(6236, page: 604, number: 7),
+      ]),
+    );
   });
 
   Future<TrackerCubit> buildCubit({bool withKhatma = true}) async {
@@ -64,10 +66,7 @@ void main() {
     return cubit;
   }
 
-  Future<void> pumpScreen(
-    WidgetTester tester, {
-    bool withKhatma = true,
-  }) async {
+  Future<void> pumpScreen(WidgetTester tester, {bool withKhatma = true}) async {
     tester.view.physicalSize = const Size(1080, 2340);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
@@ -134,20 +133,22 @@ void main() {
     expect(p.pagesDone, 5);
   });
 
-  test('finishing a portion that overruns the last page completes the plan',
-      () async {
-    final cubit = await buildCubit();
-    await cubit.startKhatma(151);
-    await khatmaRepo.advanceTo(90); // page 603
-    await cubit.reload();
+  test(
+    'finishing a portion that overruns the last page completes the plan',
+    () async {
+      final cubit = await buildCubit();
+      await cubit.startKhatma(151);
+      await khatmaRepo.advanceTo(90); // page 603
+      await cubit.reload();
 
-    await cubit.finishWirdToday();
+      await cubit.finishWirdToday();
 
-    final p = (cubit.state as TrackerReady).khatma!;
-    expect(p.completed, isTrue);
-    expect(p.pointerAyahId, 6236);
-    expect(p.pointerPage, 604);
-  });
+      final p = (cubit.state as TrackerReady).khatma!;
+      expect(p.completed, isTrue);
+      expect(p.pointerAyahId, 6236);
+      expect(p.pointerPage, 604);
+    },
+  );
 
   test('resetKhatma returns the card to setup', () async {
     final cubit = await buildCubit();
@@ -170,14 +171,16 @@ void main() {
     expect(wirdReaderRoute(p), '/quran/reader?surah=2&ayah=255');
   });
 
-  testWidgets('without a khatma repository the card renders nothing',
-      (tester) async {
+  testWidgets('without a khatma repository the card renders nothing', (
+    tester,
+  ) async {
     await pumpScreen(tester, withKhatma: false);
     expect(find.text('ورد الختمة'), findsNothing);
   });
 
-  testWidgets('setup → sheet → active card → finish advances the range',
-      (tester) async {
+  testWidgets('setup → sheet → active card → finish advances the range', (
+    tester,
+  ) async {
     await pumpScreen(tester);
 
     expect(find.text('ورد الختمة'), findsOneWidget);
@@ -204,8 +207,9 @@ void main() {
     expect(find.text('باقي نحو ١٢٠ يوم'), findsOneWidget);
   });
 
-  testWidgets('completed plan shows the completion state; new khatma resets',
-      (tester) async {
+  testWidgets('completed plan shows the completion state; new khatma resets', (
+    tester,
+  ) async {
     await khatmaRepo.startPlan(151);
     await khatmaRepo.advanceTo(90); // page 603
     await pumpScreen(tester);

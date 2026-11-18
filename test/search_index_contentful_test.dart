@@ -24,32 +24,44 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makkah',
-          ayahCount: 1,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
-    await db.into(db.ayahs).insert(AyahsCompanion.insert(
-          id: const Value(1),
-          surahId: 1,
-          numberInSurah: 1,
-          juz: 1,
-          page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم',
-          textImlaei: 'بسم الله الرحمن الرحيم',
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makkah',
+            ayahCount: 1,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
+    await db
+        .into(db.ayahs)
+        .insert(
+          AyahsCompanion.insert(
+            id: const Value(1),
+            surahId: 1,
+            numberInSurah: 1,
+            juz: 1,
+            page: 1,
+            textUthmani: 'بسم الله الرحمن الرحيم',
+            textImlaei: 'بسم الله الرحمن الرحيم',
+          ),
+        );
     await rebuildQuranSearchIndex(db);
   });
 
   test('the DDL is not contentless', () {
-    expect(kAyahSearchDdl.contains("content=''"), isFalse,
-        reason: 'a contentless FTS5 table cannot serve the short-token LIKE '
-            'fallback; reclaiming the ~815 KB needs a real ayahs column, not '
-            'a tokenizer flag');
+    expect(
+      kAyahSearchDdl.contains("content=''"),
+      isFalse,
+      reason:
+          'a contentless FTS5 table cannot serve the short-token LIKE '
+          'fallback; reclaiming the ~815 KB needs a real ayahs column, not '
+          'a tokenizer flag',
+    );
   });
 
   test('text_norm is readable, so the short-token scan can match', () async {
@@ -58,16 +70,24 @@ void main() {
         .get();
     expect(rows, isNotEmpty);
     for (final row in rows) {
-      expect(row.readNullable<String>('text_norm'), isNotNull,
-          reason: 'NULL here means the table went contentless');
+      expect(
+        row.readNullable<String>('text_norm'),
+        isNotNull,
+        reason: 'NULL here means the table went contentless',
+      );
     }
 
     // The exact predicate the repository runs for a 2-char token.
-    final hits = await db.customSelect(
-      'SELECT COUNT(*) AS c FROM ayah_search s WHERE s.text_norm LIKE ?',
-      variables: const [Variable<String>('%ال%')],
-    ).getSingle();
-    expect(hits.read<int>('c'), greaterThan(0),
-        reason: '«ال» is in the seeded ayah; the LIKE must see the text');
+    final hits = await db
+        .customSelect(
+          'SELECT COUNT(*) AS c FROM ayah_search s WHERE s.text_norm LIKE ?',
+          variables: const [Variable<String>('%ال%')],
+        )
+        .getSingle();
+    expect(
+      hits.read<int>('c'),
+      greaterThan(0),
+      reason: '«ال» is in the seeded ayah; the LIKE must see the text',
+    );
   });
 }

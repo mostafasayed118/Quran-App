@@ -76,10 +76,10 @@ class _Scheduler implements ReminderSchedulerPort {
 }
 
 ReminderTexts _texts() => ReminderTexts(
-      prayerTitle: (name) => 'prayer ${name.name}',
-      azkarTitle: 'azkar',
-      wirdTitle: 'wird',
-    );
+  prayerTitle: (name) => 'prayer ${name.name}',
+  azkarTitle: 'azkar',
+  wirdTitle: 'wird',
+);
 
 void main() {
   group('planReminders prayer toggle', () {
@@ -120,44 +120,48 @@ void main() {
     });
   });
 
-  test('ReminderSettings defaults the prayer reminder to enabled and persists',
-      () async {
-    final settings = ReminderSettings(newTestDb());
+  test(
+    'ReminderSettings defaults the prayer reminder to enabled and persists',
+    () async {
+      final settings = ReminderSettings(newTestDb());
 
-    expect(await settings.prayerEnabled(), isTrue);
+      expect(await settings.prayerEnabled(), isTrue);
 
-    await settings.setPrayerEnabled(false);
-    expect(await settings.prayerEnabled(), isFalse);
+      await settings.setPrayerEnabled(false);
+      expect(await settings.prayerEnabled(), isFalse);
 
-    await settings.setPrayerEnabled(true);
-    expect(await settings.prayerEnabled(), isTrue);
-  });
+      await settings.setPrayerEnabled(true);
+      expect(await settings.prayerEnabled(), isTrue);
+    },
+  );
 
-  test('SettingsCubit toggles the prayer flag, persists and re-plans',
-      () async {
-    final settings = _Settings();
-    final prayerSettings = _PrayerSettings();
-    final cubit = SettingsCubit(
-      settings: settings,
-      prayerSettings: prayerSettings,
-      city: _NoCity(),
-      prayer: _Prayer(),
-      scheduler: _Scheduler(),
-    );
-    addTearDown(cubit.close);
+  test(
+    'SettingsCubit toggles the prayer flag, persists and re-plans',
+    () async {
+      final settings = _Settings();
+      final prayerSettings = _PrayerSettings();
+      final cubit = SettingsCubit(
+        settings: settings,
+        prayerSettings: prayerSettings,
+        city: _NoCity(),
+        prayer: _Prayer(),
+        scheduler: _Scheduler(),
+      );
+      addTearDown(cubit.close);
 
-    await cubit.load();
-    expect((cubit.state as SettingsReady).prayerEnabled, isTrue);
+      await cubit.load();
+      expect((cubit.state as SettingsReady).prayerEnabled, isTrue);
 
-    await cubit.setPrayerEnabled(false);
+      await cubit.setPrayerEnabled(false);
 
-    expect(prayerSettings.stored, isFalse);
-    expect(prayerSettings.writes, 1);
-    expect((cubit.state as SettingsReady).prayerEnabled, isFalse);
-    expect(settings.rescheduleCalls, 1);
+      expect(prayerSettings.stored, isFalse);
+      expect(prayerSettings.writes, 1);
+      expect((cubit.state as SettingsReady).prayerEnabled, isFalse);
+      expect(settings.rescheduleCalls, 1);
 
-    // Another reminder toggle must not reset the prayer flag.
-    await cubit.setAzkarEnabled(true);
-    expect((cubit.state as SettingsReady).prayerEnabled, isFalse);
-  });
+      // Another reminder toggle must not reset the prayer flag.
+      await cubit.setAzkarEnabled(true);
+      expect((cubit.state as SettingsReady).prayerEnabled, isFalse);
+    },
+  );
 }

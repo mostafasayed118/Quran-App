@@ -13,12 +13,12 @@ class _City implements CitySource {
 
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -27,17 +27,27 @@ class _City implements CitySource {
 class _Prayer implements PrayerTimesPort {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) => [
-        PrayerChoice(PrayerName.fajr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 5)),
-        PrayerChoice(PrayerName.dhuhr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 12)),
-        PrayerChoice(PrayerName.asr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 15)),
-        PrayerChoice(PrayerName.maghrib,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 17, 30)),
-        PrayerChoice(PrayerName.isha,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 19)),
-      ];
+    PrayerChoice(
+      PrayerName.fajr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 5),
+    ),
+    PrayerChoice(
+      PrayerName.dhuhr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 12),
+    ),
+    PrayerChoice(
+      PrayerName.asr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 15),
+    ),
+    PrayerChoice(
+      PrayerName.maghrib,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 17, 30),
+    ),
+    PrayerChoice(
+      PrayerName.isha,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 19),
+    ),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -67,8 +77,11 @@ void main() {
     expect(find.textContaining('فجر'), findsWidgets);
 
     await tester.tap(find.byTooltip('الشهر التالي'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.textContaining('ديسمبر'), findsWidgets);
   });

@@ -18,12 +18,12 @@ class _City implements CitySource {
 
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -32,19 +32,16 @@ class _City implements CitySource {
 class _Prayer implements PrayerTimesPort {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime day) => [
-        PrayerChoice(
-            PrayerName.fajr, DateTime(day.year, day.month, day.day, 5)),
-        PrayerChoice(
-            PrayerName.sunrise, DateTime(day.year, day.month, day.day, 6)),
-        PrayerChoice(
-            PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12)),
-        PrayerChoice(
-            PrayerName.asr, DateTime(day.year, day.month, day.day, 15)),
-        PrayerChoice(
-            PrayerName.maghrib, DateTime(day.year, day.month, day.day, 17, 30)),
-        PrayerChoice(
-            PrayerName.isha, DateTime(day.year, day.month, day.day, 19)),
-      ];
+    PrayerChoice(PrayerName.fajr, DateTime(day.year, day.month, day.day, 5)),
+    PrayerChoice(PrayerName.sunrise, DateTime(day.year, day.month, day.day, 6)),
+    PrayerChoice(PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12)),
+    PrayerChoice(PrayerName.asr, DateTime(day.year, day.month, day.day, 15)),
+    PrayerChoice(
+      PrayerName.maghrib,
+      DateTime(day.year, day.month, day.day, 17, 30),
+    ),
+    PrayerChoice(PrayerName.isha, DateTime(day.year, day.month, day.day, 19)),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -70,10 +67,12 @@ class _PrayerAt implements PrayerTimesPort {
 
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime day) => [
-        PrayerChoice(PrayerName.fajr, fajr),
-        PrayerChoice(
-            PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 23, 59)),
-      ];
+    PrayerChoice(PrayerName.fajr, fajr),
+    PrayerChoice(
+      PrayerName.dhuhr,
+      DateTime(day.year, day.month, day.day, 23, 59),
+    ),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -132,9 +131,7 @@ void main() {
   test('only Dhuhr enabled after Isha schedules tomorrow Dhuhr', () async {
     final scheduler = _Scheduler();
     final settings = ReminderSettings(newTestDb());
-    const config = PrayerConfig(
-      enabledPrayers: {PrayerName.dhuhr},
-    );
+    const config = PrayerConfig(enabledPrayers: {PrayerName.dhuhr});
 
     await scheduleReminders(
       city: const _City(),
@@ -154,9 +151,7 @@ void main() {
   test('a partial future day falls back to the next-prayer contract', () async {
     final scheduler = _Scheduler();
     final settings = ReminderSettings(newTestDb());
-    const config = PrayerConfig(
-      enabledPrayers: {PrayerName.dhuhr},
-    );
+    const config = PrayerConfig(enabledPrayers: {PrayerName.dhuhr});
 
     await scheduleReminders(
       city: const _City(),
@@ -205,8 +200,9 @@ void main() {
       config: config,
     );
 
-    final soon = scheduler.plan!
-        .singleWhere((reminder) => reminder.id == preAdhanReminderId);
+    final soon = scheduler.plan!.singleWhere(
+      (reminder) => reminder.id == preAdhanReminderId,
+    );
     expect(soon.fireAt, DateTime(2026, 11, 2, 11, 50));
   });
 
@@ -221,7 +217,9 @@ void main() {
       newTestDb(),
       prayerConfig: _Config(
         const PrayerConfig(
-            enabledPrayers: {PrayerName.fajr}, preAdhanMinutes: 15),
+          enabledPrayers: {PrayerName.fajr},
+          preAdhanMinutes: 15,
+        ),
       ),
       preAdhanCanceller: canceller,
     );
@@ -263,8 +261,11 @@ void main() {
     );
     await Future<void>.delayed(Duration.zero);
 
-    expect(scheduler.calls, 1,
-        reason: 'the second replan waits for the first to finish');
+    expect(
+      scheduler.calls,
+      1,
+      reason: 'the second replan waits for the first to finish',
+    );
     release.complete();
     await Future.wait([first, second]);
     expect(scheduler.calls, 2);

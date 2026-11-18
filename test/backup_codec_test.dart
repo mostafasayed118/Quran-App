@@ -3,39 +3,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/backup/data/backup_codec.dart';
 
 BackupDocument fullDocument() => BackupDocument(
-      exportedAt: DateTime(2026, 10, 19, 12, 30, 5),
-      schemaVersion: 2,
-      data: BackupData(
-        bookmarks: [
-          BackupBookmark(ayahId: 1, createdAt: DateTime(2026, 1, 2, 3, 4, 5)),
-          BackupBookmark(
-              ayahId: 6236, createdAt: DateTime(2026, 6, 7, 8, 9, 10)),
-        ],
-        lastReadAyahId: 42,
-        khatma: [
-          BackupKhatmaRow(
-            ayahId: 100,
-            targetPages: 20,
-            updatedAt: DateTime(2026, 3, 4, 5, 6, 7),
-          ),
-        ],
-        prayerLog: [
-          BackupPrayerDay(
-            day: DateTime(2026, 5, 1),
-            fajr: true,
-            dhuhr: false,
-            asr: true,
-            maghrib: false,
-            isha: true,
-          ),
-        ],
-        tasbih: const BackupTasbih(count: 33, target: 99),
-        settings: const {
-          'azkar_reminder_time': '06:30',
-          'selected_city': '{"id":"cairo"}',
-        },
+  exportedAt: DateTime(2026, 10, 19, 12, 30, 5),
+  schemaVersion: 2,
+  data: BackupData(
+    bookmarks: [
+      BackupBookmark(ayahId: 1, createdAt: DateTime(2026, 1, 2, 3, 4, 5)),
+      BackupBookmark(ayahId: 6236, createdAt: DateTime(2026, 6, 7, 8, 9, 10)),
+    ],
+    lastReadAyahId: 42,
+    khatma: [
+      BackupKhatmaRow(
+        ayahId: 100,
+        targetPages: 20,
+        updatedAt: DateTime(2026, 3, 4, 5, 6, 7),
       ),
-    );
+    ],
+    prayerLog: [
+      BackupPrayerDay(
+        day: DateTime(2026, 5, 1),
+        fajr: true,
+        dhuhr: false,
+        asr: true,
+        maghrib: false,
+        isha: true,
+      ),
+    ],
+    tasbih: const BackupTasbih(count: 33, target: 99),
+    settings: const {
+      'azkar_reminder_time': '06:30',
+      'selected_city': '{"id":"cairo"}',
+    },
+  ),
+);
 
 String wrapper(String dataJson) =>
     '{"app":"$kBackupAppId","format":$kBackupFormat,"data":$dataJson}';
@@ -126,11 +125,13 @@ void main() {
   });
 
   test('skips corrupt bookmark entries and counts them', () {
-    final result = decode(wrapper(
-      '{"bookmarks":[{"ayahId":1,"createdAt":"2026-01-01T00:00:00.000"},'
-      '{"ayahId":"x","createdAt":"2026-01-01T00:00:00.000"},'
-      '{"ayahId":3}]}',
-    ));
+    final result = decode(
+      wrapper(
+        '{"bookmarks":[{"ayahId":1,"createdAt":"2026-01-01T00:00:00.000"},'
+        '{"ayahId":"x","createdAt":"2026-01-01T00:00:00.000"},'
+        '{"ayahId":3}]}',
+      ),
+    );
 
     final success = result as BackupDecodeSuccess;
     expect(success.skippedEntries, 2);
@@ -139,10 +140,12 @@ void main() {
   });
 
   test('skips corrupt prayer-log entries and counts them', () {
-    final result = decode(wrapper(
-      '{"prayerLog":[{"day":"not-a-date","fajr":true},'
-      '{"day":"2026-05-01T00:00:00.000","fajr":true}]}',
-    ));
+    final result = decode(
+      wrapper(
+        '{"prayerLog":[{"day":"not-a-date","fajr":true},'
+        '{"day":"2026-05-01T00:00:00.000","fajr":true}]}',
+      ),
+    );
 
     final success = result as BackupDecodeSuccess;
     expect(success.skippedEntries, 1);
@@ -158,8 +161,9 @@ void main() {
   });
 
   test('a corrupt tasbih object is skipped', () {
-    final success = decode(wrapper('{"tasbih":{"count":"x","target":5}}'))
-        as BackupDecodeSuccess;
+    final success = decode(
+      wrapper('{"tasbih":{"count":"x","target":5}}'),
+    ) as BackupDecodeSuccess;
     expect(success.skippedEntries, 1);
     expect(success.document.data.tasbih, isNull);
   });
@@ -175,19 +179,18 @@ void main() {
   });
 
   test('skips non-string settings values and counts them', () {
-    final success = decode(wrapper(
-      '{"settings":{"selected_city":"{\\"id\\":\\"x\\"}","bad":5}}',
-    )) as BackupDecodeSuccess;
+    final success = decode(
+      wrapper('{"settings":{"selected_city":"{\\"id\\":\\"x\\"}","bad":5}}'),
+    ) as BackupDecodeSuccess;
 
     expect(success.skippedEntries, 1);
-    expect(success.document.data.settings, {
-      'selected_city': '{"id":"x"}',
-    });
+    expect(success.document.data.settings, {'selected_city': '{"id":"x"}'});
   });
 
   test('a missing data block decodes to an empty document', () {
-    final success = decode('{"app":"$kBackupAppId","format":$kBackupFormat}')
-        as BackupDecodeSuccess;
+    final success = decode(
+      '{"app":"$kBackupAppId","format":$kBackupFormat}',
+    ) as BackupDecodeSuccess;
 
     expect(success.skippedEntries, 0);
     final data = success.document.data;
@@ -200,8 +203,9 @@ void main() {
   });
 
   test('missing metadata degrades leniently', () {
-    final success = decode('{"app":"$kBackupAppId","format":$kBackupFormat}')
-        as BackupDecodeSuccess;
+    final success = decode(
+      '{"app":"$kBackupAppId","format":$kBackupFormat}',
+    ) as BackupDecodeSuccess;
 
     expect(success.skippedEntries, 0);
     expect(success.document.schemaVersion, 0);

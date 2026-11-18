@@ -43,24 +43,24 @@ class City {
   /// from the bundled city list, so a malformed entry is a data bug, not a
   /// user error.
   factory City.fromJson(Map<String, dynamic> json) => City(
-        id: json['id'] as String,
-        nameAr: json['nameAr'] as String,
-        nameEn: json['nameEn'] as String,
-        lat: (json['lat'] as num).toDouble(),
-        lng: (json['lng'] as num).toDouble(),
-        timezone: json['timezone'] as String?,
-      );
+    id: json['id'] as String,
+    nameAr: json['nameAr'] as String,
+    nameEn: json['nameEn'] as String,
+    lat: (json['lat'] as num).toDouble(),
+    lng: (json['lng'] as num).toDouble(),
+    timezone: json['timezone'] as String?,
+  );
 
   /// The persisted JSON representation of this city (the inverse of
   /// [City.fromJson]).
   Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'nameAr': nameAr,
-        'nameEn': nameEn,
-        'lat': lat,
-        'lng': lng,
-        if (timezone != null) 'timezone': timezone,
-      };
+    'id': id,
+    'nameAr': nameAr,
+    'nameEn': nameEn,
+    'lat': lat,
+    'lng': lng,
+    if (timezone != null) 'timezone': timezone,
+  };
 }
 
 /// The city name for [localeName]: Arabic for `ar`, English otherwise.

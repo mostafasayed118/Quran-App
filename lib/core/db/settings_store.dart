@@ -19,9 +19,9 @@ class SettingsStore {
 
   /// The stored value for [key], or null when it was never written.
   Future<String?> read(String key) async {
-    final row = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.settingsTable,
+    )..where((setting) => setting.key.equals(key))).getSingleOrNull();
     return row?.value;
   }
 
@@ -34,9 +34,9 @@ class SettingsStore {
     // fail with "too many SQL variables" (L-4).
     final result = <String, String>{};
     for (final batch in sqlBatches(wanted.toList())) {
-      final rows = await (_db.select(_db.settingsTable)
-            ..where((setting) => setting.key.isIn(batch)))
-          .get();
+      final rows = await (_db.select(
+        _db.settingsTable,
+      )..where((setting) => setting.key.isIn(batch))).get();
       for (final row in rows) {
         result[row.key] = row.value;
       }
@@ -62,8 +62,8 @@ class SettingsStore {
 
   /// Deletes [key]; a missing key is a no-op.
   Future<void> remove(String key) async {
-    await (_db.delete(_db.settingsTable)
-          ..where((setting) => setting.key.equals(key)))
-        .go();
+    await (_db.delete(
+      _db.settingsTable,
+    )..where((setting) => setting.key.equals(key))).go();
   }
 }

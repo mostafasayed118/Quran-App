@@ -27,19 +27,31 @@ class _City implements CitySource {
 class _Prayer implements PrayerTimesPort {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) => [
-        PrayerChoice(PrayerName.fajr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 5)),
-        PrayerChoice(PrayerName.sunrise,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 6)),
-        PrayerChoice(PrayerName.dhuhr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 12)),
-        PrayerChoice(PrayerName.asr,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 15)),
-        PrayerChoice(PrayerName.maghrib,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 17, 30)),
-        PrayerChoice(PrayerName.isha,
-            DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 19)),
-      ];
+    PrayerChoice(
+      PrayerName.fajr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 5),
+    ),
+    PrayerChoice(
+      PrayerName.sunrise,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 6),
+    ),
+    PrayerChoice(
+      PrayerName.dhuhr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 12),
+    ),
+    PrayerChoice(
+      PrayerName.asr,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 15),
+    ),
+    PrayerChoice(
+      PrayerName.maghrib,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 17, 30),
+    ),
+    PrayerChoice(
+      PrayerName.isha,
+      DateTime(dayLocal.year, dayLocal.month, dayLocal.day, 19),
+    ),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -64,8 +76,10 @@ void main() {
     expect(ready.days.first.date, DateTime(2026, 11, 1));
     expect(ready.days.last.date, DateTime(2026, 11, 30));
     expect(ready.days.first.prayers, hasLength(5));
-    expect(ready.days.first.prayers.map((p) => p.name),
-        isNot(contains(PrayerName.sunrise)));
+    expect(
+      ready.days.first.prayers.map((p) => p.name),
+      isNot(contains(PrayerName.sunrise)),
+    );
   });
 
   test('previous and next month roll the year', () async {

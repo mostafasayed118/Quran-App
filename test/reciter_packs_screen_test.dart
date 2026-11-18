@@ -80,16 +80,14 @@ Finder _packsScrollable() => find
     .first;
 
 void main() {
-  testWidgets('publishes the intro, the five criteria and the empty state',
-      (tester) async {
+  testWidgets('publishes the intro, the five criteria and the empty state', (
+    tester,
+  ) async {
     await pumpAppHost(tester, home: const ReciterPacksScreen(packs: []));
 
     expect(find.byType(ReciterPacksScreen), findsOneWidget);
     expect(find.text('حزم القرّاء'), findsOneWidget);
-    expect(
-      find.textContaining('قوائم قرّاء مختارة بعناية'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('قوائم قرّاء مختارة بعناية'), findsOneWidget);
     expect(find.text('معايير الانتقاء'), findsOneWidget);
     for (final criterion in _criteria) {
       expect(find.text(criterion), findsOneWidget);
@@ -97,8 +95,9 @@ void main() {
     expect(find.text(_emptyCopy), findsOneWidget);
   });
 
-  testWidgets('a signed pack renders; an unsigned one never appears',
-      (tester) async {
+  testWidgets('a signed pack renders; an unsigned one never appears', (
+    tester,
+  ) async {
     await pumpAppHost(
       tester,
       home: const ReciterPacksScreen(packs: [_signedPack, _unsignedPack]),
@@ -142,8 +141,9 @@ void main() {
     }
   });
 
-  testWidgets('the shipping empty state lays out at textScaler 2.0',
-      (tester) async {
+  testWidgets('the shipping empty state lays out at textScaler 2.0', (
+    tester,
+  ) async {
     // v1 publishes no pack, so this is the screen every reader will see.
     await pumpAppHost(
       tester,
@@ -160,8 +160,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('the decorative bullet is silent; the copy is still announced',
-      (tester) async {
+  testWidgets('the decorative bullet is silent; the copy is still announced', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await pumpAppHost(
@@ -185,8 +186,9 @@ void main() {
     }
   });
 
-  testWidgets('the reciters AppBar action opens the declared packs route',
-      (tester) async {
+  testWidgets('the reciters AppBar action opens the declared packs route', (
+    tester,
+  ) async {
     final db = newTestDb();
     final cubit = RecitersCubit(repo: _EmptyReciterRepository(db));
     addTearDown(cubit.close);
@@ -214,16 +216,22 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(_routerApp(router));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // An action, never a list row: the reciters list must stay row-free for
     // the frozen "no catalog, no list" test to keep passing.
     expect(find.byTooltip('حزم القرّاء'), findsOneWidget);
 
     await tester.tap(find.byTooltip('حزم القرّاء'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(ReciterPacksScreen), findsOneWidget);
     expect(find.text(_emptyCopy), findsOneWidget);
@@ -233,8 +241,11 @@ void main() {
     // The real router: proves the address is wired, not just the widget.
     AppRouter.router.go(AppRoutes.reciterPacks);
     await tester.pumpWidget(_routerApp(AppRouter.router));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byType(ReciterPacksScreen), findsOneWidget);
     expect(find.text('حزم القرّاء'), findsOneWidget);
@@ -244,17 +255,17 @@ void main() {
 /// The in-app shell for a router: locale, delegates and the app theme, so a
 /// route renders exactly what the app renders.
 Widget _routerApp(GoRouter router) => MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    );
+  routerConfig: router,
+  locale: const Locale('ar'),
+  supportedLocales: const [Locale('ar'), Locale('en')],
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  theme: AppTheme.light,
+);
 
 /// A repository with no catalog rows: the screen only needs its AppBar here,
 /// so the loading state is enough and nothing is fetched.

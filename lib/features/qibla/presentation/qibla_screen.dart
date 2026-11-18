@@ -35,11 +35,12 @@ part 'qibla_dial_widget.dart';
 bool qiblaBodyShouldRebuild(QiblaState previous, QiblaState current) {
   if (previous.runtimeType != current.runtimeType) return true;
   return switch ((previous, current)) {
-    (final QiblaReady a, final QiblaReady b) => a.city != b.city ||
-        a.bearing != b.bearing ||
-        a.compassUnavailable != b.compassUnavailable ||
-        a.calibrationNeeded != b.calibrationNeeded ||
-        a.heading?.round() != b.heading?.round(),
+    (final QiblaReady a, final QiblaReady b) =>
+      a.city != b.city ||
+          a.bearing != b.bearing ||
+          a.compassUnavailable != b.compassUnavailable ||
+          a.calibrationNeeded != b.calibrationNeeded ||
+          a.heading?.round() != b.heading?.round(),
     (QiblaFailed(), QiblaFailed()) => false,
     (QiblaLoading(), QiblaLoading()) => false,
     _ => true,
@@ -118,26 +119,26 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
               :calibrationNeeded,
             ) = switch (state) {
               QiblaReady() => (
-                  city: state.city,
-                  bearing: state.bearing,
-                  heading: state.heading,
-                  compassUnavailable: state.compassUnavailable,
-                  calibrationNeeded: state.calibrationNeeded,
-                ),
+                city: state.city,
+                bearing: state.bearing,
+                heading: state.heading,
+                compassUnavailable: state.compassUnavailable,
+                calibrationNeeded: state.calibrationNeeded,
+              ),
               QiblaLoading() => (
-                  city: state.city,
-                  bearing: state.bearing,
-                  heading: state.heading,
-                  compassUnavailable: state.compassUnavailable,
-                  calibrationNeeded: state.calibrationNeeded,
-                ),
+                city: state.city,
+                bearing: state.bearing,
+                heading: state.heading,
+                compassUnavailable: state.compassUnavailable,
+                calibrationNeeded: state.calibrationNeeded,
+              ),
               QiblaFailed() => (
-                  city: null,
-                  bearing: null,
-                  heading: null,
-                  compassUnavailable: false,
-                  calibrationNeeded: false,
-                ),
+                city: null,
+                bearing: null,
+                heading: null,
+                compassUnavailable: false,
+                calibrationNeeded: false,
+              ),
             };
             if (city == null || bearing == null) {
               return EmptyState(
@@ -145,8 +146,9 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
                 icon: Icons.location_off_outlined,
                 actionLabel: loc.selectCity,
                 onAction: () async {
-                  final selected =
-                      await context.push<bool>(AppRoutes.cityPicker);
+                  final selected = await context.push<bool>(
+                    AppRoutes.cityPicker,
+                  );
                   if (selected == true && context.mounted) {
                     await context.read<QiblaCubit>().reload();
                   }
@@ -161,7 +163,9 @@ class _QiblaScreenState extends State<QiblaScreen> with WidgetsBindingObserver {
             // leave it unbuilt at large text scales.
             return SingleChildScrollView(
               padding: appScrollPadding(
-                  context, const EdgeInsets.all(AppSpacing.lg)),
+                context,
+                const EdgeInsets.all(AppSpacing.lg),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [

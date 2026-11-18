@@ -22,41 +22,43 @@ class _Source implements TranslationSearchSource {
 }
 
 TranslationSearchCubit _cubit(_Source source) => TranslationSearchCubit(
-      source: source,
-      surahName: (id) async => 'سورة $id',
-      debounce: Duration.zero,
-    );
+  source: source,
+  surahName: (id) async => 'سورة $id',
+  debounce: Duration.zero,
+);
 
 void main() {
-  test('loads the installed indexes and searches them case-insensitively',
-      () async {
-    final source = _Source(
-      ['en1'],
-      {
-        'en1': {
-          1001: 'In the name of Allah, the Entirely Merciful',
-          2001: 'Praise be to Allah',
+  test(
+    'loads the installed indexes and searches them case-insensitively',
+    () async {
+      final source = _Source(
+        ['en1'],
+        {
+          'en1': {
+            1001: 'In the name of Allah, the Entirely Merciful',
+            2001: 'Praise be to Allah',
+          },
         },
-      },
-    );
-    final cubit = _cubit(source);
-    addTearDown(cubit.close);
+      );
+      final cubit = _cubit(source);
+      addTearDown(cubit.close);
 
-    await cubit.start();
-    expect((cubit.state as TranslationSearchReady).hasPacks, isTrue);
+      await cubit.start();
+      expect((cubit.state as TranslationSearchReady).hasPacks, isTrue);
 
-    cubit.setQuery('merciful');
-    await pumpEventQueue();
+      cubit.setQuery('merciful');
+      await pumpEventQueue();
 
-    final ready = cubit.state as TranslationSearchReady;
-    expect(ready.query, 'merciful');
-    expect(ready.total, 1);
-    expect(ready.hits, hasLength(1));
-    expect(ready.hits.single.surahId, 1);
-    expect(ready.hits.single.ayah, 1);
-    expect(ready.hits.single.surahName, 'سورة 1');
-    expect(ready.hits.single.text, contains('Merciful'));
-  });
+      final ready = cubit.state as TranslationSearchReady;
+      expect(ready.query, 'merciful');
+      expect(ready.total, 1);
+      expect(ready.hits, hasLength(1));
+      expect(ready.hits.single.surahId, 1);
+      expect(ready.hits.single.ayah, 1);
+      expect(ready.hits.single.surahName, 'سورة 1');
+      expect(ready.hits.single.text, contains('Merciful'));
+    },
+  );
 
   test('Arabic queries ignore diacritics and letter variants', () async {
     final source = _Source(
@@ -81,9 +83,7 @@ void main() {
     final source = _Source(
       ['en1'],
       {
-        'en1': {
-          for (var i = 0; i < 150; i++) 1000 + i: 'test entry $i',
-        },
+        'en1': {for (var i = 0; i < 150; i++) 1000 + i: 'test entry $i'},
       },
     );
     final cubit = _cubit(source);

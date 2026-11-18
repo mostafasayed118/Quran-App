@@ -36,7 +36,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_downloads_summary');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -53,12 +55,15 @@ void main() {
   });
 
   Future<void> insertDone(int surahNumber, int bytes) async {
-    await db.into(db.downloads).insert(
+    await db
+        .into(db.downloads)
+        .insert(
           DownloadsCompanion.insert(
             reciterId: '51-53',
             surahId: surahNumber,
             status: 'done',
-            path: '${tempRoot.path}/audio/51-53/'
+            path:
+                '${tempRoot.path}/audio/51-53/'
                 '${surahNumber.toString().padLeft(3, '0')}.mp3',
             bytes: Value(bytes),
           ),
@@ -67,7 +72,8 @@ void main() {
 
   DownloadsCubit newCubit({AudioDownloader? downloader}) {
     final cubit = DownloadsCubit(
-      downloader: downloader ??
+      downloader:
+          downloader ??
           AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: ReciterRepository(db),
     );
@@ -105,23 +111,27 @@ void main() {
     expect(await cubit.installed(), isEmpty);
   });
 
-  test('removeAll stops at the first failure and keeps the earlier removals',
-      () async {
-    await insertDone(1, 1048576);
-    await insertDone(2, 2097152);
-    await insertDone(3, 3145728);
-    final cubit = newCubit(
-      downloader: _FailingRemoveDownloader(
-        db,
-        audioRootResolver: () async => tempRoot,
-        failFor: 2,
-      ),
-    );
+  test(
+    'removeAll stops at the first failure and keeps the earlier removals',
+    () async {
+      await insertDone(1, 1048576);
+      await insertDone(2, 2097152);
+      await insertDone(3, 3145728);
+      final cubit = newCubit(
+        downloader: _FailingRemoveDownloader(
+          db,
+          audioRootResolver: () async => tempRoot,
+          failFor: 2,
+        ),
+      );
 
-    await expectLater(cubit.removeAll(), throwsA(isA<StateError>()));
+      await expectLater(cubit.removeAll(), throwsA(isA<StateError>()));
 
-    final left = await db.select(db.downloads).get();
-    expect(left.map((row) => row.surahId), [2, 3],
-        reason: 'the first row is gone, the failed row and the rest stay');
-  });
+      final left = await db.select(db.downloads).get();
+      expect(left.map((row) => row.surahId), [
+        2,
+        3,
+      ], reason: 'the first row is gone, the failed row and the rest stay');
+    },
+  );
 }

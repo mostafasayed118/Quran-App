@@ -116,8 +116,11 @@ void main() {
     service.pending[0].completeError(StateError('late boom'));
     await play;
 
-    expect(cubit.state, isA<PlaybackInitial>(),
-        reason: 'a stopped attempt must not resurrect a failure strip');
+    expect(
+      cubit.state,
+      isA<PlaybackInitial>(),
+      reason: 'a stopped attempt must not resurrect a failure strip',
+    );
     expect(service.stopCount, 1);
   });
 
@@ -129,8 +132,11 @@ void main() {
     service.pending[0].complete();
     await play;
 
-    expect(cubit.state, isA<PlaybackInitial>(),
-        reason: 'a stopped attempt must not resurrect a playing strip');
+    expect(
+      cubit.state,
+      isA<PlaybackInitial>(),
+      reason: 'a stopped attempt must not resurrect a playing strip',
+    );
   });
 
   test("a newer play discards the previous attempt's late failure", () async {
@@ -163,30 +169,40 @@ void main() {
     gate.complete();
     await lookup;
 
-    expect(gatedCubit.state, isA<PlaybackInitial>(),
-        reason: 'a stopped lookup must not start playback or fail loudly');
+    expect(
+      gatedCubit.state,
+      isA<PlaybackInitial>(),
+      reason: 'a stopped lookup must not start playback or fail loudly',
+    );
     expect(service.pending, isEmpty);
   });
 
-  test('background-inactive load failure is labelled, not called network',
-      () async {
-    final localCubit = PlaybackCubit(
-      service: service,
-      reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
-      backgroundActive: () => false,
-    );
-    addTearDown(localCubit.close);
+  test(
+    'background-inactive load failure is labelled, not called network',
+    () async {
+      final localCubit = PlaybackCubit(
+        service: service,
+        reciters: ReciterRepository(db),
+        downloader: AudioDownloader(
+          db,
+          audioRootResolver: () async => tempRoot,
+        ),
+        backgroundActive: () => false,
+      );
+      addTearDown(localCubit.close);
 
-    final play = localCubit.playSurah(_row, 1);
-    await waitForLoads(1);
-    service.pending[0].completeError(StateError('boom'));
-    await play;
+      final play = localCubit.playSurah(_row, 1);
+      await waitForLoads(1);
+      service.pending[0].completeError(StateError('boom'));
+      await play;
 
-    expect(localCubit.state, isA<PlaybackFailed>());
-    expect((localCubit.state as PlaybackFailed).kind,
-        PlaybackFailureKind.backgroundUnavailable);
-  });
+      expect(localCubit.state, isA<PlaybackFailed>());
+      expect(
+        (localCubit.state as PlaybackFailed).kind,
+        PlaybackFailureKind.backgroundUnavailable,
+      );
+    },
+  );
 
   test('background-active load failure stays network', () async {
     final play = cubit.playSurah(_row, 1);

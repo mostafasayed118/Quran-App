@@ -10,7 +10,8 @@ import 'support/host.dart';
 Future<void> pumpTicker(WidgetTester tester) {
   return tester.pumpWidget(
     appShell(
-        home: LifecycleTicker(builder: (context, tick) => Text('tick:$tick'))),
+      home: LifecycleTicker(builder: (context, tick) => Text('tick:$tick')),
+    ),
   );
 }
 
@@ -19,13 +20,15 @@ void main() {
   // the background has to put it back for the tests that follow.
   void restoreResumed(WidgetTester tester) {
     addTearDown(
-      () => tester.binding
-          .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+      () => tester.binding.handleAppLifecycleStateChanged(
+        AppLifecycleState.resumed,
+      ),
     );
   }
 
-  testWidgets('inactive stops the ticker while frames still run',
-      (tester) async {
+  testWidgets('inactive stops the ticker while frames still run', (
+    tester,
+  ) async {
     restoreResumed(tester);
     await pumpTicker(tester);
 
@@ -66,8 +69,9 @@ void main() {
     });
   }
 
-  testWidgets('a ticker mounted while the app is inactive starts no timer',
-      (tester) async {
+  testWidgets('a ticker mounted while the app is inactive starts no timer', (
+    tester,
+  ) async {
     // Frames still run in `inactive`, so this is the mount-while-backgrounded
     // case the initState guard exists for. It cannot be written against
     // `paused`: frames are disabled there, so no widget ever mounts.
@@ -83,8 +87,9 @@ void main() {
     expect(find.text('tick:1'), findsOneWidget);
   });
 
-  testWidgets('disposing the ticker cancels the periodic timer',
-      (tester) async {
+  testWidgets('disposing the ticker cancels the periodic timer', (
+    tester,
+  ) async {
     await pumpTicker(tester);
     await tester.pump(const Duration(seconds: 1));
     expect(find.text('tick:1'), findsOneWidget);

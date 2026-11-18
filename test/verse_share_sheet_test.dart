@@ -49,34 +49,32 @@ Widget _app({
   required _FakeSharer sharer,
   required VerseImageCapture? capture,
   double? textScale,
-}) =>
-    MaterialApp(
-      locale: const Locale('ar'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      builder: textScale == null
-          ? null
-          : (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: TextScaler.linear(textScale),
-                ),
-                child: child!,
-              ),
-      home: Scaffold(
-        body: Builder(
-          builder: (context) => TextButton(
-            onPressed: () => showVerseShareSheet(
-              context,
-              ayah: _verse,
-              surahName: 'الفاتحة',
-              sharer: sharer,
-              capture: capture,
-            ),
-            child: const Text('open'),
-          ),
+}) => MaterialApp(
+  locale: const Locale('ar'),
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+  builder: textScale == null
+      ? null
+      : (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
         ),
+  home: Scaffold(
+    body: Builder(
+      builder: (context) => TextButton(
+        onPressed: () => showVerseShareSheet(
+          context,
+          ayah: _verse,
+          surahName: 'الفاتحة',
+          sharer: sharer,
+          capture: capture,
+        ),
+        child: const Text('open'),
       ),
-    );
+    ),
+  ),
+);
 
 Future<void> _openSheet(
   WidgetTester tester, {
@@ -88,13 +86,17 @@ Future<void> _openSheet(
     _app(sharer: sharer, capture: capture, textScale: textScale),
   );
   await tester.tap(find.text('open'));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
-  testWidgets('the image action shares the captured PNG and the text',
-      (tester) async {
+  testWidgets('the image action shares the captured PNG and the text', (
+    tester,
+  ) async {
     final sharer = _FakeSharer();
     final png = Uint8List.fromList(const [
       0x89,
@@ -106,11 +108,7 @@ void main() {
       0x1A,
       0x0A,
     ]);
-    await _openSheet(
-      tester,
-      sharer: sharer,
-      capture: (_) async => png,
-    );
+    await _openSheet(tester, sharer: sharer, capture: (_) async => png);
 
     await tester.tap(find.text('مشاركة كصورة'));
     await tester.pump();
@@ -125,11 +123,7 @@ void main() {
 
   testWidgets('a failed capture falls back to the text share', (tester) async {
     final sharer = _FakeSharer();
-    await _openSheet(
-      tester,
-      sharer: sharer,
-      capture: (_) async => null,
-    );
+    await _openSheet(tester, sharer: sharer, capture: (_) async => null);
 
     await tester.tap(find.text('مشاركة كصورة'));
     await tester.pump();
@@ -187,8 +181,9 @@ void main() {
     expect(bytes!.take(4), [0x89, 0x50, 0x4E, 0x47]);
   });
 
-  testWidgets('320 dp at textScale 2.0 keeps the actions above the inset',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 keeps the actions above the inset', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     tester.view.padding = const FakeViewPadding(bottom: 48);
@@ -209,8 +204,11 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).last,
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final action = tester.getRect(find.text('مشاركة كصورة'));
     expect(action.bottom, lessThanOrEqualTo(640 - 48));

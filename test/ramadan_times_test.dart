@@ -18,8 +18,11 @@ void main() {
       fajr,
     );
     expect(
-      ramadanTimesFor(fajr: fajr, maghrib: maghrib, imsakLeadMinutes: 999)
-          .imsak,
+      ramadanTimesFor(
+        fajr: fajr,
+        maghrib: maghrib,
+        imsakLeadMinutes: 999,
+      ).imsak,
       fajr.subtract(const Duration(minutes: 30)),
     );
     expect(

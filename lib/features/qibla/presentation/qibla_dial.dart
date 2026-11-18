@@ -107,11 +107,7 @@ class _DialPainter extends CustomPainter {
       center.dy - radius * math.cos(qiblaAngle),
     );
     canvas.drawCircle(marker, 9, Paint()..color = colors.secondary);
-    canvas.drawCircle(
-      marker,
-      4,
-      Paint()..color = colors.surface,
-    );
+    canvas.drawCircle(marker, 4, Paint()..color = colors.surface);
   }
 
   @override
@@ -137,15 +133,13 @@ class _CityTile extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(Icons.location_on_outlined,
-            size: AppIconSize.md, color: colors.primary),
-        const SizedBox(width: AppSpacing.xs),
-        Expanded(
-          child: Text(
-            title,
-            style: AppTheme.meQuranTitle,
-          ),
+        Icon(
+          Icons.location_on_outlined,
+          size: AppIconSize.md,
+          color: colors.primary,
         ),
+        const SizedBox(width: AppSpacing.xs),
+        Expanded(child: Text(title, style: AppTheme.meQuranTitle)),
       ],
     );
   }
@@ -158,9 +152,7 @@ class _CompassNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(text, style: AppTheme.mutedFootnote(context)),
-    );
+    return Center(child: Text(text, style: AppTheme.mutedFootnote(context)));
   }
 }
 
@@ -184,15 +176,16 @@ class _CalibrationHint extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.explore_off_outlined,
-              size: AppIconSize.md, color: colors.error),
+          Icon(
+            Icons.explore_off_outlined,
+            size: AppIconSize.md,
+            color: colors.error,
+          ),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
             child: Text(
               text,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
+              style: Theme.of(context).textTheme.bodySmall
                   ?.copyWith(color: colors.onErrorContainer),
             ),
           ),
@@ -227,8 +220,11 @@ class _AlignmentHint extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle,
-                  size: AppIconSize.md, color: AppTheme.goldText(context)),
+              Icon(
+                Icons.check_circle,
+                size: AppIconSize.md,
+                color: AppTheme.goldText(context),
+              ),
               const SizedBox(width: AppSpacing.xs),
               Flexible(
                 child: Text(

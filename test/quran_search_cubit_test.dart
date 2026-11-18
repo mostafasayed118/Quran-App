@@ -7,26 +7,28 @@ import 'package:quran_yahdi/features/quran/presentation/search/quran_search_cubi
 import 'package:quran_yahdi/features/quran/presentation/search/quran_search_state.dart';
 
 QuranSearchHit _hit(int id) => QuranSearchHit(
-      ayahId: id,
-      surahId: 1,
-      numberInSurah: id,
-      surahNameAr: 'الفاتحة',
-      textImlaei: 'نص $id',
-    );
+  ayahId: id,
+  surahId: 1,
+  numberInSurah: id,
+  surahNameAr: 'الفاتحة',
+  textImlaei: 'نص $id',
+);
 
-QuranSearchPage _page(List<int> ids,
-        {required int total, required bool hasMore}) =>
-    QuranSearchPage(
-      hits: [for (final id in ids) _hit(id)],
-      total: total,
-      hasMore: hasMore,
-    );
+QuranSearchPage _page(
+  List<int> ids, {
+  required int total,
+  required bool hasMore,
+}) => QuranSearchPage(
+  hits: [for (final id in ids) _hit(id)],
+  total: total,
+  hasMore: hasMore,
+);
 
 class _FakeSource implements QuranSearchSource {
   _FakeSource(this.onSearch);
 
   final Future<QuranSearchPage> Function(String query, int? afterAyahId)
-      onSearch;
+  onSearch;
   final List<String> queries = [];
 
   @override

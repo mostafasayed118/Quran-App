@@ -42,22 +42,22 @@ class SurahIndexBody extends StatelessWidget {
         SurahIndexLoading() => const LoadingView(),
         SurahIndexFailed() => errorPane(loc, onRetry: cubit.reload),
         SurahIndexReady(:final surahs, :final query) => Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.md,
-                  AppSpacing.md,
-                  AppSpacing.md,
-                  AppSpacing.xs,
-                ),
-                child: SearchField(
-                  hint: loc.searchSurahHint,
-                  onChanged: context.read<SurahIndexCubit>().setQuery,
-                ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.md,
+                AppSpacing.xs,
               ),
-              Expanded(
-                child: surahs.isEmpty
-                    ? (query.isEmpty
+              child: SearchField(
+                hint: loc.searchSurahHint,
+                onChanged: context.read<SurahIndexCubit>().setQuery,
+              ),
+            ),
+            Expanded(
+              child: surahs.isEmpty
+                  ? (query.isEmpty
                         ? EmptyState(loc.noResults)
                         : EmptyState(
                             loc.noResults,
@@ -68,19 +68,18 @@ class SurahIndexBody extends StatelessWidget {
                             onAction: () =>
                                 context.push(quranSearchPath(query: query)),
                           ))
-                    : ListView.builder(
-                        padding:
-                            EdgeInsets.only(bottom: appBottomInset(context)),
-                        itemCount: surahs.length,
-                        itemBuilder: (context, i) => _SurahRow(
-                          surah: surahs[i],
-                          selected: surahs[i].id == selectedSurahId,
-                          onTap: () => onSelect(surahs[i]),
-                        ),
+                  : ListView.builder(
+                      padding: EdgeInsets.only(bottom: appBottomInset(context)),
+                      itemCount: surahs.length,
+                      itemBuilder: (context, i) => _SurahRow(
+                        surah: surahs[i],
+                        selected: surahs[i].id == selectedSurahId,
+                        onTap: () => onSelect(surahs[i]),
                       ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+          ],
+        ),
       },
     );
   }

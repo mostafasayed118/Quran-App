@@ -22,8 +22,9 @@ CalculationParameters parametersFor(PrayerConfig config) {
     PrayerCalculationMethod.northAmerica => CalculationMethod.north_america,
   };
   final parameters = method.getParameters();
-  parameters.madhab =
-      config.madhab == PrayerMadhab.hanafi ? Madhab.hanafi : Madhab.shafi;
+  parameters.madhab = config.madhab == PrayerMadhab.hanafi
+      ? Madhab.hanafi
+      : Madhab.shafi;
   final adjustments = parameters.adjustments;
   adjustments.fajr = config.adjustmentFor(PrayerName.fajr);
   adjustments.dhuhr = config.adjustmentFor(PrayerName.dhuhr);
@@ -44,7 +45,7 @@ CalculationParameters parametersFor(PrayerConfig config) {
     // instead). Fall back to the rule those methods already default to.
     final unsupportedTwilight =
         highLatitude == HighLatitudeRule.twilight_angle &&
-            parameters.ishaAngle == null;
+        parameters.ishaAngle == null;
     parameters.highLatitudeRule = unsupportedTwilight
         ? HighLatitudeRule.seventh_of_the_night
         : highLatitude;

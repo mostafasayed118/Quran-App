@@ -56,9 +56,7 @@ Future<BackupDecodeResult> decodeBackup(
 /// non-test path completes; the widget suite runs under the fake clock,
 /// where isolate completions never arrive.
 Future<BackupDecodeResult> decodeBackupInIsolate(Uint8List bytes) {
-  return Isolate.run(
-    () => decode(utf8.decode(bytes, allowMalformed: true)),
-  );
+  return Isolate.run(() => decode(utf8.decode(bytes, allowMalformed: true)));
 }
 
 /// Encrypts [json] behind [passphrase] on a worker isolate.
@@ -114,10 +112,12 @@ final List<int> _envelopePrefix = utf8.encode(
 /// Logs the isolate-unavailable degrade (kept in its own function, away from
 /// the passphrase-bearing decode lines, so debug logs never capture a value).
 void _logDecodeDegrade(Object error, StackTrace stackTrace) {
-  appLog('backup decode isolate unavailable, decoding inline',
-      name: 'quran_yahdi/backup',
-      error: error.runtimeType,
-      stackTrace: stackTrace);
+  appLog(
+    'backup decode isolate unavailable, decoding inline',
+    name: 'quran_yahdi/backup',
+    error: error.runtimeType,
+    stackTrace: stackTrace,
+  );
 }
 
 /// Whether [bytes] start like an encrypted envelope.

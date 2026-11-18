@@ -18,69 +18,80 @@ void main() {
     db = newTestDb();
     final fatiha = [
       AyahsCompanion.insert(
-          id: const Value(1),
-          surahId: 1,
-          numberInSurah: 1,
-          juz: 1,
-          page: 1,
-          textUthmani: 'بسم الله الرحمن الرحيم',
-          textImlaei: 'بسم الله الرحمن الرحيم'),
+        id: const Value(1),
+        surahId: 1,
+        numberInSurah: 1,
+        juz: 1,
+        page: 1,
+        textUthmani: 'بسم الله الرحمن الرحيم',
+        textImlaei: 'بسم الله الرحمن الرحيم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(2),
-          surahId: 1,
-          numberInSurah: 2,
-          juz: 1,
-          page: 1,
-          textUthmani: 'الحمد لله رب العالمين',
-          textImlaei: 'الحمد لله رب العالمين'),
+        id: const Value(2),
+        surahId: 1,
+        numberInSurah: 2,
+        juz: 1,
+        page: 1,
+        textUthmani: 'الحمد لله رب العالمين',
+        textImlaei: 'الحمد لله رب العالمين',
+      ),
       AyahsCompanion.insert(
-          id: const Value(3),
-          surahId: 1,
-          numberInSurah: 3,
-          juz: 1,
-          page: 1,
-          textUthmani: 'الرحمن الرحيم',
-          textImlaei: 'الرحمن الرحيم'),
+        id: const Value(3),
+        surahId: 1,
+        numberInSurah: 3,
+        juz: 1,
+        page: 1,
+        textUthmani: 'الرحمن الرحيم',
+        textImlaei: 'الرحمن الرحيم',
+      ),
     ];
     final baqarah = [
       AyahsCompanion.insert(
-          id: const Value(8),
-          surahId: 2,
-          numberInSurah: 1,
-          juz: 1,
-          page: 2,
-          textUthmani: 'الم',
-          textImlaei: 'الم'),
+        id: const Value(8),
+        surahId: 2,
+        numberInSurah: 1,
+        juz: 1,
+        page: 2,
+        textUthmani: 'الم',
+        textImlaei: 'الم',
+      ),
       AyahsCompanion.insert(
-          id: const Value(9),
-          surahId: 2,
-          numberInSurah: 2,
-          juz: 1,
-          page: 2,
-          textUthmani: 'ذلك الكتاب',
-          textImlaei: 'ذلك الكتاب'),
+        id: const Value(9),
+        surahId: 2,
+        numberInSurah: 2,
+        juz: 1,
+        page: 2,
+        textUthmani: 'ذلك الكتاب',
+        textImlaei: 'ذلك الكتاب',
+      ),
     ];
     await db.batch((b) => b.insertAll(db.ayahs, fatiha));
     await db.batch((b) => b.insertAll(db.ayahs, baqarah));
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
-              id: const Value(1),
-              nameAr: 'الفاتحة',
-              nameEn: 'Al-Fatihah',
-              revelationType: 'makkah',
-              ayahCount: 3,
-              pagesStart: 1,
-              pagesEnd: 1),
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makkah',
+            ayahCount: 3,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
         );
-    await db.into(db.surahs).insert(
+    await db
+        .into(db.surahs)
+        .insert(
           SurahsCompanion.insert(
-              id: const Value(2),
-              nameAr: 'البقرة',
-              nameEn: 'Al-Baqarah',
-              revelationType: 'madinah',
-              ayahCount: 2,
-              pagesStart: 2,
-              pagesEnd: 2),
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madinah',
+            ayahCount: 2,
+            pagesStart: 2,
+            pagesEnd: 2,
+          ),
         );
     ayahs = AyahRepository(db);
     lastRead = LastReadRepository(db);
@@ -88,10 +99,11 @@ void main() {
 
   test('loads ready state; basmala banner policy per surah', () async {
     ReaderCubit? cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     final ready = await readyFuture as ReaderReady;
@@ -101,10 +113,11 @@ void main() {
     await cubit.close();
 
     cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 1,
-        initialAyah: 0);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 1,
+      initialAyah: 0,
+    );
     final fatihaReadyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     final fatihaReady = await fatihaReadyFuture as ReaderReady;
@@ -114,47 +127,54 @@ void main() {
 
   test('toggleBookmark flips the bookmarkedIds set (via watch)', () async {
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     await readyFuture;
     await cubit.toggleBookmark(8);
     await cubit.stream.firstWhere(
-        (s) => s is ReaderReady && (s).bookmarkedAyahIds.contains(8));
+      (s) => s is ReaderReady && (s).bookmarkedAyahIds.contains(8),
+    );
     await cubit.toggleBookmark(8);
     await cubit.stream.firstWhere(
-        (s) => s is ReaderReady && !(s).bookmarkedAyahIds.contains(8));
+      (s) => s is ReaderReady && !(s).bookmarkedAyahIds.contains(8),
+    );
     await cubit.close();
   });
 
-  test('toggleMode flips verses <-> mushaf; page change persists last-read',
-      () async {
-    final cubit = ReaderCubit(
+  test(
+    'toggleMode flips verses <-> mushaf; page change persists last-read',
+    () async {
+      final cubit = ReaderCubit(
         ayahRepository: ayahs,
         lastReadRepository: lastRead,
         surahId: 2,
-        initialAyah: 0);
-    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
-    await cubit.start();
-    final ready = await readyFuture as ReaderReady;
-    expect(ready.mode, ReaderMode.verses);
-    cubit.toggleMode();
-    final mushaf = cubit.state as ReaderReady;
-    expect(mushaf.mode, ReaderMode.mushaf);
-    await cubit.onMushafPageChanged(0);
-    expect(await lastRead.loadAyahId(), 8);
-    await cubit.close();
-  });
+        initialAyah: 0,
+      );
+      final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+      await cubit.start();
+      final ready = await readyFuture as ReaderReady;
+      expect(ready.mode, ReaderMode.verses);
+      cubit.toggleMode();
+      final mushaf = cubit.state as ReaderReady;
+      expect(mushaf.mode, ReaderMode.mushaf);
+      await cubit.onMushafPageChanged(0);
+      expect(await lastRead.loadAyahId(), 8);
+      await cubit.close();
+    },
+  );
 
   test('an out-of-range initial ayah is clamped to the first ayah', () async {
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 999);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 999,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     final ready = await readyFuture as ReaderReady;
@@ -167,10 +187,11 @@ void main() {
 
   test('the zero initial ayah stays the start sentinel', () async {
     final cubit = ReaderCubit(
-        ayahRepository: ayahs,
-        lastReadRepository: lastRead,
-        surahId: 2,
-        initialAyah: 0);
+      ayahRepository: ayahs,
+      lastReadRepository: lastRead,
+      surahId: 2,
+      initialAyah: 0,
+    );
     final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
     await cubit.start();
     final ready = await readyFuture as ReaderReady;

@@ -8,8 +8,9 @@ void main() {
   Future<void> pump(WidgetTester tester) =>
       tester.pumpWidget(appShell(home: const Scaffold(body: LoadingView())));
 
-  testWidgets('a load that finishes at once never paints the ring',
-      (tester) async {
+  testWidgets('a load that finishes at once never paints the ring', (
+    tester,
+  ) async {
     await pump(tester);
 
     // Present in the tree, so every test and every screen reader still finds
@@ -21,8 +22,9 @@ void main() {
     expect(_opacity(tester), 0, reason: 'the hold phase must stay invisible');
   });
 
-  testWidgets('a slow load fades the ring in instead of popping it',
-      (tester) async {
+  testWidgets('a slow load fades the ring in instead of popping it', (
+    tester,
+  ) async {
     await pump(tester);
 
     await tester.pump(const Duration(milliseconds: 220));

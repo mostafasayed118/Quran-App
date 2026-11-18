@@ -13,26 +13,26 @@ const String _today = '2026-11-02';
 final DateTime _now = DateTime(2026, 11, 2, 9);
 
 Map<String, dynamic> _catalog() => {
-      'collections': [
-        {
-          'id': 'morning',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ أَوَّل', 'count': 3},
-            {'text': 'ذِكْرٌ ثَانٍ', 'count': 2},
-          ],
-        },
-        {
-          'id': 'evening',
-          'nameAr': 'أذكار المساء',
-          'nameEn': 'Evening',
-          'items': [
-            {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'morning',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ أَوَّل', 'count': 3},
+        {'text': 'ذِكْرٌ ثَانٍ', 'count': 2},
       ],
-    };
+    },
+    {
+      'id': 'evening',
+      'nameAr': 'أذكار المساء',
+      'nameEn': 'Evening',
+      'items': [
+        {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
+      ],
+    },
+  ],
+};
 
 /// A source whose first read can be held open, so the cubit can be driven
 /// while hydration is still pending.
@@ -73,40 +73,43 @@ class _GatedSource implements AzkarSavedStateSource {
 }
 
 void main() {
-  test('opening a collection before hydration resumes the saved counters',
-      () async {
-    final gate = Completer<void>();
-    final source = _GatedSource(const AzkarSavedState(
-      day: _today,
-      remaining: {
-        'morning': [0, 1],
-      },
-    ))
-      ..gate = gate;
+  test(
+    'opening a collection before hydration resumes the saved counters',
+    () async {
+      final gate = Completer<void>();
+      final source = _GatedSource(
+        const AzkarSavedState(
+          day: _today,
+          remaining: {
+            'morning': [0, 1],
+          },
+        ),
+      )..gate = gate;
 
-    final cubit = AzkarCubit(
-      repository: AzkarRepository(loader: () async => _catalog()),
-      savedState: source,
-      clock: () => _now,
-    );
-    addTearDown(cubit.close);
+      final cubit = AzkarCubit(
+        repository: AzkarRepository(loader: () async => _catalog()),
+        savedState: source,
+        clock: () => _now,
+      );
+      addTearDown(cubit.close);
 
-    final loading = cubit.start();
-    await Future<void>.delayed(Duration.zero);
-    expect(cubit.state, isA<AzkarBrowsing>());
+      final loading = cubit.start();
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state, isA<AzkarBrowsing>());
 
-    final collection = (cubit.state as AzkarBrowsing).collections.first;
-    cubit.open(collection);
-    gate.complete();
-    await loading;
-    await Future<void>.delayed(Duration.zero);
+      final collection = (cubit.state as AzkarBrowsing).collections.first;
+      cubit.open(collection);
+      gate.complete();
+      await loading;
+      await Future<void>.delayed(Duration.zero);
 
-    expect(
-      (cubit.state as AzkarReciting).remaining,
-      [0, 1],
-      reason: 'the open must wait for the stored counters, not start at full',
-    );
-  });
+      expect(
+        (cubit.state as AzkarReciting).remaining,
+        [0, 1],
+        reason: 'the open must wait for the stored counters, not start at full',
+      );
+    },
+  );
 
   test('two collection saves racing keep both collections', () async {
     final db = newTestDb();

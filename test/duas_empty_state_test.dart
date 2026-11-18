@@ -35,8 +35,9 @@ void main() {
     );
   }
 
-  testWidgets('empty duas dataset shows the localized no-results state',
-      (tester) async {
+  testWidgets('empty duas dataset shows the localized no-results state', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(tester.takeException(), isNull);
@@ -45,13 +46,17 @@ void main() {
     expect(find.byType(ChoiceChip), findsNothing);
   });
 
-  testWidgets('empty ruqyah dataset shows the localized no-results state',
-      (tester) async {
+  testWidgets('empty ruqyah dataset shows the localized no-results state', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     await tester.tap(find.text('الرقية'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.byType(EmptyState), findsOneWidget);

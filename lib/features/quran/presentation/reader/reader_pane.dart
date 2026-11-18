@@ -53,26 +53,26 @@ class ReaderPane extends StatelessWidget {
       child: BlocBuilder<ReaderCubit, ReaderState>(
         builder: (context, state) => switch (state) {
           ReaderLoading() => Scaffold(
-              appBar: _bar(loc.quran),
-              body: const LoadingView(),
-            ),
+            appBar: _bar(loc.quran),
+            body: const LoadingView(),
+          ),
           ReaderFailed() => Scaffold(
-              appBar: _bar(loc.quran),
-              body: ReaderErrorBody(state: state),
-            ),
+            appBar: _bar(loc.quran),
+            body: ReaderErrorBody(state: state),
+          ),
           ReaderReady() => Scaffold(
-              appBar: _bar(
-                state.surahName,
-                actions: [
-                  ReaderActions(
-                    state: state,
-                    onOpenBookmarks: onOpenBookmarks,
-                    onOpenAyah: onOpenAyah,
-                  ),
-                ],
-              ),
-              body: ReaderView(state: state),
+            appBar: _bar(
+              state.surahName,
+              actions: [
+                ReaderActions(
+                  state: state,
+                  onOpenBookmarks: onOpenBookmarks,
+                  onOpenAyah: onOpenAyah,
+                ),
+              ],
             ),
+            body: ReaderView(state: state),
+          ),
         },
       ),
     );

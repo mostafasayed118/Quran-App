@@ -36,7 +36,8 @@ const String kSearchIndexContentKey = 'search_index_content_version';
 ///
 /// `rowid` carries the global ayah id (1..6236), keeping joins and ordering
 /// compatible with the rest of the reader/search pipeline.
-const String kAyahSearchDdl = 'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
+const String kAyahSearchDdl =
+    'CREATE VIRTUAL TABLE IF NOT EXISTS ayah_search '
     "USING fts5(text_norm, tokenize='trigram')";
 
 /// Awaits a computation off the UI isolate.
@@ -99,8 +100,8 @@ Future<void> ensureAyahSearchSchema(AppDatabase db) async {
 
 /// Pure projection used by the worker isolate.
 List<(int, String)> normalizeSearchEntries(List<(int, String)> input) => [
-      for (final (id, text) in input) (id, normalizeArabic(text).toLowerCase()),
-    ];
+  for (final (id, text) in input) (id, normalizeArabic(text).toLowerCase()),
+];
 
 /// Builds the off-isolate job for [normalizeSearchEntries].
 ///
@@ -153,18 +154,18 @@ Future<void> rebuildQuranSearchIndex(
 }
 
 Future<int> _indexStamp(AppDatabase db) async {
-  final row = await (db.select(db.settingsTable)
-        ..where((s) => s.key.equals(kSearchIndexVersionKey)))
-      .getSingleOrNull();
+  final row = await (db.select(
+    db.settingsTable,
+  )..where((s) => s.key.equals(kSearchIndexVersionKey))).getSingleOrNull();
   return int.tryParse(row?.value ?? '') ?? 0;
 }
 
 /// The content version the index was built from; null on an install that only
 /// has the format stamp (a rebuild is due).
 Future<int?> _contentStamp(AppDatabase db) async {
-  final row = await (db.select(db.settingsTable)
-        ..where((s) => s.key.equals(kSearchIndexContentKey)))
-      .getSingleOrNull();
+  final row = await (db.select(
+    db.settingsTable,
+  )..where((s) => s.key.equals(kSearchIndexContentKey))).getSingleOrNull();
   return row == null ? null : int.tryParse(row.value);
 }
 

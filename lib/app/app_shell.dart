@@ -36,11 +36,7 @@ abstract final class AppTabs {
 }
 
 /// One top-level destination, shared by the bar and the rail.
-typedef _Tab = ({
-  IconData icon,
-  IconData selectedIcon,
-  String label,
-});
+typedef _Tab = ({IconData icon, IconData selectedIcon, String label});
 
 /// Persistent navigation for the four primary destinations.
 ///
@@ -62,11 +58,7 @@ class AppShell extends StatelessWidget {
     final selectedIndex = AppTabs.indexOf(location);
 
     final tabs = <_Tab>[
-      (
-        icon: Icons.home_outlined,
-        selectedIcon: Icons.home,
-        label: loc.home,
-      ),
+      (icon: Icons.home_outlined, selectedIcon: Icons.home, label: loc.home),
       (
         icon: Icons.menu_book_outlined,
         selectedIcon: Icons.menu_book,
@@ -77,11 +69,7 @@ class AppShell extends StatelessWidget {
         selectedIcon: Icons.access_time,
         label: loc.prayerTimes,
       ),
-      (
-        icon: Icons.spa_outlined,
-        selectedIcon: Icons.spa,
-        label: loc.azkar,
-      ),
+      (icon: Icons.spa_outlined, selectedIcon: Icons.spa, label: loc.azkar),
     ];
 
     void select(int index) {

@@ -61,11 +61,11 @@ class _ThrowingWriteStore implements ReminderPlanStore {
 }
 
 ScheduledReminder _reminder(int id) => ScheduledReminder(
-      id: id,
-      fireAt: DateTime.now().add(const Duration(hours: 1)),
-      title: 'reminder $id',
-      payload: 'prayer',
-    );
+  id: id,
+  fireAt: DateTime.now().add(const Duration(hours: 1)),
+  title: 'reminder $id',
+  payload: 'prayer',
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -79,20 +79,20 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return true;
-        case 'areNotificationsEnabled':
-          return true;
-        case 'pendingNotificationRequests':
-          return <Object?>[];
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return true;
+            case 'areNotificationsEnabled':
+              return true;
+            case 'pendingNotificationRequests':
+              return <Object?>[];
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -131,8 +131,11 @@ void main() {
     probe.exists = false;
     await binding.scheduleAll(plan);
 
-    expect(zonedCalls(), first + 2,
-        reason: 'the binding must not trust a fingerprint the OS contradicts');
+    expect(
+      zonedCalls(),
+      first + 2,
+      reason: 'the binding must not trust a fingerprint the OS contradicts',
+    );
   });
 
   test('a normal resume with the alarms alive schedules nothing', () async {
@@ -162,31 +165,46 @@ void main() {
 
     probe.throws = false;
     await binding.scheduleAll(plan);
-    expect(zonedCalls(), first + 2,
-        reason: 'the rearm itself is idempotent and does not loop');
+    expect(
+      zonedCalls(),
+      first + 2,
+      reason: 'the rearm itself is idempotent and does not loop',
+    );
   });
 
-  test('the exit-reason flag bypasses a matching snapshot exactly once',
-      () async {
-    final plan = [_reminder(1000), _reminder(1003)];
-    final store = _MemoryStore();
+  test(
+    'the exit-reason flag bypasses a matching snapshot exactly once',
+    () async {
+      final plan = [_reminder(1000), _reminder(1003)];
+      final store = _MemoryStore();
 
-    final warm = await build(probe: _Probe(), store: store);
-    await warm.scheduleAll(plan);
-    final baseline = zonedCalls();
-    expect(baseline, 2);
+      final warm = await build(probe: _Probe(), store: store);
+      await warm.scheduleAll(plan);
+      final baseline = zonedCalls();
+      expect(baseline, 2);
 
-    final forced = await build(probe: _Probe(exitReason: '10'), store: store);
-    await forced.scheduleAll(plan);
-    expect(zonedCalls(), baseline + 2,
-        reason: 'a force-stop exit reason must not be defeated by the '
-            'snapshot it left behind');
+      final forced = await build(
+        probe: _Probe(exitReason: '10'),
+        store: store,
+      );
+      await forced.scheduleAll(plan);
+      expect(
+        zonedCalls(),
+        baseline + 2,
+        reason:
+            'a force-stop exit reason must not be defeated by the '
+            'snapshot it left behind',
+      );
 
-    final healthy = await build(probe: _Probe(), store: store);
-    await healthy.scheduleAll(plan);
-    expect(zonedCalls(), baseline + 2,
-        reason: 'the flag is consumed by the successful apply');
-  });
+      final healthy = await build(probe: _Probe(), store: store);
+      await healthy.scheduleAll(plan);
+      expect(
+        zonedCalls(),
+        baseline + 2,
+        reason: 'the flag is consumed by the successful apply',
+      );
+    },
+  );
 
   test('a MissingPluginException from the probe is not a rearm', () async {
     // Expected behaviour before the fix: PASS. A background isolate has no
@@ -201,28 +219,32 @@ void main() {
     probe.throwsMissingPlugin = true;
     await binding.scheduleAll(plan);
 
-    expect(zonedCalls(), first,
-        reason:
-            'no MainActivity in a background isolate must not force a rearm');
-  });
-
-  test('a null alarmExists reply throws instead of meaning "missing"',
-      () async {
-    // Expected behaviour before the fix: FAIL. Old code returns false via
-    // `exists ?? false`, silently conflating "unknown" with "missing".
-    const probeChannel = MethodChannel('quran_yahdi/reminder_diagnostics');
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(probeChannel, (call) async => null);
-    addTearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(probeChannel, null);
-    });
-
-    await expectLater(
-      const PlatformReminderAlarmProbe().alarmExists(1000),
-      throwsA(isA<StateError>()),
+    expect(
+      zonedCalls(),
+      first,
+      reason: 'no MainActivity in a background isolate must not force a rearm',
     );
   });
+
+  test(
+    'a null alarmExists reply throws instead of meaning "missing"',
+    () async {
+      // Expected behaviour before the fix: FAIL. Old code returns false via
+      // `exists ?? false`, silently conflating "unknown" with "missing".
+      const probeChannel = MethodChannel('quran_yahdi/reminder_diagnostics');
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(probeChannel, (call) async => null);
+      addTearDown(() {
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(probeChannel, null);
+      });
+
+      await expectLater(
+        const PlatformReminderAlarmProbe().alarmExists(1000),
+        throwsA(isA<StateError>()),
+      );
+    },
+  );
 
   test('a failed store write keeps the plan re-appliable', () async {
     // Expected behaviour before the fix: FAIL. Old code clears the rearm flag
@@ -237,7 +259,10 @@ void main() {
 
     await binding.scheduleAll(plan);
 
-    expect(zonedCalls(), first + 2,
-        reason: 'a failed plan write must leave the signal for retry');
+    expect(
+      zonedCalls(),
+      first + 2,
+      reason: 'a failed plan write must leave the signal for retry',
+    );
   });
 }

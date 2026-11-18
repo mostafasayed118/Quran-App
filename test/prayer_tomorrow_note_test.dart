@@ -34,11 +34,7 @@ void main() {
   });
 
   Future<void> pumpAt(WidgetTester tester, DateTime now) async {
-    final cubit = PrayerTimesCubit(
-      prayer: fake,
-      city: repo,
-      clock: () => now,
-    );
+    final cubit = PrayerTimesCubit(prayer: fake, city: repo, clock: () => now);
     addTearDown(cubit.close);
     await cubit.start();
     await pumpAppHost(
@@ -49,11 +45,14 @@ void main() {
     );
   }
 
-  testWidgets('after Isha the panel names tomorrow\'s Fajr and counts down',
-      (tester) async {
+  testWidgets('after Isha the panel names tomorrow\'s Fajr and counts down', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
-    fake.nextResult =
-        PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 16, 4, 45));
+    fake.nextResult = PrayerChoice(
+      PrayerName.fajr,
+      DateTime(2026, 3, 16, 4, 45),
+    );
 
     await pumpAt(tester, DateTime(2026, 3, 15, 20, 0));
 
@@ -65,11 +64,14 @@ void main() {
     expect(find.text('العشاء'), findsOneWidget);
   });
 
-  testWidgets('while a prayer is still ahead no tomorrow note is rendered',
-      (tester) async {
+  testWidgets('while a prayer is still ahead no tomorrow note is rendered', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
-    fake.nextResult =
-        PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+    fake.nextResult = PrayerChoice(
+      PrayerName.asr,
+      DateTime(2026, 3, 15, 15, 35),
+    );
 
     await pumpAt(tester, DateTime(2026, 3, 15, 14, 0));
 

@@ -14,5 +14,5 @@ String formatMegabytes(int bytes) => (bytes / (1024 * 1024)).toStringAsFixed(1);
 /// size in MB, so it must not pretend to a precision the source does not have.
 String formatMegabytesValue(double megabytes) =>
     megabytes == megabytes.roundToDouble()
-        ? megabytes.toStringAsFixed(0)
-        : megabytes.toStringAsFixed(1);
+    ? megabytes.toStringAsFixed(0)
+    : megabytes.toStringAsFixed(1);

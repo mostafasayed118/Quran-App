@@ -21,8 +21,7 @@ class _FailingAdapter implements HttpClientAdapter {
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
-  ) async =>
-      ResponseBody.fromString('not found', 404);
+  ) async => ResponseBody.fromString('not found', 404);
 
   @override
   void close({bool force = false}) {}
@@ -38,8 +37,7 @@ class _OkAdapter implements HttpClientAdapter {
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
-  ) async =>
-      ResponseBody.fromString(body, 200);
+  ) async => ResponseBody.fromString(body, 200);
 
   @override
   void close({bool force = false}) {}
@@ -76,20 +74,14 @@ Future<String> _signedPolicy(
     utf8.encode(canonicalJson(document)),
     keyPair: pair,
   );
-  return jsonEncode({
-    ...document,
-    'signature': base64Encode(signature.bytes),
-  });
+  return jsonEncode({...document, 'signature': base64Encode(signature.bytes)});
 }
 
 void main() {
   group('VersionPolicyService (network + cache)', () {
     test('a 200 with a valid policy is returned and cached', () async {
       final db = newTestDb();
-      final body = jsonEncode({
-        'min_supported': '1.0.0',
-        'latest': '1.0.0',
-      });
+      final body = jsonEncode({'min_supported': '1.0.0', 'latest': '1.0.0'});
       final service = VersionPolicyService(
         db: db,
         client: Dio()..httpClientAdapter = _OkAdapter(body),
@@ -102,56 +94,56 @@ void main() {
       expect(await service.read(), body);
     });
 
-    test('an HTTP failure with no cache fails open (null policy, app starts)',
-        () async {
-      final db = newTestDb();
-      final service = VersionPolicyService(
-        db: db,
-        client: Dio()..httpClientAdapter = _FailingAdapter(),
-      );
+    test(
+      'an HTTP failure with no cache fails open (null policy, app starts)',
+      () async {
+        final db = newTestDb();
+        final service = VersionPolicyService(
+          db: db,
+          client: Dio()..httpClientAdapter = _FailingAdapter(),
+        );
 
-      expect(await service.fetch(), isNull);
-    });
+        expect(await service.fetch(), isNull);
+      },
+    );
 
-    test('an HTTP failure serves the last known good policy from cache',
-        () async {
-      final db = newTestDb();
-      final body = jsonEncode({
-        'min_supported': '1.0.0',
-        'latest': '1.0.0',
-      });
-      final writer = VersionPolicyService(
-        db: db,
-        client: Dio()..httpClientAdapter = _OkAdapter(body),
-      );
-      await writer.fetch(); // seeds the cache
-      final reader = VersionPolicyService(
-        db: db,
-        client: Dio()..httpClientAdapter = _FailingAdapter(),
-      );
+    test(
+      'an HTTP failure serves the last known good policy from cache',
+      () async {
+        final db = newTestDb();
+        final body = jsonEncode({'min_supported': '1.0.0', 'latest': '1.0.0'});
+        final writer = VersionPolicyService(
+          db: db,
+          client: Dio()..httpClientAdapter = _OkAdapter(body),
+        );
+        await writer.fetch(); // seeds the cache
+        final reader = VersionPolicyService(
+          db: db,
+          client: Dio()..httpClientAdapter = _FailingAdapter(),
+        );
 
-      expect(await reader.fetch(), isNotNull);
-    });
+        expect(await reader.fetch(), isNotNull);
+      },
+    );
 
-    test('a malformed remote document falls back to the cache, not the wire',
-        () async {
-      final db = newTestDb();
-      final body = jsonEncode({
-        'min_supported': '1.0.0',
-        'latest': '1.0.0',
-      });
-      final writer = VersionPolicyService(
-        db: db,
-        client: Dio()..httpClientAdapter = _OkAdapter(body),
-      );
-      await writer.fetch();
-      final reader = VersionPolicyService(
-        db: db,
-        client: Dio()..httpClientAdapter = _OkAdapter('{"bogus": true}'),
-      );
+    test(
+      'a malformed remote document falls back to the cache, not the wire',
+      () async {
+        final db = newTestDb();
+        final body = jsonEncode({'min_supported': '1.0.0', 'latest': '1.0.0'});
+        final writer = VersionPolicyService(
+          db: db,
+          client: Dio()..httpClientAdapter = _OkAdapter(body),
+        );
+        await writer.fetch();
+        final reader = VersionPolicyService(
+          db: db,
+          client: Dio()..httpClientAdapter = _OkAdapter('{"bogus": true}'),
+        );
 
-      expect(await reader.fetch(), isNotNull);
-    });
+        expect(await reader.fetch(), isNotNull);
+      },
+    );
 
     test('a malformed remote document with no cache fails open', () async {
       final db = newTestDb();
@@ -231,10 +223,7 @@ void main() {
     });
 
     test('a debug build without a key keeps the unsigned path', () async {
-      final body = jsonEncode({
-        'min_supported': '1.0.0',
-        'latest': '1.0.1',
-      });
+      final body = jsonEncode({'min_supported': '1.0.0', 'latest': '1.0.1'});
       final service = VersionPolicyService(
         db: newTestDb(),
         client: Dio()..httpClientAdapter = _OkAdapter(body),
@@ -251,10 +240,7 @@ void main() {
       final publicKey = await pair.extractPublicKey();
       final body = await _signedPolicy(
         pair,
-        document: const {
-          'min_supported': '1.0.0',
-          'latest': '1.0.1',
-        },
+        document: const {'min_supported': '1.0.0', 'latest': '1.0.1'},
       );
       final service = VersionPolicyService(
         db: newTestDb(),
@@ -320,14 +306,18 @@ void main() {
   });
 
   group('VersionGate', () {
-    final mandatorySource = _StaticSource(const VersionPolicy(
-      minSupported: AppVersion(2, 0, 0),
-      latest: AppVersion(2, 0, 0),
-    ));
-    final optionalSource = _StaticSource(const VersionPolicy(
-      minSupported: AppVersion(1, 0, 0),
-      latest: AppVersion(9, 9, 9),
-    ));
+    final mandatorySource = _StaticSource(
+      const VersionPolicy(
+        minSupported: AppVersion(2, 0, 0),
+        latest: AppVersion(2, 0, 0),
+      ),
+    );
+    final optionalSource = _StaticSource(
+      const VersionPolicy(
+        minSupported: AppVersion(1, 0, 0),
+        latest: AppVersion(9, 9, 9),
+      ),
+    );
 
     test('before the first read lands the gate blocks nothing', () {
       final gate = VersionGate();
@@ -336,29 +326,33 @@ void main() {
       expect(gate.shouldShowRecommendedPrompt, isFalse);
     });
 
-    test('a valid mandatory policy blocks every route except /update',
-        () async {
-      final gate = VersionGate();
-      gate.attach(
-        source: mandatorySource,
-        ackStore: _MemoryAckStore(),
-        installed: const AppVersion(1, 0, 0),
-      );
-      await gate.settled;
+    test(
+      'a valid mandatory policy blocks every route except /update',
+      () async {
+        final gate = VersionGate();
+        gate.attach(
+          source: mandatorySource,
+          ackStore: _MemoryAckStore(),
+          installed: const AppVersion(1, 0, 0),
+        );
+        await gate.settled;
 
-      expect(gate.verdict, VersionVerdict.updateRequired);
-      expect(gate.decide(AppRoutes.home), AppRoutes.update);
-      expect(gate.decide(AppRoutes.azkar), AppRoutes.update);
-      expect(gate.decide(AppRoutes.update), isNull);
-    });
+        expect(gate.verdict, VersionVerdict.updateRequired);
+        expect(gate.decide(AppRoutes.home), AppRoutes.update);
+        expect(gate.decide(AppRoutes.azkar), AppRoutes.update);
+        expect(gate.decide(AppRoutes.update), isNull);
+      },
+    );
 
     test('an implausible min_supported never blocks navigation', () async {
       final gate = VersionGate();
       gate.attach(
-        source: _StaticSource(const VersionPolicy(
-          minSupported: AppVersion(99, 0, 0),
-          latest: AppVersion(99, 0, 0),
-        )),
+        source: _StaticSource(
+          const VersionPolicy(
+            minSupported: AppVersion(99, 0, 0),
+            latest: AppVersion(99, 0, 0),
+          ),
+        ),
         ackStore: _MemoryAckStore(),
         installed: const AppVersion(1, 0, 0),
       );
@@ -383,22 +377,23 @@ void main() {
     });
 
     test(
-        'acknowledging the recommendation suppresses the prompt for that build',
-        () async {
-      final gate = VersionGate();
-      final ack = _MemoryAckStore();
-      gate.attach(
-        source: optionalSource,
-        ackStore: ack,
-        installed: const AppVersion(1, 0, 0),
-      );
-      await gate.settled;
+      'acknowledging the recommendation suppresses the prompt for that build',
+      () async {
+        final gate = VersionGate();
+        final ack = _MemoryAckStore();
+        gate.attach(
+          source: optionalSource,
+          ackStore: ack,
+          installed: const AppVersion(1, 0, 0),
+        );
+        await gate.settled;
 
-      await gate.acknowledgeRecommended();
+        await gate.acknowledgeRecommended();
 
-      expect(gate.shouldShowRecommendedPrompt, isFalse);
-      expect(ack.value, '9.9.9');
-    });
+        expect(gate.shouldShowRecommendedPrompt, isFalse);
+        expect(ack.value, '9.9.9');
+      },
+    );
 
     test('a null (unavailable) policy can never lock the user out', () async {
       final gate = VersionGate();

@@ -23,9 +23,10 @@ List<MushafPageBlock> groupVersesByPage(List<Verse> ayahs) {
     for (final entry in pages)
       MushafPageBlock(
         page: entry.key,
-        ayahs: (entry.value
-              ..sort((a, b) => a.numberInSurah.compareTo(b.numberInSurah)))
-            .toList(),
+        ayahs:
+            (entry.value
+                  ..sort((a, b) => a.numberInSurah.compareTo(b.numberInSurah)))
+                .toList(),
       ),
   ];
 }

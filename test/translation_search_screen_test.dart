@@ -23,18 +23,19 @@ class _Source implements TranslationSearchSource {
 Future<R> _syncPrepare<R>(R Function() computation) async => computation();
 
 Widget _app(TranslationSearchCubit cubit) => BlocProvider.value(
-      value: cubit,
-      child: const MaterialApp(
-        locale: Locale('ar'),
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: TranslationSearchScreen(),
-      ),
-    );
+  value: cubit,
+  child: const MaterialApp(
+    locale: Locale('ar'),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: TranslationSearchScreen(),
+  ),
+);
 
 void main() {
-  testWidgets('typing a query renders the matching translation',
-      (tester) async {
+  testWidgets('typing a query renders the matching translation', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(360, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final cubit = TranslationSearchCubit(
@@ -60,8 +61,9 @@ void main() {
     expect(find.textContaining('Entirely Merciful'), findsOneWidget);
   });
 
-  testWidgets('no installed translation shows the install hint',
-      (tester) async {
+  testWidgets('no installed translation shows the install hint', (
+    tester,
+  ) async {
     final cubit = TranslationSearchCubit(
       source: _Source(const {}),
       surahName: (id) async => null,
@@ -106,9 +108,7 @@ void main() {
     addTearDown(() => tester.binding.setSurfaceSize(null));
     final cubit = TranslationSearchCubit(
       source: _Source({
-        'en1': {
-          for (var i = 1; i <= 101; i++) 1000 + i: 'mercy $i',
-        },
+        'en1': {for (var i = 1; i <= 101; i++) 1000 + i: 'mercy $i'},
       }),
       surahName: (id) async => 'الفاتحة',
       debounce: Duration.zero,

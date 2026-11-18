@@ -52,8 +52,9 @@ class _SafeSurahRepository extends SurahRepository {
 }
 
 void main() {
-  testWidgets('an initial query runs the search and prefills the field',
-      (tester) async {
+  testWidgets('an initial query runs the search and prefills the field', (
+    tester,
+  ) async {
     final source = _RecordingSource();
     await pumpAppHost(
       tester,
@@ -62,38 +63,48 @@ void main() {
         child: const QuranSearchScreen(initialQuery: 'الرحمن'),
       ),
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
-    expect(source.queries, ['الرحمن'],
-        reason: 'the handed-over query must run without typing');
+    expect(source.queries, [
+      'الرحمن',
+    ], reason: 'the handed-over query must run without typing');
     expect(find.text('الرحمن'), findsOneWidget);
     expect(find.textContaining('البقرة'), findsWidgets);
   });
 
-  testWidgets('a filter with no surah match offers the verse search',
-      (tester) async {
+  testWidgets('a filter with no surah match offers the verse search', (
+    tester,
+  ) async {
     final db = newTestDb();
-    await db.batch((b) => b.insertAll(db.surahs, [
-          SurahsCompanion.insert(
-              id: const Value(1),
-              nameAr: 'الفاتحة',
-              nameEn: 'Al-Fatihah',
-              revelationType: 'makkah',
-              ayahCount: 7,
-              pagesStart: 1,
-              pagesEnd: 1),
-          SurahsCompanion.insert(
-              id: const Value(2),
-              nameAr: 'البقرة',
-              nameEn: 'Al-Baqarah',
-              revelationType: 'madinah',
-              ayahCount: 286,
-              pagesStart: 2,
-              pagesEnd: 49),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.surahs, [
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 7,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+        SurahsCompanion.insert(
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'madinah',
+          ayahCount: 286,
+          pagesStart: 2,
+          pagesEnd: 49,
+        ),
+      ]),
+    );
     final cubit = SurahIndexCubit(
-        _SafeSurahRepository(db, await db.select(db.surahs).get()));
+      _SafeSurahRepository(db, await db.select(db.surahs).get()),
+    );
     addTearDown(cubit.close);
     await cubit.start();
 
@@ -104,15 +115,24 @@ void main() {
         child: const SurahIndexScreen(),
       ),
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.enterText(find.byType(TextField), 'الرحمن');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('لا نتائج مطابقة'), findsOneWidget);
-    expect(find.textContaining('ابحث عن'), findsOneWidget,
-        reason: 'a dead-end filter must offer the verse search');
+    expect(
+      find.textContaining('ابحث عن'),
+      findsOneWidget,
+      reason: 'a dead-end filter must offer the verse search',
+    );
   });
 }

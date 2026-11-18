@@ -34,13 +34,17 @@ class _InMemoryAyahSource implements AyahSource {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      rows
-          .where((a) =>
-              a.surahId == surahId &&
-              a.numberInSurah >= fromAyah &&
-              a.numberInSurah <= toAyah)
-          .toList();
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => rows
+      .where(
+        (a) =>
+            a.surahId == surahId &&
+            a.numberInSurah >= fromAyah &&
+            a.numberInSurah <= toAyah,
+      )
+      .toList();
 
   @override
   Future<void> toggleBookmark(int ayahId) async {}
@@ -78,63 +82,76 @@ const _surah = Surah(
 
 const _baqarah = [
   Ayah(
-      id: 8,
-      surahId: 2,
-      numberInSurah: 1,
-      juz: 1,
-      page: 2,
-      textUthmani: 'الم',
-      textImlaei: 'الم',
-      sajda: false),
+    id: 8,
+    surahId: 2,
+    numberInSurah: 1,
+    juz: 1,
+    page: 2,
+    textUthmani: 'الم',
+    textImlaei: 'الم',
+    sajda: false,
+  ),
   Ayah(
-      id: 9,
-      surahId: 2,
-      numberInSurah: 2,
-      juz: 1,
-      page: 2,
-      textUthmani: 'ذلك الكتاب',
-      textImlaei: 'ذلك الكتاب',
-      sajda: false),
+    id: 9,
+    surahId: 2,
+    numberInSurah: 2,
+    juz: 1,
+    page: 2,
+    textUthmani: 'ذلك الكتاب',
+    textImlaei: 'ذلك الكتاب',
+    sajda: false,
+  ),
   Ayah(
-      id: 10,
-      surahId: 2,
-      numberInSurah: 3,
-      juz: 1,
-      page: 3,
-      textUthmani: 'الذين يؤمنون',
-      textImlaei: 'الذين يؤمنون',
-      sajda: true),
+    id: 10,
+    surahId: 2,
+    numberInSurah: 3,
+    juz: 1,
+    page: 3,
+    textUthmani: 'الذين يؤمنون',
+    textImlaei: 'الذين يؤمنون',
+    sajda: true,
+  ),
 ];
 
 void main() {
-  test('reader ready carries mapped Verses from pure seam fakes (no database)',
-      () async {
-    final lastRead = _InMemoryLastReadSource();
-    final cubit = ReaderCubit(
-      ayahRepository: _InMemoryAyahSource(surah: _surah, rows: _baqarah),
-      lastReadRepository: lastRead,
-      surahId: 2,
-      initialAyah: 0,
-    );
-    addTearDown(cubit.close);
+  test(
+    'reader ready carries mapped Verses from pure seam fakes (no database)',
+    () async {
+      final lastRead = _InMemoryLastReadSource();
+      final cubit = ReaderCubit(
+        ayahRepository: _InMemoryAyahSource(surah: _surah, rows: _baqarah),
+        lastReadRepository: lastRead,
+        surahId: 2,
+        initialAyah: 0,
+      );
+      addTearDown(cubit.close);
 
-    final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
-    await cubit.start();
-    final ready = await readyFuture as ReaderReady;
+      final readyFuture = cubit.stream.firstWhere((s) => s is ReaderReady);
+      await cubit.start();
+      final ready = await readyFuture as ReaderReady;
 
-    expect(ready.surahName, 'البقرة');
-    expect(ready.ayahs, hasLength(3));
-    expect(ready.ayahs, everyElement(isA<Verse>()));
-    expect(ready.ayahs.map((v) => v.textImlaei).toList(),
-        ['الم', 'ذلك الكتاب', 'الذين يؤمنون']);
-    expect(ready.ayahs.last.sajda, isTrue);
-    expect(ready.mushafPages.map((b) => b.page).toList(), [2, 3]);
-    expect(ready.mushafPages.first.ayahs, everyElement(isA<Verse>()));
-    expect(ready.mushafPages.first.ayahs.map((v) => v.numberInSurah).toList(),
-        [1, 2]);
-    expect(lastRead.saved, 8,
-        reason: 'initial ayah 0 falls back to the surah first row id');
-  });
+      expect(ready.surahName, 'البقرة');
+      expect(ready.ayahs, hasLength(3));
+      expect(ready.ayahs, everyElement(isA<Verse>()));
+      expect(ready.ayahs.map((v) => v.textImlaei).toList(), [
+        'الم',
+        'ذلك الكتاب',
+        'الذين يؤمنون',
+      ]);
+      expect(ready.ayahs.last.sajda, isTrue);
+      expect(ready.mushafPages.map((b) => b.page).toList(), [2, 3]);
+      expect(ready.mushafPages.first.ayahs, everyElement(isA<Verse>()));
+      expect(
+        ready.mushafPages.first.ayahs.map((v) => v.numberInSurah).toList(),
+        [1, 2],
+      );
+      expect(
+        lastRead.saved,
+        8,
+        reason: 'initial ayah 0 falls back to the surah first row id',
+      );
+    },
+  );
 
   test('the initial ayah resolves through the seam to its row id', () async {
     final lastRead = _InMemoryLastReadSource();

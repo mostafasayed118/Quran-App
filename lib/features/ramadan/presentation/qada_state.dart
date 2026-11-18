@@ -8,7 +8,6 @@ sealed class QadaState with _$QadaState {
 
   const factory QadaState.failed() = QadaFailed;
 
-  const factory QadaState.ready({
-    @Default(<DateTime>[]) List<DateTime> dates,
-  }) = QadaReady;
+  const factory QadaState.ready({@Default(<DateTime>[]) List<DateTime> dates}) =
+      QadaReady;
 }

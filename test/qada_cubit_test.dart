@@ -33,30 +33,32 @@ void main() {
     expect(ready.dates, [DateTime(2027, 3, 1)]);
   });
 
-  test('add, duplicate add, remove and clear persist the normalized set',
-      () async {
-    final source = _Source();
-    final cubit = QadaCubit(source: source);
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'add, duplicate add, remove and clear persist the normalized set',
+    () async {
+      final source = _Source();
+      final cubit = QadaCubit(source: source);
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    expect(await cubit.add(DateTime(2027, 3, 2, 21)), isTrue);
-    expect(await cubit.add(DateTime(2027, 3, 1)), isTrue);
-    expect((cubit.state as QadaReady).dates, [
-      DateTime(2027, 3, 1),
-      DateTime(2027, 3, 2),
-    ]);
+      expect(await cubit.add(DateTime(2027, 3, 2, 21)), isTrue);
+      expect(await cubit.add(DateTime(2027, 3, 1)), isTrue);
+      expect((cubit.state as QadaReady).dates, [
+        DateTime(2027, 3, 1),
+        DateTime(2027, 3, 2),
+      ]);
 
-    final saves = source.saves;
-    expect(await cubit.add(DateTime(2027, 3, 1)), isTrue);
-    expect(source.saves, saves, reason: 'a duplicate add writes nothing');
+      final saves = source.saves;
+      expect(await cubit.add(DateTime(2027, 3, 1)), isTrue);
+      expect(source.saves, saves, reason: 'a duplicate add writes nothing');
 
-    expect(await cubit.remove(DateTime(2027, 3, 2, 8)), isTrue);
-    expect((cubit.state as QadaReady).dates, [DateTime(2027, 3, 1)]);
+      expect(await cubit.remove(DateTime(2027, 3, 2, 8)), isTrue);
+      expect((cubit.state as QadaReady).dates, [DateTime(2027, 3, 1)]);
 
-    expect(await cubit.clear(), isTrue);
-    expect((cubit.state as QadaReady).dates, isEmpty);
-  });
+      expect(await cubit.clear(), isTrue);
+      expect((cubit.state as QadaReady).dates, isEmpty);
+    },
+  );
 
   test('a failed save reverts the optimistic state', () async {
     final source = _Source();

@@ -26,25 +26,41 @@ void main() {
     });
   });
 
-  testWidgets('Arabic-Indic entry drives the live verdict and amount',
-      (tester) async {
+  testWidgets('Arabic-Indic entry drives the live verdict and amount', (
+    tester,
+  ) async {
     final cubit = ZakatCubit();
     addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<ZakatCubit>.value(
-      value: cubit,
-      child: appShell(home: const ZakatScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<ZakatCubit>.value(
+        value: cubit,
+        child: appShell(home: const ZakatScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.enterText(
-        find.widgetWithText(TextField, 'سعر جرام الفضة'), '١');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      find.widgetWithText(TextField, 'سعر جرام الفضة'),
+      '١',
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.enterText(
-        find.widgetWithText(TextField, 'النقد المعروض'), '١٠٠٠');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      find.widgetWithText(TextField, 'النقد المعروض'),
+      '١٠٠٠',
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('الزكاة الواجبة'), findsOneWidget);
     expect(find.textContaining('٢٥'), findsOneWidget);

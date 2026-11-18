@@ -14,54 +14,69 @@ void _scheduleReviewPrompt() {
 /// install after the user finishes (or skips) onboarding.
 void _registerVersionGate(AppDatabase db) {
   getIt.registerLazySingleton<VersionPolicyService>(
-      () => VersionPolicyService(db: db));
+    () => VersionPolicyService(db: db),
+  );
   getIt.registerLazySingleton<VersionPolicySource>(
-      () => getIt<VersionPolicyService>());
+    () => getIt<VersionPolicyService>(),
+  );
   getIt.registerLazySingleton<VersionAckStore>(() => DriftVersionAckStore(db));
   // The installed version arrives asynchronously (PackageInfo) — main.dart
   // attaches the gate behind the first frame.
   getIt.registerLazySingleton<VersionGate>(() => AppRouter.versionGate);
   getIt.registerLazySingleton<StoreListingGateway>(
-      () => InAppReviewStoreListing());
+    () => InAppReviewStoreListing(),
+  );
 }
 
 void _registerOnboardingAndSettings(AppDatabase db) {
   getIt.registerLazySingleton<OnboardingRepository>(
-      () => OnboardingRepository(db));
+    () => OnboardingRepository(db),
+  );
   // The review prompt hangs off the same completion seam as the gate: finish
   // and skip both call [OnboardingGate.complete], which fires this at most
   // once per install, never at cold start.
   getIt.registerLazySingleton<ReviewService>(() => ReviewService(db: db));
   // One instance serves both the router gate and the flow: the gate caches the
   // flag for the synchronous redirect, and a finish/skip notifies the router.
-  getIt.registerLazySingleton<OnboardingGate>(() => AppRouter.onboardingGate
-    ..onCompleted = _scheduleReviewPrompt
-    ..attach(getIt<OnboardingRepository>()));
+  getIt.registerLazySingleton<OnboardingGate>(
+    () => AppRouter.onboardingGate
+      ..onCompleted = _scheduleReviewPrompt
+      ..attach(getIt<OnboardingRepository>()),
+  );
   getIt.registerLazySingleton<OnboardingStatusSource>(
-      () => getIt<OnboardingGate>());
+    () => getIt<OnboardingGate>(),
+  );
   getIt.registerLazySingleton<AppLocaleRepository>(
-      () => AppLocaleRepository(db));
+    () => AppLocaleRepository(db),
+  );
   getIt.registerLazySingleton<AppLocaleSource>(
-      () => getIt<AppLocaleRepository>());
+    () => getIt<AppLocaleRepository>(),
+  );
   // One controller feeds the app root (MaterialApp.locale) and the settings
   // row; the app entry point calls load() behind the first frame.
   getIt.registerLazySingleton<AppLocaleController>(
-      () => AppLocaleController(getIt<AppLocaleSource>()));
+    () => AppLocaleController(getIt<AppLocaleSource>()),
+  );
   getIt.registerLazySingleton<AppThemeRepository>(() => AppThemeRepository(db));
-  getIt
-      .registerLazySingleton<AppThemeSource>(() => getIt<AppThemeRepository>());
+  getIt.registerLazySingleton<AppThemeSource>(
+    () => getIt<AppThemeRepository>(),
+  );
   // Same shape for the appearance: the root rebuilds `MaterialApp.themeMode`
   // and the settings row shows the current choice.
   getIt.registerLazySingleton<AppThemeController>(
-      () => AppThemeController(getIt<AppThemeSource>()));
+    () => AppThemeController(getIt<AppThemeSource>()),
+  );
   getIt.registerLazySingleton<PrayerSkinRepository>(
-      () => PrayerSkinRepository(db));
+    () => PrayerSkinRepository(db),
+  );
   getIt.registerLazySingleton<PrayerSkinSource>(
-      () => getIt<PrayerSkinRepository>());
+    () => getIt<PrayerSkinRepository>(),
+  );
   // The prayer skin is opt-in and device-scoped: the root reads it behind the
   // first frame, and the settings row flips it.
   getIt.registerLazySingleton<PrayerSkinController>(
-      () => PrayerSkinController(getIt<PrayerSkinSource>()));
+    () => PrayerSkinController(getIt<PrayerSkinSource>()),
+  );
 }
 
 /// Clears the one-time guard so a test can build a fresh graph.

@@ -36,8 +36,11 @@ class StateMessage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon,
-                  size: AppIconSize.state, color: colors.onSurfaceVariant),
+              Icon(
+                icon,
+                size: AppIconSize.state,
+                color: colors.onSurfaceVariant,
+              ),
               const SizedBox(height: AppSpacing.md),
             ],
             Text(

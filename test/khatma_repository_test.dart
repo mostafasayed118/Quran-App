@@ -24,16 +24,18 @@ void main() {
   setUp(() async {
     db = newTestDb();
     repo = KhatmaRepository(db);
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          _ayah(1, page: 1, number: 1),
-          _ayah(2, page: 1, number: 2),
-          _ayah(3, page: 2, number: 3),
-          _ayah(8, page: 5, number: 4),
-          _ayah(9, page: 6, number: 5),
-          _ayah(90, page: 603, number: 6),
-          _ayah(91, page: 604, number: 7),
-          _ayah(6236, page: 604, number: 8),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        _ayah(1, page: 1, number: 1),
+        _ayah(2, page: 1, number: 2),
+        _ayah(3, page: 2, number: 3),
+        _ayah(8, page: 5, number: 4),
+        _ayah(9, page: 6, number: 5),
+        _ayah(90, page: 603, number: 6),
+        _ayah(91, page: 604, number: 7),
+        _ayah(6236, page: 604, number: 8),
+      ]),
+    );
   });
 
   test('no plan until one starts', () async {

@@ -16,19 +16,21 @@ class _FakeCatalog implements PagedSource<int> {
 }
 
 void main() {
-  test('a cursor-paged catalog terminates without fetching everything',
-      () async {
-    final catalog = _FakeCatalog();
+  test(
+    'a cursor-paged catalog terminates without fetching everything',
+    () async {
+      final catalog = _FakeCatalog();
 
-    final first = await catalog.fetchPage(const PageRequest(limit: 2));
-    expect(first.items, [1, 2]);
-    expect(first.hasMore, true);
+      final first = await catalog.fetchPage(const PageRequest(limit: 2));
+      expect(first.items, [1, 2]);
+      expect(first.hasMore, true);
 
-    final second = await catalog.fetchPage(
-      const PageRequest(limit: 2, cursor: '2'),
-    );
-    expect(second.items, [3]);
-    expect(second.hasMore, false);
-    expect(catalog.calls, 2);
-  });
+      final second = await catalog.fetchPage(
+        const PageRequest(limit: 2, cursor: '2'),
+      );
+      expect(second.items, [3]);
+      expect(second.hasMore, false);
+      expect(catalog.calls, 2);
+    },
+  );
 }

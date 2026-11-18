@@ -12,9 +12,9 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   /// [location] is optional — without it the "locate me" affordance is not
   /// offered.
   CityPickerCubit({required CityRepository cityRepo, LocationService? location})
-      : _cityRepo = cityRepo,
-        _location = location,
-        super(const CityPickerState.loading());
+    : _cityRepo = cityRepo,
+      _location = location,
+      super(const CityPickerState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -41,16 +41,20 @@ class CityPickerCubit extends Cubit<CityPickerState> {
         _selectedLoaded = true;
       }
       if (isClosed || seq != _searchSeq) return;
-      emit(CityPickerState.ready(
-        query: query,
-        results: results,
-        selectedCityId: _selectedCityId,
-      ));
+      emit(
+        CityPickerState.ready(
+          query: query,
+          results: results,
+          selectedCityId: _selectedCityId,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('city search failed',
-          name: 'quran_yahdi/city_picker',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'city search failed',
+        name: 'quran_yahdi/city_picker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _searchSeq) return;
       emit(const CityPickerState.failed());
     }
@@ -64,10 +68,12 @@ class CityPickerCubit extends Cubit<CityPickerState> {
     try {
       await _cityRepo.select(city);
     } on Object catch (error, stackTrace) {
-      appLog('city persist failed',
-          name: 'quran_yahdi/city_picker',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'city persist failed',
+        name: 'quran_yahdi/city_picker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return false;
     }
     _selectedCityId = city.id;
@@ -96,10 +102,12 @@ class CityPickerCubit extends Cubit<CityPickerState> {
       _emitLocating(false);
       return city;
     } on Object catch (error, stackTrace) {
-      appLog('nearest-city resolve failed',
-          name: 'quran_yahdi/city_picker',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'nearest-city resolve failed',
+        name: 'quran_yahdi/city_picker',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) _emitLocating(false);
       return null;
     }
@@ -108,12 +116,14 @@ class CityPickerCubit extends Cubit<CityPickerState> {
   void _emitLocating(bool locating) {
     final state = this.state;
     if (state is CityPickerReady) {
-      emit(CityPickerState.ready(
-        query: state.query,
-        results: state.results,
-        locating: locating,
-        selectedCityId: state.selectedCityId,
-      ));
+      emit(
+        CityPickerState.ready(
+          query: state.query,
+          results: state.results,
+          locating: locating,
+          selectedCityId: state.selectedCityId,
+        ),
+      );
     }
   }
 

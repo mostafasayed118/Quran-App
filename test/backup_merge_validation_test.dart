@@ -7,10 +7,10 @@ BackupBookmark _bookmark(int ayahId) =>
     BackupBookmark(ayahId: ayahId, createdAt: DateTime(2026, 1, 1));
 
 BackupKhatmaRow _khatma(int ayahId, int targetPages) => BackupKhatmaRow(
-      ayahId: ayahId,
-      targetPages: targetPages,
-      updatedAt: DateTime(2026, 1, 1),
-    );
+  ayahId: ayahId,
+  targetPages: targetPages,
+  updatedAt: DateTime(2026, 1, 1),
+);
 
 void main() {
   test('out-of-range bookmark ids are rejected, not inserted', () {
@@ -26,11 +26,7 @@ void main() {
   test('khatma rows with bad ids or non-positive targets are rejected', () {
     final merge = mergeKhatma(
       existing: null,
-      imported: [
-        _khatma(0, 10),
-        _khatma(1, 0),
-        _khatma(1, 10),
-      ],
+      imported: [_khatma(0, 10), _khatma(1, 0), _khatma(1, 10)],
     );
 
     expect(merge.toWrite?.ayahId, 1);

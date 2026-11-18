@@ -117,7 +117,6 @@ List<ReciterPackDefect> validateReciterPack(
   }
 
   // One defect per kind keeps the result readable and order-stable.
-  return <ReciterPackDefect>{
-    for (final defect in defects) defect,
-  }.toList(growable: false);
+  return <ReciterPackDefect>{for (final defect in defects) defect}
+      .toList(growable: false);
 }

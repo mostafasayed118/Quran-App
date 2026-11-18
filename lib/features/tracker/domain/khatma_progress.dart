@@ -44,9 +44,10 @@ class KhatmaProgress {
 
   /// Pages to read per day for a plan of [targetPages].
   static int dailyPagesFor(int targetPages) =>
-      (targetPages / daysPerKhatmaMonth)
-          .round()
-          .clamp(firstMushafPage, totalPages);
+      (targetPages / daysPerKhatmaMonth).round().clamp(
+        firstMushafPage,
+        totalPages,
+      );
 
   /// Read-up-to pointer: global ayah id (1..6236).
   final int pointerAyahId;

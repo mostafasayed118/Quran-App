@@ -17,38 +17,38 @@ import 'package:quran_yahdi/features/library/presentation/library_state.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 List<Map<String, dynamic>> fixtureCatalog() => [
-      {
-        'id': 'f-tafsir',
-        'kind': 'tafsir',
-        'language': 'ar',
-        'titleAr': 'تفسير تجريبي',
-        'titleEn': 'Fixture Tafsir',
-        'urlTemplate': 'https://127.0.0.1:9/x/{n}.json',
-        'fileCount': 2,
-        'approxSizeMb': 0.001,
-        'version': 'v1',
-      },
-      {
-        'id': 'f-translation',
-        'kind': 'translation',
-        'language': 'en',
-        'titleAr': 'ترجمة تجريبية',
-        'titleEn': 'Fixture Translation',
-        'sourceUrl': 'https://127.0.0.1:9/x/t.json',
-        'approxSizeMb': 0.001,
-        'version': '1',
-      },
-      {
-        'id': 'f-hadith',
-        'kind': 'hadith',
-        'language': 'en',
-        'titleAr': 'حديث تجريبي',
-        'titleEn': 'Fixture Hadith',
-        'sourceUrl': 'https://127.0.0.1:9/x/h.json',
-        'approxSizeMb': 0.001,
-        'version': '1',
-      },
-    ];
+  {
+    'id': 'f-tafsir',
+    'kind': 'tafsir',
+    'language': 'ar',
+    'titleAr': 'تفسير تجريبي',
+    'titleEn': 'Fixture Tafsir',
+    'urlTemplate': 'https://127.0.0.1:9/x/{n}.json',
+    'fileCount': 2,
+    'approxSizeMb': 0.001,
+    'version': 'v1',
+  },
+  {
+    'id': 'f-translation',
+    'kind': 'translation',
+    'language': 'en',
+    'titleAr': 'ترجمة تجريبية',
+    'titleEn': 'Fixture Translation',
+    'sourceUrl': 'https://127.0.0.1:9/x/t.json',
+    'approxSizeMb': 0.001,
+    'version': '1',
+  },
+  {
+    'id': 'f-hadith',
+    'kind': 'hadith',
+    'language': 'en',
+    'titleAr': 'حديث تجريبي',
+    'titleEn': 'Fixture Hadith',
+    'sourceUrl': 'https://127.0.0.1:9/x/h.json',
+    'approxSizeMb': 0.001,
+    'version': '1',
+  },
+];
 
 /// Widget-test transport: drives REAL PackDownloader against a REAL temp
 /// file with manually-paced progress (dio/network stays out of FakeAsync;
@@ -60,8 +60,10 @@ class StreamingFakeDownloader extends PackDownloader {
   Completer<void>? gate;
 
   @override
-  Future<File> install(LibraryPackInfo pack,
-      {void Function(int, int)? onProgress}) async {
+  Future<File> install(
+    LibraryPackInfo pack, {
+    void Function(int, int)? onProgress,
+  }) async {
     onProgress?.call(412, 1049);
     final g = gate;
     if (g != null) {
@@ -70,7 +72,8 @@ class StreamingFakeDownloader extends PackDownloader {
     final dir = Directory('${root.path}/library')..createSync(recursive: true);
     final file = File('${dir.path}/${pack.id}.json')
       ..writeAsStringSync(
-          '{"quran":[{"chapter":1,"verse":1,"text":"text one"}]}');
+        '{"quran":[{"chapter":1,"verse":1,"text":"text one"}]}',
+      );
     onProgress?.call(1049, 1049);
     return file;
   }
@@ -90,8 +93,10 @@ class ControllableFakeDownloader extends PackDownloader {
   Object? nextFailureOrProgressMode;
 
   @override
-  Future<File> install(LibraryPackInfo pack,
-      {void Function(int, int)? onProgress}) async {
+  Future<File> install(
+    LibraryPackInfo pack, {
+    void Function(int, int)? onProgress,
+  }) async {
     if (onProgress != null) {
       capturedProgress.add(onProgress);
     }
@@ -218,9 +223,11 @@ void main() {
       await db.close();
     });
 
-    LibraryCubit screenCubit(AppDatabase db,
-        {required CatalogRepository catalog,
-        required PackDownloader downloader}) {
+    LibraryCubit screenCubit(
+      AppDatabase db, {
+      required CatalogRepository catalog,
+      required PackDownloader downloader,
+    }) {
       final cubit = LibraryCubit(catalog: catalog, downloader: downloader);
       addTearDown(cubit.close);
       return cubit;
@@ -242,10 +249,10 @@ void main() {
             builder: textScale == null
                 ? null
                 : (context, child) => MediaQuery(
-                      data: MediaQuery.of(context)
-                          .copyWith(textScaler: TextScaler.linear(textScale)),
-                      child: child!,
-                    ),
+                    data: MediaQuery.of(context)
+                        .copyWith(textScaler: TextScaler.linear(textScale)),
+                    child: child!,
+                  ),
             home: const LibraryScreen(),
           ),
         );
@@ -261,8 +268,11 @@ void main() {
       await cubit.start();
 
       await tester.pumpWidget(screen(cubit));
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
       expect(find.text('التفسير'), findsOneWidget);
       expect(find.text('الترجمات'), findsOneWidget);
@@ -270,57 +280,73 @@ void main() {
       expect(find.text('تفسير تجريبي'), findsOneWidget);
 
       await tester.tap(find.text('الترجمات'));
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
       expect(find.text('ترجمة تجريبية'), findsOneWidget);
     });
 
     testWidgets(
-        'install row: button -> progress -> installed badge (real file)',
-        (tester) async {
-      final catalogPack = {
-        'id': 'real-stream',
-        'kind': 'translation',
-        'language': 'en',
-        'titleAr': 'ترجمة حقيقية',
-        'titleEn': 'Real Stream Pack',
-        'sourceUrl': 'https://widget-test.invalid/x.min.json',
-        'approxSizeMb': 0.001,
-        'version': '1',
-      };
-      final downloader = StreamingFakeDownloader(db, tempRoot);
-      final cubit = screenCubit(
-        db,
-        catalog: CatalogRepository(
-          source: BundledCatalogSource(loader: () async => [catalogPack]),
-        ),
-        downloader: downloader,
-      );
-      await cubit.start();
+      'install row: button -> progress -> installed badge (real file)',
+      (tester) async {
+        final catalogPack = {
+          'id': 'real-stream',
+          'kind': 'translation',
+          'language': 'en',
+          'titleAr': 'ترجمة حقيقية',
+          'titleEn': 'Real Stream Pack',
+          'sourceUrl': 'https://widget-test.invalid/x.min.json',
+          'approxSizeMb': 0.001,
+          'version': '1',
+        };
+        final downloader = StreamingFakeDownloader(db, tempRoot);
+        final cubit = screenCubit(
+          db,
+          catalog: CatalogRepository(
+            source: BundledCatalogSource(loader: () async => [catalogPack]),
+          ),
+          downloader: downloader,
+        );
+        await cubit.start();
 
-      await tester.pumpWidget(screen(cubit));
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+        await tester.pumpWidget(screen(cubit));
+        await tester.pumpAndSettle(
+          const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate,
+          const Duration(seconds: 10),
+        );
 
-      await tester.tap(find.text('الترجمات'));
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-      downloader.gate = Completer<void>();
-      await tester.tap(find.text('تنزيل').first);
-      await tester.pump();
-      expect(find.byType(LinearProgressIndicator), findsOneWidget,
-          reason: 'progress becomes visible while the stream runs');
-      downloader.gate!.complete();
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+        await tester.tap(find.text('الترجمات'));
+        await tester.pumpAndSettle(
+          const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate,
+          const Duration(seconds: 10),
+        );
+        downloader.gate = Completer<void>();
+        await tester.tap(find.text('تنزيل').first);
+        await tester.pump();
+        expect(
+          find.byType(LinearProgressIndicator),
+          findsOneWidget,
+          reason: 'progress becomes visible while the stream runs',
+        );
+        downloader.gate!.complete();
+        await tester.pumpAndSettle(
+          const Duration(milliseconds: 100),
+          EnginePhase.sendSemanticsUpdate,
+          const Duration(seconds: 10),
+        );
 
-      expect(find.text('مثبّت'), findsOneWidget);
-      expect(find.byIcon(Icons.delete_outline), findsOneWidget);
-      expect(
-        File('${tempRoot.path}/library/real-stream.json').existsSync(),
-        isTrue,
-      );
-    });
+        expect(find.text('مثبّت'), findsOneWidget);
+        expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+        expect(
+          File('${tempRoot.path}/library/real-stream.json').existsSync(),
+          isTrue,
+        );
+      },
+    );
 
     testWidgets('320 dp at textScale 2.0 survives the library', (tester) async {
       tester.view.physicalSize = const Size(320, 640);
@@ -337,8 +363,11 @@ void main() {
       await cubit.start();
 
       await tester.pumpWidget(screen(cubit, textScale: 2.0));
-      await tester.pumpAndSettle(const Duration(milliseconds: 100),
-          EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
       expect(tester.takeException(), isNull);
       expect(find.text('التفسير'), findsOneWidget);

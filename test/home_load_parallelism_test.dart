@@ -111,34 +111,41 @@ void main() {
     await city.select(cairoCity);
   });
 
-  test('the next-prayer chain starts while the last-read chain is gated',
-      () async {
-    final lastRead = _GatedLastRead();
-    final cubit = HomeCubit(
-      lastRead: lastRead,
-      ayahs: _UnusedAyahs(),
-      prayer: _FakePrayerTimeService(),
-      city: city,
-    );
-    addTearDown(cubit.close);
+  test(
+    'the next-prayer chain starts while the last-read chain is gated',
+    () async {
+      final lastRead = _GatedLastRead();
+      final cubit = HomeCubit(
+        lastRead: lastRead,
+        ayahs: _UnusedAyahs(),
+        prayer: _FakePrayerTimeService(),
+        city: city,
+      );
+      addTearDown(cubit.close);
 
-    final reload = cubit.reload();
+      final reload = cubit.reload();
 
-    await _pumpUntil(() => city.selectedCityCalls > 0);
-    expect(lastRead.gate.isCompleted, isFalse,
-        reason: 'the gate must still be pending for the proof to hold');
-    expect(city.selectedCityCalls, greaterThan(0),
-        reason:
-            'the independent next-prayer chain must not wait for last-read');
+      await _pumpUntil(() => city.selectedCityCalls > 0);
+      expect(
+        lastRead.gate.isCompleted,
+        isFalse,
+        reason: 'the gate must still be pending for the proof to hold',
+      );
+      expect(
+        city.selectedCityCalls,
+        greaterThan(0),
+        reason: 'the independent next-prayer chain must not wait for last-read',
+      );
 
-    lastRead.gate.complete(null);
-    await reload;
+      lastRead.gate.complete(null);
+      await reload;
 
-    final ready = cubit.state as HomeReady;
-    expect(ready.lastRead, isNull);
-    expect(ready.nextPrayer, isNotNull);
-    expect(ready.nextPrayer!.name, PrayerName.fajr);
-  });
+      final ready = cubit.state as HomeReady;
+      expect(ready.lastRead, isNull);
+      expect(ready.nextPrayer, isNotNull);
+      expect(ready.nextPrayer!.name, PrayerName.fajr);
+    },
+  );
 
   test('both chains throwing emits exactly one failed state', () async {
     final cubit = HomeCubit(
@@ -157,8 +164,11 @@ void main() {
     await _pumpUntil(() => states.whereType<HomeFailed>().isNotEmpty);
     await Future<void>.delayed(Duration.zero);
 
-    expect(states.whereType<HomeFailed>(), hasLength(1),
-        reason: 'the second error must be consumed, not emitted twice');
+    expect(
+      states.whereType<HomeFailed>(),
+      hasLength(1),
+      reason: 'the second error must be consumed, not emitted twice',
+    );
     expect(cubit.state, isA<HomeFailed>());
   });
 }

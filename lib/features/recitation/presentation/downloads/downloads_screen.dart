@@ -208,8 +208,9 @@ class _SummaryHeader extends StatelessWidget {
                   ),
                   Text(
                     loc.downloadsCount(loc.number(summary.count)),
-                    style: AppTheme.caption
-                        .copyWith(color: colors.onSurfaceVariant),
+                    style: AppTheme.caption.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -240,9 +241,7 @@ class _DownloadRow extends StatelessWidget {
         : item.surahName;
     // The pack size is the app's existing "{size} MB" template; a downloaded
     // surah is sized the same way.
-    final size = loc.libraryPackSize(
-      loc.digits(formatMegabytes(item.bytes)),
-    );
+    final size = loc.libraryPackSize(loc.digits(formatMegabytes(item.bytes)));
     final reciterName = item.reciterName;
     final subtitle = reciterName.isEmpty ? size : '$reciterName · $size';
     return ListTile(

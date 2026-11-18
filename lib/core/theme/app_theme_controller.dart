@@ -23,10 +23,10 @@ class AppThemeController extends ChangeNotifier {
 
   /// The selected mode as a Flutter [ThemeMode].
   ThemeMode get themeMode => switch (_mode) {
-        AppThemeMode.system => ThemeMode.system,
-        AppThemeMode.light => ThemeMode.light,
-        AppThemeMode.dark => ThemeMode.dark,
-      };
+    AppThemeMode.system => ThemeMode.system,
+    AppThemeMode.light => ThemeMode.light,
+    AppThemeMode.dark => ThemeMode.dark,
+  };
 
   /// Whether the stored preference was read (tests / first-frame checks).
   bool get loaded => _loaded;
@@ -36,8 +36,12 @@ class AppThemeController extends ChangeNotifier {
     try {
       _mode = await _source.load();
     } on Object catch (error, stackTrace) {
-      appLog('app theme read failed',
-          name: 'quran_yahdi/theme', error: error, stackTrace: stackTrace);
+      appLog(
+        'app theme read failed',
+        name: 'quran_yahdi/theme',
+        error: error,
+        stackTrace: stackTrace,
+      );
       _mode = AppThemeMode.system;
     }
     _loaded = true;
@@ -52,8 +56,12 @@ class AppThemeController extends ChangeNotifier {
     try {
       await _source.save(mode);
     } on Object catch (error, stackTrace) {
-      appLog('app theme write failed',
-          name: 'quran_yahdi/theme', error: error, stackTrace: stackTrace);
+      appLog(
+        'app theme write failed',
+        name: 'quran_yahdi/theme',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

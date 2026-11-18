@@ -32,8 +32,10 @@ void main() {
   ) async {
     final fake = FakePrayerTimeService()
       ..todayResult = dayOn(2026, 3, 15)
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
     final cubit = PrayerTimesCubit(prayer: fake, city: repo, clock: clock);
     await cubit.start();
     addTearDown(cubit.close);
@@ -50,15 +52,17 @@ void main() {
   Duration? remainingOf(PrayerTimesCubit cubit) =>
       (cubit.state as PrayerTimesReady).remaining;
 
-  testWidgets('paused stops the ticker and resumed restarts it',
-      (tester) async {
+  testWidgets('paused stops the ticker and resumed restarts it', (
+    tester,
+  ) async {
     var now = DateTime(2026, 3, 15, 14, 0);
     final cubit = await pumpScreen(tester, () => now);
 
     tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     addTearDown(
-      () => tester.binding
-          .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+      () => tester.binding.handleAppLifecycleStateChanged(
+        AppLifecycleState.resumed,
+      ),
     );
     now = DateTime(2026, 3, 15, 14, 1);
     await tester.pump(const Duration(seconds: 1));
@@ -74,18 +78,16 @@ void main() {
     expect(find.text('متبقٍ ٠١:٣٤'), findsOneWidget);
   });
 
-  for (final state in [
-    AppLifecycleState.inactive,
-    AppLifecycleState.hidden,
-  ]) {
+  for (final state in [AppLifecycleState.inactive, AppLifecycleState.hidden]) {
     testWidgets('$state stops the ticker', (tester) async {
       var now = DateTime(2026, 3, 15, 14, 0);
       final cubit = await pumpScreen(tester, () => now);
 
       tester.binding.handleAppLifecycleStateChanged(state);
       addTearDown(
-        () => tester.binding
-            .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+        () => tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        ),
       );
       now = DateTime(2026, 3, 15, 14, 1);
       await tester.pump(const Duration(seconds: 1));

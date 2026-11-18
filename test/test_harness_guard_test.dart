@@ -59,13 +59,14 @@ final _routedApp = RegExp(r'MaterialApp\.router\s*\(');
 String _normalize(String path) => path.replaceAll(r'\', '/');
 
 /// Every test source except the harness's own definition.
-List<String> _sources() => Directory('test')
-    .listSync(recursive: true)
-    .whereType<File>()
-    .map((file) => _normalize(file.path))
-    .where((path) => path.endsWith('.dart'))
-    .where((path) => path != 'test/support/host.dart')
-    .toList();
+List<String> _sources() =>
+    Directory('test')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .map((file) => _normalize(file.path))
+        .where((path) => path.endsWith('.dart'))
+        .where((path) => path != 'test/support/host.dart')
+        .toList();
 
 bool _buildsRawApp(String path) {
   final source = File(path).readAsStringSync();
@@ -82,7 +83,8 @@ void main() {
     expect(
       offenders,
       isEmpty,
-      reason: 'Use appShell/pumpAppHost from test/support/host.dart instead '
+      reason:
+          'Use appShell/pumpAppHost from test/support/host.dart instead '
           'of a raw MaterialApp: ${offenders.join(', ')}',
     );
   });
@@ -95,7 +97,8 @@ void main() {
     expect(
       stale,
       isEmpty,
-      reason: 'These files no longer build a raw MaterialApp; drop them from '
+      reason:
+          'These files no longer build a raw MaterialApp; drop them from '
           '_exempt: ${stale.join(', ')}',
     );
   });

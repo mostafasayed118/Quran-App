@@ -54,27 +54,30 @@ void main() {
   });
 
   Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-    ));
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: AppRouter.router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+      ),
+    );
     await _pumpUntil(
       tester,
       () => find.byType(NavigationBar).evaluate().isNotEmpty,
     );
   }
 
-  testWidgets('the four primary destinations live in a persistent bar',
-      (tester) async {
+  testWidgets('the four primary destinations live in a persistent bar', (
+    tester,
+  ) async {
     AppRouter.router.go(AppRoutes.home);
     await pumpApp(tester);
 
@@ -99,8 +102,9 @@ void main() {
     expect(afterTap.selectedIndex, 2);
   });
 
-  testWidgets('a detail route opens full screen, above the bar',
-      (tester) async {
+  testWidgets('a detail route opens full screen, above the bar', (
+    tester,
+  ) async {
     AppRouter.router.go(AppRoutes.home);
     await pumpApp(tester);
 

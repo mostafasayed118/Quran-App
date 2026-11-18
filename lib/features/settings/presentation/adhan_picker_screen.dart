@@ -119,9 +119,7 @@ class _SectionHeader extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: Theme.of(context)
-            .textTheme
-            .titleSmall
+        style: Theme.of(context).textTheme.titleSmall
             ?.copyWith(color: colors.primary),
       ),
     );

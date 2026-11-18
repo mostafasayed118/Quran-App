@@ -31,13 +31,13 @@ class SettingsCubit extends Cubit<SettingsState> {
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
     AdhanPreferences? adhanPrefs,
-  })  : _settings = settings,
-        _prayerSettings = prayerSettings,
-        _city = city,
-        _prayer = prayer,
-        _scheduler = scheduler,
-        _adhanPrefs = adhanPrefs,
-        super(const SettingsState.loading());
+  }) : _settings = settings,
+       _prayerSettings = prayerSettings,
+       _city = city,
+       _prayer = prayer,
+       _scheduler = scheduler,
+       _adhanPrefs = adhanPrefs,
+       super(const SettingsState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -77,19 +77,25 @@ class SettingsCubit extends Cubit<SettingsState> {
       final wirdTime = await _settings.wirdTimeHm() ?? defaultWirdTimeHm;
       final adhanId = await _adhanPrefs?.adhanId() ?? kDefaultAdhanId;
       if (isClosed) return;
-      emit(SettingsState.ready(
-        prayerEnabled: prayerEnabled,
-        azkarEnabled: enabled,
-        azkarTimeHm: time,
-        wirdEnabled: wirdEnabled,
-        wirdTimeHm: wirdTime,
-        azkarPermissionDenied: false,
-        wirdPermissionDenied: false,
-        adhanId: adhanId,
-      ));
+      emit(
+        SettingsState.ready(
+          prayerEnabled: prayerEnabled,
+          azkarEnabled: enabled,
+          azkarTimeHm: time,
+          wirdEnabled: wirdEnabled,
+          wirdTimeHm: wirdTime,
+          azkarPermissionDenied: false,
+          wirdPermissionDenied: false,
+          adhanId: adhanId,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('settings load failed',
-          name: 'quran_yahdi/settings', error: error, stackTrace: stackTrace);
+      appLog(
+        'settings load failed',
+        name: 'quran_yahdi/settings',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const SettingsState.failed());
     }
@@ -136,10 +142,9 @@ class SettingsCubit extends Cubit<SettingsState> {
       final denied = enabled ? await _requestPermissionBestEffort() : false;
       current = _readyState();
       if (current == null) return;
-      emit(current.copyWith(
-        azkarEnabled: enabled,
-        azkarPermissionDenied: denied,
-      ));
+      emit(
+        current.copyWith(azkarEnabled: enabled, azkarPermissionDenied: denied),
+      );
       await _rescheduleBestEffort();
     });
   }
@@ -184,10 +189,9 @@ class SettingsCubit extends Cubit<SettingsState> {
       final denied = enabled ? await _requestPermissionBestEffort() : false;
       current = _readyState();
       if (current == null) return;
-      emit(current.copyWith(
-        wirdEnabled: enabled,
-        wirdPermissionDenied: denied,
-      ));
+      emit(
+        current.copyWith(wirdEnabled: enabled, wirdPermissionDenied: denied),
+      );
       await _rescheduleBestEffort();
     });
   }
@@ -266,11 +270,8 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
   }
 
-  Future<void> _reschedule() => _settings.reschedule(
-        city: _city,
-        prayer: _prayer,
-        scheduler: _scheduler,
-      );
+  Future<void> _reschedule() =>
+      _settings.reschedule(city: _city, prayer: _prayer, scheduler: _scheduler);
 
   /// The state a mutation may build on, or null when there is nothing
   /// confirmed to build on: the cubit is closed, still loading, or the load

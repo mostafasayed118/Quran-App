@@ -16,9 +16,9 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
   PrayerConfigCubit({
     required PrayerConfigSource source,
     PreAdhanCanceller? preAdhanCanceller,
-  })  : _source = source,
-        _preAdhanCanceller = preAdhanCanceller,
-        super(const PrayerConfigState.loading());
+  }) : _source = source,
+       _preAdhanCanceller = preAdhanCanceller,
+       super(const PrayerConfigState.loading());
 
   final PrayerConfigSource _source;
   final PreAdhanCanceller? _preAdhanCanceller;
@@ -39,8 +39,12 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
       _confirmed = config;
       if (!isClosed) emit(PrayerConfigState.ready(config));
     } on Object catch (error, stackTrace) {
-      appLog('prayer config load failed',
-          name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
+      appLog(
+        'prayer config load failed',
+        name: 'quran_yahdi/prayer',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const PrayerConfigState.failed());
     }
   }
@@ -137,8 +141,12 @@ class PrayerConfigCubit extends Cubit<PrayerConfigState> {
       if (!isClosed) emit(PrayerConfigState.ready(next));
     } on Object catch (error, stackTrace) {
       // Keep the last confirmed state; the screen keeps showing it.
-      appLog('prayer config save failed',
-          name: 'quran_yahdi/prayer', error: error, stackTrace: stackTrace);
+      appLog(
+        'prayer config save failed',
+        name: 'quran_yahdi/prayer',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

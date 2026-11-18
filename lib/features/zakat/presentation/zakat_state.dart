@@ -14,12 +14,7 @@ sealed class ZakatState with _$ZakatState {
     @Default('') String silverPrice,
     @Default('') String cash,
     @Default('') String debts,
-    @Default(ZakatResult(
-      zakatable: 0,
-      nisabValue: 0,
-      due: false,
-      amount: 0,
-    ))
+    @Default(ZakatResult(zakatable: 0, nisabValue: 0, due: false, amount: 0))
     ZakatResult result,
   }) = ZakatReady;
 }

@@ -38,18 +38,12 @@ class ReciterSurahsScreen extends StatelessWidget {
         title: BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
           builder: (context, state) => switch (state) {
             ReciterSurahsReady(:final row) => Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    row.reciterName,
-                    style: AppTheme.rowTitle,
-                  ),
-                  Text(
-                    row.moshafName,
-                    style: AppTheme.mutedFootnote(context),
-                  ),
-                ],
-              ),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(row.reciterName, style: AppTheme.rowTitle),
+                Text(row.moshafName, style: AppTheme.mutedFootnote(context)),
+              ],
+            ),
             _ => Text(loc.recitationsTitle),
           },
         ),
@@ -57,10 +51,10 @@ class ReciterSurahsScreen extends StatelessWidget {
           BlocBuilder<ReciterSurahsCubit, ReciterSurahsState>(
             builder: (context, state) => switch (state) {
               ReciterSurahsReady(:final row, :final surahNumbers) => IconButton(
-                  tooltip: loc.downloadAllSurahs,
-                  icon: const Icon(Icons.download_for_offline_outlined),
-                  onPressed: () => _downloadAll(context, row.id, surahNumbers),
-                ),
+                tooltip: loc.downloadAllSurahs,
+                icon: const Icon(Icons.download_for_offline_outlined),
+                onPressed: () => _downloadAll(context, row.id, surahNumbers),
+              ),
               _ => const SizedBox.shrink(),
             },
           ),
@@ -76,9 +70,9 @@ class ReciterSurahsScreen extends StatelessWidget {
           builder: (context, state) => switch (state) {
             ReciterSurahsLoading() => const LoadingView(),
             ReciterSurahsFailed() => errorPane(
-                loc,
-                onRetry: context.read<ReciterSurahsCubit>().start,
-              ),
+              loc,
+              onRetry: context.read<ReciterSurahsCubit>().start,
+            ),
             ReciterSurahsReady(
               :final row,
               :final surahNumbers,
@@ -132,8 +126,10 @@ class ReciterSurahsScreen extends StatelessWidget {
   ) async {
     final loc = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
-    final count =
-        await context.read<DownloadsCubit>().enqueueAll(rowId, surahNumbers);
+    final count = await context.read<DownloadsCubit>().enqueueAll(
+      rowId,
+      surahNumbers,
+    );
     if (!context.mounted) return;
     AppToast.showOn(
       messenger,
@@ -205,7 +201,9 @@ class _SurahDownloadRow extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(
-      BuildContext context, DownloadsCubit cubit) async {
+    BuildContext context,
+    DownloadsCubit cubit,
+  ) async {
     final loc = AppLocalizations.of(context);
     final confirmed = await confirmDeleteDialog(
       context,
@@ -227,10 +225,10 @@ class _SurahDownloadRow extends StatelessWidget {
       tooltip: AppLocalizations.of(context).playTooltip,
       icon: Icon(Icons.play_arrow, color: colors.primary),
       onPressed: () => context.read<PlaybackCubit>().playReciter(
-            reciter,
-            surahNumber,
-            surahName: name,
-          ),
+        reciter,
+        surahNumber,
+        surahName: name,
+      ),
     );
   }
 
@@ -257,8 +255,11 @@ class _SurahDownloadRow extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(AppRadius.selection),
               ),
-              child: Icon(Icons.check,
-                  color: colors.secondary, size: AppIconSize.lg),
+              child: Icon(
+                Icons.check,
+                color: colors.secondary,
+                size: AppIconSize.lg,
+              ),
             ),
             IconButton(
               tooltip: AppLocalizations.of(context).libraryDelete,
@@ -361,5 +362,7 @@ String downloadProgressLabel(AppLocalizations loc, int received, int total) {
   final receivedLabel = loc.digits(formatMegabytes(received));
   if (total <= 0) return loc.downloadProgressReceived(receivedLabel);
   return loc.downloadProgressOfTotal(
-      receivedLabel, loc.digits(formatMegabytes(total)));
+    receivedLabel,
+    loc.digits(formatMegabytes(total)),
+  );
 }

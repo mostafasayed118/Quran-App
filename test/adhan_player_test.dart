@@ -62,8 +62,10 @@ void main() {
 
     await player.preview('madinah_ejaz215_x125');
 
-    expect(log.last,
-        'control:play:assets/audio/adhan/clips/madinah_ejaz215_x125_clip.m4a');
+    expect(
+      log.last,
+      'control:play:assets/audio/adhan/clips/madinah_ejaz215_x125_clip.m4a',
+    );
   });
 
   test('a second preview replaces the first instead of stacking', () async {
@@ -81,21 +83,25 @@ void main() {
     );
   });
 
-  test('a request made before the plugin is ready waits, and is not dropped',
-      () async {
-    final gate = Completer<bool>();
-    final player = build(ready: () => gate.future);
+  test(
+    'a request made before the plugin is ready waits, and is not dropped',
+    () async {
+      final gate = Completer<bool>();
+      final player = build(ready: () => gate.future);
 
-    final pending = player.play('madinah_ejaz215_x125');
-    await Future<void>.delayed(Duration.zero);
-    expect(log, isEmpty, reason: 'must not touch audio before readiness');
+      final pending = player.play('madinah_ejaz215_x125');
+      await Future<void>.delayed(Duration.zero);
+      expect(log, isEmpty, reason: 'must not touch audio before readiness');
 
-    gate.complete(true);
-    await pending;
+      gate.complete(true);
+      await pending;
 
-    expect(
-        log.last, 'control:play:assets/audio/adhan/madinah_ejaz215_x125.m4a');
-  });
+      expect(
+        log.last,
+        'control:play:assets/audio/adhan/madinah_ejaz215_x125.m4a',
+      );
+    },
+  );
 
   test('a plugin that hangs does not queue the request forever', () async {
     // `BackgroundInitGuard.ready` only completes when the plugin returns, so a
@@ -114,15 +120,17 @@ void main() {
     expect(player.stateNow.status, AdhanPlaybackStatus.idle);
   });
 
-  test('a missing asset fails open: logs, returns to idle, never throws',
-      () async {
-    final player = build();
-    control.failNext = true;
+  test(
+    'a missing asset fails open: logs, returns to idle, never throws',
+    () async {
+      final player = build();
+      control.failNext = true;
 
-    await expectLater(player.play('madinah_ejaz215_x125'), completes);
+      await expectLater(player.play('madinah_ejaz215_x125'), completes);
 
-    expect(player.stateNow.status, AdhanPlaybackStatus.idle);
-  });
+      expect(player.stateNow.status, AdhanPlaybackStatus.idle);
+    },
+  );
 
   test('a plugin that never became ready leaves the player idle', () async {
     final player = build(ready: () async => false);

@@ -20,10 +20,10 @@ class AdhanPickerCubit extends Cubit<AdhanPickerState> {
     required AdhanPreferences prefs,
     required AdhanPlayer player,
     required Future<void> Function() reschedule,
-  })  : _prefs = prefs,
-        _player = player,
-        _reschedule = reschedule,
-        super(const AdhanPickerState.loading());
+  }) : _prefs = prefs,
+       _player = player,
+       _reschedule = reschedule,
+       super(const AdhanPickerState.loading());
 
   final AdhanPreferences _prefs;
   final AdhanPlayer _player;
@@ -55,39 +55,39 @@ class AdhanPickerCubit extends Cubit<AdhanPickerState> {
 
   /// Persists the global choice and re-plans the reminders.
   Future<void> select(String id) => _serialized(() async {
-        final current = _readyState();
-        if (current == null) return;
-        // Spec section 7: a running preview must not outlive the choice it was
-        // auditioning, or the old reciter keeps playing under the new tick.
-        await stopPreview();
-        try {
-          await _prefs.setAdhanId(id);
-        } on Object catch (error, stackTrace) {
-          _log('select', error, stackTrace);
-          return;
-        }
-        final after = _readyState();
-        if (after == null) return;
-        emit(after.copyWith(adhanId: id));
-        await _rescheduleBestEffort();
-      });
+    final current = _readyState();
+    if (current == null) return;
+    // Spec section 7: a running preview must not outlive the choice it was
+    // auditioning, or the old reciter keeps playing under the new tick.
+    await stopPreview();
+    try {
+      await _prefs.setAdhanId(id);
+    } on Object catch (error, stackTrace) {
+      _log('select', error, stackTrace);
+      return;
+    }
+    final after = _readyState();
+    if (after == null) return;
+    emit(after.copyWith(adhanId: id));
+    await _rescheduleBestEffort();
+  });
 
   /// Persists the Fajr override; null means "same as the global choice".
   Future<void> selectFajr(String? id) => _serialized(() async {
-        final current = _readyState();
-        if (current == null) return;
-        await stopPreview();
-        try {
-          await _prefs.setFajrAdhanId(id);
-        } on Object catch (error, stackTrace) {
-          _log('selectFajr', error, stackTrace);
-          return;
-        }
-        final after = _readyState();
-        if (after == null) return;
-        emit(after.copyWith(fajrAdhanId: id));
-        await _rescheduleBestEffort();
-      });
+    final current = _readyState();
+    if (current == null) return;
+    await stopPreview();
+    try {
+      await _prefs.setFajrAdhanId(id);
+    } on Object catch (error, stackTrace) {
+      _log('selectFajr', error, stackTrace);
+      return;
+    }
+    final after = _readyState();
+    if (after == null) return;
+    emit(after.copyWith(fajrAdhanId: id));
+    await _rescheduleBestEffort();
+  });
 
   /// Auditions [id]; stops whatever preview was already playing first.
   Future<void> preview(String id) async {

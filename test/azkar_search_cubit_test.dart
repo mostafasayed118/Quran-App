@@ -5,26 +5,26 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_cubit.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_state.dart';
 
 Map<String, dynamic> _root() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
-            {'text': 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', 'count': 3},
-          ],
-        },
-        {
-          'id': 'c2',
-          'nameAr': 'أذكار النوم',
-          'nameEn': 'Sleep',
-          'items': [
-            {'text': 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
+        {'text': 'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ', 'count': 3},
       ],
-    };
+    },
+    {
+      'id': 'c2',
+      'nameAr': 'أذكار النوم',
+      'nameEn': 'Sleep',
+      'items': [
+        {'text': 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', 'count': 1},
+      ],
+    },
+  ],
+};
 
 AzkarCubit _cubit() =>
     AzkarCubit(repository: AzkarRepository(loader: () async => _root()));

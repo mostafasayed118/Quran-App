@@ -95,14 +95,14 @@ class _AyahSheetView extends StatelessWidget {
         final Widget content = switch (state) {
           AyahSheetLoading() => const LoadingView(),
           AyahSheetFailed() => errorPane(
-              loc,
-              onRetry: context.read<AyahSheetCubit>().reload,
-            ),
+            loc,
+            onRetry: context.read<AyahSheetCubit>().reload,
+          ),
           final AyahSheetReady ready => _SheetBody(
-              surahName: surahName,
-              ayah: ayah,
-              ready: ready,
-            ),
+            surahName: surahName,
+            ayah: ayah,
+            ready: ready,
+          ),
         };
         return ConstrainedBox(
           constraints: BoxConstraints(maxHeight: maxHeight),
@@ -180,7 +180,11 @@ class _SheetHeader extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg, 14, AppSpacing.lg, AppSpacing.xs),
+        AppSpacing.lg,
+        14,
+        AppSpacing.lg,
+        AppSpacing.xs,
+      ),
       child: Row(
         textDirection: TextDirection.rtl,
         children: [
@@ -230,16 +234,18 @@ class _SheetPane extends StatelessWidget {
         final entry = entries[index];
         return Padding(
           padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             textDirection: TextDirection.rtl,
             children: [
               Text(
                 entry.title,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
+                style: Theme.of(context).textTheme.labelMedium
                     ?.copyWith(fontWeight: FontWeight.w700),
                 textDirection: TextDirection.rtl,
               ),

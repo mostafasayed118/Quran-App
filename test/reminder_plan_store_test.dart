@@ -10,11 +10,13 @@ void main() {
     addTearDown(db.close);
     final store = DriftReminderPlanStore(db);
 
-    await store.write(const ReminderPlanSnapshot(
-      fingerprint: 'plan-1',
-      exact: true,
-      bootId: 'boot-A',
-    ));
+    await store.write(
+      const ReminderPlanSnapshot(
+        fingerprint: 'plan-1',
+        exact: true,
+        bootId: 'boot-A',
+      ),
+    );
 
     final read = await store.read();
     expect(read?.fingerprint, 'plan-1');

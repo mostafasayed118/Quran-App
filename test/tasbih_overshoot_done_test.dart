@@ -31,13 +31,15 @@ void main() {
     return cubit;
   }
 
-  testWidgets('the done state survives an overshoot and only reset clears it',
-      (tester) async {
+  testWidgets('the done state survives an overshoot and only reset clears it', (
+    tester,
+  ) async {
     final cubit = await pumpHost(tester);
 
     double dialScale() {
-      final scales =
-          tester.widgetList<AnimatedScale>(find.byType(AnimatedScale)).toList();
+      final scales = tester
+          .widgetList<AnimatedScale>(find.byType(AnimatedScale))
+          .toList();
       expect(scales, hasLength(1));
       return scales.single.scale;
     }
@@ -46,8 +48,11 @@ void main() {
     for (var i = 0; i < 33; i++) {
       await cubit.increment();
     }
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.byIcon(Icons.check_circle), findsOneWidget);
     expect(find.text('تم بحمد الله'), findsOneWidget);

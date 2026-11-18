@@ -31,10 +31,7 @@ class PackRedirectException implements Exception {
 
 /// True when [uri] is an HTTPS URI on a trusted pack host and the default
 /// port. An explicit non-443 port is rejected even on a trusted host.
-bool isTrustedPackUri(
-  Uri uri, {
-  Set<String> trustedHosts = kTrustedPackHosts,
-}) {
+bool isTrustedPackUri(Uri uri, {Set<String> trustedHosts = kTrustedPackHosts}) {
   if (uri.scheme != 'https') return false;
   if (!trustedHosts.contains(uri.host)) return false;
   if (uri.hasPort && uri.port != 443) return false;

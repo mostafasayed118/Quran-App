@@ -21,10 +21,7 @@ class _TodayCard extends StatelessWidget {
               ),
               style: AppTheme.mutedAt(Theme.of(context).colorScheme, 13),
             ),
-            Text(
-              loc.trackerToday,
-              style: AppTheme.rowTitle,
-            ),
+            Text(loc.trackerToday, style: AppTheme.rowTitle),
           ],
         ),
       ),

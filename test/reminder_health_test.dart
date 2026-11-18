@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/domain/reminder_diagnostics.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_diagnostics_channel.dart';
 
-const MethodChannel _channel =
-    MethodChannel('quran_yahdi/reminder_diagnostics');
+const MethodChannel _channel = MethodChannel(
+  'quran_yahdi/reminder_diagnostics',
+);
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -55,18 +56,20 @@ void main() {
       );
     });
 
-    test('a failed plan write is reported even when every permission is on',
-        () {
-      expect(
-        diagnoseReminders(
-          notificationsEnabled: true,
-          exactAlarmsAllowed: true,
-          batteryOptimizationIgnored: true,
-          scheduleFailed: true,
-        ),
-        [ReminderIssue.scheduleFailed],
-      );
-    });
+    test(
+      'a failed plan write is reported even when every permission is on',
+      () {
+        expect(
+          diagnoseReminders(
+            notificationsEnabled: true,
+            exactAlarmsAllowed: true,
+            batteryOptimizationIgnored: true,
+            scheduleFailed: true,
+          ),
+          [ReminderIssue.scheduleFailed],
+        );
+      },
+    );
 
     test('an unreadable battery state is not an issue', () {
       expect(
@@ -106,24 +109,27 @@ void main() {
       batteryAnswer = true;
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(_channel, (call) async {
-        calls.add(call);
-        if (throwOn.contains(call.method)) {
-          throw PlatformException(code: 'boom', message: call.method);
-        }
-        switch (call.method) {
-          case 'notificationsEnabled':
-            return true;
-          case 'exactAlarmsAllowed':
-            return false;
-          case 'batteryOptimizationIgnored':
-            return batteryAnswer;
-          case 'openBatteryOptimizationSettings':
-          case 'openExactAlarmSettings':
-            return true;
-          default:
-            throw PlatformException(code: 'unexpected', message: call.method);
-        }
-      });
+            calls.add(call);
+            if (throwOn.contains(call.method)) {
+              throw PlatformException(code: 'boom', message: call.method);
+            }
+            switch (call.method) {
+              case 'notificationsEnabled':
+                return true;
+              case 'exactAlarmsAllowed':
+                return false;
+              case 'batteryOptimizationIgnored':
+                return batteryAnswer;
+              case 'openBatteryOptimizationSettings':
+              case 'openExactAlarmSettings':
+                return true;
+              default:
+                throw PlatformException(
+                  code: 'unexpected',
+                  message: call.method,
+                );
+            }
+          });
     });
 
     tearDown(() {
@@ -138,14 +144,11 @@ void main() {
       await diagnostics.exactAlarmsAllowed();
       await diagnostics.batteryOptimizationIgnored();
 
-      expect(
-        calls.map((call) => call.method),
-        [
-          'notificationsEnabled',
-          'exactAlarmsAllowed',
-          'batteryOptimizationIgnored',
-        ],
-      );
+      expect(calls.map((call) => call.method), [
+        'notificationsEnabled',
+        'exactAlarmsAllowed',
+        'batteryOptimizationIgnored',
+      ]);
     });
 
     test('the reads map the platform results', () async {
@@ -157,22 +160,24 @@ void main() {
       expect(await diagnostics.batteryOptimizationIgnored(), isFalse);
     });
 
-    test('a platform exception reads as unknown, never as a thrown error',
-        () async {
-      const diagnostics = ReminderDiagnosticsChannel();
-      throwOn = {
-        'notificationsEnabled',
-        'exactAlarmsAllowed',
-        'batteryOptimizationIgnored'
-      };
+    test(
+      'a platform exception reads as unknown, never as a thrown error',
+      () async {
+        const diagnostics = ReminderDiagnosticsChannel();
+        throwOn = {
+          'notificationsEnabled',
+          'exactAlarmsAllowed',
+          'batteryOptimizationIgnored',
+        };
 
-      // A failed permission read reports "no issue": fabricating a problem
-      // the user cannot see is worse than staying silent about it.
-      expect(await diagnostics.notificationsEnabled(), isTrue);
-      expect(await diagnostics.exactAlarmsAllowed(), isTrue);
-      // A failed battery read is "cannot report" — the instruction row.
-      expect(await diagnostics.batteryOptimizationIgnored(), isNull);
-    });
+        // A failed permission read reports "no issue": fabricating a problem
+        // the user cannot see is worse than staying silent about it.
+        expect(await diagnostics.notificationsEnabled(), isTrue);
+        expect(await diagnostics.exactAlarmsAllowed(), isTrue);
+        // A failed battery read is "cannot report" — the instruction row.
+        expect(await diagnostics.batteryOptimizationIgnored(), isNull);
+      },
+    );
 
     test('a missing platform implementation reads as unknown', () async {
       const diagnostics = ReminderDiagnosticsChannel();

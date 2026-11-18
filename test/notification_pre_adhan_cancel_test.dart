@@ -27,16 +27,16 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return true;
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return true;
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -54,10 +54,7 @@ void main() {
       _reminder(id: azkarReminderId, title: 'Azkar'),
       _reminder(id: preAdhanReminderId, title: 'Soon'),
     ]);
-    expect(
-      _cancelIds(calls),
-      unorderedEquals(reminderAlarmIds()),
-    );
+    expect(_cancelIds(calls), unorderedEquals(reminderAlarmIds()));
 
     calls.clear();
     await binding.scheduleAll([
@@ -65,10 +62,7 @@ void main() {
       _reminder(id: azkarReminderId, title: 'Azkar'),
     ]);
 
-    expect(
-      _cancelIds(calls),
-      unorderedEquals(reminderAlarmIds()),
-    );
+    expect(_cancelIds(calls), unorderedEquals(reminderAlarmIds()));
     expect(_cancelIds(calls), contains(preAdhanReminderId));
   });
 
@@ -109,10 +103,7 @@ void main() {
   });
 }
 
-ScheduledReminder _reminder({
-  required int id,
-  String title = 'Reminder',
-}) =>
+ScheduledReminder _reminder({required int id, String title = 'Reminder'}) =>
     ScheduledReminder(
       id: id,
       fireAt: DateTime.utc(2030, 1, 1, id),

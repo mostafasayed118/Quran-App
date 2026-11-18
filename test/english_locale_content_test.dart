@@ -19,13 +19,15 @@ void main() {
     expect(ar.digits('١٢٣'), '١٢٣');
   });
 
-  test('English renders Western digits, converting an already-formatted value',
-      () {
-    expect(en.usesArabicIndicDigits, isFalse);
-    expect(en.number(7), '7');
-    expect(en.digits('١٢٣'), '123');
-    expect(en.digits('1:23'), '1:23');
-  });
+  test(
+    'English renders Western digits, converting an already-formatted value',
+    () {
+      expect(en.usesArabicIndicDigits, isFalse);
+      expect(en.number(7), '7');
+      expect(en.digits('١٢٣'), '123');
+      expect(en.digits('1:23'), '1:23');
+    },
+  );
 
   test('the qibla cardinals follow the catalogue', () {
     expect(ar.cardinalNorth, 'شمال');
@@ -38,8 +40,9 @@ void main() {
     expect(en.cardinalWest, 'West');
   });
 
-  testWidgets('an English screen renders a formatted count in Western digits',
-      (tester) async {
+  testWidgets('an English screen renders a formatted count in Western digits', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         locale: const Locale('en'),

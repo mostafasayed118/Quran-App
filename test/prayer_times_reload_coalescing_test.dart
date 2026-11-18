@@ -22,10 +22,7 @@ const _dubai = City(
 class _GatedCityRepository extends CityRepository {
   // ignore: use_super_parameters
   _GatedCityRepository(AppDatabase db)
-      : super(
-          db: db,
-          loader: () async => [cairoCity.toJson(), _dubai.toJson()],
-        );
+    : super(db: db, loader: () async => [cairoCity.toJson(), _dubai.toJson()]);
 
   Completer<void>? gate;
   City current = cairoCity;
@@ -44,13 +41,13 @@ class _GatedCityRepository extends CityRepository {
 class _FixedPrayerTimes implements PrayerTimeService {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) => [
-        PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-        PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-        PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-        PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-        PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-        PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-      ];
+    PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+    PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
+    PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
+    PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
+    PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
+    PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -60,10 +57,7 @@ class _FixedPrayerTimes implements PrayerTimeService {
 void main() {
   test('a city change during an in-flight reload is applied', () async {
     final city = _GatedCityRepository(newTestDb())..gate = Completer<void>();
-    final cubit = PrayerTimesCubit(
-      prayer: _FixedPrayerTimes(),
-      city: city,
-    );
+    final cubit = PrayerTimesCubit(prayer: _FixedPrayerTimes(), city: city);
     addTearDown(cubit.close);
 
     final first = cubit.reload();
@@ -78,8 +72,11 @@ void main() {
     await Future.wait([first, second]);
 
     final ready = cubit.state as PrayerTimesReady;
-    expect(ready.city!.id, 'dubai',
-        reason: 'the request made during the load must run after it');
+    expect(
+      ready.city!.id,
+      'dubai',
+      reason: 'the request made during the load must run after it',
+    );
     expect(city.reads, 2);
   });
 }

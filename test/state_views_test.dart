@@ -14,8 +14,9 @@ void main() {
     expect(find.byType(FilledButton), findsNothing);
   });
 
-  testWidgets('a failure with a retry offers the action and calls it',
-      (tester) async {
+  testWidgets('a failure with a retry offers the action and calls it', (
+    tester,
+  ) async {
     var retried = 0;
     await pumpAppHost(
       tester,
@@ -34,8 +35,9 @@ void main() {
     expect(retried, 1);
   });
 
-  testWidgets('an empty state takes an icon and keeps its action',
-      (tester) async {
+  testWidgets('an empty state takes an icon and keeps its action', (
+    tester,
+  ) async {
     var tapped = 0;
     await pumpAppHost(
       tester,

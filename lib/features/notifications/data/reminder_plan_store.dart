@@ -78,13 +78,13 @@ class DriftReminderPlanStore implements ReminderPlanStore {
 
   @override
   Future<void> write(ReminderPlanSnapshot snapshot) => _settings.write(
-        key,
-        jsonEncode({
-          'fingerprint': snapshot.fingerprint,
-          'exact': snapshot.exact,
-          'bootId': snapshot.bootId,
-        }),
-      );
+    key,
+    jsonEncode({
+      'fingerprint': snapshot.fingerprint,
+      'exact': snapshot.exact,
+      'bootId': snapshot.bootId,
+    }),
+  );
 
   @override
   Future<void> clear() => _settings.remove(key);

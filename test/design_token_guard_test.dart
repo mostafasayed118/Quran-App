@@ -15,7 +15,8 @@ void main() {
     expect(
       current,
       designTokenBaseline,
-      reason: 'The tree and the recorded baseline disagree.\n'
+      reason:
+          'The tree and the recorded baseline disagree.\n'
           'Current: $current\n'
           'If this batch fixed sites, remove them from '
           'test/fixtures/design_token_baseline.dart. If it added a literal, '

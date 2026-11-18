@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
 /// F-D1 fail-open boot gate: runs [init] with at most [timeout] to complete,

@@ -23,13 +23,13 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     ReminderSchedulerPort? scheduler,
     DateTime Function()? clock,
     Stream<PrayerConfig>? configChanges,
-  })  : _prayer = prayer,
-        _city = city,
-        _settings = settings,
-        _scheduler = scheduler,
-        _clock = clock ?? DateTime.now,
-        _configChanges = configChanges,
-        super(const PrayerTimesState.loading());
+  }) : _prayer = prayer,
+       _city = city,
+       _settings = settings,
+       _scheduler = scheduler,
+       _clock = clock ?? DateTime.now,
+       _configChanges = configChanges,
+       super(const PrayerTimesState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -80,10 +80,12 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
         await _reloadOnce();
       }
     } on Object catch (error, stackTrace) {
-      appLog('prayer times load failed',
-          name: 'quran_yahdi/prayer_times',
-          error: error,
-          stackTrace: stackTrace);
+      appLog(
+        'prayer times load failed',
+        name: 'quran_yahdi/prayer_times',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const PrayerTimesState.failed());
     } finally {
       _reloading = false;
@@ -110,7 +112,8 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
           time: choice.time,
           // Same-occurrence match: after Isha the service returns tomorrow's
           // Fajr — it must not flag today's already-passed Fajr row.
-          isNext: choice.name == next.name &&
+          isNext:
+              choice.name == next.name &&
               choice.time.isAtSameMomentAs(next.time),
         ),
     ];
@@ -125,18 +128,21 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     final tomorrowRemaining = tomorrow?.time.difference(now);
     if (isClosed) return;
     _loadedDay = DateTime(now.year, now.month, now.day);
-    emit(PrayerTimesState.ready(
-      city: selected,
-      entries: entries,
-      remaining:
-          remaining != null && remaining > Duration.zero ? remaining : null,
-      nextTomorrowName: tomorrow?.name,
-      nextTomorrowTime: tomorrow?.time,
-      nextTomorrowRemaining:
-          tomorrowRemaining != null && tomorrowRemaining > Duration.zero
-              ? tomorrowRemaining
-              : null,
-    ));
+    emit(
+      PrayerTimesState.ready(
+        city: selected,
+        entries: entries,
+        remaining: remaining != null && remaining > Duration.zero
+            ? remaining
+            : null,
+        nextTomorrowName: tomorrow?.name,
+        nextTomorrowTime: tomorrow?.time,
+        nextTomorrowRemaining:
+            tomorrowRemaining != null && tomorrowRemaining > Duration.zero
+            ? tomorrowRemaining
+            : null,
+      ),
+    );
     _scheduleReminders();
   }
 
@@ -196,11 +202,9 @@ class PrayerTimesCubit extends Cubit<PrayerTimesState> {
     final settings = _settings;
     final scheduler = _scheduler;
     if (settings == null || scheduler == null) return;
-    unawaited(settings.reschedule(
-      city: _city,
-      prayer: _prayer,
-      scheduler: scheduler,
-    ));
+    unawaited(
+      settings.reschedule(city: _city, prayer: _prayer, scheduler: scheduler),
+    );
   }
 
   @override

@@ -12,7 +12,7 @@ class CatalogRepository {
     if (kind == null) return all;
     return [
       for (final pack in all)
-        if (pack.kind == kind) pack
+        if (pack.kind == kind) pack,
     ];
   }
 

@@ -10,25 +10,25 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 Map<String, dynamic> _root() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
-          ],
-        },
-        {
-          'id': 'c2',
-          'nameAr': 'أذكار النوم',
-          'nameEn': 'Sleep',
-          'items': [
-            {'text': 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
       ],
-    };
+    },
+    {
+      'id': 'c2',
+      'nameAr': 'أذكار النوم',
+      'nameEn': 'Sleep',
+      'items': [
+        {'text': 'بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا', 'count': 1},
+      ],
+    },
+  ],
+};
 
 Future<void> _pumpAzkar(WidgetTester tester, {double scale = 1.0}) async {
   final cubit = AzkarCubit(
@@ -36,26 +36,28 @@ Future<void> _pumpAzkar(WidgetTester tester, {double scale = 1.0}) async {
   );
   addTearDown(cubit.close);
   await cubit.start();
-  await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-    value: cubit,
-    child: MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: TextScaler.linear(scale)),
-        child: child!,
+  await tester.pumpWidget(
+    BlocProvider<AzkarCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: TextScaler.linear(scale)),
+          child: child!,
+        ),
+        home: const AzkarScreen(),
       ),
-      home: const AzkarScreen(),
     ),
-  ));
+  );
   await tester.pump();
   await tester.pump();
 }
@@ -67,8 +69,9 @@ Future<void> _type(WidgetTester tester, String query) async {
 }
 
 void main() {
-  testWidgets('typing shows matching items with their collection name',
-      (tester) async {
+  testWidgets('typing shows matching items with their collection name', (
+    tester,
+  ) async {
     await _pumpAzkar(tester);
 
     await _type(tester, 'باسمك');
@@ -79,8 +82,9 @@ void main() {
     expect(find.text('أذكار الصباح'), findsNothing);
   });
 
-  testWidgets('an unmatched query shows the localized empty state',
-      (tester) async {
+  testWidgets('an unmatched query shows the localized empty state', (
+    tester,
+  ) async {
     await _pumpAzkar(tester);
 
     await _type(tester, 'لا يوجد');
@@ -88,8 +92,9 @@ void main() {
     expect(find.text('لا توجد أذكار مطابقة لبحثك'), findsOneWidget);
   });
 
-  testWidgets('clearing the query restores the collections list',
-      (tester) async {
+  testWidgets('clearing the query restores the collections list', (
+    tester,
+  ) async {
     await _pumpAzkar(tester);
 
     await _type(tester, 'النوم');
@@ -100,8 +105,9 @@ void main() {
     expect(find.text('أذكار النوم'), findsOneWidget);
   });
 
-  testWidgets('tapping a result opens its collection in the reciting view',
-      (tester) async {
+  testWidgets('tapping a result opens its collection in the reciting view', (
+    tester,
+  ) async {
     await _pumpAzkar(tester);
 
     await _type(tester, 'باسمك');
@@ -120,8 +126,9 @@ void main() {
     expect(find.text('أذكار الصباح'), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0: search field and results survive the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: search field and results survive the layout', (
+    tester,
+  ) async {
     await _pumpAzkar(tester, scale: 2.0);
 
     await _type(tester, 'باسمك');

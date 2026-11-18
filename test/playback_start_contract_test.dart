@@ -68,44 +68,51 @@ void main() {
   });
 
   test(
-      'a playing event moves the mini player out of loading before load returns',
-      () async {
-    await db.into(db.reciters).insert(
-          RecitersCompanion.insert(
-            id: '51-53',
-            reciterName: 'عبدالباسط عبدالصمد',
-            moshafName: 'حفص مرتل',
-            server: 'https://server.example/mp3',
-            surahList: '1',
-            surahTotal: 114,
-          ),
-        );
-    final row = (await ReciterRepository(db).byId('51-53'))!;
+    'a playing event moves the mini player out of loading before load returns',
+    () async {
+      await db
+          .into(db.reciters)
+          .insert(
+            RecitersCompanion.insert(
+              id: '51-53',
+              reciterName: 'عبدالباسط عبدالصمد',
+              moshafName: 'حفص مرتل',
+              server: 'https://server.example/mp3',
+              surahList: '1',
+              surahTotal: 114,
+            ),
+          );
+      final row = (await ReciterRepository(db).byId('51-53'))!;
 
-    final pending = cubit.playSurah(row, 1);
-    // Wait until the cubit has bound the streams (the DB lookup runs first).
-    for (var i = 0; i < 100 && !service.playingCtrl.hasListener; i++) {
-      await Future<void>.delayed(const Duration(milliseconds: 1));
-    }
-    expect(service.playingCtrl.hasListener, isTrue);
-    expect(cubit.state, isA<PlaybackLoading>());
+      final pending = cubit.playSurah(row, 1);
+      // Wait until the cubit has bound the streams (the DB lookup runs first).
+      for (var i = 0; i < 100 && !service.playingCtrl.hasListener; i++) {
+        await Future<void>.delayed(const Duration(milliseconds: 1));
+      }
+      expect(service.playingCtrl.hasListener, isTrue);
+      expect(cubit.state, isA<PlaybackLoading>());
 
-    service.durationCtrl.add(const Duration(minutes: 3));
-    await Future<void>.delayed(Duration.zero);
+      service.durationCtrl.add(const Duration(minutes: 3));
+      await Future<void>.delayed(Duration.zero);
 
-    service.playingCtrl.add(true);
-    await Future<void>.delayed(Duration.zero);
-    expect(cubit.state, isA<PlaybackPlaying>());
-    expect(
-        (cubit.state as PlaybackPlaying).duration, const Duration(minutes: 3));
+      service.playingCtrl.add(true);
+      await Future<void>.delayed(Duration.zero);
+      expect(cubit.state, isA<PlaybackPlaying>());
+      expect(
+        (cubit.state as PlaybackPlaying).duration,
+        const Duration(minutes: 3),
+      );
 
-    service.loadGate.complete();
-    await pending;
-    expect(cubit.state, isA<PlaybackPlaying>());
-  });
+      service.loadGate.complete();
+      await pending;
+      expect(cubit.state, isA<PlaybackPlaying>());
+    },
+  );
 
   test('a pause before load settles is not undone by the late load', () async {
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -130,7 +137,10 @@ void main() {
 
     service.loadGate.complete();
     await pending;
-    expect(cubit.state, isA<PlaybackPaused>(),
-        reason: 'the late load completion must not emit playing after a pause');
+    expect(
+      cubit.state,
+      isA<PlaybackPaused>(),
+      reason: 'the late load completion must not emit playing after a pause',
+    );
   });
 }

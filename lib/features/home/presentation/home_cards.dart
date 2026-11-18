@@ -51,10 +51,9 @@ class _ContinueReadingCard extends StatelessWidget {
       margin: EdgeInsets.zero,
       child: InkWell(
         borderRadius: AppRadius.lgAll,
-        onTap: () => context.push(quranReaderPath(
-          surah: lastRead.surahId,
-          ayah: lastRead.ayahNumber,
-        )),
+        onTap: () => context.push(
+          quranReaderPath(surah: lastRead.surahId, ayah: lastRead.ayahNumber),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
@@ -74,8 +73,9 @@ class _ContinueReadingCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       loc.continueReadingAyah(loc.number(lastRead.ayahNumber)),
-                      style: AppTheme.caption
-                          .copyWith(color: colors.onSurfaceVariant),
+                      style: AppTheme.caption.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -95,11 +95,7 @@ class _ContinueReadingCard extends StatelessWidget {
 /// Extracted from the old card so [_TodayPanel] can place it inside one
 /// surface with the continue-reading row.
 class _PrayerBody extends StatelessWidget {
-  const _PrayerBody({
-    required this.prayer,
-    this.timezone,
-    this.cityNameEn,
-  });
+  const _PrayerBody({required this.prayer, this.timezone, this.cityNameEn});
 
   final NextPrayerCard prayer;
   final String? timezone;
@@ -138,8 +134,9 @@ class _PrayerBody extends StatelessWidget {
                 children: [
                   Text(
                     prayer.name.label(loc),
-                    style: AppTheme.heroTitle
-                        .copyWith(color: colors.onPrimaryContainer),
+                    style: AppTheme.heroTitle.copyWith(
+                      color: colors.onPrimaryContainer,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   // Time and city travel together so the block reads
@@ -254,8 +251,9 @@ class _NoCityCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       loc.noCity,
-                      style: AppTheme.caption
-                          .copyWith(color: colors.onSurfaceVariant),
+                      style: AppTheme.caption.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -307,10 +305,12 @@ class _TodayPanel extends StatelessWidget {
         children: [
           if (lastRead != null) ...[
             InkWell(
-              onTap: () => context.push(quranReaderPath(
-                surah: lastRead.surahId,
-                ayah: lastRead.ayahNumber,
-              )),
+              onTap: () => context.push(
+                quranReaderPath(
+                  surah: lastRead.surahId,
+                  ayah: lastRead.ayahNumber,
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: _ContinueRow(lastRead: lastRead),

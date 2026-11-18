@@ -23,12 +23,18 @@ void main() {
 
   test('both app themes carry the style on the AppBar', () {
     expect(
-      AppTheme.light.appBarTheme.systemOverlayStyle
+      AppTheme
+          .light
+          .appBarTheme
+          .systemOverlayStyle
           ?.systemNavigationBarIconBrightness,
       Brightness.dark,
     );
     expect(
-      AppTheme.dark.appBarTheme.systemOverlayStyle
+      AppTheme
+          .dark
+          .appBarTheme
+          .systemOverlayStyle
           ?.systemNavigationBarIconBrightness,
       Brightness.light,
     );

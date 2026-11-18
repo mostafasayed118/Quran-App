@@ -40,8 +40,10 @@ class RamadanScreen extends StatelessWidget {
           builder: (context, state) => switch (state) {
             RamadanLoading() => const LoadingView(),
             RamadanFailed() => errorPane(loc, onRetry: cubit.start),
-            RamadanReady(:final days) when days.isEmpty =>
-              EmptyState(loc.noCity, icon: Icons.location_off_outlined),
+            RamadanReady(:final days) when days.isEmpty => EmptyState(
+              loc.noCity,
+              icon: Icons.location_off_outlined,
+            ),
             RamadanReady(
               :final monthName,
               :final hijriYear,
@@ -125,16 +127,13 @@ class _RamadanHeader extends StatelessWidget {
           children: [
             Text(
               '$monthName ${loc.number(hijriYear)}',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: Theme.of(context).textTheme.titleLarge
+                  ?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               today == null
-                  ? loc.ramadanStartsOn(
-                      months.formatMediumDate(firstDay.date),
-                    )
+                  ? loc.ramadanStartsOn(months.formatMediumDate(firstDay.date))
                   : loc.ramadanToday(loc.number(today!.hijriDay)),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
@@ -142,16 +141,10 @@ class _RamadanHeader extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                  child: _TimePill(
-                    label: loc.ramadanImsak,
-                    time: anchor.imsak,
-                  ),
+                  child: _TimePill(label: loc.ramadanImsak, time: anchor.imsak),
                 ),
                 Expanded(
-                  child: _TimePill(
-                    label: loc.ramadanIftar,
-                    time: anchor.iftar,
-                  ),
+                  child: _TimePill(label: loc.ramadanIftar, time: anchor.iftar),
                 ),
               ],
             ),
@@ -159,8 +152,8 @@ class _RamadanHeader extends StatelessWidget {
             Text(
               loc.ramadanImsakNote,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -184,9 +177,9 @@ class _TimePill extends StatelessWidget {
         Text(
           formatHm(time, arabicIndic: loc.usesArabicIndicDigits),
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.primary,
-              ),
+            fontWeight: FontWeight.w700,
+            color: Theme.of(context).colorScheme.primary,
+          ),
         ),
       ],
     );
@@ -199,9 +192,8 @@ class _TableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final style = Theme.of(context).textTheme.labelSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-        );
+    final style = Theme.of(context).textTheme.labelSmall
+        ?.copyWith(fontWeight: FontWeight.w700);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
@@ -254,18 +246,16 @@ class _DayRow extends StatelessWidget {
               children: [
                 Text(
                   loc.number(day.hijriDay),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(context).textTheme.titleSmall
+                      ?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Text(
                     months.formatMediumDate(day.date),
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
+                    style: Theme.of(context).textTheme.bodySmall
+                        ?.copyWith(color: colors.onSurfaceVariant),
                   ),
                 ),
               ],

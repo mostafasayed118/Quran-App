@@ -30,41 +30,41 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      if (throwOn != null && call.method == throwOn) {
-        throw PlatformException(code: 'boom');
-      }
-      if (throwOnId != null && call.method == 'zonedSchedule') {
-        final args = call.arguments as Map<Object?, Object?>;
-        if (args['id'] == throwOnId) {
-          throw PlatformException(code: 'boom');
-        }
-      }
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return exact;
-        case 'areNotificationsEnabled':
-          return notificationsEnabled;
-        case 'requestNotificationsPermission':
-        case 'requestExactAlarmsPermission':
-          return true;
-        case 'getNotificationAppLaunchDetails':
-          return <String, Object?>{
-            'notificationLaunchedApp': true,
-            'notificationResponse': <String, Object?>{
-              'notificationId': 1,
-              'actionId': null,
-              'input': null,
-              'notificationResponseType': 0,
-              'payload': 'prayer',
-            },
-          };
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          if (throwOn != null && call.method == throwOn) {
+            throw PlatformException(code: 'boom');
+          }
+          if (throwOnId != null && call.method == 'zonedSchedule') {
+            final args = call.arguments as Map<Object?, Object?>;
+            if (args['id'] == throwOnId) {
+              throw PlatformException(code: 'boom');
+            }
+          }
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return exact;
+            case 'areNotificationsEnabled':
+              return notificationsEnabled;
+            case 'requestNotificationsPermission':
+            case 'requestExactAlarmsPermission':
+              return true;
+            case 'getNotificationAppLaunchDetails':
+              return <String, Object?>{
+                'notificationLaunchedApp': true,
+                'notificationResponse': <String, Object?>{
+                  'notificationId': 1,
+                  'actionId': null,
+                  'input': null,
+                  'notificationResponseType': 0,
+                  'payload': 'prayer',
+                },
+              };
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -87,8 +87,11 @@ void main() {
 
     await binding.scheduleAll(planA);
     final afterRetry = _zonedForId(calls, 1);
-    expect(afterRetry, greaterThanOrEqualTo(2),
-        reason: 'cancelAll cleared the alarms, so plan A must be re-scheduled');
+    expect(
+      afterRetry,
+      greaterThanOrEqualTo(2),
+      reason: 'cancelAll cleared the alarms, so plan A must be re-scheduled',
+    );
   });
 
   test('one rejected alarm does not skip the later chunks', () async {
@@ -99,17 +102,25 @@ void main() {
     throwOnId = 9;
     await binding.scheduleAll(plan);
 
-    expect(_zonedForId(calls, 9), 1,
-        reason: 'the failing alarm is attempted and rejected');
-    expect(_zonedForId(calls, 17), 1,
-        reason: 'the alarm after the failing chunk must still be scheduled');
+    expect(
+      _zonedForId(calls, 9),
+      1,
+      reason: 'the failing alarm is attempted and rejected',
+    );
+    expect(
+      _zonedForId(calls, 17),
+      1,
+      reason: 'the alarm after the failing chunk must still be scheduled',
+    );
   });
 }
 
 int _zonedForId(List<MethodCall> calls, int id) => calls
-    .where((call) =>
-        call.method == 'zonedSchedule' &&
-        (call.arguments as Map<Object?, Object?>)['id'] == id)
+    .where(
+      (call) =>
+          call.method == 'zonedSchedule' &&
+          (call.arguments as Map<Object?, Object?>)['id'] == id,
+    )
     .length;
 
 ScheduledReminder _reminder({
@@ -118,11 +129,10 @@ ScheduledReminder _reminder({
   String? body,
   String? payload,
   DateTime? fireAt,
-}) =>
-    ScheduledReminder(
-      id: id,
-      fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
-      title: title,
-      body: body,
-      payload: payload,
-    );
+}) => ScheduledReminder(
+  id: id,
+  fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
+  title: title,
+  body: body,
+  payload: payload,
+);

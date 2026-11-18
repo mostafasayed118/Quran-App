@@ -11,10 +11,7 @@ void main() {
     final repo = PrayerLogRepository(db);
     final now = DateTime.now();
     for (var i = 0; i <= 400; i++) {
-      await repo.togglePrayer(
-        now.subtract(Duration(days: i)),
-        PrayerSlot.fajr,
-      );
+      await repo.togglePrayer(now.subtract(Duration(days: i)), PrayerSlot.fajr);
     }
 
     final cubit = TrackerCubit(repo: repo);
@@ -22,8 +19,12 @@ void main() {
     await cubit.start();
     await cubit.loaded;
 
-    expect((cubit.state as TrackerReady).streakDays, 401,
-        reason: 'the lookback must not decide how long a user can keep a '
-            'streak; the old 400-day window truncated it silently');
+    expect(
+      (cubit.state as TrackerReady).streakDays,
+      401,
+      reason:
+          'the lookback must not decide how long a user can keep a '
+          'streak; the old 400-day window truncated it silently',
+    );
   });
 }

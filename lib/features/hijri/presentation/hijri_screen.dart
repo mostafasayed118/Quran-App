@@ -29,8 +29,10 @@ class HijriScreen extends StatelessWidget {
         child: BlocBuilder<HijriCubit, HijriState>(
           builder: (context, state) => switch (state) {
             HijriLoading() => const LoadingView(),
-            HijriFailed() =>
-              errorPane(loc, onRetry: context.read<HijriCubit>().start),
+            HijriFailed() => errorPane(
+              loc,
+              onRetry: context.read<HijriCubit>().start,
+            ),
             HijriReady(
               :final monthName,
               :final year,
@@ -68,14 +70,7 @@ class _TodayCard extends StatelessWidget {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Text(
-              todayHeader,
-              style: AppTheme.rowTitle,
-            ),
-          ],
-        ),
+        child: Column(children: [Text(todayHeader, style: AppTheme.rowTitle)]),
       ),
     );
   }

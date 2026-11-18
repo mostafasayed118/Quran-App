@@ -54,7 +54,7 @@ double smoothHeadingDeg(double previous, double sample) {
 /// qibla screen then stays in its static mode.
 class HeadingService {
   HeadingService({HeadingStreamFactory? streamFactory})
-      : _streamFactory = streamFactory ?? _deviceHeadingStream;
+    : _streamFactory = streamFactory ?? _deviceHeadingStream;
 
   final HeadingStreamFactory _streamFactory;
 

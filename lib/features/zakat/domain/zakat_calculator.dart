@@ -123,7 +123,8 @@ class ZakatCalculator {
     required double goldPricePerGram,
     required double silverPricePerGram,
   }) {
-    final zakatable = input.cash +
+    final zakatable =
+        input.cash +
         input.goldGrams * goldPricePerGram +
         input.silverGrams * silverPricePerGram -
         input.debts;

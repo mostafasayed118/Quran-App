@@ -10,13 +10,13 @@ import 'reciter_repository.dart';
 extension ReciterRowMapping on ReciterRow {
   /// Maps this row to the presentation-facing [ReciterInfo] model.
   ReciterInfo toInfo() => ReciterInfo(
-        id: id,
-        reciterName: reciterName,
-        moshafName: moshafName,
-        server: server,
-        surahList: surahList,
-        surahTotal: surahTotal,
-      );
+    id: id,
+    reciterName: reciterName,
+    moshafName: moshafName,
+    server: server,
+    surahList: surahList,
+    surahTotal: surahTotal,
+  );
 }
 
 /// Featured predicate for mapped entities: mirrors [isFeaturedReciterRow]

@@ -31,19 +31,21 @@ void main() {
   const cairo = CityCoordinates(30.0444, 31.2357);
   final day = DateTime(2026, 11, 1);
 
-  test('configured port delegates to the calculator with the cached config',
-      () {
-    final source = _FakeSource();
-    final port = ConfiguredPrayerTimes(source);
+  test(
+    'configured port delegates to the calculator with the cached config',
+    () {
+      final source = _FakeSource();
+      final port = ConfiguredPrayerTimes(source);
 
-    final configured = port.today(cairo, day);
-    final expected = prayerTimesFor(cairo, day, PrayerConfig.egyptian);
+      final configured = port.today(cairo, day);
+      final expected = prayerTimesFor(cairo, day, PrayerConfig.egyptian);
 
-    expect(configured.map((e) => e.name), expected.map((e) => e.name));
-    for (var i = 0; i < configured.length; i++) {
-      expect(configured[i].time, expected[i].time);
-    }
-  });
+      expect(configured.map((e) => e.name), expected.map((e) => e.name));
+      for (var i = 0; i < configured.length; i++) {
+        expect(configured[i].time, expected[i].time);
+      }
+    },
+  );
 
   test('a changed source changes the next computed times', () async {
     final source = _FakeSource();

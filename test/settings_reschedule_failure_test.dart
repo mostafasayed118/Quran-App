@@ -40,11 +40,11 @@ void main() {
   tearDown(() async => db.close());
 
   SettingsCubit build() => SettingsCubit(
-        settings: settings,
-        city: city,
-        prayer: prayer,
-        scheduler: _ThrowingScheduler(),
-      );
+    settings: settings,
+    city: city,
+    prayer: prayer,
+    scheduler: _ThrowingScheduler(),
+  );
 
   test('a failed re-plan still shows the committed azkar enable', () async {
     final cubit = build();

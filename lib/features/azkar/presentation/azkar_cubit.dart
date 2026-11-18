@@ -20,10 +20,10 @@ class AzkarCubit extends Cubit<AzkarState> {
     required AzkarRepository repository,
     AzkarSavedStateSource? savedState,
     DateTime Function()? clock,
-  })  : _repository = repository,
-        _savedState = savedState,
-        _clock = clock ?? DateTime.now,
-        super(const AzkarState.loading());
+  }) : _repository = repository,
+       _savedState = savedState,
+       _clock = clock ?? DateTime.now,
+       super(const AzkarState.loading());
 
   /// Starts the route-scoped load; the constructor intentionally does no
   /// work. The route scope calls this once, from the widget lifecycle.
@@ -67,8 +67,12 @@ class AzkarCubit extends Cubit<AzkarState> {
       _searchSeq++;
       emit(_browsing());
     } on Object catch (error, stackTrace) {
-      appLog('azkar load failed',
-          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      appLog(
+        'azkar load failed',
+        name: 'quran_yahdi/azkar',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const AzkarState.failed());
       return;
@@ -102,10 +106,12 @@ class AzkarCubit extends Cubit<AzkarState> {
         : AzkarSavedState(favorites: favorites);
     final state = this.state;
     if (state is AzkarBrowsing) {
-      emit(state.copyWith(
-        collections: _favoritesFirst(_catalog),
-        favorites: _saved.favorites,
-      ));
+      emit(
+        state.copyWith(
+          collections: _favoritesFirst(_catalog),
+          favorites: _saved.favorites,
+        ),
+      );
     }
   }
 
@@ -125,14 +131,20 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       final results = await _repository.search(query);
       if (isClosed || seq != _searchSeq) return;
-      emit(_browsing(
-        query: query,
-        searchResults: results.hits,
-        searchHasMore: results.hasMore,
-      ));
+      emit(
+        _browsing(
+          query: query,
+          searchResults: results.hits,
+          searchHasMore: results.hasMore,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('azkar search failed',
-          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      appLog(
+        'azkar search failed',
+        name: 'quran_yahdi/azkar',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || seq != _searchSeq) return;
       emit(_browsing(query: query));
     }
@@ -162,10 +174,12 @@ class AzkarCubit extends Cubit<AzkarState> {
 
   void _emitReciting(AzkarCollection collection) {
     _searchSeq++;
-    emit(AzkarState.reciting(
-      collection: collection,
-      remaining: _remainingFor(collection),
-    ));
+    emit(
+      AzkarState.reciting(
+        collection: collection,
+        remaining: _remainingFor(collection),
+      ),
+    );
   }
 
   /// Counts one tap on the item at [index]; the counter stops at zero.
@@ -193,9 +207,7 @@ class AzkarCubit extends Cubit<AzkarState> {
     if (isClosed) return;
     final state = this.state;
     if (state is! AzkarReciting) return;
-    final remaining = [
-      for (final item in state.collection.items) item.count,
-    ];
+    final remaining = [for (final item in state.collection.items) item.count];
     emit(state.copyWith(remaining: remaining));
     unawaited(_persistRemaining(state.collection.id, remaining));
   }
@@ -213,10 +225,12 @@ class AzkarCubit extends Cubit<AzkarState> {
     );
     final state = this.state;
     if (state is AzkarBrowsing) {
-      emit(state.copyWith(
-        collections: _favoritesFirst(_catalog),
-        favorites: favorites,
-      ));
+      emit(
+        state.copyWith(
+          collections: _favoritesFirst(_catalog),
+          favorites: favorites,
+        ),
+      );
     }
     unawaited(_persistFavorites(favorites));
   }
@@ -279,8 +293,12 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       return await source.load();
     } on Object catch (error, stackTrace) {
-      appLog('azkar saved state read failed',
-          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      appLog(
+        'azkar saved state read failed',
+        name: 'quran_yahdi/azkar',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return const AzkarSavedState();
     }
   }
@@ -294,7 +312,9 @@ class AzkarCubit extends Cubit<AzkarState> {
   }
 
   Future<void> _persistRemaining(
-      String collectionId, List<int> remaining) async {
+    String collectionId,
+    List<int> remaining,
+  ) async {
     final source = _savedState;
     if (source == null) return;
     final day = _today;
@@ -311,8 +331,12 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       await source.saveRemaining(collectionId, remaining, day);
     } on Object catch (error, stackTrace) {
-      appLog('azkar counter write failed',
-          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      appLog(
+        'azkar counter write failed',
+        name: 'quran_yahdi/azkar',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -322,8 +346,12 @@ class AzkarCubit extends Cubit<AzkarState> {
     try {
       await source.saveFavorites(favorites);
     } on Object catch (error, stackTrace) {
-      appLog('azkar favorites write failed',
-          name: 'quran_yahdi/azkar', error: error, stackTrace: stackTrace);
+      appLog(
+        'azkar favorites write failed',
+        name: 'quran_yahdi/azkar',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 }

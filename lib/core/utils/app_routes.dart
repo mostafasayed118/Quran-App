@@ -70,7 +70,7 @@ String quranSearchPath({String query = ''}) {
   return trimmed.isEmpty
       ? AppRoutes.quranSearch
       : '${AppRoutes.quranSearch}?${AppRouteQuery.q}='
-          '${Uri.encodeQueryComponent(trimmed)}';
+            '${Uri.encodeQueryComponent(trimmed)}';
 }
 
 /// `/quran/reader?surah={surah}[&ayah={ayah}]`

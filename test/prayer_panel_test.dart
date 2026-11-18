@@ -39,8 +39,10 @@ void main() {
         PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
         PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
       ]
-      ..nextResult =
-          PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35));
+      ..nextResult = PrayerChoice(
+        PrayerName.asr,
+        DateTime(2026, 3, 15, 15, 35),
+      );
   });
 
   Future<void> pumpScreen(
@@ -62,8 +64,9 @@ void main() {
     );
   }
 
-  testWidgets('the six times live in one panel instead of six cards',
-      (tester) async {
+  testWidgets('the six times live in one panel instead of six cards', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     await pumpScreen(tester);
 
@@ -71,16 +74,18 @@ void main() {
     expect(find.byType(Card), findsNWidgets(2));
   });
 
-  testWidgets('only the next prayer carries the schedule glyph',
-      (tester) async {
+  testWidgets('only the next prayer carries the schedule glyph', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     await pumpScreen(tester);
 
     expect(find.byIcon(Icons.schedule), findsOneWidget);
   });
 
-  testWidgets('sunrise is marked as a time marker, not as a prayer',
-      (tester) async {
+  testWidgets('sunrise is marked as a time marker, not as a prayer', (
+    tester,
+  ) async {
     await repo.select(cairoCity);
     await pumpScreen(tester);
 

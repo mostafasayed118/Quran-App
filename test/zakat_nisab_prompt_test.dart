@@ -9,40 +9,52 @@ import 'support/host.dart';
 
 void main() {
   testWidgets(
-      'cash without the active nisab price prompts; adding the price restores the verdict',
-      (tester) async {
-    final cubit = ZakatCubit();
-    addTearDown(cubit.close);
-    await tester.pumpWidget(BlocProvider<ZakatCubit>.value(
-      value: cubit,
-      child: appShell(home: const ZakatScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    'cash without the active nisab price prompts; adding the price restores the verdict',
+    (tester) async {
+      final cubit = ZakatCubit();
+      addTearDown(cubit.close);
+      await tester.pumpWidget(
+        BlocProvider<ZakatCubit>.value(
+          value: cubit,
+          child: appShell(home: const ZakatScreen()),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.text('لا زكاة عليك'), findsOneWidget);
+      expect(find.text('لا زكاة عليك'), findsOneWidget);
 
-    final fields = find.byType(TextField);
-    expect(fields, findsNWidgets(6));
+      final fields = find.byType(TextField);
+      expect(fields, findsNWidgets(6));
 
-    // Field order: gold g, silver g, gold price, silver price, cash, debts.
-    // Cash only — the active silver price (default mode) stays blank.
-    await tester.enterText(fields.at(4), '1000');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      // Field order: gold g, silver g, gold price, silver price, cash, debts.
+      // Cash only — the active silver price (default mode) stays blank.
+      await tester.enterText(fields.at(4), '1000');
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsOneWidget);
-    expect(find.text('الزكاة الواجبة'), findsNothing);
-    expect(find.text('لا زكاة عليك'), findsNothing);
-    expect(find.textContaining('٢٥'), findsNothing);
+      expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsOneWidget);
+      expect(find.text('الزكاة الواجبة'), findsNothing);
+      expect(find.text('لا زكاة عليك'), findsNothing);
+      expect(find.textContaining('٢٥'), findsNothing);
 
-    // Supply the silver price → the normal verdict and amount appear.
-    await tester.enterText(fields.at(3), '1');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      // Supply the silver price → the normal verdict and amount appear.
+      await tester.enterText(fields.at(3), '1');
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsNothing);
-    expect(find.text('الزكاة الواجبة'), findsOneWidget);
-    expect(find.textContaining('٢٥'), findsOneWidget);
-  });
+      expect(find.text('أدخل سعر الذهب/الفضة لحساب النصاب'), findsNothing);
+      expect(find.text('الزكاة الواجبة'), findsOneWidget);
+      expect(find.textContaining('٢٥'), findsOneWidget);
+    },
+  );
 }

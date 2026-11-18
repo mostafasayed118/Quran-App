@@ -9,8 +9,8 @@ class _Source implements TranslationSearchSource {
 
   @override
   Future<Map<int, String>> translationIndex(String packId) async => {
-        1001: 'In the name of Allah, the Entirely Merciful',
-      };
+    1001: 'In the name of Allah, the Entirely Merciful',
+  };
 }
 
 void main() {
@@ -29,8 +29,11 @@ void main() {
 
     await cubit.start();
 
-    expect(runs, 1,
-        reason: 'every installed pack is normalized in one off-isolate pass');
+    expect(
+      runs,
+      1,
+      reason: 'every installed pack is normalized in one off-isolate pass',
+    );
     expect((cubit.state as TranslationSearchReady).hasPacks, isTrue);
 
     cubit.setQuery('merciful');

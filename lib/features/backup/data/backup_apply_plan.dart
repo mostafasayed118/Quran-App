@@ -22,16 +22,16 @@ class _ApplyPlan {
   final int? khatmaRowId;
 
   BackupSummary get summary => BackupSummary(
-        newBookmarks: bookmarks.newCount,
-        mergedPrayerDays: prayerLog.mergedDays,
-        planReplaced: khatma.replaced,
-        tasbihCountDelta: tasbih.countDelta,
-        tasbihChanged: tasbih.changed,
-        lastReadChanged: lastRead.changed,
-        settingsKeysApplied: settings.appliedCount,
-        rejectedEntries: bookmarks.rejected + khatma.rejected,
-        skippedSettingsDocuments: settings.skippedDocuments.length,
-      );
+    newBookmarks: bookmarks.newCount,
+    mergedPrayerDays: prayerLog.mergedDays,
+    planReplaced: khatma.replaced,
+    tasbihCountDelta: tasbih.countDelta,
+    tasbihChanged: tasbih.changed,
+    lastReadChanged: lastRead.changed,
+    settingsKeysApplied: settings.appliedCount,
+    rejectedEntries: bookmarks.rejected + khatma.rejected,
+    skippedSettingsDocuments: settings.skippedDocuments.length,
+  );
 
   bool get reminderRelevantChanged =>
       settings.toWrite.keys.any(kBackupReminderRelevantKeys.contains);

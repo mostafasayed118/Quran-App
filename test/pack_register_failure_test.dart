@@ -18,11 +18,15 @@ class _FakeCdn implements HttpClientAdapter {
   final List<String> requested = <String>[];
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     requested.add(options.uri.toString());
     final bytes = Uint8List.fromList(
-        utf8.encode('{"quran":[{"chapter":1,"verse":1,"text":"text"}]}'));
+      utf8.encode('{"quran":[{"chapter":1,"verse":1,"text":"text"}]}'),
+    );
     return ResponseBody(
       Stream<Uint8List>.value(bytes),
       200,
@@ -38,8 +42,7 @@ class _FakeCdn implements HttpClientAdapter {
 }
 
 void main() {
-  test('a failed registry write does not leave a promoted pack orphan',
-      () async {
+  test('a failed registry write does not leave a promoted pack orphan', () async {
     final db = newTestDb();
     final root = await Directory.systemTemp.createTemp('qy_pack_register');
     addTearDown(() async {

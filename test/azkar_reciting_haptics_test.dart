@@ -10,68 +10,94 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 import 'support/host.dart';
 
 Map<String, dynamic> fixtureRoot() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
-            {'text': 'ذِكْرٌ وَاحِدٌ'},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
+        {'text': 'ذِكْرٌ وَاحِدٌ'},
       ],
-    };
+    },
+  ],
+};
 
 void main() {
-  testWidgets('reciting taps fire selection haptics; done and browsing do not',
-      (tester) async {
-    final haptics = <MethodCall>[];
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'HapticFeedback.vibrate') haptics.add(call);
-        return null;
-      },
-    );
-    addTearDown(() => tester.binding.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null));
+  testWidgets(
+    'reciting taps fire selection haptics; done and browsing do not',
+    (tester) async {
+      final haptics = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async {
+          if (call.method == 'HapticFeedback.vibrate') haptics.add(call);
+          return null;
+        },
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        ),
+      );
 
-    final cubit = AzkarCubit(
-      repository: AzkarRepository(loader: () async => fixtureRoot()),
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
-    await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-      value: cubit,
-      child: appShell(home: const AzkarScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      final cubit = AzkarCubit(
+        repository: AzkarRepository(loader: () async => fixtureRoot()),
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
+      await tester.pumpWidget(
+        BlocProvider<AzkarCubit>.value(
+          value: cubit,
+          child: appShell(home: const AzkarScreen()),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(haptics, isEmpty);
+      await tester.tap(find.text('أذكار الصباح'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(haptics, isEmpty);
 
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(haptics, hasLength(1));
-    expect(haptics.single.arguments, 'HapticFeedbackType.selectionClick');
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(haptics, hasLength(1));
+      expect(haptics.single.arguments, 'HapticFeedbackType.selectionClick');
 
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(haptics, hasLength(3));
-    expect(find.byIcon(Icons.check), findsOneWidget);
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(haptics, hasLength(3));
+      expect(find.byIcon(Icons.check), findsOneWidget);
 
-    await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(haptics, hasLength(3));
-  });
+      await tester.tap(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      expect(haptics, hasLength(3));
+    },
+  );
 }

@@ -68,10 +68,16 @@ void main() {
       expect(cubit.state.heading, 90.0);
 
       await cubit.pause();
-      expect(factory.controllers[0].hasListener, isFalse,
-          reason: 'pause must cancel the magnetometer subscription');
-      expect(cubit.state.heading, 90.0,
-          reason: 'the last heading stays displayed while paused');
+      expect(
+        factory.controllers[0].hasListener,
+        isFalse,
+        reason: 'pause must cancel the magnetometer subscription',
+      );
+      expect(
+        cubit.state.heading,
+        90.0,
+        reason: 'the last heading stays displayed while paused',
+      );
 
       // A paused stream must not reach the cubit even if it somehow buffers.
       factory.controllers[0].add(45.0);
@@ -92,31 +98,35 @@ void main() {
       expect(cubit.state.heading, 17.0);
     });
 
-    test('resume is idempotent: an already-bound cubit is not re-bound',
-        () async {
-      final factory = _TwoStreamFactory();
-      addTearDown(factory.close);
-      final cubit = QiblaCubit(
-        city: repo,
-        qibla: FakeQiblaService(),
-        heading: HeadingService(streamFactory: factory.call),
-      );
-      addTearDown(cubit.close);
-      await cubit.start();
+    test(
+      'resume is idempotent: an already-bound cubit is not re-bound',
+      () async {
+        final factory = _TwoStreamFactory();
+        addTearDown(factory.close);
+        final cubit = QiblaCubit(
+          city: repo,
+          qibla: FakeQiblaService(),
+          heading: HeadingService(streamFactory: factory.call),
+        );
+        addTearDown(cubit.close);
+        await cubit.start();
 
-      cubit.resume();
-      expect(factory.calls, 1);
-    });
+        cubit.resume();
+        expect(factory.calls, 1);
+      },
+    );
   });
 
   group('QiblaScreen app lifecycle', () {
-    testWidgets('backgrounding pauses the cubit and resuming re-acquires',
-        (tester) async {
+    testWidgets('backgrounding pauses the cubit and resuming re-acquires', (
+      tester,
+    ) async {
       final factory = _TwoStreamFactory();
       addTearDown(factory.close);
       addTearDown(
-        () => tester.binding
-            .handleAppLifecycleStateChanged(AppLifecycleState.resumed),
+        () => tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        ),
       );
       await repo.select(cairoCity);
       final cubit = QiblaCubit(

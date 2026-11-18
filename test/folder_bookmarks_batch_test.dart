@@ -48,23 +48,20 @@ class _CountingBatch implements AyahBatchLookup {
   Future<List<Ayah>> ayahsByIds(List<int> ids) async {
     calls++;
     lastIds = ids;
-    return [
-      for (final id in ids)
-        ?rows[id],
-    ];
+    return [for (final id in ids) ?rows[id]];
   }
 }
 
 Ayah _ayah(int id, int surah, int number, String text) => Ayah(
-      id: id,
-      surahId: surah,
-      numberInSurah: number,
-      juz: 1,
-      page: 1,
-      textUthmani: text,
-      textImlaei: text,
-      sajda: false,
-    );
+  id: id,
+  surahId: surah,
+  numberInSurah: number,
+  juz: 1,
+  page: 1,
+  textUthmani: text,
+  textImlaei: text,
+  sajda: false,
+);
 
 void main() {
   final meta = _Meta({
@@ -96,24 +93,26 @@ void main() {
     expect(single.calls, 0, reason: 'the per-id loop must not also run');
   });
 
-  test('without the batch port the per-id path still resolves the folder',
-      () async {
-    final single = _Single({
-      8: _ayah(8, 2, 1, 'الم'),
-      9: _ayah(9, 2, 2, 'ذلك الكتاب'),
-    });
-    final cubit = FolderBookmarksCubit(
-      folder: 'تفسير',
-      meta: meta,
-      ayahs: single,
-    );
-    addTearDown(cubit.close);
+  test(
+    'without the batch port the per-id path still resolves the folder',
+    () async {
+      final single = _Single({
+        8: _ayah(8, 2, 1, 'الم'),
+        9: _ayah(9, 2, 2, 'ذلك الكتاب'),
+      });
+      final cubit = FolderBookmarksCubit(
+        folder: 'تفسير',
+        meta: meta,
+        ayahs: single,
+      );
+      addTearDown(cubit.close);
 
-    await cubit.start();
+      await cubit.start();
 
-    final ready = cubit.state as FolderBookmarksReady;
-    expect(ready.items, hasLength(2));
-    expect(ready.items.last.note, 'الثانية');
-    expect(single.calls, 2, reason: 'frozen doubles keep the old path');
-  });
+      final ready = cubit.state as FolderBookmarksReady;
+      expect(ready.items, hasLength(2));
+      expect(ready.items.last.note, 'الثانية');
+      expect(single.calls, 2, reason: 'frozen doubles keep the old path');
+    },
+  );
 }

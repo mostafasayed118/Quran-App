@@ -55,8 +55,9 @@ void main() {
     await cubit.close();
   });
 
-  testWidgets('the screen shows the localized failure snackbar once',
-      (tester) async {
+  testWidgets('the screen shows the localized failure snackbar once', (
+    tester,
+  ) async {
     final cubit = await build();
     addTearDown(cubit.close);
     await pumpAppHost(

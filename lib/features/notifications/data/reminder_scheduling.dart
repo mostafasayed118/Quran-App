@@ -48,8 +48,11 @@ Future<List<ScheduledReminder>> scheduleReminders({
     );
     PrayerChoice? nextEnabled;
     if (selected != null && !hasFuturePrayer) {
-      final tomorrow =
-          DateTime(nowLocal.year, nowLocal.month, nowLocal.day + 1);
+      final tomorrow = DateTime(
+        nowLocal.year,
+        nowLocal.month,
+        nowLocal.day + 1,
+      );
       final tomorrowPrayers = prayer.today(selected.coordinates, tomorrow);
       for (final choice in tomorrowPrayers) {
         if (choice.name == PrayerName.sunrise) continue;

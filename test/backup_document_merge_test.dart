@@ -5,8 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/features/backup/data/backup_inventory.dart';
 import 'package:quran_yahdi/features/backup/data/backup_merger.dart';
 
-Map<String, String> _one(String key, Object value) =>
-    <String, String>{key: jsonEncode(value)};
+Map<String, String> _one(String key, Object value) => <String, String>{
+  key: jsonEncode(value),
+};
 
 Map<String, Object?> _decodeMap(SettingsMerge merge, String key) =>
     jsonDecode(merge.toWrite[key]!) as Map<String, Object?>;
@@ -94,10 +95,10 @@ void main() {
       imported: _one(backupKeyAzkarFavorites, ['evening', 'morning']),
     );
 
-    expect(
-      _decodeList(merge, backupKeyAzkarFavorites).toSet(),
-      {'morning', 'evening'},
-    );
+    expect(_decodeList(merge, backupKeyAzkarFavorites).toSet(), {
+      'morning',
+      'evening',
+    });
   });
 
   test('azkar progress is export-only (one day, not date-keyed)', () {

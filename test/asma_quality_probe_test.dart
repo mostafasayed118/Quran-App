@@ -10,21 +10,21 @@ import 'package:quran_yahdi/features/asma/presentation/asma_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 List<Map<String, dynamic>> stressedFixture() => [
-      {
-        'n': 1,
-        'nameAr': 'الرحمن',
-        'nameEn': 'The Most Compassionate',
-        'meaningAr': 'ذو الرحمة الواسعة التي وسعت كل شيء',
-        'meaningEn': 'The Most Compassionate, Owner of all-embracing mercy',
-      },
-      {
-        'n': 2,
-        'nameAr': 'الرحيم',
-        'nameEn': 'The Most Merciful',
-        'meaningAr': 'النازل بالرحمة',
-        'meaningEn': 'The Most Merciful',
-      },
-    ];
+  {
+    'n': 1,
+    'nameAr': 'الرحمن',
+    'nameEn': 'The Most Compassionate',
+    'meaningAr': 'ذو الرحمة الواسعة التي وسعت كل شيء',
+    'meaningEn': 'The Most Compassionate, Owner of all-embracing mercy',
+  },
+  {
+    'n': 2,
+    'nameAr': 'الرحيم',
+    'nameEn': 'The Most Merciful',
+    'meaningAr': 'النازل بالرحمة',
+    'meaningEn': 'The Most Merciful',
+  },
+];
 
 Future<void> pumpAsmaAt2x(WidgetTester tester) async {
   final cubit = AsmaCubit(
@@ -32,28 +32,33 @@ Future<void> pumpAsmaAt2x(WidgetTester tester) async {
   );
   addTearDown(cubit.close);
   await cubit.start();
-  await tester.pumpWidget(BlocProvider<AsmaCubit>.value(
-    value: cubit,
-    child: MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(2.0)),
-        child: child!,
+  await tester.pumpWidget(
+    BlocProvider<AsmaCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(2.0)),
+          child: child!,
+        ),
+        home: const AsmaScreen(),
       ),
-      home: const AsmaScreen(),
     ),
-  ));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  );
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
@@ -63,8 +68,9 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
-  testWidgets('textScale 2.0 on a 360-wide phone: the grid survives',
-      (tester) async {
+  testWidgets('textScale 2.0 on a 360-wide phone: the grid survives', (
+    tester,
+  ) async {
     usePhoneViewport(tester);
     await pumpAsmaAt2x(tester);
 
@@ -78,8 +84,11 @@ void main() {
     await pumpAsmaAt2x(tester);
 
     await tester.tap(find.text('الرحمن'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('ذو الرحمة الواسعة التي وسعت كل شيء'), findsOneWidget);

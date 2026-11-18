@@ -8,15 +8,20 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'support/host.dart';
 
 void main() {
-  testWidgets('PrayerNameLabel maps every prayer to its existing l10n key',
-      (tester) async {
+  testWidgets('PrayerNameLabel maps every prayer to its existing l10n key', (
+    tester,
+  ) async {
     late AppLocalizations loc;
-    await tester.pumpWidget(appShell(home: Builder(
-      builder: (context) {
-        loc = AppLocalizations.of(context);
-        return const SizedBox.shrink();
-      },
-    )));
+    await tester.pumpWidget(
+      appShell(
+        home: Builder(
+          builder: (context) {
+            loc = AppLocalizations.of(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
 
     expect(PrayerName.fajr.label(loc), 'فجر');
     expect(PrayerName.sunrise.label(loc), 'شروق');

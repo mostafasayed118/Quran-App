@@ -26,11 +26,9 @@ class QadaRepository implements QadaSource {
 
   @override
   Future<void> saveMissed(List<DateTime> dates) => _settings.write(
-        key,
-        jsonEncode([
-          for (final date in normalize(dates)) _encodeDate(date),
-        ]),
-      );
+    key,
+    jsonEncode([for (final date in normalize(dates)) _encodeDate(date)]),
+  );
 
   /// Date-only, de-duplicated, ascending.
   static List<DateTime> normalize(Iterable<DateTime> dates) {

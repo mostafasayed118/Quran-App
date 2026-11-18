@@ -35,21 +35,22 @@ class _MetaSource implements BookmarkMetaSource {
 }
 
 BookmarkEntry _entry(String text) => BookmarkEntry(
-      ayah: Ayah(
-        id: 9,
-        surahId: 2,
-        numberInSurah: 2,
-        juz: 1,
-        page: 2,
-        textUthmani: text,
-        textImlaei: text,
-        sajda: false,
-      ),
-    );
+  ayah: Ayah(
+    id: 9,
+    surahId: 2,
+    numberInSurah: 2,
+    juz: 1,
+    page: 2,
+    textUthmani: text,
+    textImlaei: text,
+    sajda: false,
+  ),
+);
 
 void main() {
-  testWidgets('shows the folder chip, the note and edits the note',
-      (tester) async {
+  testWidgets('shows the folder chip, the note and edits the note', (
+    tester,
+  ) async {
     final db = newTestDb();
     final source = _MetaSource({
       9: const BookmarkMetaEntry(folder: 'تفسير', note: 'ملاحظة قديمة'),
@@ -63,29 +64,40 @@ void main() {
     await bookmarks.start();
     await meta.start();
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<BookmarksCubit>.value(value: bookmarks),
-        BlocProvider<BookmarkMetaCubit>.value(value: meta),
-      ],
-      child: appShell(home: const BookmarksScreen(showMeta: true)),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<BookmarksCubit>.value(value: bookmarks),
+          BlocProvider<BookmarkMetaCubit>.value(value: meta),
+        ],
+        child: appShell(home: const BookmarksScreen(showMeta: true)),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تفسير'), findsWidgets);
     expect(find.text('ملاحظة قديمة'), findsOneWidget);
     expect(find.byIcon(Icons.edit_note), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.edit_note));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('تعديل الملاحظة والمجلد'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField).at(1), 'ملاحظة جديدة');
     await tester.tap(find.widgetWithText(TextButton, 'حفظ'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(source.entries[9]?.note, 'ملاحظة جديدة');
     expect(find.text('ملاحظة جديدة'), findsOneWidget);

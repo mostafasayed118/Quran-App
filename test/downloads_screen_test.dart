@@ -21,23 +21,31 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_downloads_screen');
-    await db.into(db.reciters).insert(RecitersCompanion.insert(
-          id: '51-53',
-          reciterName: 'عبدالباسط عبدالصمد',
-          moshafName: 'حفص عن عاصم - مرتل',
-          server: 'https://server.mp3quran.net',
-          surahList: '1',
-          surahTotal: 114,
-        ));
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makki',
-          ayahCount: 7,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
+    await db
+        .into(db.reciters)
+        .insert(
+          RecitersCompanion.insert(
+            id: '51-53',
+            reciterName: 'عبدالباسط عبدالصمد',
+            moshafName: 'حفص عن عاصم - مرتل',
+            server: 'https://server.mp3quran.net',
+            surahList: '1',
+            surahTotal: 114,
+          ),
+        );
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makki',
+            ayahCount: 7,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
   });
 
   tearDown(() async {
@@ -45,15 +53,20 @@ void main() {
   });
 
   Future<void> insertDone({int bytes = 1572864}) async {
-    await db.into(db.downloads).insert(DownloadsCompanion.insert(
-          reciterId: '51-53',
-          surahId: 1,
-          status: 'done',
-          path: '${tempRoot.path}${Platform.pathSeparator}audio'
-              '${Platform.pathSeparator}51-53'
-              '${Platform.pathSeparator}001.mp3',
-          bytes: Value(bytes),
-        ));
+    await db
+        .into(db.downloads)
+        .insert(
+          DownloadsCompanion.insert(
+            reciterId: '51-53',
+            surahId: 1,
+            status: 'done',
+            path:
+                '${tempRoot.path}${Platform.pathSeparator}audio'
+                '${Platform.pathSeparator}51-53'
+                '${Platform.pathSeparator}001.mp3',
+            bytes: Value(bytes),
+          ),
+        );
   }
 
   Future<DownloadsCubit> pumpScreen(WidgetTester tester) async {
@@ -68,8 +81,11 @@ void main() {
         child: appShell(home: const DownloadsScreen()),
       ),
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     return cubit;
   }
 
@@ -81,8 +97,9 @@ void main() {
     expect(find.byType(ListTile), findsNothing);
   });
 
-  testWidgets('an installed row renders the reciter, the surah and the size',
-      (tester) async {
+  testWidgets('an installed row renders the reciter, the surah and the size', (
+    tester,
+  ) async {
     await insertDone();
     await pumpScreen(tester);
 
@@ -97,14 +114,20 @@ void main() {
     await pumpScreen(tester);
 
     await tester.tap(find.byTooltip('حذف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('سيُحذف هذا الملف من جهازك.'), findsOneWidget);
 
     await tester.tap(find.text('إلغاء'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('الفاتحة'), findsOneWidget);
     expect(find.text('سيُحذف هذا الملف من جهازك.'), findsNothing);

@@ -59,58 +59,70 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_quran_probe');
-    await db.batch((b) => b.insertAll(db.surahs, [
-          SurahsCompanion.insert(
-              id: const Value(1),
-              nameAr: 'الفاتحة',
-              nameEn: 'Al-Fatihah',
-              revelationType: 'makkah',
-              ayahCount: 7,
-              pagesStart: 1,
-              pagesEnd: 1),
-          SurahsCompanion.insert(
-              id: const Value(2),
-              nameAr: 'البقرة',
-              nameEn: 'Al-Baqarah',
-              revelationType: 'madinah',
-              ayahCount: 3,
-              pagesStart: 2,
-              pagesEnd: 3),
-        ]));
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-              id: const Value(8),
-              surahId: 2,
-              numberInSurah: 1,
-              juz: 1,
-              page: 2,
-              textUthmani: 'الم',
-              textImlaei: 'الم'),
-          AyahsCompanion.insert(
-              id: const Value(9),
-              surahId: 2,
-              numberInSurah: 2,
-              juz: 1,
-              page: 2,
-              textUthmani: 'ذلك الكتاب',
-              textImlaei: 'ذلك الكتاب'),
-          AyahsCompanion.insert(
-              id: const Value(10),
-              surahId: 2,
-              numberInSurah: 3,
-              juz: 1,
-              page: 3,
-              textUthmani: 'الذين يؤمنون',
-              textImlaei: 'الذين يؤمنون'),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.surahs, [
+        SurahsCompanion.insert(
+          id: const Value(1),
+          nameAr: 'الفاتحة',
+          nameEn: 'Al-Fatihah',
+          revelationType: 'makkah',
+          ayahCount: 7,
+          pagesStart: 1,
+          pagesEnd: 1,
+        ),
+        SurahsCompanion.insert(
+          id: const Value(2),
+          nameAr: 'البقرة',
+          nameEn: 'Al-Baqarah',
+          revelationType: 'madinah',
+          ayahCount: 3,
+          pagesStart: 2,
+          pagesEnd: 3,
+        ),
+      ]),
+    );
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(8),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(9),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(10),
+          surahId: 2,
+          numberInSurah: 3,
+          juz: 1,
+          page: 3,
+          textUthmani: 'الذين يؤمنون',
+          textImlaei: 'الذين يؤمنون',
+        ),
+      ]),
+    );
   });
 
   tearDown(() async {
     await tempRoot.delete(recursive: true);
   });
 
-  Widget localizedShell(Widget home,
-      {Locale locale = const Locale('ar'), TextScaler? textScaler}) {
+  Widget localizedShell(
+    Widget home, {
+    Locale locale = const Locale('ar'),
+    TextScaler? textScaler,
+  }) {
     return MaterialApp(
       locale: locale,
       supportedLocales: const [Locale('ar'), Locale('en')],
@@ -124,33 +136,42 @@ void main() {
       builder: textScaler == null
           ? null
           : (context, child) => MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaler: textScaler),
-                child: child!,
-              ),
+              data: MediaQuery.of(context).copyWith(textScaler: textScaler),
+              child: child!,
+            ),
       home: home,
     );
   }
 
-  Future<void> pumpIndex(WidgetTester tester,
-      {Locale locale = const Locale('ar'), TextScaler? textScaler}) async {
+  Future<void> pumpIndex(
+    WidgetTester tester, {
+    Locale locale = const Locale('ar'),
+    TextScaler? textScaler,
+  }) async {
     final rows = await db.select(db.surahs).get();
     final cubit = SurahIndexCubit(_TeardownSafeSurahRepository(db, rows));
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(localizedShell(
-      BlocProvider<SurahIndexCubit>.value(
-        value: cubit,
-        child: const SurahIndexScreen(),
+    await tester.pumpWidget(
+      localizedShell(
+        BlocProvider<SurahIndexCubit>.value(
+          value: cubit,
+          child: const SurahIndexScreen(),
+        ),
+        locale: locale,
+        textScaler: textScaler,
       ),
-      locale: locale,
-      textScaler: textScaler,
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('textScale 2.0: the surah index rows survive the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the surah index rows survive the layout', (
+    tester,
+  ) async {
     await pumpIndex(tester, textScaler: const TextScaler.linear(2.0));
 
     expect(tester.takeException(), isNull);
@@ -158,8 +179,9 @@ void main() {
     expect(find.text('البقرة'), findsOneWidget);
   });
 
-  testWidgets('the surah-row chevron follows the ambient direction',
-      (tester) async {
+  testWidgets('the surah-row chevron follows the ambient direction', (
+    tester,
+  ) async {
     await pumpIndex(tester);
     expect(find.byIcon(Icons.chevron_left), findsNWidgets(2));
     expect(find.byIcon(Icons.chevron_right), findsNothing);
@@ -170,95 +192,137 @@ void main() {
   });
 
   testWidgets(
-      'textScale 2.0: the reader (verses + mushaf) and the ayah sheet survive',
-      (tester) async {
-    await getIt.reset();
-    getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(db,
-        libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode));
-    addTearDown(getIt.reset);
+    'textScale 2.0: the reader (verses + mushaf) and the ayah sheet survive',
+    (tester) async {
+      await getIt.reset();
+      getIt.registerLazySingleton<PackDownloader>(
+        () => PackDownloader(
+          db,
+          libraryRootResolver: () async => tempRoot,
+          fileDecoder: _syncDecode,
+        ),
+      );
+      addTearDown(getIt.reset);
 
-    final cubit = ReaderCubit(
-      ayahRepository: _TeardownSafeAyahRepository(db),
-      lastReadRepository: LastReadRepository(db),
-      surahId: 2,
-      initialAyah: 0,
-    );
-    addTearDown(cubit.close);
-    await cubit.start();
-    final playbackCubit = PlaybackCubit(
-      service: FakePlaybackService(),
-      reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
-    );
-    addTearDown(playbackCubit.close);
+      final cubit = ReaderCubit(
+        ayahRepository: _TeardownSafeAyahRepository(db),
+        lastReadRepository: LastReadRepository(db),
+        surahId: 2,
+        initialAyah: 0,
+      );
+      addTearDown(cubit.close);
+      await cubit.start();
+      final playbackCubit = PlaybackCubit(
+        service: FakePlaybackService(),
+        reciters: ReciterRepository(db),
+        downloader: AudioDownloader(
+          db,
+          audioRootResolver: () async => Directory.systemTemp,
+        ),
+      );
+      addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(localizedShell(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider<ReaderCubit>.value(value: cubit),
-          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-        ],
-        child: const ReaderScreen(),
-      ),
-      textScaler: const TextScaler.linear(2.0),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.pumpWidget(
+        localizedShell(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<ReaderCubit>.value(value: cubit),
+              BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+            ],
+            child: const ReaderScreen(),
+          ),
+          textScaler: const TextScaler.linear(2.0),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('الم'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      expect(find.text('الم'), findsOneWidget);
 
-    final semantics = tester.ensureSemantics();
-    final glyphLabel = tester.getSemantics(find.text('﴿١﴾')).label;
-    expect(glyphLabel, contains('الآية ١'));
-    expect(glyphLabel, isNot(contains('﴿')),
-        reason: 'the ornament must not survive into the semantics label');
-    semantics.dispose();
+      final semantics = tester.ensureSemantics();
+      final glyphLabel = tester.getSemantics(find.text('﴿١﴾')).label;
+      expect(glyphLabel, contains('الآية ١'));
+      expect(
+        glyphLabel,
+        isNot(contains('﴿')),
+        reason: 'the ornament must not survive into the semantics label',
+      );
+      semantics.dispose();
 
-    await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.tap(find.byTooltip('وضع المصحف'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(tester.takeException(), isNull);
-    expect(find.textContaining('صفحة'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      expect(find.textContaining('صفحة'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('وضع الآيات'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.tap(find.byTooltip('وضع الآيات'));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await tester.ensureVisible(find.text('الم').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.tap(find.text('الم').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    await tester.tap(find.byIcon(Icons.menu_book_outlined).first);
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await tester.ensureVisible(find.text('الم').first);
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      await tester.tap(find.text('الم').first);
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
+      await tester.tap(find.byIcon(Icons.menu_book_outlined).first);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(tester.takeException(), isNull);
-    final sheet = tester.widget<BottomSheet>(find.ancestor(
-      of: find.text('تفسير الآية وترجمتها'),
-      matching: find.byType(BottomSheet),
-    ));
-    expect(sheet.showDragHandle, isTrue);
-    expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
-    expect(find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'), findsOneWidget);
-    expect(find.text('المكتبة'), findsOneWidget);
-  });
+      expect(tester.takeException(), isNull);
+      final sheet = tester.widget<BottomSheet>(
+        find.ancestor(
+          of: find.text('تفسير الآية وترجمتها'),
+          matching: find.byType(BottomSheet),
+        ),
+      );
+      expect(sheet.showDragHandle, isTrue);
+      expect(find.text('تفسير الآية وترجمتها'), findsOneWidget);
+      expect(
+        find.text('لا يوجد تفسير مثبّت — نزّل من المكتبة'),
+        findsOneWidget,
+      );
+      expect(find.text('المكتبة'), findsOneWidget);
+    },
+  );
 
-  testWidgets('a 1024 dp window caps the reader at the reading measure',
-      (tester) async {
+  testWidgets('a 1024 dp window caps the reader at the reading measure', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1024, 768);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
 
     await getIt.reset();
-    getIt.registerLazySingleton<PackDownloader>(() => PackDownloader(db,
-        libraryRootResolver: () async => tempRoot, fileDecoder: _syncDecode));
+    getIt.registerLazySingleton<PackDownloader>(
+      () => PackDownloader(
+        db,
+        libraryRootResolver: () async => tempRoot,
+        fileDecoder: _syncDecode,
+      ),
+    );
     addTearDown(getIt.reset);
 
     final cubit = ReaderCubit(
@@ -272,32 +336,35 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(localizedShell(
-      MultiBlocProvider(
-        providers: [
-          BlocProvider<ReaderCubit>.value(value: cubit),
-          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-        ],
-        child: const ReaderScreen(),
+    await tester.pumpWidget(
+      localizedShell(
+        MultiBlocProvider(
+          providers: [
+            BlocProvider<ReaderCubit>.value(value: cubit),
+            BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+          ],
+          child: const ReaderScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
-    expect(
-      tester.getSize(find.byType(ScrollablePositionedList)).width,
-      760,
-    );
+    expect(tester.getSize(find.byType(ScrollablePositionedList)).width, 760);
   });
 
-  testWidgets(
-      'textScale 2.0: bookmark rows keep the full snippet and the '
+  testWidgets('textScale 2.0: bookmark rows keep the full snippet and the '
       'Arabic-Indic reference', (tester) async {
     const longText =
         'ذلك الكتاب لا ريب فيه هدى للمتقين الذين يؤمنون بالغيب ويقيمون الصلاة ومما رزقناهم ينفقون';
@@ -322,22 +389,30 @@ void main() {
     final cubit = BookmarksCubit(repo);
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(localizedShell(
-      BlocProvider<BookmarksCubit>.value(
-        value: cubit,
-        child: const BookmarksScreen(),
+    await tester.pumpWidget(
+      localizedShell(
+        BlocProvider<BookmarksCubit>.value(
+          value: cubit,
+          child: const BookmarksScreen(),
+        ),
+        textScaler: const TextScaler.linear(2.0),
       ),
-      textScaler: const TextScaler.linear(2.0),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     final title = tester.widget<Text>(find.text(longText));
     expect(title.maxLines, 2);
     expect(title.overflow, TextOverflow.ellipsis);
-    expect(find.textContaining('…'), findsNothing,
-        reason: 'the snippet must not be hard-cut with a literal ellipsis');
+    expect(
+      find.textContaining('…'),
+      findsNothing,
+      reason: 'the snippet must not be hard-cut with a literal ellipsis',
+    );
     expect(find.text('٢:٩'), findsOneWidget);
   });
 }

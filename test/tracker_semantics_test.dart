@@ -24,16 +24,22 @@ void main() {
     final cubit = TrackerCubit(repo: repo);
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<TrackerCubit>.value(
-      value: cubit,
-      child: appShell(home: const TrackerScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<TrackerCubit>.value(
+        value: cubit,
+        child: appShell(home: const TrackerScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('each of the seven dots announces its day and marked state',
-      (tester) async {
+  testWidgets('each of the seven dots announces its day and marked state', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     await pumpTracker(tester);
 
@@ -52,18 +58,23 @@ void main() {
     handle.dispose();
   });
 
-  testWidgets('slot rows expose a checked state that follows the toggle',
-      (tester) async {
+  testWidgets('slot rows expose a checked state that follows the toggle', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     await pumpTracker(tester);
 
-    var data =
-        tester.getSemantics(find.bySemanticsLabel('فجر')).getSemanticsData();
+    var data = tester
+        .getSemantics(find.bySemanticsLabel('فجر'))
+        .getSemanticsData();
     expect(data.flagsCollection.isChecked, CheckedState.isFalse);
 
     await tester.tap(find.text('فجر'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     data = tester.getSemantics(find.bySemanticsLabel('فجر')).getSemanticsData();
     expect(data.flagsCollection.isChecked, CheckedState.isTrue);

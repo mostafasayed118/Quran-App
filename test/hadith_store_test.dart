@@ -45,12 +45,14 @@ void main() {
     final dir = Directory.systemTemp.createTempSync('qy_hadith_store');
     addTearDown(() => dir.deleteSync(recursive: true));
     final file = File('${dir.path}/p.json')
-      ..writeAsStringSync(jsonEncode({
-        'hadiths': [
-          {'hadithnumber': 1, 'text': 'first'},
-          {'hadithnumber': 2, 'text': 'second'},
-        ],
-      }));
+      ..writeAsStringSync(
+        jsonEncode({
+          'hadiths': [
+            {'hadithnumber': 1, 'text': 'first'},
+            {'hadithnumber': 2, 'text': 'second'},
+          ],
+        }),
+      );
     final store = HadithStore(
       db,
       packPath: (_) async => file.path,

@@ -20,10 +20,10 @@ class BackupCubit extends Cubit<BackupState> {
     required BackupService service,
     BackupPickBytes? pickBytes,
     BackupShareJson? shareJson,
-  })  : _service = service,
-        _pickBytes = pickBytes ?? pickBackupBytes,
-        _shareJson = shareJson ?? shareBackupJson,
-        super(const BackupState.idle());
+  }) : _service = service,
+       _pickBytes = pickBytes ?? pickBackupBytes,
+       _shareJson = shareJson ?? shareBackupJson,
+       super(const BackupState.idle());
 
   final BackupService _service;
   final BackupPickBytes _pickBytes;
@@ -50,10 +50,12 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(const BackupState.exported());
     } on Object catch (error, stackTrace) {
-      appLog('backup export failed',
-          name: 'quran_yahdi/backup',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'backup export failed',
+        name: 'quran_yahdi/backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: true));
     }
@@ -99,10 +101,12 @@ class BackupCubit extends Cubit<BackupState> {
       // The error MESSAGE is never logged: a jsonDecode failure embeds a
       // snippet of the imported file, and the imported file is user content.
       // The runtime type is enough to diagnose the failure.
-      appLog('backup import failed',
-          name: 'quran_yahdi/backup',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'backup import failed',
+        name: 'quran_yahdi/backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: false));
     }
@@ -130,10 +134,12 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(const BackupState.exported());
     } on Object catch (error, stackTrace) {
-      appLog('backup export failed',
-          name: 'quran_yahdi/backup',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'backup export failed',
+        name: 'quran_yahdi/backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: true));
     }
@@ -164,10 +170,12 @@ class BackupCubit extends Cubit<BackupState> {
       _pendingEncryptedBytes = null;
       emit(BackupState.preview(document: result.document, summary: summary));
     } on Object catch (error, stackTrace) {
-      appLog('backup import failed',
-          name: 'quran_yahdi/backup',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'backup import failed',
+        name: 'quran_yahdi/backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       _pendingEncryptedBytes = null;
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: false));
@@ -192,10 +200,12 @@ class BackupCubit extends Cubit<BackupState> {
       if (isClosed) return;
       emit(BackupState.imported(summary: outcome.summary));
     } on Object catch (error, stackTrace) {
-      appLog('backup apply failed',
-          name: 'quran_yahdi/backup',
-          error: error.runtimeType,
-          stackTrace: stackTrace);
+      appLog(
+        'backup apply failed',
+        name: 'quran_yahdi/backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       if (isClosed) return;
       emit(const BackupState.failed(duringExport: false));
     }

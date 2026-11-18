@@ -54,9 +54,10 @@ bool hasSqliteHeader(File file) {
 /// so the file is not silently lost.
 @visibleForTesting
 Future<File> moveDbAside(File target, {DateTime? now}) async {
-  final moment = (now ?? DateTime.now())
-      .toIso8601String()
-      .replaceAll(RegExp(r'[:.]'), '-');
+  final moment = (now ?? DateTime.now()).toIso8601String().replaceAll(
+    RegExp(r'[:.]'),
+    '-',
+  );
   var aside = File('${target.path}.corrupt-$moment');
   var suffix = 1;
   while (aside.existsSync()) {
@@ -82,8 +83,11 @@ Future<void> copyDbAssetIfAbsent({
   if (target.existsSync()) {
     if (hasSqliteHeader(target)) return;
     final aside = await moveDbAside(target, now: now);
-    appLog('db file was not SQLite; moved aside',
-        name: 'quran_yahdi/db', error: aside.path);
+    appLog(
+      'db file was not SQLite; moved aside',
+      name: 'quran_yahdi/db',
+      error: aside.path,
+    );
   }
   await target.parent.create(recursive: true);
   final data = await loadAsset(assetKey);
@@ -117,13 +121,19 @@ Future<void> ensureContentCurrent(
   final seedFile = File(p.join(tempDir.path, 'quran_yahdi.seed.tmp'));
   try {
     final data = await loadAsset(dbAssetKey);
-    final bytes =
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    final bytes = data.buffer.asUint8List(
+      data.offsetInBytes,
+      data.lengthInBytes,
+    );
     await seedFile.writeAsBytes(bytes, flush: true);
     await _seedContentFromFile(db, seedFile, bundledVersion);
   } on Object catch (error, stackTrace) {
-    appLog('content refresh failed',
-        name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
+    appLog(
+      'content refresh failed',
+      name: 'quran_yahdi/db',
+      error: error,
+      stackTrace: stackTrace,
+    );
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
   }
@@ -172,15 +182,18 @@ Future<void> _seedContentFromFile(
 /// unavailable (no root-isolate token, e.g. in a test VM); the caller then
 /// falls back to the UI-isolate path so the boot never breaks.
 Future<Uint8List?> _loadAssetOnWorker(
-        String assetKey, RootIsolateToken token) =>
-    Isolate.run(() async {
-      BackgroundIsolateBinaryMessenger.ensureInitialized(token);
-      final encoded = utf8.encode(Uri(path: Uri.encodeFull(assetKey)).path);
-      final asset = await BackgroundIsolateBinaryMessenger.instance
-          .send('flutter/assets', ByteData.sublistView(encoded));
-      if (asset == null) return null;
-      return asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes);
-    });
+  String assetKey,
+  RootIsolateToken token,
+) => Isolate.run(() async {
+  BackgroundIsolateBinaryMessenger.ensureInitialized(token);
+  final encoded = utf8.encode(Uri(path: Uri.encodeFull(assetKey)).path);
+  final asset = await BackgroundIsolateBinaryMessenger.instance.send(
+    'flutter/assets',
+    ByteData.sublistView(encoded),
+  );
+  if (asset == null) return null;
+  return asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes);
+});
 
 /// Upper bound on the worker-isolate asset read.
 ///
@@ -210,8 +223,11 @@ Future<void> writeAssetOffUiIsolate(
   if (target.existsSync()) {
     if (hasSqliteHeader(target)) return;
     final aside = await moveDbAside(target);
-    appLog('db file was not SQLite; moved aside',
-        name: 'quran_yahdi/db', error: aside.path);
+    appLog(
+      'db file was not SQLite; moved aside',
+      name: 'quran_yahdi/db',
+      error: aside.path,
+    );
   }
   if (workerLoad != null) {
     try {
@@ -228,8 +244,12 @@ Future<void> writeAssetOffUiIsolate(
         return;
       }
     } on Object catch (error, stackTrace) {
-      appLog('db asset copy on the worker isolate failed',
-          name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
+      appLog(
+        'db asset copy on the worker isolate failed',
+        name: 'quran_yahdi/db',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
   await copyDbAssetIfAbsent(
@@ -276,8 +296,12 @@ Future<void> _ensureContentCurrentOffUiIsolate(
     await _writeAssetOffUiIsolate(seedFile, dbAssetKey);
     await _seedContentFromFile(db, seedFile, kContentVersion);
   } on Object catch (error, stackTrace) {
-    appLog('content refresh failed',
-        name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
+    appLog(
+      'content refresh failed',
+      name: 'quran_yahdi/db',
+      error: error,
+      stackTrace: stackTrace,
+    );
   } finally {
     if (seedFile.existsSync()) seedFile.deleteSync();
   }
@@ -314,7 +338,11 @@ Future<void> _ensureSearchIndex(AppDatabase db) async {
   try {
     await ensureQuranSearchIndex(db);
   } on Object catch (error, stackTrace) {
-    appLog('search index build failed',
-        name: 'quran_yahdi/db', error: error, stackTrace: stackTrace);
+    appLog(
+      'search index build failed',
+      name: 'quran_yahdi/db',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 }

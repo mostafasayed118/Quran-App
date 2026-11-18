@@ -51,8 +51,11 @@ void main() {
     final second = cubit.add(_d2);
     await Future<void>.delayed(Duration.zero);
 
-    expect(source.calls, hasLength(1),
-        reason: 'the second write must wait for the first to settle');
+    expect(
+      source.calls,
+      hasLength(1),
+      reason: 'the second write must wait for the first to settle',
+    );
 
     source.complete(0);
     await Future<void>.delayed(Duration.zero);
@@ -81,11 +84,12 @@ void main() {
 
     expect(await first, isFalse);
     expect(await second, isTrue);
-    expect(source.stored, [_d2],
-        reason:
-            'd1 was never stored, so it must not ride along in d2\'s write');
-    expect((cubit.state as QadaReady).dates, [_d2],
-        reason: 'the UI must show what is actually stored');
+    expect(source.stored, [
+      _d2,
+    ], reason: 'd1 was never stored, so it must not ride along in d2\'s write');
+    expect((cubit.state as QadaReady).dates, [
+      _d2,
+    ], reason: 'the UI must show what is actually stored');
   });
 
   test('a failed second save reverts to the last stored state', () async {
@@ -105,7 +109,8 @@ void main() {
     expect(await first, isTrue);
     expect(await second, isFalse);
     expect(source.stored, [_d1]);
-    expect((cubit.state as QadaReady).dates, [_d1],
-        reason: 'the revert goes to the last confirmed state, not a snapshot');
+    expect((cubit.state as QadaReady).dates, [
+      _d1,
+    ], reason: 'the revert goes to the last confirmed state, not a snapshot');
   });
 }

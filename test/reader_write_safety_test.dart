@@ -53,22 +53,24 @@ class _ThrowingAyahs implements AyahSource {
 
   @override
   Future<Surah?> surahById(int surahId) async => const Surah(
-        id: 1,
-        nameAr: 'الفاتحة',
-        nameEn: 'Al-Fatihah',
-        revelationType: 'makkah',
-        ayahCount: 2,
-        pagesStart: 1,
-        pagesEnd: 1,
-      );
+    id: 1,
+    nameAr: 'الفاتحة',
+    nameEn: 'Al-Fatihah',
+    revelationType: 'makkah',
+    ayahCount: 2,
+    pagesStart: 1,
+    pagesEnd: 1,
+  );
 
   @override
   Future<Ayah?> ayahById(int ayahId) async => null;
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      const <Ayah>[];
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => const <Ayah>[];
 
   @override
   Future<void> toggleBookmark(int ayahId) async {
@@ -90,11 +92,11 @@ void main() {
   late _ThrowingLastRead lastRead;
 
   ReaderCubit buildCubit() => ReaderCubit(
-        ayahRepository: _ThrowingAyahs(),
-        lastReadRepository: lastRead,
-        surahId: 1,
-        initialAyah: 1,
-      );
+    ayahRepository: _ThrowingAyahs(),
+    lastReadRepository: lastRead,
+    surahId: 1,
+    initialAyah: 1,
+  );
 
   setUp(() {
     lastRead = _ThrowingLastRead();
@@ -111,8 +113,11 @@ void main() {
     final ready = await readyFuture;
 
     expect(ready, isA<ReaderReady>());
-    expect(lastRead.saves, 1,
-        reason: 'the marker write is attempted once on load');
+    expect(
+      lastRead.saves,
+      1,
+      reason: 'the marker write is attempted once on load',
+    );
     // A stray unhandled async error would fail this test at teardown.
   });
 

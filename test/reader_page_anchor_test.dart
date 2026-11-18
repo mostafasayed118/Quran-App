@@ -21,18 +21,20 @@ class _Anchors implements PageAnchorSource {
 }
 
 void main() {
-  test('the reader resolves a page through its optional anchor source',
-      () async {
-    final cubit = ReaderCubit(
-      ayahRepository: _NoAyahs(),
-      lastReadRepository: _NoLastRead(),
-      surahId: 1,
-      initialAyah: 1,
-      pageAnchors: _Anchors(),
-    );
-    addTearDown(cubit.close);
+  test(
+    'the reader resolves a page through its optional anchor source',
+    () async {
+      final cubit = ReaderCubit(
+        ayahRepository: _NoAyahs(),
+        lastReadRepository: _NoLastRead(),
+        surahId: 1,
+        initialAyah: 1,
+        pageAnchors: _Anchors(),
+      );
+      addTearDown(cubit.close);
 
-    expect(await cubit.anchorForPage(604), (surahId: 112, numberInSurah: 1));
-    expect(await cubit.anchorForPage(1), isNull);
-  });
+      expect(await cubit.anchorForPage(604), (surahId: 112, numberInSurah: 1));
+      expect(await cubit.anchorForPage(1), isNull);
+    },
+  );
 }

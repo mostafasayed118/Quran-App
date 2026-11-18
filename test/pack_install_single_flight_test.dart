@@ -20,12 +20,16 @@ class _GatedCdn implements HttpClientAdapter {
   int requests = 0;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     requests++;
     await gate.future;
     final bytes = Uint8List.fromList(
-        utf8.encode('{"quran":[{"chapter":1,"verse":1,"text":"ب"}]}'));
+      utf8.encode('{"quran":[{"chapter":1,"verse":1,"text":"ب"}]}'),
+    );
     return ResponseBody(
       Stream<Uint8List>.value(bytes),
       200,

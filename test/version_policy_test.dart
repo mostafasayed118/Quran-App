@@ -168,24 +168,36 @@ void main() {
     );
 
     test('below the minimum → updateRequired', () {
-      expect(policy.verdictFor(const AppVersion(1, 1, 9)),
-          VersionVerdict.updateRequired);
-      expect(policy.verdictFor(const AppVersion(0, 9, 0)),
-          VersionVerdict.updateRequired);
+      expect(
+        policy.verdictFor(const AppVersion(1, 1, 9)),
+        VersionVerdict.updateRequired,
+      );
+      expect(
+        policy.verdictFor(const AppVersion(0, 9, 0)),
+        VersionVerdict.updateRequired,
+      );
     });
 
     test('at the minimum but behind latest → updateRecommended', () {
-      expect(policy.verdictFor(const AppVersion(1, 2, 0)),
-          VersionVerdict.updateRecommended);
-      expect(policy.verdictFor(const AppVersion(1, 3, 9)),
-          VersionVerdict.updateRecommended);
+      expect(
+        policy.verdictFor(const AppVersion(1, 2, 0)),
+        VersionVerdict.updateRecommended,
+      );
+      expect(
+        policy.verdictFor(const AppVersion(1, 3, 9)),
+        VersionVerdict.updateRecommended,
+      );
     });
 
     test('at or above latest → upToDate', () {
-      expect(policy.verdictFor(const AppVersion(1, 4, 0)),
-          VersionVerdict.upToDate);
-      expect(policy.verdictFor(const AppVersion(2, 0, 0)),
-          VersionVerdict.upToDate);
+      expect(
+        policy.verdictFor(const AppVersion(1, 4, 0)),
+        VersionVerdict.upToDate,
+      );
+      expect(
+        policy.verdictFor(const AppVersion(2, 0, 0)),
+        VersionVerdict.upToDate,
+      );
     });
   });
 }

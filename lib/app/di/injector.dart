@@ -162,7 +162,8 @@ Future<void> configureDependencies({
 }) async {
   if (_configured) return;
   getIt.registerLazySingleton<AppDatabase>(
-      () => AppDatabase(LazyDatabase(openAppDatabase)));
+    () => AppDatabase(LazyDatabase(openAppDatabase)),
+  );
   final db = getIt<AppDatabase>();
 
   _registerQuran(db);

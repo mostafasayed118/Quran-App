@@ -31,12 +31,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     bool Function()? backgroundActive,
     Stream<AdhanPlaybackState>? adhanStates,
     SurahNameSource? surahNames,
-  })  : _service = service,
-        _reciters = reciters,
-        _downloader = downloader,
-        _surahNames = surahNames,
-        _backgroundActive = backgroundActive ?? _probeBackgroundInit,
-        super(const PlaybackState.initial()) {
+  }) : _service = service,
+       _reciters = reciters,
+       _downloader = downloader,
+       _surahNames = surahNames,
+       _backgroundActive = backgroundActive ?? _probeBackgroundInit,
+       super(const PlaybackState.initial()) {
     _adhanSub = adhanStates?.listen(_onAdhanState, onError: _onStreamError);
   }
 
@@ -118,14 +118,23 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   ///
   /// [surahName] is the display name when the caller knows it; the player
   /// shows it instead of a bare number.
-  Future<void> playReciter(ReciterInfo reciter, int surahNumber,
-      {String surahName = ''}) async {
+  Future<void> playReciter(
+    ReciterInfo reciter,
+    int surahNumber, {
+    String surahName = '',
+  }) async {
     _useQueue(reciter.surahList);
-    final name =
-        surahName.isNotEmpty ? surahName : await _resolveName(surahNumber);
+    final name = surahName.isNotEmpty
+        ? surahName
+        : await _resolveName(surahNumber);
     if (isClosed) return;
     await _start(
-        reciter.id, reciter.reciterName, reciter.server, surahNumber, name);
+      reciter.id,
+      reciter.reciterName,
+      reciter.server,
+      surahNumber,
+      name,
+    );
   }
 
   /// The Arabic name of [surahNumber], or an empty string when unavailable.
@@ -136,8 +145,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       final names = await source.surahNamesFor([surahNumber]);
       return names[surahNumber] ?? '';
     } on Object catch (error, stackTrace) {
-      appLog('surah name lookup failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'surah name lookup failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return '';
     }
   }
@@ -154,27 +167,38 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _surahNumbers = numbers;
   }
 
-  Future<void> _start(String rowId, String reciterName, String server,
-      int surahNumber, String surahName) async {
+  Future<void> _start(
+    String rowId,
+    String reciterName,
+    String server,
+    int surahNumber,
+    String surahName,
+  ) async {
     if (isClosed) return;
     final episode = ++_episode;
     _lastDuration = Duration.zero;
     _reciterName = reciterName;
     _rowId = rowId;
     _server = server;
-    emit(PlaybackState.loading(
-      reciterName: reciterName,
-      surahNumber: surahNumber,
-      surahName: surahName,
-    ));
+    emit(
+      PlaybackState.loading(
+        reciterName: reciterName,
+        surahNumber: surahNumber,
+        surahName: surahName,
+      ),
+    );
     String? downloaded;
     try {
       downloaded = await _downloader.downloadedPath(rowId, surahNumber);
     } on Object catch (error, stackTrace) {
       // A registry read failure is not a playback failure: fall back to the
       // remote URL instead of leaving the state stuck in loading.
-      appLog('download lookup failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'download lookup failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
       downloaded = null;
     }
     if (isClosed || episode != _episode) return;
@@ -195,23 +219,31 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       await _applyTuning();
       if (isClosed || episode != _episode) return;
       if (state is! PlaybackLoading) return;
-      emit(state.toPlaying(
-        duration: _lastDuration,
-        speedOverride: _speed,
-        repeatModeOverride: _repeatMode,
-        sleepTimerOverride: _sleepTimerDuration,
-      ));
+      emit(
+        state.toPlaying(
+          duration: _lastDuration,
+          speedOverride: _speed,
+          repeatModeOverride: _repeatMode,
+          sleepTimerOverride: _sleepTimerDuration,
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('playback load failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'playback load failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
-      emit(PlaybackState.failed(
-        kind: _backgroundActive()
-            ? PlaybackFailureKind.network
-            : PlaybackFailureKind.backgroundUnavailable,
-      ));
+      emit(
+        PlaybackState.failed(
+          kind: _backgroundActive()
+              ? PlaybackFailureKind.network
+              : PlaybackFailureKind.backgroundUnavailable,
+        ),
+      );
     }
   }
 
@@ -219,15 +251,21 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   ///
   /// A missing default reciter fails with [PlaybackFailureKind.noReciters];
   /// a lookup error fails with [PlaybackFailureKind.network].
-  Future<void> playDefaultForSurah(int surahNumber,
-      {String surahName = ''}) async {
+  Future<void> playDefaultForSurah(
+    int surahNumber, {
+    String surahName = '',
+  }) async {
     final episode = ++_episode;
     final ReciterInfo? reciter;
     try {
       reciter = await _reciters.defaultReciter();
     } on Object catch (error, stackTrace) {
-      appLog('reciter lookup failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'reciter lookup failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
@@ -238,9 +276,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     if (reciter == null) {
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
-      emit(const PlaybackState.failed(
-        kind: PlaybackFailureKind.noReciters,
-      ));
+      emit(const PlaybackState.failed(kind: PlaybackFailureKind.noReciters));
       return;
     }
     await playReciter(reciter, surahNumber, surahName: surahName);
@@ -258,8 +294,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await tunable.setSpeed(safe);
       } on Object catch (error, stackTrace) {
-        appLog('speed change failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'speed change failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
     _emitControls();
@@ -281,8 +321,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
       } on Object catch (error, stackTrace) {
-        appLog('repeat change failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'repeat change failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
     _emitControls();
@@ -324,8 +368,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await tunable.setSpeed(_speed);
         await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
       } on Object catch (error, stackTrace) {
-        appLog('playback tuning failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'playback tuning failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -370,13 +418,13 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     final state = this.state;
     final current = switch (state) {
       PlaybackPlaying(:final surahNumber, :final surahName) => (
-          number: surahNumber,
-          name: surahName
-        ),
+        number: surahNumber,
+        name: surahName,
+      ),
       PlaybackPaused(:final surahNumber, :final surahName) => (
-          number: surahNumber,
-          name: surahName
-        ),
+        number: surahNumber,
+        name: surahName,
+      ),
       _ => null,
     };
     if (current == null || _rowId.isEmpty) {
@@ -384,13 +432,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       return;
     }
     if (_repeatMode == PlaybackRepeatMode.one) {
-      await _start(
-        _rowId,
-        _reciterName,
-        _server,
-        current.number,
-        current.name,
-      );
+      await _start(_rowId, _reciterName, _server, current.number, current.name);
       return;
     }
     await stopAndReset();
@@ -407,8 +449,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       } on Object catch (error, stackTrace) {
         // The timer still clears; the audio may keep playing and the user can
         // pause it manually.
-        appLog('sleep timer pause failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'sleep timer pause failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
       if (isClosed) return;
       emit(state.toPaused(clearSleepTimer: true));
@@ -418,41 +464,43 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   ({double speed, PlaybackRepeatMode repeatMode, Duration? sleepTimer})
-      _controlsOf(PlaybackState state) => switch (state) {
-            PlaybackPlaying(
-              :final speed,
-              :final repeatMode,
-              :final sleepTimer,
-            ) =>
-              (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
-            PlaybackPaused(
-              :final speed,
-              :final repeatMode,
-              :final sleepTimer,
-            ) =>
-              (speed: speed, repeatMode: repeatMode, sleepTimer: sleepTimer),
-            _ => (
-                speed: _speed,
-                repeatMode: _repeatMode,
-                sleepTimer: _sleepTimerDuration,
-              ),
-          };
+  _controlsOf(PlaybackState state) => switch (state) {
+    PlaybackPlaying(:final speed, :final repeatMode, :final sleepTimer) => (
+      speed: speed,
+      repeatMode: repeatMode,
+      sleepTimer: sleepTimer,
+    ),
+    PlaybackPaused(:final speed, :final repeatMode, :final sleepTimer) => (
+      speed: speed,
+      repeatMode: repeatMode,
+      sleepTimer: sleepTimer,
+    ),
+    _ => (
+      speed: _speed,
+      repeatMode: _repeatMode,
+      sleepTimer: _sleepTimerDuration,
+    ),
+  };
 
   void _emitControls() {
     if (isClosed) return;
     final state = this.state;
     if (state is PlaybackPlaying) {
-      emit(state.copyWith(
-        speed: _speed,
-        repeatMode: _repeatMode,
-        sleepTimer: _sleepTimerDuration,
-      ));
+      emit(
+        state.copyWith(
+          speed: _speed,
+          repeatMode: _repeatMode,
+          sleepTimer: _sleepTimerDuration,
+        ),
+      );
     } else if (state is PlaybackPaused) {
-      emit(state.copyWith(
-        speed: _speed,
-        repeatMode: _repeatMode,
-        sleepTimer: _sleepTimerDuration,
-      ));
+      emit(
+        state.copyWith(
+          speed: _speed,
+          repeatMode: _repeatMode,
+          sleepTimer: _sleepTimerDuration,
+        ),
+      );
     }
   }
 
@@ -464,8 +512,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
-      appLog('playback stop failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'playback stop failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -479,8 +531,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       try {
         await seekable.seek(to);
       } on Object catch (error, stackTrace) {
-        appLog('seek failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'seek failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
       }
     }
   }
@@ -497,8 +553,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await _service.pause();
       } on Object catch (error, stackTrace) {
         // Keep the playing state: the audio is still audible.
-        appLog('pause failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'pause failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
         return;
       }
       if (isClosed || episode != _episode) return;
@@ -508,8 +568,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
         await _service.resume();
       } on Object catch (error, stackTrace) {
         // Keep the paused state: resume did not take effect.
-        appLog('resume failed',
-            name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+        appLog(
+          'resume failed',
+          name: 'quran_yahdi/playback',
+          error: error,
+          stackTrace: stackTrace,
+        );
         return;
       }
       if (isClosed || episode != _episode) return;
@@ -531,8 +595,12 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     try {
       await _service.stop();
     } on Object catch (error, stackTrace) {
-      appLog('stop failed',
-          name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+      appLog(
+        'stop failed',
+        name: 'quran_yahdi/playback',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     // A newer play (or stop) superseded this one: its streams must stay bound.
     if (isClosed || episode != _episode) return;
@@ -542,26 +610,33 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   }
 
   void _bindStreams() {
-    _playingSub ??= _service
-        .playingStream()
-        .listen(_onPlayingChanged, onError: _onStreamError);
-    _positionSub ??= _service
-        .positionStream()
-        .listen(_onPositionChanged, onError: _onStreamError);
-    _durationSub ??= _service
-        .durationStream()
-        .listen(_onDurationChanged, onError: _onStreamError);
+    _playingSub ??= _service.playingStream().listen(
+      _onPlayingChanged,
+      onError: _onStreamError,
+    );
+    _positionSub ??= _service.positionStream().listen(
+      _onPositionChanged,
+      onError: _onStreamError,
+    );
+    _durationSub ??= _service.durationStream().listen(
+      _onDurationChanged,
+      onError: _onStreamError,
+    );
     if (_service case final CompletingPlaybackService completing) {
       _completionSub ??= completing.completionStream().listen(
-            (_) => unawaited(_onCompleted()),
-            onError: _onStreamError,
-          );
+        (_) => unawaited(_onCompleted()),
+        onError: _onStreamError,
+      );
     }
   }
 
   void _onStreamError(Object error, StackTrace stackTrace) {
-    appLog('playback stream error',
-        name: 'quran_yahdi/playback', error: error, stackTrace: stackTrace);
+    appLog(
+      'playback stream error',
+      name: 'quran_yahdi/playback',
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   /// The adhan took over the shared player: clear the surah state without
@@ -626,19 +701,23 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     if (isClosed || _externalAudioActive) return;
     final state = this.state;
     if (playing && state is PlaybackLoading && state.reciterName != null) {
-      emit(state.toPlaying(
-        duration: _lastDuration,
-        speedOverride: _speed,
-        repeatModeOverride: _repeatMode,
-        sleepTimerOverride: _sleepTimerDuration,
-      ));
+      emit(
+        state.toPlaying(
+          duration: _lastDuration,
+          speedOverride: _speed,
+          repeatModeOverride: _repeatMode,
+          sleepTimerOverride: _sleepTimerDuration,
+        ),
+      );
     } else if (playing && state is PlaybackPaused) {
       final controls = _controlsOf(state);
-      emit(state.toPlaying(
-        speedOverride: controls.speed,
-        repeatModeOverride: controls.repeatMode,
-        sleepTimerOverride: controls.sleepTimer,
-      ));
+      emit(
+        state.toPlaying(
+          speedOverride: controls.speed,
+          repeatModeOverride: controls.repeatMode,
+          sleepTimerOverride: controls.sleepTimer,
+        ),
+      );
     } else if (!playing && state is PlaybackPlaying) {
       emit(state.toPaused());
     }

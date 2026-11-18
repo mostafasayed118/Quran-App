@@ -63,7 +63,7 @@ class _ServiceGrid extends StatelessWidget {
 typedef _Service = ({
   IconData icon,
   String Function(AppLocalizations) label,
-  String route
+  String route,
 });
 
 const List<_Service> _quranServices = [
@@ -72,7 +72,7 @@ const List<_Service> _quranServices = [
   (
     icon: Icons.bookmarks_outlined,
     label: _locBookmarks,
-    route: AppRoutes.bookmarks
+    route: AppRoutes.bookmarks,
   ),
 ];
 
@@ -83,7 +83,7 @@ const List<_Service> _worshipServices = [
   (
     icon: Icons.radio_button_checked,
     label: _locTasbih,
-    route: AppRoutes.tasbih
+    route: AppRoutes.tasbih,
   ),
   (icon: Icons.volunteer_activism, label: _locDuas, route: AppRoutes.duas),
   (icon: Icons.mosque, label: _locWorship, route: AppRoutes.worship),

@@ -97,22 +97,24 @@ void main() {
       expect(await service.alreadyRequested, isTrue);
     });
 
-    test('a failing plugin is swallowed and never reported to the user',
-        () async {
-      final db = newTestDb();
-      final gateway = _FakeGateway(requestError: StateError('plugin boom'));
-      final service = ReviewService(
-        db: db,
-        gateway: gateway,
-        delayer: (_) async {},
-      );
+    test(
+      'a failing plugin is swallowed and never reported to the user',
+      () async {
+        final db = newTestDb();
+        final gateway = _FakeGateway(requestError: StateError('plugin boom'));
+        final service = ReviewService(
+          db: db,
+          gateway: gateway,
+          delayer: (_) async {},
+        );
 
-      // Must not throw.
-      await service.maybeRequestAfterOnboarding();
-      await pumpEventQueue();
+        // Must not throw.
+        await service.maybeRequestAfterOnboarding();
+        await pumpEventQueue();
 
-      expect(await service.alreadyRequested, isTrue);
-    });
+        expect(await service.alreadyRequested, isTrue);
+      },
+    );
 
     test('the delay elapses before the gateway is consulted', () async {
       final db = newTestDb();

@@ -47,44 +47,47 @@ void main() {
     await db.close();
   });
 
-  testWidgets('a new identity creates and starts one cubit and closes the old',
-      (tester) async {
-    var created = 0;
-    var started = 0;
-    var closed = 0;
+  testWidgets(
+    'a new identity creates and starts one cubit and closes the old',
+    (tester) async {
+      var created = 0;
+      var started = 0;
+      var closed = 0;
 
-    Widget host(int surah) {
-      return appShell(
+      Widget host(int surah) {
+        return appShell(
           home: Scaffold(
-        body: ReaderRouteScope(
-          surah: surah,
-          ayah: 0,
-          create: () {
-            created++;
-            return _CountingReaderCubit(
-              ayahRepository: AyahRepository(db),
-              lastReadRepository: LastReadRepository(db),
+            body: ReaderRouteScope(
               surah: surah,
-              onStart: () => started++,
-              onClose: () => closed++,
-            );
-          },
-          child: const SizedBox.shrink(),
-        ),
-      ));
-    }
+              ayah: 0,
+              create: () {
+                created++;
+                return _CountingReaderCubit(
+                  ayahRepository: AyahRepository(db),
+                  lastReadRepository: LastReadRepository(db),
+                  surah: surah,
+                  onStart: () => started++,
+                  onClose: () => closed++,
+                );
+              },
+              child: const SizedBox.shrink(),
+            ),
+          ),
+        );
+      }
 
-    await tester.pumpWidget(host(1));
-    await tester.pump();
-    expect(created, 1);
-    expect(started, 1);
-    expect(closed, 0);
+      await tester.pumpWidget(host(1));
+      await tester.pump();
+      expect(created, 1);
+      expect(started, 1);
+      expect(closed, 0);
 
-    await tester.pumpWidget(host(2));
-    await tester.pump();
+      await tester.pumpWidget(host(2));
+      await tester.pump();
 
-    expect(created, 2);
-    expect(started, 2);
-    expect(closed, 1);
-  });
+      expect(created, 2);
+      expect(started, 2);
+      expect(closed, 1);
+    },
+  );
 }

@@ -35,22 +35,17 @@ PrayerName _periodAt(
   DateTime now, {
   DateTime? sunrise,
   bool hasSunrise = true,
-}) =>
-    prayerPeriodAt(
-      now: now,
-      fajr: _fajr,
-      sunrise: hasSunrise ? (sunrise ?? _sunrise) : null,
-      dhuhr: _dhuhr,
-      asr: _asr,
-      maghrib: _maghrib,
-      isha: _isha,
-    );
+}) => prayerPeriodAt(
+  now: now,
+  fajr: _fajr,
+  sunrise: hasSunrise ? (sunrise ?? _sunrise) : null,
+  dhuhr: _dhuhr,
+  asr: _asr,
+  maghrib: _maghrib,
+  isha: _isha,
+);
 
-DateTime? _nextAt(
-  DateTime now, {
-  DateTime? sunrise,
-  bool hasSunrise = true,
-}) =>
+DateTime? _nextAt(DateTime now, {DateTime? sunrise, bool hasSunrise = true}) =>
     nextPeriodBoundary(
       now: now,
       fajr: _fajr,
@@ -216,8 +211,10 @@ void main() {
       );
       // A degenerate sunrise (not before dhuhr) is the same case.
       expect(
-        _periodAt(DateTime(2026, 11, 14, 10),
-            sunrise: DateTime(2026, 11, 14, 13)),
+        _periodAt(
+          DateTime(2026, 11, 14, 10),
+          sunrise: DateTime(2026, 11, 14, 13),
+        ),
         PrayerName.fajr,
       );
       expect(
@@ -226,36 +223,38 @@ void main() {
       );
     });
 
-    test('a high-latitude day whose maghrib equals isha has no maghrib window',
-        () {
-      expect(_periodAt(_maghrib), PrayerName.maghrib);
-      // With maghrib == isha the maghrib window is empty: 18:00 is still asr,
-      // and the isha palette starts at 19:05.
-      expect(
-        prayerPeriodAt(
-          now: DateTime(2026, 11, 14, 18),
-          fajr: _fajr,
-          sunrise: _sunrise,
-          dhuhr: _dhuhr,
-          asr: _asr,
-          maghrib: _isha,
-          isha: _isha,
-        ),
-        PrayerName.asr,
-      );
-      expect(
-        prayerPeriodAt(
-          now: _isha,
-          fajr: _fajr,
-          sunrise: _sunrise,
-          dhuhr: _dhuhr,
-          asr: _asr,
-          maghrib: _isha,
-          isha: _isha,
-        ),
-        PrayerName.isha,
-      );
-    });
+    test(
+      'a high-latitude day whose maghrib equals isha has no maghrib window',
+      () {
+        expect(_periodAt(_maghrib), PrayerName.maghrib);
+        // With maghrib == isha the maghrib window is empty: 18:00 is still asr,
+        // and the isha palette starts at 19:05.
+        expect(
+          prayerPeriodAt(
+            now: DateTime(2026, 11, 14, 18),
+            fajr: _fajr,
+            sunrise: _sunrise,
+            dhuhr: _dhuhr,
+            asr: _asr,
+            maghrib: _isha,
+            isha: _isha,
+          ),
+          PrayerName.asr,
+        );
+        expect(
+          prayerPeriodAt(
+            now: _isha,
+            fajr: _fajr,
+            sunrise: _sunrise,
+            dhuhr: _dhuhr,
+            asr: _asr,
+            maghrib: _isha,
+            isha: _isha,
+          ),
+          PrayerName.isha,
+        );
+      },
+    );
   });
 
   group('nextPeriodBoundary', () {
@@ -336,27 +335,31 @@ void main() {
       await controller.refresh();
 
       expect(controller.period, PrayerName.isha);
-      expect(timers.single.delay,
-          const Duration(hours: 4, minutes: 30, seconds: 1));
-    });
-
-    test('a device that slept across several boundaries jumps to the right one',
-        () async {
-      final controller = build();
-      await controller.refresh();
-      expect(controller.period, PrayerName.sunrise);
-
-      // Woke at 18:00: crossed dhuhr, asr and maghrib while asleep.
-      clock = DateTime(2026, 11, 14, 18);
-      await controller.refresh();
-
-      expect(controller.period, PrayerName.maghrib);
-      expect(timers, hasLength(2)); // One new timer, not one per boundary.
       expect(
-        timers.last.delay,
-        const Duration(hours: 1, minutes: 5, seconds: 1),
+        timers.single.delay,
+        const Duration(hours: 4, minutes: 30, seconds: 1),
       );
     });
+
+    test(
+      'a device that slept across several boundaries jumps to the right one',
+      () async {
+        final controller = build();
+        await controller.refresh();
+        expect(controller.period, PrayerName.sunrise);
+
+        // Woke at 18:00: crossed dhuhr, asr and maghrib while asleep.
+        clock = DateTime(2026, 11, 14, 18);
+        await controller.refresh();
+
+        expect(controller.period, PrayerName.maghrib);
+        expect(timers, hasLength(2)); // One new timer, not one per boundary.
+        expect(
+          timers.last.delay,
+          const Duration(hours: 1, minutes: 5, seconds: 1),
+        );
+      },
+    );
 
     test('two rapid plan changes settle on the last one', () async {
       clock = DateTime(2026, 11, 14, 12, 30);
@@ -440,36 +443,41 @@ void main() {
       await controller.refresh(); // Must not throw or notify.
     });
 
-    test('stop cancels the timer and keeps the period; start re-arms it',
-        () async {
-      Timer? armed;
-      final controller = PrayerPeriodController(
-        city: city,
-        times: times,
-        config: config,
-        cityChanges: cityChanges.stream,
-        now: () => clock,
-        schedule: (delay, fire) {
-          armed = Timer(const Duration(days: 3650), () {});
-          return armed!;
-        },
-      );
-      addTearDown(controller.dispose);
+    test(
+      'stop cancels the timer and keeps the period; start re-arms it',
+      () async {
+        Timer? armed;
+        final controller = PrayerPeriodController(
+          city: city,
+          times: times,
+          config: config,
+          cityChanges: cityChanges.stream,
+          now: () => clock,
+          schedule: (delay, fire) {
+            armed = Timer(const Duration(days: 3650), () {});
+            return armed!;
+          },
+        );
+        addTearDown(controller.dispose);
 
-      controller.start();
-      await pumpEventQueue();
-      expect(controller.period, PrayerName.sunrise);
-      expect(armed?.isActive, isTrue);
+        controller.start();
+        await pumpEventQueue();
+        expect(controller.period, PrayerName.sunrise);
+        expect(armed?.isActive, isTrue);
 
-      controller.stop();
-      controller.stop(); // Idempotent.
-      expect(armed?.isActive, isFalse);
-      expect(controller.period, PrayerName.sunrise); // The last period is kept.
+        controller.stop();
+        controller.stop(); // Idempotent.
+        expect(armed?.isActive, isFalse);
+        expect(
+          controller.period,
+          PrayerName.sunrise,
+        ); // The last period is kept.
 
-      controller.start();
-      await pumpEventQueue();
-      expect(armed?.isActive, isTrue);
-    });
+        controller.start();
+        await pumpEventQueue();
+        expect(armed?.isActive, isTrue);
+      },
+    );
 
     test('without a city stream start still computes', () async {
       final controller = PrayerPeriodController(

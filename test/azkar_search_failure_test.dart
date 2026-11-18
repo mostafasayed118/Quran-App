@@ -5,25 +5,26 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_cubit.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_state.dart';
 
 Map<String, dynamic> _root() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'اللَّهُمَّ بِكَ أَصْبَحْنَا', 'count': 1},
       ],
-    };
+    },
+  ],
+};
 
 class _FailingSearchRepository extends AzkarRepository {
   _FailingSearchRepository() : super(loader: () async => _root());
 
   @override
-  Future<AzkarSearchResults> search(String query,
-          {int limit = AzkarRepository.searchLimit}) =>
-      Future<AzkarSearchResults>.error(StateError('search down'));
+  Future<AzkarSearchResults> search(
+    String query, {
+    int limit = AzkarRepository.searchLimit,
+  }) => Future<AzkarSearchResults>.error(StateError('search down'));
 }
 
 void main() {

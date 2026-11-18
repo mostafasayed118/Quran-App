@@ -152,7 +152,6 @@ class SettingsTable extends Table {
 }
 
 @DataClassName('ReciterRow')
-
 /// Cached reciter rows mirroring the remote reciters catalog.
 class Reciters extends Table {
   /// Row id in `<reciterId>-<moshafId>` form.

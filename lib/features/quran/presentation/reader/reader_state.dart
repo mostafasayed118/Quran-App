@@ -33,9 +33,8 @@ sealed class ReaderState with _$ReaderState {
   /// The load failed. [emptySurahId] is set when the surah itself has no
   /// readable ayahs — a distinct, user-meaningful reason the screen shows
   /// instead of the generic error pane.
-  const factory ReaderState.failed({
-    @Default(null) int? emptySurahId,
-  }) = ReaderFailed;
+  const factory ReaderState.failed({@Default(null) int? emptySurahId}) =
+      ReaderFailed;
 }
 
 /// The mushaf pages, derived from [ReaderReady.ayahs] and memoized per

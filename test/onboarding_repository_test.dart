@@ -23,21 +23,25 @@ void main() {
 
   test('an unrelated settings row is untouched', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(key: 'unrelated', value: 'keep-me'),
         );
 
     await OnboardingRepository(db).markCompleted();
 
-    final row = await (db.select(db.settingsTable)
-          ..where((s) => s.key.equals('unrelated')))
-        .getSingle();
+    final row = await (db.select(
+      db.settingsTable,
+    )..where((s) => s.key.equals('unrelated'))).getSingle();
     expect(row.value, 'keep-me');
   });
 
   test('a malformed flag reads as not completed', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: OnboardingRepository.completedKey,
             value: 'yes',

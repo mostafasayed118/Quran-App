@@ -34,17 +34,19 @@ class _StaticReciterRepository extends ReciterRepository {
 
   @override
   Future<ReciterRow?> byId(String rowId) async => const ReciterRow(
-        id: '51-53',
-        reciterName: 'عبدالباسط عبدالصمد',
-        moshafName: 'حفص عن عاصم - مرتل',
-        server: 'PLACEHOLDER',
-        surahList: '1,2',
-        surahTotal: 114,
-      );
+    id: '51-53',
+    reciterName: 'عبدالباسط عبدالصمد',
+    moshafName: 'حفص عن عاصم - مرتل',
+    server: 'PLACEHOLDER',
+    surahList: '1,2',
+    surahTotal: 114,
+  );
 
   @override
-  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async =>
-      {1: 'الفاتحة', 2: 'البقرة'};
+  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async => {
+    1: 'الفاتحة',
+    2: 'البقرة',
+  };
 
   @override
   Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async => {};
@@ -86,23 +88,20 @@ class _StreamedPlaybackService implements PlaybackService {
 }
 
 class _SeededDownloadsCubit extends DownloadsCubit {
-  _SeededDownloadsCubit({
-    required super.downloader,
-    required super.reciters,
-  });
+  _SeededDownloadsCubit({required super.downloader, required super.reciters});
 
   void seed(Map<String, DownloadItem> items) =>
       emit(DownloadsState(items: items));
 }
 
 ReciterRow _row({required String id, required String name}) => ReciterRow(
-      id: id,
-      reciterName: name,
-      moshafName: 'مرتل',
-      server: 'https://x/',
-      surahList: '1',
-      surahTotal: 114,
-    );
+  id: id,
+  reciterName: name,
+  moshafName: 'مرتل',
+  server: 'https://x/',
+  surahList: '1',
+  surahTotal: 114,
+);
 
 const _playRow = ReciterRow(
   id: '51-53',
@@ -121,22 +120,22 @@ void _usePhoneViewport(WidgetTester tester) {
 }
 
 Widget _shell(Widget home) => MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(2.0)),
-        child: child!,
-      ),
-      home: home,
-    );
+  locale: const Locale('ar'),
+  supportedLocales: const [Locale('ar'), Locale('en')],
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  theme: AppTheme.light,
+  builder: (context, child) => MediaQuery(
+    data: MediaQuery.of(context)
+        .copyWith(textScaler: const TextScaler.linear(2.0)),
+    child: child!,
+  ),
+  home: home,
+);
 
 void main() {
   late AppDatabase db;
@@ -153,8 +152,9 @@ void main() {
     }
   });
 
-  testWidgets('textScale 2.0: the reciters list survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the reciters list survives the layout', (
+    tester,
+  ) async {
     _usePhoneViewport(tester);
     final repo = _StaticReciterRepository(db, [
       _row(id: '51-53', name: 'عبدالباسط عبدالصمد'),
@@ -163,14 +163,19 @@ void main() {
     final cubit = RecitersCubit(repo: repo);
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(_shell(
-      BlocProvider<RecitersCubit>.value(
-        value: cubit,
-        child: const RecitersScreen(),
+    await tester.pumpWidget(
+      _shell(
+        BlocProvider<RecitersCubit>.value(
+          value: cubit,
+          child: const RecitersScreen(),
+        ),
       ),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('عبدالباسط عبدالصمد'), findsOneWidget);
@@ -178,59 +183,77 @@ void main() {
   });
 
   testWidgets(
-      'textScale 2.0: reciter surah rows with download states survive the layout',
-      (tester) async {
-    _usePhoneViewport(tester);
-    final repo = _StaticReciterRepository(db, const []);
-    final downloads = _SeededDownloadsCubit(
-      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
-      reciters: repo,
-    );
-    addTearDown(downloads.close);
-    final playback = PlaybackCubit(
-      service: _StreamedPlaybackService(),
-      reciters: repo,
-      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
-      backgroundActive: () => true,
-    );
-    addTearDown(playback.close);
-    final surahs = ReciterSurahsCubit(
-      reciters: repo,
-      downloads: downloads,
-      rowId: '51-53',
-    );
-    addTearDown(surahs.close);
-    await surahs.start();
-    await tester.pumpWidget(_shell(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: playback),
-        BlocProvider<DownloadsCubit>.value(value: downloads),
-        BlocProvider<ReciterSurahsCubit>.value(value: surahs),
-      ],
-      child: const ReciterSurahsScreen(),
-    )));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    'textScale 2.0: reciter surah rows with download states survive the layout',
+    (tester) async {
+      _usePhoneViewport(tester);
+      final repo = _StaticReciterRepository(db, const []);
+      final downloads = _SeededDownloadsCubit(
+        downloader: AudioDownloader(
+          db,
+          audioRootResolver: () async => tempRoot,
+        ),
+        reciters: repo,
+      );
+      addTearDown(downloads.close);
+      final playback = PlaybackCubit(
+        service: _StreamedPlaybackService(),
+        reciters: repo,
+        downloader: AudioDownloader(
+          db,
+          audioRootResolver: () async => tempRoot,
+        ),
+        backgroundActive: () => true,
+      );
+      addTearDown(playback.close);
+      final surahs = ReciterSurahsCubit(
+        reciters: repo,
+        downloads: downloads,
+        rowId: '51-53',
+      );
+      addTearDown(surahs.close);
+      await surahs.start();
+      await tester.pumpWidget(
+        _shell(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<PlaybackCubit>.value(value: playback),
+              BlocProvider<DownloadsCubit>.value(value: downloads),
+              BlocProvider<ReciterSurahsCubit>.value(value: surahs),
+            ],
+            child: const ReciterSurahsScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    downloads.seed({
-      '51-53-1': const DownloadItem(
-        status: DownloadStatus.downloading,
-        received: 1572864, // 1.5 MiB
-        total: 3145728, // 3.0 MiB
-      ),
-      '51-53-2': const DownloadItem(status: DownloadStatus.done),
-    });
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      downloads.seed({
+        '51-53-1': const DownloadItem(
+          status: DownloadStatus.downloading,
+          received: 1572864, // 1.5 MiB
+          total: 3145728, // 3.0 MiB
+        ),
+        '51-53-2': const DownloadItem(status: DownloadStatus.done),
+      });
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('الفاتحة'), findsOneWidget);
-    expect(find.text('١.٥ من ٣.٠ م.ب'), findsOneWidget);
-    expect(find.byIcon(Icons.check), findsOneWidget);
-  });
+      expect(tester.takeException(), isNull);
+      expect(find.text('الفاتحة'), findsOneWidget);
+      expect(find.text('١.٥ من ٣.٠ م.ب'), findsOneWidget);
+      expect(find.byIcon(Icons.check), findsOneWidget);
+    },
+  );
 
-  testWidgets('textScale 2.0: the playing mini player survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the playing mini player survives the layout', (
+    tester,
+  ) async {
     _usePhoneViewport(tester);
     final fake = _StreamedPlaybackService();
     final cubit = PlaybackCubit(
@@ -240,51 +263,76 @@ void main() {
       backgroundActive: () => true,
     );
     addTearDown(cubit.close);
-    await tester.pumpWidget(_shell(Scaffold(
-      bottomSheet: BlocProvider<PlaybackCubit>.value(
-        value: cubit,
-        child: const MiniPlayerBar(),
+    await tester.pumpWidget(
+      _shell(
+        Scaffold(
+          bottomSheet: BlocProvider<PlaybackCubit>.value(
+            value: cubit,
+            child: const MiniPlayerBar(),
+          ),
+        ),
       ),
-    )));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await cubit.playSurah(_playRow, 1);
     fake.durationCtrl.add(const Duration(minutes: 6));
     fake.positionCtrl.add(Duration.zero);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.textContaining('عبدالباسط عبدالصمد'), findsOneWidget);
     expect(find.text('سورة ١'), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0: the failed mini player strip survives the layout',
-      (tester) async {
-    _usePhoneViewport(tester);
-    final fake = _StreamedPlaybackService()..loadError = StateError('x');
-    final cubit = PlaybackCubit(
-      service: fake,
-      reciters: _StaticReciterRepository(db, const []),
-      downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
-      backgroundActive: () => true,
-    );
-    addTearDown(cubit.close);
-    await tester.pumpWidget(_shell(Scaffold(
-      bottomSheet: BlocProvider<PlaybackCubit>.value(
-        value: cubit,
-        child: const MiniPlayerBar(),
-      ),
-    )));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  testWidgets(
+    'textScale 2.0: the failed mini player strip survives the layout',
+    (tester) async {
+      _usePhoneViewport(tester);
+      final fake = _StreamedPlaybackService()..loadError = StateError('x');
+      final cubit = PlaybackCubit(
+        service: fake,
+        reciters: _StaticReciterRepository(db, const []),
+        downloader: AudioDownloader(
+          db,
+          audioRootResolver: () async => tempRoot,
+        ),
+        backgroundActive: () => true,
+      );
+      addTearDown(cubit.close);
+      await tester.pumpWidget(
+        _shell(
+          Scaffold(
+            bottomSheet: BlocProvider<PlaybackCubit>.value(
+              value: cubit,
+              child: const MiniPlayerBar(),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    await cubit.playSurah(_playRow, 1);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+      await cubit.playSurah(_playRow, 1);
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(tester.takeException(), isNull);
-    expect(find.text('تعذّر تشغيل التلاوة'), findsOneWidget);
-  });
+      expect(tester.takeException(), isNull);
+      expect(find.text('تعذّر تشغيل التلاوة'), findsOneWidget);
+    },
+  );
 }

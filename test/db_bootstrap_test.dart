@@ -23,13 +23,23 @@ void main() {
         ByteData.sublistView(Uint8List.fromList([9, 8, 7]));
 
     await copyDbAssetIfAbsent(
-        target: target, assetKey: 'assets/db/quran.sqlite', loadAsset: loader);
-    expect(await target.readAsBytes(), [...sqliteHeader, 1, 2, 3],
-        reason: 'existing file untouched');
+      target: target,
+      assetKey: 'assets/db/quran.sqlite',
+      loadAsset: loader,
+    );
+    expect(await target.readAsBytes(), [
+      ...sqliteHeader,
+      1,
+      2,
+      3,
+    ], reason: 'existing file untouched');
 
     await target.delete();
     await copyDbAssetIfAbsent(
-        target: target, assetKey: 'assets/db/quran.sqlite', loadAsset: loader);
+      target: target,
+      assetKey: 'assets/db/quran.sqlite',
+      loadAsset: loader,
+    );
     expect(await target.readAsBytes(), [9, 8, 7], reason: 'absent file copied');
 
     await dir.delete(recursive: true);

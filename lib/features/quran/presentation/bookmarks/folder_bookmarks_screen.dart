@@ -32,39 +32,43 @@ class FolderBookmarksScreen extends StatelessWidget {
           builder: (context, state) => switch (state) {
             FolderBookmarksLoading() => const LoadingView(),
             FolderBookmarksFailed() => errorPane(loc, onRetry: cubit.start),
-            FolderBookmarksReady(:final items) when items.isEmpty =>
-              EmptyState(loc.bookmarkFolderEmpty, icon: Icons.folder_open),
+            FolderBookmarksReady(:final items) when items.isEmpty => EmptyState(
+              loc.bookmarkFolderEmpty,
+              icon: Icons.folder_open,
+            ),
             FolderBookmarksReady(:final items) => ListView.builder(
-                padding: EdgeInsets.only(bottom: appBottomInset(context)),
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  final verse = item.verse;
-                  return ListTile(
-                    leading: Text(
-                      '${loc.number(verse.surahId)}:${loc.number(verse.numberInSurah)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                      textDirection: TextDirection.rtl,
-                    ),
-                    title: Text(
-                      verse.textImlaei,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    subtitle: item.note.isEmpty
-                        ? null
-                        : Text(
-                            item.note,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                    onTap: () => context.push(quranReaderPath(
+              padding: EdgeInsets.only(bottom: appBottomInset(context)),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                final verse = item.verse;
+                return ListTile(
+                  leading: Text(
+                    '${loc.number(verse.surahId)}:${loc.number(verse.numberInSurah)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    textDirection: TextDirection.rtl,
+                  ),
+                  title: Text(
+                    verse.textImlaei,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  subtitle: item.note.isEmpty
+                      ? null
+                      : Text(
+                          item.note,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                  onTap: () => context.push(
+                    quranReaderPath(
                       surah: verse.surahId,
                       ayah: verse.numberInSurah,
-                    )),
-                  );
-                },
-              ),
+                    ),
+                  ),
+                );
+              },
+            ),
           },
         ),
       ),

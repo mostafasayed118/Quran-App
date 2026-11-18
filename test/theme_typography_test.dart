@@ -73,7 +73,10 @@ void main() {
         hits.add(entity.path);
       }
     }
-    expect(hits, isEmpty,
-        reason: 'use w400/w700, or change the bundled Cairo weights first');
+    expect(
+      hits,
+      isEmpty,
+      reason: 'use w400/w700, or change the bundled Cairo weights first',
+    );
   });
 }

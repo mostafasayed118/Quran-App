@@ -28,9 +28,9 @@ void main() {
 
   /// The wird toggle (A1b) adds a second Switch; scope the azkar finder.
   Finder azkarSwitch() => find.descendant(
-        of: find.widgetWithText(SwitchListTile, 'تذكير الأذكار'),
-        matching: find.byType(Switch),
-      );
+    of: find.widgetWithText(SwitchListTile, 'تذكير الأذكار'),
+    matching: find.byType(Switch),
+  );
 
   Future<void> pumpHost(WidgetTester tester, {double? textScale}) async {
     final cubit = SettingsCubit(
@@ -50,8 +50,9 @@ void main() {
     );
   }
 
-  testWidgets('renders the minimal surface with the persisted defaults',
-      (tester) async {
+  testWidgets('renders the minimal surface with the persisted defaults', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     expect(find.text('الإعدادات'), findsOneWidget);
@@ -66,13 +67,17 @@ void main() {
     );
   });
 
-  testWidgets('toggling on persists and shows no hint when granted',
-      (tester) async {
+  testWidgets('toggling on persists and shows no hint when granted', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(await settings.azkarEnabled(), isTrue);
     expect(tester.widget<Switch>(azkarSwitch()).value, isTrue);
@@ -88,8 +93,11 @@ void main() {
     await pumpHost(tester);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(
       find.text('إن لم تصلك التذكيرات، فعِّل إذن الإشعارات من إعدادات جهازك'),
@@ -97,26 +105,39 @@ void main() {
     );
   });
 
-  testWidgets('time tile opens the material picker once enabled',
-      (tester) async {
+  testWidgets('time tile opens the material picker once enabled', (
+    tester,
+  ) async {
     await pumpHost(tester);
 
     await tester.tap(find.text('وقت التذكير'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byType(TimePickerDialog), findsNothing);
 
     await tester.tap(azkarSwitch());
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.text('وقت التذكير'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byType(TimePickerDialog), findsOneWidget);
 
     await tester.tap(find.text('الإلغاء'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byType(TimePickerDialog), findsNothing);
   });
 
@@ -131,8 +152,9 @@ void main() {
     expect(tester.getSize(find.byType(ListView)).width, 720);
   });
 
-  testWidgets('320 dp at textScale 2.0 survives the settings list',
-      (tester) async {
+  testWidgets('320 dp at textScale 2.0 survives the settings list', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -143,8 +165,9 @@ void main() {
     expect(find.text('الإعدادات'), findsOneWidget);
   });
 
-  testWidgets('the dark-mode note follows the appearance picker',
-      (tester) async {
+  testWidgets('the dark-mode note follows the appearance picker', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(800, 1600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -168,12 +191,18 @@ void main() {
       home: SettingsScreen(theme: theme),
     );
 
-    expect(find.text('الوضع الليلي من إعدادات جهازك'), findsNothing,
-        reason: 'the user picked dark; the picker above owns the truth');
+    expect(
+      find.text('الوضع الليلي من إعدادات جهازك'),
+      findsNothing,
+      reason: 'the user picked dark; the picker above owns the truth',
+    );
 
     await theme.setMode(AppThemeMode.system);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('الوضع الليلي من إعدادات جهازك'), findsOneWidget);
   });

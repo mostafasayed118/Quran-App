@@ -4,25 +4,25 @@ import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 
 List<PrayerChoice> fakeDay() => [
-      PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-      PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-      PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-      PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-      PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-      PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-    ];
+  PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+  PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
+  PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
+  PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
+  PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
+  PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+];
 
 void main() {
   List<PrayerName> textCalls() => <PrayerName>[];
 
   ReminderTexts texts(List<PrayerName> calls) => ReminderTexts(
-        prayerTitle: (name) {
-          calls.add(name);
-          return 'حان موعد صلاة ${name.name}';
-        },
-        azkarTitle: 'أذكار الصباح',
-        azkarBody: 'أذكار الصباح',
-      );
+    prayerTitle: (name) {
+      calls.add(name);
+      return 'حان موعد صلاة ${name.name}';
+    },
+    azkarTitle: 'أذكار الصباح',
+    azkarBody: 'أذكار الصباح',
+  );
 
   test('next prayer is picked strictly ahead; sunrise is skipped', () {
     final calls = textCalls();

@@ -98,8 +98,11 @@ void main() {
     await cubit.setAsDefault().timeout(const Duration(seconds: 10));
 
     expect(reciters.selectAttempted, isTrue);
-    expect(cubit.state, isA<ReciterSurahsReady>(),
-        reason: 'setAsDefault must not emit a state change');
+    expect(
+      cubit.state,
+      isA<ReciterSurahsReady>(),
+      reason: 'setAsDefault must not emit a state change',
+    );
   });
 
   test('surah names and teasers are read concurrently', () async {
@@ -115,7 +118,10 @@ void main() {
 
     expect(ready.names, {1: 'الفاتحة'});
     expect(ready.previews, {1: 'الم'});
-    expect(reciters.teasersStartedAfterNamesFinished, isFalse,
-        reason: 'both reads must be in flight together (Future.wait)');
+    expect(
+      reciters.teasersStartedAfterNamesFinished,
+      isFalse,
+      reason: 'both reads must be in flight together (Future.wait)',
+    );
   });
 }

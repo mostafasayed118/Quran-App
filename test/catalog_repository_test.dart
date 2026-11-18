@@ -7,48 +7,46 @@ import 'package:quran_yahdi/features/library/data/catalog_repository.dart';
 import 'package:quran_yahdi/features/library/data/library_catalog.dart';
 
 List<Map<String, dynamic>> fixturePacks() => [
-      {
-        'id': 'ar-tafsir-muyassar',
-        'kind': 'tafsir',
-        'language': 'ar',
-        'titleAr': 'التفسير الميسر',
-        'titleEn': 'At-Tafsir Al-Muyassar',
-        'urlTemplate':
-            'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir/ar-tafsir-muyassar/{n}.json',
-        'fileCount': 114,
-        'approxSizeMb': 5.5,
-        'version': 'v1.2.2',
-      },
-      {
-        'id': 'ara-sirajtafseer',
-        'kind': 'translation',
-        'language': 'ar',
-        'titleAr': 'المختصر في التفسير (سِراج)',
-        'titleEn': 'At-Tafsir Al-Mukhtasar (Siraj)',
-        'sourceUrl':
-            'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-sirajtafseer.min.json',
-        'approxSizeMb': 2.0,
-        'version': '1',
-      },
-      {
-        'id': 'ara-bukhari',
-        'kind': 'hadith',
-        'language': 'ar',
-        'titleAr': 'صحيح البخاري',
-        'titleEn': 'Sahih al-Bukhari',
-        'sourceUrl':
-            'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari.min.json',
-        'approxSizeMb': 9.0,
-        'version': '1',
-      },
-    ];
+  {
+    'id': 'ar-tafsir-muyassar',
+    'kind': 'tafsir',
+    'language': 'ar',
+    'titleAr': 'التفسير الميسر',
+    'titleEn': 'At-Tafsir Al-Muyassar',
+    'urlTemplate': 'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api@v1.2.2/tafsir/ar-tafsir-muyassar/{n}.json',
+    'fileCount': 114,
+    'approxSizeMb': 5.5,
+    'version': 'v1.2.2',
+  },
+  {
+    'id': 'ara-sirajtafseer',
+    'kind': 'translation',
+    'language': 'ar',
+    'titleAr': 'المختصر في التفسير (سِراج)',
+    'titleEn': 'At-Tafsir Al-Mukhtasar (Siraj)',
+    'sourceUrl': 'https://cdn.jsdelivr.net/gh/fawazahmed0/quran-api@1/editions/ara-sirajtafseer.min.json',
+    'approxSizeMb': 2.0,
+    'version': '1',
+  },
+  {
+    'id': 'ara-bukhari',
+    'kind': 'hadith',
+    'language': 'ar',
+    'titleAr': 'صحيح البخاري',
+    'titleEn': 'Sahih al-Bukhari',
+    'sourceUrl': 'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari.min.json',
+    'approxSizeMb': 9.0,
+    'version': '1',
+  },
+];
 
 void main() {
   late CatalogRepository repo;
 
   setUp(() {
     repo = CatalogRepository(
-        source: BundledCatalogSource(loader: () async => fixturePacks()));
+      source: BundledCatalogSource(loader: () async => fixturePacks()),
+    );
   });
 
   test('lists all packs and filters by kind', () async {
@@ -105,7 +103,9 @@ void main() {
     final packs = await repo2.packs();
     final ids = packs.map((p) => p.id).toSet();
     expect(
-        ids, containsAll(<String>['ar-tafsir-muyassar', 'ara-sirajtafseer']));
+      ids,
+      containsAll(<String>['ar-tafsir-muyassar', 'ara-sirajtafseer']),
+    );
     expect(packs, hasLength(3));
   });
 
@@ -169,66 +169,86 @@ void main() {
     expect(packs, hasLength(3));
   });
 
-  test('bundled library catalog asset is well-formed (3 curated packs)',
-      () async {
-    final file = File('assets/data/library_catalog.json');
-    if (!file.existsSync()) {
-      markTestSkipped(
-          'working dir does not resolve the bundled asset from this runner');
-    }
-    final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-    final list = (json['packs'] as List).cast<Map<String, dynamic>>();
-    expect(list.length, 3);
-
-    final packs = await CatalogRepository(
-      source: BundledCatalogSource(loader: () async => list),
-    ).packs();
-    expect(packs, hasLength(3)); // every entry must parse
-
-    for (final pack in packs) {
-      expect(pack.id, isNotEmpty);
-      expect(pack.language, isNotEmpty);
-      expect(pack.titleAr, isNotEmpty);
-      expect(pack.titleEn, isNotEmpty);
-      expect(pack.version, isNotEmpty);
-      expect(pack.approxSizeMb, greaterThan(0));
-      final pinnedUrl = pack.sourceUrl ?? pack.urlTemplate;
-      expect(pinnedUrl, startsWith('https://cdn.jsdelivr.net/'),
-          reason: 'pack ${pack.id} URL must be pinned to the jsDelivr CDN');
-      expect(pinnedUrl, contains('@'),
-          reason: 'pack ${pack.id} URL must carry a pinned tag');
-      expect(pinnedUrl, isNot(contains('/latest/')),
-          reason: 'pack ${pack.id} URL must never float latest');
-    }
-
-    final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
-    expect(tafsirs, hasLength(1));
-    for (final pack in tafsirs) {
-      if (pack.urlTemplate == null) {
-        expect(pack.sourceUrl, isNotNull);
-        expect(pack.sha256, isNotNull,
-            reason: 'single-file tafsir ${pack.id} needs a sha256');
-        continue;
+  test(
+    'bundled library catalog asset is well-formed (3 curated packs)',
+    () async {
+      final file = File('assets/data/library_catalog.json');
+      if (!file.existsSync()) {
+        markTestSkipped(
+          'working dir does not resolve the bundled asset from this runner',
+        );
       }
-      expect(pack.urlTemplate!, contains('{n}'),
-          reason: 'tafsir template must carry the surah placeholder');
-      expect(pack.fileCount, 114);
-    }
+      final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+      final list = (json['packs'] as List).cast<Map<String, dynamic>>();
+      expect(list.length, 3);
 
-    final translations =
-        packs.where((p) => p.kind == LibraryPackKind.translation);
-    expect(translations, hasLength(1));
-    final hadiths = packs.where((p) => p.kind == LibraryPackKind.hadith);
-    expect(hadiths, hasLength(1));
+      final packs = await CatalogRepository(
+        source: BundledCatalogSource(loader: () async => list),
+      ).packs();
+      expect(packs, hasLength(3)); // every entry must parse
 
-    final ids = packs.map((p) => p.id).toSet();
-    expect(ids.length, 3, reason: 'pack ids must be unique');
-    expect(
+      for (final pack in packs) {
+        expect(pack.id, isNotEmpty);
+        expect(pack.language, isNotEmpty);
+        expect(pack.titleAr, isNotEmpty);
+        expect(pack.titleEn, isNotEmpty);
+        expect(pack.version, isNotEmpty);
+        expect(pack.approxSizeMb, greaterThan(0));
+        final pinnedUrl = pack.sourceUrl ?? pack.urlTemplate;
+        expect(
+          pinnedUrl,
+          startsWith('https://cdn.jsdelivr.net/'),
+          reason: 'pack ${pack.id} URL must be pinned to the jsDelivr CDN',
+        );
+        expect(
+          pinnedUrl,
+          contains('@'),
+          reason: 'pack ${pack.id} URL must carry a pinned tag',
+        );
+        expect(
+          pinnedUrl,
+          isNot(contains('/latest/')),
+          reason: 'pack ${pack.id} URL must never float latest',
+        );
+      }
+
+      final tafsirs = packs.where((p) => p.kind == LibraryPackKind.tafsir);
+      expect(tafsirs, hasLength(1));
+      for (final pack in tafsirs) {
+        if (pack.urlTemplate == null) {
+          expect(pack.sourceUrl, isNotNull);
+          expect(
+            pack.sha256,
+            isNotNull,
+            reason: 'single-file tafsir ${pack.id} needs a sha256',
+          );
+          continue;
+        }
+        expect(
+          pack.urlTemplate!,
+          contains('{n}'),
+          reason: 'tafsir template must carry the surah placeholder',
+        );
+        expect(pack.fileCount, 114);
+      }
+
+      final translations = packs.where(
+        (p) => p.kind == LibraryPackKind.translation,
+      );
+      expect(translations, hasLength(1));
+      final hadiths = packs.where((p) => p.kind == LibraryPackKind.hadith);
+      expect(hadiths, hasLength(1));
+
+      final ids = packs.map((p) => p.id).toSet();
+      expect(ids.length, 3, reason: 'pack ids must be unique');
+      expect(
         ids,
         containsAll(<String>[
           'ara-sirajtafseer',
           'eng-mohammedmarmadu',
           'ara-bukhari',
-        ]));
-  });
+        ]),
+      );
+    },
+  );
 }

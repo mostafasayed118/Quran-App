@@ -27,11 +27,12 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
     required Future<bool> Function() ready,
     required MediaPlaybackControl control,
     Duration readyTimeout = const Duration(seconds: 2),
-  })  : _ready = ready,
-        _control = control,
-        _readyTimeout = readyTimeout {
-    _completionSub =
-        _control.adhanCompleted.listen((_) => _emit(AdhanPlaybackState.idle));
+  }) : _ready = ready,
+       _control = control,
+       _readyTimeout = readyTimeout {
+    _completionSub = _control.adhanCompleted.listen(
+      (_) => _emit(AdhanPlaybackState.idle),
+    );
   }
 
   final Future<bool> Function() _ready;
@@ -56,24 +57,24 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
 
   @override
   Future<void> play(String trackId) => _enqueue(() async {
-        if (!await _ensureReady()) return;
-        await _control.stopForAdhan();
-        await _start(trackId, preview: false);
-      });
+    if (!await _ensureReady()) return;
+    await _control.stopForAdhan();
+    await _start(trackId, preview: false);
+  });
 
   @override
   Future<void> preview(String trackId) => _enqueue(() async {
-        if (!await _ensureReady()) return;
-        // A second audition replaces the first rather than mixing with it.
-        await _control.stopForAdhan();
-        await _start(trackId, preview: true);
-      });
+    if (!await _ensureReady()) return;
+    // A second audition replaces the first rather than mixing with it.
+    await _control.stopForAdhan();
+    await _start(trackId, preview: true);
+  });
 
   @override
   Future<void> stop() => _enqueue(() async {
-        await _control.stopForAdhan();
-        _emit(AdhanPlaybackState.idle);
-      });
+    await _control.stopForAdhan();
+    _emit(AdhanPlaybackState.idle);
+  });
 
   /// False when the plugin failed or never settled. The request is not an
   /// error: it is reported once and the player stays idle.
@@ -93,10 +94,12 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
   Future<void> _start(String trackId, {required bool preview}) async {
     final track = adhanById(trackId);
     try {
-      _emit(AdhanPlaybackState(
-        status: AdhanPlaybackStatus.playing,
-        trackId: track.id,
-      ));
+      _emit(
+        AdhanPlaybackState(
+          status: AdhanPlaybackStatus.playing,
+          trackId: track.id,
+        ),
+      );
       await _control.playAdhan(
         preview ? track.clipPath : track.assetPath,
         id: track.id,
@@ -124,10 +127,7 @@ class JustAudioAdhanPlayer implements AdhanPlayer {
     if (!_states.isClosed) _states.add(next);
   }
 
-  void _log(String message) => appLog(
-        message,
-        name: 'quran_yahdi/adhan',
-      );
+  void _log(String message) => appLog(message, name: 'quran_yahdi/adhan');
 
   /// Releases the stream and silences the player. Wired as the GetIt
   /// `dispose:` callback.

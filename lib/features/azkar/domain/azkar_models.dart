@@ -26,11 +26,11 @@ class AzkarItem {
   final String? reference;
 
   factory AzkarItem.fromJson(Map<String, dynamic> json) => AzkarItem(
-        text: json['text'] as String,
-        count: (json['count'] as int?) ?? 1,
-        virtue: json['virtue'] as String?,
-        reference: json['reference'] as String?,
-      );
+    text: json['text'] as String,
+    count: (json['count'] as int?) ?? 1,
+    virtue: json['virtue'] as String?,
+    reference: json['reference'] as String?,
+  );
 }
 
 /// A named group of remembrances (e.g. morning/evening).

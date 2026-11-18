@@ -13,7 +13,10 @@ void main() {
         )
         .get();
 
-    expect(rows, isNotEmpty,
-        reason: 'the bundled search index needs its own table');
+    expect(
+      rows,
+      isNotEmpty,
+      reason: 'the bundled search index needs its own table',
+    );
   });
 }

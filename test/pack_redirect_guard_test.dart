@@ -28,8 +28,11 @@ class _HopAdapter implements HttpClientAdapter {
   final List<bool?> followRedirectFlags = <bool?>[];
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     final uri = options.uri.toString();
     requested.add(uri);
     followRedirectFlags.add(options.followRedirects);
@@ -53,16 +56,16 @@ class _HopAdapter implements HttpClientAdapter {
 }
 
 LibraryPackInfo _pack(String sourceUrl) => LibraryPackInfo(
-      id: 'redirect-test',
-      kind: LibraryPackKind.translation,
-      language: 'en',
-      titleAr: 't',
-      titleEn: 't',
-      approxSizeMb: 0.001,
-      version: '1',
-      sourceUrl: sourceUrl,
-      sha256: List.filled(64, 'a').join(),
-    );
+  id: 'redirect-test',
+  kind: LibraryPackKind.translation,
+  language: 'en',
+  titleAr: 't',
+  titleEn: 't',
+  approxSizeMb: 0.001,
+  version: '1',
+  sourceUrl: sourceUrl,
+  sha256: List.filled(64, 'a').join(),
+);
 
 Future<Directory> _newRoot() async {
   final root = await Directory.systemTemp.createTemp('qy_pack_redirect');
@@ -95,9 +98,7 @@ void main() {
         isFalse,
       );
       expect(
-        isTrustedPackUri(
-          Uri.parse('https://cdn.jsdelivr.net:8443/pack.json'),
-        ),
+        isTrustedPackUri(Uri.parse('https://cdn.jsdelivr.net:8443/pack.json')),
         isFalse,
       );
     });
@@ -129,43 +130,49 @@ void main() {
   });
 
   group('pack downloader', () {
-    test('a redirect to a foreign host is rejected before it is requested',
-        () async {
-      final db = newTestDb();
-      addTearDown(db.close);
-      final root = await _newRoot();
-      final adapter = _HopAdapter({
-        'https://cdn.jsdelivr.net/start.json':
-            _Hop.redirect(302, 'https://evil.example/pack.json'),
-      });
-      final downloader = PackDownloader(
-        db,
-        dio: Dio()..httpClientAdapter = adapter,
-        libraryRootResolver: () async => root,
-      );
+    test(
+      'a redirect to a foreign host is rejected before it is requested',
+      () async {
+        final db = newTestDb();
+        addTearDown(db.close);
+        final root = await _newRoot();
+        final adapter = _HopAdapter({
+          'https://cdn.jsdelivr.net/start.json': _Hop.redirect(
+            302,
+            'https://evil.example/pack.json',
+          ),
+        });
+        final downloader = PackDownloader(
+          db,
+          dio: Dio()..httpClientAdapter = adapter,
+          libraryRootResolver: () async => root,
+        );
 
-      await expectLater(
-        downloader.install(_pack('https://cdn.jsdelivr.net/start.json')),
-        throwsA(isA<PackFailure>()),
-      );
-      expect(adapter.requested, ['https://cdn.jsdelivr.net/start.json']);
-      expect(adapter.followRedirectFlags, [false]);
-      final parts = root.existsSync()
-          ? root
-              .listSync(recursive: true)
-              .whereType<File>()
-              .where((f) => f.path.endsWith('.part'))
-          : const <File>[];
-      expect(parts, isEmpty);
-    });
+        await expectLater(
+          downloader.install(_pack('https://cdn.jsdelivr.net/start.json')),
+          throwsA(isA<PackFailure>()),
+        );
+        expect(adapter.requested, ['https://cdn.jsdelivr.net/start.json']);
+        expect(adapter.followRedirectFlags, [false]);
+        final parts = root.existsSync()
+            ? root
+                  .listSync(recursive: true)
+                  .whereType<File>()
+                  .where((f) => f.path.endsWith('.part'))
+            : const <File>[];
+        expect(parts, isEmpty);
+      },
+    );
 
     test('a redirect to http is rejected before it is requested', () async {
       final db = newTestDb();
       addTearDown(db.close);
       final root = await _newRoot();
       final adapter = _HopAdapter({
-        'https://cdn.jsdelivr.net/start.json':
-            _Hop.redirect(301, 'http://cdn.jsdelivr.net/pack.json'),
+        'https://cdn.jsdelivr.net/start.json': _Hop.redirect(
+          301,
+          'http://cdn.jsdelivr.net/pack.json',
+        ),
       });
       final downloader = PackDownloader(
         db,

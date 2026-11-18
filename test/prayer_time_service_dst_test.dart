@@ -14,33 +14,27 @@ void main() {
   const cairo = CityCoordinates(30.0444, 31.2357);
   const service = PrayerTimeService();
 
-  test('after isha the next prayer is strictly in the future (DST-end day)',
-      () {
-    final lateNight = DateTime(2026, 10, 29, 21, 26);
-    final next = service.nextPrayer(cairo, lateNight);
+  test(
+    'after isha the next prayer is strictly in the future (DST-end day)',
+    () {
+      final lateNight = DateTime(2026, 10, 29, 21, 26);
+      final next = service.nextPrayer(cairo, lateNight);
 
-    expect(
-      next.time.isAfter(lateNight),
-      isTrue,
-      reason: 'next prayer ${next.time} must be after $lateNight',
-    );
-    expect(next.name, PrayerName.fajr);
-  });
+      expect(
+        next.time.isAfter(lateNight),
+        isTrue,
+        reason: 'next prayer ${next.time} must be after $lateNight',
+      );
+      expect(next.name, PrayerName.fajr);
+    },
+  );
 
   test('after isha the next prayer is tomorrow, never today', () {
     final lateNight = DateTime(2026, 10, 29, 23, 50);
     final next = service.nextPrayer(cairo, lateNight);
 
-    final nextDay = DateTime(
-      next.time.year,
-      next.time.month,
-      next.time.day,
-    );
-    final today = DateTime(
-      lateNight.year,
-      lateNight.month,
-      lateNight.day,
-    );
+    final nextDay = DateTime(next.time.year, next.time.month, next.time.day);
+    final today = DateTime(lateNight.year, lateNight.month, lateNight.day);
     expect(next.time.isAfter(lateNight), isTrue);
     expect(nextDay, isNot(today));
   });

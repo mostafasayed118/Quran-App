@@ -24,7 +24,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_surahs_test');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -58,16 +60,21 @@ void main() {
     );
     addTearDown(surahs.close);
     await surahs.start();
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-        BlocProvider<DownloadsCubit>.value(value: downloads),
-        BlocProvider<ReciterSurahsCubit>.value(value: surahs),
-      ],
-      child: appShell(home: const ReciterSurahsScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+          BlocProvider<DownloadsCubit>.value(value: downloads),
+          BlocProvider<ReciterSurahsCubit>.value(value: surahs),
+        ],
+        child: appShell(home: const ReciterSurahsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   testWidgets('rows render surah names + opening ayah teasers', (tester) async {
@@ -87,24 +94,32 @@ void main() {
     await pumpSurahsHost(tester, downloads);
 
     await tester.tap(find.byIcon(Icons.download).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(downloads.enqueuedKey, '51-53-1');
   });
 
-  testWidgets('done row exposes delete; confirm delegates to removeDone',
-      (tester) async {
+  testWidgets('done row exposes delete; confirm delegates to removeDone', (
+    tester,
+  ) async {
     final dir = Directory('${tempRoot.path}/audio/51-53')
       ..createSync(recursive: true);
     final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
-    await db.into(db.downloads).insert(DownloadsCompanion.insert(
-          reciterId: '51-53',
-          surahId: 1,
-          status: 'done',
-          path: file.path,
-          bytes: const Value(3),
-        ));
+    await db
+        .into(db.downloads)
+        .insert(
+          DownloadsCompanion.insert(
+            reciterId: '51-53',
+            surahId: 1,
+            status: 'done',
+            path: file.path,
+            bytes: const Value(3),
+          ),
+        );
     final downloads = _StaticDownloadsCubit(db, tempRoot);
     addTearDown(downloads.close);
     await pumpSurahsHost(tester, downloads);
@@ -113,13 +128,19 @@ void main() {
     expect(find.byIcon(Icons.check), findsOneWidget);
 
     await tester.tap(find.byIcon(Icons.delete_outline));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byType(AlertDialog), findsOneWidget);
 
     await tester.tap(find.text('حذف').last);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(downloads.removedKeys, contains('51-53-1'));
   });
@@ -128,13 +149,17 @@ void main() {
     final dir = Directory('${tempRoot.path}/audio/51-53')
       ..createSync(recursive: true);
     final file = File('${dir.path}/001.mp3')..writeAsBytesSync([1, 2, 3]);
-    await db.into(db.downloads).insert(DownloadsCompanion.insert(
-          reciterId: '51-53',
-          surahId: 1,
-          status: 'done',
-          path: file.path,
-          bytes: const Value(3),
-        ));
+    await db
+        .into(db.downloads)
+        .insert(
+          DownloadsCompanion.insert(
+            reciterId: '51-53',
+            surahId: 1,
+            status: 'done',
+            path: file.path,
+            bytes: const Value(3),
+          ),
+        );
     final downloads = DownloadsCubit(
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: _StaticReciterRepository(db),
@@ -156,21 +181,25 @@ class _StaticReciterRepository extends ReciterRepository {
 
   @override
   Future<ReciterRow?> byId(String rowId) async => const ReciterRow(
-        id: '51-53',
-        reciterName: 'عبدالباسط عبدالصمد',
-        moshafName: 'حفص عن عاصم - مرتل',
-        server: 'PLACEHOLDER',
-        surahList: '1,2',
-        surahTotal: 114,
-      );
+    id: '51-53',
+    reciterName: 'عبدالباسط عبدالصمد',
+    moshafName: 'حفص عن عاصم - مرتل',
+    server: 'PLACEHOLDER',
+    surahList: '1,2',
+    surahTotal: 114,
+  );
 
   @override
-  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async =>
-      {1: 'الفاتحة', 2: 'البقرة'};
+  Future<Map<int, String>> surahNamesFor(List<int> surahIds) async => {
+    1: 'الفاتحة',
+    2: 'البقرة',
+  };
 
   @override
-  Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async =>
-      {1: 'الم', 2: 'ذلك الكتاب'};
+  Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async => {
+    1: 'الم',
+    2: 'ذلك الكتاب',
+  };
 
   @override
   Future<void> selectMoshaf(String rowId) async {}
@@ -178,14 +207,14 @@ class _StaticReciterRepository extends ReciterRepository {
 
 class _StaticDownloadsCubit extends DownloadsCubit {
   _StaticDownloadsCubit(AppDatabase db, Directory tempRoot)
-      : super(
-          downloader: AudioDownloader(
-            db,
-            dio: Dio(),
-            audioRootResolver: () async => tempRoot,
-          ),
-          reciters: _StaticReciterRepository(db),
-        );
+    : super(
+        downloader: AudioDownloader(
+          db,
+          dio: Dio(),
+          audioRootResolver: () async => tempRoot,
+        ),
+        reciters: _StaticReciterRepository(db),
+      );
 
   String? enqueuedKey;
   final List<String> removedKeys = <String>[];

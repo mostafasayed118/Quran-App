@@ -15,9 +15,7 @@ import 'support/test_db.dart';
 class _Hop {
   _Hop.redirect(this.status, String this.location) : body = const <int>[];
 
-  _Hop.ok(this.body)
-      : status = 200,
-        location = null;
+  _Hop.ok(this.body) : status = 200, location = null;
 
   final int status;
   final String? location;
@@ -33,8 +31,11 @@ class _HopAdapter implements HttpClientAdapter {
   final List<bool?> followRedirectFlags = <bool?>[];
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     final uri = options.uri.toString();
     requested.add(uri);
     followRedirectFlags.add(options.followRedirects);
@@ -61,14 +62,18 @@ const _trustedServer = 'https://server.mp3quran.net/mp3';
 final String _firstUrl = surahAudioUrl(_trustedServer, 1);
 
 Future<ReciterRow> _seedReciter(AppDatabase db, String server) async {
-  await db.into(db.reciters).insert(RecitersCompanion.insert(
-        id: '51-53',
-        reciterName: 'عبدالباسط عبدالصمد',
-        moshafName: 'حفص مرتل',
-        server: server,
-        surahList: '1',
-        surahTotal: 114,
-      ));
+  await db
+      .into(db.reciters)
+      .insert(
+        RecitersCompanion.insert(
+          id: '51-53',
+          reciterName: 'عبدالباسط عبدالصمد',
+          moshafName: 'حفص مرتل',
+          server: server,
+          surahList: '1',
+          surahTotal: 114,
+        ),
+      );
   return (db.select(db.reciters)).getSingle();
 }
 
@@ -92,50 +97,60 @@ Future<AudioDownloader> _downloader(
   AppDatabase db,
   Directory root,
   _HopAdapter adapter,
-) async =>
-    AudioDownloader(
-      db,
-      dio: Dio()..httpClientAdapter = adapter,
-      audioRootResolver: () async => root,
-      // One attempt: these tests pin the redirect guard, not the retry policy.
-      retryDelay: null,
-    );
+) async => AudioDownloader(
+  db,
+  dio: Dio()..httpClientAdapter = adapter,
+  audioRootResolver: () async => root,
+  // One attempt: these tests pin the redirect guard, not the retry policy.
+  retryDelay: null,
+);
 
 void main() {
-  test('trusted relative and absolute redirects are followed to the limit',
-      () async {
-    final db = newTestDb();
-    final root = await _newRoot('qy_audio_redirect_ok');
-    final reciter = await _seedReciter(db, _trustedServer);
-    final body = List<int>.generate(4096, (i) => i % 251);
-    final adapter = _HopAdapter({
-      _firstUrl: _Hop.redirect(302, '/h1/001.mp3'),
-      'https://server.mp3quran.net/h1/001.mp3':
-          _Hop.redirect(307, 'https://cdn.mp3quran.net/h2/001.mp3'),
-      'https://cdn.mp3quran.net/h2/001.mp3':
-          _Hop.redirect(308, '../h3/001.mp3'),
-      'https://cdn.mp3quran.net/h3/001.mp3': _Hop.ok(body),
-    });
-    final downloader = await _downloader(db, root, adapter);
+  test(
+    'trusted relative and absolute redirects are followed to the limit',
+    () async {
+      final db = newTestDb();
+      final root = await _newRoot('qy_audio_redirect_ok');
+      final reciter = await _seedReciter(db, _trustedServer);
+      final body = List<int>.generate(4096, (i) => i % 251);
+      final adapter = _HopAdapter({
+        _firstUrl: _Hop.redirect(302, '/h1/001.mp3'),
+        'https://server.mp3quran.net/h1/001.mp3': _Hop.redirect(
+          307,
+          'https://cdn.mp3quran.net/h2/001.mp3',
+        ),
+        'https://cdn.mp3quran.net/h2/001.mp3': _Hop.redirect(
+          308,
+          '../h3/001.mp3',
+        ),
+        'https://cdn.mp3quran.net/h3/001.mp3': _Hop.ok(body),
+      });
+      final downloader = await _downloader(db, root, adapter);
 
-    final file =
-        await downloader.downloadSurah(reciter: reciter, surahNumber: 1);
+      final file = await downloader.downloadSurah(
+        reciter: reciter,
+        surahNumber: 1,
+      );
 
-    expect(file.existsSync(), isTrue);
-    expect(await file.readAsBytes(), body);
-    expect(adapter.requested, <String>[
-      _firstUrl,
-      'https://server.mp3quran.net/h1/001.mp3',
-      'https://cdn.mp3quran.net/h2/001.mp3',
-      'https://cdn.mp3quran.net/h3/001.mp3',
-    ]);
-    expect(adapter.followRedirectFlags, everyElement(isFalse),
-        reason: 'every hop must be followed by the guard, not by Dio');
-    expect(_partFiles(root), isEmpty);
-    final row = await (db.select(db.downloads)).getSingle();
-    expect(row.status, 'done');
-    expect(row.bytes, body.length);
-  });
+      expect(file.existsSync(), isTrue);
+      expect(await file.readAsBytes(), body);
+      expect(adapter.requested, <String>[
+        _firstUrl,
+        'https://server.mp3quran.net/h1/001.mp3',
+        'https://cdn.mp3quran.net/h2/001.mp3',
+        'https://cdn.mp3quran.net/h3/001.mp3',
+      ]);
+      expect(
+        adapter.followRedirectFlags,
+        everyElement(isFalse),
+        reason: 'every hop must be followed by the guard, not by Dio',
+      );
+      expect(_partFiles(root), isEmpty);
+      final row = await (db.select(db.downloads)).getSingle();
+      expect(row.status, 'done');
+      expect(row.bytes, body.length);
+    },
+  );
 
   test('a redirect to http:// fails and never serves bytes', () async {
     final db = newTestDb();
@@ -152,8 +167,9 @@ void main() {
       throwsA(isA<DownloadFailure>()),
     );
 
-    expect(adapter.requested, <String>[_firstUrl],
-        reason: 'the insecure hop must be rejected before it is requested');
+    expect(adapter.requested, <String>[
+      _firstUrl,
+    ], reason: 'the insecure hop must be rejected before it is requested');
     expect(_partFiles(root), isEmpty);
     final row = await (db.select(db.downloads)).getSingle();
     expect(row.status, 'failed');
@@ -186,12 +202,18 @@ void main() {
     final reciter = await _seedReciter(db, _trustedServer);
     final adapter = _HopAdapter({
       _firstUrl: _Hop.redirect(302, '/h1/001.mp3'),
-      'https://server.mp3quran.net/h1/001.mp3':
-          _Hop.redirect(302, '/h2/001.mp3'),
-      'https://server.mp3quran.net/h2/001.mp3':
-          _Hop.redirect(302, '/h3/001.mp3'),
-      'https://server.mp3quran.net/h3/001.mp3':
-          _Hop.redirect(302, '/h4/001.mp3'),
+      'https://server.mp3quran.net/h1/001.mp3': _Hop.redirect(
+        302,
+        '/h2/001.mp3',
+      ),
+      'https://server.mp3quran.net/h2/001.mp3': _Hop.redirect(
+        302,
+        '/h3/001.mp3',
+      ),
+      'https://server.mp3quran.net/h3/001.mp3': _Hop.redirect(
+        302,
+        '/h4/001.mp3',
+      ),
       'https://server.mp3quran.net/h4/001.mp3': _Hop.ok(List<int>.filled(8, 3)),
     });
     final downloader = await _downloader(db, root, adapter);
@@ -201,10 +223,15 @@ void main() {
       throwsA(isA<DownloadFailure>()),
     );
 
-    expect(adapter.requested, hasLength(4),
-        reason: 'the initial request plus exactly three followed hops');
-    expect(adapter.requested,
-        isNot(contains('https://server.mp3quran.net/h4/001.mp3')));
+    expect(
+      adapter.requested,
+      hasLength(4),
+      reason: 'the initial request plus exactly three followed hops',
+    );
+    expect(
+      adapter.requested,
+      isNot(contains('https://server.mp3quran.net/h4/001.mp3')),
+    );
     expect(_partFiles(root), isEmpty);
     final row = await (db.select(db.downloads)).getSingle();
     expect(row.status, 'failed');
@@ -236,8 +263,10 @@ void main() {
     final adapter = _HopAdapter({_firstUrl: _Hop.ok(body)});
     final downloader = await _downloader(db, root, adapter);
 
-    final file =
-        await downloader.downloadSurah(reciter: reciter, surahNumber: 1);
+    final file = await downloader.downloadSurah(
+      reciter: reciter,
+      surahNumber: 1,
+    );
 
     expect(file.path, endsWith('001.mp3'));
     expect(await file.readAsBytes(), body);

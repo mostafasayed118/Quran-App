@@ -42,35 +42,41 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'madani',
-          ayahCount: 2,
-          pagesStart: 2,
-          pagesEnd: 2,
-        ));
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          AyahsCompanion.insert(
-            id: const Value(101),
-            surahId: 2,
-            numberInSurah: 1,
-            juz: 1,
-            page: 2,
-            textUthmani: 'الم',
-            textImlaei: 'الم',
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madani',
+            ayahCount: 2,
+            pagesStart: 2,
+            pagesEnd: 2,
           ),
-          AyahsCompanion.insert(
-            id: const Value(102),
-            surahId: 2,
-            numberInSurah: 2,
-            juz: 1,
-            page: 2,
-            textUthmani: 'ذلك الكتاب',
-            textImlaei: 'ذلك الكتاب',
-          ),
-        ]));
+        );
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        AyahsCompanion.insert(
+          id: const Value(101),
+          surahId: 2,
+          numberInSurah: 1,
+          juz: 1,
+          page: 2,
+          textUthmani: 'الم',
+          textImlaei: 'الم',
+        ),
+        AyahsCompanion.insert(
+          id: const Value(102),
+          surahId: 2,
+          numberInSurah: 2,
+          juz: 1,
+          page: 2,
+          textUthmani: 'ذلك الكتاب',
+          textImlaei: 'ذلك الكتاب',
+        ),
+      ]),
+    );
   });
 
   Future<void> pumpReader(WidgetTester tester) async {
@@ -85,39 +91,56 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
-  testWidgets('tapping the bookmark confirms that the verse was saved',
-      (tester) async {
+  testWidgets('tapping the bookmark confirms that the verse was saved', (
+    tester,
+  ) async {
     await pumpReader(tester);
 
     await tester.tap(find.text('الم').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.bookmark_border).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('تم حفظ الآية'), findsOneWidget);
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 
   test('a failed bookmark write reports false instead of throwing', () async {

@@ -27,10 +27,12 @@ void main() {
         .customSelect('SELECT COUNT(*) AS c FROM ayah_search')
         .getSingle();
     expect(count.read<int>('c'), 6236);
-    final stamp = await db.customSelect(
-      'SELECT value FROM settings_table WHERE key = ?',
-      variables: [const Variable(kSearchIndexVersionKey)],
-    ).getSingle();
+    final stamp = await db
+        .customSelect(
+          'SELECT value FROM settings_table WHERE key = ?',
+          variables: [const Variable(kSearchIndexVersionKey)],
+        )
+        .getSingle();
     expect(stamp.read<String>('value'), '$kContentVersion');
   });
 }

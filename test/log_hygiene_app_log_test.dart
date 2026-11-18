@@ -13,10 +13,12 @@ void main() {
   final files = Directory('lib')
       .listSync(recursive: true)
       .whereType<File>()
-      .where((file) =>
-          file.path.endsWith('.dart') &&
-          !file.path.endsWith('.g.dart') &&
-          !file.path.endsWith('.freezed.dart'))
+      .where(
+        (file) =>
+            file.path.endsWith('.dart') &&
+            !file.path.endsWith('.g.dart') &&
+            !file.path.endsWith('.freezed.dart'),
+      )
       .toList();
 
   test('only app_log.dart may call dev.log', () {
@@ -53,8 +55,12 @@ void main() {
 
   test('the helper itself is release-gated', () {
     final source = File('lib/core/utils/app_log.dart').readAsStringSync();
-    expect(source.contains('if (kReleaseMode) return;'), isTrue,
-        reason: 'appLog must no-op in a release build: the privacy policy '
-            'states that local logs are used during development only');
+    expect(
+      source.contains('if (kReleaseMode) return;'),
+      isTrue,
+      reason:
+          'appLog must no-op in a release build: the privacy policy '
+          'states that local logs are used during development only',
+    );
   });
 }

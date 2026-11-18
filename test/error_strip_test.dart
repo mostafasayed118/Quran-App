@@ -28,18 +28,16 @@ void main() {
     expect(find.text('تعذّر التنزيل'), findsOneWidget);
   });
 
-  testWidgets('icon shows when passed; no retry button without an action label',
-      (tester) async {
-    await pump(
-      tester,
-      ErrorStrip(
-        'فشل الشبكة',
-        icon: Icons.wifi_off,
-        onDismiss: () {},
-      ),
-    );
-    expect(find.byIcon(Icons.wifi_off), findsOneWidget);
-    expect(find.byType(TextButton), findsNothing);
-    expect(find.byIcon(Icons.close), findsOneWidget);
-  });
+  testWidgets(
+    'icon shows when passed; no retry button without an action label',
+    (tester) async {
+      await pump(
+        tester,
+        ErrorStrip('فشل الشبكة', icon: Icons.wifi_off, onDismiss: () {}),
+      );
+      expect(find.byIcon(Icons.wifi_off), findsOneWidget);
+      expect(find.byType(TextButton), findsNothing);
+      expect(find.byIcon(Icons.close), findsOneWidget);
+    },
+  );
 }

@@ -55,16 +55,17 @@ class BookmarksBody extends StatelessWidget {
       builder: (context, state) => switch (state) {
         BookmarksLoading() => const LoadingView(),
         BookmarksFailed() => errorPane(
-            loc,
-            onRetry: context.read<BookmarksCubit>().reload,
-          ),
-        BookmarksReady() => state.entries.isEmpty
-            ? EmptyState(
-                loc.noBookmarks,
-                actionLabel: onBrowseQuran == null ? null : loc.quran,
-                onAction: onBrowseQuran,
-              )
-            : _body(context, state),
+          loc,
+          onRetry: context.read<BookmarksCubit>().reload,
+        ),
+        BookmarksReady() =>
+          state.entries.isEmpty
+              ? EmptyState(
+                  loc.noBookmarks,
+                  actionLabel: onBrowseQuran == null ? null : loc.quran,
+                  onAction: onBrowseQuran,
+                )
+              : _body(context, state),
       },
     );
   }

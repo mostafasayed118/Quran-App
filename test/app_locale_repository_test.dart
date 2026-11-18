@@ -24,7 +24,9 @@ void main() {
 
   test('a malformed stored value falls back to Arabic', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: AppLocaleRepository.key,
             value: 'fr',
@@ -36,15 +38,17 @@ void main() {
 
   test('an unrelated settings row is untouched', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(key: 'unrelated', value: 'keep-me'),
         );
 
     await AppLocaleRepository(db).save(AppLanguage.english);
 
-    final row = await (db.select(db.settingsTable)
-          ..where((s) => s.key.equals('unrelated')))
-        .getSingle();
+    final row = await (db.select(
+      db.settingsTable,
+    )..where((s) => s.key.equals('unrelated'))).getSingle();
     expect(row.value, 'keep-me');
   });
 

@@ -34,8 +34,9 @@ void main() {
     );
   }
 
-  testWidgets('landscape 640x360 at textScale 2.0 does not overflow',
-      (tester) async {
+  testWidgets('landscape 640x360 at textScale 2.0 does not overflow', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(640, 360);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
@@ -47,8 +48,9 @@ void main() {
     expect(find.text('تصفير'), findsOneWidget);
   });
 
-  testWidgets('the dial announces its label and count to screen readers',
-      (tester) async {
+  testWidgets('the dial announces its label and count to screen readers', (
+    tester,
+  ) async {
     final handle = tester.ensureSemantics();
     try {
       await pump(tester);

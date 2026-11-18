@@ -19,11 +19,11 @@ class FolderBookmarksCubit extends Cubit<FolderBookmarksState> {
     required BookmarkMetaSource meta,
     required AyahLookup ayahs,
     AyahBatchLookup? batch,
-  })  : _folder = folder,
-        _meta = meta,
-        _ayahs = ayahs,
-        _batch = batch,
-        super(const FolderBookmarksState.loading());
+  }) : _folder = folder,
+       _meta = meta,
+       _ayahs = ayahs,
+       _batch = batch,
+       super(const FolderBookmarksState.loading());
 
   final String _folder;
   final BookmarkMetaSource _meta;
@@ -43,19 +43,20 @@ class FolderBookmarksCubit extends Cubit<FolderBookmarksState> {
       if (batch != null) {
         // One query for the whole folder instead of one per bookmark.
         for (final ayah in await batch.ayahsByIds(ids)) {
-          items.add(FolderBookmark(
-            verse: ayah.toVerse(),
-            note: meta[ayah.id]?.note ?? '',
-          ));
+          items.add(
+            FolderBookmark(
+              verse: ayah.toVerse(),
+              note: meta[ayah.id]?.note ?? '',
+            ),
+          );
         }
       } else {
         for (final id in ids) {
           final ayah = await _ayahs.ayahById(id);
           if (ayah == null) continue;
-          items.add(FolderBookmark(
-            verse: ayah.toVerse(),
-            note: meta[id]?.note ?? '',
-          ));
+          items.add(
+            FolderBookmark(verse: ayah.toVerse(), note: meta[id]?.note ?? ''),
+          );
         }
       }
       items.sort((a, b) {
@@ -65,13 +66,19 @@ class FolderBookmarksCubit extends Cubit<FolderBookmarksState> {
             : a.verse.numberInSurah.compareTo(b.verse.numberInSurah);
       });
       if (isClosed) return;
-      emit(FolderBookmarksState.ready(
-        folder: _folder,
-        items: List<FolderBookmark>.unmodifiable(items),
-      ));
+      emit(
+        FolderBookmarksState.ready(
+          folder: _folder,
+          items: List<FolderBookmark>.unmodifiable(items),
+        ),
+      );
     } on Object catch (error, stackTrace) {
-      appLog('folder bookmarks load failed',
-          name: 'quran_yahdi/bookmarks', error: error, stackTrace: stackTrace);
+      appLog(
+        'folder bookmarks load failed',
+        name: 'quran_yahdi/bookmarks',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const FolderBookmarksState.failed());
     }
   }

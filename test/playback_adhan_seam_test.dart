@@ -102,40 +102,52 @@ void main() {
     expect(cubit.state, isA<PlaybackPlaying>());
   }
 
-  test('an adhan start clears the surah without touching the shared player',
-      () async {
-    await startSurah();
+  test(
+    'an adhan start clears the surah without touching the shared player',
+    () async {
+      await startSurah();
 
-    adhan.add(const AdhanPlaybackState(
-      status: AdhanPlaybackStatus.playing,
-      trackId: 'abdulbasit',
-    ));
-    await _settle();
+      adhan.add(
+        const AdhanPlaybackState(
+          status: AdhanPlaybackStatus.playing,
+          trackId: 'abdulbasit',
+        ),
+      );
+      await _settle();
 
-    expect(cubit.state, isA<PlaybackInitial>(),
-        reason: 'the mini player must not claim the adhan is the surah');
-    expect(service.stopCount, 0,
-        reason: 'the adhan player already stopped the shared player');
+      expect(
+        cubit.state,
+        isA<PlaybackInitial>(),
+        reason: 'the mini player must not claim the adhan is the surah',
+      );
+      expect(
+        service.stopCount,
+        0,
+        reason: 'the adhan player already stopped the shared player',
+      );
 
-    // The shared player now belongs to the adhan; its events must not revive
-    // the surah state.
-    service.playing.add(true);
-    service.durationCtrl.add(const Duration(minutes: 3));
-    service.positionCtrl.add(const Duration(seconds: 5));
-    await _settle();
-    expect(cubit.state, isA<PlaybackInitial>());
+      // The shared player now belongs to the adhan; its events must not revive
+      // the surah state.
+      service.playing.add(true);
+      service.durationCtrl.add(const Duration(minutes: 3));
+      service.positionCtrl.add(const Duration(seconds: 5));
+      await _settle();
+      expect(cubit.state, isA<PlaybackInitial>());
 
-    adhan.add(AdhanPlaybackState.idle);
-    await _settle();
-    expect(cubit.state, isA<PlaybackInitial>());
-  });
+      adhan.add(AdhanPlaybackState.idle);
+      await _settle();
+      expect(cubit.state, isA<PlaybackInitial>());
+    },
+  );
 
   test('a new surah plays normally after the adhan ends', () async {
     await startSurah();
-    adhan.add(const AdhanPlaybackState(
-      status: AdhanPlaybackStatus.playing,
-      trackId: 'abdulbasit',
-    ));
+    adhan.add(
+      const AdhanPlaybackState(
+        status: AdhanPlaybackStatus.playing,
+        trackId: 'abdulbasit',
+      ),
+    );
     await _settle();
     adhan.add(AdhanPlaybackState.idle);
     await _settle();

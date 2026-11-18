@@ -23,7 +23,8 @@ class _ReminderReliabilitySection extends StatefulWidget {
 }
 
 class _ReminderReliabilitySectionState
-    extends State<_ReminderReliabilitySection> with WidgetsBindingObserver {
+    extends State<_ReminderReliabilitySection>
+    with WidgetsBindingObserver {
   List<ReminderIssue> _issues = const <ReminderIssue>[];
   bool _batteryUnknown = false;
 
@@ -104,7 +105,11 @@ class _ReminderReliabilitySectionState
         ),
         Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(
-              AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm),
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
           child: Text(
             loc.reminderReliabilityIntro,
             style: AppTheme.mutedFootnote(context),
@@ -126,30 +131,33 @@ class _ReminderReliabilitySectionState
   /// already says where to grant it), so that row carries no action rather
   /// than a button that cannot do anything.
   Widget _issueTile(AppLocalizations loc, ReminderIssue issue) {
-    final (IconData icon, String message, Future<bool> Function()? onFix) =
-        switch (issue) {
+    final (
+      IconData icon,
+      String message,
+      Future<bool> Function()? onFix,
+    ) = switch (issue) {
       ReminderIssue.notificationsOff => (
-          Icons.notifications_off_outlined,
-          loc.reminderIssueNotifications,
-          null,
-        ),
+        Icons.notifications_off_outlined,
+        loc.reminderIssueNotifications,
+        null,
+      ),
       ReminderIssue.exactAlarmsOff => (
-          Icons.alarm_off_outlined,
-          loc.reminderIssueExactAlarms,
-          widget.diagnostics.openExactAlarmSettings,
-        ),
+        Icons.alarm_off_outlined,
+        loc.reminderIssueExactAlarms,
+        widget.diagnostics.openExactAlarmSettings,
+      ),
       ReminderIssue.batteryRestricted => (
-          Icons.battery_alert_outlined,
-          loc.reminderIssueBattery,
-          widget.diagnostics.openBatteryOptimizationSettings,
-        ),
+        Icons.battery_alert_outlined,
+        loc.reminderIssueBattery,
+        widget.diagnostics.openBatteryOptimizationSettings,
+      ),
       // No system screen fixes this one: the next boot/resume retries the
       // write, so the row is the honest report, not a dead button.
       ReminderIssue.scheduleFailed => (
-          Icons.event_busy_outlined,
-          loc.reminderIssueScheduleFailed,
-          null,
-        ),
+        Icons.event_busy_outlined,
+        loc.reminderIssueScheduleFailed,
+        null,
+      ),
     };
     return ListTile(
       leading: Icon(icon),

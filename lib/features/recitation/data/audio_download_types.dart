@@ -30,21 +30,19 @@ class DownloadCancelToken {
 /// Raised when a surah audio download cannot be completed.
 class DownloadFailure implements Exception {
   /// A failure that may succeed on a second attempt (network, truncation).
-  DownloadFailure(this.message)
-      : retryable = true,
-        outOfSpace = false;
+  DownloadFailure(this.message) : retryable = true, outOfSpace = false;
 
   /// A failure the same request cannot fix (an HTML error page, a redirect
   /// chain, an unsupported scheme): retrying would only burn the queue.
   DownloadFailure.permanent(this.message)
-      : retryable = false,
-        outOfSpace = false;
+    : retryable = false,
+      outOfSpace = false;
 
   /// The write hit a full disk: the request is fine, the device is not.
   DownloadFailure.outOfSpace()
-      : message = 'no space left on device',
-        retryable = false,
-        outOfSpace = true;
+    : message = 'no space left on device',
+      retryable = false,
+      outOfSpace = true;
 
   /// Human-readable reason of the failure.
   final String message;

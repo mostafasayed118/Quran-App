@@ -41,15 +41,15 @@ class RuqyahEntry {
   bool get isQuran => kind == 'quran';
 
   factory RuqyahEntry.fromJson(Map<String, dynamic> json) => RuqyahEntry(
-        id: json['id'] as String,
-        kind: json['kind'] as String,
-        surahId: (json['surahId'] as num?)?.toInt(),
-        fromAyah: (json['fromAyah'] as num?)?.toInt(),
-        toAyah: (json['toAyah'] as num?)?.toInt(),
-        text: json['text'] as String?,
-        count: (json['count'] as int?) ?? 1,
-        reference: json['reference'] as String?,
-      );
+    id: json['id'] as String,
+    kind: json['kind'] as String,
+    surahId: (json['surahId'] as num?)?.toInt(),
+    fromAyah: (json['fromAyah'] as num?)?.toInt(),
+    toAyah: (json['toAyah'] as num?)?.toInt(),
+    text: json['text'] as String?,
+    count: (json['count'] as int?) ?? 1,
+    reference: json['reference'] as String?,
+  );
 }
 
 /// Reads the bundled ruqyah catalog.

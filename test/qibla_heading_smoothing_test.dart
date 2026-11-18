@@ -12,12 +12,12 @@ class _City implements CitySource {
 
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -38,47 +38,51 @@ void main() {
     expect(smoothHeadingDeg(90, 130), 130);
   });
 
-  test('the cubit filters jitter but passes the first sample exactly',
-      () async {
-    final heading = StreamController<double>.broadcast();
-    final cubit = QiblaCubit(
-      city: const _City(),
-      qibla: const QiblaService(),
-      heading: HeadingService(streamFactory: () => heading.stream),
-    );
-    addTearDown(() async {
-      await cubit.close();
-      await heading.close();
-    });
+  test(
+    'the cubit filters jitter but passes the first sample exactly',
+    () async {
+      final heading = StreamController<double>.broadcast();
+      final cubit = QiblaCubit(
+        city: const _City(),
+        qibla: const QiblaService(),
+        heading: HeadingService(streamFactory: () => heading.stream),
+      );
+      addTearDown(() async {
+        await cubit.close();
+        await heading.close();
+      });
 
-    await cubit.start();
-    heading.add(90);
-    await Future<void>.delayed(Duration.zero);
-    expect((cubit.state as QiblaReady).heading, 90);
+      await cubit.start();
+      heading.add(90);
+      await Future<void>.delayed(Duration.zero);
+      expect((cubit.state as QiblaReady).heading, 90);
 
-    heading.add(95);
-    await Future<void>.delayed(Duration.zero);
-    expect((cubit.state as QiblaReady).heading, closeTo(91.5, 1e-9));
+      heading.add(95);
+      await Future<void>.delayed(Duration.zero);
+      expect((cubit.state as QiblaReady).heading, closeTo(91.5, 1e-9));
 
-    heading.add(95);
-    await Future<void>.delayed(Duration.zero);
-    expect((cubit.state as QiblaReady).heading, closeTo(92.55, 1e-9));
+      heading.add(95);
+      await Future<void>.delayed(Duration.zero);
+      expect((cubit.state as QiblaReady).heading, closeTo(92.55, 1e-9));
 
-    heading.add(95);
-    await Future<void>.delayed(Duration.zero);
-    expect((cubit.state as QiblaReady).heading, closeTo(93.285, 1e-9));
-  });
+      heading.add(95);
+      await Future<void>.delayed(Duration.zero);
+      expect((cubit.state as QiblaReady).heading, closeTo(93.285, 1e-9));
+    },
+  );
 
   test('a resumed stream re-seeds the filter instead of dragging', () async {
     final controllers = <StreamController<double>>[];
     final cubit = QiblaCubit(
       city: const _City(),
       qibla: const QiblaService(),
-      heading: HeadingService(streamFactory: () {
-        final controller = StreamController<double>.broadcast();
-        controllers.add(controller);
-        return controller.stream;
-      }),
+      heading: HeadingService(
+        streamFactory: () {
+          final controller = StreamController<double>.broadcast();
+          controllers.add(controller);
+          return controller.stream;
+        },
+      ),
     );
     addTearDown(() async {
       await cubit.close();

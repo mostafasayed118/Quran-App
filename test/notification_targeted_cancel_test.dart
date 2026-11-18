@@ -28,19 +28,19 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      if (throwOn != null && call.method == throwOn) {
-        throw PlatformException(code: 'boom');
-      }
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return exact;
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          if (throwOn != null && call.method == throwOn) {
+            throw PlatformException(code: 'boom');
+          }
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return exact;
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -58,47 +58,53 @@ void main() {
     expect(
       _methods(calls).where((method) => method == 'cancelAll'),
       isEmpty,
-      reason: 'cancelAll wipes the playback notification posted by '
+      reason:
+          'cancelAll wipes the playback notification posted by '
           'just_audio_background, not just the reminder alarms',
     );
     expect(
       _cancelIds(calls),
       unorderedEquals(reminderAlarmIds()),
-      reason: 'the clear covers the whole planner id universe (the binding '
+      reason:
+          'the clear covers the whole planner id universe (the binding '
           'keeps no memory across a process death), and nothing else',
     );
   });
 
-  test('azkar and wird register a daily repeat; prayers stay one-shot',
-      () async {
-    final binding = NotificationsBinding();
-    await binding.init();
+  test(
+    'azkar and wird register a daily repeat; prayers stay one-shot',
+    () async {
+      final binding = NotificationsBinding();
+      await binding.init();
 
-    await binding.scheduleAll([
-      _reminder(id: prayerReminderId, title: 'Fajr'),
-      ScheduledReminder(
-        id: azkarReminderId,
-        fireAt: DateTime.utc(2030, 1, 1, 6, 30),
-        title: 'Azkar',
-        repeatsDaily: true,
-      ),
-    ]);
+      await binding.scheduleAll([
+        _reminder(id: prayerReminderId, title: 'Fajr'),
+        ScheduledReminder(
+          id: azkarReminderId,
+          fireAt: DateTime.utc(2030, 1, 1, 6, 30),
+          title: 'Azkar',
+          repeatsDaily: true,
+        ),
+      ]);
 
-    final byId = <int, Map<Object?, Object?>>{
-      for (final call in calls.where((call) => call.method == 'zonedSchedule'))
-        _arguments(call)['id'] as int: _arguments(call),
-    };
-    expect(
-      byId[prayerReminderId]!['matchDateTimeComponents'],
-      isNull,
-      reason: 'a prayer time moves every day: repeating it would drift',
-    );
-    expect(
-      byId[azkarReminderId]!['matchDateTimeComponents'],
-      DateTimeComponents.time.index,
-      reason: 'the OS keeps the daily alarm and restores it after a reboot',
-    );
-  });
+      final byId = <int, Map<Object?, Object?>>{
+        for (final call in calls.where(
+          (call) => call.method == 'zonedSchedule',
+        ))
+          _arguments(call)['id'] as int: _arguments(call),
+      };
+      expect(
+        byId[prayerReminderId]!['matchDateTimeComponents'],
+        isNull,
+        reason: 'a prayer time moves every day: repeating it would drift',
+      );
+      expect(
+        byId[azkarReminderId]!['matchDateTimeComponents'],
+        DateTimeComponents.time.index,
+        reason: 'the OS keeps the daily alarm and restores it after a reboot',
+      );
+    },
+  );
 
   test('the scheduled plan keeps its count and ids', () async {
     final binding = NotificationsBinding();
@@ -126,10 +132,11 @@ void main() {
     throwOn = null;
     await binding.scheduleAll(planA);
 
-    expect(
-      _zonedIds(calls),
-      [prayerReminderId, azkarReminderId, prayerReminderId],
-    );
+    expect(_zonedIds(calls), [
+      prayerReminderId,
+      azkarReminderId,
+      prayerReminderId,
+    ]);
   });
 }
 
@@ -139,14 +146,13 @@ ScheduledReminder _reminder({
   String? body,
   String? payload,
   DateTime? fireAt,
-}) =>
-    ScheduledReminder(
-      id: id,
-      fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
-      title: title,
-      body: body,
-      payload: payload,
-    );
+}) => ScheduledReminder(
+  id: id,
+  fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
+  title: title,
+  body: body,
+  payload: payload,
+);
 
 List<String> _methods(List<MethodCall> calls) =>
     calls.map((call) => call.method).toList();

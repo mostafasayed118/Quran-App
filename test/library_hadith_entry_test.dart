@@ -29,16 +29,16 @@ class _InstalledHadithDownloader extends PackDownloader {
 
   @override
   Future<List<InstalledPack>> installedPacks() async => <InstalledPack>[
-        InstalledPack(
-          packId: 'f-hadith',
-          kind: 'hadith',
-          language: 'en',
-          title: 'Fixture Hadith',
-          sizeMb: 0.001,
-          version: '1',
-          installedAt: DateTime(2026),
-        ),
-      ];
+    InstalledPack(
+      packId: 'f-hadith',
+      kind: 'hadith',
+      language: 'en',
+      title: 'Fixture Hadith',
+      sizeMb: 0.001,
+      version: '1',
+      installedAt: DateTime(2026),
+    ),
+  ];
 
   @override
   Future<File> install(
@@ -50,8 +50,9 @@ class _InstalledHadithDownloader extends PackDownloader {
 }
 
 void main() {
-  testWidgets('installed hadith pack exposes the read affordance',
-      (tester) async {
+  testWidgets('installed hadith pack exposes the read affordance', (
+    tester,
+  ) async {
     final db = AppDatabase.test(NativeDatabase.memory());
     addTearDown(db.close);
     final cubit = LibraryCubit(
@@ -65,16 +66,24 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    await tester.pumpWidget(BlocProvider<LibraryCubit>.value(
-      value: cubit,
-      child: appShell(home: const LibraryScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      BlocProvider<LibraryCubit>.value(
+        value: cubit,
+        child: appShell(home: const LibraryScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.text('الأحاديث'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('حديث تجريبي'), findsOneWidget);
     expect(find.byTooltip('اقرأ'), findsOneWidget);

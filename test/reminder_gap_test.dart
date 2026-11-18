@@ -16,19 +16,19 @@ class _NoCity implements CitySource {
 class _OneCity implements CitySource {
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
   @override
   Future<void> select(City city) async {}
 }
 
 class _Prayer implements PrayerTimesPort {
   _Prayer({List<PrayerChoice> today = const <PrayerChoice>[]})
-      : todayPrayers = today;
+    : todayPrayers = today;
 
   final List<PrayerChoice> todayPrayers;
 
@@ -76,10 +76,10 @@ class _Scheduler implements ReminderSchedulerPort {
 }
 
 ReminderTexts _texts() => ReminderTexts(
-      prayerTitle: (name) => 'prayer ${name.name}',
-      azkarTitle: 'azkar',
-      wirdTitle: 'wird',
-    );
+  prayerTitle: (name) => 'prayer ${name.name}',
+  azkarTitle: 'azkar',
+  wirdTitle: 'wird',
+);
 
 void main() {
   test('after Isha the plan uses the supplied next prayer (tomorrow Fajr)', () {
@@ -115,23 +115,27 @@ void main() {
     expect(ids, isNot(contains(prayerReminderId)));
   });
 
-  test('a selected city after Isha schedules tomorrow Fajr from the port',
-      () async {
-    final scheduler = _Scheduler();
-    await scheduleReminders(
-      city: _OneCity(),
-      prayer: _Prayer(today: [
-        PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-        PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-      ]),
-      settings: _Settings(),
-      scheduler: scheduler,
-      now: DateTime(2026, 3, 15, 21, 0),
-    );
+  test(
+    'a selected city after Isha schedules tomorrow Fajr from the port',
+    () async {
+      final scheduler = _Scheduler();
+      await scheduleReminders(
+        city: _OneCity(),
+        prayer: _Prayer(
+          today: [
+            PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
+            PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
+          ],
+        ),
+        settings: _Settings(),
+        scheduler: scheduler,
+        now: DateTime(2026, 3, 15, 21, 0),
+      );
 
-    final plan = scheduler.plan!;
-    expect(plan.map((r) => r.id).toSet(), {1, 2, 3});
-    final prayer = plan.singleWhere((r) => r.id == prayerReminderId);
-    expect(prayer.fireAt, DateTime(2026, 3, 16, 4, 45));
-  });
+      final plan = scheduler.plan!;
+      expect(plan.map((r) => r.id).toSet(), {1, 2, 3});
+      final prayer = plan.singleWhere((r) => r.id == prayerReminderId);
+      expect(prayer.fireAt, DateTime(2026, 3, 16, 4, 45));
+    },
+  );
 }

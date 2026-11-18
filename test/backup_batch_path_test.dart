@@ -51,10 +51,12 @@ class _FailingBatchInterceptor extends QueryInterceptor {
     }
     const applied = 10;
     appliedStatements = applied;
-    await executor.runBatched(BatchedStatements(
-      statements.statements,
-      statements.arguments.take(applied).toList(),
-    ));
+    await executor.runBatched(
+      BatchedStatements(
+        statements.statements,
+        statements.arguments.take(applied).toList(),
+      ),
+    );
     throw StateError('injected batch failure');
   }
 }
@@ -66,25 +68,29 @@ BackupDocument doc({
   List<BackupPrayerDay> prayerLog = const [],
   BackupTasbih? tasbih,
   Map<String, String> settings = const {},
-}) =>
-    BackupDocument(
-      exportedAt: DateTime(2026, 10, 19),
-      schemaVersion: 2,
-      data: BackupData(
-        bookmarks: bookmarks,
-        lastReadAyahId: lastRead,
-        khatma: khatma,
-        prayerLog: prayerLog,
-        tasbih: tasbih,
-        settings: settings,
-      ),
-    );
+}) => BackupDocument(
+  exportedAt: DateTime(2026, 10, 19),
+  schemaVersion: 2,
+  data: BackupData(
+    bookmarks: bookmarks,
+    lastReadAyahId: lastRead,
+    khatma: khatma,
+    prayerLog: prayerLog,
+    tasbih: tasbih,
+    settings: settings,
+  ),
+);
 
 BackupBookmark bookmark(int ayahId, [DateTime? at]) => BackupBookmark(
-    ayahId: ayahId, createdAt: at ?? DateTime(2026, 1, 2, 3, 4, 5));
+  ayahId: ayahId,
+  createdAt: at ?? DateTime(2026, 1, 2, 3, 4, 5),
+);
 
 BackupKhatmaRow khatma(int targetPages, DateTime updatedAt) => BackupKhatmaRow(
-    ayahId: 100, targetPages: targetPages, updatedAt: updatedAt);
+  ayahId: 100,
+  targetPages: targetPages,
+  updatedAt: updatedAt,
+);
 
 BackupPrayerDay prayerDay(
   DateTime day, {
@@ -93,19 +99,17 @@ BackupPrayerDay prayerDay(
   bool asr = false,
   bool maghrib = false,
   bool isha = false,
-}) =>
-    BackupPrayerDay(
-      day: day,
-      fajr: fajr,
-      dhuhr: dhuhr,
-      asr: asr,
-      maghrib: maghrib,
-      isha: isha,
-    );
+}) => BackupPrayerDay(
+  day: day,
+  fajr: fajr,
+  dhuhr: dhuhr,
+  asr: asr,
+  maghrib: maghrib,
+  isha: isha,
+);
 
 void main() {
-  test(
-      'a 65-bookmark import (batch path) writes every entity and is '
+  test('a 65-bookmark import (batch path) writes every entity and is '
       'idempotent on replay', () async {
     final db = newTestDb();
     var rescheduleCalls = 0;
@@ -135,9 +139,9 @@ void main() {
     );
 
     Future<String?> setting(String key) async {
-      final row = await (db.select(db.settingsTable)
-            ..where((s) => s.key.equals(key)))
-          .getSingleOrNull();
+      final row = await (db.select(
+        db.settingsTable,
+      )..where((s) => s.key.equals(key))).getSingleOrNull();
       return row?.value;
     }
 
@@ -156,8 +160,10 @@ void main() {
     final bookmarks = await db.select(db.bookmarks).get();
     expect(bookmarks, hasLength(65));
     final sample = bookmarks.singleWhere((row) => row.ayahId == 65);
-    expect(sample.createdAt.millisecondsSinceEpoch,
-        DateTime(2026, 6, 1, 12).millisecondsSinceEpoch);
+    expect(
+      sample.createdAt.millisecondsSinceEpoch,
+      DateTime(2026, 6, 1, 12).millisecondsSinceEpoch,
+    );
 
     final prayerRows = await db.select(db.prayerLog).get();
     expect(prayerRows, hasLength(2));
@@ -171,8 +177,10 @@ void main() {
     expect(byDay[2]!.fajr, isFalse);
 
     expect(await setting('last_read_ayah_id'), '4321');
-    expect(jsonDecode((await setting('tasbih_state'))!),
-        {'count': 33, 'target': 99});
+    expect(jsonDecode((await setting('tasbih_state'))!), {
+      'count': 33,
+      'target': 99,
+    });
     expect(await setting('azkar_reminder_time'), '06:30');
     expect(await setting('selected_moshaf_row'), '2');
 
@@ -180,8 +188,10 @@ void main() {
     expect(khatmaRows, hasLength(1));
     expect(khatmaRows.single.ayahId, 100);
     expect(khatmaRows.single.targetPages, 20);
-    expect(khatmaRows.single.updatedAt.millisecondsSinceEpoch,
-        DateTime(2026, 3, 1).millisecondsSinceEpoch);
+    expect(
+      khatmaRows.single.updatedAt.millisecondsSinceEpoch,
+      DateTime(2026, 3, 1).millisecondsSinceEpoch,
+    );
 
     final replay = await service.apply(document);
 
@@ -192,8 +202,10 @@ void main() {
     expect(await db.select(db.prayerLog).get(), hasLength(2));
     expect(await db.select(db.khatmaProgress).get(), hasLength(1));
     expect(await setting('last_read_ayah_id'), '4321');
-    expect(jsonDecode((await setting('tasbih_state'))!),
-        {'count': 33, 'target': 99});
+    expect(jsonDecode((await setting('tasbih_state'))!), {
+      'count': 33,
+      'target': 99,
+    });
     expect(await setting('azkar_reminder_time'), '06:30');
     expect(await setting('selected_moshaf_row'), '2');
   });
@@ -216,21 +228,24 @@ void main() {
     interceptor.fail = true;
 
     await expectLater(
-      service.apply(doc(
-        bookmarks: [
-          for (var i = 1; i <= 65; i++) bookmark(i),
-        ],
-        lastRead: 42,
-        prayerLog: [prayerDay(DateTime(2026, 5, 1), fajr: true)],
-        khatma: [khatma(20, DateTime(2026, 3, 1))],
-        tasbih: const BackupTasbih(count: 10, target: 100),
-        settings: const {'selected_moshaf_row': '2'},
-      )),
+      service.apply(
+        doc(
+          bookmarks: [for (var i = 1; i <= 65; i++) bookmark(i)],
+          lastRead: 42,
+          prayerLog: [prayerDay(DateTime(2026, 5, 1), fajr: true)],
+          khatma: [khatma(20, DateTime(2026, 3, 1))],
+          tasbih: const BackupTasbih(count: 10, target: 100),
+          settings: const {'selected_moshaf_row': '2'},
+        ),
+      ),
       throwsA(isA<StateError>()),
     );
 
-    expect(interceptor.appliedStatements, 10,
-        reason: 'the injected failure happened after partial progress');
+    expect(
+      interceptor.appliedStatements,
+      10,
+      reason: 'the injected failure happened after partial progress',
+    );
     expect(await db.select(db.bookmarks).get(), isEmpty);
     expect(await db.select(db.prayerLog).get(), isEmpty);
     expect(await db.select(db.khatmaProgress).get(), isEmpty);
@@ -238,13 +253,10 @@ void main() {
     expect(rescheduleCalls, 0);
   });
 
-  test(
-      '63 writes take the per-row path, 64 take the batch path, and both '
+  test('63 writes take the per-row path, 64 take the batch path, and both '
       'persist identical rows', () async {
     final document = doc(
-      bookmarks: [
-        for (var i = 1; i <= 61; i++) bookmark(i),
-      ],
+      bookmarks: [for (var i = 1; i <= 61; i++) bookmark(i)],
       lastRead: 42,
       prayerLog: [
         prayerDay(DateTime(2026, 5, 1), fajr: true),
@@ -257,7 +269,9 @@ void main() {
       NativeDatabase.memory().interceptWith(perRowProbe),
     );
     addTearDown(perRowDb.close);
-    await perRowDb.into(perRowDb.bookmarks).insert(
+    await perRowDb
+        .into(perRowDb.bookmarks)
+        .insert(
           BookmarksCompanion.insert(
             ayahId: 1,
             createdAt: Value(bookmark(1).createdAt),
@@ -299,15 +313,15 @@ void main() {
     final perRowPrayer = await perRowDb.select(perRowDb.prayerLog).get();
     final batchPrayer = await batchDb.select(batchDb.prayerLog).get();
     Map<int, List<bool>> prayerShape(List<PrayerLogData> rows) => {
-          for (final row in rows)
-            row.day.millisecondsSinceEpoch: [
-              row.fajr,
-              row.dhuhr,
-              row.asr,
-              row.maghrib,
-              row.isha,
-            ],
-        };
+      for (final row in rows)
+        row.day.millisecondsSinceEpoch: [
+          row.fajr,
+          row.dhuhr,
+          row.asr,
+          row.maghrib,
+          row.isha,
+        ],
+    };
     expect(prayerShape(perRowPrayer), prayerShape(batchPrayer));
 
     final perRowSettings = await perRowDb.select(perRowDb.settingsTable).get();

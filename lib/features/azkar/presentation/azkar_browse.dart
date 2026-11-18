@@ -62,7 +62,11 @@ class _BrowsingView extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md, AppSpacing.md, AppSpacing.md, AppSpacing.xs),
+            AppSpacing.md,
+            AppSpacing.md,
+            AppSpacing.md,
+            AppSpacing.xs,
+          ),
           child: SearchField(
             hint: loc.azkarSearchPlaceholder,
             onChanged: context.read<AzkarCubit>().setSearchQuery,
@@ -71,18 +75,18 @@ class _BrowsingView extends StatelessWidget {
         Expanded(
           child: query.isEmpty
               ? (collections.isEmpty
-                  ? EmptyState(loc.noResults)
-                  : ListView.builder(
-                      padding: appScrollPadding(
-                        context,
-                        const EdgeInsets.all(AppSpacing.md),
-                      ),
-                      itemCount: collections.length,
-                      itemBuilder: (context, i) => _CollectionTile(
-                        collection: collections[i],
-                        favorite: favorites.contains(collections[i].id),
-                      ),
-                    ))
+                    ? EmptyState(loc.noResults)
+                    : ListView.builder(
+                        padding: appScrollPadding(
+                          context,
+                          const EdgeInsets.all(AppSpacing.md),
+                        ),
+                        itemCount: collections.length,
+                        itemBuilder: (context, i) => _CollectionTile(
+                          collection: collections[i],
+                          favorite: favorites.contains(collections[i].id),
+                        ),
+                      ))
               : _SearchResultsList(
                   results: searchResults,
                   hasMore: searchHasMore,
@@ -126,7 +130,8 @@ class _SearchResultsList extends StatelessWidget {
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   child: Text(
                     loc.azkarSearchMore(
-                        loc.number(AzkarRepository.searchLimit)),
+                      loc.number(AzkarRepository.searchLimit),
+                    ),
                     textAlign: TextAlign.center,
                     style: AppTheme.mutedFootnote(context),
                   ),
@@ -204,8 +209,9 @@ class _CollectionTile extends StatelessWidget {
               ),
             ),
             IconButton(
-              tooltip:
-                  favorite ? loc.azkarFavoriteRemove : loc.azkarFavoriteAdd,
+              tooltip: favorite
+                  ? loc.azkarFavoriteRemove
+                  : loc.azkarFavoriteAdd,
               icon: Icon(
                 favorite ? Icons.star : Icons.star_border,
                 color: favorite ? colors.secondary : colors.onSurfaceVariant,

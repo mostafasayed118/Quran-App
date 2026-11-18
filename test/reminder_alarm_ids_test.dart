@@ -7,9 +7,13 @@ void main() {
     final day = DateTime.utc(2026, 11, 16);
 
     for (var i = 0; i < kFajrFollowUpMinutes.length; i++) {
-      expect(ids, contains(fajrFollowUpAlarmId(day, i)),
-          reason: 'a new follow-up in kFajrFollowUpMinutes must be cancellable '
-              'by the next plan change; the set used to hard-code two');
+      expect(
+        ids,
+        contains(fajrFollowUpAlarmId(day, i)),
+        reason:
+            'a new follow-up in kFajrFollowUpMinutes must be cancellable '
+            'by the next plan change; the set used to hard-code two',
+      );
     }
   });
 }

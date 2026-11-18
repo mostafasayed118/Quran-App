@@ -21,41 +21,55 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_downloads_toast');
-    await db.into(db.reciters).insert(RecitersCompanion.insert(
-          id: '51-53',
-          reciterName: 'عبدالباسط عبدالصمد',
-          moshafName: 'حفص عن عاصم - مرتل',
-          server: 'https://server.mp3quran.net',
-          surahList: '1',
-          surahTotal: 114,
-        ));
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makki',
-          ayahCount: 7,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
-    await db.into(db.downloads).insert(DownloadsCompanion.insert(
-          reciterId: '51-53',
-          surahId: 1,
-          status: 'done',
-          // Outside the downloader's audio root, so removal never touches the
-          // real filesystem: a widget test cannot await real file I/O.
-          path: '${tempRoot.path}${Platform.pathSeparator}elsewhere'
-              '${Platform.pathSeparator}001.mp3',
-          bytes: const Value(1572864),
-        ));
+    await db
+        .into(db.reciters)
+        .insert(
+          RecitersCompanion.insert(
+            id: '51-53',
+            reciterName: 'عبدالباسط عبدالصمد',
+            moshafName: 'حفص عن عاصم - مرتل',
+            server: 'https://server.mp3quran.net',
+            surahList: '1',
+            surahTotal: 114,
+          ),
+        );
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makki',
+            ayahCount: 7,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
+    await db
+        .into(db.downloads)
+        .insert(
+          DownloadsCompanion.insert(
+            reciterId: '51-53',
+            surahId: 1,
+            status: 'done',
+            // Outside the downloader's audio root, so removal never touches the
+            // real filesystem: a widget test cannot await real file I/O.
+            path:
+                '${tempRoot.path}${Platform.pathSeparator}elsewhere'
+                '${Platform.pathSeparator}001.mp3',
+            bytes: const Value(1572864),
+          ),
+        );
   });
 
   tearDown(() async {
     await tempRoot.delete(recursive: true);
   });
 
-  testWidgets('a confirmed delete confirms that the file is gone',
-      (tester) async {
+  testWidgets('a confirmed delete confirms that the file is gone', (
+    tester,
+  ) async {
     final cubit = DownloadsCubit(
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: ReciterRepository(db),
@@ -67,12 +81,18 @@ void main() {
         child: appShell(home: const DownloadsScreen()),
       ),
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     await tester.tap(find.byTooltip('حذف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     // The dialog title and its confirm button share the word "حذف".
     await tester.tap(find.widgetWithText(TextButton, 'حذف'));
     // Bounded pumps: `pumpAndSettle` would keep advancing fake time while the
@@ -86,7 +106,10 @@ void main() {
 
     // Let the toast's auto-dismiss timer fire before teardown.
     await tester.pump(const Duration(seconds: 5));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   });
 }

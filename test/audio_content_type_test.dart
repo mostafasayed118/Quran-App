@@ -38,10 +38,7 @@ void main() {
       surahList: '1',
       surahTotal: 114,
     );
-    final downloader = AudioDownloader(
-      db,
-      audioRootResolver: () async => root,
-    );
+    final downloader = AudioDownloader(db, audioRootResolver: () async => root);
 
     await expectLater(
       downloader.downloadSurah(reciter: reciter, surahNumber: 1),

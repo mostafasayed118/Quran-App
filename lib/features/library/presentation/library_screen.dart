@@ -65,26 +65,28 @@ class LibraryScreen extends StatelessWidget {
             body: AppContentFrame(
               child: switch (state) {
                 LibraryLoading() => const LoadingView(),
-                LibraryFailed() =>
-                  errorPane(loc, onRetry: context.read<LibraryCubit>().load),
+                LibraryFailed() => errorPane(
+                  loc,
+                  onRetry: context.read<LibraryCubit>().load,
+                ),
                 final LibraryReady ready when ready.packs.isEmpty => EmptyState(
-                    loc.libraryEmpty,
-                    icon: Icons.inventory_2_outlined,
-                  ),
+                  loc.libraryEmpty,
+                  icon: Icons.inventory_2_outlined,
+                ),
                 final LibraryReady ready => Column(
-                    children: [
-                      if (ready.failed.isNotEmpty && ready.progress.isEmpty)
-                        _failureStrip(context, ready),
-                      Expanded(
-                        child: TabBarView(
-                          children: [
-                            for (final kind in kinds)
-                              _PackList(packs: ready.packsWhere(kind)),
-                          ],
-                        ),
+                  children: [
+                    if (ready.failed.isNotEmpty && ready.progress.isEmpty)
+                      _failureStrip(context, ready),
+                    Expanded(
+                      child: TabBarView(
+                        children: [
+                          for (final kind in kinds)
+                            _PackList(packs: ready.packsWhere(kind)),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
               },
             ),
           ),
@@ -121,8 +123,10 @@ bool _rebuildRoot(LibraryState previous, LibraryState current) {
   return switch ((previous, current)) {
     (LibraryLoading(), LibraryLoading()) => false,
     (LibraryFailed(), LibraryFailed()) => false,
-    (final LibraryReady before, final LibraryReady after) =>
-      _rootChanged(before, after),
+    (final LibraryReady before, final LibraryReady after) => _rootChanged(
+      before,
+      after,
+    ),
     _ => true,
   };
 }
@@ -145,9 +149,9 @@ bool _rootChanged(LibraryReady before, LibraryReady after) {
 
 extension on LibraryReady {
   List<LibraryPackInfo> packsWhere(LibraryPackKind kind) => [
-        for (final pack in packs)
-          if (pack.kind == kind) pack
-      ];
+    for (final pack in packs)
+      if (pack.kind == kind) pack,
+  ];
 }
 
 /// Fixed display order for the library tabs.
@@ -225,7 +229,8 @@ class _PackRow extends StatelessWidget {
         ? loc.libraryPackUnavailable
         : loc.libraryPackSubtitle(
             loc.libraryPackSize(
-                loc.digits(formatMegabytesValue(pack.approxSizeMb))),
+              loc.digits(formatMegabytesValue(pack.approxSizeMb)),
+            ),
             pack.titleEn,
           );
 
@@ -243,12 +248,12 @@ class _PackRow extends StatelessWidget {
   }
 
   _PackRowStatus _statusOf(LibraryState state) => switch (state) {
-        final LibraryReady ready => (
-            installed: ready.installed.contains(pack.id),
-            progress: ready.progress[pack.id],
-          ),
-        _ => (installed: false, progress: null),
-      };
+    final LibraryReady ready => (
+      installed: ready.installed.contains(pack.id),
+      progress: ready.progress[pack.id],
+    ),
+    _ => (installed: false, progress: null),
+  };
 
   Widget _trailing(
     BuildContext context,
@@ -290,7 +295,9 @@ class _PackRow extends StatelessWidget {
           Text(
             loc.libraryInstalled,
             style: TextStyle(
-                color: AppTheme.goldText(context), fontSize: AppType.caption),
+              color: AppTheme.goldText(context),
+              fontSize: AppType.caption,
+            ),
           ),
         if (installed && pack.kind == LibraryPackKind.hadith)
           IconButton(
@@ -305,7 +312,10 @@ class _PackRow extends StatelessWidget {
   }
 
   Future<void> _confirmDelete(
-      BuildContext context, LibraryCubit cubit, AppLocalizations loc) async {
+    BuildContext context,
+    LibraryCubit cubit,
+    AppLocalizations loc,
+  ) async {
     final confirmed = await confirmDeleteDialog(
       context,
       title: loc.libraryDelete,

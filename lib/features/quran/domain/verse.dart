@@ -49,17 +49,17 @@ class Verse {
 
   /// Same verse, with the Unicode Uthmani reading attached.
   Verse withUnicode(String? unicode) => Verse(
-        id: id,
-        surahId: surahId,
-        numberInSurah: numberInSurah,
-        juz: juz,
-        page: page,
-        textUthmani: textUthmani,
-        textImlaei: textImlaei,
-        sajda: sajda,
-        textUnicode: unicode,
-        displayUthmani: displayUthmani,
-      );
+    id: id,
+    surahId: surahId,
+    numberInSurah: numberInSurah,
+    juz: juz,
+    page: page,
+    textUthmani: textUthmani,
+    textImlaei: textImlaei,
+    sajda: sajda,
+    textUnicode: unicode,
+    displayUthmani: displayUthmani,
+  );
 
   final int id;
   final int surahId;

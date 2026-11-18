@@ -26,16 +26,19 @@ void main() {
     expect(platformLocalizations().settings, 'الإعدادات');
   });
 
-  test('the controller publishes the loaded language before the first frame',
-      () async {
-    final controller =
-        AppLocaleController(_Source(language: AppLanguage.english));
+  test(
+    'the controller publishes the loaded language before the first frame',
+    () async {
+      final controller = AppLocaleController(
+        _Source(language: AppLanguage.english),
+      );
 
-    await controller.load();
+      await controller.load();
 
-    expect(platformLanguage, AppLanguage.english);
-    expect(platformLocalizations().settings, 'Settings');
-  });
+      expect(platformLanguage, AppLanguage.english);
+      expect(platformLocalizations().settings, 'Settings');
+    },
+  );
 
   test('switching the language switches the notification copy', () async {
     final controller = AppLocaleController(_Source());

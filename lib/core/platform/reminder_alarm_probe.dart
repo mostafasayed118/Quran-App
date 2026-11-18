@@ -30,8 +30,9 @@ class PlatformReminderAlarmProbe implements ReminderAlarmProbe {
   /// Creates the probe over the app's diagnostics channel.
   const PlatformReminderAlarmProbe();
 
-  static const MethodChannel channel =
-      MethodChannel('quran_yahdi/reminder_diagnostics');
+  static const MethodChannel channel = MethodChannel(
+    'quran_yahdi/reminder_diagnostics',
+  );
 
   @override
   Future<bool> alarmExists(int notificationId) async {

@@ -58,10 +58,7 @@ void main() {
           child: const ListTile(
             contentPadding: AppTheme.tileContentPadding,
             leading: CircleAvatar(radius: 20, child: Text('ع')),
-            title: Text(
-              'عبد الرحمن السديس',
-              style: AppTheme.rowTitle,
-            ),
+            title: Text('عبد الرحمن السديس', style: AppTheme.rowTitle),
             subtitle: Text('حفص عن عاصم'),
             trailing: Text('١١٤ سورة'),
           ),

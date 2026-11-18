@@ -41,10 +41,16 @@ void main() {
       for (final entry in decoded.entries) {
         final text = entry.value as String;
         expect(text.trim(), isNotEmpty, reason: '$surah:${entry.key} is blank');
-        expect(pua.hasMatch(text), isFalse,
-            reason: '$surah:${entry.key} leaked a glyph codepoint');
-        expect(latin.hasMatch(text), isFalse,
-            reason: '$surah:${entry.key} leaked latin');
+        expect(
+          pua.hasMatch(text),
+          isFalse,
+          reason: '$surah:${entry.key} leaked a glyph codepoint',
+        );
+        expect(
+          latin.hasMatch(text),
+          isFalse,
+          reason: '$surah:${entry.key} leaked latin',
+        );
       }
     }
     expect(total, 6236);

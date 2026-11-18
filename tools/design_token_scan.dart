@@ -46,14 +46,15 @@ final class DesignTokenViolation {
 List<DesignTokenViolation> scanLib([String? root]) {
   final package = Directory(root ?? Directory.current.path).absolute.path;
   final library = Directory('$package/lib');
-  final files = library
-      .listSync(recursive: true)
-      .whereType<File>()
-      .where((file) => file.path.endsWith('.dart'))
-      .where((file) => !file.path.endsWith('.g.dart'))
-      .where((file) => !file.path.endsWith('.freezed.dart'))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final files =
+      library
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.dart'))
+          .where((file) => !file.path.endsWith('.g.dart'))
+          .where((file) => !file.path.endsWith('.freezed.dart'))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
 
   final out = <DesignTokenViolation>[];
   for (final file in files) {
@@ -133,8 +134,11 @@ List<DesignTokenViolation> scanSource(String path, String source) {
     final block = _blockAt(source, match.start);
     final size = _iconSize.firstMatch(block);
     if (size != null) {
-      add(match.start + size.start, 'iconSize',
-          _number(size.group(1)!).toString());
+      add(
+        match.start + size.start,
+        'iconSize',
+        _number(size.group(1)!).toString(),
+      );
     }
   }
 
@@ -146,8 +150,11 @@ List<DesignTokenViolation> scanSource(String path, String source) {
     final block = _blockAt(source, match.start);
     final width = _borderWidth.firstMatch(block);
     if (width != null) {
-      add(match.start + width.start, 'stroke',
-          _number(width.group(1)!).toString());
+      add(
+        match.start + width.start,
+        'stroke',
+        _number(width.group(1)!).toString(),
+      );
     }
   }
 
@@ -162,32 +169,25 @@ List<DesignTokenViolation> scanSource(String path, String source) {
 
 final _hex = RegExp(r'Color\(0x([0-9A-Fa-f]{6,8})\)');
 final _alphaExpression = RegExp(r'withValues\(\s*alpha:\s*([^)]*)\)');
-final _bareNumber = RegExp(
-  r'(?<![\w.])(-?(?:\d+(?:\.\d+)?|\.\d+))(?![\w.])',
-);
+final _bareNumber = RegExp(r'(?<![\w.])(-?(?:\d+(?:\.\d+)?|\.\d+))(?![\w.])');
 final _tracking = RegExp(
   r'\bletterSpacing:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
 );
 final _opacityExpression = RegExp(r'\bopacity:\s*([^)]*)\)');
-final _lineHeight = RegExp(
-  r'\bheight:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
-);
+final _lineHeight = RegExp(r'\bheight:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]');
 final _iconStart = RegExp(r'\bIcon\(');
-final _iconSize = RegExp(
-  r'\bsize:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
-);
+final _iconSize = RegExp(r'\bsize:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]');
 final _radius = RegExp(
   r'\b(?:BorderRadius|Radius)\.circular\(\s*(-?\d+(?:\.\d+)?)\s*\)',
 );
 final _borderStart = RegExp(r'\b(?:BorderSide|Border\.all)\(');
-final _borderWidth = RegExp(
-  r'\bwidth:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]',
-);
+final _borderWidth = RegExp(r'\bwidth:\s*(-?(?:\d+(?:\.\d+)?|\.\d+))\s*[,)]');
 
 /// Offsets where a text-style block opens.
 Iterable<int> _styleStarts(String source) sync* {
-  for (final match
-      in RegExp(r'\b(?:TextStyle|StrutStyle)\(').allMatches(source)) {
+  for (final match in RegExp(
+    r'\b(?:TextStyle|StrutStyle)\(',
+  ).allMatches(source)) {
     yield match.start;
   }
   // `copyWith` is the only other constructor that can carry a line height;

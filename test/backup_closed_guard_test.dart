@@ -21,17 +21,17 @@ Future<void> _settle(WidgetTester tester) async {
 }
 
 BackupDocument _doc() => BackupDocument(
-      exportedAt: DateTime(2026, 10, 19),
-      schemaVersion: 2,
-      data: const BackupData(
-        bookmarks: [],
-        lastReadAyahId: null,
-        khatma: [],
-        prayerLog: [],
-        tasbih: null,
-        settings: {},
-      ),
-    );
+  exportedAt: DateTime(2026, 10, 19),
+  schemaVersion: 2,
+  data: const BackupData(
+    bookmarks: [],
+    lastReadAyahId: null,
+    khatma: [],
+    prayerLog: [],
+    tasbih: null,
+    settings: {},
+  ),
+);
 
 void main() {
   late BackupService service;
@@ -41,15 +41,13 @@ void main() {
   });
 
   BackupCubit newCubit({BackupPickBytes? pickBytes}) => BackupCubit(
-        service: service,
-        pickBytes: pickBytes ?? () async => null,
-        shareJson: (_) async {},
-      );
+    service: service,
+    pickBytes: pickBytes ?? () async => null,
+    shareJson: (_) async {},
+  );
 
   test('cancelPreview and acknowledge are no-ops after close', () async {
-    final cubit = newCubit(
-      pickBytes: () async => utf8.encode(encode(_doc())),
-    );
+    final cubit = newCubit(pickBytes: () async => utf8.encode(encode(_doc())));
     await cubit.importFromFile();
     expect(cubit.state, isA<BackupPreviewReady>());
     await cubit.close();
@@ -77,9 +75,7 @@ void main() {
   });
 
   test('confirmImport completes after close with a pending preview', () async {
-    final cubit = newCubit(
-      pickBytes: () async => utf8.encode(encode(_doc())),
-    );
+    final cubit = newCubit(pickBytes: () async => utf8.encode(encode(_doc())));
     await cubit.importFromFile();
     expect(cubit.state, isA<BackupPreviewReady>());
     await cubit.close();
@@ -87,11 +83,10 @@ void main() {
     await expectLater(cubit.confirmImport(), completes);
   });
 
-  testWidgets('system back dismisses the preview and restores idle',
-      (tester) async {
-    final cubit = newCubit(
-      pickBytes: () async => utf8.encode(encode(_doc())),
-    );
+  testWidgets('system back dismisses the preview and restores idle', (
+    tester,
+  ) async {
+    final cubit = newCubit(pickBytes: () async => utf8.encode(encode(_doc())));
     addTearDown(cubit.close);
     await pumpAppHost(
       tester,

@@ -8,18 +8,14 @@ const _collection = AzkarCollection(
   id: 'morning',
   nameAr: 'أذكار الصباح',
   nameEn: 'Morning',
-  items: [
-    AzkarItem(text: 'ذِكْرٌ', count: 3),
-  ],
+  items: [AzkarItem(text: 'ذِكْرٌ', count: 3)],
 );
 
 const _otherCollection = AzkarCollection(
   id: 'evening',
   nameAr: 'أذكار المساء',
   nameEn: 'Evening',
-  items: [
-    AzkarItem(text: 'ذِكْرٌ', count: 1),
-  ],
+  items: [AzkarItem(text: 'ذِكْرٌ', count: 1)],
 );
 
 AzkarReciting _reciting(
@@ -33,12 +29,11 @@ AzkarBrowsing _browsing({
   List<AzkarCollection> collections = const [_collection],
   Set<String> favorites = const {},
   String query = '',
-}) =>
-    AzkarState.browsing(
-      collections: collections,
-      favorites: favorites,
-      query: query,
-    ) as AzkarBrowsing;
+}) => AzkarState.browsing(
+  collections: collections,
+  favorites: favorites,
+  query: query,
+) as AzkarBrowsing;
 
 void main() {
   test('a counter tap does not rebuild the azkar scaffold', () {

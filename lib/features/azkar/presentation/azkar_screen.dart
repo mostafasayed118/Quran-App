@@ -70,8 +70,10 @@ class AzkarScreen extends StatelessWidget {
             body: AppContentFrame(
               child: switch (state) {
                 AzkarLoading() => const LoadingView(),
-                AzkarFailed() =>
-                  errorPane(loc, onRetry: context.read<AzkarCubit>().start),
+                AzkarFailed() => errorPane(
+                  loc,
+                  onRetry: context.read<AzkarCubit>().start,
+                ),
                 AzkarBrowsing(
                   :final collections,
                   :final favorites,
@@ -86,8 +88,9 @@ class AzkarScreen extends StatelessWidget {
                     searchResults: searchResults,
                     searchHasMore: searchHasMore,
                   ),
-                AzkarReciting(:final collection) =>
-                  _RecitingList(collection: collection),
+                AzkarReciting(:final collection) => _RecitingList(
+                  collection: collection,
+                ),
               },
             ),
           ),

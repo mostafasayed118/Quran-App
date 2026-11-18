@@ -8,26 +8,26 @@ const String _today = '2026-11-02';
 final DateTime _now = DateTime(2026, 11, 2, 9);
 
 Map<String, dynamic> _catalog() => {
-      'collections': [
-        {
-          'id': 'morning',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ ثَلَاثٌ', 'count': 3},
-            {'text': 'ذِكْرٌ اثْنَان', 'count': 2},
-          ],
-        },
-        {
-          'id': 'evening',
-          'nameAr': 'أذكار المساء',
-          'nameEn': 'Evening',
-          'items': [
-            {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'morning',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ ثَلَاثٌ', 'count': 3},
+        {'text': 'ذِكْرٌ اثْنَان', 'count': 2},
       ],
-    };
+    },
+    {
+      'id': 'evening',
+      'nameAr': 'أذكار المساء',
+      'nameEn': 'Evening',
+      'items': [
+        {'text': 'ذِكْرٌ وَاحِد', 'count': 1},
+      ],
+    },
+  ],
+};
 
 class _Source implements AzkarSavedStateSource {
   _Source({this.alwaysReturnsInitialLoad = false});
@@ -81,13 +81,14 @@ class _Source implements AzkarSavedStateSource {
   }
 }
 
-AzkarCubit _cubit(
-        {AzkarSavedStateSource? source, DateTime Function()? clock}) =>
-    AzkarCubit(
-      repository: AzkarRepository(loader: () async => _catalog()),
-      savedState: source,
-      clock: clock ?? () => _now,
-    );
+AzkarCubit _cubit({
+  AzkarSavedStateSource? source,
+  DateTime Function()? clock,
+}) => AzkarCubit(
+  repository: AzkarRepository(loader: () async => _catalog()),
+  savedState: source,
+  clock: clock ?? () => _now,
+);
 
 void main() {
   test('saved counters resume, clamped to each item count', () async {
@@ -107,23 +108,25 @@ void main() {
     expect((cubit.state as AzkarReciting).remaining, [3, 1]);
   });
 
-  test('a short saved list fills the missing items with their full count',
-      () async {
-    final source = _Source()
-      ..stored = const AzkarSavedState(
-        day: _today,
-        remaining: {
-          'morning': [1],
-        },
-      );
-    final cubit = _cubit(source: source);
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'a short saved list fills the missing items with their full count',
+    () async {
+      final source = _Source()
+        ..stored = const AzkarSavedState(
+          day: _today,
+          remaining: {
+            'morning': [1],
+          },
+        );
+      final cubit = _cubit(source: source);
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    cubit.open((cubit.state as AzkarBrowsing).collections.first);
+      cubit.open((cubit.state as AzkarBrowsing).collections.first);
 
-    expect((cubit.state as AzkarReciting).remaining, [1, 2]);
-  });
+      expect((cubit.state as AzkarReciting).remaining, [1, 2]);
+    },
+  );
 
   test('counters stored on an earlier day open at full again', () async {
     final source = _Source()
@@ -145,37 +148,38 @@ void main() {
     expect((cubit.state as AzkarReciting).remaining, [3, 2]);
   });
 
-  test('a session that crosses midnight does not carry yesterday counters',
-      () async {
-    var now = DateTime(2026, 11, 2, 23, 55);
-    final source = _Source();
-    final cubit = _cubit(source: source, clock: () => now);
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'a session that crosses midnight does not carry yesterday counters',
+    () async {
+      var now = DateTime(2026, 11, 2, 23, 55);
+      final source = _Source();
+      final cubit = _cubit(source: source, clock: () => now);
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    cubit.open((cubit.state as AzkarBrowsing).collections.first);
-    cubit.tapItem(0);
-    await Future<void>.delayed(Duration.zero);
-    expect(source.stored.remaining['morning'], [2, 2]);
+      cubit.open((cubit.state as AzkarBrowsing).collections.first);
+      cubit.tapItem(0);
+      await Future<void>.delayed(Duration.zero);
+      expect(source.stored.remaining['morning'], [2, 2]);
 
-    now = DateTime(2026, 11, 3, 0, 5);
-    cubit.back();
-    await Future<void>.delayed(Duration.zero);
-    cubit.open((cubit.state as AzkarBrowsing).collections.first);
-    cubit.tapItem(1);
-    await Future<void>.delayed(Duration.zero);
+      now = DateTime(2026, 11, 3, 0, 5);
+      cubit.back();
+      await Future<void>.delayed(Duration.zero);
+      cubit.open((cubit.state as AzkarBrowsing).collections.first);
+      cubit.tapItem(1);
+      await Future<void>.delayed(Duration.zero);
 
-    expect(source.stored.day, '2026-11-03');
-    expect(source.stored.remaining.keys, ['morning']);
-    cubit.back();
-    await Future<void>.delayed(Duration.zero);
-    cubit.open((cubit.state as AzkarBrowsing).collections.first);
-    expect(
-      (cubit.state as AzkarReciting).remaining,
-      [3, 1],
-      reason: 'yesterday morning counters are not relabelled as today',
-    );
-  });
+      expect(source.stored.day, '2026-11-03');
+      expect(source.stored.remaining.keys, ['morning']);
+      cubit.back();
+      await Future<void>.delayed(Duration.zero);
+      cubit.open((cubit.state as AzkarBrowsing).collections.first);
+      expect((cubit.state as AzkarReciting).remaining, [
+        3,
+        1,
+      ], reason: 'yesterday morning counters are not relabelled as today');
+    },
+  );
 
   test('every tap persists the counters of the open collection', () async {
     final source = _Source();
@@ -270,8 +274,7 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    final ids = (cubit.state as AzkarBrowsing)
-        .collections
+    final ids = (cubit.state as AzkarBrowsing).collections
         .map((collection) => collection.id)
         .toList();
     expect(ids, ['morning', 'evening']);
@@ -280,10 +283,10 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     final browsing = cubit.state as AzkarBrowsing;
-    expect(
-      browsing.collections.map((collection) => collection.id),
-      ['evening', 'morning'],
-    );
+    expect(browsing.collections.map((collection) => collection.id), [
+      'evening',
+      'morning',
+    ]);
     expect(browsing.favorites, {'evening'});
     expect(source.stored.favorites, {'evening'});
     expect(source.favoriteWrites, 1);
@@ -297,9 +300,9 @@ void main() {
     await cubit.start();
 
     expect(
-      (cubit.state as AzkarBrowsing)
-          .collections
-          .map((collection) => collection.id),
+      (cubit.state as AzkarBrowsing).collections.map(
+        (collection) => collection.id,
+      ),
       ['evening', 'morning'],
     );
 
@@ -307,9 +310,9 @@ void main() {
     await Future<void>.delayed(Duration.zero);
 
     expect(
-      (cubit.state as AzkarBrowsing)
-          .collections
-          .map((collection) => collection.id),
+      (cubit.state as AzkarBrowsing).collections.map(
+        (collection) => collection.id,
+      ),
       ['morning', 'evening'],
     );
     expect(source.stored.favorites, isEmpty);
@@ -340,9 +343,9 @@ void main() {
     addTearDown(cubit.close);
     await cubit.start();
 
-    final morning = (cubit.state as AzkarBrowsing)
-        .collections
-        .firstWhere((collection) => collection.id == 'morning');
+    final morning = (cubit.state as AzkarBrowsing).collections.firstWhere(
+      (collection) => collection.id == 'morning',
+    );
     cubit.open(morning);
     await pumpEventQueue();
     expect(cubit.state, isA<AzkarReciting>());
@@ -357,10 +360,9 @@ void main() {
     await pumpEventQueue();
 
     expect(source.stored.day, '2026-11-02');
-    expect(
-      source.stored.remaining['morning'],
-      [2, 2],
-      reason: 'the fresh count is 3, minus this tap; yesterday is discarded',
-    );
+    expect(source.stored.remaining['morning'], [
+      2,
+      2,
+    ], reason: 'the fresh count is 3, minus this tap; yesterday is discarded');
   });
 }

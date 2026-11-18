@@ -53,16 +53,22 @@ class _TomorrowNote extends StatelessWidget {
                         arabicIndic: loc.usesArabicIndicDigits,
                       ),
                     ),
-                    style: AppTheme.cardTitle
-                        .copyWith(fontSize: AppType.bodyLarge),
+                    style: AppTheme.cardTitle.copyWith(
+                      fontSize: AppType.bodyLarge,
+                    ),
                   ),
                   if (remaining != null) ...[
                     const SizedBox(height: 2),
                     Text(
-                      loc.remaining(formatDurationHm(remaining!,
-                          arabicIndic: loc.usesArabicIndicDigits)),
-                      style: AppTheme.caption
-                          .copyWith(color: colors.onSurfaceVariant),
+                      loc.remaining(
+                        formatDurationHm(
+                          remaining!,
+                          arabicIndic: loc.usesArabicIndicDigits,
+                        ),
+                      ),
+                      style: AppTheme.caption.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ],
@@ -183,14 +189,20 @@ class _PrayerRow extends StatelessWidget {
           if (isNext)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-              child:
-                  Icon(Icons.schedule, size: AppIconSize.lg, color: foreground),
+              child: Icon(
+                Icons.schedule,
+                size: AppIconSize.lg,
+                color: foreground,
+              ),
             )
           else if (isSunrise)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-              child: Icon(Icons.wb_sunny_outlined,
-                  size: AppIconSize.md, color: muted),
+              child: Icon(
+                Icons.wb_sunny_outlined,
+                size: AppIconSize.md,
+                color: muted,
+              ),
             ),
           Expanded(
             child: Column(
@@ -208,8 +220,12 @@ class _PrayerRow extends StatelessWidget {
                 if (isNext && remaining != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    loc.remaining(formatDurationHm(remaining!,
-                        arabicIndic: loc.usesArabicIndicDigits)),
+                    loc.remaining(
+                      formatDurationHm(
+                        remaining!,
+                        arabicIndic: loc.usesArabicIndicDigits,
+                      ),
+                    ),
                     style: AppTheme.caption.copyWith(color: muted),
                   ),
                 ],

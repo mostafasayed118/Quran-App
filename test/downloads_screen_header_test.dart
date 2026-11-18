@@ -30,7 +30,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_downloads_header');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -40,24 +42,32 @@ void main() {
             surahTotal: 114,
           ),
         );
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(1),
-          nameAr: 'الفاتحة',
-          nameEn: 'Al-Fatihah',
-          revelationType: 'makki',
-          ayahCount: 7,
-          pagesStart: 1,
-          pagesEnd: 1,
-        ));
-    await db.into(db.surahs).insert(SurahsCompanion.insert(
-          id: const Value(2),
-          nameAr: 'البقرة',
-          nameEn: 'Al-Baqarah',
-          revelationType: 'madani',
-          ayahCount: 286,
-          pagesStart: 2,
-          pagesEnd: 49,
-        ));
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(1),
+            nameAr: 'الفاتحة',
+            nameEn: 'Al-Fatihah',
+            revelationType: 'makki',
+            ayahCount: 7,
+            pagesStart: 1,
+            pagesEnd: 1,
+          ),
+        );
+    await db
+        .into(db.surahs)
+        .insert(
+          SurahsCompanion.insert(
+            id: const Value(2),
+            nameAr: 'البقرة',
+            nameEn: 'Al-Baqarah',
+            revelationType: 'madani',
+            ayahCount: 286,
+            pagesStart: 2,
+            pagesEnd: 49,
+          ),
+        );
   });
 
   tearDown(() async {
@@ -65,7 +75,9 @@ void main() {
   });
 
   Future<void> insertDone(int surahNumber, int bytes) async {
-    await db.into(db.downloads).insert(
+    await db
+        .into(db.downloads)
+        .insert(
           DownloadsCompanion.insert(
             reciterId: '51-53',
             surahId: surahNumber,
@@ -78,10 +90,7 @@ void main() {
         );
   }
 
-  Future<void> pumpScreen(
-    WidgetTester tester, {
-    double textScale = 1,
-  }) async {
+  Future<void> pumpScreen(WidgetTester tester, {double textScale = 1}) async {
     final cubit = DownloadsCubit(
       downloader: AudioDownloader(db, audioRootResolver: () async => tempRoot),
       reciters: ReciterRepository(db),
@@ -101,9 +110,8 @@ void main() {
           ],
           theme: AppTheme.light,
           builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: TextScaler.linear(textScale),
-            ),
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(textScale)),
             child: child!,
           ),
           home: const DownloadsScreen(),
@@ -113,8 +121,9 @@ void main() {
     await settle(tester);
   }
 
-  testWidgets('two installed rows show the total and the count',
-      (tester) async {
+  testWidgets('two installed rows show the total and the count', (
+    tester,
+  ) async {
     await insertDone(1, 1572864); // 1.5 MB
     await insertDone(2, 2097152); // 2.0 MB
     await pumpScreen(tester);

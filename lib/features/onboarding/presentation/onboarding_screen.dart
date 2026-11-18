@@ -81,10 +81,7 @@ class _Steps extends StatelessWidget {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<OnboardingCubit>();
     return ListView(
-      padding: appScrollPadding(
-        context,
-        const EdgeInsets.all(AppSpacing.lg),
-      ),
+      padding: appScrollPadding(context, const EdgeInsets.all(AppSpacing.lg)),
       children: [
         Text(loc.onboardingIntro, style: AppTheme.cardTitle),
         const SizedBox(height: AppSpacing.lg),
@@ -166,8 +163,10 @@ class _StepCard extends StatelessWidget {
                         Text(title, style: AppTheme.cardTitle),
                         if (subtitle != null) ...[
                           const SizedBox(height: 2),
-                          Text(subtitle!,
-                              style: AppTheme.mutedFootnote(context)),
+                          Text(
+                            subtitle!,
+                            style: AppTheme.mutedFootnote(context),
+                          ),
                         ],
                       ],
                     ),
@@ -175,8 +174,11 @@ class _StepCard extends StatelessWidget {
                   if (done)
                     Padding(
                       padding: const EdgeInsetsDirectional.only(end: 6),
-                      child: Icon(Icons.check_circle,
-                          color: colors.secondary, size: AppIconSize.lg),
+                      child: Icon(
+                        Icons.check_circle,
+                        color: colors.secondary,
+                        size: AppIconSize.lg,
+                      ),
                     ),
                   if (actionLabel != null)
                     Flexible(

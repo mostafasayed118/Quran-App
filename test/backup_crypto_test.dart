@@ -46,8 +46,7 @@ void main() {
     expect(isEncryptedBackupEnvelope(tampered), isTrue);
   });
 
-  test(
-      'decodeBackup: encrypted file without passphrase is reported, not '
+  test('decodeBackup: encrypted file without passphrase is reported, not '
       'decoded', () async {
     final envelope = await encryptBackupJson(
       jsonEncode({
@@ -107,10 +106,7 @@ void main() {
   });
 
   test('an empty passphrase is refused by the encryptor', () async {
-    await expectLater(
-      encryptBackupJson('{}', ''),
-      throwsArgumentError,
-    );
+    await expectLater(encryptBackupJson('{}', ''), throwsArgumentError);
   });
 
   test('the exported state family compiles with its new variant', () {

@@ -38,21 +38,21 @@ void main() {
         AndroidFlutterLocalNotificationsPlugin();
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_channel, (call) async {
-      calls.add(call);
-      switch (call.method) {
-        case 'initialize':
-          return true;
-        case 'canScheduleExactNotifications':
-          return exact;
-        case 'areNotificationsEnabled':
-          return false;
-        case 'requestNotificationsPermission':
-        case 'requestExactAlarmsPermission':
-          return true;
-        default:
-          return null;
-      }
-    });
+          calls.add(call);
+          switch (call.method) {
+            case 'initialize':
+              return true;
+            case 'canScheduleExactNotifications':
+              return exact;
+            case 'areNotificationsEnabled':
+              return false;
+            case 'requestNotificationsPermission':
+            case 'requestExactAlarmsPermission':
+              return true;
+            default:
+              return null;
+          }
+        });
   });
 
   tearDown(() {
@@ -77,8 +77,11 @@ void main() {
 
     final methods = calls.map((call) => call.method).toList();
     expect(methods, isNot(contains('cancel')));
-    expect(methods, isNot(contains('zonedSchedule')),
-        reason: 'the background isolate must not rewrite the same alarms');
+    expect(
+      methods,
+      isNot(contains('zonedSchedule')),
+      reason: 'the background isolate must not rewrite the same alarms',
+    );
   });
 
   test('a reboot re-arms an unchanged plan; the OS lost its alarms', () async {
@@ -99,8 +102,11 @@ void main() {
 
     final methods = calls.map((call) => call.method).toList();
     expect(methods, contains('cancel'));
-    expect(methods, contains('zonedSchedule'),
-        reason: 'the boot path must re-arm a plan from a previous boot');
+    expect(
+      methods,
+      contains('zonedSchedule'),
+      reason: 'the boot path must re-arm a plan from a previous boot',
+    );
     expect(store.snapshot?.bootId, 'boot-B');
   });
 
@@ -120,8 +126,9 @@ void main() {
     await second.init();
     await second.scheduleAll(plan);
 
-    final zoned =
-        calls.where((call) => call.method == 'zonedSchedule').toList();
+    final zoned = calls
+        .where((call) => call.method == 'zonedSchedule')
+        .toList();
     expect(zoned, hasLength(1));
     final args = zoned.single.arguments as Map<Object?, Object?>;
     expect(args['id'], 1);
@@ -142,7 +149,8 @@ void main() {
     expect(
       calls.map((call) => call.method),
       contains('zonedSchedule'),
-      reason: 'an old app version stored no boot id; scheduling once is the '
+      reason:
+          'an old app version stored no boot id; scheduling once is the '
           'only safe reading',
     );
   });
@@ -170,11 +178,10 @@ ScheduledReminder _reminder({
   String? body,
   String? payload,
   DateTime? fireAt,
-}) =>
-    ScheduledReminder(
-      id: id,
-      fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
-      title: title,
-      body: body,
-      payload: payload,
-    );
+}) => ScheduledReminder(
+  id: id,
+  fireAt: fireAt ?? DateTime.utc(2030, 1, 1, id),
+  title: title,
+  body: body,
+  payload: payload,
+);

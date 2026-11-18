@@ -7,36 +7,38 @@ import 'package:quran_yahdi/features/library/data/pack_reader.dart';
 /// Scheduling contract of the read path: one decode per pack in flight
 /// (single-flight) and at most one decode in flight globally (serialization).
 void main() {
-  test('concurrent reads of the same pack share ONE decode (single-flight)',
-      () async {
-    var calls = 0;
-    final gate = Completer<dynamic>();
-    final reader = PackReader(
-      fileDecoder: (path) {
-        calls++;
-        return gate.future;
-      },
-      packPath: (packId) async => '/fake/$packId.json',
-    );
+  test(
+    'concurrent reads of the same pack share ONE decode (single-flight)',
+    () async {
+      var calls = 0;
+      final gate = Completer<dynamic>();
+      final reader = PackReader(
+        fileDecoder: (path) {
+          calls++;
+          return gate.future;
+        },
+        packPath: (packId) async => '/fake/$packId.json',
+      );
 
-    final first = reader.translationFor('same-pack', 1, 1);
-    final second = reader.translationFor('same-pack', 1, 2);
-    await Future<void>.delayed(const Duration(milliseconds: 20));
+      final first = reader.translationFor('same-pack', 1, 1);
+      final second = reader.translationFor('same-pack', 1, 2);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
 
-    // Both readers are pending on the same gated decode.
-    expect(calls, 1);
+      // Both readers are pending on the same gated decode.
+      expect(calls, 1);
 
-    gate.complete({
-      'quran': [
-        {'chapter': 1, 'verse': 1, 'text': 'one'},
-        {'chapter': 1, 'verse': 2, 'text': 'two'},
-      ],
-    });
+      gate.complete({
+        'quran': [
+          {'chapter': 1, 'verse': 1, 'text': 'one'},
+          {'chapter': 1, 'verse': 2, 'text': 'two'},
+        ],
+      });
 
-    expect(await first, 'one');
-    expect(await second, 'two');
-    expect(calls, 1);
-  });
+      expect(await first, 'one');
+      expect(await second, 'two');
+      expect(calls, 1);
+    },
+  );
 
   test('decodes for different packs are serialized in start order', () async {
     final started = <String>[];

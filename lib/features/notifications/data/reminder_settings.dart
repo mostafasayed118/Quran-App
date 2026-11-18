@@ -27,9 +27,9 @@ class ReminderSettings
     PrayerConfigSource? prayerConfig,
     PreAdhanCanceller? preAdhanCanceller,
     AdhanPreferences? adhanPrefs,
-  })  : _prayerConfig = prayerConfig,
-        _preAdhanCanceller = preAdhanCanceller,
-        _adhanPrefs = adhanPrefs;
+  }) : _prayerConfig = prayerConfig,
+       _preAdhanCanceller = preAdhanCanceller,
+       _adhanPrefs = adhanPrefs;
 
   final AppDatabase _db;
   final PrayerConfigSource? _prayerConfig;

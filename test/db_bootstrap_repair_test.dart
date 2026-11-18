@@ -36,15 +36,16 @@ void main() {
     );
 
     expect(await target.readAsBytes(), <int>[1, 2, 3, 4]);
-    expect(File('${target.path}.part').existsSync(), isFalse,
-        reason: 'a crashed write must never leave a half-written target');
+    expect(
+      File('${target.path}.part').existsSync(),
+      isFalse,
+      reason: 'a crashed write must never leave a half-written target',
+    );
   });
 
   test('a valid database with user rows is never touched', () async {
     final db = AppDatabase(NativeDatabase(target));
-    await db.into(db.bookmarks).insert(
-          BookmarksCompanion.insert(ayahId: 7),
-        );
+    await db.into(db.bookmarks).insert(BookmarksCompanion.insert(ayahId: 7));
     await db.close();
     final before = await target.readAsBytes();
 
@@ -81,12 +82,15 @@ void main() {
     );
 
     expect(hasSqliteHeader(target), isTrue);
-    expect(await target.readAsBytes(), truncated,
-        reason: 'a valid header is kept as-is: no silent replacement');
+    expect(
+      await target.readAsBytes(),
+      truncated,
+      reason: 'a valid header is kept as-is: no silent replacement',
+    );
     expect(
       dir.listSync().whereType<File>().where(
-            (f) => f.path.contains('.corrupt-'),
-          ),
+        (f) => f.path.contains('.corrupt-'),
+      ),
       isEmpty,
       reason: 'a possibly-populated file is never moved aside automatically',
     );
@@ -108,10 +112,16 @@ void main() {
         .where((f) => f.path.contains('.corrupt-'))
         .toList();
     expect(asides, hasLength(1));
-    expect(await asides.single.readAsString(), 'not a database',
-        reason: 'the unusable file is preserved, not deleted');
-    expect(p.basename(asides.single.path), contains('T'),
-        reason: 'the aside name carries the moment it was moved');
+    expect(
+      await asides.single.readAsString(),
+      'not a database',
+      reason: 'the unusable file is preserved, not deleted',
+    );
+    expect(
+      p.basename(asides.single.path),
+      contains('T'),
+      reason: 'the aside name carries the moment it was moved',
+    );
   });
 
   test('an existing aside is never overwritten', () async {
@@ -138,8 +148,8 @@ void main() {
     expect(await target.readAsBytes(), <int>[9, 9, 9, 9]);
     expect(
       dir.listSync().whereType<File>().where(
-            (f) => f.path.contains('.corrupt-'),
-          ),
+        (f) => f.path.contains('.corrupt-'),
+      ),
       hasLength(1),
     );
   });

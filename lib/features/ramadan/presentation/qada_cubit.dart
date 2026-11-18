@@ -18,8 +18,8 @@ import 'qada_state.dart';
 class QadaCubit extends Cubit<QadaState> {
   /// Creates the cubit over [source].
   QadaCubit({required QadaSource source})
-      : _source = source,
-        super(const QadaState.loading());
+    : _source = source,
+      super(const QadaState.loading());
 
   final QadaSource _source;
   final SerialQueue _writes = SerialQueue();
@@ -38,8 +38,12 @@ class QadaCubit extends Cubit<QadaState> {
       _confirmed = dates;
       if (!isClosed) emit(QadaState.ready(dates: dates));
     } on Object catch (error, stackTrace) {
-      appLog('qada load failed',
-          name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
+      appLog(
+        'qada load failed',
+        name: 'quran_yahdi/ramadan',
+        error: error,
+        stackTrace: stackTrace,
+      );
       if (!isClosed) emit(const QadaState.failed());
     }
   }
@@ -49,18 +53,16 @@ class QadaCubit extends Cubit<QadaState> {
 
   /// Removes [date]; a date not in the set is a successful no-op.
   Future<bool> remove(DateTime date) => _mutate(
-        (dates) => [
-          for (final entry in dates)
-            if (!_sameDay(entry, date)) entry,
-        ],
-      );
+    (dates) => [
+      for (final entry in dates)
+        if (!_sameDay(entry, date)) entry,
+    ],
+  );
 
   /// Removes every recorded day.
   Future<bool> clear() => _mutate((_) => const <DateTime>[]);
 
-  Future<bool> _mutate(
-    List<DateTime> Function(List<DateTime> dates) update,
-  ) {
+  Future<bool> _mutate(List<DateTime> Function(List<DateTime> dates) update) {
     final current = state;
     if (current is! QadaReady) return Future<bool>.value(false);
     final optimistic = QadaRepository.normalize(update(current.dates));
@@ -83,8 +85,12 @@ class QadaCubit extends Cubit<QadaState> {
         }
         return true;
       } on Object catch (error, stackTrace) {
-        appLog('qada save failed',
-            name: 'quran_yahdi/ramadan', error: error, stackTrace: stackTrace);
+        appLog(
+          'qada save failed',
+          name: 'quran_yahdi/ramadan',
+          error: error,
+          stackTrace: stackTrace,
+        );
         if (!isClosed && revision == _revision) {
           emit(QadaState.ready(dates: _confirmed));
         }

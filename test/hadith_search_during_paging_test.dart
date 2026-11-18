@@ -34,8 +34,7 @@ class _GatedPageDownloader extends PackDownloader {
     String query, {
     int offset = 0,
     int limit = 20,
-  }) async =>
-      (<(int, String)>[(42, 'needle $query')], false);
+  }) async => (<(int, String)>[(42, 'needle $query')], false);
 }
 
 void main() {

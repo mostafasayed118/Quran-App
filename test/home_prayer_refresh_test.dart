@@ -17,8 +17,10 @@ class _NoAyahs implements AyahLookup {
 
   @override
   Future<List<Ayah>> ayahsForRange(
-          int surahId, int fromAyah, int toAyah) async =>
-      const <Ayah>[];
+    int surahId,
+    int fromAyah,
+    int toAyah,
+  ) async => const <Ayah>[];
 
   @override
   Future<Surah?> surahById(int surahId) async => null;
@@ -27,12 +29,12 @@ class _NoAyahs implements AyahLookup {
 class _OneCity implements CitySource {
   @override
   Future<City?> selectedCity() async => const City(
-        id: 'cairo',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357,
-      );
+    id: 'cairo',
+    nameAr: 'القاهرة',
+    nameEn: 'Cairo',
+    lat: 30.0444,
+    lng: 31.2357,
+  );
 
   @override
   Future<void> select(City city) async {}
@@ -56,8 +58,9 @@ class _AdvancingPrayer implements PrayerTimesPort {
 }
 
 void main() {
-  testWidgets('home re-plans when the shown prayer time passes',
-      (tester) async {
+  testWidgets('home re-plans when the shown prayer time passes', (
+    tester,
+  ) async {
     final prayer = _AdvancingPrayer();
     final cubit = HomeCubit(
       lastRead: _NoLastRead(),

@@ -9,42 +9,42 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'support/test_db.dart';
 
 List<Map<String, dynamic>> fixtureRows() => [
-      {
-        'id': 'c1',
-        'nameAr': 'القاهرة',
-        'nameEn': 'Cairo',
-        'lat': 30.0444,
-        'lng': 31.2357
-      },
-      {
-        'id': 'c2',
-        'nameAr': 'الرياض',
-        'nameEn': 'Riyadh',
-        'lat': 24.7136,
-        'lng': 46.6753
-      },
-      {
-        'id': 'c3',
-        'nameAr': 'دبي',
-        'nameEn': 'Dubai',
-        'lat': 25.2048,
-        'lng': 55.2708
-      },
-      {
-        'id': 'c4',
-        'nameAr': 'عمّان',
-        'nameEn': 'Amman',
-        'lat': 31.9539,
-        'lng': 35.9106
-      },
-      {
-        'id': 'c5',
-        'nameAr': 'الدار البيضاء',
-        'nameEn': 'Casablanca',
-        'lat': 33.5731,
-        'lng': -7.5898
-      },
-    ];
+  {
+    'id': 'c1',
+    'nameAr': 'القاهرة',
+    'nameEn': 'Cairo',
+    'lat': 30.0444,
+    'lng': 31.2357,
+  },
+  {
+    'id': 'c2',
+    'nameAr': 'الرياض',
+    'nameEn': 'Riyadh',
+    'lat': 24.7136,
+    'lng': 46.6753,
+  },
+  {
+    'id': 'c3',
+    'nameAr': 'دبي',
+    'nameEn': 'Dubai',
+    'lat': 25.2048,
+    'lng': 55.2708,
+  },
+  {
+    'id': 'c4',
+    'nameAr': 'عمّان',
+    'nameEn': 'Amman',
+    'lat': 31.9539,
+    'lng': 35.9106,
+  },
+  {
+    'id': 'c5',
+    'nameAr': 'الدار البيضاء',
+    'nameEn': 'Casablanca',
+    'lat': 33.5731,
+    'lng': -7.5898,
+  },
+];
 
 void main() {
   late AppDatabase db;
@@ -96,11 +96,12 @@ void main() {
 
   test('select persists and round-trips via the settings table', () async {
     const cairo = City(
-        id: 'c1',
-        nameAr: 'القاهرة',
-        nameEn: 'Cairo',
-        lat: 30.0444,
-        lng: 31.2357);
+      id: 'c1',
+      nameAr: 'القاهرة',
+      nameEn: 'Cairo',
+      lat: 30.0444,
+      lng: 31.2357,
+    );
     await repo.select(cairo);
 
     final restored = await repo.selectedCity();
@@ -123,7 +124,8 @@ void main() {
     final file = File('assets/data/cities.json');
     if (!file.existsSync()) {
       markTestSkipped(
-          'working dir does not resolve the bundled asset from this runner');
+        'working dir does not resolve the bundled asset from this runner',
+      );
     }
     final list = (jsonDecode(file.readAsStringSync()) as List)
         .cast<Map<String, dynamic>>();

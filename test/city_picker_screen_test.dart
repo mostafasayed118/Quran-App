@@ -12,7 +12,7 @@ import 'support/test_db.dart';
 
 class _ThrowingSearchRepo extends CityRepository {
   _ThrowingSearchRepo(AppDatabase db)
-      : super(db: db, loader: () async => const []);
+    : super(db: db, loader: () async => const []);
 
   @override
   Future<List<City>> search(String query) => Future.error(StateError('boom'));
@@ -25,76 +25,90 @@ void main() {
   setUp(() async {
     db = newTestDb();
     repo = CityRepository(
-        db: db,
-        loader: () async => [
-              {
-                'id': 'cairo',
-                'nameAr': 'القاهرة',
-                'nameEn': 'Cairo',
-                'lat': 30.0444,
-                'lng': 31.2357
-              },
-              {
-                'id': 'riyadh',
-                'nameAr': 'الرياض',
-                'nameEn': 'Riyadh',
-                'lat': 24.7136,
-                'lng': 46.6753
-              },
-              {
-                'id': 'dubai',
-                'nameAr': 'دبي',
-                'nameEn': 'Dubai',
-                'lat': 25.2048,
-                'lng': 55.2708
-              },
-            ]);
+      db: db,
+      loader: () async => [
+        {
+          'id': 'cairo',
+          'nameAr': 'القاهرة',
+          'nameEn': 'Cairo',
+          'lat': 30.0444,
+          'lng': 31.2357,
+        },
+        {
+          'id': 'riyadh',
+          'nameAr': 'الرياض',
+          'nameEn': 'Riyadh',
+          'lat': 24.7136,
+          'lng': 46.6753,
+        },
+        {
+          'id': 'dubai',
+          'nameAr': 'دبي',
+          'nameEn': 'Dubai',
+          'lat': 25.2048,
+          'lng': 55.2708,
+        },
+      ],
+    );
   });
 
-  testWidgets('search filters live and picking persists then pops',
-      (tester) async {
+  testWidgets('search filters live and picking persists then pops', (
+    tester,
+  ) async {
     final cubit = CityPickerCubit(cityRepo: repo);
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
-      value: cubit,
-      child: appShell(
+    await tester.pumpWidget(
+      BlocProvider<CityPickerCubit>.value(
+        value: cubit,
+        child: appShell(
           home: Scaffold(
-        body: Builder(
-          builder: (context) => Center(
-            child: TextButton(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder: (_) => BlocProvider<CityPickerCubit>.value(
-                    value: cubit,
-                    child: const CityPickerScreen(),
+            body: Builder(
+              builder: (context) => Center(
+                child: TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => BlocProvider<CityPickerCubit>.value(
+                        value: cubit,
+                        child: const CityPickerScreen(),
+                      ),
+                    ),
                   ),
+                  child: const Text('OPEN'),
                 ),
               ),
-              child: const Text('OPEN'),
             ),
           ),
         ),
-      )),
-    ));
+      ),
+    );
 
     await tester.tap(find.text('OPEN'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('اختر مدينتك'), findsOneWidget);
     expect(find.text('القاهرة'), findsOneWidget);
     expect(find.text('الرياض'), findsOneWidget);
     expect(find.text('دبي'), findsOneWidget);
 
     await tester.enterText(find.byType(TextField), 'cai');
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.text('القاهرة'), findsOneWidget);
     expect(find.text('الرياض'), findsNothing);
 
     await tester.tap(find.text('القاهرة'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('اختر مدينتك'), findsNothing);
     final selected = await repo.selectedCity();
@@ -102,15 +116,18 @@ void main() {
     expect(selected!.id, 'cairo');
   });
 
-  testWidgets('a failing search shows the localized error pane, not a hang',
-      (tester) async {
+  testWidgets('a failing search shows the localized error pane, not a hang', (
+    tester,
+  ) async {
     final cubit = CityPickerCubit(cityRepo: _ThrowingSearchRepo(db));
     addTearDown(cubit.close);
     await cubit.start();
-    await tester.pumpWidget(BlocProvider<CityPickerCubit>.value(
-      value: cubit,
-      child: appShell(home: const CityPickerScreen()),
-    ));
+    await tester.pumpWidget(
+      BlocProvider<CityPickerCubit>.value(
+        value: cubit,
+        child: appShell(home: const CityPickerScreen()),
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 

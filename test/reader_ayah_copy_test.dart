@@ -32,8 +32,9 @@ class _TeardownSafeAyahRepository extends AyahRepository {
 /// column, so a test can prove which one reached the clipboard.
 class _FakeUthmani implements UthmaniTextSource {
   @override
-  Future<Map<int, String>> forSurah(int surahId) async =>
-      {for (var i = 1; i <= 12; i++) i: 'آيَةٌ $i'};
+  Future<Map<int, String>> forSurah(int surahId) async => {
+    for (var i = 1; i <= 12; i++) i: 'آيَةٌ $i',
+  };
 }
 
 /// Private-use codepoints are how the bundled Hafs font encodes glyphs; they
@@ -46,27 +47,26 @@ void main() {
 
   setUp(() async {
     db = newTestDb();
-    await db.batch((b) => b.insertAll(db.ayahs, [
-          for (var i = 1; i <= 12; i++)
-            AyahsCompanion.insert(
-              id: Value(100 + i),
-              surahId: 2,
-              numberInSurah: i,
-              juz: 1,
-              page: i <= 6 ? 2 : 3,
-              // The real asset stores a private-use encoding here; imlaei is
-              // the plain orthography.
-              textUthmani: '\u200F\uE8DB \u200F\uE338',
-              textImlaei: 'آية $i',
-            ),
-        ]));
+    await db.batch(
+      (b) => b.insertAll(db.ayahs, [
+        for (var i = 1; i <= 12; i++)
+          AyahsCompanion.insert(
+            id: Value(100 + i),
+            surahId: 2,
+            numberInSurah: i,
+            juz: 1,
+            page: i <= 6 ? 2 : 3,
+            // The real asset stores a private-use encoding here; imlaei is
+            // the plain orthography.
+            textUthmani: '\u200F\uE8DB \u200F\uE338',
+            textImlaei: 'آية $i',
+          ),
+      ]),
+    );
     lastRead = LastReadRepository(db);
   });
 
-  Future<void> pumpReader(
-    WidgetTester tester, {
-    bool unicode = true,
-  }) async {
+  Future<void> pumpReader(WidgetTester tester, {bool unicode = true}) async {
     final cubit = ReaderCubit(
       ayahRepository: _TeardownSafeAyahRepository(db),
       lastReadRepository: lastRead,
@@ -79,20 +79,27 @@ void main() {
     final playbackCubit = PlaybackCubit(
       service: FakePlaybackService(),
       reciters: ReciterRepository(db),
-      downloader: AudioDownloader(db,
-          audioRootResolver: () async => Directory.systemTemp),
+      downloader: AudioDownloader(
+        db,
+        audioRootResolver: () async => Directory.systemTemp,
+      ),
     );
     addTearDown(playbackCubit.close);
 
-    await tester.pumpWidget(MultiBlocProvider(
-      providers: [
-        BlocProvider<ReaderCubit>.value(value: cubit),
-        BlocProvider<PlaybackCubit>.value(value: playbackCubit),
-      ],
-      child: appShell(home: const ReaderScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpWidget(
+      MultiBlocProvider(
+        providers: [
+          BlocProvider<ReaderCubit>.value(value: cubit),
+          BlocProvider<PlaybackCubit>.value(value: playbackCubit),
+        ],
+        child: appShell(home: const ReaderScreen()),
+      ),
+    );
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
   }
 
   List<MethodCall> captureClipboard(WidgetTester tester) {
@@ -109,8 +116,9 @@ void main() {
     return calls;
   }
 
-  testWidgets('with Unicode text the reader renders it and allows selection',
-      (tester) async {
+  testWidgets('with Unicode text the reader renders it and allows selection', (
+    tester,
+  ) async {
     await pumpReader(tester);
 
     expect(find.byType(SelectionArea), findsOneWidget);
@@ -118,17 +126,24 @@ void main() {
     expect(ayah.style?.fontFamily, AppTheme.hafsAyah.fontFamily);
   });
 
-  testWidgets('copy takes the Unicode Uthmani text, never the glyph column',
-      (tester) async {
+  testWidgets('copy takes the Unicode Uthmani text, never the glyph column', (
+    tester,
+  ) async {
     await pumpReader(tester);
     final clipboard = captureClipboard(tester);
 
     await tester.tap(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(clipboard, hasLength(1));
     final text = (clipboard.single.arguments as Map)['text'] as String;
@@ -137,14 +152,18 @@ void main() {
     expect(find.text('تم نسخ الآية'), findsOneWidget);
   });
 
-  testWidgets('with Unicode text a long-press starts selection, not copy',
-      (tester) async {
+  testWidgets('with Unicode text a long-press starts selection, not copy', (
+    tester,
+  ) async {
     await pumpReader(tester);
     final clipboard = captureClipboard(tester);
 
     await tester.longPress(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     // SelectionArea owns the gesture; the copy shortcut only exists for the
     // glyph fallback where selection would be meaningless.
@@ -157,8 +176,11 @@ void main() {
     final clipboard = captureClipboard(tester);
 
     await tester.longPress(find.textContaining('\uE8DB').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(clipboard, hasLength(1));
     final text = (clipboard.single.arguments as Map)['text'] as String;
@@ -166,8 +188,7 @@ void main() {
     expect(_pua.hasMatch(text), isFalse);
   });
 
-  testWidgets(
-      'without the asset it falls back to glyphs, no selection, and '
+  testWidgets('without the asset it falls back to glyphs, no selection, and '
       'copies the imlaei column', (tester) async {
     await pumpReader(tester, unicode: false);
 
@@ -177,11 +198,17 @@ void main() {
 
     final clipboard = captureClipboard(tester);
     await tester.tap(find.textContaining('\uE8DB').first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     await tester.tap(find.byIcon(Icons.copy_outlined).first);
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final text = (clipboard.single.arguments as Map)['text'] as String;
     expect(text, 'آية 1');
@@ -190,65 +217,91 @@ void main() {
 
   testWidgets('a vertical drag still scrolls the list', (tester) async {
     await pumpReader(tester);
-    final list = tester.state<ScrollableState>(find
-        .descendant(
-          of: find.byType(ScrollablePositionedList),
-          matching: find.byType(Scrollable),
-        )
-        .first);
+    final list = tester.state<ScrollableState>(
+      find
+          .descendant(
+            of: find.byType(ScrollablePositionedList),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
     final before = list.position.pixels;
 
     await tester.drag(
       find.byType(ScrollablePositionedList),
       const Offset(0, -200),
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(list.position.pixels, greaterThan(before + 100));
   });
 
-  testWidgets('mushaf mode: a horizontal fling still turns the page',
-      (tester) async {
+  testWidgets('mushaf mode: a horizontal fling still turns the page', (
+    tester,
+  ) async {
     await pumpReader(tester);
     await tester.tap(find.byTooltip('وضع المصحف'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     String pageLabel() =>
         tester.widget<Text>(find.textContaining('صفحة')).data!;
     expect(pageLabel(), contains('٢'));
 
-    final rtl = Directionality.of(tester.element(find.byType(PageView))) ==
+    final rtl =
+        Directionality.of(tester.element(find.byType(PageView))) ==
         TextDirection.rtl;
     await tester.fling(
       find.byType(PageView),
       Offset(rtl ? 600 : -600, 0),
       1000,
     );
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(pageLabel(), contains('٣'));
   });
 
-  testWidgets('the action row is closed until the verse is tapped',
-      (tester) async {
+  testWidgets('the action row is closed until the verse is tapped', (
+    tester,
+  ) async {
     await pumpReader(tester);
 
-    expect(find.byIcon(Icons.copy_outlined), findsNothing,
-        reason: 'the row must not spend the reader height on chrome');
+    expect(
+      find.byIcon(Icons.copy_outlined),
+      findsNothing,
+      reason: 'the row must not spend the reader height on chrome',
+    );
     expect(find.byIcon(Icons.menu_book_outlined), findsNothing);
 
     await tester.tap(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
     expect(find.byIcon(Icons.copy_outlined), findsOneWidget);
 
     await tester.tap(find.text('آيَةٌ 1'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
-    expect(find.byIcon(Icons.copy_outlined), findsNothing,
-        reason: 'tapping the open verse again closes it');
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
+    expect(
+      find.byIcon(Icons.copy_outlined),
+      findsNothing,
+      reason: 'tapping the open verse again closes it',
+    );
   });
 }

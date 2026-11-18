@@ -46,13 +46,16 @@ class PackDownloader {
     Dio? dio,
     Future<Directory> Function()? libraryRootResolver,
     Future<dynamic> Function(String path)? fileDecoder,
-  })  : _dio = dio ??
-            Dio(BaseOptions(
-              connectTimeout: const Duration(seconds: 15),
-              receiveTimeout: const Duration(minutes: 2),
-            )),
-        _rootResolver = libraryRootResolver,
-        _fileDecoder = fileDecoder;
+  }) : _dio =
+           dio ??
+           Dio(
+             BaseOptions(
+               connectTimeout: const Duration(seconds: 15),
+               receiveTimeout: const Duration(minutes: 2),
+             ),
+           ),
+       _rootResolver = libraryRootResolver,
+       _fileDecoder = fileDecoder;
 
   final AppDatabase _db;
   final Dio _dio;
@@ -66,8 +69,10 @@ class PackDownloader {
   final Future<dynamic> Function(String path)? _fileDecoder;
 
   /// Read side: bounded decoded-pack cache, ayah indexes and the read API.
-  late final PackReader _reader =
-      PackReader(fileDecoder: _fileDecoder, packPath: packPath);
+  late final PackReader _reader = PackReader(
+    fileDecoder: _fileDecoder,
+    packPath: packPath,
+  );
 
   /// DB-backed hadith read index: imports the install projection once, then
   /// serves pages with SQL LIMIT/OFFSET instead of retaining the pack list.
@@ -153,21 +158,25 @@ class PackDownloader {
   }
 
   Future<void> uninstall(String packId) async {
-    final row = await (_db.select(_db.installedPacks)
-          ..where((p) => p.packId.equals(packId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.installedPacks,
+    )..where((p) => p.packId.equals(packId))).getSingleOrNull();
     // Row/index first, file last: a failed DB delete must leave a usable
     // installed pack, never a row whose file is already gone.
     if (row != null) {
-      await (_db.delete(_db.installedPacks)
-            ..where((p) => p.packId.equals(packId)))
-          .go();
+      await (_db.delete(
+        _db.installedPacks,
+      )..where((p) => p.packId.equals(packId))).go();
     }
     try {
       await _hadithStore.deletePack(packId);
     } on Object catch (error, stackTrace) {
-      appLog('hadith pack index cleanup failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith pack index cleanup failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
     final finalFile = await _store.packFile(packId);
     await _store.deleteIfExists(finalFile);
@@ -175,9 +184,9 @@ class PackDownloader {
   }
 
   Future<bool> isInstalledAny(String packId) async {
-    final row = await (_db.select(_db.installedPacks)
-          ..where((p) => p.packId.equals(packId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.installedPacks,
+    )..where((p) => p.packId.equals(packId))).getSingleOrNull();
     return row != null;
   }
 
@@ -186,9 +195,9 @@ class PackDownloader {
 
   /// Path of an installed pack's file, null when absent.
   Future<String?> packPath(String packId) async {
-    final row = await (_db.select(_db.installedPacks)
-          ..where((p) => p.packId.equals(packId)))
-        .getSingleOrNull();
+    final row = await (_db.select(
+      _db.installedPacks,
+    )..where((p) => p.packId.equals(packId))).getSingleOrNull();
     if (row == null) return null;
     final f = await _store.packFile(packId);
     return f.existsSync() ? f.path : null;
@@ -215,12 +224,19 @@ class PackDownloader {
   /// DB-backed in production. The in-memory reader stays as a fail-open
   /// fallback if the derived index cannot be built.
   Future<(List<(int, String)>, bool)> hadithPage(
-      String packId, int offset, int limit) async {
+    String packId,
+    int offset,
+    int limit,
+  ) async {
     try {
       return await _hadithStore.hadithPage(packId, offset, limit);
     } on Object catch (error, stackTrace) {
-      appLog('hadith DB page failed; reading the pack directly',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith DB page failed; reading the pack directly',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
       return _reader.hadithPage(packId, offset, limit);
     }
   }
@@ -231,13 +247,11 @@ class PackDownloader {
     String query, {
     int offset = 0,
     int limit = 20,
-  }) =>
-      _hadithStore.search(packId, query, offset: offset, limit: limit);
+  }) => _hadithStore.search(packId, query, offset: offset, limit: limit);
 
   /// The stored hadiths whose numbers are in [numbers], in book order.
   Future<List<(int, String)>> hadithByNumbers(
     String packId,
     Set<int> numbers,
-  ) =>
-      _hadithStore.byNumbers(packId, numbers);
+  ) => _hadithStore.byNumbers(packId, numbers);
 }

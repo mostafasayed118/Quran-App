@@ -37,19 +37,19 @@ class TrackerDay {
 
   /// Whether the prayer of [slot] is marked.
   bool forSlot(PrayerSlot slot) => switch (slot) {
-        PrayerSlot.fajr => fajr,
-        PrayerSlot.dhuhr => dhuhr,
-        PrayerSlot.asr => asr,
-        PrayerSlot.maghrib => maghrib,
-        PrayerSlot.isha => isha,
-      };
+    PrayerSlot.fajr => fajr,
+    PrayerSlot.dhuhr => dhuhr,
+    PrayerSlot.asr => asr,
+    PrayerSlot.maghrib => maghrib,
+    PrayerSlot.isha => isha,
+  };
 
   factory TrackerDay.empty(DateTime day) => TrackerDay(
-        day: dateOnly(day),
-        fajr: false,
-        dhuhr: false,
-        asr: false,
-        maghrib: false,
-        isha: false,
-      );
+    day: dateOnly(day),
+    fajr: false,
+    dhuhr: false,
+    asr: false,
+    maghrib: false,
+    isha: false,
+  );
 }

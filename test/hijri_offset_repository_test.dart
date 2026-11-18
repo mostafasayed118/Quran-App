@@ -20,7 +20,9 @@ void main() {
     final db = newTestDb();
     final repo = HijriOffsetRepository(db);
 
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: HijriOffsetRepository.key,
             value: 'not-a-number',

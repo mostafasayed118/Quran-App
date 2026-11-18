@@ -41,14 +41,8 @@ class _SeekRow extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                positionLabel,
-                style: AppTheme.mutedAt(colors, 12),
-              ),
-              Text(
-                durationLabel,
-                style: AppTheme.mutedAt(colors, 12),
-              ),
+              Text(positionLabel, style: AppTheme.mutedAt(colors, 12)),
+              Text(durationLabel, style: AppTheme.mutedAt(colors, 12)),
             ],
           ),
         ),

@@ -30,7 +30,9 @@ void main() {
 
   test('malformed stored JSON degrades to empty', () async {
     final db = newTestDb();
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: QadaRepository.key,
             value: 'not-json',
@@ -39,7 +41,9 @@ void main() {
 
     expect(await QadaRepository(db).loadMissed(), isEmpty);
 
-    await db.into(db.settingsTable).insertOnConflictUpdate(
+    await db
+        .into(db.settingsTable)
+        .insertOnConflictUpdate(
           SettingsTableCompanion.insert(
             key: QadaRepository.key,
             value: '["2027-03-01", 4, "bad-date"]',

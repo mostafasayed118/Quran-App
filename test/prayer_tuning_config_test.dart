@@ -3,19 +3,18 @@ import 'package:quran_yahdi/core/domain/prayer_config.dart';
 import 'package:quran_yahdi/core/domain/prayer_name.dart';
 
 void main() {
-  test('the historical defaults add no adjustment and no high-latitude rule',
-      () {
-    expect(PrayerConfig.egyptian.adjustments, isEmpty);
-    expect(PrayerConfig.egyptian.highLatitude, PrayerHighLatitudeRule.none);
-    expect(PrayerConfig.egyptian.adjustmentFor(PrayerName.fajr), 0);
-  });
+  test(
+    'the historical defaults add no adjustment and no high-latitude rule',
+    () {
+      expect(PrayerConfig.egyptian.adjustments, isEmpty);
+      expect(PrayerConfig.egyptian.highLatitude, PrayerHighLatitudeRule.none);
+      expect(PrayerConfig.egyptian.adjustmentFor(PrayerName.fajr), 0);
+    },
+  );
 
   test('adjustments and the high-latitude rule round-trip through JSON', () {
     const config = PrayerConfig(
-      adjustments: {
-        PrayerName.fajr: 5,
-        PrayerName.isha: -3,
-      },
+      adjustments: {PrayerName.fajr: 5, PrayerName.isha: -3},
       highLatitude: PrayerHighLatitudeRule.seventhOfTheNight,
     );
 
@@ -27,22 +26,28 @@ void main() {
     expect(decoded.highLatitude, PrayerHighLatitudeRule.seventhOfTheNight);
   });
 
-  test('malformed, unknown and out-of-range adjustments are clamped or dropped',
-      () {
-    final decoded = PrayerConfig.fromJson(const {
-      PrayerConfig.adjustmentsKey:
-          'fajr:999,isha:-999,sunrise:5,dhuhr:0,unknown:4,garbage',
-      PrayerConfig.highLatitudeKey: 'not-a-rule',
-    });
+  test(
+    'malformed, unknown and out-of-range adjustments are clamped or dropped',
+    () {
+      final decoded = PrayerConfig.fromJson(const {
+        PrayerConfig.adjustmentsKey:
+            'fajr:999,isha:-999,sunrise:5,dhuhr:0,unknown:4,garbage',
+        PrayerConfig.highLatitudeKey: 'not-a-rule',
+      });
 
-    expect(decoded.adjustmentFor(PrayerName.fajr),
-        PrayerConfig.maxAdjustmentMinutes);
-    expect(decoded.adjustmentFor(PrayerName.isha),
-        PrayerConfig.minAdjustmentMinutes);
-    expect(decoded.adjustments.containsKey(PrayerName.sunrise), isFalse);
-    expect(decoded.adjustmentFor(PrayerName.dhuhr), 0);
-    expect(decoded.highLatitude, PrayerHighLatitudeRule.none);
-  });
+      expect(
+        decoded.adjustmentFor(PrayerName.fajr),
+        PrayerConfig.maxAdjustmentMinutes,
+      );
+      expect(
+        decoded.adjustmentFor(PrayerName.isha),
+        PrayerConfig.minAdjustmentMinutes,
+      );
+      expect(decoded.adjustments.containsKey(PrayerName.sunrise), isFalse);
+      expect(decoded.adjustmentFor(PrayerName.dhuhr), 0);
+      expect(decoded.highLatitude, PrayerHighLatitudeRule.none);
+    },
+  );
 
   test('zero entries never reach the persisted map', () {
     const config = PrayerConfig(

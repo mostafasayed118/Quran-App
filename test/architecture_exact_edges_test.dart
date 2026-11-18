@@ -33,8 +33,9 @@ String? _featureOf(String libRel) =>
 
 void main() {
   final sources = <String, String>{};
-  for (final f
-      in Directory('lib').listSync(recursive: true).whereType<File>()) {
+  for (final f in Directory(
+    'lib',
+  ).listSync(recursive: true).whereType<File>()) {
     if (!f.path.endsWith('.dart')) continue;
     if (f.path.endsWith('.g.dart') || f.path.endsWith('.freezed.dart')) {
       continue;
@@ -57,9 +58,13 @@ void main() {
         }
       }
     });
-    expect(offenders, isEmpty,
-        reason: 'core must stay feature-agnostic (dependency direction: '
-            'app -> features -> core)');
+    expect(
+      offenders,
+      isEmpty,
+      reason:
+          'core must stay feature-agnostic (dependency direction: '
+          'app -> features -> core)',
+    );
   });
 
   test('the live cross-feature edges are exactly the ratified two', () {
@@ -73,8 +78,12 @@ void main() {
         if (edge != null) live.add('${edge.$1}->${edge.$2}');
       }
     });
-    expect(live, {'quran->library', 'quran->recitation'},
-        reason: 'a new feature-to-feature dependency needs a conscious '
-            'architecture decision; keep this set exact');
+    expect(
+      live,
+      {'quran->library', 'quran->recitation'},
+      reason:
+          'a new feature-to-feature dependency needs a conscious '
+          'architecture decision; keep this set exact',
+    );
   });
 }

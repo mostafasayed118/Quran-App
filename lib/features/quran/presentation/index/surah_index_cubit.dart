@@ -28,10 +28,12 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
         _emitFiltered();
       },
       onError: (Object error, StackTrace stackTrace) {
-        appLog('surah index stream failed',
-            name: 'quran_yahdi/surah_index',
-            error: error,
-            stackTrace: stackTrace);
+        appLog(
+          'surah index stream failed',
+          name: 'quran_yahdi/surah_index',
+          error: error,
+          stackTrace: stackTrace,
+        );
         if (isClosed) return;
         emit(const SurahIndexState.failed());
       },
@@ -60,10 +62,7 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
 
   void _emitFiltered() {
     if (isClosed) return;
-    emit(SurahIndexState.ready(
-      surahs: _filter(_latest),
-      query: _query,
-    ));
+    emit(SurahIndexState.ready(surahs: _filter(_latest), query: _query));
   }
 
   List<SurahSummary> _filter(List<SurahSummary> surahs) {
@@ -72,7 +71,9 @@ class SurahIndexCubit extends Cubit<SurahIndexState> {
     final prepared = prepareQuery(_query);
     return surahs.where((s) {
       return matchesPrepared(
-              normalizeArabic(s.nameAr).toLowerCase(), prepared) ||
+            normalizeArabic(s.nameAr).toLowerCase(),
+            prepared,
+          ) ||
           matchesPrepared(normalizeArabic(s.nameEn).toLowerCase(), prepared) ||
           s.id.toString() == westernQuery;
     }).toList();

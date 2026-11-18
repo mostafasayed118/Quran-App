@@ -14,12 +14,12 @@ class _PackInstaller {
     required PackReader reader,
     required HadithStore hadithStore,
     required Future<dynamic> Function(String path)? fileDecoder,
-  })  : _db = db,
-        _dio = dio,
-        _store = store,
-        _reader = reader,
-        _hadithStore = hadithStore,
-        _fileDecoder = fileDecoder;
+  }) : _db = db,
+       _dio = dio,
+       _store = store,
+       _reader = reader,
+       _hadithStore = hadithStore,
+       _fileDecoder = fileDecoder;
 
   final AppDatabase _db;
   final Dio _dio;
@@ -53,8 +53,9 @@ class _PackInstaller {
         final gap = catalogIntegrityGap(pack);
         if (gap != null) {
           appLog(
-              'pack "${pack.id}" is not integrity-pinned ($gap): the install is validated by shape only',
-              name: 'quran_yahdi/library');
+            'pack "${pack.id}" is not integrity-pinned ($gap): the install is validated by shape only',
+            name: 'quran_yahdi/library',
+          );
         }
       }
       final projection = pinnedTafsir ? null : await _sniffPack(pack, partFile);
@@ -96,15 +97,30 @@ class _PackInstaller {
         case LibraryPackKind.tafsir:
           if (pack.urlTemplate == null) {
             await _writeSingleFile(
-                pack, sink, expectedBytes, throttle, onProgress);
+              pack,
+              sink,
+              expectedBytes,
+              throttle,
+              onProgress,
+            );
           } else {
             mergedIndex = await _writeTafsir(
-                pack, sink, expectedBytes, throttle, onProgress);
+              pack,
+              sink,
+              expectedBytes,
+              throttle,
+              onProgress,
+            );
           }
         case LibraryPackKind.translation:
         case LibraryPackKind.hadith:
           await _writeSingleFile(
-              pack, sink, expectedBytes, throttle, onProgress);
+            pack,
+            sink,
+            expectedBytes,
+            throttle,
+            onProgress,
+          );
       }
       await sink.flush();
     } on Object {
@@ -170,7 +186,8 @@ class _PackInstaller {
         final error = projection.error;
         if (error == _shaMismatchError) {
           throw PackFailure(
-              'tafsir surah ${numbers[i]} failed sha256 verification');
+            'tafsir surah ${numbers[i]} failed sha256 verification',
+          );
         }
         if (error != null) {
           throw PackFailure('tafsir surah ${numbers[i]} is $error');
@@ -272,8 +289,9 @@ class _PackInstaller {
     // O(1) hashing: feed every chunk straight into the sha256 sink
     // instead of accumulating the whole body in a second buffer.
     final digestSink = expectedSha == null ? null : _DigestSink();
-    final hasher =
-        digestSink == null ? null : sha256.startChunkedConversion(digestSink);
+    final hasher = digestSink == null
+        ? null
+        : sha256.startChunkedConversion(digestSink);
     var received = 0;
     final body = res.data;
     if (body == null) throw PackFailure('empty response body');
@@ -350,8 +368,12 @@ class _PackInstaller {
     try {
       await _hadithStore.importProjection(pack.id, projection);
     } on Object catch (error, stackTrace) {
-      appLog('hadith pack import failed',
-          name: 'quran_yahdi/library', error: error, stackTrace: stackTrace);
+      appLog(
+        'hadith pack import failed',
+        name: 'quran_yahdi/library',
+        error: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -360,28 +382,34 @@ class _PackInstaller {
   /// Writes (or refreshes) the installed-pack row of a promoted pack.
   Future<void> _registerRow(LibraryPackInfo pack, File promoted) async {
     final sizeMb = await promoted.length() / (1024 * 1024);
-    final existing = await (_db.select(_db.installedPacks)
-          ..where((p) => p.packId.equals(pack.id)))
-        .getSingleOrNull();
+    final existing = await (_db.select(
+      _db.installedPacks,
+    )..where((p) => p.packId.equals(pack.id))).getSingleOrNull();
     if (existing == null) {
-      await _db.into(_db.installedPacks).insert(InstalledPacksCompanion.insert(
-            packId: pack.id,
-            kind: pack.kind.name,
-            language: pack.language,
-            title: pack.titleAr,
-            sizeMb: sizeMb,
-            version: pack.version,
-          ));
+      await _db
+          .into(_db.installedPacks)
+          .insert(
+            InstalledPacksCompanion.insert(
+              packId: pack.id,
+              kind: pack.kind.name,
+              language: pack.language,
+              title: pack.titleAr,
+              sizeMb: sizeMb,
+              version: pack.version,
+            ),
+          );
     } else {
-      await (_db.update(_db.installedPacks)
-            ..where((p) => p.packId.equals(existing.packId)))
-          .write(InstalledPacksCompanion(
-        kind: Value(pack.kind.name),
-        language: Value(pack.language),
-        title: Value(pack.titleAr),
-        version: Value(pack.version),
-        sizeMb: Value(sizeMb),
-      ));
+      await (_db.update(
+        _db.installedPacks,
+      )..where((p) => p.packId.equals(existing.packId))).write(
+        InstalledPacksCompanion(
+          kind: Value(pack.kind.name),
+          language: Value(pack.language),
+          title: Value(pack.titleAr),
+          version: Value(pack.version),
+          sizeMb: Value(sizeMb),
+        ),
+      );
     }
   }
 }

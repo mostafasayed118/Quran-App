@@ -53,8 +53,10 @@ class InAppReviewGateway implements ReviewGateway {
 ///   inspected, counted or transmitted.
 @immutable
 class ReviewEligibility {
-  const ReviewEligibility(
-      {required this.onboardingCompleted, required this.alreadyRequested});
+  const ReviewEligibility({
+    required this.onboardingCompleted,
+    required this.alreadyRequested,
+  });
 
   final bool onboardingCompleted;
   final bool alreadyRequested;
@@ -72,10 +74,10 @@ class ReviewService {
     ReviewGateway? gateway,
     Future<void> Function(Duration)? delayer,
     Duration delay = kReviewPromptDelay,
-  })  : _db = db,
-        _gateway = gateway ?? InAppReviewGateway(),
-        _delayer = delayer ?? Future<void>.delayed,
-        _delay = delay;
+  }) : _db = db,
+       _gateway = gateway ?? InAppReviewGateway(),
+       _delayer = delayer ?? Future<void>.delayed,
+       _delay = delay;
 
   final AppDatabase _db;
   final ReviewGateway _gateway;

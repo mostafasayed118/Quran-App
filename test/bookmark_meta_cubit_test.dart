@@ -5,7 +5,7 @@ import 'package:quran_yahdi/features/quran/presentation/bookmarks/bookmark_meta_
 
 class _Source implements BookmarkMetaSource {
   _Source([Map<int, BookmarkMetaEntry>? entries])
-      : entries = entries ?? <int, BookmarkMetaEntry>{};
+    : entries = entries ?? <int, BookmarkMetaEntry>{};
 
   Map<int, BookmarkMetaEntry> entries;
   bool throwOnSave = false;
@@ -40,32 +40,29 @@ void main() {
     expect(cubit.entryFor(7), isNull);
   });
 
-  test('set stores a trimmed pair and clears it when both fields are empty',
-      () async {
-    final source = _Source();
-    final cubit = BookmarkMetaCubit(source: source);
-    addTearDown(cubit.close);
-    await cubit.start();
+  test(
+    'set stores a trimmed pair and clears it when both fields are empty',
+    () async {
+      final source = _Source();
+      final cubit = BookmarkMetaCubit(source: source);
+      addTearDown(cubit.close);
+      await cubit.start();
 
-    expect(
-      await cubit.set(9, folder: '  تفسير ', note: ' ملاحظة '),
-      isTrue,
-    );
-    expect(
-      (cubit.state as BookmarkMetaReady).entries[9],
-      const BookmarkMetaEntry(folder: 'تفسير', note: 'ملاحظة'),
-    );
-    expect(source.entries[9]?.folder, 'تفسير');
+      expect(await cubit.set(9, folder: '  تفسير ', note: ' ملاحظة '), isTrue);
+      expect(
+        (cubit.state as BookmarkMetaReady).entries[9],
+        const BookmarkMetaEntry(folder: 'تفسير', note: 'ملاحظة'),
+      );
+      expect(source.entries[9]?.folder, 'تفسير');
 
-    expect(await cubit.set(9, folder: ' ', note: ''), isTrue);
-    expect((cubit.state as BookmarkMetaReady).entries, isEmpty);
-    expect(source.entries, isEmpty);
-  });
+      expect(await cubit.set(9, folder: ' ', note: ''), isTrue);
+      expect((cubit.state as BookmarkMetaReady).entries, isEmpty);
+      expect(source.entries, isEmpty);
+    },
+  );
 
   test('remove deletes one entry and is a no-op for an unknown ayah', () async {
-    final source = _Source({
-      9: const BookmarkMetaEntry(note: 'ملاحظة'),
-    });
+    final source = _Source({9: const BookmarkMetaEntry(note: 'ملاحظة')});
     final cubit = BookmarkMetaCubit(source: source);
     addTearDown(cubit.close);
     await cubit.start();
@@ -135,9 +132,7 @@ void main() {
   });
 
   test('a failed folder rename reverts to the previous map', () async {
-    final source = _Source({
-      9: const BookmarkMetaEntry(folder: 'تفسير'),
-    })
+    final source = _Source({9: const BookmarkMetaEntry(folder: 'تفسير')})
       ..throwOnSave = true;
     final cubit = BookmarkMetaCubit(source: source);
     addTearDown(cubit.close);

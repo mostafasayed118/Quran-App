@@ -19,14 +19,18 @@ Future<void> _seedPacks(AppDatabase db, Directory tempRoot) async {
     ..createSync(recursive: true);
   File('test/fixtures/tafsir_wrapper_sample.json')
       .copySync('${libraryDir.path}/ar-tafsir-muyassar.json');
-  await db.into(db.installedPacks).insert(InstalledPacksCompanion.insert(
-        packId: 'ar-tafsir-muyassar',
-        kind: 'tafsir',
-        language: 'ar',
-        title: 'التفسير الميسر',
-        sizeMb: 0.2,
-        version: 'v1.2.2',
-      ));
+  await db
+      .into(db.installedPacks)
+      .insert(
+        InstalledPacksCompanion.insert(
+          packId: 'ar-tafsir-muyassar',
+          kind: 'tafsir',
+          language: 'ar',
+          title: 'التفسير الميسر',
+          sizeMb: 0.2,
+          version: 'v1.2.2',
+        ),
+      );
 }
 
 const double kHeight = 800;
@@ -61,34 +65,40 @@ void main() {
     tester.view.viewPadding = const FakeViewPadding(bottom: kInset);
     addTearDown(tester.view.reset);
 
-    await tester.pumpWidget(appShell(
+    await tester.pumpWidget(
+      appShell(
         home: Scaffold(
-      body: Builder(
-        builder: (context) => Center(
-          child: FilledButton(
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              useSafeArea: true,
-              isScrollControlled: true,
-              showDragHandle: true,
-              builder: (_) => AyahSheet(
-                surahId: 1,
-                surahName: 'الفاتحة',
-                ayah: 1,
-                downloader: downloader,
+          body: Builder(
+            builder: (context) => Center(
+              child: FilledButton(
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  useSafeArea: true,
+                  isScrollControlled: true,
+                  showDragHandle: true,
+                  builder: (_) => AyahSheet(
+                    surahId: 1,
+                    surahName: 'الفاتحة',
+                    ayah: 1,
+                    downloader: downloader,
+                  ),
+                ),
+                child: const Text('open'),
               ),
             ),
-            child: const Text('open'),
           ),
         ),
       ),
-    )));
+    );
 
     await tester.tap(find.text('open'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     final pane = tester.getRect(find.byType(ListView));
     expect(pane.bottom, lessThanOrEqualTo(kHeight - kInset));

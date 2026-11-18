@@ -38,31 +38,37 @@ void main() {
     expect(source.current.adjustmentFor(PrayerName.fajr), 5);
 
     await cubit.setAdjustment(PrayerName.fajr, 999);
-    expect(source.current.adjustmentFor(PrayerName.fajr),
-        PrayerConfig.maxAdjustmentMinutes);
+    expect(
+      source.current.adjustmentFor(PrayerName.fajr),
+      PrayerConfig.maxAdjustmentMinutes,
+    );
 
     await cubit.setAdjustment(PrayerName.fajr, -999);
-    expect(source.current.adjustmentFor(PrayerName.fajr),
-        PrayerConfig.minAdjustmentMinutes);
+    expect(
+      source.current.adjustmentFor(PrayerName.fajr),
+      PrayerConfig.minAdjustmentMinutes,
+    );
 
     await cubit.setAdjustment(PrayerName.fajr, 0);
     expect(source.current.adjustmentFor(PrayerName.fajr), 0);
     expect(source.current.adjustments.containsKey(PrayerName.fajr), isFalse);
   });
 
-  test('adjustBy accumulates rapid taps instead of one absolute value',
-      () async {
-    final source = _FakeSource();
-    final cubit = PrayerConfigCubit(source: source);
-    await cubit.start();
+  test(
+    'adjustBy accumulates rapid taps instead of one absolute value',
+    () async {
+      final source = _FakeSource();
+      final cubit = PrayerConfigCubit(source: source);
+      await cubit.start();
 
-    final first = cubit.adjustBy(PrayerName.fajr, 1);
-    final second = cubit.adjustBy(PrayerName.fajr, 1);
-    await Future.wait([first, second]);
+      final first = cubit.adjustBy(PrayerName.fajr, 1);
+      final second = cubit.adjustBy(PrayerName.fajr, 1);
+      await Future.wait([first, second]);
 
-    expect(source.current.adjustmentFor(PrayerName.fajr), 2);
-    expect(source.saves, 2);
-  });
+      expect(source.current.adjustmentFor(PrayerName.fajr), 2);
+      expect(source.saves, 2);
+    },
+  );
 
   test('sunrise is rejected without a write', () async {
     final source = _FakeSource();
@@ -83,7 +89,9 @@ void main() {
     await cubit.setHighLatitude(PrayerHighLatitudeRule.seventhOfTheNight);
 
     expect(
-        source.current.highLatitude, PrayerHighLatitudeRule.seventhOfTheNight);
+      source.current.highLatitude,
+      PrayerHighLatitudeRule.seventhOfTheNight,
+    );
     expect(source.saves, 1);
 
     await cubit.setHighLatitude(PrayerHighLatitudeRule.seventhOfTheNight);

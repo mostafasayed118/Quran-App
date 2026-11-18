@@ -74,8 +74,9 @@ void main() {
     AppRouter.onboardingGate.reset();
   });
 
-  testWidgets('a fresh install opens the setup flow, then lands on home',
-      (tester) async {
+  testWidgets('a fresh install opens the setup flow, then lands on home', (
+    tester,
+  ) async {
     // Constructing the gate is what the app entry point does; the DI graph then
     // serves that same instance to the flow.
     final gate = getIt<OnboardingGate>();
@@ -84,18 +85,20 @@ void main() {
     final ready = gate.reload();
     await tester.pump();
 
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    ));
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: AppRouter.router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+      ),
+    );
     await _pumpUntil(
       tester,
       () => find.byType(OnboardingScreen).evaluate().isNotEmpty,

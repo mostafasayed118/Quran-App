@@ -34,11 +34,13 @@ class PrayerConfigScreen extends StatelessWidget {
           builder: (context, state) => switch (state) {
             PrayerConfigLoading() => const LoadingView(),
             PrayerConfigFailed() => errorPane(
-                loc,
-                onRetry: () => context.read<PrayerConfigCubit>().start(),
-              ),
-            PrayerConfigReady(:final config) =>
-              _Ready(config: config, loc: loc),
+              loc,
+              onRetry: () => context.read<PrayerConfigCubit>().start(),
+            ),
+            PrayerConfigReady(:final config) => _Ready(
+              config: config,
+              loc: loc,
+            ),
           },
         ),
       ),
@@ -160,8 +162,8 @@ class _Ready extends StatelessWidget {
           child: Text(
             loc.prayerAdjustmentHint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         ListTile(
@@ -179,8 +181,8 @@ class _Ready extends StatelessWidget {
           child: Text(
             loc.prayerConfigNote,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         SwitchListTile(
@@ -211,9 +213,8 @@ class _SectionLabel extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+        style: Theme.of(context).textTheme.titleMedium
+            ?.copyWith(fontWeight: FontWeight.w700),
       ),
     );
   }
@@ -285,10 +286,7 @@ String _madhabLabel(AppLocalizations loc, PrayerMadhab madhab) {
   };
 }
 
-String _highLatitudeLabel(
-  AppLocalizations loc,
-  PrayerHighLatitudeRule rule,
-) {
+String _highLatitudeLabel(AppLocalizations loc, PrayerHighLatitudeRule rule) {
   return switch (rule) {
     PrayerHighLatitudeRule.none => loc.highLatitudeNone,
     PrayerHighLatitudeRule.middleOfTheNight => loc.highLatitudeMiddle,
@@ -324,10 +322,7 @@ class _AdjustmentRow extends StatelessWidget {
                 : () => onStep(-1),
             icon: const Icon(Icons.remove),
           ),
-          SizedBox(
-            width: 48,
-            child: Text(value, textAlign: TextAlign.center),
-          ),
+          SizedBox(width: 48, child: Text(value, textAlign: TextAlign.center)),
           IconButton(
             tooltip: loc.prayerAdjustmentIncrease,
             onPressed: minutes >= PrayerConfig.maxAdjustmentMinutes

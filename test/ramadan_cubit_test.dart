@@ -28,31 +28,22 @@ class _City implements CitySource {
 class _Prayer implements PrayerTimesPort {
   @override
   List<PrayerChoice> today(CityCoordinates c, DateTime day) => [
-        PrayerChoice(
-          PrayerName.fajr,
-          DateTime(day.year, day.month, day.day, 5),
-        ),
-        PrayerChoice(
-          PrayerName.sunrise,
-          DateTime(day.year, day.month, day.day, 6, 20),
-        ),
-        PrayerChoice(
-          PrayerName.dhuhr,
-          DateTime(day.year, day.month, day.day, 12),
-        ),
-        PrayerChoice(
-          PrayerName.asr,
-          DateTime(day.year, day.month, day.day, 15),
-        ),
-        PrayerChoice(
-          PrayerName.maghrib,
-          DateTime(day.year, day.month, day.day, 18),
-        ),
-        PrayerChoice(
-          PrayerName.isha,
-          DateTime(day.year, day.month, day.day, 19, 30),
-        ),
-      ];
+    PrayerChoice(PrayerName.fajr, DateTime(day.year, day.month, day.day, 5)),
+    PrayerChoice(
+      PrayerName.sunrise,
+      DateTime(day.year, day.month, day.day, 6, 20),
+    ),
+    PrayerChoice(PrayerName.dhuhr, DateTime(day.year, day.month, day.day, 12)),
+    PrayerChoice(PrayerName.asr, DateTime(day.year, day.month, day.day, 15)),
+    PrayerChoice(
+      PrayerName.maghrib,
+      DateTime(day.year, day.month, day.day, 18),
+    ),
+    PrayerChoice(
+      PrayerName.isha,
+      DateTime(day.year, day.month, day.day, 19, 30),
+    ),
+  ];
 
   @override
   PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
@@ -60,10 +51,7 @@ class _Prayer implements PrayerTimesPort {
 }
 
 class _Calendar implements RamadanCalendar {
-  _Calendar({
-    required this.today,
-    required this.ramadanStart,
-  });
+  _Calendar({required this.today, required this.ramadanStart});
 
   final ({int year, int month, int day}) today;
   final DateTime ramadanStart;
@@ -73,10 +61,10 @@ class _Calendar implements RamadanCalendar {
 
   @override
   DateTime gregorianDate(int year, int month, int day) => DateTime(
-        ramadanStart.year,
-        ramadanStart.month,
-        ramadanStart.day + day - 1,
-      );
+    ramadanStart.year,
+    ramadanStart.month,
+    ramadanStart.day + day - 1,
+  );
 
   @override
   int daysInMonth(int year, int month) => 30;

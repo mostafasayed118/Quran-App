@@ -55,8 +55,9 @@ class PrayerConfigRepository implements PrayerConfigSource {
     await _settings.writeAll(<String, String>{
       PrayerConfig.methodKey: config.method.name,
       PrayerConfig.madhabKey: config.madhab.name,
-      PrayerConfig.enabledPrayersKey:
-          config.enabledPrayers.map((prayer) => prayer.name).join(','),
+      PrayerConfig.enabledPrayersKey: config.enabledPrayers
+          .map((prayer) => prayer.name)
+          .join(','),
       PrayerConfig.preAdhanMinutesKey: '${config.preAdhanMinutes}',
       PrayerConfig.fajrFollowUpKey: config.fajrFollowUp ? 'true' : 'false',
       PrayerConfig.adjustmentsKey:

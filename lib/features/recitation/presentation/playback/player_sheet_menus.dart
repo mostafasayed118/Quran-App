@@ -1,8 +1,9 @@
 part of 'player_sheet.dart';
 
 String _speedLabel(double speed) {
-  final text =
-      speed == speed.roundToDouble() ? speed.toStringAsFixed(0) : '$speed';
+  final text = speed == speed.roundToDouble()
+      ? speed.toStringAsFixed(0)
+      : '$speed';
   return '$text×';
 }
 

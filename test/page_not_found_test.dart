@@ -41,21 +41,24 @@ void main() {
     );
   });
 
-  testWidgets('unknown route lands on the localized 404 page with a way home',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: AppRouter.router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-    ));
+  testWidgets('unknown route lands on the localized 404 page with a way home', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: AppRouter.router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+      ),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(HomeScreen), findsOneWidget);

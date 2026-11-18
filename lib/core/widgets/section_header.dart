@@ -62,9 +62,7 @@ class SectionHeader extends StatelessWidget {
           // reads as a page division — the same reason the app uses hairlines
           // instead of a second surface tone.
           const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Container(height: 1, color: ruleColor),
-          ),
+          Expanded(child: Container(height: 1, color: ruleColor)),
           if (trailing != null) ...[
             const SizedBox(width: AppSpacing.sm),
             trailing!,

@@ -38,8 +38,9 @@ class _OneHitSource implements QuranSearchSource {
 }
 
 void main() {
-  testWidgets('tapping a search hit opens the reader at surah:ayah',
-      (tester) async {
+  testWidgets('tapping a search hit opens the reader at surah:ayah', (
+    tester,
+  ) async {
     final router = GoRouter(
       initialLocation: AppRoutes.quranSearch,
       routes: [
@@ -66,18 +67,20 @@ void main() {
     );
     addTearDown(router.dispose);
 
-    await tester.pumpWidget(MaterialApp.router(
-      routerConfig: router,
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-    ));
+    await tester.pumpWidget(
+      MaterialApp.router(
+        routerConfig: router,
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+      ),
+    );
     await tester.pump();
 
     await tester.enterText(find.byType(TextField), 'الصلاة');
@@ -86,8 +89,11 @@ void main() {
 
     expect(find.text('الذين يؤمنون بالغيب'), findsOneWidget);
     await tester.tap(find.text('الذين يؤمنون بالغيب'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(find.text('reader:2:3'), findsOneWidget);
   });

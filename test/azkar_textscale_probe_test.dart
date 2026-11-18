@@ -10,18 +10,18 @@ import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 Map<String, dynamic> fixtureRoot() => {
-      'collections': [
-        {
-          'id': 'c1',
-          'nameAr': 'أذكار الصباح',
-          'nameEn': 'Morning',
-          'items': [
-            {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
-            {'text': 'ذِكْرٌ وَاحِدٌ'},
-          ],
-        },
+  'collections': [
+    {
+      'id': 'c1',
+      'nameAr': 'أذكار الصباح',
+      'nameEn': 'Morning',
+      'items': [
+        {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
+        {'text': 'ذِكْرٌ وَاحِدٌ'},
       ],
-    };
+    },
+  ],
+};
 
 Future<void> pumpAzkarAt2x(WidgetTester tester) async {
   final cubit = AzkarCubit(
@@ -29,33 +29,39 @@ Future<void> pumpAzkarAt2x(WidgetTester tester) async {
   );
   addTearDown(cubit.close);
   await cubit.start();
-  await tester.pumpWidget(BlocProvider<AzkarCubit>.value(
-    value: cubit,
-    child: MaterialApp(
-      locale: const Locale('ar'),
-      supportedLocales: const [Locale('ar'), Locale('en')],
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme.light,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context)
-            .copyWith(textScaler: const TextScaler.linear(2.0)),
-        child: child!,
+  await tester.pumpWidget(
+    BlocProvider<AzkarCubit>.value(
+      value: cubit,
+      child: MaterialApp(
+        locale: const Locale('ar'),
+        supportedLocales: const [Locale('ar'), Locale('en')],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme.light,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(2.0)),
+          child: child!,
+        ),
+        home: const AzkarScreen(),
       ),
-      home: const AzkarScreen(),
     ),
-  ));
-  await tester.pumpAndSettle(const Duration(milliseconds: 100),
-      EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+  );
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 100),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 void main() {
-  testWidgets('textScale 2.0: the browse list survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the browse list survives the layout', (
+    tester,
+  ) async {
     await pumpAzkarAt2x(tester);
 
     expect(tester.takeException(), isNull);
@@ -63,13 +69,17 @@ void main() {
     expect(find.text('٢ ذكر'), findsOneWidget);
   });
 
-  testWidgets('textScale 2.0: the reciting list survives the layout',
-      (tester) async {
+  testWidgets('textScale 2.0: the reciting list survives the layout', (
+    tester,
+  ) async {
     await pumpAzkarAt2x(tester);
 
     await tester.tap(find.text('أذكار الصباح'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    await tester.pumpAndSettle(
+      const Duration(milliseconds: 100),
+      EnginePhase.sendSemanticsUpdate,
+      const Duration(seconds: 10),
+    );
 
     expect(tester.takeException(), isNull);
     expect(find.text('ذِكْرٌ لَهُ ثَلَاثٌ'), findsOneWidget);

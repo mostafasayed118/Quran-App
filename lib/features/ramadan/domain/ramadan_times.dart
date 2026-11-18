@@ -28,8 +28,8 @@ RamadanTimes ramadanTimesFor({
   final lead = imsakLeadMinutes < 0
       ? 0
       : (imsakLeadMinutes > kMaxImsakLeadMinutes
-          ? kMaxImsakLeadMinutes
-          : imsakLeadMinutes);
+            ? kMaxImsakLeadMinutes
+            : imsakLeadMinutes);
   return RamadanTimes(
     imsak: fajr.subtract(Duration(minutes: lead)),
     iftar: maghrib,

@@ -16,8 +16,11 @@ class _FakeCdn implements HttpClientAdapter {
   final String body;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     final bytes = Uint8List.fromList(utf8.encode(body));
     return ResponseBody(
       Stream<Uint8List>.value(bytes),
@@ -36,38 +39,40 @@ class _FakeCdn implements HttpClientAdapter {
 const _body = '{"quran":[{"chapter":1,"verse":1,"text":"تفسير البسملة"}]}';
 
 LibraryPackInfo _pack({String? sha256Hex}) => LibraryPackInfo(
-      id: 'tafsir-single',
-      kind: LibraryPackKind.tafsir,
-      language: 'ar',
-      titleAr: 'تفسير',
-      titleEn: 'Tafsir',
-      sourceUrl: 'https://cdn.jsdelivr.net/library/tafsir-single.min.json',
-      approxSizeMb: 0.001,
-      version: '1',
-      sha256: sha256Hex,
-    );
+  id: 'tafsir-single',
+  kind: LibraryPackKind.tafsir,
+  language: 'ar',
+  titleAr: 'تفسير',
+  titleEn: 'Tafsir',
+  sourceUrl: 'https://cdn.jsdelivr.net/library/tafsir-single.min.json',
+  approxSizeMb: 0.001,
+  version: '1',
+  sha256: sha256Hex,
+);
 
 void main() {
-  test('a single-file tafsir parses and its integrity contract uses sha256',
-      () {
-    final hash = sha256.convert(utf8.encode(_body)).toString();
-    final pack = LibraryPackInfo.fromJson({
-      'id': 'tafsir-single',
-      'kind': 'tafsir',
-      'language': 'ar',
-      'titleAr': 'تفسير',
-      'titleEn': 'Tafsir',
-      'sourceUrl': 'https://cdn.jsdelivr.net/library/tafsir-single.min.json',
-      'approxSizeMb': 0.001,
-      'version': '1',
-      'sha256': hash,
-    });
+  test(
+    'a single-file tafsir parses and its integrity contract uses sha256',
+    () {
+      final hash = sha256.convert(utf8.encode(_body)).toString();
+      final pack = LibraryPackInfo.fromJson({
+        'id': 'tafsir-single',
+        'kind': 'tafsir',
+        'language': 'ar',
+        'titleAr': 'تفسير',
+        'titleEn': 'Tafsir',
+        'sourceUrl': 'https://cdn.jsdelivr.net/library/tafsir-single.min.json',
+        'approxSizeMb': 0.001,
+        'version': '1',
+        'sha256': hash,
+      });
 
-    expect(pack.kind, LibraryPackKind.tafsir);
-    expect(pack.urlTemplate, isNull);
-    expect(catalogIntegrityGap(pack), isNull);
-    expect(catalogIntegrityGap(_pack()), 'requires a sha256 hash');
-  });
+      expect(pack.kind, LibraryPackKind.tafsir);
+      expect(pack.urlTemplate, isNull);
+      expect(catalogIntegrityGap(pack), isNull);
+      expect(catalogIntegrityGap(_pack()), 'requires a sha256 hash');
+    },
+  );
 
   test('a tafsir with neither a template nor a source is rejected', () {
     expect(
@@ -115,9 +120,9 @@ void main() {
     );
 
     await expectLater(
-      downloader.install(_pack(
-        sha256Hex: sha256.convert(utf8.encode(body)).toString(),
-      )),
+      downloader.install(
+        _pack(sha256Hex: sha256.convert(utf8.encode(body)).toString()),
+      ),
       throwsA(isA<PackFailure>()),
     );
     expect(await downloader.installedPacks(), isEmpty);

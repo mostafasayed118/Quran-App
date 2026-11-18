@@ -17,21 +17,21 @@ const _verse = Verse(
 );
 
 Widget _app(Widget child) => MaterialApp(
-      locale: const Locale('ar'),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(body: Center(child: child)),
-    );
+  locale: const Locale('ar'),
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+  home: Scaffold(body: Center(child: child)),
+);
 
 void main() {
-  testWidgets('the card renders the verse, surah name and attribution',
-      (tester) async {
+  testWidgets('the card renders the verse, surah name and attribution', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(420, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(_app(const VerseCard(
-      ayah: _verse,
-      surahName: 'الفاتحة',
-    )));
+    await tester.pumpWidget(
+      _app(const VerseCard(ayah: _verse, surahName: 'الفاتحة')),
+    );
 
     expect(find.text('بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'), findsOneWidget);
     expect(find.text('الفاتحة'), findsOneWidget);
@@ -39,8 +39,9 @@ void main() {
     expect(find.textContaining('quranyahdi'), findsOneWidget);
   });
 
-  testWidgets('the card falls back to the glyph text without Unicode',
-      (tester) async {
+  testWidgets('the card falls back to the glyph text without Unicode', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(420, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     const glyphOnly = Verse(
@@ -54,23 +55,27 @@ void main() {
       sajda: false,
     );
 
-    await tester.pumpWidget(_app(const VerseCard(
-      ayah: glyphOnly,
-      surahName: 'البقرة',
-    )));
+    await tester.pumpWidget(
+      _app(const VerseCard(ayah: glyphOnly, surahName: 'البقرة')),
+    );
 
     expect(find.text('ذلك الكتاب'), findsOneWidget);
   });
 
   testWidgets(
-      'the card survives a 320-wide surface without horizontal overflow',
-      (tester) async {
-    await tester.binding.setSurfaceSize(const Size(320, 900));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(_app(const SingleChildScrollView(
-      child: VerseCard(ayah: _verse, surahName: 'الفاتحة', width: 300),
-    )));
+    'the card survives a 320-wide surface without horizontal overflow',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(320, 900));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(
+        _app(
+          const SingleChildScrollView(
+            child: VerseCard(ayah: _verse, surahName: 'الفاتحة', width: 300),
+          ),
+        ),
+      );
 
-    expect(tester.takeException(), isNull);
-  });
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

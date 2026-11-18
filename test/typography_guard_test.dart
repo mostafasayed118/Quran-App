@@ -20,8 +20,11 @@ List<File> _sources() => Directory('lib')
     .listSync(recursive: true)
     .whereType<File>()
     .where((file) => file.path.endsWith('.dart'))
-    .where((file) =>
-        !file.path.endsWith('.g.dart') && !file.path.endsWith('.freezed.dart'))
+    .where(
+      (file) =>
+          !file.path.endsWith('.g.dart') &&
+          !file.path.endsWith('.freezed.dart'),
+    )
     .toList();
 
 String _relative(File file) =>
@@ -45,7 +48,8 @@ void main() {
     expect(
       offenders,
       isEmpty,
-      reason: 'Use AppType (or a named component token) instead of a number: '
+      reason:
+          'Use AppType (or a named component token) instead of a number: '
           '${offenders.join(', ')}',
     );
   });
@@ -68,7 +72,8 @@ void main() {
     expect(
       offenders,
       isEmpty,
-      reason: 'Add a rung (with its role) before using a new size: '
+      reason:
+          'Add a rung (with its role) before using a new size: '
           '${offenders.join(', ')}',
     );
   });
@@ -106,7 +111,8 @@ void main() {
           index++;
         }
         final block = source.substring(match.start, index + 1);
-        final arabic = block.contains('QuranFonts.quran') ||
+        final arabic =
+            block.contains('QuranFonts.quran') ||
             block.contains('QuranFonts.meQuran');
         if (arabic && block.contains('letterSpacing')) {
           offenders.add(_relative(file));

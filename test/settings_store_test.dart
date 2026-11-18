@@ -37,16 +37,18 @@ void main() {
     expect(await store.readAll(const <String>[]), isEmpty);
   });
 
-  test('remove deletes one key, leaves the rest, and no-ops when absent',
-      () async {
-    await store.writeAll(<String, String>{'keep': 'yes', 'drop': 'no'});
+  test(
+    'remove deletes one key, leaves the rest, and no-ops when absent',
+    () async {
+      await store.writeAll(<String, String>{'keep': 'yes', 'drop': 'no'});
 
-    await store.remove('drop');
-    expect(await store.read('drop'), isNull);
-    expect(await store.read('keep'), 'yes');
+      await store.remove('drop');
+      expect(await store.read('drop'), isNull);
+      expect(await store.read('keep'), 'yes');
 
-    await store.remove('drop');
-  });
+      await store.remove('drop');
+    },
+  );
 
   test('writeAll lands every row in one batch', () async {
     await store.writeAll(<String, String>{

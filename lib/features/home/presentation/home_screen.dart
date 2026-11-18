@@ -148,9 +148,9 @@ class _HomeScreenState extends State<HomeScreen>
           builder: (context, state) => switch (state) {
             HomeLoading() => const LoadingView(),
             HomeFailed() => errorPane(
-                loc,
-                onRetry: () => context.read<HomeCubit>().reload(),
-              ),
+              loc,
+              onRetry: () => context.read<HomeCubit>().reload(),
+            ),
             HomeReady(
               :final lastRead,
               :final nextPrayer,

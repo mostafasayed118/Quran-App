@@ -66,10 +66,7 @@ void main() {
     await tester.scrollUntilVisible(fajr, 200);
     await tester.tap(fajr);
     await tester.pump();
-    expect(
-      source.current.enabledPrayers,
-      isNot(contains(PrayerName.fajr)),
-    );
+    expect(source.current.enabledPrayers, isNot(contains(PrayerName.fajr)));
 
     await tester.scrollUntilVisible(find.text('تذكير قبل الأذان'), 200);
     final tenMinutes = find.text('١٠ دقائق');

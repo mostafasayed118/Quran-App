@@ -20,8 +20,8 @@ class PackReader {
   PackReader({
     Future<dynamic> Function(String path)? fileDecoder,
     required Future<String?> Function(String packId) packPath,
-  })  : _fileDecoder = fileDecoder,
-        _packPath = packPath;
+  }) : _fileDecoder = fileDecoder,
+       _packPath = packPath;
 
   /// The injectable decode seam, returning the DECODED JSON TREE for [path].
   ///
@@ -107,9 +107,9 @@ class PackReader {
       }
       final rawNumber = entry['hadithnumber'];
       final text = entry['text'];
-      out.add(rawNumber is num && text is String
-          ? (rawNumber.toInt(), text)
-          : null);
+      out.add(
+        rawNumber is num && text is String ? (rawNumber.toInt(), text) : null,
+      );
     }
     return out;
   }
@@ -203,7 +203,8 @@ class PackReader {
   /// This is the DB importer's cold path: only the projection crosses the
   /// port, mirroring the read path's memory discipline.
   static Future<List<(int, String)?>?> decodeHadithProjectionInIsolate(
-      String path) async {
+    String path,
+  ) async {
     final result = await _decodeProjectionInIsolate(path, 'hadiths');
     return result is List<(int, String)?> ? result : null;
   }
@@ -227,9 +228,11 @@ class PackReader {
   /// Production cold decode: reads, parses AND projects inside the isolate.
   /// Only the projection crosses the port; an absent/unreadable/corrupt file
   /// projects to null (the same "absent" semantics the read API exposes).
-  static Future<Object?> _decodeProjectionInIsolate(String path, String key,
-          {int? surah}) =>
-      Isolate.run(() => _projectFile(path, key, surah: surah));
+  static Future<Object?> _decodeProjectionInIsolate(
+    String path,
+    String key, {
+    int? surah,
+  }) => Isolate.run(() => _projectFile(path, key, surah: surah));
 
   static Object? _projectFile(String path, String key, {int? surah}) {
     dynamic decoded;
@@ -247,8 +250,8 @@ class PackReader {
   /// Projects a decoded entry list to what the read API actually needs.
   static Object? _projectList(String key, List list, {int? surah}) =>
       key == 'hadiths'
-          ? buildHadithList(list)
-          : buildAyahIndex(list, surah: surah);
+      ? buildHadithList(list)
+      : buildAyahIndex(list, surah: surah);
 
   /// One cold decode through the injected seam (tree on the main isolate) or
   /// through the production isolate projection. Never throws: failures read
@@ -275,8 +278,12 @@ class PackReader {
 
   /// Schedules one decode for [cacheKey], sharing it with concurrent readers
   /// and chaining it behind every earlier decode.
-  Future<Object?> _scheduledDecode(String cacheKey, String path, String key,
-      {int? surah}) {
+  Future<Object?> _scheduledDecode(
+    String cacheKey,
+    String path,
+    String key, {
+    int? surah,
+  }) {
     final pending = _inFlight[cacheKey];
     if (pending != null) return pending;
     final task = _decodeQueue.then((_) => _decode(path, key, surah: surah));
@@ -318,8 +325,12 @@ class PackReader {
         return slice;
       }
     }
-    final projection =
-        await _scheduledDecode(cacheKey, path, key, surah: surah);
+    final projection = await _scheduledDecode(
+      cacheKey,
+      path,
+      key,
+      surah: surah,
+    );
     if (projection == null) return null;
     _write(cacheKey, projection);
     return projection;
@@ -357,7 +368,10 @@ class PackReader {
   /// A paged window of an installed hadith pack:
   /// `([ (hadithnumber, text), ... ], hasMore)`.
   Future<(List<(int, String)>, bool)> hadithPage(
-      String packId, int offset, int limit) async {
+    String packId,
+    int offset,
+    int limit,
+  ) async {
     final list = await _load(packId, 'hadiths');
     if (list is! List || offset >= list.length || offset < 0 || limit <= 0) {
       return (const <(int, String)>[], false);

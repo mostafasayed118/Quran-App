@@ -17,8 +17,11 @@ class _LyingAdapter implements HttpClientAdapter {
   final List<List<int>> chunks;
 
   @override
-  Future<ResponseBody> fetch(RequestOptions options,
-      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+  Future<ResponseBody> fetch(
+    RequestOptions options,
+    Stream<Uint8List>? requestStream,
+    Future<void>? cancelFuture,
+  ) async {
     return ResponseBody(
       Stream.fromIterable(chunks.map(Uint8List.fromList)),
       200,
@@ -42,7 +45,9 @@ void main() {
   setUp(() async {
     db = newTestDb();
     tempRoot = await Directory.systemTemp.createTemp('qy_audio_test');
-    await db.into(db.reciters).insert(
+    await db
+        .into(db.reciters)
+        .insert(
           RecitersCompanion.insert(
             id: '51-53',
             reciterName: 'عبدالباسط عبدالصمد',
@@ -66,8 +71,9 @@ void main() {
     base = 'http://127.0.0.1:${server.port}/';
     final row = await (db.select(db.reciters)).getSingle();
     final updated = row.copyWith(server: base);
-    await (db.update(db.reciters)..where((r) => r.id.equals(row.id)))
-        .write(RecitersCompanion(server: Value(updated.server)));
+    await (db.update(db.reciters)..where((r) => r.id.equals(row.id))).write(
+      RecitersCompanion(server: Value(updated.server)),
+    );
     return AudioDownloader(
       db,
       dio: Dio(),
@@ -95,9 +101,9 @@ void main() {
     expect(file.existsSync(), isTrue);
     expect(await file.length(), 4096);
     expect(receivedTotal, isNotEmpty);
-    final statuses = await (db.select(db.downloads)
-          ..where((d) => d.reciterId.equals('51-53')))
-        .get();
+    final statuses = await (db.select(
+      db.downloads,
+    )..where((d) => d.reciterId.equals('51-53'))).get();
     expect(statuses.single.status, 'done');
     expect(statuses.single.bytes, 4096);
     expect(await downloader.isDownloaded('51-53', 2), isTrue);
@@ -122,9 +128,9 @@ void main() {
       throwsA(isA<DownloadFailure>()),
     );
 
-    final statuses = await (db.select(db.downloads)
-          ..where((d) => d.reciterId.equals('51-53')))
-        .get();
+    final statuses = await (db.select(
+      db.downloads,
+    )..where((d) => d.reciterId.equals('51-53'))).get();
     expect(statuses.single.status, 'failed');
     expect(await downloader.isDownloaded('51-53', 3), isFalse);
   });
@@ -141,9 +147,9 @@ void main() {
       throwsA(isA<DioException>()),
     );
 
-    final statuses = await (db.select(db.downloads)
-          ..where((d) => d.reciterId.equals('51-53')))
-        .get();
+    final statuses = await (db.select(
+      db.downloads,
+    )..where((d) => d.reciterId.equals('51-53'))).get();
     expect(statuses.single.status, 'failed');
     expect(await downloader.isDownloaded('51-53', 1), isFalse);
   });
@@ -166,8 +172,10 @@ void main() {
       await req.response.close();
     });
     final reciter = await (db.select(db.reciters)).getSingle();
-    final file =
-        await downloader.downloadSurah(reciter: reciter, surahNumber: 2);
+    final file = await downloader.downloadSurah(
+      reciter: reciter,
+      surahNumber: 2,
+    );
     expect(file.existsSync(), isTrue);
 
     await downloader.removeDownload('51-53', 2);
@@ -176,22 +184,28 @@ void main() {
     expect(await (db.select(db.downloads)).get(), isEmpty);
   });
 
-  test('removeDownload never deletes outside the audio root (tampered row)',
-      () async {
-    final downloader = await serve((_) async {});
-    final outside = File('${tempRoot.path}/outside.mp3')
-      ..writeAsStringSync('x');
-    await db.into(db.downloads).insert(DownloadsCompanion.insert(
-          reciterId: '51-53',
-          surahId: 9,
-          status: 'done',
-          path: outside.path,
-          bytes: const Value(1),
-        ));
+  test(
+    'removeDownload never deletes outside the audio root (tampered row)',
+    () async {
+      final downloader = await serve((_) async {});
+      final outside = File('${tempRoot.path}/outside.mp3')
+        ..writeAsStringSync('x');
+      await db
+          .into(db.downloads)
+          .insert(
+            DownloadsCompanion.insert(
+              reciterId: '51-53',
+              surahId: 9,
+              status: 'done',
+              path: outside.path,
+              bytes: const Value(1),
+            ),
+          );
 
-    await downloader.removeDownload('51-53', 9);
+      await downloader.removeDownload('51-53', 9);
 
-    expect(outside.existsSync(), isTrue);
-    expect(await (db.select(db.downloads)).get(), isEmpty);
-  });
+      expect(outside.existsSync(), isTrue);
+      expect(await (db.select(db.downloads)).get(), isEmpty);
+    },
+  );
 }

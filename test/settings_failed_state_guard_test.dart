@@ -88,157 +88,189 @@ SettingsCubit buildSettingsCubit({
   required RecordingReminderSettings settings,
   required RecordingPrayerSettings prayerSettings,
   required FakeReminderScheduler scheduler,
-}) =>
-    SettingsCubit(
-      settings: settings,
-      prayerSettings: prayerSettings,
-      city: NoCity(),
-      prayer: NoPrayer(),
-      scheduler: scheduler,
-    );
+}) => SettingsCubit(
+  settings: settings,
+  prayerSettings: prayerSettings,
+  city: NoCity(),
+  prayer: NoPrayer(),
+  scheduler: scheduler,
+);
 
 /// All seven ready fields, in declaration order.
 List<Object?> fields(SettingsReady ready) => [
-      ready.prayerEnabled,
-      ready.azkarEnabled,
-      ready.azkarTimeHm,
-      ready.wirdEnabled,
-      ready.wirdTimeHm,
-      ready.azkarPermissionDenied,
-      ready.wirdPermissionDenied,
-    ];
+  ready.prayerEnabled,
+  ready.azkarEnabled,
+  ready.azkarTimeHm,
+  ready.wirdEnabled,
+  ready.wirdTimeHm,
+  ready.azkarPermissionDenied,
+  ready.wirdPermissionDenied,
+];
 
 void main() {
-  test('mutations issued before the load resolves write and emit nothing',
-      () async {
-    final settings = RecordingReminderSettings();
-    final prayerSettings = RecordingPrayerSettings();
-    final scheduler = FakeReminderScheduler();
-    final cubit = buildSettingsCubit(
-      settings: settings,
-      prayerSettings: prayerSettings,
-      scheduler: scheduler,
-    );
-    addTearDown(cubit.close);
+  test(
+    'mutations issued before the load resolves write and emit nothing',
+    () async {
+      final settings = RecordingReminderSettings();
+      final prayerSettings = RecordingPrayerSettings();
+      final scheduler = FakeReminderScheduler();
+      final cubit = buildSettingsCubit(
+        settings: settings,
+        prayerSettings: prayerSettings,
+        scheduler: scheduler,
+      );
+      addTearDown(cubit.close);
 
-    final emitted = <SettingsState>[];
-    final sub = cubit.stream.listen(emitted.add);
-    addTearDown(sub.cancel);
+      final emitted = <SettingsState>[];
+      final sub = cubit.stream.listen(emitted.add);
+      addTearDown(sub.cancel);
 
-    expect(cubit.state, isA<SettingsLoading>());
+      expect(cubit.state, isA<SettingsLoading>());
 
-    await cubit.setPrayerEnabled(true);
-    await cubit.setAzkarEnabled(true);
-    await cubit.setTime('05:15');
-    await cubit.toggleWird(true);
-    await cubit.changeWirdTime('21:45');
-    await Future<void>.delayed(Duration.zero);
-
-    expect(emitted, isEmpty);
-    expect(cubit.state, isA<SettingsLoading>());
-    expect(settings.writes, isEmpty);
-    expect(prayerSettings.writes, isEmpty);
-    expect(scheduler.permissionCalls, 0);
-    expect(settings.reschedules, 0);
-  });
-
-  test('a failed load keeps every mutator from inventing a ready state',
-      () async {
-    final settings = RecordingReminderSettings()..failLoad = true;
-    final prayerSettings = RecordingPrayerSettings();
-    final scheduler = FakeReminderScheduler();
-    final cubit = buildSettingsCubit(
-      settings: settings,
-      prayerSettings: prayerSettings,
-      scheduler: scheduler,
-    );
-    addTearDown(cubit.close);
-
-    await cubit.load();
-    expect(cubit.state, isA<SettingsFailed>());
-
-    final emitted = <SettingsState>[];
-    final sub = cubit.stream.listen(emitted.add);
-    addTearDown(sub.cancel);
-
-    await cubit.setPrayerEnabled(true);
-    await cubit.setAzkarEnabled(true);
-    await cubit.setTime('05:15');
-    await cubit.toggleWird(true);
-    await cubit.changeWirdTime('21:45');
-    await Future<void>.delayed(Duration.zero);
-
-    expect(emitted, isEmpty);
-    expect(cubit.state, isA<SettingsFailed>());
-    expect(settings.writes, isEmpty);
-    expect(prayerSettings.writes, isEmpty);
-    expect(scheduler.permissionCalls, 0);
-    expect(settings.reschedules, 0);
-  });
-
-  test('a ready cubit emits once per mutation and preserves every other field',
-      () async {
-    final settings = RecordingReminderSettings();
-    final prayerSettings = RecordingPrayerSettings();
-    final scheduler = FakeReminderScheduler()..permissionsResult = false;
-    final cubit = buildSettingsCubit(
-      settings: settings,
-      prayerSettings: prayerSettings,
-      scheduler: scheduler,
-    );
-    addTearDown(cubit.close);
-
-    await cubit.load();
-    expect(
-      fields(cubit.state as SettingsReady),
-      [false, false, '04:45', false, '22:10', false, false],
-    );
-
-    final emitted = <SettingsState>[];
-    final sub = cubit.stream.listen(emitted.add);
-    addTearDown(sub.cancel);
-
-    Future<SettingsReady> mutate(Future<void> Function() op) async {
-      emitted.clear();
-      await op();
+      await cubit.setPrayerEnabled(true);
+      await cubit.setAzkarEnabled(true);
+      await cubit.setTime('05:15');
+      await cubit.toggleWird(true);
+      await cubit.changeWirdTime('21:45');
       await Future<void>.delayed(Duration.zero);
-      expect(emitted, hasLength(1));
-      return emitted.single as SettingsReady;
-    }
 
-    // Each step flips exactly the fields it owns; the denied flags go true
-    // with the first enable (the fake denies permissions) and must survive
-    // every later mutation.
-    expect(
-      fields(await mutate(() => cubit.setPrayerEnabled(true))),
-      [true, false, '04:45', false, '22:10', false, false],
-    );
-    expect(
-      fields(await mutate(() => cubit.setAzkarEnabled(true))),
-      [true, true, '04:45', false, '22:10', true, false],
-    );
-    expect(
-      fields(await mutate(() => cubit.setTime('05:15'))),
-      [true, true, '05:15', false, '22:10', true, false],
-    );
-    expect(
-      fields(await mutate(() => cubit.toggleWird(true))),
-      [true, true, '05:15', true, '22:10', true, true],
-    );
-    expect(
-      fields(await mutate(() => cubit.changeWirdTime('21:45'))),
-      [true, true, '05:15', true, '21:45', true, true],
-    );
+      expect(emitted, isEmpty);
+      expect(cubit.state, isA<SettingsLoading>());
+      expect(settings.writes, isEmpty);
+      expect(prayerSettings.writes, isEmpty);
+      expect(scheduler.permissionCalls, 0);
+      expect(settings.reschedules, 0);
+    },
+  );
 
-    expect(
-      settings.writes,
-      [
+  test(
+    'a failed load keeps every mutator from inventing a ready state',
+    () async {
+      final settings = RecordingReminderSettings()..failLoad = true;
+      final prayerSettings = RecordingPrayerSettings();
+      final scheduler = FakeReminderScheduler();
+      final cubit = buildSettingsCubit(
+        settings: settings,
+        prayerSettings: prayerSettings,
+        scheduler: scheduler,
+      );
+      addTearDown(cubit.close);
+
+      await cubit.load();
+      expect(cubit.state, isA<SettingsFailed>());
+
+      final emitted = <SettingsState>[];
+      final sub = cubit.stream.listen(emitted.add);
+      addTearDown(sub.cancel);
+
+      await cubit.setPrayerEnabled(true);
+      await cubit.setAzkarEnabled(true);
+      await cubit.setTime('05:15');
+      await cubit.toggleWird(true);
+      await cubit.changeWirdTime('21:45');
+      await Future<void>.delayed(Duration.zero);
+
+      expect(emitted, isEmpty);
+      expect(cubit.state, isA<SettingsFailed>());
+      expect(settings.writes, isEmpty);
+      expect(prayerSettings.writes, isEmpty);
+      expect(scheduler.permissionCalls, 0);
+      expect(settings.reschedules, 0);
+    },
+  );
+
+  test(
+    'a ready cubit emits once per mutation and preserves every other field',
+    () async {
+      final settings = RecordingReminderSettings();
+      final prayerSettings = RecordingPrayerSettings();
+      final scheduler = FakeReminderScheduler()..permissionsResult = false;
+      final cubit = buildSettingsCubit(
+        settings: settings,
+        prayerSettings: prayerSettings,
+        scheduler: scheduler,
+      );
+      addTearDown(cubit.close);
+
+      await cubit.load();
+      expect(fields(cubit.state as SettingsReady), [
+        false,
+        false,
+        '04:45',
+        false,
+        '22:10',
+        false,
+        false,
+      ]);
+
+      final emitted = <SettingsState>[];
+      final sub = cubit.stream.listen(emitted.add);
+      addTearDown(sub.cancel);
+
+      Future<SettingsReady> mutate(Future<void> Function() op) async {
+        emitted.clear();
+        await op();
+        await Future<void>.delayed(Duration.zero);
+        expect(emitted, hasLength(1));
+        return emitted.single as SettingsReady;
+      }
+
+      // Each step flips exactly the fields it owns; the denied flags go true
+      // with the first enable (the fake denies permissions) and must survive
+      // every later mutation.
+      expect(fields(await mutate(() => cubit.setPrayerEnabled(true))), [
+        true,
+        false,
+        '04:45',
+        false,
+        '22:10',
+        false,
+        false,
+      ]);
+      expect(fields(await mutate(() => cubit.setAzkarEnabled(true))), [
+        true,
+        true,
+        '04:45',
+        false,
+        '22:10',
+        true,
+        false,
+      ]);
+      expect(fields(await mutate(() => cubit.setTime('05:15'))), [
+        true,
+        true,
+        '05:15',
+        false,
+        '22:10',
+        true,
+        false,
+      ]);
+      expect(fields(await mutate(() => cubit.toggleWird(true))), [
+        true,
+        true,
+        '05:15',
+        true,
+        '22:10',
+        true,
+        true,
+      ]);
+      expect(fields(await mutate(() => cubit.changeWirdTime('21:45'))), [
+        true,
+        true,
+        '05:15',
+        true,
+        '21:45',
+        true,
+        true,
+      ]);
+
+      expect(settings.writes, [
         'azkarEnabled:true',
         'azkarTime:05:15',
         'wirdEnabled:true',
-        'wirdTime:21:45'
-      ],
-    );
-    expect(prayerSettings.writes, [true]);
-  });
+        'wirdTime:21:45',
+      ]);
+      expect(prayerSettings.writes, [true]);
+    },
+  );
 }

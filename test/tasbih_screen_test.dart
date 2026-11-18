@@ -20,37 +20,43 @@ void main() {
   });
 
   testWidgets(
-      'dial shows count and target; tapping increments; chips switch target',
-      (tester) async {
-    final cubit = TasbihCubit(repo: repo);
-    addTearDown(cubit.close);
-    await cubit.start();
-    await tester.pumpWidget(BlocProvider<TasbihCubit>.value(
-      value: cubit,
-      child: appShell(home: const TasbihScreen()),
-    ));
-    await tester.pumpAndSettle(const Duration(milliseconds: 100),
-        EnginePhase.sendSemanticsUpdate, const Duration(seconds: 10));
+    'dial shows count and target; tapping increments; chips switch target',
+    (tester) async {
+      final cubit = TasbihCubit(repo: repo);
+      addTearDown(cubit.close);
+      await cubit.start();
+      await tester.pumpWidget(
+        BlocProvider<TasbihCubit>.value(
+          value: cubit,
+          child: appShell(home: const TasbihScreen()),
+        ),
+      );
+      await tester.pumpAndSettle(
+        const Duration(milliseconds: 100),
+        EnginePhase.sendSemanticsUpdate,
+        const Duration(seconds: 10),
+      );
 
-    expect(find.text('٠'), findsOneWidget);
-    final targetLabels = [
-      find.text('٣٣'),
-      find.text('٩٩'),
-      find.text('١٠٠'),
-      find.text('٥٠٠')
-    ];
-    for (final label in targetLabels) {
-      expect(label, findsOneWidget);
-    }
+      expect(find.text('٠'), findsOneWidget);
+      final targetLabels = [
+        find.text('٣٣'),
+        find.text('٩٩'),
+        find.text('١٠٠'),
+        find.text('٥٠٠'),
+      ];
+      for (final label in targetLabels) {
+        expect(label, findsOneWidget);
+      }
 
-    await tester.tap(find.byKey(const Key('tasbih_dial')));
-    await tester.pump();
-    await tester.pump();
-    expect(find.text('١'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('tasbih_dial')));
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('١'), findsOneWidget);
 
-    await tester.tap(find.text('١٠٠'));
-    await tester.pump();
-    await tester.pump();
-    expect(find.text('٠'), findsOneWidget);
-  });
+      await tester.tap(find.text('١٠٠'));
+      await tester.pump();
+      await tester.pump();
+      expect(find.text('٠'), findsOneWidget);
+    },
+  );
 }
