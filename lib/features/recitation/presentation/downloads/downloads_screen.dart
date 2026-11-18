@@ -27,6 +27,12 @@ class DownloadsScreen extends StatefulWidget {
 }
 
 class _DownloadsScreenState extends State<DownloadsScreen> {
+  // Intentional exception to the app's usual Cubit-state pattern: this screen
+  // performs a one-shot `Future` load (installed() + summary()) in initState
+  // and holds it in a FutureBuilder-style field instead of subscribing to a
+  // stream. It has no live state to react to — downloads are driven from the
+  // player/player sheet — so a BlocBuilder would add a subscription with no
+  // events to consume. Refresh is an explicit re-read, not a stream rebuild.
   late Future<_DownloadsView> _data;
 
   @override
