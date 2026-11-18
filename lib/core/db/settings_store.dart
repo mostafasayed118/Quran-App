@@ -1,4 +1,5 @@
 import 'app_database.dart';
+import 'sql_batching.dart';
 
 /// The one access point for the key/value [SettingsTable].
 ///
@@ -29,10 +30,18 @@ class SettingsStore {
   Future<Map<String, String>> readAll(Iterable<String> keys) async {
     final wanted = keys.toSet();
     if (wanted.isEmpty) return const <String, String>{};
-    final rows = await (_db.select(_db.settingsTable)
-          ..where((setting) => setting.key.isIn(wanted)))
-        .get();
-    return {for (final row in rows) row.key: row.value};
+    // Split below SQLite's host-parameter limit so a large key set cannot
+    // fail with "too many SQL variables" (L-4).
+    final result = <String, String>{};
+    for (final batch in sqlBatches(wanted.toList())) {
+      final rows = await (_db.select(_db.settingsTable)
+            ..where((setting) => setting.key.isIn(batch)))
+          .get();
+      for (final row in rows) {
+        result[row.key] = row.value;
+      }
+    }
+    return result;
   }
 
   /// Inserts or replaces one setting.

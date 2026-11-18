@@ -8,6 +8,7 @@ import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/db/settings_store.dart';
 import '../../../core/db/sql_batching.dart';
+import '../../../core/db/sql_batching.dart';
 import '../domain/reciter_info.dart';
 import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
@@ -298,9 +299,15 @@ class ReciterRepository
   @override
   Future<Map<int, String>> surahNamesFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
-    final rows =
-        await (_db.select(_db.surahs)..where((s) => s.id.isIn(surahIds))).get();
-    return {for (final s in rows) s.id: s.nameAr};
+    final result = <int, String>{};
+    for (final batch in sqlBatches(surahIds)) {
+      final rows =
+          await (_db.select(_db.surahs)..where((s) => s.id.isIn(batch))).get();
+      for (final s in rows) {
+        result[s.id] = s.nameAr;
+      }
+    }
+    return result;
   }
 
   /// Opening-ayah teasers for the reciter's surah rows (W2a plan T6 shape),
@@ -312,9 +319,15 @@ class ReciterRepository
   @override
   Future<Map<int, String>> ayahTeasersFor(List<int> surahIds) async {
     if (surahIds.isEmpty) return {};
-    final rows = await (_db.select(_db.ayahs)
-          ..where((a) => a.surahId.isIn(surahIds) & a.numberInSurah.equals(1)))
-        .get();
-    return {for (final a in rows) a.surahId: a.textImlaei};
+    final result = <int, String>{};
+    for (final batch in sqlBatches(surahIds)) {
+      final rows = await (_db.select(_db.ayahs)
+            ..where((a) => a.surahId.isIn(batch) & a.numberInSurah.equals(1)))
+          .get();
+      for (final a in rows) {
+        result[a.surahId] = a.textImlaei;
+      }
+    }
+    return result;
   }
 }
