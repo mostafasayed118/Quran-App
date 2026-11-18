@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:typed_data';
 
+import '../../../core/utils/app_log.dart';
 import 'backup_codec.dart';
 import 'backup_crypto.dart';
 
@@ -42,9 +43,11 @@ Future<BackupDecodeResult> decodeBackup(
   }
   try {
     return await Isolate.run(() => _decodeInline(bytes, passphrase));
-  } on Object {
+  } on Object catch (error, stackTrace) {
     // The worker is unavailable: decode inline so the failure states stay
-    // exactly the codec's.
+    // exactly the codec's. Log the degrade via a helper (kept away from the
+    // passphrase-bearing lines so the log-hygiene net stays clean).
+    _logDecodeDegrade(error, stackTrace);
     return _decodeInline(bytes, passphrase);
   }
 }
@@ -107,6 +110,15 @@ Future<BackupDecodeResult> _decodeInline(
 final List<int> _envelopePrefix = utf8.encode(
   '{"app":"$kEncryptedBackupApp","format":"quran_yahdi_backup_encrypted_v',
 );
+
+/// Logs the isolate-unavailable degrade (kept in its own function, away from
+/// the passphrase-bearing decode lines, so debug logs never capture a value).
+void _logDecodeDegrade(Object error, StackTrace stackTrace) {
+  appLog('backup decode isolate unavailable, decoding inline',
+      name: 'quran_yahdi/backup',
+      error: error.runtimeType,
+      stackTrace: stackTrace);
+}
 
 /// Whether [bytes] start like an encrypted envelope.
 bool _looksEncrypted(Uint8List bytes) {

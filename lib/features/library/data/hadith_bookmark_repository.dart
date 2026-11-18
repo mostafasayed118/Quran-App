@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/db/settings_store.dart';
+import '../../../core/utils/app_log.dart';
 import 'hadith_personal.dart';
 
 /// Stores the hadith bookmarks as one JSON object in the settings table.
@@ -50,7 +51,11 @@ class HadithBookmarkRepository implements HadithBookmarkSource {
         if (numbers.isNotEmpty) result['${entry.key}'] = numbers;
       }
       return result;
-    } on Object {
+    } on Object catch (error, stackTrace) {
+      appLog('hadith bookmarks decode failed, defaulting to empty',
+          name: 'quran_yahdi/library',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
       return <String, Set<int>>{};
     }
   }

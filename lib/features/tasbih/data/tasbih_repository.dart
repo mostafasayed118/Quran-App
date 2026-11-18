@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import '../../../core/db/app_database.dart';
 import '../../../core/db/settings_store.dart';
+import '../../../core/utils/app_log.dart';
 
 const tasbihStateKey = 'tasbih_state';
 
@@ -34,7 +35,11 @@ class TasbihRepository {
         count: (json['count'] as num).toInt(),
         target: (json['target'] as num).toInt(),
       );
-    } on Object {
+    } on Object catch (error, stackTrace) {
+      appLog('tasbih state decode failed, defaulting',
+          name: 'quran_yahdi/tasbih',
+          error: error.runtimeType,
+          stackTrace: stackTrace);
       return null;
     }
   }

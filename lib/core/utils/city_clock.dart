@@ -1,6 +1,8 @@
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'app_log.dart';
+
 bool _zonesReady = false;
 
 void _ensureZones() {
@@ -21,7 +23,9 @@ DateTime cityWallClock(DateTime instant, String? timezone) {
   _ensureZones();
   try {
     return tz.TZDateTime.from(instant, tz.getLocation(timezone));
-  } on Object {
+  } on Object catch (error) {
+    appLog('city zone resolution failed, using device-local components',
+        name: 'quran_yahdi/city_clock', error: error.runtimeType);
     return instant;
   }
 }
