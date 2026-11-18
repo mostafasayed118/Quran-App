@@ -40,7 +40,14 @@ jobs:
           git diff --exit-code -- lib/l10n ':(glob)**/*.g.dart' ':(glob)**/*.freezed.dart'
           test -z "$(git ls-files --others --exclude-standard -- lib/l10n ':(glob)**/*.g.dart' ':(glob)**/*.freezed.dart')"
       - run: flutter analyze
-      - run: dart format --output=none --set-exit-if-changed lib test tools
+      # Generated sources are emitted by build_runner in its own style. They
+      # must stay byte-identical to build_runner output for the "Generated code
+      # is current" gate above: formatting them to tall style would conflict
+      # with that gate. Exclude *.g.dart / *.freezed.dart from this check.
+      - name: Check formatting (hand-written Dart only)
+        run: |
+          files=$(find lib test tools -name '*.dart' ! -name '*.g.dart' ! -name '*.freezed.dart')
+          dart format --output=none --set-exit-if-changed $files
       - run: flutter test
       # The DST regression test computes in the HOST time zone. On the UTC
       # runner, `DateTime(y,m,d+1)` and `+24h` are equivalent, so the test is
