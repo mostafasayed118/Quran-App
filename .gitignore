@@ -61,5 +61,9 @@ _adhan_masters/
 INSTRUCTIONS.md
 .opencode/plugins/entire-external.ts
 
+# Local audit working documents — snapshots that go stale; never staged (L-16)
+PROJECT_AUDIT_REPORT.md
+PROJECT_FULL_AUDIT_REPORT.md
+
 # Owner design explorations for the web campaign (ledger 2026-11-01: never staged)
 web/design-concepts/
