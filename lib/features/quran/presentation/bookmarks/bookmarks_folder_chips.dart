@@ -20,13 +20,17 @@ class _FolderChips extends StatelessWidget {
           for (final folder in folders)
             Padding(
               padding: const EdgeInsetsDirectional.only(end: AppSpacing.xs),
-              child: GestureDetector(
-                onLongPress: () => _folderActions(context, folder),
-                child: ActionChip(
-                  avatar:
-                      const Icon(Icons.folder_outlined, size: AppIconSize.sm),
-                  label: Text(folder),
-                  onPressed: () => context.push(bookmarksFolderPath(folder)),
+              child: Semantics(
+                button: true,
+                label: folder,
+                child: GestureDetector(
+                  onLongPress: () => _folderActions(context, folder),
+                  child: ActionChip(
+                    avatar:
+                        const Icon(Icons.folder_outlined, size: AppIconSize.sm),
+                    label: Text(folder),
+                    onPressed: () => context.push(bookmarksFolderPath(folder)),
+                  ),
                 ),
               ),
             ),

@@ -223,13 +223,16 @@ class DuaCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (citationText != null)
-              Text(
-                citationText,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  fontSize: AppType.caption,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.goldText(context),
+              Semantics(
+                label: citationText,
+                child: Text(
+                  citationText,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: AppType.caption,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.goldText(context),
+                  ),
                 ),
               ),
             Text(

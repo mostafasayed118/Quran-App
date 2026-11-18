@@ -166,13 +166,16 @@ class _SummaryCard extends StatelessWidget {
                 label: loc.zakatableLabel, value: ready.result.zakatable),
             _ZakatLine(label: loc.nisabLabel, value: ready.result.nisabValue),
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              verdictText,
-              textAlign: TextAlign.start,
-              style: AppTheme.rowTitle.copyWith(
-                color: ready.result.due
-                    ? AppTheme.goldText(context)
-                    : colors.onSurfaceVariant,
+            Semantics(
+              label: verdictText,
+              child: Text(
+                verdictText,
+                textAlign: TextAlign.start,
+                style: AppTheme.rowTitle.copyWith(
+                  color: ready.result.due
+                      ? AppTheme.goldText(context)
+                      : colors.onSurfaceVariant,
+                ),
               ),
             ),
             if (!needsNisabPrice && ready.result.due)

@@ -45,11 +45,16 @@ class _SettingsList extends StatelessWidget {
         if (language != null) ...[
           ListenableBuilder(
             listenable: language,
-            builder: (context, _) => ListTile(
-              leading: const Icon(Icons.language),
-              title: Text(loc.language),
-              subtitle: Text(_languageLabel(loc, language.language)),
-              onTap: () => unawaited(_pickLanguage(context, loc, language)),
+            builder: (context, _) => Semantics(
+              button: true,
+              label:
+                  '${loc.language}: ${_languageLabel(loc, language.language)}',
+              child: ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(loc.language),
+                subtitle: Text(_languageLabel(loc, language.language)),
+                onTap: () => unawaited(_pickLanguage(context, loc, language)),
+              ),
             ),
           ),
           const Divider(height: 1),
