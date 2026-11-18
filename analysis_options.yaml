@@ -33,7 +33,17 @@ linter:
 
     # --- public API hygiene ---
     prefer_final_fields: true
-    prefer_initializing_formals: true
+    # Documented exception (L-3): this codebase intentionally declares a named
+    # parameter and assigns it to a private field in the initializer list, e.g.
+    # AzkarRepository({required Future<Map<String,dynamic>> Function() loader})
+    #     : _loader = loader;
+    # The suggested fix (`required this._loader`) renames the named parameter
+    # (loader: -> _loader:), which is a public API change and breaks every call
+    # site — applying it produced 2684 errors. Renaming the 124 private fields
+    # to public was considered and rejected by the owner (it would change the
+    # public API surface of 51 files). The code is correct and all tests pass;
+    # this is a style preference only, so the lint is ignored project-wide.
+    prefer_initializing_formals: false
     prefer_final_in_for_each: true
     unnecessary_underscores: true
     library_private_types_in_public_api: true
