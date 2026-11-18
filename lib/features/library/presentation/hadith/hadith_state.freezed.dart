@@ -12,445 +12,328 @@ part of 'hadith_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$HadithState {
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HadithState);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HadithState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
     return 'HadithState()';
-  }
+}
+
+
 }
 
 /// @nodoc
-class $HadithStateCopyWith<$Res> {
-  $HadithStateCopyWith(HadithState _, $Res Function(HadithState) __);
+class $HadithStateCopyWith<$Res>  {
+$HadithStateCopyWith(HadithState _, $Res Function(HadithState) __);
 }
+
 
 /// Adds pattern-matching-related methods to [HadithState].
 extension HadithStatePatterns on HadithState {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HadithLoading value)? loading,
-    TResult Function(HadithReady value)? ready,
-    TResult Function(HadithFailed value)? failed,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading() when loading != null:
-        return loading(_that);
-      case HadithReady() when ready != null:
-        return ready(_that);
-      case HadithFailed() when failed != null:
-        return failed(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( HadithLoading value)?  loading,TResult Function( HadithReady value)?  ready,TResult Function( HadithFailed value)?  failed,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case HadithLoading() when loading != null:
+return loading(_that);case HadithReady() when ready != null:
+return ready(_that);case HadithFailed() when failed != null:
+return failed(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HadithLoading value) loading,
-    required TResult Function(HadithReady value) ready,
-    required TResult Function(HadithFailed value) failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading():
-        return loading(_that);
-      case HadithReady():
-        return ready(_that);
-      case HadithFailed():
-        return failed(_that);
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( HadithLoading value)  loading,required TResult Function( HadithReady value)  ready,required TResult Function( HadithFailed value)  failed,}){
+final _that = this;
+switch (_that) {
+case HadithLoading():
+return loading(_that);case HadithReady():
+return ready(_that);case HadithFailed():
+return failed(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( HadithLoading value)?  loading,TResult? Function( HadithReady value)?  ready,TResult? Function( HadithFailed value)?  failed,}){
+final _that = this;
+switch (_that) {
+case HadithLoading() when loading != null:
+return loading(_that);case HadithReady() when ready != null:
+return ready(_that);case HadithFailed() when failed != null:
+return failed(_that);case _:
+  return null;
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HadithLoading value)? loading,
-    TResult? Function(HadithReady value)? ready,
-    TResult? Function(HadithFailed value)? failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading() when loading != null:
-        return loading(_that);
-      case HadithReady() when ready != null:
-        return ready(_that);
-      case HadithFailed() when failed != null:
-        return failed(_that);
-      case _:
-        return null;
-    }
-  }
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function( String packTitle,  String language,  List<HadithItem> items,  int offset,  bool hasMore,  String query,  bool bookmarksOnly,  Set<int> bookmarked)?  ready,TResult Function()?  failed,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case HadithLoading() when loading != null:
+return loading();case HadithReady() when ready != null:
+return ready(_that.packTitle,_that.language,_that.items,_that.offset,_that.hasMore,_that.query,_that.bookmarksOnly,_that.bookmarked);case HadithFailed() when failed != null:
+return failed();case _:
+  return orElse();
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(
-            String packTitle,
-            String language,
-            List<HadithItem> items,
-            int offset,
-            bool hasMore,
-            String query,
-            bool bookmarksOnly,
-            Set<int> bookmarked)?
-        ready,
-    TResult Function()? failed,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading() when loading != null:
-        return loading();
-      case HadithReady() when ready != null:
-        return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
-      case HadithFailed() when failed != null:
-        return failed();
-      case _:
-        return orElse();
-    }
-  }
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function( String packTitle,  String language,  List<HadithItem> items,  int offset,  bool hasMore,  String query,  bool bookmarksOnly,  Set<int> bookmarked)  ready,required TResult Function()  failed,}) {final _that = this;
+switch (_that) {
+case HadithLoading():
+return loading();case HadithReady():
+return ready(_that.packTitle,_that.language,_that.items,_that.offset,_that.hasMore,_that.query,_that.bookmarksOnly,_that.bookmarked);case HadithFailed():
+return failed();}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(
-            String packTitle,
-            String language,
-            List<HadithItem> items,
-            int offset,
-            bool hasMore,
-            String query,
-            bool bookmarksOnly,
-            Set<int> bookmarked)
-        ready,
-    required TResult Function() failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading():
-        return loading();
-      case HadithReady():
-        return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
-      case HadithFailed():
-        return failed();
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function( String packTitle,  String language,  List<HadithItem> items,  int offset,  bool hasMore,  String query,  bool bookmarksOnly,  Set<int> bookmarked)?  ready,TResult? Function()?  failed,}) {final _that = this;
+switch (_that) {
+case HadithLoading() when loading != null:
+return loading();case HadithReady() when ready != null:
+return ready(_that.packTitle,_that.language,_that.items,_that.offset,_that.hasMore,_that.query,_that.bookmarksOnly,_that.bookmarked);case HadithFailed() when failed != null:
+return failed();case _:
+  return null;
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(
-            String packTitle,
-            String language,
-            List<HadithItem> items,
-            int offset,
-            bool hasMore,
-            String query,
-            bool bookmarksOnly,
-            Set<int> bookmarked)?
-        ready,
-    TResult? Function()? failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HadithLoading() when loading != null:
-        return loading();
-      case HadithReady() when ready != null:
-        return ready(_that.packTitle, _that.language, _that.items, _that.offset,
-            _that.hasMore, _that.query, _that.bookmarksOnly, _that.bookmarked);
-      case HadithFailed() when failed != null:
-        return failed();
-      case _:
-        return null;
-    }
-  }
 }
 
 /// @nodoc
+
 
 class HadithLoading implements HadithState {
   const HadithLoading();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HadithLoading);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'HadithState.loading()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HadithLoading);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'HadithState.loading()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class HadithReady implements HadithState {
-  const HadithReady(
-      {required this.packTitle,
-      required this.language,
-      required List<HadithItem> items,
-      required this.offset,
-      required this.hasMore,
-      this.query = '',
-      this.bookmarksOnly = false,
-      Set<int> bookmarked = const <int>{}})
-      : _items = items,
-        _bookmarked = bookmarked;
+  const HadithReady({required this.packTitle, required this.language, required  List<HadithItem> items, required this.offset, required this.hasMore, this.query = '', this.bookmarksOnly = false,  Set<int> bookmarked = const <int>{}}): _items = items,_bookmarked = bookmarked;
+  
 
-  final String packTitle;
-  final String language;
-  final List<HadithItem> _items;
-  List<HadithItem> get items {
-    if (_items is EqualUnmodifiableListView) return _items;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_items);
-  }
+ final  String packTitle;
+ final  String language;
+ final  List<HadithItem> _items;
+ List<HadithItem> get items {
+  if (_items is EqualUnmodifiableListView) return _items;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_items);
+}
 
-  final int offset;
-  final bool hasMore;
-  @JsonKey()
-  final String query;
-  @JsonKey()
-  final bool bookmarksOnly;
-  final Set<int> _bookmarked;
-  @JsonKey()
-  Set<int> get bookmarked {
-    if (_bookmarked is EqualUnmodifiableSetView) return _bookmarked;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableSetView(_bookmarked);
-  }
+ final  int offset;
+ final  bool hasMore;
+@JsonKey() final  String query;
+@JsonKey() final  bool bookmarksOnly;
+ final  Set<int> _bookmarked;
+@JsonKey() Set<int> get bookmarked {
+  if (_bookmarked is EqualUnmodifiableSetView) return _bookmarked;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_bookmarked);
+}
 
-  /// Create a copy of HadithState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $HadithReadyCopyWith<HadithReady> get copyWith =>
-      _$HadithReadyCopyWithImpl<HadithReady>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is HadithReady &&
-            (identical(other.packTitle, packTitle) ||
-                other.packTitle == packTitle) &&
-            (identical(other.language, language) ||
-                other.language == language) &&
-            const DeepCollectionEquality().equals(other.items, _items) &&
-            (identical(other.offset, offset) || other.offset == offset) &&
-            (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
-            (identical(other.query, query) || other.query == query) &&
-            (identical(other.bookmarksOnly, bookmarksOnly) ||
-                other.bookmarksOnly == bookmarksOnly) &&
-            const DeepCollectionEquality()
-                .equals(other.bookmarked, _bookmarked));
-  }
+/// Create a copy of HadithState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$HadithReadyCopyWith<HadithReady> get copyWith => _$HadithReadyCopyWithImpl<HadithReady>(this, _$identity);
 
-  @override
-  int get hashCode {
-    return Object.hash(
-        runtimeType,
-        packTitle,
-        language,
-        const DeepCollectionEquality().hash(_items),
-        offset,
-        hasMore,
-        query,
-        bookmarksOnly,
-        const DeepCollectionEquality().hash(_bookmarked));
-  }
 
-  @override
-  String toString() {
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HadithReady&&(identical(other.packTitle, packTitle) || other.packTitle == packTitle)&&(identical(other.language, language) || other.language == language)&&const DeepCollectionEquality().equals(other.items, _items)&&(identical(other.offset, offset) || other.offset == offset)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.query, query) || other.query == query)&&(identical(other.bookmarksOnly, bookmarksOnly) || other.bookmarksOnly == bookmarksOnly)&&const DeepCollectionEquality().equals(other.bookmarked, _bookmarked));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,packTitle,language,const DeepCollectionEquality().hash(_items),offset,hasMore,query,bookmarksOnly,const DeepCollectionEquality().hash(_bookmarked));
+}
+
+@override
+String toString() {
     return 'HadithState.ready(packTitle: $packTitle, language: $language, items: $items, offset: $offset, hasMore: $hasMore, query: $query, bookmarksOnly: $bookmarksOnly, bookmarked: $bookmarked)';
-  }
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $HadithReadyCopyWith<$Res>
-    implements $HadithStateCopyWith<$Res> {
-  factory $HadithReadyCopyWith(
-          HadithReady value, $Res Function(HadithReady) _then) =
-      _$HadithReadyCopyWithImpl;
-  @useResult
-  $Res call(
-      {String packTitle,
-      String language,
-      List<HadithItem> items,
-      int offset,
-      bool hasMore,
-      String query,
-      bool bookmarksOnly,
-      Set<int> bookmarked});
-}
+abstract mixin class $HadithReadyCopyWith<$Res> implements $HadithStateCopyWith<$Res> {
+  factory $HadithReadyCopyWith(HadithReady value, $Res Function(HadithReady) _then) = _$HadithReadyCopyWithImpl;
+@useResult
+$Res call({
+ String packTitle, String language, List<HadithItem> items, int offset, bool hasMore, String query, bool bookmarksOnly, Set<int> bookmarked
+});
 
+
+
+
+}
 /// @nodoc
-class _$HadithReadyCopyWithImpl<$Res> implements $HadithReadyCopyWith<$Res> {
+class _$HadithReadyCopyWithImpl<$Res>
+    implements $HadithReadyCopyWith<$Res> {
   _$HadithReadyCopyWithImpl(this._self, this._then);
 
   final HadithReady _self;
   final $Res Function(HadithReady) _then;
 
-  /// Create a copy of HadithState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? packTitle = null,
-    Object? language = null,
-    Object? items = null,
-    Object? offset = null,
-    Object? hasMore = null,
-    Object? query = null,
-    Object? bookmarksOnly = null,
-    Object? bookmarked = null,
-  }) {
-    return _then(HadithReady(
-      packTitle: null == packTitle
-          ? _self.packTitle
-          : packTitle // ignore: cast_nullable_to_non_nullable
-              as String,
-      language: null == language
-          ? _self.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
-      items: null == items
-          ? _self._items
-          : items // ignore: cast_nullable_to_non_nullable
-              as List<HadithItem>,
-      offset: null == offset
-          ? _self.offset
-          : offset // ignore: cast_nullable_to_non_nullable
-              as int,
-      hasMore: null == hasMore
-          ? _self.hasMore
-          : hasMore // ignore: cast_nullable_to_non_nullable
-              as bool,
-      query: null == query
-          ? _self.query
-          : query // ignore: cast_nullable_to_non_nullable
-              as String,
-      bookmarksOnly: null == bookmarksOnly
-          ? _self.bookmarksOnly
-          : bookmarksOnly // ignore: cast_nullable_to_non_nullable
-              as bool,
-      bookmarked: null == bookmarked
-          ? _self._bookmarked
-          : bookmarked // ignore: cast_nullable_to_non_nullable
-              as Set<int>,
-    ));
-  }
+/// Create a copy of HadithState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? packTitle = null,Object? language = null,Object? items = null,Object? offset = null,Object? hasMore = null,Object? query = null,Object? bookmarksOnly = null,Object? bookmarked = null,}) {
+  return _then(HadithReady(
+packTitle: null == packTitle ? _self.packTitle : packTitle // ignore: cast_nullable_to_non_nullable
+as String,language: null == language ? _self.language : language // ignore: cast_nullable_to_non_nullable
+as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as List<HadithItem>,offset: null == offset ? _self.offset : offset // ignore: cast_nullable_to_non_nullable
+as int,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
+as bool,query: null == query ? _self.query : query // ignore: cast_nullable_to_non_nullable
+as String,bookmarksOnly: null == bookmarksOnly ? _self.bookmarksOnly : bookmarksOnly // ignore: cast_nullable_to_non_nullable
+as bool,bookmarked: null == bookmarked ? _self._bookmarked : bookmarked // ignore: cast_nullable_to_non_nullable
+as Set<int>,
+  ));
+}
+
+
 }
 
 /// @nodoc
 
+
 class HadithFailed implements HadithState {
   const HadithFailed();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HadithFailed);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'HadithState.failed()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HadithFailed);
 }
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'HadithState.failed()';
+}
+
+
+}
+
+
+
 
 // dart format on

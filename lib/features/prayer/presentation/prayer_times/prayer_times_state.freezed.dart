@@ -12,396 +12,303 @@ part of 'prayer_times_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$PrayerTimesState {
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is PrayerTimesState);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is PrayerTimesState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
     return 'PrayerTimesState()';
-  }
+}
+
+
 }
 
 /// @nodoc
-class $PrayerTimesStateCopyWith<$Res> {
-  $PrayerTimesStateCopyWith(
-      PrayerTimesState _, $Res Function(PrayerTimesState) __);
+class $PrayerTimesStateCopyWith<$Res>  {
+$PrayerTimesStateCopyWith(PrayerTimesState _, $Res Function(PrayerTimesState) __);
 }
+
 
 /// Adds pattern-matching-related methods to [PrayerTimesState].
 extension PrayerTimesStatePatterns on PrayerTimesState {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(PrayerTimesLoading value)? loading,
-    TResult Function(PrayerTimesFailed value)? failed,
-    TResult Function(PrayerTimesReady value)? ready,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading() when loading != null:
-        return loading(_that);
-      case PrayerTimesFailed() when failed != null:
-        return failed(_that);
-      case PrayerTimesReady() when ready != null:
-        return ready(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( PrayerTimesLoading value)?  loading,TResult Function( PrayerTimesFailed value)?  failed,TResult Function( PrayerTimesReady value)?  ready,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case PrayerTimesLoading() when loading != null:
+return loading(_that);case PrayerTimesFailed() when failed != null:
+return failed(_that);case PrayerTimesReady() when ready != null:
+return ready(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(PrayerTimesLoading value) loading,
-    required TResult Function(PrayerTimesFailed value) failed,
-    required TResult Function(PrayerTimesReady value) ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading():
-        return loading(_that);
-      case PrayerTimesFailed():
-        return failed(_that);
-      case PrayerTimesReady():
-        return ready(_that);
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( PrayerTimesLoading value)  loading,required TResult Function( PrayerTimesFailed value)  failed,required TResult Function( PrayerTimesReady value)  ready,}){
+final _that = this;
+switch (_that) {
+case PrayerTimesLoading():
+return loading(_that);case PrayerTimesFailed():
+return failed(_that);case PrayerTimesReady():
+return ready(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( PrayerTimesLoading value)?  loading,TResult? Function( PrayerTimesFailed value)?  failed,TResult? Function( PrayerTimesReady value)?  ready,}){
+final _that = this;
+switch (_that) {
+case PrayerTimesLoading() when loading != null:
+return loading(_that);case PrayerTimesFailed() when failed != null:
+return failed(_that);case PrayerTimesReady() when ready != null:
+return ready(_that);case _:
+  return null;
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(PrayerTimesLoading value)? loading,
-    TResult? Function(PrayerTimesFailed value)? failed,
-    TResult? Function(PrayerTimesReady value)? ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading() when loading != null:
-        return loading(_that);
-      case PrayerTimesFailed() when failed != null:
-        return failed(_that);
-      case PrayerTimesReady() when ready != null:
-        return ready(_that);
-      case _:
-        return null;
-    }
-  }
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function()?  failed,TResult Function( City? city,  List<PrayerEntry> entries,  Duration? remaining,  PrayerName? nextTomorrowName,  DateTime? nextTomorrowTime,  Duration? nextTomorrowRemaining)?  ready,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case PrayerTimesLoading() when loading != null:
+return loading();case PrayerTimesFailed() when failed != null:
+return failed();case PrayerTimesReady() when ready != null:
+return ready(_that.city,_that.entries,_that.remaining,_that.nextTomorrowName,_that.nextTomorrowTime,_that.nextTomorrowRemaining);case _:
+  return orElse();
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function()? failed,
-    TResult Function(
-            City? city,
-            List<PrayerEntry> entries,
-            Duration? remaining,
-            PrayerName? nextTomorrowName,
-            DateTime? nextTomorrowTime,
-            Duration? nextTomorrowRemaining)?
-        ready,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading() when loading != null:
-        return loading();
-      case PrayerTimesFailed() when failed != null:
-        return failed();
-      case PrayerTimesReady() when ready != null:
-        return ready(
-            _that.city,
-            _that.entries,
-            _that.remaining,
-            _that.nextTomorrowName,
-            _that.nextTomorrowTime,
-            _that.nextTomorrowRemaining);
-      case _:
-        return orElse();
-    }
-  }
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function()  failed,required TResult Function( City? city,  List<PrayerEntry> entries,  Duration? remaining,  PrayerName? nextTomorrowName,  DateTime? nextTomorrowTime,  Duration? nextTomorrowRemaining)  ready,}) {final _that = this;
+switch (_that) {
+case PrayerTimesLoading():
+return loading();case PrayerTimesFailed():
+return failed();case PrayerTimesReady():
+return ready(_that.city,_that.entries,_that.remaining,_that.nextTomorrowName,_that.nextTomorrowTime,_that.nextTomorrowRemaining);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function() failed,
-    required TResult Function(
-            City? city,
-            List<PrayerEntry> entries,
-            Duration? remaining,
-            PrayerName? nextTomorrowName,
-            DateTime? nextTomorrowTime,
-            Duration? nextTomorrowRemaining)
-        ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading():
-        return loading();
-      case PrayerTimesFailed():
-        return failed();
-      case PrayerTimesReady():
-        return ready(
-            _that.city,
-            _that.entries,
-            _that.remaining,
-            _that.nextTomorrowName,
-            _that.nextTomorrowTime,
-            _that.nextTomorrowRemaining);
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function()?  failed,TResult? Function( City? city,  List<PrayerEntry> entries,  Duration? remaining,  PrayerName? nextTomorrowName,  DateTime? nextTomorrowTime,  Duration? nextTomorrowRemaining)?  ready,}) {final _that = this;
+switch (_that) {
+case PrayerTimesLoading() when loading != null:
+return loading();case PrayerTimesFailed() when failed != null:
+return failed();case PrayerTimesReady() when ready != null:
+return ready(_that.city,_that.entries,_that.remaining,_that.nextTomorrowName,_that.nextTomorrowTime,_that.nextTomorrowRemaining);case _:
+  return null;
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function()? failed,
-    TResult? Function(
-            City? city,
-            List<PrayerEntry> entries,
-            Duration? remaining,
-            PrayerName? nextTomorrowName,
-            DateTime? nextTomorrowTime,
-            Duration? nextTomorrowRemaining)?
-        ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case PrayerTimesLoading() when loading != null:
-        return loading();
-      case PrayerTimesFailed() when failed != null:
-        return failed();
-      case PrayerTimesReady() when ready != null:
-        return ready(
-            _that.city,
-            _that.entries,
-            _that.remaining,
-            _that.nextTomorrowName,
-            _that.nextTomorrowTime,
-            _that.nextTomorrowRemaining);
-      case _:
-        return null;
-    }
-  }
 }
 
 /// @nodoc
+
 
 class PrayerTimesLoading implements PrayerTimesState {
   const PrayerTimesLoading();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is PrayerTimesLoading);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'PrayerTimesState.loading()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is PrayerTimesLoading);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'PrayerTimesState.loading()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class PrayerTimesFailed implements PrayerTimesState {
   const PrayerTimesFailed();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is PrayerTimesFailed);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'PrayerTimesState.failed()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is PrayerTimesFailed);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'PrayerTimesState.failed()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class PrayerTimesReady implements PrayerTimesState {
-  const PrayerTimesReady(
-      {this.city,
-      List<PrayerEntry> entries = const <PrayerEntry>[],
-      this.remaining = null,
-      this.nextTomorrowName = null,
-      this.nextTomorrowTime = null,
-      this.nextTomorrowRemaining = null})
-      : _entries = entries;
+  const PrayerTimesReady({this.city,  List<PrayerEntry> entries = const <PrayerEntry>[], this.remaining = null, this.nextTomorrowName = null, this.nextTomorrowTime = null, this.nextTomorrowRemaining = null}): _entries = entries;
+  
 
-  final City? city;
-  final List<PrayerEntry> _entries;
-  @JsonKey()
-  List<PrayerEntry> get entries {
-    if (_entries is EqualUnmodifiableListView) return _entries;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_entries);
-  }
+ final  City? city;
+ final  List<PrayerEntry> _entries;
+@JsonKey() List<PrayerEntry> get entries {
+  if (_entries is EqualUnmodifiableListView) return _entries;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_entries);
+}
 
-  @JsonKey()
-  final Duration? remaining;
+@JsonKey() final  Duration? remaining;
+/// The first prayer after today's list is over (after Isha this is
+/// tomorrow's Fajr). Null while a today entry is still ahead.
+///
+/// Carried separately instead of appended to [entries] because the panel
+/// must stay "today's six times"; the screen renders this as a footer.
+@JsonKey() final  PrayerName? nextTomorrowName;
+@JsonKey() final  DateTime? nextTomorrowTime;
+/// Countdown to [nextTomorrowTime]. Kept apart from [remaining], which
+/// stays null once no row is next — the frozen contract the row subtitle
+/// and the ticker tests rely on.
+@JsonKey() final  Duration? nextTomorrowRemaining;
 
-  /// The first prayer after today's list is over (after Isha this is
-  /// tomorrow's Fajr). Null while a today entry is still ahead.
-  ///
-  /// Carried separately instead of appended to [entries] because the panel
-  /// must stay "today's six times"; the screen renders this as a footer.
-  @JsonKey()
-  final PrayerName? nextTomorrowName;
-  @JsonKey()
-  final DateTime? nextTomorrowTime;
+/// Create a copy of PrayerTimesState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PrayerTimesReadyCopyWith<PrayerTimesReady> get copyWith => _$PrayerTimesReadyCopyWithImpl<PrayerTimesReady>(this, _$identity);
 
-  /// Countdown to [nextTomorrowTime]. Kept apart from [remaining], which
-  /// stays null once no row is next — the frozen contract the row subtitle
-  /// and the ticker tests rely on.
-  @JsonKey()
-  final Duration? nextTomorrowRemaining;
 
-  /// Create a copy of PrayerTimesState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $PrayerTimesReadyCopyWith<PrayerTimesReady> get copyWith =>
-      _$PrayerTimesReadyCopyWithImpl<PrayerTimesReady>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is PrayerTimesReady &&
-            (identical(other.city, city) || other.city == city) &&
-            const DeepCollectionEquality().equals(other.entries, _entries) &&
-            (identical(other.remaining, remaining) ||
-                other.remaining == remaining) &&
-            (identical(other.nextTomorrowName, nextTomorrowName) ||
-                other.nextTomorrowName == nextTomorrowName) &&
-            (identical(other.nextTomorrowTime, nextTomorrowTime) ||
-                other.nextTomorrowTime == nextTomorrowTime) &&
-            (identical(other.nextTomorrowRemaining, nextTomorrowRemaining) ||
-                other.nextTomorrowRemaining == nextTomorrowRemaining));
-  }
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is PrayerTimesReady&&(identical(other.city, city) || other.city == city)&&const DeepCollectionEquality().equals(other.entries, _entries)&&(identical(other.remaining, remaining) || other.remaining == remaining)&&(identical(other.nextTomorrowName, nextTomorrowName) || other.nextTomorrowName == nextTomorrowName)&&(identical(other.nextTomorrowTime, nextTomorrowTime) || other.nextTomorrowTime == nextTomorrowTime)&&(identical(other.nextTomorrowRemaining, nextTomorrowRemaining) || other.nextTomorrowRemaining == nextTomorrowRemaining));
+}
 
-  @override
-  int get hashCode {
-    return Object.hash(
-        runtimeType,
-        city,
-        const DeepCollectionEquality().hash(_entries),
-        remaining,
-        nextTomorrowName,
-        nextTomorrowTime,
-        nextTomorrowRemaining);
-  }
 
-  @override
-  String toString() {
+@override
+int get hashCode {
+    return Object.hash(runtimeType,city,const DeepCollectionEquality().hash(_entries),remaining,nextTomorrowName,nextTomorrowTime,nextTomorrowRemaining);
+}
+
+@override
+String toString() {
     return 'PrayerTimesState.ready(city: $city, entries: $entries, remaining: $remaining, nextTomorrowName: $nextTomorrowName, nextTomorrowTime: $nextTomorrowTime, nextTomorrowRemaining: $nextTomorrowRemaining)';
-  }
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $PrayerTimesReadyCopyWith<$Res>
-    implements $PrayerTimesStateCopyWith<$Res> {
-  factory $PrayerTimesReadyCopyWith(
-          PrayerTimesReady value, $Res Function(PrayerTimesReady) _then) =
-      _$PrayerTimesReadyCopyWithImpl;
-  @useResult
-  $Res call(
-      {City? city,
-      List<PrayerEntry> entries,
-      Duration? remaining,
-      PrayerName? nextTomorrowName,
-      DateTime? nextTomorrowTime,
-      Duration? nextTomorrowRemaining});
-}
+abstract mixin class $PrayerTimesReadyCopyWith<$Res> implements $PrayerTimesStateCopyWith<$Res> {
+  factory $PrayerTimesReadyCopyWith(PrayerTimesReady value, $Res Function(PrayerTimesReady) _then) = _$PrayerTimesReadyCopyWithImpl;
+@useResult
+$Res call({
+ City? city, List<PrayerEntry> entries, Duration? remaining, PrayerName? nextTomorrowName, DateTime? nextTomorrowTime, Duration? nextTomorrowRemaining
+});
 
+
+
+
+}
 /// @nodoc
 class _$PrayerTimesReadyCopyWithImpl<$Res>
     implements $PrayerTimesReadyCopyWith<$Res> {
@@ -410,44 +317,21 @@ class _$PrayerTimesReadyCopyWithImpl<$Res>
   final PrayerTimesReady _self;
   final $Res Function(PrayerTimesReady) _then;
 
-  /// Create a copy of PrayerTimesState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? city = freezed,
-    Object? entries = null,
-    Object? remaining = freezed,
-    Object? nextTomorrowName = freezed,
-    Object? nextTomorrowTime = freezed,
-    Object? nextTomorrowRemaining = freezed,
-  }) {
-    return _then(PrayerTimesReady(
-      city: freezed == city
-          ? _self.city
-          : city // ignore: cast_nullable_to_non_nullable
-              as City?,
-      entries: null == entries
-          ? _self._entries
-          : entries // ignore: cast_nullable_to_non_nullable
-              as List<PrayerEntry>,
-      remaining: freezed == remaining
-          ? _self.remaining
-          : remaining // ignore: cast_nullable_to_non_nullable
-              as Duration?,
-      nextTomorrowName: freezed == nextTomorrowName
-          ? _self.nextTomorrowName
-          : nextTomorrowName // ignore: cast_nullable_to_non_nullable
-              as PrayerName?,
-      nextTomorrowTime: freezed == nextTomorrowTime
-          ? _self.nextTomorrowTime
-          : nextTomorrowTime // ignore: cast_nullable_to_non_nullable
-              as DateTime?,
-      nextTomorrowRemaining: freezed == nextTomorrowRemaining
-          ? _self.nextTomorrowRemaining
-          : nextTomorrowRemaining // ignore: cast_nullable_to_non_nullable
-              as Duration?,
-    ));
-  }
+/// Create a copy of PrayerTimesState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? city = freezed,Object? entries = null,Object? remaining = freezed,Object? nextTomorrowName = freezed,Object? nextTomorrowTime = freezed,Object? nextTomorrowRemaining = freezed,}) {
+  return _then(PrayerTimesReady(
+city: freezed == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as City?,entries: null == entries ? _self._entries : entries // ignore: cast_nullable_to_non_nullable
+as List<PrayerEntry>,remaining: freezed == remaining ? _self.remaining : remaining // ignore: cast_nullable_to_non_nullable
+as Duration?,nextTomorrowName: freezed == nextTomorrowName ? _self.nextTomorrowName : nextTomorrowName // ignore: cast_nullable_to_non_nullable
+as PrayerName?,nextTomorrowTime: freezed == nextTomorrowTime ? _self.nextTomorrowTime : nextTomorrowTime // ignore: cast_nullable_to_non_nullable
+as DateTime?,nextTomorrowRemaining: freezed == nextTomorrowRemaining ? _self.nextTomorrowRemaining : nextTomorrowRemaining // ignore: cast_nullable_to_non_nullable
+as Duration?,
+  ));
+}
+
+
 }
 
 // dart format on

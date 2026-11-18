@@ -12,328 +12,262 @@ part of 'bookmarks_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$BookmarksState {
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is BookmarksState);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is BookmarksState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
     return 'BookmarksState()';
-  }
+}
+
+
 }
 
 /// @nodoc
-class $BookmarksStateCopyWith<$Res> {
-  $BookmarksStateCopyWith(BookmarksState _, $Res Function(BookmarksState) __);
+class $BookmarksStateCopyWith<$Res>  {
+$BookmarksStateCopyWith(BookmarksState _, $Res Function(BookmarksState) __);
 }
+
 
 /// Adds pattern-matching-related methods to [BookmarksState].
 extension BookmarksStatePatterns on BookmarksState {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(BookmarksLoading value)? loading,
-    TResult Function(BookmarksReady value)? ready,
-    TResult Function(BookmarksFailed value)? failed,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading() when loading != null:
-        return loading(_that);
-      case BookmarksReady() when ready != null:
-        return ready(_that);
-      case BookmarksFailed() when failed != null:
-        return failed(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( BookmarksLoading value)?  loading,TResult Function( BookmarksReady value)?  ready,TResult Function( BookmarksFailed value)?  failed,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case BookmarksLoading() when loading != null:
+return loading(_that);case BookmarksReady() when ready != null:
+return ready(_that);case BookmarksFailed() when failed != null:
+return failed(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(BookmarksLoading value) loading,
-    required TResult Function(BookmarksReady value) ready,
-    required TResult Function(BookmarksFailed value) failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading():
-        return loading(_that);
-      case BookmarksReady():
-        return ready(_that);
-      case BookmarksFailed():
-        return failed(_that);
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( BookmarksLoading value)  loading,required TResult Function( BookmarksReady value)  ready,required TResult Function( BookmarksFailed value)  failed,}){
+final _that = this;
+switch (_that) {
+case BookmarksLoading():
+return loading(_that);case BookmarksReady():
+return ready(_that);case BookmarksFailed():
+return failed(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( BookmarksLoading value)?  loading,TResult? Function( BookmarksReady value)?  ready,TResult? Function( BookmarksFailed value)?  failed,}){
+final _that = this;
+switch (_that) {
+case BookmarksLoading() when loading != null:
+return loading(_that);case BookmarksReady() when ready != null:
+return ready(_that);case BookmarksFailed() when failed != null:
+return failed(_that);case _:
+  return null;
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(BookmarksLoading value)? loading,
-    TResult? Function(BookmarksReady value)? ready,
-    TResult? Function(BookmarksFailed value)? failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading() when loading != null:
-        return loading(_that);
-      case BookmarksReady() when ready != null:
-        return ready(_that);
-      case BookmarksFailed() when failed != null:
-        return failed(_that);
-      case _:
-        return null;
-    }
-  }
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function( List<Verse> entries,  int lastBookmarkId,  bool hasMore,  bool loadingMore,  bool moreFailed)?  ready,TResult Function()?  failed,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case BookmarksLoading() when loading != null:
+return loading();case BookmarksReady() when ready != null:
+return ready(_that.entries,_that.lastBookmarkId,_that.hasMore,_that.loadingMore,_that.moreFailed);case BookmarksFailed() when failed != null:
+return failed();case _:
+  return orElse();
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function(List<Verse> entries, int lastBookmarkId, bool hasMore,
-            bool loadingMore, bool moreFailed)?
-        ready,
-    TResult Function()? failed,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading() when loading != null:
-        return loading();
-      case BookmarksReady() when ready != null:
-        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
-            _that.loadingMore, _that.moreFailed);
-      case BookmarksFailed() when failed != null:
-        return failed();
-      case _:
-        return orElse();
-    }
-  }
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function( List<Verse> entries,  int lastBookmarkId,  bool hasMore,  bool loadingMore,  bool moreFailed)  ready,required TResult Function()  failed,}) {final _that = this;
+switch (_that) {
+case BookmarksLoading():
+return loading();case BookmarksReady():
+return ready(_that.entries,_that.lastBookmarkId,_that.hasMore,_that.loadingMore,_that.moreFailed);case BookmarksFailed():
+return failed();}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function(List<Verse> entries, int lastBookmarkId,
-            bool hasMore, bool loadingMore, bool moreFailed)
-        ready,
-    required TResult Function() failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading():
-        return loading();
-      case BookmarksReady():
-        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
-            _that.loadingMore, _that.moreFailed);
-      case BookmarksFailed():
-        return failed();
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function( List<Verse> entries,  int lastBookmarkId,  bool hasMore,  bool loadingMore,  bool moreFailed)?  ready,TResult? Function()?  failed,}) {final _that = this;
+switch (_that) {
+case BookmarksLoading() when loading != null:
+return loading();case BookmarksReady() when ready != null:
+return ready(_that.entries,_that.lastBookmarkId,_that.hasMore,_that.loadingMore,_that.moreFailed);case BookmarksFailed() when failed != null:
+return failed();case _:
+  return null;
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function(List<Verse> entries, int lastBookmarkId, bool hasMore,
-            bool loadingMore, bool moreFailed)?
-        ready,
-    TResult? Function()? failed,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case BookmarksLoading() when loading != null:
-        return loading();
-      case BookmarksReady() when ready != null:
-        return ready(_that.entries, _that.lastBookmarkId, _that.hasMore,
-            _that.loadingMore, _that.moreFailed);
-      case BookmarksFailed() when failed != null:
-        return failed();
-      case _:
-        return null;
-    }
-  }
 }
 
 /// @nodoc
+
 
 class BookmarksLoading implements BookmarksState {
   const BookmarksLoading();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is BookmarksLoading);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'BookmarksState.loading()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is BookmarksLoading);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'BookmarksState.loading()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class BookmarksReady implements BookmarksState {
-  const BookmarksReady(
-      {required List<Verse> entries,
-      this.lastBookmarkId = 0,
-      this.hasMore = false,
-      this.loadingMore = false,
-      this.moreFailed = false})
-      : _entries = entries;
+  const BookmarksReady({required  List<Verse> entries, this.lastBookmarkId = 0, this.hasMore = false, this.loadingMore = false, this.moreFailed = false}): _entries = entries;
+  
 
-  final List<Verse> _entries;
-  List<Verse> get entries {
-    if (_entries is EqualUnmodifiableListView) return _entries;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_entries);
-  }
+ final  List<Verse> _entries;
+ List<Verse> get entries {
+  if (_entries is EqualUnmodifiableListView) return _entries;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_entries);
+}
 
-  @JsonKey()
-  final int lastBookmarkId;
-  @JsonKey()
-  final bool hasMore;
-  @JsonKey()
-  final bool loadingMore;
-  @JsonKey()
-  final bool moreFailed;
+@JsonKey() final  int lastBookmarkId;
+@JsonKey() final  bool hasMore;
+@JsonKey() final  bool loadingMore;
+@JsonKey() final  bool moreFailed;
 
-  /// Create a copy of BookmarksState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $BookmarksReadyCopyWith<BookmarksReady> get copyWith =>
-      _$BookmarksReadyCopyWithImpl<BookmarksReady>(this, _$identity);
+/// Create a copy of BookmarksState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$BookmarksReadyCopyWith<BookmarksReady> get copyWith => _$BookmarksReadyCopyWithImpl<BookmarksReady>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is BookmarksReady &&
-            const DeepCollectionEquality().equals(other.entries, _entries) &&
-            (identical(other.lastBookmarkId, lastBookmarkId) ||
-                other.lastBookmarkId == lastBookmarkId) &&
-            (identical(other.hasMore, hasMore) || other.hasMore == hasMore) &&
-            (identical(other.loadingMore, loadingMore) ||
-                other.loadingMore == loadingMore) &&
-            (identical(other.moreFailed, moreFailed) ||
-                other.moreFailed == moreFailed));
-  }
 
-  @override
-  int get hashCode {
-    return Object.hash(
-        runtimeType,
-        const DeepCollectionEquality().hash(_entries),
-        lastBookmarkId,
-        hasMore,
-        loadingMore,
-        moreFailed);
-  }
 
-  @override
-  String toString() {
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is BookmarksReady&&const DeepCollectionEquality().equals(other.entries, _entries)&&(identical(other.lastBookmarkId, lastBookmarkId) || other.lastBookmarkId == lastBookmarkId)&&(identical(other.hasMore, hasMore) || other.hasMore == hasMore)&&(identical(other.loadingMore, loadingMore) || other.loadingMore == loadingMore)&&(identical(other.moreFailed, moreFailed) || other.moreFailed == moreFailed));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_entries),lastBookmarkId,hasMore,loadingMore,moreFailed);
+}
+
+@override
+String toString() {
     return 'BookmarksState.ready(entries: $entries, lastBookmarkId: $lastBookmarkId, hasMore: $hasMore, loadingMore: $loadingMore, moreFailed: $moreFailed)';
-  }
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $BookmarksReadyCopyWith<$Res>
-    implements $BookmarksStateCopyWith<$Res> {
-  factory $BookmarksReadyCopyWith(
-          BookmarksReady value, $Res Function(BookmarksReady) _then) =
-      _$BookmarksReadyCopyWithImpl;
-  @useResult
-  $Res call(
-      {List<Verse> entries,
-      int lastBookmarkId,
-      bool hasMore,
-      bool loadingMore,
-      bool moreFailed});
-}
+abstract mixin class $BookmarksReadyCopyWith<$Res> implements $BookmarksStateCopyWith<$Res> {
+  factory $BookmarksReadyCopyWith(BookmarksReady value, $Res Function(BookmarksReady) _then) = _$BookmarksReadyCopyWithImpl;
+@useResult
+$Res call({
+ List<Verse> entries, int lastBookmarkId, bool hasMore, bool loadingMore, bool moreFailed
+});
 
+
+
+
+}
 /// @nodoc
 class _$BookmarksReadyCopyWithImpl<$Res>
     implements $BookmarksReadyCopyWith<$Res> {
@@ -342,59 +276,52 @@ class _$BookmarksReadyCopyWithImpl<$Res>
   final BookmarksReady _self;
   final $Res Function(BookmarksReady) _then;
 
-  /// Create a copy of BookmarksState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? entries = null,
-    Object? lastBookmarkId = null,
-    Object? hasMore = null,
-    Object? loadingMore = null,
-    Object? moreFailed = null,
-  }) {
-    return _then(BookmarksReady(
-      entries: null == entries
-          ? _self._entries
-          : entries // ignore: cast_nullable_to_non_nullable
-              as List<Verse>,
-      lastBookmarkId: null == lastBookmarkId
-          ? _self.lastBookmarkId
-          : lastBookmarkId // ignore: cast_nullable_to_non_nullable
-              as int,
-      hasMore: null == hasMore
-          ? _self.hasMore
-          : hasMore // ignore: cast_nullable_to_non_nullable
-              as bool,
-      loadingMore: null == loadingMore
-          ? _self.loadingMore
-          : loadingMore // ignore: cast_nullable_to_non_nullable
-              as bool,
-      moreFailed: null == moreFailed
-          ? _self.moreFailed
-          : moreFailed // ignore: cast_nullable_to_non_nullable
-              as bool,
-    ));
-  }
+/// Create a copy of BookmarksState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? entries = null,Object? lastBookmarkId = null,Object? hasMore = null,Object? loadingMore = null,Object? moreFailed = null,}) {
+  return _then(BookmarksReady(
+entries: null == entries ? _self._entries : entries // ignore: cast_nullable_to_non_nullable
+as List<Verse>,lastBookmarkId: null == lastBookmarkId ? _self.lastBookmarkId : lastBookmarkId // ignore: cast_nullable_to_non_nullable
+as int,hasMore: null == hasMore ? _self.hasMore : hasMore // ignore: cast_nullable_to_non_nullable
+as bool,loadingMore: null == loadingMore ? _self.loadingMore : loadingMore // ignore: cast_nullable_to_non_nullable
+as bool,moreFailed: null == moreFailed ? _self.moreFailed : moreFailed // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
 }
 
 /// @nodoc
 
+
 class BookmarksFailed implements BookmarksState {
   const BookmarksFailed();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is BookmarksFailed);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'BookmarksState.failed()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is BookmarksFailed);
 }
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'BookmarksState.failed()';
+}
+
+
+}
+
+
+
 
 // dart format on

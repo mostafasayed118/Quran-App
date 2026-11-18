@@ -12,370 +12,308 @@ part of 'home_state.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
-
 /// @nodoc
 mixin _$HomeState {
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HomeState);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeState);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
     return 'HomeState()';
-  }
+}
+
+
 }
 
 /// @nodoc
-class $HomeStateCopyWith<$Res> {
-  $HomeStateCopyWith(HomeState _, $Res Function(HomeState) __);
+class $HomeStateCopyWith<$Res>  {
+$HomeStateCopyWith(HomeState _, $Res Function(HomeState) __);
 }
+
 
 /// Adds pattern-matching-related methods to [HomeState].
 extension HomeStatePatterns on HomeState {
-  /// A variant of `map` that fallback to returning `orElse`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult maybeMap<TResult extends Object?>({
-    TResult Function(HomeLoading value)? loading,
-    TResult Function(HomeFailed value)? failed,
-    TResult Function(HomeReady value)? ready,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading() when loading != null:
-        return loading(_that);
-      case HomeFailed() when failed != null:
-        return failed(_that);
-      case HomeReady() when ready != null:
-        return ready(_that);
-      case _:
-        return orElse();
-    }
-  }
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( HomeLoading value)?  loading,TResult Function( HomeFailed value)?  failed,TResult Function( HomeReady value)?  ready,required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case HomeLoading() when loading != null:
+return loading(_that);case HomeFailed() when failed != null:
+return failed(_that);case HomeReady() when ready != null:
+return ready(_that);case _:
+  return orElse();
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// Callbacks receives the raw object, upcasted.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case final Subclass2 value:
-  ///     return ...;
-  /// }
-  /// ```
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult map<TResult extends Object?>({
-    required TResult Function(HomeLoading value) loading,
-    required TResult Function(HomeFailed value) failed,
-    required TResult Function(HomeReady value) ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading():
-        return loading(_that);
-      case HomeFailed():
-        return failed(_that);
-      case HomeReady():
-        return ready(_that);
-    }
-  }
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( HomeLoading value)  loading,required TResult Function( HomeFailed value)  failed,required TResult Function( HomeReady value)  ready,}){
+final _that = this;
+switch (_that) {
+case HomeLoading():
+return loading(_that);case HomeFailed():
+return failed(_that);case HomeReady():
+return ready(_that);}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  /// A variant of `map` that fallback to returning `null`.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case final Subclass value:
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( HomeLoading value)?  loading,TResult? Function( HomeFailed value)?  failed,TResult? Function( HomeReady value)?  ready,}){
+final _that = this;
+switch (_that) {
+case HomeLoading() when loading != null:
+return loading(_that);case HomeFailed() when failed != null:
+return failed(_that);case HomeReady() when ready != null:
+return ready(_that);case _:
+  return null;
 
-  @optionalTypeArgs
-  TResult? mapOrNull<TResult extends Object?>({
-    TResult? Function(HomeLoading value)? loading,
-    TResult? Function(HomeFailed value)? failed,
-    TResult? Function(HomeReady value)? ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading() when loading != null:
-        return loading(_that);
-      case HomeFailed() when failed != null:
-        return failed(_that);
-      case HomeReady() when ready != null:
-        return ready(_that);
-      case _:
-        return null;
-    }
-  }
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
 
-  /// A variant of `when` that fallback to an `orElse` callback.
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return orElse();
-  /// }
-  /// ```
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function()?  failed,TResult Function( LastReadCard? lastRead,  NextPrayerCard? nextPrayer,  String? cityTimezone,  String? cityNameEn)?  ready,required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case HomeLoading() when loading != null:
+return loading();case HomeFailed() when failed != null:
+return failed();case HomeReady() when ready != null:
+return ready(_that.lastRead,_that.nextPrayer,_that.cityTimezone,_that.cityNameEn);case _:
+  return orElse();
 
-  @optionalTypeArgs
-  TResult maybeWhen<TResult extends Object?>({
-    TResult Function()? loading,
-    TResult Function()? failed,
-    TResult Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer,
-            String? cityTimezone, String? cityNameEn)?
-        ready,
-    required TResult orElse(),
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading() when loading != null:
-        return loading();
-      case HomeFailed() when failed != null:
-        return failed();
-      case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone,
-            _that.cityNameEn);
-      case _:
-        return orElse();
-    }
-  }
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
 
-  /// A `switch`-like method, using callbacks.
-  ///
-  /// As opposed to `map`, this offers destructuring.
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case Subclass2(:final field2):
-  ///     return ...;
-  /// }
-  /// ```
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function()  failed,required TResult Function( LastReadCard? lastRead,  NextPrayerCard? nextPrayer,  String? cityTimezone,  String? cityNameEn)  ready,}) {final _that = this;
+switch (_that) {
+case HomeLoading():
+return loading();case HomeFailed():
+return failed();case HomeReady():
+return ready(_that.lastRead,_that.nextPrayer,_that.cityTimezone,_that.cityNameEn);}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
 
-  @optionalTypeArgs
-  TResult when<TResult extends Object?>({
-    required TResult Function() loading,
-    required TResult Function() failed,
-    required TResult Function(
-            LastReadCard? lastRead,
-            NextPrayerCard? nextPrayer,
-            String? cityTimezone,
-            String? cityNameEn)
-        ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading():
-        return loading();
-      case HomeFailed():
-        return failed();
-      case HomeReady():
-        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone,
-            _that.cityNameEn);
-    }
-  }
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function()?  failed,TResult? Function( LastReadCard? lastRead,  NextPrayerCard? nextPrayer,  String? cityTimezone,  String? cityNameEn)?  ready,}) {final _that = this;
+switch (_that) {
+case HomeLoading() when loading != null:
+return loading();case HomeFailed() when failed != null:
+return failed();case HomeReady() when ready != null:
+return ready(_that.lastRead,_that.nextPrayer,_that.cityTimezone,_that.cityNameEn);case _:
+  return null;
 
-  /// A variant of `when` that fallback to returning `null`
-  ///
-  /// It is equivalent to doing:
-  /// ```dart
-  /// switch (sealedClass) {
-  ///   case Subclass(:final field):
-  ///     return ...;
-  ///   case _:
-  ///     return null;
-  /// }
-  /// ```
+}
+}
 
-  @optionalTypeArgs
-  TResult? whenOrNull<TResult extends Object?>({
-    TResult? Function()? loading,
-    TResult? Function()? failed,
-    TResult? Function(LastReadCard? lastRead, NextPrayerCard? nextPrayer,
-            String? cityTimezone, String? cityNameEn)?
-        ready,
-  }) {
-    final _that = this;
-    switch (_that) {
-      case HomeLoading() when loading != null:
-        return loading();
-      case HomeFailed() when failed != null:
-        return failed();
-      case HomeReady() when ready != null:
-        return ready(_that.lastRead, _that.nextPrayer, _that.cityTimezone,
-            _that.cityNameEn);
-      case _:
-        return null;
-    }
-  }
 }
 
 /// @nodoc
+
 
 class HomeLoading implements HomeState {
   const HomeLoading();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HomeLoading);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'HomeState.loading()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeLoading);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'HomeState.loading()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class HomeFailed implements HomeState {
   const HomeFailed();
+  
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType && other is HomeFailed);
-  }
 
-  @override
-  int get hashCode => runtimeType.hashCode;
 
-  @override
-  String toString() {
-    return 'HomeState.failed()';
-  }
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeFailed);
 }
 
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'HomeState.failed()';
+}
+
+
+}
+
+
+
+
 /// @nodoc
+
 
 class HomeReady implements HomeState {
-  const HomeReady(
-      {this.lastRead = null,
-      this.nextPrayer = null,
-      this.cityTimezone = null,
-      this.cityNameEn = null});
+  const HomeReady({this.lastRead = null, this.nextPrayer = null, this.cityTimezone = null, this.cityNameEn = null});
+  
 
-  @JsonKey()
-  final LastReadCard? lastRead;
-  @JsonKey()
-  final NextPrayerCard? nextPrayer;
-  @JsonKey()
-  final String? cityTimezone;
-  @JsonKey()
-  final String? cityNameEn;
+@JsonKey() final  LastReadCard? lastRead;
+@JsonKey() final  NextPrayerCard? nextPrayer;
+@JsonKey() final  String? cityTimezone;
+@JsonKey() final  String? cityNameEn;
 
-  /// Create a copy of HomeState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  @pragma('vm:prefer-inline')
-  $HomeReadyCopyWith<HomeReady> get copyWith =>
-      _$HomeReadyCopyWithImpl<HomeReady>(this, _$identity);
+/// Create a copy of HomeState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$HomeReadyCopyWith<HomeReady> get copyWith => _$HomeReadyCopyWithImpl<HomeReady>(this, _$identity);
 
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other.runtimeType == runtimeType &&
-            other is HomeReady &&
-            (identical(other.lastRead, lastRead) ||
-                other.lastRead == lastRead) &&
-            (identical(other.nextPrayer, nextPrayer) ||
-                other.nextPrayer == nextPrayer) &&
-            (identical(other.cityTimezone, cityTimezone) ||
-                other.cityTimezone == cityTimezone) &&
-            (identical(other.cityNameEn, cityNameEn) ||
-                other.cityNameEn == cityNameEn));
-  }
 
-  @override
-  int get hashCode {
-    return Object.hash(
-        runtimeType, lastRead, nextPrayer, cityTimezone, cityNameEn);
-  }
 
-  @override
-  String toString() {
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeReady&&(identical(other.lastRead, lastRead) || other.lastRead == lastRead)&&(identical(other.nextPrayer, nextPrayer) || other.nextPrayer == nextPrayer)&&(identical(other.cityTimezone, cityTimezone) || other.cityTimezone == cityTimezone)&&(identical(other.cityNameEn, cityNameEn) || other.cityNameEn == cityNameEn));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,lastRead,nextPrayer,cityTimezone,cityNameEn);
+}
+
+@override
+String toString() {
     return 'HomeState.ready(lastRead: $lastRead, nextPrayer: $nextPrayer, cityTimezone: $cityTimezone, cityNameEn: $cityNameEn)';
-  }
+}
+
+
 }
 
 /// @nodoc
-abstract mixin class $HomeReadyCopyWith<$Res>
-    implements $HomeStateCopyWith<$Res> {
-  factory $HomeReadyCopyWith(HomeReady value, $Res Function(HomeReady) _then) =
-      _$HomeReadyCopyWithImpl;
-  @useResult
-  $Res call(
-      {LastReadCard? lastRead,
-      NextPrayerCard? nextPrayer,
-      String? cityTimezone,
-      String? cityNameEn});
-}
+abstract mixin class $HomeReadyCopyWith<$Res> implements $HomeStateCopyWith<$Res> {
+  factory $HomeReadyCopyWith(HomeReady value, $Res Function(HomeReady) _then) = _$HomeReadyCopyWithImpl;
+@useResult
+$Res call({
+ LastReadCard? lastRead, NextPrayerCard? nextPrayer, String? cityTimezone, String? cityNameEn
+});
 
+
+
+
+}
 /// @nodoc
-class _$HomeReadyCopyWithImpl<$Res> implements $HomeReadyCopyWith<$Res> {
+class _$HomeReadyCopyWithImpl<$Res>
+    implements $HomeReadyCopyWith<$Res> {
   _$HomeReadyCopyWithImpl(this._self, this._then);
 
   final HomeReady _self;
   final $Res Function(HomeReady) _then;
 
-  /// Create a copy of HomeState
-  /// with the given fields replaced by the non-null parameter values.
-  @pragma('vm:prefer-inline')
-  $Res call({
-    Object? lastRead = freezed,
-    Object? nextPrayer = freezed,
-    Object? cityTimezone = freezed,
-    Object? cityNameEn = freezed,
-  }) {
-    return _then(HomeReady(
-      lastRead: freezed == lastRead
-          ? _self.lastRead
-          : lastRead // ignore: cast_nullable_to_non_nullable
-              as LastReadCard?,
-      nextPrayer: freezed == nextPrayer
-          ? _self.nextPrayer
-          : nextPrayer // ignore: cast_nullable_to_non_nullable
-              as NextPrayerCard?,
-      cityTimezone: freezed == cityTimezone
-          ? _self.cityTimezone
-          : cityTimezone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      cityNameEn: freezed == cityNameEn
-          ? _self.cityNameEn
-          : cityNameEn // ignore: cast_nullable_to_non_nullable
-              as String?,
-    ));
-  }
+/// Create a copy of HomeState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? lastRead = freezed,Object? nextPrayer = freezed,Object? cityTimezone = freezed,Object? cityNameEn = freezed,}) {
+  return _then(HomeReady(
+lastRead: freezed == lastRead ? _self.lastRead : lastRead // ignore: cast_nullable_to_non_nullable
+as LastReadCard?,nextPrayer: freezed == nextPrayer ? _self.nextPrayer : nextPrayer // ignore: cast_nullable_to_non_nullable
+as NextPrayerCard?,cityTimezone: freezed == cityTimezone ? _self.cityTimezone : cityTimezone // ignore: cast_nullable_to_non_nullable
+as String?,cityNameEn: freezed == cityNameEn ? _self.cityNameEn : cityNameEn // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
 }
 
 // dart format on
