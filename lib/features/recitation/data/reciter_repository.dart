@@ -8,7 +8,6 @@ import 'package:drift/drift.dart';
 import '../../../core/db/app_database.dart';
 import '../../../core/db/settings_store.dart';
 import '../../../core/db/sql_batching.dart';
-import '../../../core/db/sql_batching.dart';
 import '../domain/reciter_info.dart';
 import 'recitation_keys.dart';
 import 'reciter_info_source.dart';
