@@ -28,6 +28,9 @@ const String _scheduleIssue =
 const String _batteryUnknown =
     'تعذّر فحص تحسين استهلاك البطارية — تأكد من استثناء التطبيق من تحسين البطارية يدويًا.';
 const String _fixAction = 'إصلاح';
+const String _exactAlarmsGranted = 'المنبه الدقيق: مسموح';
+const String _exactAlarmsDisabled =
+    'المنبه الدقيق: معطّل — التذكيرات لن تُنبت في مواقعها';
 
 /// The app-side half: whether the last plan write actually reached the OS.
 class FakeReminderApplyHealth extends ChangeNotifier
@@ -282,4 +285,28 @@ void main() {
     expect(find.text(_title), findsNothing);
     expect(find.text(_fixAction), findsNothing);
   });
+
+  testWidgets(
+    'the exact-alarm state row reports granted when the OS allows it',
+    (tester) async {
+      // The section renders whenever something is worth showing; the state
+      // row is part of that contract (an allowed grant says so, so the user
+      // can tell granted from "no signal").
+      diagnostics.notifications = false;
+      diagnostics.exactAlarms = true;
+      await pumpSettings(tester);
+
+      expect(find.text(_exactAlarmsGranted), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'the exact-alarm state row reports disabled when the OS denies it',
+    (tester) async {
+      diagnostics.exactAlarms = false;
+      await pumpSettings(tester);
+
+      expect(find.text(_exactAlarmsDisabled), findsOneWidget);
+    },
+  );
 }

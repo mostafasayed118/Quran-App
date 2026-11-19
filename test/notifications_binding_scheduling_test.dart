@@ -212,6 +212,44 @@ void main() {
     );
   });
 
+  test(
+    'a missing exact-alarm grant is requested when a reminder is enabled',
+    () async {
+      exact = false;
+      final binding = NotificationsBinding();
+      await binding.init();
+      calls.clear();
+
+      expect(await binding.ensureExactAlarms(), isTrue);
+
+      expect(
+        _methods(calls),
+        contains('requestExactAlarmsPermission'),
+        reason:
+            'the plugin request path is used: the OS reports the grant '
+            'missing, so the app asks the OS to grant it',
+      );
+    },
+  );
+
+  test(
+    'an allowed exact-alarm grant requests nothing',
+    () async {
+      exact = true;
+      final binding = NotificationsBinding();
+      await binding.init();
+      calls.clear();
+
+      expect(await binding.ensureExactAlarms(), isTrue);
+
+      expect(
+        _methods(calls),
+        isNot(contains('requestExactAlarmsPermission')),
+        reason: 'a granted permission is already allowed, nothing to request',
+      );
+    },
+  );
+
   test('a permission queued before init is applied before the plan', () async {
     final binding = NotificationsBinding();
     expect(await binding.ensurePermissions(), isTrue);
