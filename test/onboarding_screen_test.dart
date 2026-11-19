@@ -52,6 +52,9 @@ class _Scheduler implements ReminderSchedulerPort {
   }
 
   @override
+  Future<bool> ensureExactAlarms() async => true;
+
+  @override
   Future<void> scheduleAll(List<ScheduledReminder> reminders) async {}
 }
 

@@ -1402,6 +1402,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reminderFixAction => 'Fix';
 
   @override
+  String get reminderExactAlarmsGranted => 'Exact alarms: granted';
+
+  @override
+  String get reminderExactAlarmsDisabled =>
+      'Exact alarms: DISABLED — reminders will not fire on time';
+
+  @override
+  String get exactAlarmsPromptTitle =>
+      'Exact alarms let reminders fire on time';
+
+  @override
+  String get exactAlarmsPromptBody =>
+      'Reminders arrive through the exact alarm; enabling it from your device settings makes them arrive at their scheduled times.';
+
+  @override
+  String get exactAlarmsPromptAction => 'Open exact-alarm settings';
+
+  @override
+  String get exactAlarmsPromptDismiss => 'Dismiss this session';
+
+  @override
   String get principlesTitle => 'Principles';
 
   @override

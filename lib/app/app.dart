@@ -64,6 +64,10 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
   final ReminderPlanFreshness _planFreshness = ReminderPlanFreshness();
   bool? _exactAlarmsAllowed;
 
+  /// The start/resume exact-alarm prompt is shown at most once per session:
+  /// the user's dismissal or the system-screen action closes it for good.
+  bool _exactAlarmsPromptDismissed = false;
+
   @override
   void initState() {
     super.initState();
@@ -108,6 +112,7 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
         // The device may have slept across several boundaries (or the user
         // travelled): recompute instead of trusting the pending timer.
         if (_skin.followsPrayer) unawaited(_period.refresh());
+        unawaited(_showExactAlarmsPromptIfNeeded());
       case AppLifecycleState.inactive:
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
@@ -150,6 +155,62 @@ class _QuranYahdiAppState extends State<QuranYahdiApp>
         stackTrace: stackTrace,
       );
     }
+  }
+
+  /// Whether any reminder family is currently enabled: the start/resume
+  /// prompt must not fire when the user has no reminders at all.
+  Future<bool> _anyRemindersEnabled() async {
+    try {
+      final port = getIt<ReminderSettingsPort>();
+      if (await port.azkarEnabled() || await port.wirdEnabled()) return true;
+      return await getIt<PrayerReminderSettingsPort>().prayerEnabled();
+    } on Object {
+      return false;
+    }
+  }
+
+  /// Prompts when reminders are ON but the OS exact-alarm grant is missing.
+  ///
+  /// Advisory only, non-blocking: a dismissable dialog over the running
+  /// route — the user's dismissal is remembered for the session, and the
+  /// system "Alarms & reminders" screen opens through the port the settings
+  /// reliability row already uses. Reads through `ReminderDiagnostics`, the
+  /// same OS truth the scheduler probes — no new Android bridge is needed.
+  Future<void> _showExactAlarmsPromptIfNeeded() async {
+    if (_exactAlarmsPromptDismissed) return;
+    try {
+      final diagnostics = getIt<ReminderDiagnostics>();
+      if (await diagnostics.exactAlarmsAllowed()) return;
+      if (!await _anyRemindersEnabled()) return;
+    } on Object {
+      return;
+    }
+    if (!mounted || _exactAlarmsPromptDismissed) return;
+    final loc = AppLocalizations.of(context);
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(loc.exactAlarmsPromptTitle),
+        content: Text(loc.exactAlarmsPromptBody),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              _exactAlarmsPromptDismissed = true;
+              Navigator.of(context).pop();
+            },
+            child: Text(loc.exactAlarmsPromptDismiss),
+          ),
+          TextButton(
+            onPressed: () {
+              _exactAlarmsPromptDismissed = true;
+              getIt<ReminderDiagnostics>().openExactAlarmSettings().ignore();
+              Navigator.of(context).pop();
+            },
+            child: Text(loc.exactAlarmsPromptAction),
+          ),
+        ],
+      ),
+    );
   }
 
   /// Best-effort: a failed re-plan must never break the running app; the next

@@ -24,6 +24,9 @@ class FakeReminderScheduler implements ReminderSchedulerPort {
   }
 
   @override
+  Future<bool> ensureExactAlarms() async => true;
+
+  @override
   Future<void> scheduleAll(List<ScheduledReminder> reminders) async {
     scheduleCalls++;
     plans.add(reminders);

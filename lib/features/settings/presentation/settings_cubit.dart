@@ -103,7 +103,9 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   /// Enables or disables the prayer reminder and re-plans the schedule.
   ///
-  /// The prayer reminder needs no extra OS permission flow. A failed write is
+  /// Enabling asks the OS for the exact-alarm permission when it is missing —
+  /// the alarms that notify the user need the grant, and a fresh install
+  /// otherwise schedules them inexact on some OEM devices. A failed write is
   /// logged and the last confirmed state is kept. A failed re-plan still
   /// commits the confirmed setting: the next boot/settings load re-plans.
   Future<void> setPrayerEnabled(bool enabled) {
@@ -119,16 +121,20 @@ class SettingsCubit extends Cubit<SettingsState> {
       current = _readyState();
       if (current == null) return;
       emit(current.copyWith(prayerEnabled: enabled));
+      if (enabled) {
+        await _requestExactAlarmsBestEffort();
+      }
       await _rescheduleBestEffort();
     });
   }
 
   /// Enables or disables the azkar reminder and re-plans the schedule.
   ///
-  /// Enabling asks for the OS notification permission; a refusal is reported
-  /// through [SettingsReady.azkarPermissionDenied], not as an error state. A
-  /// failed write is logged and the last confirmed state is kept. A failed
-  /// permission request or re-plan does not hide the committed setting.
+  /// Enabling asks for the OS notification and exact-alarm permissions; a
+  /// refusal is reported through [SettingsReady.azkarPermissionDenied], not
+  /// as an error state. A failed write is logged and the last confirmed
+  /// state is kept. A failed permission request or re-plan does not hide
+  /// the committed setting.
   Future<void> setAzkarEnabled(bool enabled) {
     return _serialized(() async {
       var current = _readyState();
@@ -145,6 +151,9 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(
         current.copyWith(azkarEnabled: enabled, azkarPermissionDenied: denied),
       );
+      if (enabled) {
+        await _requestExactAlarmsBestEffort();
+      }
       await _rescheduleBestEffort();
     });
   }
@@ -172,10 +181,11 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   /// Enables or disables the wird reminder and re-plans the schedule.
   ///
-  /// Enabling asks for the OS notification permission; a refusal is reported
-  /// through [SettingsReady.wirdPermissionDenied], not as an error state. A
-  /// failed write is logged and the last confirmed state is kept. A failed
-  /// permission request or re-plan does not hide the committed setting.
+  /// Enabling asks for the OS notification and exact-alarm permissions; a
+  /// refusal is reported through [SettingsReady.wirdPermissionDenied], not
+  /// as an error state. A failed write is logged and the last confirmed
+  /// state is kept. A failed permission request or re-plan does not hide
+  /// the committed setting.
   Future<void> toggleWird(bool enabled) {
     return _serialized(() async {
       var current = _readyState();
@@ -192,6 +202,9 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(
         current.copyWith(wirdEnabled: enabled, wirdPermissionDenied: denied),
       );
+      if (enabled) {
+        await _requestExactAlarmsBestEffort();
+      }
       await _rescheduleBestEffort();
     });
   }
@@ -230,6 +243,23 @@ class SettingsCubit extends Cubit<SettingsState> {
         stackTrace: stackTrace,
       );
       return true;
+    }
+  }
+
+  /// Best-effort exact-alarm request on reminder enable: a request storm is
+  /// worse than a missed one here — the OS grants the permission itself, and
+  /// the diagnostics readout carries the visible state (`ensureExactAlarms`
+  /// in `notifications_binding.dart` is the production path).
+  Future<void> _requestExactAlarmsBestEffort() async {
+    try {
+      await _scheduler.ensureExactAlarms();
+    } on Object catch (error, stackTrace) {
+      appLog(
+        'settings exact alarms request failed',
+        name: 'quran_yahdi/settings',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
     }
   }
 

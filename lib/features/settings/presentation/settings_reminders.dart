@@ -28,6 +28,10 @@ class _ReminderReliabilitySectionState
   List<ReminderIssue> _issues = const <ReminderIssue>[];
   bool _batteryUnknown = false;
 
+  /// The exact-alarm state as the OS reports it — the same boolean the
+  /// scheduler probes (`notifications_binding.dart` `canScheduleExactNotifications`).
+  bool _exactAlarmsAllowed = true;
+
   @override
   void initState() {
     super.initState();
@@ -80,6 +84,7 @@ class _ReminderReliabilitySectionState
           scheduleFailed: widget.applyHealth?.lastApplyFailed ?? false,
         );
         _batteryUnknown = battery == null;
+        _exactAlarmsAllowed = exactAlarms;
       });
     } on Object catch (error, stackTrace) {
       appLog(
@@ -113,6 +118,18 @@ class _ReminderReliabilitySectionState
           child: Text(
             loc.reminderReliabilityIntro,
             style: AppTheme.mutedFootnote(context),
+          ),
+        ),
+        // The explicit state row: the user must be able to tell "granted"
+        // from "no signal". The section itself is the signal — a healthy
+        // device keeps it hidden (see the healthy-device pin in
+        // `reminder_diagnostics_card_test`).
+        ListTile(
+          leading: const Icon(Icons.alarm_outlined),
+          title: Text(
+            _exactAlarmsAllowed
+                ? loc.reminderExactAlarmsGranted
+                : loc.reminderExactAlarmsDisabled,
           ),
         ),
         for (final issue in _issues) _issueTile(loc, issue),

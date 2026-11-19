@@ -2564,6 +2564,42 @@ abstract class AppLocalizations {
   /// **'إصلاح'**
   String get reminderFixAction;
 
+  /// No description provided for @reminderExactAlarmsGranted.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنبه الدقيق: مسموح'**
+  String get reminderExactAlarmsGranted;
+
+  /// No description provided for @reminderExactAlarmsDisabled.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنبه الدقيق: معطّل — التذكيرات لن تُنبت في مواقعها'**
+  String get reminderExactAlarmsDisabled;
+
+  /// No description provided for @exactAlarmsPromptTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المنبه الدقيق يخلّي التذكيرات تصلوا'**
+  String get exactAlarmsPromptTitle;
+
+  /// No description provided for @exactAlarmsPromptBody.
+  ///
+  /// In ar, this message translates to:
+  /// **'التذكيرات تصلًا بمواقعها عبر المنبه الدقيق؛ فعّله من إعدادات الجهاز علشان تصلوا في موايعها.'**
+  String get exactAlarmsPromptBody;
+
+  /// No description provided for @exactAlarmsPromptAction.
+  ///
+  /// In ar, this message translates to:
+  /// **'فتح إعدادات المنبه الدقيق'**
+  String get exactAlarmsPromptAction;
+
+  /// No description provided for @exactAlarmsPromptDismiss.
+  ///
+  /// In ar, this message translates to:
+  /// **'إلغاء لهذه الجلسة'**
+  String get exactAlarmsPromptDismiss;
+
   /// No description provided for @principlesTitle.
   ///
   /// In ar, this message translates to:

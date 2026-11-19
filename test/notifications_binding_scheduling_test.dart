@@ -232,23 +232,20 @@ void main() {
     },
   );
 
-  test(
-    'an allowed exact-alarm grant requests nothing',
-    () async {
-      exact = true;
-      final binding = NotificationsBinding();
-      await binding.init();
-      calls.clear();
+  test('an allowed exact-alarm grant requests nothing', () async {
+    exact = true;
+    final binding = NotificationsBinding();
+    await binding.init();
+    calls.clear();
 
-      expect(await binding.ensureExactAlarms(), isTrue);
+    expect(await binding.ensureExactAlarms(), isTrue);
 
-      expect(
-        _methods(calls),
-        isNot(contains('requestExactAlarmsPermission')),
-        reason: 'a granted permission is already allowed, nothing to request',
-      );
-    },
-  );
+    expect(
+      _methods(calls),
+      isNot(contains('requestExactAlarmsPermission')),
+      reason: 'a granted permission is already allowed, nothing to request',
+    );
+  });
 
   test('a permission queued before init is applied before the plan', () async {
     final binding = NotificationsBinding();

@@ -137,6 +137,11 @@ class NotificationsBinding extends ChangeNotifier
   /// once the plugin is ready.
   bool _pendingPermission = false;
 
+  /// Whether an exact-alarm request arrived before the plugin was ready.
+  /// Same contract as [_pendingPermission]: [init] drains it through
+  /// [ensureExactAlarms].
+  bool _pendingExactAlarms = false;
+
   /// Whether the plugin init has already failed.
   ///
   /// After a failed init the reminders stay disabled (the disclosed v1
@@ -259,10 +264,11 @@ class NotificationsBinding extends ChangeNotifier
         stackTrace: stackTrace,
       );
       // A failed init leaves the reminders disabled — drop the queued plan
-      // and the queued permission request so neither survives as a stale
+      // and the queued permission requests so neither survives as a stale
       // wish that will never be fulfilled.
       _pendingPlan = null;
       _pendingPermission = false;
+      _pendingExactAlarms = false;
       _pendingCancelPreAdhan = false;
       return;
     }
@@ -292,7 +298,7 @@ class NotificationsBinding extends ChangeNotifier
 
   /// Applies what arrived while the plugin was not ready.
   ///
-  /// The permission request goes first (an alarm registered before the OS
+  /// The permission requests go first (an alarm registered before the OS
   /// permission is granted never shows up), then the plan — through the very
   /// same path a normal [scheduleAll] uses, so the plan-fingerprint dedupe
   /// applies to it as well. Nothing here throws: the queued work is
@@ -301,6 +307,10 @@ class NotificationsBinding extends ChangeNotifier
     if (_pendingPermission) {
       _pendingPermission = false;
       await ensurePermissions();
+    }
+    if (_pendingExactAlarms) {
+      _pendingExactAlarms = false;
+      await ensureExactAlarms();
     }
     if (_pendingCancelPreAdhan) {
       _pendingCancelPreAdhan = false;
@@ -435,6 +445,38 @@ class NotificationsBinding extends ChangeNotifier
             false;
       }
       return true;
+    } on Object {
+      return false;
+    }
+  }
+
+  /// Requests the OS exact-alarm permission when the OS reports it missing.
+  ///
+  /// Fresh installs schedule their reminder plan while the permission is
+  /// still denied — on some OEM devices those alarms then never deliver. This
+  /// is the request path the enable actions call, once per enable action: the
+  /// plugin's own API is used when it has one; the "Alarms & reminders"
+  /// system screen is the documented fallback where it does not. Returns
+  /// whether the OS allows exact alarms afterwards (a granted grant reports
+  /// `true`). Never throws.
+  @override
+  Future<bool> ensureExactAlarms() async {
+    if (!_ready) {
+      // The plugin failed for good: no init is left that could perform the
+      // request later — drop it instead of keeping a stale wish.
+      if (_initFailed) return false;
+      _pendingExactAlarms = true;
+      return true;
+    }
+    try {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
+      if (android == null) return true;
+      final exact = await android.canScheduleExactNotifications();
+      if (exact == true) return true;
+      return await android.requestExactAlarmsPermission() ?? false;
     } on Object {
       return false;
     }

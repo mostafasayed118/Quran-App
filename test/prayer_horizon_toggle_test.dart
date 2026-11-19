@@ -72,6 +72,9 @@ class _Scheduler implements ReminderSchedulerPort {
   List<ScheduledReminder>? plan;
   @override
   Future<bool> ensurePermissions() async => true;
+
+  @override
+  Future<bool> ensureExactAlarms() async => true;
   @override
   Future<void> scheduleAll(List<ScheduledReminder> reminders) async {
     plan = List<ScheduledReminder>.of(reminders);

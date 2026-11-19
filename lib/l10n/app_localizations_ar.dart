@@ -1394,6 +1394,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reminderFixAction => 'إصلاح';
 
   @override
+  String get reminderExactAlarmsGranted => 'المنبه الدقيق: مسموح';
+
+  @override
+  String get reminderExactAlarmsDisabled =>
+      'المنبه الدقيق: معطّل — التذكيرات لن تُنبت في مواقعها';
+
+  @override
+  String get exactAlarmsPromptTitle => 'المنبه الدقيق يخلّي التذكيرات تصلوا';
+
+  @override
+  String get exactAlarmsPromptBody =>
+      'التذكيرات تصلًا بمواقعها عبر المنبه الدقيق؛ فعّله من إعدادات الجهاز علشان تصلوا في موايعها.';
+
+  @override
+  String get exactAlarmsPromptAction => 'فتح إعدادات المنبه الدقيق';
+
+  @override
+  String get exactAlarmsPromptDismiss => 'إلغاء لهذه الجلسة';
+
+  @override
   String get principlesTitle => 'مبادئ التطبيق';
 
   @override

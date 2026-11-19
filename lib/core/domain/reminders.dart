@@ -71,6 +71,16 @@ abstract interface class ReminderSchedulerPort {
   /// plugin is ready.
   Future<bool> ensurePermissions();
 
+  /// Requests the OS exact-alarm permission when the OS reports it missing.
+  ///
+  /// Called once per enable action (enabling a reminder), never on every
+  /// resume: the OS grants the permission itself, and a refresh loop would
+  /// turn the request into a prompt storm. Returns whether the OS allows
+  /// exact alarms afterwards — the default `true` ("nothing to request") is
+  /// the right answer where the port has no exact-alarm concept (iOS).
+  /// Never throws.
+  Future<bool> ensureExactAlarms() async => true;
+
   /// Replace-all semantics: cancels previously scheduled reminders, then
   /// schedules the given plan.
   Future<void> scheduleAll(List<ScheduledReminder> reminders);
