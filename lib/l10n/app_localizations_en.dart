@@ -1522,4 +1522,147 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get updateUnavailable =>
       'Could not open the store. You can update from the app\'s Play Store page.';
+
+  @override
+  String get feelingsTitle => 'How are you feeling?';
+
+  @override
+  String get feelingsSubtitle =>
+      'Pick a feeling and we will show you verses that calm your heart';
+
+  @override
+  String get feelingsHomeTitle => 'Verses for your feeling';
+
+  @override
+  String get feelingsHomeSubtitle => 'Verses that calm your heart, by feeling';
+
+  @override
+  String get feelingsAyahOfDay => 'Verse of the day';
+
+  @override
+  String get feelingsReadAyah => 'Read verse';
+
+  @override
+  String get feelingsSectionTitle => 'Feelings and states';
+
+  @override
+  String feelingsCount(int count) {
+    return '$count feelings';
+  }
+
+  @override
+  String get feelingsTwoVerses => 'Two verses';
+
+  @override
+  String get feelingsFooterNote =>
+      'Verses are from the Quran. Tap any verse to read and reflect';
+
+  @override
+  String get feelingsSavedButton => 'My saved verses';
+
+  @override
+  String feelingsSavedCount(int count) {
+    return '$count verses';
+  }
+
+  @override
+  String get feelingQalaq => 'Anxiety';
+
+  @override
+  String get feelingHuzn => 'Sadness';
+
+  @override
+  String get feelingWahda => 'Loneliness';
+
+  @override
+  String get feelingHayra => 'Confusion';
+
+  @override
+  String get feelingKhawf => 'Fear';
+
+  @override
+  String get feelingGhadab => 'Anger';
+
+  @override
+  String get feelingImtinam => 'Gratitude';
+
+  @override
+  String get feelingAmal => 'Hope';
+
+  @override
+  String get feelingsQalaqSubtitle => 'Two verses that calm your heart';
+
+  @override
+  String get feelingsGenericSubtitle => 'Two verses from the Quran';
+
+  @override
+  String get feelingsReadAndReflect => 'Read and reflect';
+
+  @override
+  String get feelingsAnother => 'Another feeling';
+
+  @override
+  String get feelingsTadabburTitle => 'Reflection and a touch of calm';
+
+  @override
+  String get feelingsTadabburCopy =>
+      'Tranquility is not the absence of worry, but remembering Allah with the worry. Whenever your chest tightens, return to remembrance.';
+
+  @override
+  String get feelingsSave => 'Save';
+
+  @override
+  String get feelingsSaved => 'Saved';
+
+  @override
+  String get feelingsShare => 'Share';
+
+  @override
+  String get feelingsListen => 'Listen';
+
+  @override
+  String get feelingsStop => 'Stop';
+
+  @override
+  String get feelingsCopy => 'Copy';
+
+  @override
+  String get feelingsCopied => 'Copied';
+
+  @override
+  String get feelingsAdded => 'Added to saved verses';
+
+  @override
+  String get feelingsRemoved => 'Removed from saved verses';
+
+  @override
+  String get feelingsNextVerse => 'Next verse';
+
+  @override
+  String get feelingsTadabburScreenTitle => 'Verse reflection';
+
+  @override
+  String get feelingsEmpty => 'Tap the save icon on any verse to keep it here';
+
+  @override
+  String get feelingsDelete => 'Delete';
+
+  @override
+  String get feelingsLoadFailed => 'Could not load content. Please try again.';
+
+  @override
+  String get feelingsInvalidParams => 'The required data is invalid.';
+
+  @override
+  String feelingsRefLine(String surah, int ayah) {
+    return 'Surah $surah, Ayah $ayah';
+  }
+
+  @override
+  String feelingsMetaLine(String surah, int ayah, int juz) {
+    return 'Surah $surah • Ayah $ayah • Juz $juz';
+  }
+
+  @override
+  String get feelingsHeroSurah => 'Ar-Ra\'d';
 }

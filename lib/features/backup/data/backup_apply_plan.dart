@@ -3,6 +3,7 @@ part of 'backup_service.dart';
 class _ApplyPlan {
   const _ApplyPlan({
     required this.bookmarks,
+    required this.feelingSavedVerses,
     required this.lastRead,
     required this.khatma,
     required this.prayerLog,
@@ -12,6 +13,7 @@ class _ApplyPlan {
   });
 
   final BookmarkMerge bookmarks;
+  final SavedFeelingVersesMerge feelingSavedVerses;
   final LastReadMerge lastRead;
   final KhatmaMerge khatma;
   final PrayerLogMerge prayerLog;
@@ -29,8 +31,10 @@ class _ApplyPlan {
     tasbihChanged: tasbih.changed,
     lastReadChanged: lastRead.changed,
     settingsKeysApplied: settings.appliedCount,
-    rejectedEntries: bookmarks.rejected + khatma.rejected,
+    rejectedEntries:
+        bookmarks.rejected + khatma.rejected + feelingSavedVerses.rejected,
     skippedSettingsDocuments: settings.skippedDocuments.length,
+    newSavedFeelingVerses: feelingSavedVerses.newCount,
   );
 
   bool get reminderRelevantChanged =>

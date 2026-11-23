@@ -1510,4 +1510,147 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get updateUnavailable =>
       'تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play.';
+
+  @override
+  String get feelingsTitle => 'شعورك إيه دلوقتي؟';
+
+  @override
+  String get feelingsSubtitle =>
+      'اختار شعورك، ونعرض لك آيات من القرآن تطمئن قلبك';
+
+  @override
+  String get feelingsHomeTitle => 'آيات لشعورك';
+
+  @override
+  String get feelingsHomeSubtitle => 'آيات تطمئن قلبك حسب شعورك';
+
+  @override
+  String get feelingsAyahOfDay => 'آية اليوم';
+
+  @override
+  String get feelingsReadAyah => 'اقرأ الآية';
+
+  @override
+  String get feelingsSectionTitle => 'المشاعر والأحوال';
+
+  @override
+  String feelingsCount(int count) {
+    return '$count مشاعر';
+  }
+
+  @override
+  String get feelingsTwoVerses => 'آيتان';
+
+  @override
+  String get feelingsFooterNote =>
+      'الآيات من المصحف، اضغط على أي آية لقراءتها وتدبرها';
+
+  @override
+  String get feelingsSavedButton => 'آياتي المحفوظة';
+
+  @override
+  String feelingsSavedCount(int count) {
+    return '$count آيات';
+  }
+
+  @override
+  String get feelingQalaq => 'قلق';
+
+  @override
+  String get feelingHuzn => 'حزن';
+
+  @override
+  String get feelingWahda => 'وحدة';
+
+  @override
+  String get feelingHayra => 'حيرة';
+
+  @override
+  String get feelingKhawf => 'خوف';
+
+  @override
+  String get feelingGhadab => 'غضب';
+
+  @override
+  String get feelingImtinam => 'امتنان';
+
+  @override
+  String get feelingAmal => 'أمل';
+
+  @override
+  String get feelingsQalaqSubtitle => 'آيتان تطمئنان قلبك';
+
+  @override
+  String get feelingsGenericSubtitle => 'آيتان من القرآن';
+
+  @override
+  String get feelingsReadAndReflect => 'اقرأ وتدبر';
+
+  @override
+  String get feelingsAnother => 'شعور تاني';
+
+  @override
+  String get feelingsTadabburTitle => 'تدبر الآية ولمسة السكينة';
+
+  @override
+  String get feelingsTadabburCopy =>
+      'الطمأنينة ليست في زوال الهم، بل في ذكر الله مع الهم، فكلما ضاق صدرك، فارجع إلى الذكر.';
+
+  @override
+  String get feelingsSave => 'حفظ';
+
+  @override
+  String get feelingsSaved => 'محفوظة';
+
+  @override
+  String get feelingsShare => 'مشاركة';
+
+  @override
+  String get feelingsListen => 'استماع';
+
+  @override
+  String get feelingsStop => 'إيقاف';
+
+  @override
+  String get feelingsCopy => 'نسخ';
+
+  @override
+  String get feelingsCopied => 'تم النسخ';
+
+  @override
+  String get feelingsAdded => 'تمت الإضافة إلى الآيات المحفوظة';
+
+  @override
+  String get feelingsRemoved => 'تمت إزالة الحفظ';
+
+  @override
+  String get feelingsNextVerse => 'الآية التالية';
+
+  @override
+  String get feelingsTadabburScreenTitle => 'تدبر الآية';
+
+  @override
+  String get feelingsEmpty => 'اضغط على أيقونة الحفظ في أي آية لتحفظها هنا';
+
+  @override
+  String get feelingsDelete => 'حذف';
+
+  @override
+  String get feelingsLoadFailed => 'تعذر تحميل المحتوى. حاول مرة أخرى.';
+
+  @override
+  String get feelingsInvalidParams => 'البيانات المطلوبة غير صحيحة.';
+
+  @override
+  String feelingsRefLine(String surah, int ayah) {
+    return 'سورة $surah، الآية $ayah';
+  }
+
+  @override
+  String feelingsMetaLine(String surah, int ayah, int juz) {
+    return 'سورة $surah • الآية $ayah • الجزء $juz';
+  }
+
+  @override
+  String get feelingsHeroSurah => 'الرعد';
 }

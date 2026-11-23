@@ -55,6 +55,37 @@ BookmarkMerge mergeBookmarks({
   );
 }
 
+/// Result of merging imported feelings saved verses.
+class SavedFeelingVersesMerge {
+  const SavedFeelingVersesMerge(this.toInsert, {this.rejected = 0});
+
+  final List<BackupSavedFeelingVerse> toInsert;
+  final int rejected;
+  int get newCount => toInsert.length;
+}
+
+/// Union by `ayahId`: existing rows are kept (never deleted or rewritten);
+/// the file's first occurrence wins for duplicate ids inside the file.
+SavedFeelingVersesMerge mergeSavedFeelingVerses({
+  required Set<int> existingAyahIds,
+  required List<BackupSavedFeelingVerse> imported,
+}) {
+  final seen = <int>{...existingAyahIds};
+  final toInsert = <BackupSavedFeelingVerse>[];
+  var rejected = 0;
+  for (final row in imported) {
+    if (row.ayahId < 1 || row.ayahId > kBackupMaxAyahId) {
+      rejected++;
+      continue;
+    }
+    if (seen.add(row.ayahId)) toInsert.add(row);
+  }
+  return SavedFeelingVersesMerge(
+    List<BackupSavedFeelingVerse>.unmodifiable(toInsert),
+    rejected: rejected,
+  );
+}
+
 /// Result of merging the imported last-read position.
 class LastReadMerge {
   const LastReadMerge({required this.toWrite, required this.changed});

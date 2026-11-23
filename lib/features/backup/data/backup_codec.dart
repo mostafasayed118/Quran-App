@@ -37,6 +37,14 @@ Map<String, Object?> encodeMap(BackupDocument document) {
             'createdAt': bookmark.createdAt.toIso8601String(),
           },
       ],
+      'feelingSavedVerses': [
+        for (final row in data.feelingSavedVerses)
+          <String, Object?>{
+            'ayahId': row.ayahId,
+            'feeling': row.feeling,
+            'createdAt': row.createdAt.toIso8601String(),
+          },
+      ],
       'lastRead': lastRead == null
           ? null
           : <String, Object?>{'ayahId': lastRead},
@@ -128,6 +136,11 @@ BackupData _decodeData(Object? raw, _SkipCounter skipped) {
   }
   return BackupData(
     bookmarks: _decodeList(raw['bookmarks'], skipped, _decodeBookmark),
+    feelingSavedVerses: _decodeList(
+      raw['feelingSavedVerses'],
+      skipped,
+      _decodeSavedFeelingVerse,
+    ),
     lastReadAyahId: _decodeLastRead(raw['lastRead'], skipped),
     khatma: _decodeList(raw['khatma'], skipped, _decodeKhatmaRow),
     prayerLog: _decodeList(raw['prayerLog'], skipped, _decodePrayerDay),
@@ -166,6 +179,23 @@ BackupBookmark? _decodeBookmark(Object? raw) {
   final createdAt = DateTime.tryParse(createdAtRaw);
   if (createdAt == null) return null;
   return BackupBookmark(ayahId: ayahId.toInt(), createdAt: createdAt);
+}
+
+BackupSavedFeelingVerse? _decodeSavedFeelingVerse(Object? raw) {
+  if (raw is! Map<String, dynamic>) return null;
+  final ayahId = raw['ayahId'];
+  final feeling = raw['feeling'];
+  final createdAtRaw = raw['createdAt'];
+  if (ayahId is! num || feeling is! String || createdAtRaw is! String) {
+    return null;
+  }
+  final createdAt = DateTime.tryParse(createdAtRaw);
+  if (createdAt == null) return null;
+  return BackupSavedFeelingVerse(
+    ayahId: ayahId.toInt(),
+    feeling: feeling,
+    createdAt: createdAt,
+  );
 }
 
 int? _decodeLastRead(Object? raw, _SkipCounter skipped) {

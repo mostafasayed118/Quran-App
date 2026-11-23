@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
@@ -41,6 +41,13 @@ import '../features/duas/data/dua_repository.dart';
 import '../features/duas/data/ruqyah_repository.dart';
 import '../features/duas/presentation/duas_cubit.dart';
 import '../features/duas/presentation/duas_screen.dart';
+import '../features/feelings/data/feelings_repository.dart';
+import '../features/feelings/domain/feeling.dart';
+import '../features/feelings/presentation/feeling_verses_screen.dart';
+import '../features/feelings/presentation/feelings_cubit.dart';
+import '../features/feelings/presentation/feelings_screen.dart';
+import '../features/feelings/presentation/saved_verses_screen.dart';
+import '../features/feelings/presentation/verse_detail_screen.dart';
 import '../features/hijri/data/hijri_offset_source.dart';
 import '../features/hijri/data/hijri_service.dart';
 import '../features/hijri/presentation/hijri_cubit.dart';
@@ -135,6 +142,7 @@ import 'onboarding_gate.dart';
 import 'route_observer.dart';
 import 'version_gate.dart';
 
+part 'routes/feelings_routes.dart';
 part 'routes/read_routes.dart';
 part 'routes/recitation_routes.dart';
 part 'routes/settings_routes.dart';
@@ -285,6 +293,7 @@ abstract final class AppRouter {
     ..._libraryRoutes(),
     ..._prayerRoutes(),
     ..._worshipRoutes(),
+    ..._feelingsRoutes(),
     ..._settingsRoutes(),
     ..._readerRoutes(),
     ..._onboardingRoutes(),

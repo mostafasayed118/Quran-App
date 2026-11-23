@@ -3868,6 +3868,309 @@ class HadithEntriesCompanion extends UpdateCompanion<HadithEntry> {
   }
 }
 
+class $FeelingSavedVersesTable extends FeelingSavedVerses
+    with TableInfo<$FeelingSavedVersesTable, FeelingSavedVerse> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $FeelingSavedVersesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _ayahIdMeta = const VerificationMeta('ayahId');
+  @override
+  late final GeneratedColumn<int> ayahId = GeneratedColumn<int>(
+    'ayah_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _feelingMeta = const VerificationMeta(
+    'feeling',
+  );
+  @override
+  late final GeneratedColumn<String> feeling = GeneratedColumn<String>(
+    'feeling',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, ayahId, feeling, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'feeling_saved_verses';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<FeelingSavedVerse> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('ayah_id')) {
+      context.handle(
+        _ayahIdMeta,
+        ayahId.isAcceptableOrUnknown(data['ayah_id']!, _ayahIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ayahIdMeta);
+    }
+    if (data.containsKey('feeling')) {
+      context.handle(
+        _feelingMeta,
+        feeling.isAcceptableOrUnknown(data['feeling']!, _feelingMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_feelingMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  FeelingSavedVerse map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return FeelingSavedVerse(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      ayahId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}ayah_id'],
+      )!,
+      feeling: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}feeling'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $FeelingSavedVersesTable createAlias(String alias) {
+    return $FeelingSavedVersesTable(attachedDatabase, alias);
+  }
+}
+
+class FeelingSavedVerse extends DataClass
+    implements Insertable<FeelingSavedVerse> {
+  final int id;
+
+  /// Global ayah number, 1..6236.
+  final int ayahId;
+
+  /// Stable feeling key (see FeelingKey.value).
+  final String feeling;
+
+  /// When the ayah was saved (defaults to write time).
+  final DateTime createdAt;
+  const FeelingSavedVerse({
+    required this.id,
+    required this.ayahId,
+    required this.feeling,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['ayah_id'] = Variable<int>(ayahId);
+    map['feeling'] = Variable<String>(feeling);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  FeelingSavedVersesCompanion toCompanion(bool nullToAbsent) {
+    return FeelingSavedVersesCompanion(
+      id: Value(id),
+      ayahId: Value(ayahId),
+      feeling: Value(feeling),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory FeelingSavedVerse.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return FeelingSavedVerse(
+      id: serializer.fromJson<int>(json['id']),
+      ayahId: serializer.fromJson<int>(json['ayahId']),
+      feeling: serializer.fromJson<String>(json['feeling']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'ayahId': serializer.toJson<int>(ayahId),
+      'feeling': serializer.toJson<String>(feeling),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  FeelingSavedVerse copyWith({
+    int? id,
+    int? ayahId,
+    String? feeling,
+    DateTime? createdAt,
+  }) => FeelingSavedVerse(
+    id: id ?? this.id,
+    ayahId: ayahId ?? this.ayahId,
+    feeling: feeling ?? this.feeling,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  FeelingSavedVerse copyWithCompanion(FeelingSavedVersesCompanion data) {
+    return FeelingSavedVerse(
+      id: data.id.present ? data.id.value : this.id,
+      ayahId: data.ayahId.present ? data.ayahId.value : this.ayahId,
+      feeling: data.feeling.present ? data.feeling.value : this.feeling,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeelingSavedVerse(')
+          ..write('id: $id, ')
+          ..write('ayahId: $ayahId, ')
+          ..write('feeling: $feeling, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, ayahId, feeling, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is FeelingSavedVerse &&
+          other.id == this.id &&
+          other.ayahId == this.ayahId &&
+          other.feeling == this.feeling &&
+          other.createdAt == this.createdAt);
+}
+
+class FeelingSavedVersesCompanion extends UpdateCompanion<FeelingSavedVerse> {
+  final Value<int> id;
+  final Value<int> ayahId;
+  final Value<String> feeling;
+  final Value<DateTime> createdAt;
+  const FeelingSavedVersesCompanion({
+    this.id = const Value.absent(),
+    this.ayahId = const Value.absent(),
+    this.feeling = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  FeelingSavedVersesCompanion.insert({
+    this.id = const Value.absent(),
+    required int ayahId,
+    required String feeling,
+    this.createdAt = const Value.absent(),
+  }) : ayahId = Value(ayahId),
+       feeling = Value(feeling);
+  static Insertable<FeelingSavedVerse> custom({
+    Expression<int>? id,
+    Expression<int>? ayahId,
+    Expression<String>? feeling,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ayahId != null) 'ayah_id': ayahId,
+      if (feeling != null) 'feeling': feeling,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  FeelingSavedVersesCompanion copyWith({
+    Value<int>? id,
+    Value<int>? ayahId,
+    Value<String>? feeling,
+    Value<DateTime>? createdAt,
+  }) {
+    return FeelingSavedVersesCompanion(
+      id: id ?? this.id,
+      ayahId: ayahId ?? this.ayahId,
+      feeling: feeling ?? this.feeling,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (ayahId.present) {
+      map['ayah_id'] = Variable<int>(ayahId.value);
+    }
+    if (feeling.present) {
+      map['feeling'] = Variable<String>(feeling.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('FeelingSavedVersesCompanion(')
+          ..write('id: $id, ')
+          ..write('ayahId: $ayahId, ')
+          ..write('feeling: $feeling, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3881,6 +4184,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
   late final $RecitersTable reciters = $RecitersTable(this);
   late final $HadithEntriesTable hadithEntries = $HadithEntriesTable(this);
+  late final $FeelingSavedVersesTable feelingSavedVerses =
+      $FeelingSavedVersesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3896,6 +4201,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settingsTable,
     reciters,
     hadithEntries,
+    feelingSavedVerses,
   ];
 }
 
@@ -6041,6 +6347,205 @@ typedef $$HadithEntriesTableProcessedTableManager =
       HadithEntry,
       PrefetchHooks Function()
     >;
+typedef $$FeelingSavedVersesTableCreateCompanionBuilder =
+    FeelingSavedVersesCompanion Function({
+      Value<int> id,
+      required int ayahId,
+      required String feeling,
+      Value<DateTime> createdAt,
+    });
+typedef $$FeelingSavedVersesTableUpdateCompanionBuilder =
+    FeelingSavedVersesCompanion Function({
+      Value<int> id,
+      Value<int> ayahId,
+      Value<String> feeling,
+      Value<DateTime> createdAt,
+    });
+
+class $$FeelingSavedVersesTableFilterComposer
+    extends Composer<_$AppDatabase, $FeelingSavedVersesTable> {
+  $$FeelingSavedVersesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get ayahId => $composableBuilder(
+    column: $table.ayahId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get feeling => $composableBuilder(
+    column: $table.feeling,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$FeelingSavedVersesTableOrderingComposer
+    extends Composer<_$AppDatabase, $FeelingSavedVersesTable> {
+  $$FeelingSavedVersesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get ayahId => $composableBuilder(
+    column: $table.ayahId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get feeling => $composableBuilder(
+    column: $table.feeling,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$FeelingSavedVersesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $FeelingSavedVersesTable> {
+  $$FeelingSavedVersesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get ayahId =>
+      $composableBuilder(column: $table.ayahId, builder: (column) => column);
+
+  GeneratedColumn<String> get feeling =>
+      $composableBuilder(column: $table.feeling, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$FeelingSavedVersesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $FeelingSavedVersesTable,
+          FeelingSavedVerse,
+          $$FeelingSavedVersesTableFilterComposer,
+          $$FeelingSavedVersesTableOrderingComposer,
+          $$FeelingSavedVersesTableAnnotationComposer,
+          $$FeelingSavedVersesTableCreateCompanionBuilder,
+          $$FeelingSavedVersesTableUpdateCompanionBuilder,
+          (
+            FeelingSavedVerse,
+            BaseReferences<
+              _$AppDatabase,
+              $FeelingSavedVersesTable,
+              FeelingSavedVerse
+            >,
+          ),
+          FeelingSavedVerse,
+          PrefetchHooks Function()
+        > {
+  $$FeelingSavedVersesTableTableManager(
+    _$AppDatabase db,
+    $FeelingSavedVersesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$FeelingSavedVersesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$FeelingSavedVersesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$FeelingSavedVersesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> ayahId = const Value.absent(),
+                Value<String> feeling = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FeelingSavedVersesCompanion(
+                id: id,
+                ayahId: ayahId,
+                feeling: feeling,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int ayahId,
+                required String feeling,
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => FeelingSavedVersesCompanion.insert(
+                id: id,
+                ayahId: ayahId,
+                feeling: feeling,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$FeelingSavedVersesTable, FeelingSavedVerse>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $FeelingSavedVersesTable,
+                    FeelingSavedVerse
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$FeelingSavedVersesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $FeelingSavedVersesTable,
+      FeelingSavedVerse,
+      $$FeelingSavedVersesTableFilterComposer,
+      $$FeelingSavedVersesTableOrderingComposer,
+      $$FeelingSavedVersesTableAnnotationComposer,
+      $$FeelingSavedVersesTableCreateCompanionBuilder,
+      $$FeelingSavedVersesTableUpdateCompanionBuilder,
+      (
+        FeelingSavedVerse,
+        BaseReferences<
+          _$AppDatabase,
+          $FeelingSavedVersesTable,
+          FeelingSavedVerse
+        >,
+      ),
+      FeelingSavedVerse,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6065,4 +6570,6 @@ class $AppDatabaseManager {
       $$RecitersTableTableManager(_db, _db.reciters);
   $$HadithEntriesTableTableManager get hadithEntries =>
       $$HadithEntriesTableTableManager(_db, _db.hadithEntries);
+  $$FeelingSavedVersesTableTableManager get feelingSavedVerses =>
+      $$FeelingSavedVersesTableTableManager(_db, _db.feelingSavedVerses);
 }

@@ -1672,3 +1672,75 @@ Format: newest entries appended at the bottom. Every entry = independently verif
 - **Accounting:** **17 fixed**, **1 withdrawn** as a false positive (#4), **2 not proven** (#13, #15), **1 open** (#1b), **2 latent** added by the sweep (21, 22).
 - **Gates at the tip (`d07f6820`):** format **0** · analyze **0** · suite **1931/1931**; CI analyze-test 6m21s green.
 - **Next:** **#1b diagnosis first** — what cleared 32 alarms on the same boot; no re-arm code before that answer.
+
+### 2026-11-23 (Q43–Q46 feelings — Frozen Tests gate: Stage A + Stage B)
+
+**Stage A — Class B graduation (applied before any pin edit).** Six pin files graduated by append-only rows in `docs/decisions/2026-11-02-frozen-test-policy.md`: `test/architecture_exact_edges_test.dart`, `test/architecture_guard_test.dart`, `test/db_migration_test.dart`, `test/db_migration_v2_v3_test.dart`, `test/home_dashboard_visual_test.dart`, `test/home_quality_probe_test.dart`. Reason: a mandated additive feature — the `feeling_saved_verses` table, the v4 migration, the feelings routes, one home tile and the prompt-required `feelings->quran` import. Graduation is **NOT** a general exemption from the Frozen Tests policy and **NOT** a precedent for later behaviour changes. The v2→v3 step assertions in `db_migration_v2_v3_test.dart` remain Class A; only the terminal schema-version literals graduated.
+
+**Test-count truth.** The "12 new" figure was superseded by **13**. The 13th is `test/features/feelings/verse_detail_listen_test.dart`. A later full-suite total of **1973** (= 1960 baseline + 13 new) is therefore **not** a loss of one test; the earlier 1972 run was taken before the 13th file existed at enumeration. Stage B Authorization explicitly keeps that test.
+
+**New test files by path (six files after keeping the 13th test):**
+- `test/features/feelings/feeling_catalog_test.dart`
+- `test/features/feelings/feelings_helpers_test.dart`
+- `test/features/feelings/feelings_repository_test.dart`
+- `test/features/feelings/verse_detail_listen_test.dart` (13th; added after the "12 new" count)
+- `test/backup_feelings_test.dart`
+- `test/db_migration_v3_v4_test.dart`
+
+**Routes added in `lib/app/routes/feelings_routes.dart` (four):**
+- `/feelings` (`AppRoutes.feelings`) → `FeelingsScreen`
+- `/feelings/verses` (`AppRoutes.feelingsVerses`) → `FeelingVersesScreen`
+- `/feelings/verse` (`AppRoutes.feelingsVerse`) → `VerseDetailScreen`
+- `/feelings/saved` (`AppRoutes.feelingsSaved`) → `SavedVersesScreen`
+
+**Router-injected playback callback — owner-accepted deviation.** The prompt named `getIt<PlaybackCubit>()` inside the feature or explicit provision. Implemented instead as a typed callback injected by the router. Reason: calling `getIt` inside the feature imports `lib/app/di/injector.dart` and breaks the Class A architecture guard; importing `PlaybackCubit` into the feature would add a second cross-feature edge (`feelings->recitation`). Only **one** route builds `VerseDetailScreen` — `/feelings/verse`, child at `feelings_routes.dart:52` — and it supplies the callback at `feelings_routes.dart:47-48`: `playSurah: (s, name) => getIt<PlaybackCubit>().playDefaultForSurah(s, surahName: name)`. This resolves the already registered `PlaybackCubit` singleton; no new cubit or player is instantiated.
+
+**Stage B — ten authorized pin edits (exact before → after):**
+| file | line | before | after |
+|---|---|---|---|
+| `architecture_exact_edges_test.dart` | 70 (title) | `'the live cross-feature edges are exactly the ratified two'` | `'the live cross-feature edges are exactly the ratified three'` |
+| `architecture_exact_edges_test.dart` | 83 (set) | `{'quran->library', 'quran->recitation'}` | `{'quran->library', 'quran->recitation', 'feelings->quran'}` |
+| `architecture_guard_test.dart` | 12 | `const Set<String> allowedFeatureEdges = {'quran->library', 'quran->recitation'};` | same set plus `'feelings->quran'` |
+| `architecture_guard_test.dart` | after 56 | — | `'lib/app/routes/feelings_routes.dart': 'feelings route group (part)',` |
+| `db_migration_test.dart` | 20 | `expect(db.allTables.length, 10);` | `expect(db.allTables.length, 11);` |
+| `db_migration_v2_v3_test.dart` | 127 | `expect(await _userVersion(v3), 3);` | `expect(await _userVersion(v3), 4);` |
+| `db_migration_v2_v3_test.dart` | 141 | `expect(await _userVersion(db), 3);` | `expect(await _userVersion(db), 4);` |
+| `db_migration_v2_v3_test.dart` | 173 | `expect(await _userVersion(second), 3);` | `expect(await _userVersion(second), 4);` |
+| `home_dashboard_visual_test.dart` | between 21/22 | — | `  'آيات لشعورك',` inserted in render order after `'العلامات المرجعية'` and before `'مواقيت الصلاة'` |
+| `home_quality_probe_test.dart` | 173 | `expect(find.byType(ServiceTile), findsNWidgets(15));` | `expect(find.byType(ServiceTile), findsNWidgets(16));` |
+
+All ten are inventory membership / count lines; no behaviour assertion, no section header and no historical migration step assertion was touched. The 10 failures and the 10 edits are not one-to-one (architecture_guard has 3 failures fixed by 2 lines; exact_edges has 1 failing test fixed by 2 lines).
+
+**No commit / push / PR / merge / tag.**
+
+### 2026-11-23 (Q43–Q46 feelings — README count + emulator verification + final gates)
+
+- **README:** Build-section test count updated `1950` → `1973` (the measured full-suite total; 1960 baseline + 13 new). No other README content changed.
+- **Emulator:** `A16_API36` (`emulator-5554`, 1080x2400 @420dpi, Android 16 / API 36), debug APK `com.mostafasayed.quranyahdi.debug`. Verified on-device: Q43 from the Home Quran tile (8 feelings in order + icons + hero Ar-Ra'd 28); Q44 for all eight feelings (16 references); Q45 full Uthmani text + surah + juz, Tadabbur only for Ar-Ra'd 28, next-verse only on the first verse; save/unsave via the bookmark toggle; saves persisted across restart; Q46 rows with feeling + Arabic date, row delete, empty state; surah-level listening via the existing player (`media-session PLAYING`, now-playing bar «عبدالباسط عبدالصمد — الزمر», queue size 1 → whole surah, no per-ayah); Arabic + English; light + dark incl. mushaf-card contrast. Device restored to Arabic + system theme afterwards.
+- **Known limitations (disclosed, not fixed):** the surah/ayah/juz reference strings and the Q43 hero reference are built in the data layer / hardcoded Arabic, so they stay Arabic in English mode; Q46 rows show the global ayah id rather than a surah:ayah label; next-verse uses `context.go`, which resets the back stack.
+- **Final gates (after all edits):** `flutter analyze lib test` → No issues found; scoped `dart format --set-exit-if-changed` → 0 changed; `flutter gen-l10n` regenerated earlier; full `flutter test` → **1973 passed / 0 failed / 1973 discovered**, exit 0 (`05:21 +1973: All tests passed!`).
+- **Backup verification:** `test/backup_feelings_test.dart` (round-trip, old-file compatibility, merge-by-ayahId) plus a throwaway service-level probe (export → fresh-db apply → merge dedup → old-file) run outside the repo suite so the count stays 1973; probe passed.
+- **No commit / push / PR / merge / tag.** HEAD remains `9649553d`; all changes are uncommitted working-tree changes.
+
+### 2026-11-23 (Q43–Q46 — fix pass: back-stack, English references, Q46 label, README, permanent backup test)
+
+- **Fix 1 (P1):** Next verse changed `context.go` → `context.push` in `verse_detail_screen.dart`; a real-GoRouter regression test (`test/features/feelings/feelings_back_stack_test.dart`) drives the production button and asserts verse 2 → verse 1 → Q44 → Home shell on three pops. A shared `routedAppShell` helper was added to `test/support/host.dart` so the test builds through the harness (the harness guard must not be edited).
+- **Fix 2 (P2):** Surah/Ayah/Juz labels localized via new AR/EN ARB keys; `FeelingVerseView` now carries raw `surahNameEn` and the data-layer reference getters were removed; presentation helper `feelings_reference.dart` builds the localized line. Verified on-device: «Surah Ar-Ra'd • Ayah 28 • Juz 13» with Arabic Quran text unchanged. No tadabbur content was written or rewritten.
+- **Fix 4:** Q46 rows now show `surah:ayah` (Western digits) resolved via `AyahLookup.ayahRefById` (no arithmetic on the id, no DB change); on-device `قلق · 13:28` with the Arabic date still shown.
+- **Fix 5:** Permanent service-level test `test/backup_feelings_service_test.dart` (one declaration) exercises export → fresh-db apply → reapply dedup → older-file compatibility through the production `BackupService`; the throwaway probe remains outside the repo.
+- **Fix 3:** README Build-section test count `1950` → `1975` (measured final), updated last; single-line diff.
+- **Not changed:** 16 references, verified excerpts, migration semantics, playback implementation, unrelated pre-existing tests.
+- **Step 0 evidence:** worktree at `9649553d` confirmed the `tap()` warning pre-exists; English surah names come from `Surahs.name_en`; the global ayah id was visible in `q46_list.png`; census before edits = 62 M + 9 ?? (git status).
+- **Gates (after fixes):** analyze 0 · format 0 changed · gen-l10n clean · full `flutter test` **1975 passed / 0 failed / 1975 discovered**, `10:04 +1975: All tests passed!`.
+- **No commit / push / PR / merge / tag.** HEAD `9649553d`, all changes uncommitted.
+
+### 2026-11-23 (Q43–Q46 — back-stack test extension, owner-GO'd)
+
+- **Step 0 finding:** `feelings_back_stack_test.dart` started from a stub `Text('HOME-SHELL')`, not the real Q43 screen; the owner authorized extending it (only authorized change this round).
+- **Extension:** the test now starts on the Home stub, pushes the REAL `FeelingsScreen` (Q43, assertion `شعورك إيه دلوقتي؟`), taps the `قلق` tile → real `FeelingVersesScreen` (Q44), taps `اقرأ وتدبر` → Ar-Ra'd 28, taps the real Next-verse button → At-Talaq 2, then three pops assert Ar-Ra'd 28 → Q44 → Q43 (`AppRoutes.feelings` + the Q43 title present). No stub destination inside the chain; no app-exit assertion added.
+- **Real GoRouter** with the production feelings paths; real production screens; only the cubits are seeded from a fake repo. `ensureVisible` used for the off-viewport `قلق` tile.
+- **Census note (Step 0):** before this fix pass = 62 M + 9 untracked top-level entries (from the preserved earlier `git status --short` output in the session transcript; not reconstructed); after = 62 M + 10 untracked (measured directly). The added untracked file is `test/backup_feelings_service_test.dart`. `test/support/host.dart` and the generated `app_localizations*.dart` were already M before this pass.
+- **`_labels` resolution:** the round-1 evidence pack proposed inserting `'آيات لشعورك'` after `'أسماء الله الحسنى'`; the owner's corrected GO placed it in render order after `'العلامات المرجعية'`, which is the actual current source (verified against `git show HEAD:test/home_dashboard_visual_test.dart`). No further change made.
+- **No README change this round** — the count is verified by the final full run before any conditional edit.
+- **Final gates after the extension:** analyze 0 · `dart format --output=none --set-exit-if-changed test/features/feelings/feelings_back_stack_test.dart` → `Formatted 1 file (0 changed)` · gen-l10n clean (l10n working-tree state identical before/after) · full `flutter test` **1975 passed / 0 failed / 1975 discovered** (`06:42 +1975: All tests passed!`). The extended test passed in-suite at `02:43 +610`. Count unchanged (declaration extended, not added); README stays `1975`.
+- **Census after edits:** 62 M + 10 untracked, measured directly. No commit / push / PR / merge / tag; HEAD `9649553d`.

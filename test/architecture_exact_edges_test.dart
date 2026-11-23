@@ -67,7 +67,7 @@ void main() {
     );
   });
 
-  test('the live cross-feature edges are exactly the ratified two', () {
+  test('the live cross-feature edges are exactly the ratified three', () {
     final live = <String>{};
     sources.forEach((rel, src) {
       if (!rel.startsWith('lib/features/')) return;
@@ -80,7 +80,7 @@ void main() {
     });
     expect(
       live,
-      {'quran->library', 'quran->recitation'},
+      {'quran->library', 'quran->recitation', 'feelings->quran'},
       reason:
           'a new feature-to-feature dependency needs a conscious '
           'architecture decision; keep this set exact',

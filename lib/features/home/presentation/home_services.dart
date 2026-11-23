@@ -74,7 +74,10 @@ const List<_Service> _quranServices = [
     label: _locBookmarks,
     route: AppRoutes.bookmarks,
   ),
+  (icon: Icons.spa, label: _locFeelings, route: AppRoutes.feelings),
 ];
+
+String _locFeelings(AppLocalizations loc) => loc.feelingsHomeTitle;
 
 const List<_Service> _worshipServices = [
   (icon: Icons.schedule, label: _locPrayerTimes, route: AppRoutes.prayerTimes),

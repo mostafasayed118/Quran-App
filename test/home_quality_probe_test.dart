@@ -170,7 +170,7 @@ void main() {
     await pumpHome(tester, cubit, textScaler: const TextScaler.linear(2.0));
 
     expect(tester.takeException(), isNull);
-    expect(find.byType(ServiceTile), findsNWidgets(15));
+    expect(find.byType(ServiceTile), findsNWidgets(16));
     // Row 1 is Qur'an + recitations; bookmarks must wrap to row 2.
     final first = tester.getTopLeft(find.text('القرآن الكريم')).dy;
     final third = tester.getTopLeft(find.text('العلامات المرجعية')).dy;
