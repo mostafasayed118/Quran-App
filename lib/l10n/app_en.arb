@@ -880,5 +880,72 @@
   "updateRecommendedBody": "A newer version is available. We recommend updating for the latest improvements and fixes.",
   "updateNow": "Update now",
   "updateLater": "Later",
-  "updateUnavailable": "Could not open the store. You can update from the app's Play Store page."
+  "updateUnavailable": "Could not open the store. You can update from the app's Play Store page.",
+  "feelingsTitle": "How are you feeling?",
+  "feelingsSubtitle": "Pick a feeling and we will show you verses that calm your heart",
+  "feelingsHomeTitle": "Verses for your feeling",
+  "feelingsHomeSubtitle": "Verses that calm your heart, by feeling",
+  "feelingsAyahOfDay": "Verse of the day",
+  "feelingsReadAyah": "Read verse",
+  "feelingsSectionTitle": "Feelings and states",
+  "feelingsCount": "{count} feelings",
+  "@feelingsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "feelingsTwoVerses": "Two verses",
+  "feelingsFooterNote": "Verses are from the Quran. Tap any verse to read and reflect",
+  "feelingsSavedButton": "My saved verses",
+  "feelingsSavedCount": "{count} verses",
+  "@feelingsSavedCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "feelingQalaq": "Anxiety",
+  "feelingHuzn": "Sadness",
+  "feelingWahda": "Loneliness",
+  "feelingHayra": "Confusion",
+  "feelingKhawf": "Fear",
+  "feelingGhadab": "Anger",
+  "feelingImtinam": "Gratitude",
+  "feelingAmal": "Hope",
+  "feelingsQalaqSubtitle": "Two verses that calm your heart",
+  "feelingsGenericSubtitle": "Two verses from the Quran",
+  "feelingsReadAndReflect": "Read and reflect",
+  "feelingsAnother": "Another feeling",
+  "feelingsTadabburTitle": "Reflection and a touch of calm",
+  "feelingsTadabburCopy": "Tranquility is not the absence of worry, but remembering Allah with the worry. Whenever your chest tightens, return to remembrance.",
+  "feelingsSave": "Save",
+  "feelingsSaved": "Saved",
+  "feelingsShare": "Share",
+  "feelingsListen": "Listen",
+  "feelingsStop": "Stop",
+  "feelingsCopy": "Copy",
+  "feelingsCopied": "Copied",
+  "feelingsAdded": "Added to saved verses",
+  "feelingsRemoved": "Removed from saved verses",
+  "feelingsNextVerse": "Next verse",
+  "feelingsTadabburScreenTitle": "Verse reflection",
+  "feelingsEmpty": "Tap the save icon on any verse to keep it here",
+  "feelingsDelete": "Delete",
+  "feelingsLoadFailed": "Could not load content. Please try again.",
+  "feelingsInvalidParams": "The required data is invalid.",
+  "feelingsRefLine": "Surah {surah}, Ayah {ayah}",
+  "@feelingsRefLine": {
+    "placeholders": {
+      "surah": { "type": "String" },
+      "ayah": { "type": "int" }
+    }
+  },
+  "feelingsMetaLine": "Surah {surah} • Ayah {ayah} • Juz {juz}",
+  "@feelingsMetaLine": {
+    "placeholders": {
+      "surah": { "type": "String" },
+      "ayah": { "type": "int" },
+      "juz": { "type": "int" }
+    }
+  },
+  "feelingsHeroSurah": "Ar-Ra'd"
 }

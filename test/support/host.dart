@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:quran_yahdi/core/theme/app_theme.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
@@ -43,6 +44,26 @@ Widget appShell({
   );
   return wrap == null ? app : wrap(app);
 }
+
+/// Canonical routed shell: a [MaterialApp.router] driven by [router] with the
+/// same locale / theme / delegate decisions as [appShell]. Route-stack tests
+/// that own a real GoRouter build the app through this helper.
+Widget routedAppShell({
+  required GoRouter router,
+  Locale locale = const Locale('ar'),
+  ThemeData? theme,
+}) => MaterialApp.router(
+  routerConfig: router,
+  locale: locale,
+  supportedLocales: const [Locale('ar'), Locale('en')],
+  localizationsDelegates: const [
+    AppLocalizations.delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+  theme: theme ?? AppTheme.light,
+);
 
 /// Pumps [appShell] and settles unless [settle] is false (bounded-pump sites
 /// keep their own pump sequence).

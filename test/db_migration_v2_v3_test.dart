@@ -124,7 +124,7 @@ void main() {
     // Reopening must not throw ("index ... already exists").
     final v3 = AppDatabase(NativeDatabase(file));
     try {
-      expect(await _userVersion(v3), 3);
+      expect(await _userVersion(v3), 4);
       expect(await v3.select(v3.bookmarks).get(), hasLength(1));
       expect(await v3.select(v3.downloads).get(), hasLength(1));
       expect(await _uniqueIndexExists(v3, 'idx_bookmarks_ayah'), isTrue);
@@ -138,7 +138,7 @@ void main() {
     final file = await _tempDbFile();
     final db = AppDatabase(NativeDatabase(file));
     try {
-      expect(await _userVersion(db), 3);
+      expect(await _userVersion(db), 4);
       expect(await _tableExists(db, 'ayah_search'), isTrue);
       expect(await _tableExists(db, 'hadith_entries'), isTrue);
       expect(await _indexExists(db, 'idx_ayahs_surah'), isTrue);
@@ -170,7 +170,7 @@ void main() {
 
     final second = AppDatabase(NativeDatabase(file));
     try {
-      expect(await _userVersion(second), 3);
+      expect(await _userVersion(second), 4);
       expect(await second.select(second.bookmarks).get(), hasLength(1));
       expect(await second.select(second.settingsTable).get(), hasLength(1));
     } finally {

@@ -9,7 +9,11 @@ import 'package:path/path.dart' as p;
 /// never let this set grow to match the tree. Reconciled 2026-10-28, pruning
 /// the 9 dead permissions that had accumulated since the 2026-10-19 first run;
 /// the pinned set below is what `lib/` actually contains.
-const Set<String> allowedFeatureEdges = {'quran->library', 'quran->recitation'};
+const Set<String> allowedFeatureEdges = {
+  'quran->library',
+  'quran->recitation',
+  'feelings->quran',
+};
 
 /// Feature data files that legitimately need a Flutter platform API.
 ///
@@ -54,6 +58,7 @@ const Map<String, String> appLayerFiles = {
   'lib/app/routes/recitation_routes.dart': 'recitation route group (part)',
   'lib/app/routes/settings_routes.dart': 'settings route group (part)',
   'lib/app/routes/worship_routes.dart': 'worship route group (part)',
+  'lib/app/routes/feelings_routes.dart': 'feelings route group (part)',
   'lib/app/splash_screen.dart': 'first-frame splash',
   'lib/app/version_gate.dart': 'router-facing force-update redirect',
 };

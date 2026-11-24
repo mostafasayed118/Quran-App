@@ -1,5 +1,15 @@
 part of 'injector.dart';
 
+void _registerFeelings(AppDatabase db) {
+  getIt.registerLazySingleton<FeelingsRepository>(
+    () => FeelingsRepository(
+      db,
+      getIt<UthmaniTextSource>(),
+      getIt<AyahRepository>(),
+    ),
+  );
+}
+
 void _registerQuran(AppDatabase db) {
   getIt.registerLazySingleton<SurahRepository>(() => SurahRepository(db));
   getIt.registerLazySingleton<SurahSource>(() => getIt<SurahRepository>());

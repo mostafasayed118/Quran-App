@@ -70,6 +70,12 @@ philosophy.
 | `test/backup_merge_validation_test.dart` | the accepted/rejected id bounds |
 | `test/theme_typography_test.dart` | the Cairo weight census |
 | `test/security_platform_config_test.dart` | the manifest/SDK pins |
+| `test/architecture_exact_edges_test.dart` | the live cross-feature edge set |
+| `test/architecture_guard_test.dart` | allowed cross-feature edges + pinned lib/app/ file set |
+| `test/db_migration_test.dart` | table count of the current schema |
+| `test/db_migration_v2_v3_test.dart` | terminal schema-version literals only; the historical v2 to v3 step assertions stay Class A |
+| `test/home_dashboard_visual_test.dart` | additions to the dashboard destination label set only (no section header is edited) |
+| `test/home_quality_probe_test.dart` | service-tile count |
 
 Anything not in this table is Class A by default. Adding a file to this table is itself a
 Class B edit (append-only, no removal): a pin only graduates to Class B when it asserts a set

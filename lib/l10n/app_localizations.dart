@@ -2773,6 +2773,270 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تعذر فتح المتجر. يمكنك التحديث من صفحة التطبيق على متجر Play.'**
   String get updateUnavailable;
+
+  /// No description provided for @feelingsTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'شعورك إيه دلوقتي؟'**
+  String get feelingsTitle;
+
+  /// No description provided for @feelingsSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'اختار شعورك، ونعرض لك آيات من القرآن تطمئن قلبك'**
+  String get feelingsSubtitle;
+
+  /// No description provided for @feelingsHomeTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيات لشعورك'**
+  String get feelingsHomeTitle;
+
+  /// No description provided for @feelingsHomeSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيات تطمئن قلبك حسب شعورك'**
+  String get feelingsHomeSubtitle;
+
+  /// No description provided for @feelingsAyahOfDay.
+  ///
+  /// In ar, this message translates to:
+  /// **'آية اليوم'**
+  String get feelingsAyahOfDay;
+
+  /// No description provided for @feelingsReadAyah.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ الآية'**
+  String get feelingsReadAyah;
+
+  /// No description provided for @feelingsSectionTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'المشاعر والأحوال'**
+  String get feelingsSectionTitle;
+
+  /// No description provided for @feelingsCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} مشاعر'**
+  String feelingsCount(int count);
+
+  /// No description provided for @feelingsTwoVerses.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيتان'**
+  String get feelingsTwoVerses;
+
+  /// No description provided for @feelingsFooterNote.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآيات من المصحف، اضغط على أي آية لقراءتها وتدبرها'**
+  String get feelingsFooterNote;
+
+  /// No description provided for @feelingsSavedButton.
+  ///
+  /// In ar, this message translates to:
+  /// **'آياتي المحفوظة'**
+  String get feelingsSavedButton;
+
+  /// No description provided for @feelingsSavedCount.
+  ///
+  /// In ar, this message translates to:
+  /// **'{count} آيات'**
+  String feelingsSavedCount(int count);
+
+  /// No description provided for @feelingQalaq.
+  ///
+  /// In ar, this message translates to:
+  /// **'قلق'**
+  String get feelingQalaq;
+
+  /// No description provided for @feelingHuzn.
+  ///
+  /// In ar, this message translates to:
+  /// **'حزن'**
+  String get feelingHuzn;
+
+  /// No description provided for @feelingWahda.
+  ///
+  /// In ar, this message translates to:
+  /// **'وحدة'**
+  String get feelingWahda;
+
+  /// No description provided for @feelingHayra.
+  ///
+  /// In ar, this message translates to:
+  /// **'حيرة'**
+  String get feelingHayra;
+
+  /// No description provided for @feelingKhawf.
+  ///
+  /// In ar, this message translates to:
+  /// **'خوف'**
+  String get feelingKhawf;
+
+  /// No description provided for @feelingGhadab.
+  ///
+  /// In ar, this message translates to:
+  /// **'غضب'**
+  String get feelingGhadab;
+
+  /// No description provided for @feelingImtinam.
+  ///
+  /// In ar, this message translates to:
+  /// **'امتنان'**
+  String get feelingImtinam;
+
+  /// No description provided for @feelingAmal.
+  ///
+  /// In ar, this message translates to:
+  /// **'أمل'**
+  String get feelingAmal;
+
+  /// No description provided for @feelingsQalaqSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيتان تطمئنان قلبك'**
+  String get feelingsQalaqSubtitle;
+
+  /// No description provided for @feelingsGenericSubtitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'آيتان من القرآن'**
+  String get feelingsGenericSubtitle;
+
+  /// No description provided for @feelingsReadAndReflect.
+  ///
+  /// In ar, this message translates to:
+  /// **'اقرأ وتدبر'**
+  String get feelingsReadAndReflect;
+
+  /// No description provided for @feelingsAnother.
+  ///
+  /// In ar, this message translates to:
+  /// **'شعور تاني'**
+  String get feelingsAnother;
+
+  /// No description provided for @feelingsTadabburTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تدبر الآية ولمسة السكينة'**
+  String get feelingsTadabburTitle;
+
+  /// No description provided for @feelingsTadabburCopy.
+  ///
+  /// In ar, this message translates to:
+  /// **'الطمأنينة ليست في زوال الهم، بل في ذكر الله مع الهم، فكلما ضاق صدرك، فارجع إلى الذكر.'**
+  String get feelingsTadabburCopy;
+
+  /// No description provided for @feelingsSave.
+  ///
+  /// In ar, this message translates to:
+  /// **'حفظ'**
+  String get feelingsSave;
+
+  /// No description provided for @feelingsSaved.
+  ///
+  /// In ar, this message translates to:
+  /// **'محفوظة'**
+  String get feelingsSaved;
+
+  /// No description provided for @feelingsShare.
+  ///
+  /// In ar, this message translates to:
+  /// **'مشاركة'**
+  String get feelingsShare;
+
+  /// No description provided for @feelingsListen.
+  ///
+  /// In ar, this message translates to:
+  /// **'استماع'**
+  String get feelingsListen;
+
+  /// No description provided for @feelingsStop.
+  ///
+  /// In ar, this message translates to:
+  /// **'إيقاف'**
+  String get feelingsStop;
+
+  /// No description provided for @feelingsCopy.
+  ///
+  /// In ar, this message translates to:
+  /// **'نسخ'**
+  String get feelingsCopy;
+
+  /// No description provided for @feelingsCopied.
+  ///
+  /// In ar, this message translates to:
+  /// **'تم النسخ'**
+  String get feelingsCopied;
+
+  /// No description provided for @feelingsAdded.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت الإضافة إلى الآيات المحفوظة'**
+  String get feelingsAdded;
+
+  /// No description provided for @feelingsRemoved.
+  ///
+  /// In ar, this message translates to:
+  /// **'تمت إزالة الحفظ'**
+  String get feelingsRemoved;
+
+  /// No description provided for @feelingsNextVerse.
+  ///
+  /// In ar, this message translates to:
+  /// **'الآية التالية'**
+  String get feelingsNextVerse;
+
+  /// No description provided for @feelingsTadabburScreenTitle.
+  ///
+  /// In ar, this message translates to:
+  /// **'تدبر الآية'**
+  String get feelingsTadabburScreenTitle;
+
+  /// No description provided for @feelingsEmpty.
+  ///
+  /// In ar, this message translates to:
+  /// **'اضغط على أيقونة الحفظ في أي آية لتحفظها هنا'**
+  String get feelingsEmpty;
+
+  /// No description provided for @feelingsDelete.
+  ///
+  /// In ar, this message translates to:
+  /// **'حذف'**
+  String get feelingsDelete;
+
+  /// No description provided for @feelingsLoadFailed.
+  ///
+  /// In ar, this message translates to:
+  /// **'تعذر تحميل المحتوى. حاول مرة أخرى.'**
+  String get feelingsLoadFailed;
+
+  /// No description provided for @feelingsInvalidParams.
+  ///
+  /// In ar, this message translates to:
+  /// **'البيانات المطلوبة غير صحيحة.'**
+  String get feelingsInvalidParams;
+
+  /// No description provided for @feelingsRefLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah}، الآية {ayah}'**
+  String feelingsRefLine(String surah, int ayah);
+
+  /// No description provided for @feelingsMetaLine.
+  ///
+  /// In ar, this message translates to:
+  /// **'سورة {surah} • الآية {ayah} • الجزء {juz}'**
+  String feelingsMetaLine(String surah, int ayah, int juz);
+
+  /// No description provided for @feelingsHeroSurah.
+  ///
+  /// In ar, this message translates to:
+  /// **'الرعد'**
+  String get feelingsHeroSurah;
 }
 
 class _AppLocalizationsDelegate

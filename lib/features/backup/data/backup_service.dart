@@ -140,6 +140,7 @@ class BackupService {
 
   Future<BackupData> _gather() async {
     final bookmarkRows = await _db.select(_db.bookmarks).get();
+    final feelingRows = await _db.select(_db.feelingSavedVerses).get();
     final khatmaRow = await _db.select(_db.khatmaProgress).getSingleOrNull();
     final prayerRows = await _db.select(_db.prayerLog).get();
     final lastReadRow = await _readSetting(backupKeyLastReadAyahId);
@@ -152,6 +153,14 @@ class BackupService {
       bookmarks: [
         for (final row in bookmarkRows)
           BackupBookmark(ayahId: row.ayahId, createdAt: row.createdAt),
+      ],
+      feelingSavedVerses: [
+        for (final row in feelingRows)
+          BackupSavedFeelingVerse(
+            ayahId: row.ayahId,
+            feeling: row.feeling,
+            createdAt: row.createdAt,
+          ),
       ],
       lastReadAyahId: int.tryParse(lastReadRow?.value ?? ''),
       khatma: [
@@ -231,6 +240,7 @@ class BackupService {
 
   Future<_ApplyPlan> _planFor(BackupData data) async {
     final bookmarkRows = await _db.select(_db.bookmarks).get();
+    final feelingRows = await _db.select(_db.feelingSavedVerses).get();
     final khatmaRow = await _db.select(_db.khatmaProgress).getSingleOrNull();
     final prayerRows = await _db.select(_db.prayerLog).get();
     final lastReadRow = await _readSetting(backupKeyLastReadAyahId);
@@ -243,6 +253,10 @@ class BackupService {
       bookmarks: mergeBookmarks(
         existingAyahIds: {for (final row in bookmarkRows) row.ayahId},
         imported: data.bookmarks,
+      ),
+      feelingSavedVerses: mergeSavedFeelingVerses(
+        existingAyahIds: {for (final row in feelingRows) row.ayahId},
+        imported: data.feelingSavedVerses,
       ),
       lastRead: mergeLastRead(
         existing: int.tryParse(lastReadRow?.value ?? ''),
@@ -295,6 +309,15 @@ class BackupService {
         ),
     ];
 
+    final feelingVerses = <FeelingSavedVersesCompanion>[
+      for (final row in plan.feelingSavedVerses.toInsert)
+        FeelingSavedVersesCompanion.insert(
+          ayahId: row.ayahId,
+          feeling: row.feeling,
+          createdAt: Value(row.createdAt),
+        ),
+    ];
+
     final prayerDays = <PrayerLogCompanion>[
       for (final day in plan.prayerLog.daysToWrite)
         PrayerLogCompanion.insert(
@@ -343,12 +366,16 @@ class BackupService {
     final khatmaRowId = plan.khatmaRowId;
     final totalWrites =
         bookmarks.length +
+        feelingVerses.length +
         prayerDays.length +
         settings.length +
         (khatmaWrite == null ? 0 : 1);
     if (totalWrites < _threshold) {
       for (final bookmark in bookmarks) {
         await _db.into(_db.bookmarks).insert(bookmark);
+      }
+      for (final row in feelingVerses) {
+        await _db.into(_db.feelingSavedVerses).insert(row);
       }
       if (khatmaWrite != null) {
         await _writeKhatma(khatmaWrite, khatmaRowId);
@@ -364,6 +391,7 @@ class BackupService {
 
     await _db.batch((batch) {
       batch.insertAll(_db.bookmarks, bookmarks);
+      batch.insertAll(_db.feelingSavedVerses, feelingVerses);
       if (khatmaWrite != null) {
         if (khatmaRowId != null) {
           batch.update(

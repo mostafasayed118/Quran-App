@@ -18,6 +18,7 @@ part 'app_database.g.dart';
     SettingsTable,
     Reciters,
     HadithEntries,
+    FeelingSavedVerses,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -27,13 +28,16 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.test(super.e);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onUpgrade: (migrator, from, to) async {
       if (from < 2) {
         await migrator.createAll();
+      }
+      if (from < 4) {
+        await migrator.createTable(feelingSavedVerses);
       }
       // No v3 step: the derived objects and the duplicate repair are a
       // startup invariant (beforeOpen), guarded by sqlite_master so a
@@ -87,6 +91,19 @@ class AppDatabase extends _$AppDatabase {
       await customStatement(
         'CREATE UNIQUE INDEX idx_bookmarks_ayah '
         'ON bookmarks(ayah_id)',
+      );
+    }
+    // One saved feelings verse per ayah: a duplicate save must not create two
+    // rows. Existing duplicates (if any) keep the oldest row.
+    if (!await _uniqueIndexExists('idx_feeling_saved_ayah')) {
+      await customStatement('DROP INDEX IF EXISTS idx_feeling_saved_ayah');
+      await customStatement(
+        'DELETE FROM feeling_saved_verses WHERE id NOT IN '
+        '(SELECT MIN(id) FROM feeling_saved_verses GROUP BY ayah_id)',
+      );
+      await customStatement(
+        'CREATE UNIQUE INDEX idx_feeling_saved_ayah '
+        'ON feeling_saved_verses(ayah_id)',
       );
     }
     // One download per (reciter, surah) is a user-visible invariant: the row

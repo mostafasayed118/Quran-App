@@ -16,6 +16,19 @@ class BackupBookmark {
   final DateTime createdAt;
 }
 
+/// One verse saved from a feelings screen — `feeling_saved_verses`.
+class BackupSavedFeelingVerse {
+  const BackupSavedFeelingVerse({
+    required this.ayahId,
+    required this.feeling,
+    required this.createdAt,
+  });
+
+  final int ayahId;
+  final String feeling;
+  final DateTime createdAt;
+}
+
 /// One khatma/wird plan row — `khatma_progress` (single row by invariant).
 class BackupKhatmaRow {
   /// The exported khatma plan row.
@@ -88,6 +101,7 @@ class BackupData {
     required this.prayerLog,
     required this.tasbih,
     required this.settings,
+    this.feelingSavedVerses = const [],
   });
 
   /// Exported bookmarks.
@@ -107,6 +121,9 @@ class BackupData {
 
   /// Exported settings, key to raw string value.
   final Map<String, String> settings;
+
+  /// Saved feelings verses. Absent in older files → treated as empty.
+  final List<BackupSavedFeelingVerse> feelingSavedVerses;
 }
 
 /// A decoded, typed backup document (wrapper metadata + typed data).
@@ -181,6 +198,7 @@ class BackupSummary {
     required this.settingsKeysApplied,
     this.rejectedEntries = 0,
     this.skippedSettingsDocuments = 0,
+    this.newSavedFeelingVerses = 0,
   });
 
   /// New bookmarks a merge would add (existing rows stay).
@@ -212,6 +230,9 @@ class BackupSummary {
   /// Nothing is applied from those documents; the local value stays. The
   /// preview surfaces the count so the merge is not silent about it.
   final int skippedSettingsDocuments;
+
+  /// New feelings saved verses a merge would add.
+  final int newSavedFeelingVerses;
 
   /// True when the import changed nothing at all.
   bool get isEmpty =>

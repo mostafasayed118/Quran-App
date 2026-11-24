@@ -50,6 +50,11 @@ abstract final class AppRoutes {
   static const onboardingCity = '/onboarding/city';
   static const bookmarks = '/bookmarks';
   static const bookmarksFolder = '/bookmarks/folder';
+
+  static const feelings = '/feelings';
+  static const feelingsVerses = '/feelings/verses';
+  static const feelingsVerse = '/feelings/verse';
+  static const feelingsSaved = '/feelings/saved';
 }
 
 abstract final class AppRouteQuery {
@@ -59,6 +64,7 @@ abstract final class AppRouteQuery {
   static const row = 'row';
   static const q = 'q';
   static const name = 'name';
+  static const feeling = 'feeling';
 }
 
 /// `/quran/search[?q={query}]`
@@ -91,3 +97,14 @@ String reciterSurahsPath(String rowId) =>
 String bookmarksFolderPath(String name) =>
     '${AppRoutes.bookmarksFolder}?${AppRouteQuery.name}='
     '${Uri.encodeQueryComponent(name)}';
+
+/// `/feelings/verses?feeling={key}`
+String feelingsVersesPath(String feelingKey) =>
+    '${AppRoutes.feelingsVerses}?${AppRouteQuery.feeling}='
+    '${Uri.encodeQueryComponent(feelingKey)}';
+
+/// `/feelings/verse?surah={n}&ayah={n}&feeling={key}`
+String feelingsVersePath(int surah, int ayah, String feelingKey) =>
+    '${AppRoutes.feelingsVerse}?${AppRouteQuery.surah}=$surah'
+    '&${AppRouteQuery.ayah}=$ayah'
+    '&${AppRouteQuery.feeling}=${Uri.encodeQueryComponent(feelingKey)}';

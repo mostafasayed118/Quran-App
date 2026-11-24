@@ -43,6 +43,7 @@ import 'package:quran_yahdi/features/azkar/data/azkar_saved_state_repository.dar
 import 'package:quran_yahdi/features/backup/data/backup_service.dart';
 import 'package:quran_yahdi/features/duas/data/dua_repository.dart';
 import 'package:quran_yahdi/features/duas/data/ruqyah_repository.dart';
+import 'package:quran_yahdi/features/feelings/data/feelings_repository.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_offset_repository.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_offset_source.dart';
 import 'package:quran_yahdi/features/hijri/data/hijri_service.dart';
@@ -167,6 +168,7 @@ Future<void> configureDependencies({
   final db = getIt<AppDatabase>();
 
   _registerQuran(db);
+  _registerFeelings(db);
   _registerRecitation(db, audioRootResolver);
   _registerPrayerAndNotifications(db, citiesLoader);
   _registerWorship(db, azkarLoader, duasLoader, ruqyahLoader, asmaLoader);

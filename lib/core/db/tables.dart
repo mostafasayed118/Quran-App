@@ -173,6 +173,24 @@ class Reciters extends Table {
 /// The pack JSON stays the canonical downloaded artifact; this table is a
 /// derived read index so a browse page can use SQL LIMIT/OFFSET instead of
 /// retaining the whole decoded pack in memory.
+/// Feelings feature: one row per ayah saved from a feelings screen.
+///
+/// Mirrors [Bookmarks] (global ayah id, write-time default) plus the stable
+/// feeling key the ayah was saved from. Unique by ayah so a duplicate save
+/// cannot create two rows.
+class FeelingSavedVerses extends Table {
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Global ayah number, 1..6236.
+  IntColumn get ayahId => integer()();
+
+  /// Stable feeling key (see FeelingKey.value).
+  TextColumn get feeling => text()();
+
+  /// When the ayah was saved (defaults to write time).
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+}
+
 class HadithEntries extends Table {
   /// Catalog id of the owning hadith pack.
   TextColumn get packId => text()();
