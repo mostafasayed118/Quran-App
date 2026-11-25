@@ -3,14 +3,14 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 
-/// Exact dependency pins that complement `architecture_guard_test.dart`.
+/// Independent exact dependency pins that back up `architecture_guard_test.dart`.
 ///
-/// The guard's allowlist is deliberately permissive (a superset of the live
-/// edges), so a new edge between two already-listed features could pass
-/// silently. These tests pin the live set instead, and assert the one rule
-/// the guard does not cover: `lib/core` never imports a feature.
+/// The guard pins the same two invariants against its own scan. This file
+/// re-derives them with a separate scanner, so a resolver bug in either one
+/// cannot hide a violation: the live cross-feature edge set must stay exactly
+/// the ratified three, and `lib/core` must never import a feature.
 
-final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
+final _importRe = RegExp(r"""(?:import|export)\s+['"]([^'"]+)['"]""");
 
 String? _resolveTarget(String fileRel, String import) {
   if (import.startsWith('package:quran_yahdi/')) {
