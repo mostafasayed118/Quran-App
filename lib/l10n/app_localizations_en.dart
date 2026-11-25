@@ -923,6 +923,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupPassphraseEmpty => 'A passphrase is required';
 
   @override
+  String get backupPassphraseTooShort =>
+      'The passphrase is too short — use at least 8 characters';
+
+  @override
   String get backupImportPassphraseTitle => 'This backup is encrypted';
 
   @override

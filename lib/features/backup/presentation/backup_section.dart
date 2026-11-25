@@ -10,6 +10,7 @@ import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/error_strip.dart';
 import '../../../core/widgets/section_header.dart';
 import '../../../l10n/app_localizations.dart';
+import '../data/backup_crypto.dart' show kBackupMinPassphraseLength;
 import '../data/backup_merger.dart';
 import 'backup_cubit.dart';
 import 'backup_state.dart';
@@ -275,6 +276,12 @@ class _ExportPassphraseDialogState extends State<_ExportPassphraseDialog> {
     final second = _confirm.text;
     if (first.isEmpty) {
       setState(() => _error = loc.backupPassphraseEmpty);
+      return;
+    }
+    // Creation-time floor only: the import prompt accepts any length, so a
+    // backup made by an older build with a short passphrase still opens.
+    if (first.length < kBackupMinPassphraseLength) {
+      setState(() => _error = loc.backupPassphraseTooShort);
       return;
     }
     if (first != second) {

@@ -57,6 +57,14 @@ const String kEncryptedBackupFormatV1 = 'quran_yahdi_backup_encrypted_v1';
 /// The app field of an encrypted envelope.
 const String kEncryptedBackupApp = kBackupAppId;
 
+/// The shortest passphrase a NEW backup may be encrypted with.
+///
+/// Creation-time policy only: the importer never applies it, so a backup
+/// written by an earlier build with a shorter passphrase still opens. Argon2id
+/// raises the guessing cost per attempt but cannot make a weak passphrase
+/// strong — eight characters is a floor, not a guarantee.
+const int kBackupMinPassphraseLength = 8;
+
 /// The KDF ids the reader understands.
 const String _kdfArgon2id = 'argon2id';
 const String _kdfPbkdf2HmacSha256 = 'pbkdf2-hmac-sha256';
