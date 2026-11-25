@@ -251,16 +251,12 @@ class ReaderCubit extends Cubit<ReaderState> {
     }
   }
 
-  /// Sets the reader font scale (0.8–2.0); a failed write keeps the on-screen
-  /// value and only logs.
-  Future<void> setFontScale(double scale) async {
-    final current = state;
-    if (current is! ReaderReady || isClosed) return;
-    final safe = scale < 0.8 ? 0.8 : (scale > 2.0 ? 2.0 : scale);
-    if (safe == current.fontScale) return;
-    emit(current.copyWith(fontScale: safe));
+  static double _clampFontScale(double scale) =>
+      scale < 0.8 ? 0.8 : (scale > 2.0 ? 2.0 : scale);
+
+  Future<void> _persistFontScale(double scale) async {
     try {
-      await _settings?.saveFontScale(safe);
+      await _settings?.saveFontScale(scale);
     } on Object catch (error, stackTrace) {
       appLog(
         'reader font scale write failed',
@@ -269,6 +265,33 @@ class ReaderCubit extends Cubit<ReaderState> {
         stackTrace: stackTrace,
       );
     }
+  }
+
+  /// Preview during a slider drag: updates the visible state only. No write.
+  Future<void> previewFontScale(double scale) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = _clampFontScale(scale);
+    if (safe == current.fontScale) return;
+    emit(current.copyWith(fontScale: safe));
+  }
+
+  /// Commit once when the drag ends: persist the final visible value.
+  Future<void> commitFontScale() async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    await _persistFontScale(current.fontScale);
+  }
+
+  /// Sets the reader font scale (0.8–2.0); a failed write keeps the on-screen
+  /// value and only logs. Retained for non-slider callers and tests.
+  Future<void> setFontScale(double scale) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = _clampFontScale(scale);
+    if (safe == current.fontScale) return;
+    emit(current.copyWith(fontScale: safe));
+    await _persistFontScale(safe);
   }
 
   Future<double> _loadLineHeight() async {
@@ -286,20 +309,16 @@ class ReaderCubit extends Cubit<ReaderState> {
     }
   }
 
-  /// Sets the reader line height (1.6–3.0); a failed write keeps the
-  /// on-screen value and only logs.
-  Future<void> setLineHeight(double lineHeight) async {
-    final current = state;
-    if (current is! ReaderReady || isClosed) return;
-    final safe = lineHeight < ReaderLayoutSource.minLineHeight
-        ? ReaderLayoutSource.minLineHeight
-        : (lineHeight > ReaderLayoutSource.maxLineHeight
-              ? ReaderLayoutSource.maxLineHeight
-              : lineHeight);
-    if (safe == current.lineHeight) return;
-    emit(current.copyWith(lineHeight: safe));
+  static double _clampLineHeight(double lineHeight) =>
+      lineHeight < ReaderLayoutSource.minLineHeight
+      ? ReaderLayoutSource.minLineHeight
+      : (lineHeight > ReaderLayoutSource.maxLineHeight
+            ? ReaderLayoutSource.maxLineHeight
+            : lineHeight);
+
+  Future<void> _persistLineHeight(double lineHeight) async {
     try {
-      await _layout?.saveLineHeight(safe);
+      await _layout?.saveLineHeight(lineHeight);
     } on Object catch (error, stackTrace) {
       appLog(
         'reader line height write failed',
@@ -308,6 +327,33 @@ class ReaderCubit extends Cubit<ReaderState> {
         stackTrace: stackTrace,
       );
     }
+  }
+
+  /// Preview during a slider drag: updates the visible state only. No write.
+  Future<void> previewLineHeight(double lineHeight) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = _clampLineHeight(lineHeight);
+    if (safe == current.lineHeight) return;
+    emit(current.copyWith(lineHeight: safe));
+  }
+
+  /// Commit once when the drag ends: persist the final visible value.
+  Future<void> commitLineHeight() async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    await _persistLineHeight(current.lineHeight);
+  }
+
+  /// Sets the reader line height (1.6–3.0); a failed write keeps the
+  /// on-screen value and only logs. Retained for non-slider callers and tests.
+  Future<void> setLineHeight(double lineHeight) async {
+    final current = state;
+    if (current is! ReaderReady || isClosed) return;
+    final safe = _clampLineHeight(lineHeight);
+    if (safe == current.lineHeight) return;
+    emit(current.copyWith(lineHeight: safe));
+    await _persistLineHeight(safe);
   }
 
   /// The surah + ayah of [page]'s first row; null without a source or on a

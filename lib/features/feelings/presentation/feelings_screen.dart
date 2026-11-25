@@ -11,6 +11,7 @@ import 'package:quran_yahdi/core/widgets/error_pane.dart';
 import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import '../domain/feeling.dart';
 import 'feelings_cubit.dart';
 import 'feelings_icons.dart';
 import 'feelings_state.dart';
@@ -32,53 +33,47 @@ class FeelingsScreen extends StatelessWidget {
               loc,
               onRetry: context.read<FeelingsCubit>().start,
             ),
-            FeelingsReady(
-              :final feelings,
-              :final heroExcerpt,
-              :final savedCount,
-            ) =>
-              ListView(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                children: [
-                  Text(loc.feelingsSubtitle),
-                  const SizedBox(height: AppSpacing.lg),
-                  _HeroCard(excerpt: heroExcerpt, reference: '13:28'),
-                  const SizedBox(height: AppSpacing.lg),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(loc.feelingsSectionTitle),
-                      Text(loc.feelingsCount(feelings.length)),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    mainAxisSpacing: AppSpacing.sm,
-                    crossAxisSpacing: AppSpacing.sm,
-                    children: [
-                      for (final feeling in feelings)
-                        _FeelingTile(
-                          icon: feelingIcon(feeling.iconName),
-                          label: _feelingName(loc, feeling.key.value),
-                          onTap: () => context.push(
-                            feelingsVersesPath(feeling.key.value),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(loc.feelingsFooterNote),
-                  const SizedBox(height: AppSpacing.md),
-                  OutlinedButton.icon(
-                    onPressed: () => context.push(AppRoutes.feelingsSaved),
-                    icon: const Icon(Icons.bookmark_border),
-                    label: Text(loc.feelingsSavedCount(savedCount)),
-                  ),
-                ],
-              ),
+            FeelingsReady(:final feelings, :final savedCount) => ListView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              children: [
+                Text(loc.feelingsSubtitle),
+                const SizedBox(height: AppSpacing.lg),
+                _HeroCard(verse: FeelingsCatalog.heroVerse),
+                const SizedBox(height: AppSpacing.lg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(loc.feelingsSectionTitle),
+                    Text(loc.feelingsCount(feelings.length)),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: 2,
+                  mainAxisSpacing: AppSpacing.sm,
+                  crossAxisSpacing: AppSpacing.sm,
+                  children: [
+                    for (final feeling in feelings)
+                      _FeelingTile(
+                        icon: feelingIcon(feeling.iconName),
+                        label: _feelingName(loc, feeling.key.value),
+                        onTap: () =>
+                            context.push(feelingsVersesPath(feeling.key.value)),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(loc.feelingsFooterNote),
+                const SizedBox(height: AppSpacing.md),
+                OutlinedButton.icon(
+                  onPressed: () => context.push(AppRoutes.feelingsSaved),
+                  icon: const Icon(Icons.bookmark_border),
+                  label: Text(loc.feelingsSavedCount(savedCount)),
+                ),
+              ],
+            ),
           },
         ),
       ),
@@ -98,10 +93,9 @@ String _feelingName(AppLocalizations loc, String key) => switch (key) {
 };
 
 class _HeroCard extends StatelessWidget {
-  const _HeroCard({required this.excerpt, required this.reference});
+  const _HeroCard({required this.verse});
 
-  final String excerpt;
-  final String reference;
+  final FeelingVerse verse;
 
   @override
   Widget build(BuildContext context) {
@@ -123,7 +117,7 @@ class _HeroCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            excerpt,
+            verse.excerpt,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               color: AppColors.mushafCardInk,
@@ -131,13 +125,19 @@ class _HeroCard extends StatelessWidget {
             ),
           ),
           Text(
-            loc.feelingsRefLine(loc.feelingsHeroSurah, 28),
+            loc.feelingsRefLine(loc.feelingsHeroSurah, verse.ayah),
             style: Theme.of(context).textTheme.labelMedium
                 ?.copyWith(color: AppColors.mushafCardMuted),
           ),
           const SizedBox(height: AppSpacing.sm),
           FilledButton(
-            onPressed: () => context.push(feelingsVersePath(13, 28, 'qalaq')),
+            onPressed: () => context.push(
+              feelingsVersePath(
+                verse.surah,
+                verse.ayah,
+                FeelingsCatalog.qalaq.key.value,
+              ),
+            ),
             child: Text(loc.feelingsReadAyah),
           ),
         ],
