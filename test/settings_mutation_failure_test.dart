@@ -6,7 +6,7 @@ import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
-import 'settings_cubit_test.dart' show FakeReminderScheduler;
+import 'support/fake_reminder_scheduler.dart';
 import 'support/fakes.dart';
 import 'support/test_db.dart';
 

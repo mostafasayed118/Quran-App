@@ -5,8 +5,8 @@ import 'package:quran_yahdi/core/utils/arabic_date.dart';
 import 'package:quran_yahdi/core/widgets/app_content_frame.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'feelings_cubit.dart';
 import 'feelings_state.dart';
+import 'saved_verses_cubit.dart';
 
 /// Q46 — saved verses, newest first.
 class SavedVersesScreen extends StatelessWidget {

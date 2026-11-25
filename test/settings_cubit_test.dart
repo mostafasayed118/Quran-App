@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:quran_yahdi/core/db/app_database.dart';
-import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_planner.dart';
 import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
@@ -8,30 +7,9 @@ import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
 import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
+import 'support/fake_reminder_scheduler.dart';
 import 'support/fakes.dart';
 import 'support/test_db.dart';
-
-class FakeReminderScheduler implements ReminderSchedulerPort {
-  final plans = <List<ScheduledReminder>>[];
-  bool permissionsResult = true;
-  int permissionCalls = 0;
-  int scheduleCalls = 0;
-
-  @override
-  Future<bool> ensurePermissions() async {
-    permissionCalls++;
-    return permissionsResult;
-  }
-
-  @override
-  Future<bool> ensureExactAlarms() async => true;
-
-  @override
-  Future<void> scheduleAll(List<ScheduledReminder> reminders) async {
-    scheduleCalls++;
-    plans.add(reminders);
-  }
-}
 
 void main() {
   late AppDatabase db;

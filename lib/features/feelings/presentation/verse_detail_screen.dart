@@ -14,9 +14,9 @@ import 'package:quran_yahdi/l10n/app_localizations.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../domain/feeling.dart';
-import 'feelings_cubit.dart';
 import 'feelings_reference.dart';
 import 'feelings_state.dart';
+import 'verse_detail_cubit.dart';
 
 /// Q45 — full verse with save/share/listen/copy and next-verse navigation.
 class VerseDetailScreen extends StatelessWidget {

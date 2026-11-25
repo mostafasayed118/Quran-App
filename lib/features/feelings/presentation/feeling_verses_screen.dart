@@ -9,7 +9,7 @@ import 'package:quran_yahdi/core/widgets/error_pane.dart';
 import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'feelings_cubit.dart';
+import 'feeling_verses_cubit.dart';
 import 'feelings_reference.dart';
 import 'feelings_state.dart';
 
