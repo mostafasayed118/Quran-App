@@ -63,7 +63,9 @@ const Map<String, String> appLayerFiles = {
   'lib/app/version_gate.dart': 'router-facing force-update redirect',
 };
 
-final _importRe = RegExp(r"(?:import|export)\s+'([^']+)'");
+// Both quote styles: the formatter does not normalise them, so a
+// double-quoted directive is still a real import.
+final _importRe = RegExp(r"""(?:import|export)\s+['"]([^'"]+)['"]""");
 final _flutterImportRe = RegExp(
   r"""import\s+['"](?:package:flutter/|dart:ui)""",
 );

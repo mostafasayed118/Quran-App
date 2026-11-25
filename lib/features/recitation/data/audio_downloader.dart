@@ -368,7 +368,15 @@ class AudioDownloader {
       if (!await file.exists()) return null;
       final value = (await file.readAsString()).trim();
       return value.isEmpty ? null : value;
-    } on Object {
+    } on Object catch (error) {
+      // An unreadable validator only costs a resume: the transfer restarts
+      // from zero, which is always safe. Keep a trace so a persistently
+      // unreadable sidecar is diagnosable instead of invisible.
+      appLog(
+        'download validator read failed',
+        name: 'quran_yahdi/downloads',
+        error: error.runtimeType,
+      );
       return null;
     }
   }

@@ -76,13 +76,16 @@ class _ReminderReliabilitySectionState
       final exactAlarms = await widget.diagnostics.exactAlarmsAllowed();
       final battery = await widget.diagnostics.batteryOptimizationIgnored();
       if (!mounted) return;
+      // Compute before setState: the diagnostic is pure, and doing it inside
+      // the callback would run it during the rebuild boundary for no reason.
+      final issues = diagnoseReminders(
+        notificationsEnabled: notifications,
+        exactAlarmsAllowed: exactAlarms,
+        batteryOptimizationIgnored: battery,
+        scheduleFailed: widget.applyHealth?.lastApplyFailed ?? false,
+      );
       setState(() {
-        _issues = diagnoseReminders(
-          notificationsEnabled: notifications,
-          exactAlarmsAllowed: exactAlarms,
-          batteryOptimizationIgnored: battery,
-          scheduleFailed: widget.applyHealth?.lastApplyFailed ?? false,
-        );
+        _issues = issues;
         _batteryUnknown = battery == null;
         _exactAlarmsAllowed = exactAlarms;
       });

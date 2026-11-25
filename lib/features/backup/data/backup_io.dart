@@ -14,6 +14,31 @@ export 'backup_codec.dart'
 bool exceedsBackupLimit(String json) =>
     utf8.encode(json).length > kBackupMaxBytes;
 
+/// [exceedsBackupLimit] with the byte count taken on a worker isolate.
+///
+/// An encoded document can sit right at the cap, and encoding 2 MB on the UI
+/// isolate stalls the frame just before the share sheet opens. The worker
+/// receives the string and returns one bool, so nothing large travels back.
+///
+/// A `flutter test` build measures inline for the same reason the decode does:
+/// an isolate completion never arrives under the fake clock.
+Future<bool> exceedsBackupLimitAsync(String text) async {
+  if (Platform.environment['FLUTTER_TEST'] == 'true') {
+    return exceedsBackupLimit(text);
+  }
+  try {
+    return await exceedsBackupLimitInIsolate(text);
+  } on Object catch (error, stackTrace) {
+    _logMeasureDegrade(error, stackTrace);
+    return exceedsBackupLimit(text);
+  }
+}
+
+/// The real worker-isolate measure. Exposed so a unit test can prove the
+/// non-test path completes and measures the same bytes as the sync predicate.
+Future<bool> exceedsBackupLimitInIsolate(String text) =>
+    Isolate.run(() => exceedsBackupLimit(text));
+
 /// Decodes the picked backup document.
 ///
 /// An encrypted envelope ([kEncryptedBackupFormat]) needs [passphrase];
@@ -108,6 +133,16 @@ Future<BackupDecodeResult> _decodeInline(
 final List<int> _envelopePrefix = utf8.encode(
   '{"app":"$kEncryptedBackupApp","format":"quran_yahdi_backup_encrypted_v',
 );
+
+/// Logs the size-measure isolate degrade, mirroring [_logDecodeDegrade].
+void _logMeasureDegrade(Object error, StackTrace stackTrace) {
+  appLog(
+    'backup size measure isolate unavailable, measuring inline',
+    name: 'quran_yahdi/backup',
+    error: error.runtimeType,
+    stackTrace: stackTrace,
+  );
+}
 
 /// Logs the isolate-unavailable degrade (kept in its own function, away from
 /// the passphrase-bearing decode lines, so debug logs never capture a value).

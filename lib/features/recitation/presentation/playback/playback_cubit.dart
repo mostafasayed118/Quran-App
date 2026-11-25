@@ -18,6 +18,9 @@ import 'playback_state.dart';
 // imports a drift row; it is re-exported for the frozen recitation doubles.
 export '../../data/playback_row_entry.dart';
 
+part 'playback_controls.dart';
+part 'playback_queue.dart';
+
 /// The player: the current track, its position and the mini player's state.
 class PlaybackCubit extends Cubit<PlaybackState> {
   /// Creates the cubit around the playback service.
@@ -113,6 +116,28 @@ class PlaybackCubit extends Cubit<PlaybackState> {
   /// recitation's, so they must not rebuild the surah state.
   bool _externalAudioActive = false;
 
+  /// The single `emit` bridge for the part files.
+  ///
+  /// `Cubit.emit` is `@protected`, so an extension on this cubit cannot call
+  /// it; the class keeps the one legal call and the parts go through here.
+  void _emit(PlaybackState next) => emit(next);
+
+  /// Cancels every player subscription and forgets them.
+  ///
+  /// Lives in the class body (not the stream part) because the
+  /// `cancel_subscriptions` lint only pairs a field's creation with a cancel
+  /// it can see on the declaring class.
+  Future<void> _unbindStreams() async {
+    await _playingSub?.cancel();
+    await _positionSub?.cancel();
+    await _durationSub?.cancel();
+    await _completionSub?.cancel();
+    _playingSub = null;
+    _positionSub = null;
+    _durationSub = null;
+    _completionSub = null;
+  }
+
   /// Entity entry for the re-typed screens (ready states carry
   /// [ReciterInfo], never drift rows).
   ///
@@ -180,7 +205,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     _reciterName = reciterName;
     _rowId = rowId;
     _server = server;
-    emit(
+    _emit(
       PlaybackState.loading(
         reciterName: reciterName,
         surahNumber: surahNumber,
@@ -219,7 +244,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       await _applyTuning();
       if (isClosed || episode != _episode) return;
       if (state is! PlaybackLoading) return;
-      emit(
+      _emit(
         state.toPlaying(
           duration: _lastDuration,
           speedOverride: _speed,
@@ -237,7 +262,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
-      emit(
+      _emit(
         PlaybackState.failed(
           kind: _backgroundActive()
               ? PlaybackFailureKind.network
@@ -269,316 +294,17 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       if (isClosed || episode != _episode) return;
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
-      emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
+      _emit(const PlaybackState.failed(kind: PlaybackFailureKind.network));
       return;
     }
     if (isClosed || episode != _episode) return;
     if (reciter == null) {
       await _stopBestEffort();
       if (isClosed || episode != _episode) return;
-      emit(const PlaybackState.failed(kind: PlaybackFailureKind.noReciters));
+      _emit(const PlaybackState.failed(kind: PlaybackFailureKind.noReciters));
       return;
     }
     await playReciter(reciter, surahNumber, surahName: surahName);
-  }
-
-  /// Sets the playback speed, clamped to 0.75–2.0.
-  ///
-  /// A service without [TunablePlaybackService] still updates the state so
-  /// the control stays coherent; the production adapter implements it.
-  Future<void> setSpeed(double speed) async {
-    final safe = speed < 0.75 ? 0.75 : (speed > 2.0 ? 2.0 : speed);
-    if (safe == _speed) return;
-    _speed = safe;
-    if (_service case final TunablePlaybackService tunable) {
-      try {
-        await tunable.setSpeed(safe);
-      } on Object catch (error, stackTrace) {
-        appLog(
-          'speed change failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      }
-    }
-    _emitControls();
-  }
-
-  /// Advances to the next speed in [speeds].
-  Future<void> cycleSpeed() {
-    final index = speeds.indexOf(_speed);
-    final next = speeds[(index < 0 ? 0 : index + 1) % speeds.length];
-    return setSpeed(next);
-  }
-
-  /// Toggles between stopping at the end of the surah and repeating it.
-  Future<void> toggleRepeat() async {
-    _repeatMode = _repeatMode == PlaybackRepeatMode.one
-        ? PlaybackRepeatMode.off
-        : PlaybackRepeatMode.one;
-    if (_service case final TunablePlaybackService tunable) {
-      try {
-        await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
-      } on Object catch (error, stackTrace) {
-        appLog(
-          'repeat change failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      }
-    }
-    _emitControls();
-  }
-
-  /// Pauses the track after [duration]; a zero duration clears the timer.
-  Future<void> startSleepTimer(Duration duration) async {
-    _sleepTimer?.cancel();
-    _sleepTimer = null;
-    if (duration <= Duration.zero) {
-      _sleepTimerDuration = null;
-      _emitControls();
-      return;
-    }
-    _sleepTimerDuration = duration;
-    _sleepTimer = Timer(duration, () => unawaited(_sleepNow()));
-    _emitControls();
-  }
-
-  /// Clears the sleep timer without touching playback.
-  Future<void> cancelSleepTimer() => startSleepTimer(Duration.zero);
-
-  /// Plays the next surah of the current reciter when one exists.
-  Future<void> nextSurah() => _skipTo(1);
-
-  /// Plays the previous surah of the current reciter when one exists.
-  Future<void> previousSurah() => _skipTo(-1);
-
-  /// Whether the current track has a next surah in this reciter's list.
-  bool get hasNextSurah => _stepTarget(1) != null;
-
-  /// Whether the current track has a previous surah in this reciter's list.
-  bool get hasPreviousSurah => _stepTarget(-1) != null;
-
-  /// Applies the retained speed/loop preference to a freshly loaded source.
-  Future<void> _applyTuning() async {
-    if (_service case final TunablePlaybackService tunable) {
-      try {
-        await tunable.setSpeed(_speed);
-        await tunable.setLoopMode(_repeatMode == PlaybackRepeatMode.one);
-      } on Object catch (error, stackTrace) {
-        appLog(
-          'playback tuning failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      }
-    }
-  }
-
-  Future<void> _skipTo(int delta) async {
-    final target = _stepTarget(delta);
-    if (target == null || _rowId.isEmpty) return;
-    final name = await _resolveName(target);
-    if (isClosed) return;
-    await _start(_rowId, _reciterName, _server, target, name);
-  }
-
-  /// The surah [delta] steps away in the reciter's list, or null at an edge.
-  ///
-  /// A reciter that serves a subset must step within that subset (1, 3, 7 -
-  /// never the missing 2); an unknown/empty list falls back to 1..114.
-  int? _stepTarget(int delta) {
-    final state = this.state;
-    final current = switch (state) {
-      PlaybackPlaying(:final surahNumber) => surahNumber,
-      PlaybackPaused(:final surahNumber) => surahNumber,
-      PlaybackLoading(:final surahNumber) => surahNumber,
-      PlaybackFailed() => 0,
-    };
-    if (current <= 0) return null;
-    final queue = _surahNumbers;
-    final index = queue.indexOf(current);
-    if (index >= 0) {
-      final nextIndex = index + delta;
-      return nextIndex < 0 || nextIndex >= queue.length
-          ? null
-          : queue[nextIndex];
-    }
-    final next = current + delta;
-    if (next < kFirstSurahId || next > kSurahCount) return null;
-    return next;
-  }
-
-  /// The end-of-track policy: repeat the surah or stop.
-  Future<void> _onCompleted() async {
-    if (isClosed || _externalAudioActive) return;
-    final state = this.state;
-    final current = switch (state) {
-      PlaybackPlaying(:final surahNumber, :final surahName) => (
-        number: surahNumber,
-        name: surahName,
-      ),
-      PlaybackPaused(:final surahNumber, :final surahName) => (
-        number: surahNumber,
-        name: surahName,
-      ),
-      _ => null,
-    };
-    if (current == null || _rowId.isEmpty) {
-      await stopAndReset();
-      return;
-    }
-    if (_repeatMode == PlaybackRepeatMode.one) {
-      await _start(_rowId, _reciterName, _server, current.number, current.name);
-      return;
-    }
-    await stopAndReset();
-  }
-
-  Future<void> _sleepNow() async {
-    _sleepTimer = null;
-    _sleepTimerDuration = null;
-    if (isClosed) return;
-    final state = this.state;
-    if (state is PlaybackPlaying) {
-      try {
-        await _service.pause();
-      } on Object catch (error, stackTrace) {
-        // The timer still clears; the audio may keep playing and the user can
-        // pause it manually.
-        appLog(
-          'sleep timer pause failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      }
-      if (isClosed) return;
-      emit(state.toPaused(clearSleepTimer: true));
-    } else if (state is PlaybackPaused) {
-      emit(state.copyWith(sleepTimer: null));
-    }
-  }
-
-  ({double speed, PlaybackRepeatMode repeatMode, Duration? sleepTimer})
-  _controlsOf(PlaybackState state) => switch (state) {
-    PlaybackPlaying(:final speed, :final repeatMode, :final sleepTimer) => (
-      speed: speed,
-      repeatMode: repeatMode,
-      sleepTimer: sleepTimer,
-    ),
-    PlaybackPaused(:final speed, :final repeatMode, :final sleepTimer) => (
-      speed: speed,
-      repeatMode: repeatMode,
-      sleepTimer: sleepTimer,
-    ),
-    _ => (
-      speed: _speed,
-      repeatMode: _repeatMode,
-      sleepTimer: _sleepTimerDuration,
-    ),
-  };
-
-  void _emitControls() {
-    if (isClosed) return;
-    final state = this.state;
-    if (state is PlaybackPlaying) {
-      emit(
-        state.copyWith(
-          speed: _speed,
-          repeatMode: _repeatMode,
-          sleepTimer: _sleepTimerDuration,
-        ),
-      );
-    } else if (state is PlaybackPaused) {
-      emit(
-        state.copyWith(
-          speed: _speed,
-          repeatMode: _repeatMode,
-          sleepTimer: _sleepTimerDuration,
-        ),
-      );
-    }
-  }
-
-  /// Stops the audio before a failed attempt becomes visible.
-  ///
-  /// The failure strip must never sit above a track that is still audible;
-  /// a stop failure is logged and does not block the failure state.
-  Future<void> _stopBestEffort() async {
-    try {
-      await _service.stop();
-    } on Object catch (error, stackTrace) {
-      appLog(
-        'playback stop failed',
-        name: 'quran_yahdi/playback',
-        error: error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
-  /// Seeks inside the loaded track.
-  ///
-  /// A service without the [SeekablePlaybackService] capability (the plain
-  /// test seam) ignores the request; a seek failure is logged and keeps the
-  /// current state — the position stream remains the source of truth.
-  Future<void> seek(Duration to) async {
-    if (_service case final SeekablePlaybackService seekable) {
-      try {
-        await seekable.seek(to);
-      } on Object catch (error, stackTrace) {
-        appLog(
-          'seek failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-      }
-    }
-  }
-
-  /// Pauses a playing track, resumes a paused one; a no-op otherwise.
-  ///
-  /// A failed pause/resume keeps the current state: the audio is still
-  /// audible (pause) or still paused (resume).
-  Future<void> toggle() async {
-    final state = this.state;
-    final episode = _episode;
-    if (state is PlaybackPlaying) {
-      try {
-        await _service.pause();
-      } on Object catch (error, stackTrace) {
-        // Keep the playing state: the audio is still audible.
-        appLog(
-          'pause failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-        return;
-      }
-      if (isClosed || episode != _episode) return;
-      emit(state.toPaused());
-    } else if (state is PlaybackPaused) {
-      try {
-        await _service.resume();
-      } on Object catch (error, stackTrace) {
-        // Keep the paused state: resume did not take effect.
-        appLog(
-          'resume failed',
-          name: 'quran_yahdi/playback',
-          error: error,
-          stackTrace: stackTrace,
-        );
-        return;
-      }
-      if (isClosed || episode != _episode) return;
-      emit(state.toPlaying());
-    }
   }
 
   /// Stops the playback and returns to the idle (not-ready) state.
@@ -606,73 +332,7 @@ class PlaybackCubit extends Cubit<PlaybackState> {
     if (isClosed || episode != _episode) return;
     await _unbindStreams();
     if (isClosed) return;
-    emit(const PlaybackState.initial());
-  }
-
-  void _bindStreams() {
-    _playingSub ??= _service.playingStream().listen(
-      _onPlayingChanged,
-      onError: _onStreamError,
-    );
-    _positionSub ??= _service.positionStream().listen(
-      _onPositionChanged,
-      onError: _onStreamError,
-    );
-    _durationSub ??= _service.durationStream().listen(
-      _onDurationChanged,
-      onError: _onStreamError,
-    );
-    if (_service case final CompletingPlaybackService completing) {
-      _completionSub ??= completing.completionStream().listen(
-        (_) => unawaited(_onCompleted()),
-        onError: _onStreamError,
-      );
-    }
-  }
-
-  void _onStreamError(Object error, StackTrace stackTrace) {
-    appLog(
-      'playback stream error',
-      name: 'quran_yahdi/playback',
-      error: error,
-      stackTrace: stackTrace,
-    );
-  }
-
-  /// The adhan took over the shared player: clear the surah state without
-  /// stopping the player (the adhan already did) and drop the recitation
-  /// stream subscriptions so the adhan's events cannot be read as the surah's.
-  void _onAdhanState(AdhanPlaybackState adhan) {
-    if (isClosed) return;
-    if (adhan.isPlaying) {
-      if (_externalAudioActive) return;
-      _externalAudioActive = true;
-      _resetForExternalAudio();
-    } else if (_externalAudioActive) {
-      _externalAudioActive = false;
-    }
-  }
-
-  void _resetForExternalAudio() {
-    _sleepTimer?.cancel();
-    _sleepTimer = null;
-    _sleepTimerDuration = null;
-    _rowId = '';
-    _surahNumbers = const <int>[];
-    _episode++;
-    unawaited(_unbindStreams());
-    if (!isClosed) emit(const PlaybackState.initial());
-  }
-
-  Future<void> _unbindStreams() async {
-    await _playingSub?.cancel();
-    await _positionSub?.cancel();
-    await _durationSub?.cancel();
-    await _completionSub?.cancel();
-    _playingSub = null;
-    _positionSub = null;
-    _durationSub = null;
-    _completionSub = null;
+    _emit(const PlaybackState.initial());
   }
 
   /// Unbinds the player streams and disposes the service when it owns
@@ -694,61 +354,6 @@ class PlaybackCubit extends Cubit<PlaybackState> {
       }
     } finally {
       await super.close();
-    }
-  }
-
-  void _onPlayingChanged(bool playing) {
-    if (isClosed || _externalAudioActive) return;
-    final state = this.state;
-    if (playing && state is PlaybackLoading && state.reciterName != null) {
-      emit(
-        state.toPlaying(
-          duration: _lastDuration,
-          speedOverride: _speed,
-          repeatModeOverride: _repeatMode,
-          sleepTimerOverride: _sleepTimerDuration,
-        ),
-      );
-    } else if (playing && state is PlaybackPaused) {
-      final controls = _controlsOf(state);
-      emit(
-        state.toPlaying(
-          speedOverride: controls.speed,
-          repeatModeOverride: controls.repeatMode,
-          sleepTimerOverride: controls.sleepTimer,
-        ),
-      );
-    } else if (!playing && state is PlaybackPlaying) {
-      emit(state.toPaused());
-    }
-  }
-
-  void _onPositionChanged(Duration position) {
-    if (isClosed || _externalAudioActive) return;
-    final state = this.state;
-    final current = switch (state) {
-      PlaybackPlaying(position: final p) => p,
-      PlaybackPaused(position: final p) => p,
-      _ => null,
-    };
-    // The plugin stream is already capped at 1 Hz; this dedupe also protects
-    // the UI from a replayed tick at the same wall-clock second.
-    if (current != null && current.inSeconds == position.inSeconds) return;
-    if (state is PlaybackPlaying) {
-      emit(state.copyWith(position: position));
-    } else if (state is PlaybackPaused) {
-      emit(state.copyWith(position: position));
-    }
-  }
-
-  void _onDurationChanged(Duration? duration) {
-    if (isClosed || _externalAudioActive || duration == null) return;
-    _lastDuration = duration;
-    final state = this.state;
-    if (state is PlaybackPlaying) {
-      emit(state.copyWith(duration: duration));
-    } else if (state is PlaybackPaused) {
-      emit(state.copyWith(duration: duration));
     }
   }
 }

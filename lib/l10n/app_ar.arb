@@ -554,6 +554,7 @@
   "backupEncryptedConfirmPassphrase": "تأكيد عبارة المرور",
   "backupPassphraseMismatch": "عبارتا المرور غير متطابقتين",
   "backupPassphraseEmpty": "عبارة المرور مطلوبة",
+  "backupPassphraseTooShort": "عبارة المرور قصيرة جدًا — استخدم ٨ أحرف على الأقل",
   "backupImportPassphraseTitle": "هذه النسخة مشفّرة",
   "backupImportPassphraseBody": "أدخل عبارة مرور التشفير لفكّ النسخة واستعادتها.",
   "backupPassphraseCancel": "إلغاء",

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quran_yahdi/core/utils/app_log.dart';
 
+import '../data/backup_crypto.dart' show kBackupMinPassphraseLength;
 import '../data/backup_service.dart';
 import '../domain/backup_models.dart';
 import 'backup_platform.dart';
@@ -43,7 +44,7 @@ class BackupCubit extends Cubit<BackupState> {
       final json = await _service.exportJson();
       // On export the encoded JSON is measured before it is shared: the app
       // must never emit a file its own importer would reject.
-      if (_service.exceedsLimit(json)) {
+      if (await _service.exceedsLimit(json)) {
         throw const BackupTooLarge();
       }
       await _shareJson(json);
@@ -113,12 +114,12 @@ class BackupCubit extends Cubit<BackupState> {
   }
 
   /// Encodes the backup as AES-256-GCM behind [passphrase] and shares the
-  /// envelope. An empty passphrase fails fast to the export-failure state;
-  /// the UI enforces non-empty first.
+  /// envelope. An empty or too-short passphrase fails fast to the export-
+  /// failure state; the UI enforces both with a specific message first.
   Future<void> exportEncrypted(String passphrase) async {
     if (isClosed) return;
     if (!_canStart) return;
-    if (passphrase.isEmpty) {
+    if (passphrase.isEmpty || passphrase.length < kBackupMinPassphraseLength) {
       emit(const BackupState.failed(duringExport: true));
       return;
     }
@@ -127,7 +128,7 @@ class BackupCubit extends Cubit<BackupState> {
       final json = await _service.exportJson();
       final encrypted = await _service.encryptForExport(json, passphrase);
       // Never emit a file this app's own importer would reject.
-      if (_service.exceedsLimit(encrypted)) {
+      if (await _service.exceedsLimit(encrypted)) {
         throw const BackupTooLarge();
       }
       await _shareJson(encrypted);

@@ -1736,6 +1736,12 @@ abstract class AppLocalizations {
   /// **'عبارة المرور مطلوبة'**
   String get backupPassphraseEmpty;
 
+  /// No description provided for @backupPassphraseTooShort.
+  ///
+  /// In ar, this message translates to:
+  /// **'عبارة المرور قصيرة جدًا — استخدم ٨ أحرف على الأقل'**
+  String get backupPassphraseTooShort;
+
   /// No description provided for @backupImportPassphraseTitle.
   ///
   /// In ar, this message translates to:

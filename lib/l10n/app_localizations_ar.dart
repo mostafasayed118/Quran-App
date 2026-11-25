@@ -920,6 +920,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get backupPassphraseEmpty => 'عبارة المرور مطلوبة';
 
   @override
+  String get backupPassphraseTooShort =>
+      'عبارة المرور قصيرة جدًا — استخدم ٨ أحرف على الأقل';
+
+  @override
   String get backupImportPassphraseTitle => 'هذه النسخة مشفّرة';
 
   @override

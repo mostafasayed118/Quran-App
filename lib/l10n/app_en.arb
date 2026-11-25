@@ -533,6 +533,7 @@
   "backupEncryptedConfirmPassphrase": "Confirm passphrase",
   "backupPassphraseMismatch": "The two passphrases do not match",
   "backupPassphraseEmpty": "A passphrase is required",
+  "backupPassphraseTooShort": "The passphrase is too short — use at least 8 characters",
   "backupImportPassphraseTitle": "This backup is encrypted",
   "backupImportPassphraseBody": "Enter the encryption passphrase to unlock and restore it.",
   "backupPassphraseCancel": "Cancel",

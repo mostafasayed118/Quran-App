@@ -77,7 +77,11 @@ class BackupService {
       encryptBackupJsonInIsolate(json, passphrase);
 
   /// Whether [text] exceeds the import size cap.
-  bool exceedsLimit(String text) => exceedsBackupLimit(text);
+  ///
+  /// The byte count runs on a worker isolate: an export can reach the cap, and
+  /// encoding 2 MB on the UI isolate stalls the frame before the share sheet
+  /// opens.
+  Future<bool> exceedsLimit(String text) => exceedsBackupLimitAsync(text);
 
   /// The largest import file accepted.
   int get maxImportBytes => kBackupMaxBytes;

@@ -4,8 +4,11 @@ import '../../../core/domain/prayer_skin.dart';
 
 /// Stores the prayer-skin preference in the local settings table.
 ///
-/// A twin of `AppThemeRepository`: the two preferences have the same shape, and
-/// a generic would only be worth it when a third one appears.
+/// A thin typed wrapper over [SettingsStore] for the device-scoped
+/// `prayer_skin_mode` key — one of 22 per-feature wrappers that map a typed
+/// value onto a settings row. The preference is per device and is never
+/// exported by a backup. It mirrors `AppThemeRepository`'s shape; a generic
+/// would only be worth it when a third wrapper needs the same mapping.
 class PrayerSkinRepository implements PrayerSkinSource {
   /// Creates the repository over the app database.
   PrayerSkinRepository(this._db);
