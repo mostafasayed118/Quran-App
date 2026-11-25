@@ -31,11 +31,16 @@ class FeelingVerse {
     required this.surah,
     required this.ayah,
     required this.excerpt,
+    this.hasTadabbur = false,
   });
 
   final int surah;
   final int ayah;
   final String excerpt;
+
+  /// Whether Q45 shows the tadabbur section for this verse. A property of the
+  /// canonical catalog entry, never a second literal in a widget.
+  final bool hasTadabbur;
 
   String get reference => '$surah:$ayah';
 }
@@ -66,6 +71,7 @@ class FeelingsCatalog {
         surah: 13,
         ayah: 28,
         excerpt: 'أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ',
+        hasTadabbur: true,
       ),
       FeelingVerse(
         surah: 65,
@@ -205,9 +211,14 @@ class FeelingsCatalog {
     amal,
   ];
 
-  /// The fixed Q43 hero excerpt: the trailing part of Ar-Ra'd 28.
-  static const String heroExcerpt =
-      'أَلَا بِذِكْرِ ٱللَّهِ تَطْمَئِنُّ ٱلْقُلُوبُ';
+  /// The Q43 hero verse — Ar-Ra'd 28, the first verse of the qalaq entry.
+  /// Every hero label, excerpt and navigation target derives from this one
+  /// catalog entry; there is no second copy of the identity or the excerpt.
+  static FeelingVerse get heroVerse => qalaq.verses.first;
+
+  static String get heroReference => heroVerse.reference;
+
+  static String get heroExcerpt => heroVerse.excerpt;
 
   static Feeling? byKey(FeelingKey key) {
     for (final feeling in ordered) {

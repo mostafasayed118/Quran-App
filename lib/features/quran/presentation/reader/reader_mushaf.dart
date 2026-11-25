@@ -241,8 +241,9 @@ void _showFontSheet(
                     label: value.toStringAsFixed(1),
                     onChanged: (next) {
                       setSheetState(() => value = next);
-                      unawaited(cubit.setFontScale(next));
+                      unawaited(cubit.previewFontScale(next));
                     },
+                    onChangeEnd: (_) => unawaited(cubit.commitFontScale()),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
@@ -257,8 +258,9 @@ void _showFontSheet(
                     label: lineHeight.toStringAsFixed(1),
                     onChanged: (next) {
                       setSheetState(() => lineHeight = next);
-                      unawaited(cubit.setLineHeight(next));
+                      unawaited(cubit.previewLineHeight(next));
                     },
+                    onChangeEnd: (_) => unawaited(cubit.commitLineHeight()),
                   ),
                 ],
               ),

@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:quran_yahdi/core/domain/ayah_ref.dart';
+
 import '../data/feelings_repository.dart';
 import '../domain/feeling.dart';
 import '../domain/saved_feeling_verse.dart';
@@ -42,5 +44,9 @@ sealed class SavedVersesState with _$SavedVersesState {
   const factory SavedVersesState.loading() = SavedVersesLoading;
   const factory SavedVersesState.ready({
     required List<SavedFeelingVerse> verses,
+
+    /// Resolved surah:ayah labels, keyed by global ayah id. Missing ids are
+    /// absent, so the list still renders with the feeling-name fallback.
+    @Default(<int, AyahRef>{}) Map<int, AyahRef> refs,
   }) = SavedVersesReady;
 }

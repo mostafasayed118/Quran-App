@@ -1034,11 +1034,11 @@ return ready(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function( List<SavedFeelingVerse> verses)?  ready,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function( List<SavedFeelingVerse> verses,  Map<int, AyahRef> refs)?  ready,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SavedVersesLoading() when loading != null:
 return loading();case SavedVersesReady() when ready != null:
-return ready(_that.verses);case _:
+return ready(_that.verses,_that.refs);case _:
   return orElse();
 
 }
@@ -1056,11 +1056,11 @@ return ready(_that.verses);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function( List<SavedFeelingVerse> verses)  ready,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function( List<SavedFeelingVerse> verses,  Map<int, AyahRef> refs)  ready,}) {final _that = this;
 switch (_that) {
 case SavedVersesLoading():
 return loading();case SavedVersesReady():
-return ready(_that.verses);}
+return ready(_that.verses,_that.refs);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -1074,11 +1074,11 @@ return ready(_that.verses);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function( List<SavedFeelingVerse> verses)?  ready,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function( List<SavedFeelingVerse> verses,  Map<int, AyahRef> refs)?  ready,}) {final _that = this;
 switch (_that) {
 case SavedVersesLoading() when loading != null:
 return loading();case SavedVersesReady() when ready != null:
-return ready(_that.verses);case _:
+return ready(_that.verses,_that.refs);case _:
   return null;
 
 }
@@ -1122,7 +1122,7 @@ String toString() {
 
 
 class SavedVersesReady implements SavedVersesState {
-  const SavedVersesReady({required  List<SavedFeelingVerse> verses}): _verses = verses;
+  const SavedVersesReady({required  List<SavedFeelingVerse> verses,  Map<int, AyahRef> refs = const <int, AyahRef>{}}): _verses = verses,_refs = refs;
   
 
  final  List<SavedFeelingVerse> _verses;
@@ -1130,6 +1130,17 @@ class SavedVersesReady implements SavedVersesState {
   if (_verses is EqualUnmodifiableListView) return _verses;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_verses);
+}
+
+/// Resolved surah:ayah labels, keyed by global ayah id. Missing ids are
+/// absent, so the list still renders with the feeling-name fallback.
+ final  Map<int, AyahRef> _refs;
+/// Resolved surah:ayah labels, keyed by global ayah id. Missing ids are
+/// absent, so the list still renders with the feeling-name fallback.
+@JsonKey() Map<int, AyahRef> get refs {
+  if (_refs is EqualUnmodifiableMapView) return _refs;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(_refs);
 }
 
 
@@ -1143,18 +1154,18 @@ $SavedVersesReadyCopyWith<SavedVersesReady> get copyWith => _$SavedVersesReadyCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is SavedVersesReady&&const DeepCollectionEquality().equals(other.verses, _verses));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is SavedVersesReady&&const DeepCollectionEquality().equals(other.verses, _verses)&&const DeepCollectionEquality().equals(other.refs, _refs));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_verses));
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_verses),const DeepCollectionEquality().hash(_refs));
 }
 
 @override
 String toString() {
-    return 'SavedVersesState.ready(verses: $verses)';
+    return 'SavedVersesState.ready(verses: $verses, refs: $refs)';
 }
 
 
@@ -1165,7 +1176,7 @@ abstract mixin class $SavedVersesReadyCopyWith<$Res> implements $SavedVersesStat
   factory $SavedVersesReadyCopyWith(SavedVersesReady value, $Res Function(SavedVersesReady) _then) = _$SavedVersesReadyCopyWithImpl;
 @useResult
 $Res call({
- List<SavedFeelingVerse> verses
+ List<SavedFeelingVerse> verses, Map<int, AyahRef> refs
 });
 
 
@@ -1182,10 +1193,11 @@ class _$SavedVersesReadyCopyWithImpl<$Res>
 
 /// Create a copy of SavedVersesState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? verses = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? verses = null,Object? refs = null,}) {
   return _then(SavedVersesReady(
 verses: null == verses ? _self._verses : verses // ignore: cast_nullable_to_non_nullable
-as List<SavedFeelingVerse>,
+as List<SavedFeelingVerse>,refs: null == refs ? _self._refs : refs // ignore: cast_nullable_to_non_nullable
+as Map<int, AyahRef>,
   ));
 }
 

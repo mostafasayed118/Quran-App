@@ -18,7 +18,11 @@ List<RouteBase> _feelingsRoutes() => [
         state.uri.queryParameters[AppRouteQuery.feeling],
       );
       if (key == null) {
-        return const Scaffold(body: Center(child: Text('Invalid feeling')));
+        return Scaffold(
+          body: Center(
+            child: Text(AppLocalizations.of(context).feelingsInvalidParams),
+          ),
+        );
       }
       return RouteCubitScope<FeelingVersesCubit>(
         create: () => FeelingVersesCubit(getIt<FeelingsRepository>(), key),
@@ -36,7 +40,11 @@ List<RouteBase> _feelingsRoutes() => [
       final surah = int.tryParse(params[AppRouteQuery.surah] ?? '');
       final ayah = int.tryParse(params[AppRouteQuery.ayah] ?? '');
       if (key == null || surah == null || ayah == null) {
-        return const Scaffold(body: Center(child: Text('Invalid verse')));
+        return Scaffold(
+          body: Center(
+            child: Text(AppLocalizations.of(context).feelingsInvalidParams),
+          ),
+        );
       }
       return RouteCubitScope<VerseDetailCubit>(
         create: () => VerseDetailCubit(
@@ -59,6 +67,7 @@ List<RouteBase> _feelingsRoutes() => [
       create: () => SavedVersesCubit(
         getIt<FeelingsRepository>(),
         lookup: getIt<AyahLookup>(),
+        batch: getIt<AyahBatchLookup>(),
       ),
       identity: AppRoutes.feelingsSaved,
       start: (cubit) async {},

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:quran_yahdi/core/domain/ayah_ref.dart';
 import 'package:quran_yahdi/core/utils/arabic_date.dart';
 import 'package:quran_yahdi/core/widgets/app_content_frame.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
@@ -24,30 +23,23 @@ class SavedVersesScreen extends StatelessWidget {
             SavedVersesLoading() => const Center(
               child: CircularProgressIndicator(),
             ),
-            SavedVersesReady(:final verses) =>
+            SavedVersesReady(:final verses, :final refs) =>
               verses.isEmpty
                   ? Center(child: Text(loc.feelingsEmpty))
                   : ListView.builder(
                       itemCount: verses.length,
                       itemBuilder: (context, index) {
                         final row = verses[index];
+                        final name = _feelingName(loc, row.feeling.value);
+                        final ref = refs[row.ayahId];
+                        final label = ref == null
+                            ? name
+                            : '$name · ${ref.surahId}:${ref.numberInSurah}';
                         return ListTile(
-                          title: FutureBuilder<AyahRef?>(
-                            future: context.read<SavedVersesCubit>().ayahRef(
-                              row.ayahId,
-                            ),
-                            builder: (context, snap) {
-                              final ref = snap.data;
-                              final label = ref == null
-                                  ? _feelingName(loc, row.feeling.value)
-                                  : '${_feelingName(loc, row.feeling.value)}'
-                                        ' · ${ref.surahId}:${ref.numberInSurah}';
-                              return Text(
-                                label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              );
-                            },
+                          title: Text(
+                            label,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Text(formatArabicDate(row.createdAt)),
                           trailing: IconButton(

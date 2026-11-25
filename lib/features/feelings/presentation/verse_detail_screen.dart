@@ -68,7 +68,7 @@ class VerseDetailScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (verse.verse.surah == 13 && verse.verse.ayah == 28) ...[
+                if (verse.verse.hasTadabbur) ...[
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     loc.feelingsTadabburTitle,
