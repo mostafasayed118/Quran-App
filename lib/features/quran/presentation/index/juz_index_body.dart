@@ -45,11 +45,7 @@ class JuzIndexBody extends StatelessWidget {
               subtitle: Text(
                 '${entry.surahName} · ${loc.number(entry.firstPage)}',
               ),
-              trailing: Icon(
-                Directionality.of(context) == TextDirection.rtl
-                    ? Icons.chevron_left
-                    : Icons.chevron_right,
-              ),
+              trailing: const Icon(Icons.chevron_right),
               onTap: () => onSelect(entry),
             );
           },

@@ -179,12 +179,11 @@ void main() {
     expect(find.text('البقرة'), findsOneWidget);
   });
 
-  testWidgets('the surah-row chevron follows the ambient direction', (
-    tester,
-  ) async {
+  testWidgets('the surah-row chevron is the logical chevron_right in both '
+      'locales', (tester) async {
     await pumpIndex(tester);
-    expect(find.byIcon(Icons.chevron_left), findsNWidgets(2));
-    expect(find.byIcon(Icons.chevron_right), findsNothing);
+    expect(find.byIcon(Icons.chevron_right), findsNWidgets(2));
+    expect(find.byIcon(Icons.chevron_left), findsNothing);
 
     await pumpIndex(tester, locale: const Locale('en'));
     expect(find.byIcon(Icons.chevron_right), findsNWidgets(2));

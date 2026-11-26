@@ -117,11 +117,7 @@ class _SurahRow extends StatelessWidget {
         style: TextStyle(color: colors.onSurfaceVariant),
         textAlign: TextAlign.start,
       ),
-      trailing: Icon(
-        Directionality.of(context) == TextDirection.rtl
-            ? Icons.chevron_left
-            : Icons.chevron_right,
-      ),
+      trailing: const Icon(Icons.chevron_right),
     );
   }
 }

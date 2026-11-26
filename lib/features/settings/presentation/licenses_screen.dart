@@ -140,11 +140,7 @@ class _AssetTile extends StatelessWidget {
       leading: Icon(icon),
       title: Text(title, style: const TextStyle(fontSize: AppType.body)),
       subtitle: Text(action),
-      trailing: Icon(
-        Directionality.of(context) == TextDirection.rtl
-            ? Icons.chevron_left
-            : Icons.chevron_right,
-      ),
+      trailing: const Icon(Icons.chevron_right),
       onTap: () => _open(context, title, asset),
     );
   }

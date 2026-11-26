@@ -25,19 +25,18 @@ class PrayerMonthScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final cubit = context.read<PrayerMonthCubit>();
-    final direction = Directionality.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(loc.monthlyTimetable),
         actions: [
           IconButton(
             tooltip: loc.previousMonth,
-            icon: Icon(pagerChevronFor(direction, next: false)),
+            icon: Icon(pagerChevronFor(next: false)),
             onPressed: cubit.previousMonth,
           ),
           IconButton(
             tooltip: loc.nextMonth,
-            icon: Icon(pagerChevronFor(direction, next: true)),
+            icon: Icon(pagerChevronFor(next: true)),
             onPressed: cubit.nextMonth,
           ),
         ],

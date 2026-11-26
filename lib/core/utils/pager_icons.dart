@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// The chevron for a month pager, mirrored for the ambient direction.
+/// The chevron for a month pager, in its logical direction.
 ///
-/// Both pager screens use this so "next" means the same thing everywhere and
-/// flips with the locale instead of being hardcoded per screen.
-IconData pagerChevronFor(TextDirection direction, {required bool next}) {
-  final rtl = direction == TextDirection.rtl;
-  if (next) return rtl ? Icons.chevron_left : Icons.chevron_right;
-  return rtl ? Icons.chevron_right : Icons.chevron_left;
-}
+/// Flutter marks `chevron_left` / `chevron_right` with
+/// `matchTextDirection: true` and mirrors them itself in RTL, so "next" is
+/// always [Icons.chevron_right] and "previous" is always
+/// [Icons.chevron_left]. This helper never branches on the locale: branching
+/// here would cancel the framework's mirroring and invert the rendered
+/// direction.
+IconData pagerChevronFor({required bool next}) =>
+    next ? Icons.chevron_right : Icons.chevron_left;
