@@ -1,15 +1,13 @@
 part of 'home_screen.dart';
 
-/// Direction-aware disclosure chevron.
+/// Disclosure chevron; Flutter mirrors it in RTL.
 class _Chevron extends StatelessWidget {
   const _Chevron();
 
   @override
   Widget build(BuildContext context) {
     return Icon(
-      Directionality.of(context) == TextDirection.rtl
-          ? Icons.chevron_left
-          : Icons.chevron_right,
+      Icons.chevron_right,
       color: Theme.of(context).colorScheme.onSurfaceVariant,
     );
   }
@@ -359,9 +357,7 @@ class _ContinueRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final colors = Theme.of(context).colorScheme;
-    final chevron = Directionality.of(context) == TextDirection.rtl
-        ? Icons.chevron_left
-        : Icons.chevron_right;
+    const chevron = Icons.chevron_right;
     return Row(
       children: [
         const _IconBadge(icon: Icons.menu_book_rounded),

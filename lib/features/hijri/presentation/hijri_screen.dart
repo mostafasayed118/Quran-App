@@ -139,13 +139,12 @@ class _MonthNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final direction = Directionality.of(context);
     return Row(
       textDirection: TextDirection.rtl,
       children: [
         IconButton(
           tooltip: loc.nextMonth,
-          icon: Icon(pagerChevronFor(direction, next: true)),
+          icon: Icon(pagerChevronFor(next: true)),
           onPressed: () => context.read<HijriCubit>().next(),
         ),
         Expanded(
@@ -165,7 +164,7 @@ class _MonthNavBar extends StatelessWidget {
         ),
         IconButton(
           tooltip: loc.previousMonth,
-          icon: Icon(pagerChevronFor(direction, next: false)),
+          icon: Icon(pagerChevronFor(next: false)),
           onPressed: () => context.read<HijriCubit>().prev(),
         ),
       ],
