@@ -12,6 +12,7 @@ import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
 import '../domain/feeling.dart';
+import 'feeling_label.dart';
 import 'feelings_cubit.dart';
 import 'feelings_icons.dart';
 import 'feelings_state.dart';
@@ -58,7 +59,7 @@ class FeelingsScreen extends StatelessWidget {
                     for (final feeling in feelings)
                       _FeelingTile(
                         icon: feelingIcon(feeling.iconName),
-                        label: _feelingName(loc, feeling.key.value),
+                        label: feelingLabel(loc, feeling.key.value),
                         onTap: () =>
                             context.push(feelingsVersesPath(feeling.key.value)),
                       ),
@@ -80,17 +81,6 @@ class FeelingsScreen extends StatelessWidget {
     );
   }
 }
-
-String _feelingName(AppLocalizations loc, String key) => switch (key) {
-  'qalaq' => loc.feelingQalaq,
-  'huzn' => loc.feelingHuzn,
-  'wahda' => loc.feelingWahda,
-  'hayra' => loc.feelingHayra,
-  'khawf' => loc.feelingKhawf,
-  'ghadab' => loc.feelingGhadab,
-  'imtinam' => loc.feelingImtinam,
-  _ => loc.feelingAmal,
-};
 
 class _HeroCard extends StatelessWidget {
   const _HeroCard({required this.verse});

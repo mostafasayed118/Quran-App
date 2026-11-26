@@ -5,7 +5,7 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 class ThrowingCityRepository extends CityRepository {

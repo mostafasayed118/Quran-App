@@ -4,6 +4,7 @@ import 'package:quran_yahdi/core/domain/prayer_times.dart';
 import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/core/utils/date_only.dart';
 import 'package:quran_yahdi/core/utils/hour_minute.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 // Compat: existing importers of this file keep resolving the fallback times.
 export 'package:quran_yahdi/core/domain/reminders.dart'
@@ -343,10 +344,27 @@ bool shouldRequestBootPermission({
 
 /// Today at the 'H:mm' settings time when still ahead, else tomorrow at it;
 /// [fallback] covers unset or malformed values (azkar and wird share it).
+///
+/// The fire time is built in the same zone as [now] when it is a
+/// [tz.TZDateTime] (the city wall clock the scheduler passes): constructing a
+/// device-local `DateTime` from city components would fire at the device's
+/// wall clock instead, disagreeing with the prayer alarms whenever the two
+/// zones differ.
 DateTime _nextFireAt(DateTime now, String? hm, (int, int) fallback) {
   final time = parseHourMinute(hm) ?? fallback;
   final day = dateOnly(now);
-  final fireAt = DateTime(day.year, day.month, day.day, time.$1, time.$2);
+  final zone = now is tz.TZDateTime ? now.location : null;
+  DateTime at(int dayOffset) => zone == null
+      ? DateTime(day.year, day.month, day.day + dayOffset, time.$1, time.$2)
+      : tz.TZDateTime(
+          zone,
+          day.year,
+          day.month,
+          day.day + dayOffset,
+          time.$1,
+          time.$2,
+        );
+  final fireAt = at(0);
   if (fireAt.isAfter(now)) return fireAt;
-  return DateTime(day.year, day.month, day.day + 1, time.$1, time.$2);
+  return at(1);
 }

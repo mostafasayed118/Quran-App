@@ -6,21 +6,8 @@ import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_cubit.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 
+import 'support/azkar_fixtures.dart';
 import 'support/host.dart';
-
-Map<String, dynamic> fixtureRoot() => {
-  'collections': [
-    {
-      'id': 'c1',
-      'nameAr': 'أذكار الصباح',
-      'nameEn': 'Morning',
-      'items': [
-        {'text': 'ذِكْرٌ لَهُ ثَلَاثٌ', 'count': 3},
-        {'text': 'ذِكْرٌ وَاحِدٌ'},
-      ],
-    },
-  ],
-};
 
 void main() {
   testWidgets('browsing lists collections with item counts', (tester) async {

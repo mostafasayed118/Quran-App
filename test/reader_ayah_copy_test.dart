@@ -35,6 +35,10 @@ class _FakeUthmani implements UthmaniTextSource {
   Future<Map<int, String>> forSurah(int surahId) async => {
     for (var i = 1; i <= 12; i++) i: 'آيَةٌ $i',
   };
+
+  @override
+  Future<String?> forAyah(int surahId, int ayah) async =>
+      (await forSurah(surahId))[ayah];
 }
 
 /// Private-use codepoints are how the bundled Hafs font encodes glyphs; they

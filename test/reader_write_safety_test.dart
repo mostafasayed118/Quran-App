@@ -52,6 +52,10 @@ class _ThrowingAyahs implements AyahSource {
   Future<List<Ayah>> surahAyahs(int surahId) async => const [_first, _second];
 
   @override
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah) async =>
+      null;
+
+  @override
   Future<Surah?> surahById(int surahId) async => const Surah(
     id: 1,
     nameAr: 'الفاتحة',

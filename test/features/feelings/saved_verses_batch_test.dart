@@ -27,6 +27,10 @@ import '../../support/test_db.dart';
 class _EmptyUthmani implements UthmaniTextSource {
   @override
   Future<Map<int, String>> forSurah(int surahId) async => {};
+
+  @override
+  Future<String?> forAyah(int surahId, int ayah) async =>
+      (await forSurah(surahId))[ayah];
 }
 
 /// A repo whose saved-list stream is controlled by the test.
@@ -123,6 +127,7 @@ void main() {
       final lookup = _CountingLookup();
       final batch = _CountingBatch();
       final cubit = SavedVersesCubit(repo, lookup: lookup, batch: batch);
+      await cubit.start();
       addTearDown(cubit.close);
 
       // Deliberately unordered ayah ids, plus one id absent from the catalog.
@@ -161,6 +166,7 @@ void main() {
     final lookup = _CountingLookup();
     final batch = _CountingBatch();
     final cubit = SavedVersesCubit(repo, lookup: lookup, batch: batch);
+    await cubit.start();
     addTearDown(cubit.close);
 
     controller.add([_saved(1, 10)]);
@@ -184,6 +190,7 @@ void main() {
     final lookup = _CountingLookup();
     final batch = _CountingBatch();
     final cubit = SavedVersesCubit(repo, lookup: lookup, batch: batch);
+    await cubit.start();
     addTearDown(cubit.close);
 
     controller.add([_saved(1, 10), _saved(2, 999)]);

@@ -5,22 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 
-List<Map<String, dynamic>> fixtureRows() => [
-  {
-    'n': 1,
-    'nameAr': 'الرحمن',
-    'nameEn': 'Ar-Rahman',
-    'meaningAr': 'ذو الرحمة الواسعة',
-    'meaningEn': 'The Most Compassionate',
-  },
-  {
-    'n': 2,
-    'nameAr': 'الرحيم',
-    'nameEn': 'Ar-Raheem',
-    'meaningAr': 'النازل بالرحمة',
-    'meaningEn': 'The Most Merciful',
-  },
-];
+import 'support/asma_fixtures.dart';
 
 void main() {
   late AsmaRepository repo;

@@ -19,6 +19,10 @@ import '../../support/test_db.dart';
 class _StubUthmani implements UthmaniTextSource {
   @override
   Future<Map<int, String>> forSurah(int surahId) async => {};
+
+  @override
+  Future<String?> forAyah(int surahId, int ayah) async =>
+      (await forSurah(surahId))[ayah];
 }
 
 class _FakeRepo extends FeelingsRepository {

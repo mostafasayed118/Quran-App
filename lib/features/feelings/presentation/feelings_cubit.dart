@@ -24,7 +24,6 @@ class FeelingsCubit extends Cubit<FeelingsState> {
       emit(
         FeelingsState.ready(
           feelings: FeelingsCatalog.ordered,
-          heroExcerpt: FeelingsCatalog.heroExcerpt,
           savedCount: count,
         ),
       );

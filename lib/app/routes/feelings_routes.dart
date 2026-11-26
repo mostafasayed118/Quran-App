@@ -70,7 +70,7 @@ List<RouteBase> _feelingsRoutes() => [
         batch: getIt<AyahBatchLookup>(),
       ),
       identity: AppRoutes.feelingsSaved,
-      start: (cubit) async {},
+      start: (cubit) => cubit.start(),
       child: const SavedVersesScreen(),
     ),
   ),

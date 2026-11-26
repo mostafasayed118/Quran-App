@@ -6,7 +6,7 @@ import 'package:quran_yahdi/features/asma/data/asma_repository.dart';
 import 'package:quran_yahdi/features/asma/presentation/asma_cubit.dart';
 import 'package:quran_yahdi/features/asma/presentation/asma_screen.dart';
 
-import 'asma_repository_test.dart' show fixtureRows;
+import 'support/asma_fixtures.dart' show fixtureRows;
 
 import 'support/host.dart';
 

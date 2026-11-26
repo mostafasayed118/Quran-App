@@ -9,6 +9,7 @@ import 'package:quran_yahdi/core/widgets/error_pane.dart';
 import 'package:quran_yahdi/core/widgets/loading_and_error_views.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'feeling_label.dart';
 import 'feeling_verses_cubit.dart';
 import 'feelings_reference.dart';
 import 'feelings_state.dart';
@@ -34,7 +35,7 @@ class FeelingVersesScreen extends StatelessWidget {
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
                 Text(
-                  _name(loc, feeling.value),
+                  feelingLabel(loc, feeling.value),
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 Text(
@@ -91,14 +92,3 @@ class FeelingVersesScreen extends StatelessWidget {
     );
   }
 }
-
-String _name(AppLocalizations loc, String key) => switch (key) {
-  'qalaq' => loc.feelingQalaq,
-  'huzn' => loc.feelingHuzn,
-  'wahda' => loc.feelingWahda,
-  'hayra' => loc.feelingHayra,
-  'khawf' => loc.feelingKhawf,
-  'ghadab' => loc.feelingGhadab,
-  'imtinam' => loc.feelingImtinam,
-  _ => loc.feelingAmal,
-};

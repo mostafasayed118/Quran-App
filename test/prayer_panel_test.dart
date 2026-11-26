@@ -7,9 +7,9 @@ import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fakes.dart';
 import 'support/host.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 class _ThrowingPrayerService implements PrayerTimeService {

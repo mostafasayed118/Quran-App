@@ -27,12 +27,12 @@ Style: the owner is a **senior** Flutter engineer — tradeoffs not basics; comp
 
 ## 2) Project truth — verified 2026-10-18, amended 2026-10-28 (do not invent alternatives)
 
-**Toolchain:** Flutter 3.47.5 stable (CI-pinned) · Dart SDK constraint `^3.5.0` (`pubspec.yaml`) · Windows PowerShell 5.1 (no `&&`; use `;`).
+**Toolchain:** Flutter 3.47.5 stable (CI-pinned) · Dart SDK constraint `^3.13.0` (`pubspec.yaml`) · Windows PowerShell 5.1 (no `&&`; use `;`).
 **CI runs the SAME version** (`.github/workflows/ci.yml` → `flutter-version: 3.47.5`, pinned on purpose): the `dart format` gate is formatter-version-sensitive, so a floating `stable` made CI red on a green tree. Bumping the toolchain is a deliberate commit that changes this line and the workflow together.
 
 **Stack (as actually shipped):**
 - State: `flutter_bloc ^9.1.1` Cubits + **freezed** immutable states (`Equatable` is NOT used)
-- DI: `get_it` · Routing: `go_router ^18.1.0` · DB: `drift` · HTTP: `dio` (+ `http`)
+- DI: `get_it` · Routing: `go_router ^18.1.4` · DB: `drift` · HTTP: `dio` (+ `http`)
 - l10n: `flutter_localizations` + ARB (`lib/l10n/app_ar.arb` is the template; EN mirrored; generated files committed)
 - Domain packages: `just_audio` (+ `just_audio_background`), `flutter_local_notifications` + `timezone`, `geolocator`, `sensors_plus`, `adhan`, `hijri`, `app_links`, `share_plus`
 

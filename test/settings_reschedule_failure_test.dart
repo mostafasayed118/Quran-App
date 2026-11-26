@@ -6,8 +6,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService, fakeDay;
 import 'support/test_db.dart';
 
 /// The write succeeds, but the schedule cannot be rebuilt.

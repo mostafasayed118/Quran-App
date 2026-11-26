@@ -85,3 +85,29 @@ jobs:
           name: debug-signed-aab
           path: build/app/outputs/bundle/release/app-release.aab
           retention-days: 14
+
+  # The four integration_test journeys are DEVICE tests: `flutter test
+  # integration_test` needs an Android target, so they run on an emulator.
+  # Kept out of analyze-test on purpose: that job must stay fast and hermetic.
+  # Trigger is the workflow's (push to main + every pull_request).
+  integration-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          channel: stable
+          flutter-version: 3.47.5
+      - run: flutter pub get
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Run the integration journeys
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
+        with:
+          api-level: 34
+          arch: x86_64
+          disable-animations: true
+          script: flutter test integration_test/*_test.dart

@@ -13,10 +13,6 @@ import 'support/fake_prayer_time_service.dart';
 import 'support/fakes.dart';
 import 'support/test_db.dart';
 
-// The home suite is the historical entry point for this double; keep the
-// relative importers working while the definition lives in test/support.
-export 'support/fake_prayer_time_service.dart' show FakePrayerTimeService;
-
 void main() {
   late AppDatabase db;
   late LastReadRepository lastRead;

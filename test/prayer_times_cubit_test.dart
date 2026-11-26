@@ -6,29 +6,9 @@ import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 
-import 'support/fake_prayer_time_service.dart';
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart';
 import 'support/test_db.dart';
-
-// Historical entry point for the prayer-time double; see the home suite.
-export 'support/fake_prayer_time_service.dart' show FakePrayerTimeService;
-
-const dubaiCity = City(
-  id: 'dubai',
-  nameAr: 'دبي',
-  nameEn: 'Dubai',
-  lat: 25.2048,
-  lng: 55.2708,
-);
-
-List<PrayerChoice> fakeDay() => [
-  PrayerChoice(PrayerName.fajr, DateTime(2026, 3, 15, 4, 45)),
-  PrayerChoice(PrayerName.sunrise, DateTime(2026, 3, 15, 6, 10)),
-  PrayerChoice(PrayerName.dhuhr, DateTime(2026, 3, 15, 12, 5)),
-  PrayerChoice(PrayerName.asr, DateTime(2026, 3, 15, 15, 35)),
-  PrayerChoice(PrayerName.maghrib, DateTime(2026, 3, 15, 18, 5)),
-  PrayerChoice(PrayerName.isha, DateTime(2026, 3, 15, 19, 30)),
-];
 
 void main() {
   late AppDatabase db;

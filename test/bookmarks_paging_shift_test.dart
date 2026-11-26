@@ -74,6 +74,10 @@ class _FakeAyahSource implements AyahSource {
   Future<List<Ayah>> surahAyahs(int surahId) async => const [];
 
   @override
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah) async =>
+      null;
+
+  @override
   Future<void> toggleBookmark(int ayahId) async {}
 
   @override

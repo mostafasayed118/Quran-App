@@ -1751,3 +1751,10 @@ All ten are inventory membership / count lines; no behaviour assertion, no secti
 - **Audit:** the read-only five-dimension audit at `2aaba2f2` scored security 9.0, maintainability 7.2, clean architecture 8.5, code quality 8.3, performance 8.5 — weighted **8.33 / 10**. Its Top 5 findings were fixed on `fix/audit-top5-2026-11-25` in commit `a8c5b737` (batched saved-verse refs, localized invalid deep-link copy, one Q43 hero verse source, reader slider persistence committed on drag end).
 - **Converged verdict:** the audit was reviewed and **ACCEPT WITH CORRECTIONS** (Muse + ChatGPT + River GLM-5.3-Flash). The corrections are documentation-only: the trend 7.80 → 7.28 → 8.33 is indicative, not a measured improvement unless identical criteria, weights and scope were used; the maintainability 7.4 → 7.2 adjustment is a reviewer scoring decision, not a mathematically derived penalty; and the dimension scores are reviewed estimates, not independently verified measurements. The runners-up remain investigation candidates, not fix tasks.
 - This entry is documentation-only; no push / PR / merge / tag was made.
+
+### 2026-11-26 (Code Quality Audit round 2 — merges of the fix waves)
+
+- **Top 5 (round 1):** merged via **PR #78** as `bd2bb74102ee41559b71a04df6432af82d679943` (branch `fix/audit-top5-2026-11-25`, commit `a8c5b737`).
+- **Runners-up R1–R11 (round 1):** merged via **PR #79** as `c0fdfe7dcba2e340b6f4db332f890805988c5be8` (branch `fix/audit-runners-up-2026-11-25`, commits `224fd890`, `8613540f`, `6a329a06`).
+- **H1 (round 2, High):** the manual RTL chevron flip cancelled Flutter's own mirroring, inverting the rendered direction in Arabic; fixed by returning the logical chevron and relying on the framework. Merged via **PR #80** as `78a4325f72b63cec986565e5473b0cbefa84d096` (commit `40b5250a`, 10 files, +129/−50).
+- **Round-2 Mediums M1–M8:** fixed on `fix/audit-r2-mediums-2026-11-26` (local branch only — no push / PR / merge / tag).

@@ -8,10 +8,10 @@ import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_tim
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
-import 'prayer_times_ticker_test.dart' show dayOn;
 import 'support/fakes.dart';
 import 'support/host.dart';
+import 'support/prayer_fixtures.dart' show dayOn;
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 const _remainingOneThirtyFive = Duration(hours: 1, minutes: 35);

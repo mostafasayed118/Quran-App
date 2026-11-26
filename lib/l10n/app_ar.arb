@@ -1,4 +1,4 @@
-﻿{
+{
   "@@locale": "ar",
   "appName": "قرآن يَهدي",
   "splashTagline": "القرآن الكريم بين يديك",
@@ -909,7 +909,6 @@
   "feelingsTitle": "شعورك إيه دلوقتي؟",
   "feelingsSubtitle": "اختار شعورك، ونعرض لك آيات من القرآن تطمئن قلبك",
   "feelingsHomeTitle": "آيات لشعورك",
-  "feelingsHomeSubtitle": "آيات تطمئن قلبك حسب شعورك",
   "feelingsAyahOfDay": "آية اليوم",
   "feelingsReadAyah": "اقرأ الآية",
   "feelingsSectionTitle": "المشاعر والأحوال",
@@ -919,7 +918,6 @@
       "count": { "type": "int" }
     }
   },
-  "feelingsTwoVerses": "آيتان",
   "feelingsFooterNote": "الآيات من المصحف، اضغط على أي آية لقراءتها وتدبرها",
   "feelingsSavedButton": "آياتي المحفوظة",
   "feelingsSavedCount": "{count} آيات",
@@ -946,16 +944,12 @@
   "feelingsSaved": "محفوظة",
   "feelingsShare": "مشاركة",
   "feelingsListen": "استماع",
-  "feelingsStop": "إيقاف",
   "feelingsCopy": "نسخ",
   "feelingsCopied": "تم النسخ",
-  "feelingsAdded": "تمت الإضافة إلى الآيات المحفوظة",
-  "feelingsRemoved": "تمت إزالة الحفظ",
   "feelingsNextVerse": "الآية التالية",
   "feelingsTadabburScreenTitle": "تدبر الآية",
   "feelingsEmpty": "اضغط على أيقونة الحفظ في أي آية لتحفظها هنا",
   "feelingsDelete": "حذف",
-  "feelingsLoadFailed": "تعذر تحميل المحتوى. حاول مرة أخرى.",
   "feelingsInvalidParams": "البيانات المطلوبة غير صحيحة.",
   "feelingsRefLine": "سورة {surah}، الآية {ayah}",
   "@feelingsRefLine": {

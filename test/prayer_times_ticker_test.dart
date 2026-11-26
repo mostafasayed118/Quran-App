@@ -8,19 +8,10 @@ import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_tim
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_state.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fakes.dart';
 import 'support/host.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService, dayOn;
 import 'support/test_db.dart';
-
-List<PrayerChoice> dayOn(int y, int m, int d) => [
-  PrayerChoice(PrayerName.fajr, DateTime(y, m, d, 4, 45)),
-  PrayerChoice(PrayerName.sunrise, DateTime(y, m, d, 6, 10)),
-  PrayerChoice(PrayerName.dhuhr, DateTime(y, m, d, 12, 5)),
-  PrayerChoice(PrayerName.asr, DateTime(y, m, d, 15, 35)),
-  PrayerChoice(PrayerName.maghrib, DateTime(y, m, d, 18, 5)),
-  PrayerChoice(PrayerName.isha, DateTime(y, m, d, 19, 30)),
-];
 
 void main() {
   late AppDatabase db;

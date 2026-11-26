@@ -15,7 +15,21 @@ class SavedVersesCubit extends Cubit<SavedVersesState> {
   SavedVersesCubit(this._repo, {AyahLookup? lookup, AyahBatchLookup? batch})
     : _lookup = lookup,
       _batch = batch,
-      super(const SavedVersesState.loading()) {
+      super(const SavedVersesState.loading());
+
+  final FeelingsRepository _repo;
+  final AyahLookup? _lookup;
+  final AyahBatchLookup? _batch;
+  StreamSubscription<List<SavedFeelingVerse>>? _sub;
+  bool _started = false;
+
+  /// Starts the saved-list subscription once.
+  ///
+  /// Construction is side-effect free (the [RouteCubitScope] contract); the
+  /// scope calls this exactly once from `initState`.
+  Future<void> start() async {
+    if (_started || isClosed) return;
+    _started = true;
     _sub = _repo.watchSaved().listen(
       _onSaved,
       onError: (Object error, StackTrace stack) {
@@ -28,11 +42,6 @@ class SavedVersesCubit extends Cubit<SavedVersesState> {
       },
     );
   }
-
-  final FeelingsRepository _repo;
-  final AyahLookup? _lookup;
-  final AyahBatchLookup? _batch;
-  StreamSubscription<List<SavedFeelingVerse>>? _sub;
 
   /// Resolves the whole saved list in one batch read, then emits the labels
   /// with it. A rebuild no longer re-queries one ayah per visible row.

@@ -123,12 +123,12 @@ return ready(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function()?  failed,TResult Function( List<Feeling> feelings,  String heroExcerpt,  int savedCount)?  ready,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loading,TResult Function()?  failed,TResult Function( List<Feeling> feelings,  int savedCount)?  ready,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case FeelingsLoading() when loading != null:
 return loading();case FeelingsFailed() when failed != null:
 return failed();case FeelingsReady() when ready != null:
-return ready(_that.feelings,_that.heroExcerpt,_that.savedCount);case _:
+return ready(_that.feelings,_that.savedCount);case _:
   return orElse();
 
 }
@@ -146,12 +146,12 @@ return ready(_that.feelings,_that.heroExcerpt,_that.savedCount);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function()  failed,required TResult Function( List<Feeling> feelings,  String heroExcerpt,  int savedCount)  ready,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loading,required TResult Function()  failed,required TResult Function( List<Feeling> feelings,  int savedCount)  ready,}) {final _that = this;
 switch (_that) {
 case FeelingsLoading():
 return loading();case FeelingsFailed():
 return failed();case FeelingsReady():
-return ready(_that.feelings,_that.heroExcerpt,_that.savedCount);}
+return ready(_that.feelings,_that.savedCount);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -165,12 +165,12 @@ return ready(_that.feelings,_that.heroExcerpt,_that.savedCount);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function()?  failed,TResult? Function( List<Feeling> feelings,  String heroExcerpt,  int savedCount)?  ready,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loading,TResult? Function()?  failed,TResult? Function( List<Feeling> feelings,  int savedCount)?  ready,}) {final _that = this;
 switch (_that) {
 case FeelingsLoading() when loading != null:
 return loading();case FeelingsFailed() when failed != null:
 return failed();case FeelingsReady() when ready != null:
-return ready(_that.feelings,_that.heroExcerpt,_that.savedCount);case _:
+return ready(_that.feelings,_that.savedCount);case _:
   return null;
 
 }
@@ -246,7 +246,7 @@ String toString() {
 
 
 class FeelingsReady implements FeelingsState {
-  const FeelingsReady({required  List<Feeling> feelings, required this.heroExcerpt, required this.savedCount}): _feelings = feelings;
+  const FeelingsReady({required  List<Feeling> feelings, required this.savedCount}): _feelings = feelings;
   
 
  final  List<Feeling> _feelings;
@@ -256,7 +256,6 @@ class FeelingsReady implements FeelingsState {
   return EqualUnmodifiableListView(_feelings);
 }
 
- final  String heroExcerpt;
  final  int savedCount;
 
 /// Create a copy of FeelingsState
@@ -269,18 +268,18 @@ $FeelingsReadyCopyWith<FeelingsReady> get copyWith => _$FeelingsReadyCopyWithImp
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is FeelingsReady&&const DeepCollectionEquality().equals(other.feelings, _feelings)&&(identical(other.heroExcerpt, heroExcerpt) || other.heroExcerpt == heroExcerpt)&&(identical(other.savedCount, savedCount) || other.savedCount == savedCount));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is FeelingsReady&&const DeepCollectionEquality().equals(other.feelings, _feelings)&&(identical(other.savedCount, savedCount) || other.savedCount == savedCount));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_feelings),heroExcerpt,savedCount);
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_feelings),savedCount);
 }
 
 @override
 String toString() {
-    return 'FeelingsState.ready(feelings: $feelings, heroExcerpt: $heroExcerpt, savedCount: $savedCount)';
+    return 'FeelingsState.ready(feelings: $feelings, savedCount: $savedCount)';
 }
 
 
@@ -291,7 +290,7 @@ abstract mixin class $FeelingsReadyCopyWith<$Res> implements $FeelingsStateCopyW
   factory $FeelingsReadyCopyWith(FeelingsReady value, $Res Function(FeelingsReady) _then) = _$FeelingsReadyCopyWithImpl;
 @useResult
 $Res call({
- List<Feeling> feelings, String heroExcerpt, int savedCount
+ List<Feeling> feelings, int savedCount
 });
 
 
@@ -308,11 +307,10 @@ class _$FeelingsReadyCopyWithImpl<$Res>
 
 /// Create a copy of FeelingsState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? feelings = null,Object? heroExcerpt = null,Object? savedCount = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? feelings = null,Object? savedCount = null,}) {
   return _then(FeelingsReady(
 feelings: null == feelings ? _self._feelings : feelings // ignore: cast_nullable_to_non_nullable
-as List<Feeling>,heroExcerpt: null == heroExcerpt ? _self.heroExcerpt : heroExcerpt // ignore: cast_nullable_to_non_nullable
-as String,savedCount: null == savedCount ? _self.savedCount : savedCount // ignore: cast_nullable_to_non_nullable
+as List<Feeling>,savedCount: null == savedCount ? _self.savedCount : savedCount // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

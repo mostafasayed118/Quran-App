@@ -5,7 +5,7 @@ import 'package:quran_yahdi/features/azkar/data/azkar_repository.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_cubit.dart';
 import 'package:quran_yahdi/features/azkar/presentation/azkar_screen.dart';
 
-import 'azkar_screen_test.dart' show fixtureRoot;
+import 'support/azkar_fixtures.dart' show fixtureRoot;
 
 import 'support/host.dart';
 
