@@ -9,9 +9,9 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 
-import 'home_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fakes.dart';
 import 'support/host.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 void main() {

@@ -13,6 +13,9 @@ import 'package:quran_yahdi/core/utils/app_log.dart';
 abstract interface class UthmaniTextSource {
   /// Ayah number → Unicode Uthmani text for [surahId]. Empty when unavailable.
   Future<Map<int, String>> forSurah(int surahId);
+
+  /// The single ayah's Unicode text, or null when the surah/ayah is absent.
+  Future<String?> forAyah(int surahId, int ayah);
 }
 
 /// Loads the per-surah JSON assets, caching each surah after the first read.
@@ -21,6 +24,12 @@ class AssetUthmaniTextSource implements UthmaniTextSource {
 
   final AssetBundle _bundle;
   final Map<int, Map<int, String>> _cache = <int, Map<int, String>>{};
+
+  @override
+  Future<String?> forAyah(int surahId, int ayah) async {
+    final texts = await forSurah(surahId);
+    return texts[ayah];
+  }
 
   @override
   Future<Map<int, String>> forSurah(int surahId) async {

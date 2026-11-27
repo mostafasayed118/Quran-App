@@ -15,8 +15,8 @@ import 'package:quran_yahdi/features/quran/data/ayah_repository.dart';
 import 'package:quran_yahdi/features/quran/data/last_read_repository.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'home_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 Future<void> _pumpRounds(WidgetTester tester, {int rounds = 8}) async {

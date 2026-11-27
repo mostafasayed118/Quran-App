@@ -11,6 +11,9 @@ abstract class AyahSource implements AyahLookup {
   /// All ayahs of a surah, in reading order.
   Future<List<Ayah>> surahAyahs(int surahId);
 
+  /// One ayah by (surah id, ayah number); null when absent.
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah);
+
   @override
   Future<Surah?> surahById(int surahId);
 

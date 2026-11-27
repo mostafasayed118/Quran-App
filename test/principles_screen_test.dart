@@ -13,10 +13,10 @@ import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fake_reminder_scheduler.dart';
 import 'support/fakes.dart';
 import 'support/host.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 /// The owner-approved copy, verbatim: the page must render it unchanged.

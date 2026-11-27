@@ -4,8 +4,8 @@ import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_cubit.dart';
 import 'package:quran_yahdi/features/prayer/presentation/city_picker/city_picker_state.dart';
 
-import 'prayer_times_cubit_test.dart' show dubaiCity;
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart' show dubaiCity;
 import 'support/test_db.dart';
 
 class _FlakySelectRepo extends CityRepository {

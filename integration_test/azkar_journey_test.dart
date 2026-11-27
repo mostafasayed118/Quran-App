@@ -25,24 +25,36 @@ void main() {
       // Collections → «أذكار الصباح» → reciting list.
       await tester.tap(find.text(morningCollection));
 
-      // The first zikr's counter renders its remaining count in Arabic-Indic
-      // digits (first item count = 1 → «١»).
+      // The reciting list renders one Card per zikr. Wait for the list itself
+      // before pinning its first card: a `.first` finder handed to the wait
+      // loop throws `Bad state: No element` while no Card is onstage (the
+      // route/state transition after the collection tap).
+      final anyCounter = find.descendant(
+        of: find.byType(Card),
+        matching: find.text(firstCounter),
+      );
+      await waitFor(tester, anyCounter);
+
       final firstCard = find.byType(Card).first;
       final counterOne = find.descendant(
         of: firstCard,
         matching: find.text(firstCounter),
       );
-      await waitFor(tester, counterOne);
       expect(counterOne, findsOneWidget);
 
       // Tap the first counter target: the zikr completes (remaining 1 → 0)
       // and the counter display flips to the screen's done check.
       await tester.tap(counterOne);
+      final anyDone = find.descendant(
+        of: find.byType(Card),
+        matching: find.byIcon(Icons.check),
+      );
+      await waitFor(tester, anyDone);
+
       final doneCheck = find.descendant(
         of: firstCard,
         matching: find.byIcon(Icons.check),
       );
-      await waitFor(tester, doneCheck);
       expect(doneCheck, findsOneWidget);
     },
   );

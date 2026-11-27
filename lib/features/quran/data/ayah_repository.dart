@@ -33,6 +33,16 @@ class AyahRepository implements AyahSource, BookmarkPager, AyahBatchLookup {
   }
 
   @override
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah) {
+    final query = _db.select(_db.ayahs)
+      ..where(
+        (a) =>
+            a.surahId.equals(surahId) & a.numberInSurah.equals(numberInSurah),
+      );
+    return query.getSingleOrNull();
+  }
+
+  @override
   Future<Surah?> surahById(int surahId) => (_db.select(
     _db.surahs,
   )..where((s) => s.id.equals(surahId))).getSingleOrNull();

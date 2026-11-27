@@ -2798,12 +2798,6 @@ abstract class AppLocalizations {
   /// **'آيات لشعورك'**
   String get feelingsHomeTitle;
 
-  /// No description provided for @feelingsHomeSubtitle.
-  ///
-  /// In ar, this message translates to:
-  /// **'آيات تطمئن قلبك حسب شعورك'**
-  String get feelingsHomeSubtitle;
-
   /// No description provided for @feelingsAyahOfDay.
   ///
   /// In ar, this message translates to:
@@ -2827,12 +2821,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'{count} مشاعر'**
   String feelingsCount(int count);
-
-  /// No description provided for @feelingsTwoVerses.
-  ///
-  /// In ar, this message translates to:
-  /// **'آيتان'**
-  String get feelingsTwoVerses;
 
   /// No description provided for @feelingsFooterNote.
   ///
@@ -2960,12 +2948,6 @@ abstract class AppLocalizations {
   /// **'استماع'**
   String get feelingsListen;
 
-  /// No description provided for @feelingsStop.
-  ///
-  /// In ar, this message translates to:
-  /// **'إيقاف'**
-  String get feelingsStop;
-
   /// No description provided for @feelingsCopy.
   ///
   /// In ar, this message translates to:
@@ -2977,18 +2959,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'تم النسخ'**
   String get feelingsCopied;
-
-  /// No description provided for @feelingsAdded.
-  ///
-  /// In ar, this message translates to:
-  /// **'تمت الإضافة إلى الآيات المحفوظة'**
-  String get feelingsAdded;
-
-  /// No description provided for @feelingsRemoved.
-  ///
-  /// In ar, this message translates to:
-  /// **'تمت إزالة الحفظ'**
-  String get feelingsRemoved;
 
   /// No description provided for @feelingsNextVerse.
   ///
@@ -3013,12 +2983,6 @@ abstract class AppLocalizations {
   /// In ar, this message translates to:
   /// **'حذف'**
   String get feelingsDelete;
-
-  /// No description provided for @feelingsLoadFailed.
-  ///
-  /// In ar, this message translates to:
-  /// **'تعذر تحميل المحتوى. حاول مرة أخرى.'**
-  String get feelingsLoadFailed;
 
   /// No description provided for @feelingsInvalidParams.
   ///

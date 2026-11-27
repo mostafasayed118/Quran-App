@@ -6,8 +6,8 @@ import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
-import 'settings_mutation_serialization_test.dart' show NoCity, NoPrayer;
 import 'support/fake_reminder_scheduler.dart';
+import 'support/prayer_fixtures.dart' show NoCity, NoPrayer;
 
 /// Records every write so the tests can prove a rejected mutation never
 /// reached storage. [failLoad] drives the cubit's load to a failed state.

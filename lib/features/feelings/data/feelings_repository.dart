@@ -43,17 +43,16 @@ class FeelingsRepository {
   final AyahRepository _ayahs;
 
   Future<FeelingVerseView> load(FeelingKey feeling, FeelingVerse verse) async {
-    final texts = await _uthmani.forSurah(verse.surah);
+    final text = await _uthmani.forAyah(verse.surah, verse.ayah);
     final surah = await _ayahs.surahById(verse.surah);
-    final rows = await _ayahs.surahAyahs(verse.surah);
-    final row = rows.firstWhere(
-      (a) => a.numberInSurah == verse.ayah,
-      orElse: () => throw StateError('ayah ${verse.reference} not in database'),
-    );
+    final row = await _ayahs.ayahBySurahAndNumber(verse.surah, verse.ayah);
+    if (row == null) {
+      throw StateError('ayah ${verse.reference} not in database');
+    }
     return FeelingVerseView(
       feeling: feeling,
       verse: verse,
-      fullText: texts[verse.ayah] ?? '',
+      fullText: text ?? '',
       surahName: surah?.nameAr ?? '',
       surahNameEn: surah?.nameEn ?? '',
       juz: row.juz,
@@ -64,11 +63,10 @@ class FeelingsRepository {
   Future<List<FeelingVerseView>> forFeeling(FeelingKey key) async {
     final feeling = FeelingsCatalog.byKey(key);
     if (feeling == null) return const <FeelingVerseView>[];
-    final result = <FeelingVerseView>[];
-    for (final verse in feeling.verses) {
-      result.add(await load(key, verse));
-    }
-    return List.unmodifiable(result);
+    final views = await Future.wait([
+      for (final verse in feeling.verses) load(key, verse),
+    ]);
+    return List.unmodifiable(views);
   }
 
   Stream<List<SavedFeelingVerse>> watchSaved() => _db

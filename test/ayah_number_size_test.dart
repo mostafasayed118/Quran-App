@@ -33,6 +33,10 @@ class _FakeUthmani implements UthmaniTextSource {
   Future<Map<int, String>> forSurah(int surahId) async => {
     for (var i = 1; i <= 2; i++) i: 'آيَةٌ $i',
   };
+
+  @override
+  Future<String?> forAyah(int surahId, int ayah) async =>
+      (await forSurah(surahId))[ayah];
 }
 
 class _Settings implements ReaderSettingsSource {

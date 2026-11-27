@@ -1526,9 +1526,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get feelingsHomeTitle => 'آيات لشعورك';
 
   @override
-  String get feelingsHomeSubtitle => 'آيات تطمئن قلبك حسب شعورك';
-
-  @override
   String get feelingsAyahOfDay => 'آية اليوم';
 
   @override
@@ -1541,9 +1538,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String feelingsCount(int count) {
     return '$count مشاعر';
   }
-
-  @override
-  String get feelingsTwoVerses => 'آيتان';
 
   @override
   String get feelingsFooterNote =>
@@ -1613,19 +1607,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get feelingsListen => 'استماع';
 
   @override
-  String get feelingsStop => 'إيقاف';
-
-  @override
   String get feelingsCopy => 'نسخ';
 
   @override
   String get feelingsCopied => 'تم النسخ';
-
-  @override
-  String get feelingsAdded => 'تمت الإضافة إلى الآيات المحفوظة';
-
-  @override
-  String get feelingsRemoved => 'تمت إزالة الحفظ';
 
   @override
   String get feelingsNextVerse => 'الآية التالية';
@@ -1638,9 +1623,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get feelingsDelete => 'حذف';
-
-  @override
-  String get feelingsLoadFailed => 'تعذر تحميل المحتوى. حاول مرة أخرى.';
 
   @override
   String get feelingsInvalidParams => 'البيانات المطلوبة غير صحيحة.';

@@ -68,6 +68,10 @@ class _UnusedAyahs implements AyahSource {
   Future<List<Ayah>> surahAyahs(int surahId) => throw UnimplementedError();
 
   @override
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> toggleBookmark(int ayahId) => throw UnimplementedError();
 
   @override

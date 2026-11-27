@@ -191,7 +191,6 @@ class _SummaryHeader extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsetsDirectional.fromSTEB(14, 6, 6, 6),
         child: Row(
-          textDirection: TextDirection.rtl,
           children: [
             Icon(Icons.sd_storage_outlined, color: colors.primary),
             const SizedBox(width: AppSpacing.sm),
@@ -251,13 +250,11 @@ class _DownloadRow extends StatelessWidget {
         surahName,
         style: AppTheme.cardTitle,
         textAlign: TextAlign.right,
-        textDirection: TextDirection.rtl,
       ),
       subtitle: Text(
         subtitle,
         style: AppTheme.caption.copyWith(color: colors.onSurfaceVariant),
         textAlign: TextAlign.right,
-        textDirection: TextDirection.rtl,
       ),
       trailing: IconButton(
         tooltip: loc.libraryDelete,

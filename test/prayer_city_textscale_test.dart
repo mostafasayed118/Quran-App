@@ -12,8 +12,8 @@ import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_tim
 import 'package:quran_yahdi/features/prayer/presentation/prayer_times/prayer_times_screen.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService;
 import 'support/test_db.dart';
 
 void main() {

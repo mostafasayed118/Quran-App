@@ -14,7 +14,6 @@ sealed class FeelingsState with _$FeelingsState {
   const factory FeelingsState.failed() = FeelingsFailed;
   const factory FeelingsState.ready({
     required List<Feeling> feelings,
-    required String heroExcerpt,
     required int savedCount,
   }) = FeelingsReady;
 }

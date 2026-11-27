@@ -1538,9 +1538,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feelingsHomeTitle => 'Verses for your feeling';
 
   @override
-  String get feelingsHomeSubtitle => 'Verses that calm your heart, by feeling';
-
-  @override
   String get feelingsAyahOfDay => 'Verse of the day';
 
   @override
@@ -1553,9 +1550,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String feelingsCount(int count) {
     return '$count feelings';
   }
-
-  @override
-  String get feelingsTwoVerses => 'Two verses';
 
   @override
   String get feelingsFooterNote =>
@@ -1625,19 +1619,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feelingsListen => 'Listen';
 
   @override
-  String get feelingsStop => 'Stop';
-
-  @override
   String get feelingsCopy => 'Copy';
 
   @override
   String get feelingsCopied => 'Copied';
-
-  @override
-  String get feelingsAdded => 'Added to saved verses';
-
-  @override
-  String get feelingsRemoved => 'Removed from saved verses';
 
   @override
   String get feelingsNextVerse => 'Next verse';
@@ -1650,9 +1635,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get feelingsDelete => 'Delete';
-
-  @override
-  String get feelingsLoadFailed => 'Could not load content. Please try again.';
 
   @override
   String get feelingsInvalidParams => 'The required data is invalid.';

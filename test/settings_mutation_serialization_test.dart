@@ -8,6 +8,8 @@ import 'package:quran_yahdi/core/domain/reminders.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_state.dart';
 
+import 'support/prayer_fixtures.dart';
+
 class GatedSettings implements ReminderSettingsPort {
   final Completer<void> azkarGate = Completer<void>();
   int azkarWriteCalls = 0;
@@ -58,24 +60,6 @@ class GatedSettings implements ReminderSettingsPort {
     required PrayerTimesPort prayer,
     required ReminderSchedulerPort scheduler,
   }) async {}
-}
-
-class NoCity implements CitySource {
-  @override
-  Future<City?> selectedCity() async => null;
-
-  @override
-  Future<void> select(City city) async {}
-}
-
-class NoPrayer implements PrayerTimesPort {
-  @override
-  List<PrayerChoice> today(CityCoordinates c, DateTime dayLocal) =>
-      const <PrayerChoice>[];
-
-  @override
-  PrayerChoice nextPrayer(CityCoordinates c, DateTime whenLocal) =>
-      PrayerChoice(PrayerName.fajr, whenLocal);
 }
 
 class NoScheduler implements ReminderSchedulerPort {

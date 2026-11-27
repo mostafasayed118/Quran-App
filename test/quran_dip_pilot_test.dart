@@ -21,6 +21,16 @@ class _InMemoryAyahSource implements AyahSource {
       rows.where((a) => a.surahId == surahId).toList();
 
   @override
+  Future<Ayah?> ayahBySurahAndNumber(int surahId, int numberInSurah) async {
+    for (final row in rows) {
+      if (row.surahId == surahId && row.numberInSurah == numberInSurah) {
+        return row;
+      }
+    }
+    return null;
+  }
+
+  @override
   Future<Surah?> surahById(int surahId) async =>
       surahId == surah.id ? surah : null;
 

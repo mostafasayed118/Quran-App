@@ -5,6 +5,7 @@ import 'package:quran_yahdi/core/utils/arabic_date.dart';
 import 'package:quran_yahdi/core/widgets/app_content_frame.dart';
 import 'package:quran_yahdi/l10n/app_localizations.dart';
 
+import 'feeling_label.dart';
 import 'feelings_state.dart';
 import 'saved_verses_cubit.dart';
 
@@ -30,7 +31,7 @@ class SavedVersesScreen extends StatelessWidget {
                       itemCount: verses.length,
                       itemBuilder: (context, index) {
                         final row = verses[index];
-                        final name = _feelingName(loc, row.feeling.value);
+                        final name = feelingLabel(loc, row.feeling.value);
                         final ref = refs[row.ayahId];
                         final label = ref == null
                             ? name
@@ -57,14 +58,3 @@ class SavedVersesScreen extends StatelessWidget {
     );
   }
 }
-
-String _feelingName(AppLocalizations loc, String key) => switch (key) {
-  'qalaq' => loc.feelingQalaq,
-  'huzn' => loc.feelingHuzn,
-  'wahda' => loc.feelingWahda,
-  'hayra' => loc.feelingHayra,
-  'khawf' => loc.feelingKhawf,
-  'ghadab' => loc.feelingGhadab,
-  'imtinam' => loc.feelingImtinam,
-  _ => loc.feelingAmal,
-};

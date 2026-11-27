@@ -6,10 +6,10 @@ import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/settings/presentation/settings_cubit.dart';
 
-import '../prayer_times_cubit_test.dart' show FakePrayerTimeService;
 import 'fake_reminder_scheduler.dart';
 import 'fakes.dart';
 import 'host.dart';
+import 'prayer_fixtures.dart' show FakePrayerTimeService;
 
 /// Pumps the settings screen with a started [SettingsCubit] over [db].
 ///

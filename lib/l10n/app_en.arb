@@ -885,7 +885,6 @@
   "feelingsTitle": "How are you feeling?",
   "feelingsSubtitle": "Pick a feeling and we will show you verses that calm your heart",
   "feelingsHomeTitle": "Verses for your feeling",
-  "feelingsHomeSubtitle": "Verses that calm your heart, by feeling",
   "feelingsAyahOfDay": "Verse of the day",
   "feelingsReadAyah": "Read verse",
   "feelingsSectionTitle": "Feelings and states",
@@ -895,7 +894,6 @@
       "count": { "type": "int" }
     }
   },
-  "feelingsTwoVerses": "Two verses",
   "feelingsFooterNote": "Verses are from the Quran. Tap any verse to read and reflect",
   "feelingsSavedButton": "My saved verses",
   "feelingsSavedCount": "{count} verses",
@@ -922,16 +920,12 @@
   "feelingsSaved": "Saved",
   "feelingsShare": "Share",
   "feelingsListen": "Listen",
-  "feelingsStop": "Stop",
   "feelingsCopy": "Copy",
   "feelingsCopied": "Copied",
-  "feelingsAdded": "Added to saved verses",
-  "feelingsRemoved": "Removed from saved verses",
   "feelingsNextVerse": "Next verse",
   "feelingsTadabburScreenTitle": "Verse reflection",
   "feelingsEmpty": "Tap the save icon on any verse to keep it here",
   "feelingsDelete": "Delete",
-  "feelingsLoadFailed": "Could not load content. Please try again.",
   "feelingsInvalidParams": "The required data is invalid.",
   "feelingsRefLine": "Surah {surah}, Ayah {ayah}",
   "@feelingsRefLine": {

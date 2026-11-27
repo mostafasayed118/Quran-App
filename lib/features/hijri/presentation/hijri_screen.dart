@@ -92,7 +92,6 @@ class _OffsetCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
         child: Row(
-          textDirection: TextDirection.rtl,
           children: [
             IconButton(
               tooltip: loc.hijriOffsetMinus,
@@ -140,7 +139,6 @@ class _MonthNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Row(
-      textDirection: TextDirection.rtl,
       children: [
         IconButton(
           tooltip: loc.nextMonth,

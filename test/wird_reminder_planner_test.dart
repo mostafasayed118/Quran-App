@@ -8,8 +8,8 @@ import 'package:quran_yahdi/features/notifications/data/reminder_settings.dart';
 import 'package:quran_yahdi/features/prayer/data/city_repository.dart';
 import 'package:quran_yahdi/features/prayer/data/prayer_time_service.dart';
 
-import 'prayer_times_cubit_test.dart' show FakePrayerTimeService, fakeDay;
 import 'support/fakes.dart';
+import 'support/prayer_fixtures.dart' show FakePrayerTimeService, fakeDay;
 
 class _CapturingScheduler implements ReminderSchedulerPort {
   final plans = <List<ScheduledReminder>>[];
