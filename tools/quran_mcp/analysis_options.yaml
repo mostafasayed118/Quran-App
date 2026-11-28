@@ -1,0 +1,22 @@
+# Standalone Dart package (no Flutter deps), so it cannot include
+# package:flutter_lints/flutter.yaml the way the app root does.
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+
+linter:
+  rules:
+    prefer_final_locals: true
+    avoid_print: true
+    always_declare_return_types: true
+    avoid_dynamic_calls: true
+    type_annotate_public_apis: true
+    unawaited_futures: true
+    prefer_final_fields: true
+    directives_ordering: true
+    depend_on_referenced_packages: true
+    implementation_imports: true
+    file_names: true

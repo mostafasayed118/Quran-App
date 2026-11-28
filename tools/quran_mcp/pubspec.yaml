@@ -1,0 +1,14 @@
+name: quran_mcp
+description: Experimental MCP server exposing the Quran Yahdi assets to agents.
+publish_to: none
+version: 0.2.0
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  dart_mcp: ^0.5.2
+  sqlite3: ^3.9.2
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.32.0
